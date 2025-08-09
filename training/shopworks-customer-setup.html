@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopworks Customer Setup Training - Northwest Custom Apparel</title>
+<link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        color: #333;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Navigation Header */
+    .nav-header {
+        background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+
+    .back-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateX(-2px);
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-title i {
+        font-size: 1.25rem;
+        opacity: 0.9;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-container {
+        height: 35px;
+        opacity: 0.95;
+    }
+
+    .logo-container img {
+        height: 100%;
+        width: auto;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: white;
+        padding: 0.75rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .breadcrumb-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb a {
+        color: #981e32;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover {
+        color: #b82940;
+        text-decoration: underline;
+    }
+
+    .breadcrumb span {
+        color: #6b7280;
+    }
+
+    /* Main Container */
+    .container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    /* Mode Selection */
+    .mode-selection {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .mode-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .mode-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        border-color: #981e32;
+    }
+
+    .mode-card.active {
+        background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+        color: white;
+        transform: scale(1.02);
+    }
+
+    .mode-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: block;
+        text-align: center;
+    }
+
+    .mode-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .mode-description {
+        font-size: 0.875rem;
+        text-align: center;
+        opacity: 0.9;
+    }
+
+    /* Game Area */
+    .game-area {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        min-height: 500px;
+        display: none;
+    }
+
+    .game-area.active {
+        display: block;
+        animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Shopworks Mock Interface */
+    .shopworks-interface {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .field-section {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .field-group {
+        position: relative;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .field-label.required::after {
+        content: ' *';
+        color: #dc3545;
+    }
+
+    .field-input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .field-input:focus {
+        outline: none;
+        border-color: #981e32;
+        box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+    }
+
+    .field-input.correct {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+
+    .field-input.incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+    }
+
+    .field-hint {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        font-size: 0.75rem;
+        color: #6c757d;
+        display: none;
+    }
+
+    .field-group:hover .field-hint {
+        display: block;
+    }
+
+    /* Field Explorer Mode */
+    .field-explorer {
+        display: none;
+    }
+
+    .field-explorer.active {
+        display: block;
+    }
+
+    .field-info {
+        background: #e7f3ff;
+        border: 2px solid #0066cc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .field-info.active {
+        display: block;
+        animation: slideDown 0.3s;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; max-height: 0; }
+        to { opacity: 1; max-height: 500px; }
+    }
+
+    .field-info h4 {
+        color: #0066cc;
+        margin-bottom: 0.5rem;
+    }
+
+    .field-info ul {
+        margin-left: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .field-clickable {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .field-clickable:hover {
+        background: #fff3cd;
+        transform: scale(1.02);
+    }
+
+    /* Score and Progress */
+    .score-panel {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .score-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .score-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(152, 30, 50, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
+    }
+
+    /* Scenario Cards */
+    .scenario-card {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .scenario-header {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 1rem;
+    }
+
+    .scenario-details {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .scenario-details p {
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .scenario-details strong {
+        min-width: 150px;
+        color: #495057;
+    }
+
+    /* Feedback Messages */
+    .feedback-message {
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        display: none;
+    }
+
+    .feedback-message.active {
+        display: block;
+        animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .feedback-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .feedback-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .feedback-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+    }
+
+    /* Speed Challenge */
+    .timer-display {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        color: #981e32;
+        margin: 1rem 0;
+    }
+
+    .challenge-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .stat-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #343a40;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
+        .mode-selection {
+            grid-template-columns: 1fr;
+        }
+        
+        .field-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .score-panel {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .challenge-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Completion Modal */
+    .completion-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .completion-modal.active {
+        display: flex;
+        animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+
+    .modal-stats {
+        margin: 1.5rem 0;
+    }
+
+    .modal-stat {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        margin: 0.5rem 0;
+        border-radius: 6px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation Header -->
+<nav class="nav-header">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="/staff-dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <div class="page-title">
+                <i class="fas fa-user-plus"></i>
+                <span>Shopworks Customer Setup Training</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="logo-container">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel">
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+    <div class="breadcrumb-container">
+        <a href="/staff-dashboard.html">Staff Dashboard</a>
+        <span>/</span>
+        <a href="#">Training Games</a>
+        <span>/</span>
+        <span>Customer Setup Game</span>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <!-- Mode Selection -->
+    <div class="mode-selection" id="modeSelection">
+        <div class="mode-card" onclick="startMode('explorer')">
+            <i class="mode-icon fas fa-search"></i>
+            <div class="mode-title">Field Explorer</div>
+            <div class="mode-description">Learn what each field does and why it's important</div>
+        </div>
+        
+        <div class="mode-card" onclick="startMode('simulator')">
+            <i class="mode-icon fas fa-user-edit"></i>
+            <div class="mode-title">Setup Simulator</div>
+            <div class="mode-description">Practice setting up different types of customers</div>
+        </div>
+        
+        <div class="mode-card" onclick="startMode('detective')">
+            <i class="mode-icon fas fa-search-plus"></i>
+            <div class="mode-title">Field Detective</div>
+            <div class="mode-description">Find and fix errors in customer records</div>
+        </div>
+        
+        <div class="mode-card" onclick="startMode('speed')">
+            <i class="mode-icon fas fa-tachometer-alt"></i>
+            <div class="mode-title">Speed Challenge</div>
+            <div class="mode-description">Race to set up customers correctly</div>
+        </div>
+    </div>
+
+    <!-- Field Explorer Mode -->
+    <div class="game-area" id="explorerMode">
+        <h2 style="margin-bottom: 1.5rem; color: #343a40;">
+            <i class="fas fa-search"></i> Field Explorer - Click any field to learn about it
+        </h2>
+        
+        <div class="shopworks-interface">
+            <!-- Company Information Section -->
+            <div class="field-section">
+                <div class="section-title">
+                    <i class="fas fa-building"></i> Company Information
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Company Number</label>
+                        <input type="text" class="field-input field-clickable" value="13216" readonly 
+                               onclick="showFieldInfo('companyNumber')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label required">Company Name</label>
+                        <input type="text" class="field-input field-clickable" placeholder="Enter company name"
+                               onclick="showFieldInfo('companyName')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Website</label>
+                        <input type="text" class="field-input field-clickable" placeholder="www.example.com"
+                               onclick="showFieldInfo('website')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Main Email</label>
+                        <input type="email" class="field-input field-clickable" placeholder="info@company.com"
+                               onclick="showFieldInfo('mainEmail')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Details Section -->
+            <div class="field-section">
+                <div class="section-title">
+                    <i class="fas fa-user"></i> Contact Details
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label required">First Name</label>
+                        <input type="text" class="field-input field-clickable" placeholder="First name"
+                               onclick="showFieldInfo('firstName')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label required">Last Name</label>
+                        <input type="text" class="field-input field-clickable" placeholder="Last name"
+                               onclick="showFieldInfo('lastName')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Title</label>
+                        <select class="field-input field-clickable" onclick="showFieldInfo('title')">
+                            <option>Select Title</option>
+                            <option>Owner</option>
+                            <option>Manager</option>
+                            <option>AP</option>
+                            <option>Purchasing</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Department</label>
+                        <input type="text" class="field-input field-clickable" placeholder="Department"
+                               onclick="showFieldInfo('department')">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label required">Primary Phone</label>
+                        <input type="tel" class="field-input field-clickable" placeholder="XXX-XXX-XXXX"
+                               onclick="showFieldInfo('primaryPhone')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Primary Fax</label>
+                        <input type="tel" class="field-input field-clickable" placeholder="XXX-XXX-XXXX"
+                               onclick="showFieldInfo('primaryFax')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label required">Primary Email</label>
+                        <input type="email" class="field-input field-clickable" placeholder="contact@email.com"
+                               onclick="showFieldInfo('primaryEmail')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="field-section">
+                <div class="section-title">
+                    <i class="fas fa-id-card"></i> Profile Settings
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label required">Salesperson</label>
+                        <select class="field-input field-clickable" onclick="showFieldInfo('salesperson')">
+                            <option>Select Salesperson</option>
+                            <option>Nika Lao</option>
+                            <option>Adriyella Trujillo</option>
+                            <option>Taneisha Clark</option>
+                            <option>Erik Mickelson</option>
+                            <option>Jim Mickelson</option>
+                            <option>Ruthie Nhong</option>
+                            <option>House</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label required">Type</label>
+                        <select class="field-input field-clickable" onclick="showFieldInfo('customerType')">
+                            <option>Select Type</option>
+                            <option>Corporate</option>
+                            <option>Contract</option>
+                            <option>Construction</option>
+                            <option>Medical</option>
+                            <option>School</option>
+                            <option>Emblem</option>
+                            <option>Fire/Police</option>
+                            <option>Retail</option>
+                            <option>Food Service</option>
+                            <option>Military</option>
+                            <option>Events</option>
+                            <option>AMC</option>
+                            <option>Dead</option>
+                            <option>Alaska</option>
+                            <option>Charter</option>
+                            <option>Landscaper</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label required">Source</label>
+                        <select class="field-input field-clickable" onclick="showFieldInfo('source')">
+                            <option>Select Source</option>
+                            <option>Google Search</option>
+                            <option>Walk In</option>
+                            <option>Old Customer</option>
+                            <option>Referral</option>
+                            <option>Drive By</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label"># Of Employees (Not Used)</label>
+                        <input type="number" class="field-input field-clickable" placeholder="Not used - leave blank"
+                               onclick="showFieldInfo('numEmployees')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Tax Section -->
+            <div class="field-section">
+                <div class="section-title">
+                    <i class="fas fa-receipt"></i> Sales Tax Settings
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Tax Account #</label>
+                        <input type="text" class="field-input field-clickable" placeholder="Tax account number"
+                               onclick="showFieldInfo('taxAccount')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Tax Exempt #</label>
+                        <input type="text" class="field-input field-clickable" placeholder="If tax exempt"
+                               onclick="showFieldInfo('taxExempt')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Expiration Date</label>
+                        <input type="date" class="field-input field-clickable"
+                               onclick="showFieldInfo('expirationDate')">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Tax Settings</label>
+                        <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;"
+                                   onclick="showFieldInfo('payTax')">
+                                <input type="checkbox" checked> Pay Sales Tax?
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;"
+                                   onclick="showFieldInfo('shippingTax')">
+                                <input type="checkbox" checked> Shipping Taxable
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Information Display -->
+        <div id="fieldInfoDisplay" class="field-info">
+            <!-- Field information will be dynamically inserted here -->
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <button class="btn btn-success" onclick="showTaxDecisionHelper()" style="margin-right: 1rem;">
+                <i class="fas fa-question-circle"></i> Tax Code Decision Helper
+            </button>
+            <button class="btn btn-primary" onclick="backToModes()">
+                <i class="fas fa-arrow-left"></i> Back to Mode Selection
+            </button>
+        </div>
+        
+        <!-- Tax Decision Helper Modal -->
+        <div id="taxDecisionHelper" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                                           background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+                                           z-index: 1000; max-width: 700px; max-height: 80vh; overflow-y: auto;">
+            <button onclick="closeTaxHelper()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; 
+                                                      font-size: 1.5rem; cursor: pointer; color: #6c757d;">&times;</button>
+            <h3 style="color: #981e32; margin-bottom: 1.5rem;">
+                <i class="fas fa-route"></i> Tax Code Decision Helper
+            </h3>
+            
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem;">Quick Decision Flow:</h4>
+                
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border-left: 4px solid #dc3545; border-radius: 4px;">
+                    <strong>Question 1: Is the customer in Washington State?</strong>
+                    <div style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <div>✅ YES → Go to Question 2</div>
+                        <div>❌ NO → Use <strong style="color: #0066cc;">2202 (Out of State)</strong> - Must ship via UPS/FedEx/USPS</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border-left: 4px solid #28a745; border-radius: 4px;">
+                    <strong>Question 2: Does the customer have a WA Reseller Permit?</strong>
+                    <div style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <div>✅ YES → Use <strong style="color: #28a745;">2203 (Wholesale)</strong> - Need permit # and physical copy</div>
+                        <div>❌ NO → Use <strong style="color: #dc3545;">2200 (WA Sales Tax)</strong> - This is 95% of customers</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <strong>⚠️ Important Notes:</strong>
+                    <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                        <li>Non-profits and government in WA use <strong>2200</strong> (not 2203)</li>
+                        <li>Out-of-state resellers still need WA permit for <strong>2203</strong></li>
+                        <li>Customer pickup = cannot use <strong>2202</strong> (must ship)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 1.5rem; border-radius: 8px;">
+                <h4 style="margin-bottom: 1rem;">Common Mistakes to Avoid:</h4>
+                <ol style="margin: 0; padding-left: 1.5rem;">
+                    <li><strong>Not getting physical signed reseller permit</strong> - Must be in accounting office</li>
+                    <li><strong>Not checking expiration dates</strong> - Permits valid for 4 years</li>
+                    <li><strong>Wrong code for out-of-state</strong> - Must verify shipping via carrier</li>
+                    <li><strong>Defaulting to 2200 without checking</strong> - Always verify customer type</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Overlay for modal -->
+        <div id="taxHelperOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                          background: rgba(0,0,0,0.5); z-index: 999;" onclick="closeTaxHelper()"></div>
+    </div>
+
+    <!-- Setup Simulator Mode -->
+    <div class="game-area" id="simulatorMode">
+        <div class="score-panel">
+            <div class="score-item">
+                <i class="fas fa-user-check"></i>
+                <span>Customer: <span class="score-value" id="simCustomerNum">1</span>/5</span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-star"></i>
+                <span>Score: <span class="score-value" id="simScore">0</span></span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Accuracy: <span class="score-value" id="simAccuracy">100</span>%</span>
+            </div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-header" id="scenarioTitle">
+                <i class="fas fa-clipboard"></i> Customer Scenario #1
+            </div>
+            <div class="scenario-details" id="scenarioDetails">
+                <!-- Scenario details will be inserted here -->
+            </div>
+        </div>
+
+        <div class="shopworks-interface" id="simulatorInterface">
+            <!-- Interface will be generated here -->
+        </div>
+
+        <div class="feedback-message" id="simFeedback">
+            <!-- Feedback will appear here -->
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+            <button class="btn btn-success" onclick="checkSimulatorAnswers()">
+                <i class="fas fa-check"></i> Submit Customer Setup
+            </button>
+            <button class="btn btn-warning" onclick="showSimulatorHints()">
+                <i class="fas fa-lightbulb"></i> Show Hints
+            </button>
+            <button class="btn btn-primary" onclick="backToModes()">
+                <i class="fas fa-arrow-left"></i> Back to Modes
+            </button>
+        </div>
+    </div>
+
+    <!-- Field Detective Mode -->
+    <div class="game-area" id="detectiveMode">
+        <div class="score-panel">
+            <div class="score-item">
+                <i class="fas fa-search"></i>
+                <span>Case: <span class="score-value" id="detCaseNum">1</span>/5</span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-bug"></i>
+                <span>Errors Found: <span class="score-value" id="detErrors">0</span>/3</span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-trophy"></i>
+                <span>Score: <span class="score-value" id="detScore">0</span></span>
+            </div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-header">
+                <i class="fas fa-search-plus"></i> Find the Errors in This Customer Record
+            </div>
+            <p style="margin: 1rem 0; color: #666;">This customer record has 3 errors. Can you find and fix them all?</p>
+        </div>
+
+        <div class="shopworks-interface" id="detectiveInterface">
+            <!-- Pre-filled interface with errors will be generated here -->
+        </div>
+
+        <div class="feedback-message" id="detFeedback">
+            <!-- Feedback will appear here -->
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+            <button class="btn btn-success" onclick="checkDetectiveAnswers()">
+                <i class="fas fa-check"></i> Submit Corrections
+            </button>
+            <button class="btn btn-info" onclick="revealOneError()">
+                <i class="fas fa-eye"></i> Reveal One Error (-10 points)
+            </button>
+            <button class="btn btn-primary" onclick="backToModes()">
+                <i class="fas fa-arrow-left"></i> Back to Modes
+            </button>
+        </div>
+    </div>
+
+    <!-- Speed Challenge Mode -->
+    <div class="game-area" id="speedMode">
+        <div class="timer-display">
+            <i class="fas fa-clock"></i> Time: <span id="speedTimer">00:00</span>
+        </div>
+
+        <div class="challenge-stats">
+            <div class="stat-card">
+                <div class="stat-label">Customer</div>
+                <div class="stat-value" id="speedCustomer">1/10</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value" id="speedCorrect">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="speedScore">0</div>
+            </div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-header">
+                <i class="fas fa-bolt"></i> Quick! Set up this customer:
+            </div>
+            <div id="speedScenario" style="padding: 1rem; background: white; border-radius: 6px; margin-top: 1rem;">
+                <!-- Quick scenario details -->
+            </div>
+        </div>
+
+        <div class="shopworks-interface" id="speedInterface">
+            <!-- Simplified interface for speed -->
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+            <button class="btn btn-success" onclick="submitSpeedAnswer()">
+                <i class="fas fa-forward"></i> Next Customer
+            </button>
+            <button class="btn btn-primary" onclick="endSpeedChallenge()">
+                <i class="fas fa-stop"></i> End Challenge
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div class="completion-modal" id="completionModal">
+        <div class="modal-content">
+            <i class="fas fa-trophy" style="font-size: 3rem; color: #ffc107; margin-bottom: 1rem;"></i>
+            <h2 class="modal-title">Great Job!</h2>
+            <div class="modal-stats" id="modalStats">
+                <!-- Stats will be inserted here -->
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="playAgain()">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="btn btn-primary" onclick="backToModes()">
+                    <i class="fas fa-home"></i> Choose Another Mode
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Field information database
+const fieldInfo = {
+    companyNumber: {
+        title: 'Company Number',
+        description: 'Auto-generated unique identifier for each customer',
+        importance: 'This number is assigned automatically by Shopworks and cannot be changed.',
+        tips: [
+            'This is used internally to track the customer',
+            'Each customer gets a unique number',
+            'You cannot edit this field'
+        ]
+    },
+    companyName: {
+        title: 'Company Name',
+        description: 'The official business name of the customer',
+        importance: 'REQUIRED FIELD - Must be filled for every customer',
+        tips: [
+            'Use the full legal business name',
+            'Check for correct spelling',
+            'Include LLC, Inc., Corp. if applicable',
+            'For individuals, use "Personal - [Name]"'
+        ]
+    },
+    website: {
+        title: 'Website',
+        description: 'Company\'s website URL',
+        importance: 'Helpful for looking up company information and verifying legitimacy',
+        tips: [
+            'Include full URL (www.example.com)',
+            'Optional but recommended',
+            'Useful for researching the company',
+            'Can help with logo and branding questions'
+        ]
+    },
+    mainEmail: {
+        title: 'Main Company Email',
+        description: 'General company email address',
+        importance: 'Used for general communications and invoices',
+        tips: [
+            'Different from individual contact email',
+            'Often info@ or orders@ address',
+            'Used for company-wide communications',
+            'Important for billing department'
+        ]
+    },
+    firstName: {
+        title: 'Contact First Name',
+        description: 'First name of the primary contact person',
+        importance: 'REQUIRED FIELD - Need at least one contact person',
+        tips: [
+            'Get the correct spelling',
+            'This is who we\'ll primarily work with',
+            'Can have multiple contacts',
+            'Used in personalized communications'
+        ]
+    },
+    lastName: {
+        title: 'Contact Last Name',
+        description: 'Last name of the primary contact person',
+        importance: 'REQUIRED FIELD - Must have for proper identification',
+        tips: [
+            'Double-check spelling',
+            'Important for professional communication',
+            'Used in email greetings'
+        ]
+    },
+    title: {
+        title: 'Job Title',
+        description: 'Contact person\'s position in the company',
+        importance: 'Helps us understand decision-making authority',
+        tips: [
+            'Common: Owner, Manager, AP, Purchasing',
+            'AP = Accounts Payable',
+            'Helps route communications correctly',
+            'Important for approval processes'
+        ]
+    },
+    department: {
+        title: 'Department',
+        description: 'Which department the contact works in',
+        importance: 'Helps route orders and communications',
+        tips: [
+            'Marketing, HR, Operations, etc.',
+            'Optional but helpful',
+            'Useful for large companies',
+            'Helps identify decision makers'
+        ]
+    },
+    primaryPhone: {
+        title: 'Primary Phone',
+        description: 'Main contact phone number',
+        importance: 'REQUIRED FIELD - Critical for order confirmations',
+        tips: [
+            'Format: XXX-XXX-XXXX',
+            'Include area code',
+            'Get direct line if possible',
+            'Mobile numbers are acceptable'
+        ]
+    },
+    primaryFax: {
+        title: 'Primary Fax',
+        description: 'Fax number if available',
+        importance: 'Some companies still require fax for POs',
+        tips: [
+            'Optional field',
+            'Format: XXX-XXX-XXXX',
+            'Less common nowadays',
+            'Government often requires fax'
+        ]
+    },
+    primaryEmail: {
+        title: 'Contact Email',
+        description: 'Individual contact\'s email address',
+        importance: 'REQUIRED FIELD - Primary communication method',
+        tips: [
+            'Different from company email',
+            'This person\'s direct email',
+            'Used for order confirmations',
+            'Critical for proofs and approvals'
+        ]
+    },
+    salesperson: {
+        title: 'Assigned Salesperson',
+        description: 'NWCA sales rep assigned to this account - Determines commission and account ownership',
+        importance: 'REQUIRED FIELD - Critical for commission tracking',
+        tips: [
+            '👤 Nika Lao - Account Executive',
+            '👤 Adriyella Trujillo - Account Executive', 
+            '👤 Taneisha Clark - Account Executive',
+            '👤 Erik Mickelson - Operations Manager',
+            '👤 Jim Mickelson - Owner/CEO',
+            '👤 Ruthie Nhong - Production Manager',
+            '🏠 House - NO assigned rep (one-time purchases, walk-ins, online orders)',
+            '⚠️ Ask manager if unsure who to assign',
+            '📝 House accounts get no commission'
+        ]
+    },
+    customerType: {
+        title: 'Customer Type',
+        description: 'Industry or customer category classification - Critical for sales tracking',
+        importance: 'REQUIRED FIELD - Determines customer segment for reporting',
+        tips: [
+            '✅ Corporate - Business offices, professional services',
+            '✅ Contract - Ongoing uniform programs',
+            '✅ Construction - Contractors and builders', 
+            '✅ Medical - Healthcare facilities',
+            '✅ School - Educational institutions',
+            '✅ Fire/Police - First responders',
+            '✅ Retail - Retail stores',
+            '✅ Food Service - Restaurants',
+            '✅ Military - Military organizations',
+            '✅ Events - One-time events',
+            '⚠️ Dead - DO NOT USE for new customers'
+        ]
+    },
+    source: {
+        title: 'Lead Source',
+        description: 'How the customer found us (links to Lead Source training)',
+        importance: 'REQUIRED FIELD - Critical for marketing tracking',
+        tips: [
+            'MUST ask "How did you hear about us?"',
+            'Options: Google, Walk In, Referral, etc.',
+            'If Referral, create WOW Order',
+            'See Lead Source Game for details'
+        ]
+    },
+    numEmployees: {
+        title: 'Number of Employees (Not Used)',
+        description: 'NOT USED - This field is not utilized in our Shopworks system',
+        importance: 'OPTIONAL - Not required for customer setup',
+        tips: [
+            '⚠️ This field is NOT USED at NWCA',
+            '✅ You can leave this blank',
+            '📝 Field exists in Shopworks but we don\'t track this data',
+            '🚫 Do not waste time filling this out'
+        ]
+    },
+    taxAccount: {
+        title: 'Sales Tax Classification (CRITICAL FIELD!)',
+        description: 'Determines which liability account for tax reporting - MUST BE CORRECT!',
+        importance: '🚨 MOST IMPORTANT TAX FIELD - Wrong code = audit issues & penalties!',
+        tips: [
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '🔴 <strong>2200 - WASHINGTON STATE SALES TAX (95% of customers)</strong>',
+            '• Use for ALL WA customers buying for internal/employee use',
+            '• YES - Use for non-profits & government (even if tax-exempt)',
+            '• This is the DEFAULT - when in doubt, use 2200!',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '🔵 <strong>2202 - OUT OF STATE SALES</strong>',
+            '• ONLY when shipping outside WA via common carrier',
+            '• MUST ship via UPS/FedEx/USPS (not customer pickup)',
+            '• Shipping records = proof for tax auditors',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '🟢 <strong>2203 - WHOLESALE SALES (WA Resellers)</strong>',
+            '• REQUIRES valid WA State Reseller Permit',
+            '• Even out-of-state resellers need WA permit',
+            '• Physical signed copy MUST be in accounting',
+            '• Enter permit # and expiration date below!'
+        ]
+    },
+    taxExempt: {
+        title: 'Tax Exempt / Reseller Permit Number',
+        description: 'REQUIRED for any tax-free sale - No number = Must charge tax!',
+        importance: '⚠️ CRITICAL - Missing this = we MUST charge sales tax',
+        tips: [
+            '📋 <strong>For WA Non-Profits & Government (Code 2200):</strong>',
+            '• Enter their tax-exempt certificate number',
+            '• They still use code 2200 (not 2203)',
+            '• Keep certificate copy on file',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '🏪 <strong>For Resellers (Code 2203):</strong>',
+            '• Enter WA State Reseller Permit number',
+            '• Valid for 4 YEARS - check expiration!',
+            '• MUST have SIGNED copy in accounting office',
+            '• Missing physical copy = BIG problem in audit',
+            '• Out-of-state resellers ALSO need WA permit'
+        ]
+    },
+    expirationDate: {
+        title: 'Permit/Certificate Expiration Date',
+        description: 'CRITICAL DATE - Expired = charge tax immediately!',
+        importance: '📅 Track this carefully - expired permits = full tax liability',
+        tips: [
+            '⏰ <strong>RESELLER PERMITS (4-year validity):</strong>',
+            '• ALWAYS verify date hasn\'t lapsed',
+            '• If expired → Request updated permit NOW',
+            '• Cannot do tax-free sale until updated',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '📋 <strong>TAX-EXEMPT CERTIFICATES:</strong>',
+            '• Government may not have expiration',
+            '• Non-profits usually expire annually',
+            '• Schools/churches check each year'
+        ]
+    },
+    payTax: {
+        title: 'Pay Sales Tax Checkbox',
+        description: 'Controls whether sales tax appears on invoices',
+        importance: 'Directly affects invoice totals - double check!',
+        tips: [
+            '✅ <strong>CHECK this box when:</strong>',
+            '• Code 2200 + NO exemption certificate',
+            '• Regular WA businesses',
+            '• Individual customers',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '❌ <strong>UNCHECK this box when:</strong>',
+            '• Code 2202 (out of state)',
+            '• Code 2203 (reseller with permit)',
+            '• Code 2200 + valid exempt certificate'
+        ]
+    },
+    shippingTax: {
+        title: 'Shipping Taxable Checkbox',
+        description: 'WA State taxes shipping - must be correct!',
+        importance: 'Washington State requirement - shipping IS taxable',
+        tips: [
+            '✅ <strong>CHECK this box when:</strong>',
+            '• Code 2200 (WA customers)',
+            '• Unless they\'re tax-exempt',
+            '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+            '❌ <strong>UNCHECK this box when:</strong>',
+            '• Code 2202 (out of state)',
+            '• Code 2203 (wholesale)',
+            '• Tax-exempt organizations'
+        ]
+    }
+};
+
+// Scenarios for Setup Simulator
+const setupScenarios = [
+    {
+        title: 'New Corporate Account',
+        company: 'Pacific Construction Group LLC',
+        website: 'www.pacificconstructiongroup.com',
+        mainEmail: 'orders@pacificconstructiongroup.com',
+        contact: {
+            firstName: 'Michael',
+            lastName: 'Johnson',
+            title: 'Purchasing Manager',
+            department: 'Operations',
+            phone: '253-555-8745',
+            email: 'mjohnson@pacificconstructiongroup.com'
+        },
+        profile: {
+            salesperson: 'Nika Lao',
+            type: 'Construction',
+            source: 'Google Search'
+        },
+        tax: {
+            taxCode: '2200', // Washington State Sales Tax - standard WA customer
+            exempt: false,
+            payTax: true,
+            shippingTax: true
+        }
+    },
+    {
+        title: 'Tax-Exempt Non-Profit',
+        company: 'Tacoma Youth Soccer Association',
+        website: 'www.tacomayouthsoccer.org',
+        mainEmail: 'info@tacomayouthsoccer.org',
+        contact: {
+            firstName: 'Sarah',
+            lastName: 'Martinez',
+            title: 'Program Director',
+            department: 'Administration',
+            phone: '253-555-3692',
+            email: 'sarah@tacomayouthsoccer.org'
+        },
+        profile: {
+            salesperson: 'Adriyella Trujillo',
+            type: 'Medical',
+            source: 'Referral'
+        },
+        tax: {
+            taxCode: '2200', // WA non-profits still use 2200!
+            exempt: true,
+            exemptNumber: 'EX-789456',
+            expirationDate: '2026-12-31',
+            payTax: false,
+            shippingTax: false
+        }
+    },
+    {
+        title: 'Government Entity',
+        company: 'City of Federal Way',
+        website: 'www.cityoffederalway.com',
+        mainEmail: 'purchasing@cityoffederalway.com',
+        contact: {
+            firstName: 'Robert',
+            lastName: 'Chen',
+            title: 'Procurement Officer',
+            department: 'Finance',
+            phone: '253-555-7412',
+            email: 'rchen@cityoffederalway.com'
+        },
+        profile: {
+            salesperson: 'Ruthie Nhong',
+            type: 'Fire/Police',
+            source: 'Old Customer'
+        },
+        tax: {
+            taxCode: '2200', // WA government still uses 2200!
+            exempt: true,
+            exemptNumber: 'GOV-WA-4521',
+            expirationDate: '', // Government often no expiration
+            payTax: false,
+            shippingTax: false
+        }
+    },
+    {
+        title: 'Small Business Walk-In',
+        company: 'Joe\'s Auto Repair',
+        website: '',
+        mainEmail: 'joesautorepair@gmail.com',
+        contact: {
+            firstName: 'Joseph',
+            lastName: 'Thompson',
+            title: 'Owner',
+            department: '',
+            phone: '253-555-1234',
+            email: 'joe@joesautorepair.com'
+        },
+        profile: {
+            salesperson: 'Taneisha Clark',
+            type: 'Food Service',
+            source: 'Walk In'
+        },
+        tax: {
+            account: '2200-9876',
+            exempt: false,
+            payTax: true,
+            shippingTax: true
+        }
+    },
+    {
+        title: 'Individual Customer',
+        company: 'Personal - David Wilson',
+        website: '',
+        mainEmail: 'davidwilson@hotmail.com',
+        contact: {
+            firstName: 'David',
+            lastName: 'Wilson',
+            title: '',
+            department: '',
+            phone: '253-555-9988',
+            email: 'davidwilson@hotmail.com'
+        },
+        profile: {
+            salesperson: 'House',
+            type: 'Events',
+            source: 'Drive By'
+        },
+        tax: {
+            taxCode: '2200', // Individual WA customers use 2200
+            exempt: false,
+            payTax: true,
+            shippingTax: true
+        }
+    },
+    {
+        title: 'Out-of-State Customer',
+        company: 'Oregon Trail Outfitters',
+        website: 'www.oregontrailoutfitters.com',
+        mainEmail: 'orders@oregontrailoutfitters.com',
+        contact: {
+            firstName: 'Jennifer',
+            lastName: 'Brooks',
+            title: 'Purchasing Manager',
+            department: 'Operations',
+            phone: '503-555-2341',
+            email: 'jbrooks@oregontrailoutfitters.com'
+        },
+        profile: {
+            salesperson: 'Erik Mickelson',
+            type: 'Corporate',
+            source: 'Trade Show'
+        },
+        tax: {
+            taxCode: '2202', // Out of State Sales - shipping via UPS
+            exempt: false, // Not exempt, just out of state
+            payTax: false, // No WA sales tax for out-of-state
+            shippingTax: false, // No tax on shipping for out-of-state
+            notes: 'MUST ship via common carrier (UPS/FedEx/USPS)'
+        }
+    },
+    {
+        title: 'Washington Reseller',
+        company: 'Northwest Promotional Products',
+        website: 'www.nwpromo.com',
+        mainEmail: 'sales@nwpromo.com',
+        contact: {
+            firstName: 'Kevin',
+            lastName: 'Lee',
+            title: 'Owner',
+            department: 'Sales',
+            phone: '206-555-7890',
+            email: 'kevin@nwpromo.com'
+        },
+        profile: {
+            salesperson: 'Jim Mickelson',
+            type: 'Corporate',
+            source: 'Referral'
+        },
+        tax: {
+            taxCode: '2203', // Wholesale Sales - WA reseller
+            exempt: true, // Tax exempt for resale
+            exemptNumber: 'WA-RES-123456', // WA State Reseller Permit
+            expirationDate: '2027-06-30', // 4-year validity
+            payTax: false, // No tax for resellers
+            shippingTax: false, // No tax on shipping for resellers
+            notes: 'MUST have signed reseller permit in accounting office!'
+        }
+    }
+];
+
+// Detective Mode Error Scenarios
+const detectiveScenarios = [
+    {
+        errors: ['Missing salesperson', 'Wrong phone format', 'No source selected'],
+        data: {
+            companyName: 'Summit Engineering Inc',
+            firstName: 'Jennifer',
+            lastName: 'Adams',
+            phone: '2535558899', // Wrong format
+            email: 'jadams@summiteng.com',
+            salesperson: '', // Missing
+            type: 'Corporate',
+            source: '', // Missing
+            payTax: true
+        }
+    },
+    {
+        errors: ['Tax exempt but tax enabled', 'Missing expiration date', 'No contact email'],
+        data: {
+            companyName: 'Pierce County Food Bank',
+            firstName: 'Mark',
+            lastName: 'Davis',
+            phone: '253-555-7766',
+            email: '', // Missing
+            salesperson: 'Ruthie Nhong',
+            type: 'School',
+            source: 'Referral',
+            taxExempt: 'NP-445566',
+            expirationDate: '', // Missing
+            payTax: true, // Should be false
+            shippingTax: true // Should be false
+        }
+    },
+    {
+        errors: ['Company name has typo', 'Wrong customer type', 'Missing main email'],
+        data: {
+            companyName: 'Microsft Corporation', // Typo
+            mainEmail: '', // Missing
+            firstName: 'Steve',
+            lastName: 'Johnson',
+            phone: '425-555-0100',
+            email: 'sjohnson@microsoft.com',
+            salesperson: 'Taneisha Clark',
+            type: 'Events', // Should be Corporate
+            source: 'Google Search',
+            payTax: true
+        }
+    },
+    {
+        errors: ['Wrong tax code for out-of-state', 'Pay tax checked for out-of-state', 'Shipping taxable checked'],
+        data: {
+            companyName: 'Portland Design Studio',
+            firstName: 'Sarah',
+            lastName: 'Mitchell',
+            phone: '503-555-4321',
+            email: 'sarah@pdxdesign.com',
+            address: '1234 Division St, Portland, OR 97202',
+            salesperson: 'Nika Lao',
+            type: 'Corporate',
+            source: 'Trade Show',
+            taxAccount: '2200', // Should be 2202 for out-of-state
+            payTax: true, // Should be false for out-of-state
+            shippingTax: true // Should be false for out-of-state
+        }
+    },
+    {
+        errors: ['Missing reseller permit number', 'Expired permit date', 'Tax checkboxes not unchecked'],
+        data: {
+            companyName: 'Evergreen Promotional Products',
+            firstName: 'Mike',
+            lastName: 'Chen',
+            phone: '206-555-8765',
+            email: 'mike@evergreenpromo.com',
+            address: '456 Pine St, Seattle, WA 98101',
+            salesperson: 'Erik Mickelson',
+            type: 'Corporate',
+            source: 'Referral',
+            taxAccount: '2203', // Wholesale - needs permit
+            taxExempt: '', // Missing permit number!
+            expirationDate: '2022-06-30', // Expired!
+            payTax: true, // Should be false for reseller
+            shippingTax: true // Should be false for reseller
+        }
+    },
+    {
+        errors: ['Wrong tax code for WA non-profit', 'Missing tax exempt certificate'],
+        data: {
+            companyName: 'Tacoma Community Foundation',
+            firstName: 'Lisa',
+            lastName: 'Wong',
+            phone: '253-555-9876',
+            email: 'lwong@tacomafoundation.org',
+            address: '789 Pacific Ave, Tacoma, WA 98402',
+            salesperson: 'Adriyella Trujillo',
+            type: 'Medical',
+            source: 'Website',
+            taxAccount: '2203', // Should be 2200 for WA non-profit!
+            taxExempt: '', // Missing certificate number
+            payTax: false,
+            shippingTax: false
+        }
+    }
+];
+
+// Game state variables
+let currentMode = null;
+let currentScenario = 0;
+let score = 0;
+let speedTimer = null;
+let speedSeconds = 0;
+let speedCustomerCount = 0;
+let detectiveErrors = [];
+let simulatorAccuracy = 100;
+
+// Mode Management
+function startMode(mode) {
+    currentMode = mode;
+    currentScenario = 0;
+    score = 0;
+    
+    // Hide mode selection
+    document.getElementById('modeSelection').style.display = 'none';
+    
+    // Hide all game areas
+    document.querySelectorAll('.game-area').forEach(area => {
+        area.classList.remove('active');
+    });
+    
+    // Show selected mode
+    switch(mode) {
+        case 'explorer':
+            document.getElementById('explorerMode').classList.add('active');
+            break;
+        case 'simulator':
+            startSimulator();
+            break;
+        case 'detective':
+            startDetective();
+            break;
+        case 'speed':
+            startSpeedChallenge();
+            break;
+    }
+}
+
+function showTaxDecisionHelper() {
+    document.getElementById('taxDecisionHelper').style.display = 'block';
+    document.getElementById('taxHelperOverlay').style.display = 'block';
+}
+
+function closeTaxHelper() {
+    document.getElementById('taxDecisionHelper').style.display = 'none';
+    document.getElementById('taxHelperOverlay').style.display = 'none';
+}
+
+function backToModes() {
+    // Clear any active timers
+    if (speedTimer) {
+        clearInterval(speedTimer);
+        speedTimer = null;
+    }
+    
+    // Hide completion modal
+    document.getElementById('completionModal').classList.remove('active');
+    
+    // Hide all game areas
+    document.querySelectorAll('.game-area').forEach(area => {
+        area.classList.remove('active');
+    });
+    
+    // Show mode selection
+    document.getElementById('modeSelection').style.display = 'grid';
+    
+    currentMode = null;
+}
+
+// Field Explorer Functions
+function showFieldInfo(fieldName) {
+    const info = fieldInfo[fieldName];
+    if (!info) return;
+    
+    const display = document.getElementById('fieldInfoDisplay');
+    display.innerHTML = `
+        <h4><i class="fas fa-info-circle"></i> ${info.title}</h4>
+        <p><strong>Description:</strong> ${info.description}</p>
+        <p><strong>Why It's Important:</strong> ${info.importance}</p>
+        <h5>Tips & Best Practices:</h5>
+        <ul>
+            ${info.tips.map(tip => `<li>${tip}</li>`).join('')}
+        </ul>
+    `;
+    display.classList.add('active');
+}
+
+// Setup Simulator Functions
+function startSimulator() {
+    document.getElementById('simulatorMode').classList.add('active');
+    currentScenario = 0;
+    score = 0;
+    simulatorAccuracy = 100;
+    loadSimulatorScenario();
+}
+
+function loadSimulatorScenario() {
+    if (currentScenario >= setupScenarios.length) {
+        showCompletion('simulator');
+        return;
+    }
+    
+    const scenario = setupScenarios[currentScenario];
+    document.getElementById('simCustomerNum').textContent = currentScenario + 1;
+    document.getElementById('scenarioTitle').innerHTML = `
+        <i class="fas fa-clipboard"></i> Customer Scenario #${currentScenario + 1}: ${scenario.title}
+    `;
+    
+    // Display scenario details
+    document.getElementById('scenarioDetails').innerHTML = `
+        <p><strong>Company:</strong> ${scenario.company}</p>
+        <p><strong>Contact:</strong> ${scenario.contact.firstName} ${scenario.contact.lastName}${scenario.contact.title ? `, ${scenario.contact.title}` : ''}</p>
+        <p><strong>Phone:</strong> ${scenario.contact.phone}</p>
+        <p><strong>Email:</strong> ${scenario.contact.email}</p>
+        ${scenario.website ? `<p><strong>Website:</strong> ${scenario.website}</p>` : ''}
+        <p><strong>How they found us:</strong> ${scenario.profile.source}</p>
+        ${scenario.tax.exempt ? `<p><strong>Tax Status:</strong> Tax Exempt${scenario.tax.exemptNumber ? ` (${scenario.tax.exemptNumber})` : ''}</p>` : ''}
+    `;
+    
+    // Generate empty form
+    generateSimulatorInterface();
+}
+
+function generateSimulatorInterface() {
+    const interface = document.getElementById('simulatorInterface');
+    interface.innerHTML = `
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-building"></i> Company Information
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Company Name</label>
+                    <input type="text" class="field-input" id="sim_companyName">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Website</label>
+                    <input type="text" class="field-input" id="sim_website">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Main Email</label>
+                    <input type="email" class="field-input" id="sim_mainEmail">
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-user"></i> Contact Details
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">First Name</label>
+                    <input type="text" class="field-input" id="sim_firstName">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Last Name</label>
+                    <input type="text" class="field-input" id="sim_lastName">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Title</label>
+                    <input type="text" class="field-input" id="sim_title">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Phone</label>
+                    <input type="tel" class="field-input" id="sim_phone" placeholder="XXX-XXX-XXXX">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Email</label>
+                    <input type="email" class="field-input" id="sim_email">
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-id-card"></i> Profile Settings
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Salesperson</label>
+                    <select class="field-input" id="sim_salesperson">
+                        <option value="">Select...</option>
+                        <option>Nika Lao</option>
+                        <option>Taylar Hanson</option>
+                        <option>Ruth Nhong</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Type</label>
+                    <select class="field-input" id="sim_type">
+                        <option value="">Select...</option>
+                        <option>Corporate</option>
+                        <option>Government</option>
+                        <option>Non-Profit</option>
+                        <option>Individual</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Source</label>
+                    <select class="field-input" id="sim_source">
+                        <option value="">Select...</option>
+                        <option>Google Search</option>
+                        <option>Walk In</option>
+                        <option>Old Customer</option>
+                        <option>Referral</option>
+                        <option>Drive By</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-receipt"></i> Tax Settings
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label">Tax Exempt #</label>
+                    <input type="text" class="field-input" id="sim_taxExempt">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Expiration</label>
+                    <input type="date" class="field-input" id="sim_expiration">
+                </div>
+                <div class="field-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem;">
+                        <input type="checkbox" id="sim_payTax" checked>
+                        Pay Sales Tax?
+                    </label>
+                </div>
+                <div class="field-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem;">
+                        <input type="checkbox" id="sim_shippingTax" checked>
+                        Shipping Taxable?
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function checkSimulatorAnswers() {
+    const scenario = setupScenarios[currentScenario];
+    let errors = [];
+    let correct = 0;
+    let total = 0;
+    
+    // Check required fields
+    const checks = [
+        { field: 'sim_companyName', expected: scenario.company, required: true },
+        { field: 'sim_website', expected: scenario.website, required: false },
+        { field: 'sim_mainEmail', expected: scenario.mainEmail, required: false },
+        { field: 'sim_firstName', expected: scenario.contact.firstName, required: true },
+        { field: 'sim_lastName', expected: scenario.contact.lastName, required: true },
+        { field: 'sim_title', expected: scenario.contact.title, required: false },
+        { field: 'sim_phone', expected: scenario.contact.phone, required: true },
+        { field: 'sim_email', expected: scenario.contact.email, required: true },
+        { field: 'sim_salesperson', expected: scenario.profile.salesperson, required: true },
+        { field: 'sim_type', expected: scenario.profile.type, required: true },
+        { field: 'sim_source', expected: scenario.profile.source, required: true }
+    ];
+    
+    checks.forEach(check => {
+        const field = document.getElementById(check.field);
+        if (!field) return;
+        
+        total++;
+        const value = field.value.trim();
+        
+        if (check.required && !value) {
+            errors.push(`Missing required field: ${check.field.replace('sim_', '')}`);
+            field.classList.add('incorrect');
+            field.classList.remove('correct');
+        } else if (value && check.expected && value.toLowerCase() !== check.expected.toLowerCase()) {
+            errors.push(`Incorrect value for ${check.field.replace('sim_', '')}`);
+            field.classList.add('incorrect');
+            field.classList.remove('correct');
+        } else if (value || !check.required) {
+            correct++;
+            field.classList.add('correct');
+            field.classList.remove('incorrect');
+        }
+    });
+    
+    // Check tax settings
+    const payTax = document.getElementById('sim_payTax').checked;
+    const shippingTax = document.getElementById('sim_shippingTax').checked;
+    
+    if (scenario.tax.exempt) {
+        if (payTax || shippingTax) {
+            errors.push('Tax-exempt customers should not pay tax');
+        }
+    }
+    
+    // Calculate accuracy
+    const accuracy = Math.round((correct / total) * 100);
+    simulatorAccuracy = Math.round((simulatorAccuracy + accuracy) / 2);
+    
+    // Update display
+    document.getElementById('simAccuracy').textContent = simulatorAccuracy;
+    
+    // Show feedback
+    const feedbackEl = document.getElementById('simFeedback');
+    if (errors.length === 0) {
+        score += 100;
+        document.getElementById('simScore').textContent = score;
+        feedbackEl.className = 'feedback-message feedback-success active';
+        feedbackEl.innerHTML = `
+            <i class="fas fa-check-circle"></i> Perfect! All fields are correct.
+            ${scenario.profile.source === 'Referral' ? '<br><strong>Remember:</strong> Since this is a referral, create a WOW Order for the referrer!' : ''}
+        `;
+        
+        setTimeout(() => {
+            currentScenario++;
+            loadSimulatorScenario();
+        }, 3000);
+    } else {
+        feedbackEl.className = 'feedback-message feedback-error active';
+        feedbackEl.innerHTML = `
+            <i class="fas fa-times-circle"></i> Please fix these issues:
+            <ul style="margin: 0.5rem 0 0 1.5rem;">
+                ${errors.map(e => `<li>${e}</li>`).join('')}
+            </ul>
+        `;
+    }
+}
+
+function showSimulatorHints() {
+    const scenario = setupScenarios[currentScenario];
+    const feedbackEl = document.getElementById('simFeedback');
+    feedbackEl.className = 'feedback-message feedback-warning active';
+    feedbackEl.innerHTML = `
+        <i class="fas fa-lightbulb"></i> <strong>Hints:</strong>
+        <ul style="margin: 0.5rem 0 0 1.5rem;">
+            <li>Customer Type: ${scenario.profile.type}</li>
+            <li>Assigned to: ${scenario.profile.salesperson}</li>
+            <li>Lead Source: ${scenario.profile.source}</li>
+            ${scenario.tax.exempt ? '<li>This customer is TAX EXEMPT - uncheck tax boxes!</li>' : '<li>This customer pays normal tax</li>'}
+        </ul>
+    `;
+}
+
+// Field Detective Functions
+function startDetective() {
+    document.getElementById('detectiveMode').classList.add('active');
+    currentScenario = 0;
+    score = 0;
+    loadDetectiveScenario();
+}
+
+function loadDetectiveScenario() {
+    if (currentScenario >= detectiveScenarios.length) {
+        showCompletion('detective');
+        return;
+    }
+    
+    const scenario = detectiveScenarios[currentScenario];
+    detectiveErrors = scenario.errors;
+    
+    document.getElementById('detCaseNum').textContent = currentScenario + 1;
+    document.getElementById('detErrors').textContent = `0/${scenario.errors.length}`;
+    
+    // Generate interface with errors
+    generateDetectiveInterface(scenario.data);
+}
+
+function generateDetectiveInterface(data) {
+    const interface = document.getElementById('detectiveInterface');
+    interface.innerHTML = `
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-building"></i> Company Information
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Company Name</label>
+                    <input type="text" class="field-input" id="det_companyName" value="${data.companyName || ''}">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Main Email</label>
+                    <input type="email" class="field-input" id="det_mainEmail" value="${data.mainEmail || ''}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-user"></i> Contact Details
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">First Name</label>
+                    <input type="text" class="field-input" id="det_firstName" value="${data.firstName || ''}">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Last Name</label>
+                    <input type="text" class="field-input" id="det_lastName" value="${data.lastName || ''}">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Phone</label>
+                    <input type="tel" class="field-input" id="det_phone" value="${data.phone || ''}">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Email</label>
+                    <input type="email" class="field-input" id="det_email" value="${data.email || ''}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-id-card"></i> Profile Settings
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Salesperson</label>
+                    <select class="field-input" id="det_salesperson">
+                        <option value="">Select...</option>
+                        <option ${data.salesperson === 'Nika Lao' ? 'selected' : ''}>Nika Lao</option>
+                        <option ${data.salesperson === 'Taylar Hanson' ? 'selected' : ''}>Taylar Hanson</option>
+                        <option ${data.salesperson === 'Ruth Nhong' ? 'selected' : ''}>Ruth Nhong</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Type</label>
+                    <select class="field-input" id="det_type">
+                        <option value="">Select...</option>
+                        <option ${data.type === 'Corporate' ? 'selected' : ''}>Corporate</option>
+                        <option ${data.type === 'Government' ? 'selected' : ''}>Government</option>
+                        <option ${data.type === 'Non-Profit' ? 'selected' : ''}>Non-Profit</option>
+                        <option ${data.type === 'Individual' ? 'selected' : ''}>Individual</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Source</label>
+                    <select class="field-input" id="det_source">
+                        <option value="">Select...</option>
+                        <option ${data.source === 'Google Search' ? 'selected' : ''}>Google Search</option>
+                        <option ${data.source === 'Walk In' ? 'selected' : ''}>Walk In</option>
+                        <option ${data.source === 'Old Customer' ? 'selected' : ''}>Old Customer</option>
+                        <option ${data.source === 'Referral' ? 'selected' : ''}>Referral</option>
+                        <option ${data.source === 'Drive By' ? 'selected' : ''}>Drive By</option>
+                        <option ${data.source === 'Other' ? 'selected' : ''}>Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        ${data.taxExempt ? `
+        <div class="field-section">
+            <div class="section-title">
+                <i class="fas fa-receipt"></i> Tax Settings
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label">Tax Exempt #</label>
+                    <input type="text" class="field-input" id="det_taxExempt" value="${data.taxExempt || ''}">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Expiration</label>
+                    <input type="date" class="field-input" id="det_expiration" value="${data.expirationDate || ''}">
+                </div>
+                <div class="field-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="det_payTax" ${data.payTax ? 'checked' : ''}>
+                        Pay Sales Tax?
+                    </label>
+                </div>
+                <div class="field-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="det_shippingTax" ${data.shippingTax ? 'checked' : ''}>
+                        Shipping Taxable?
+                    </label>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+    `;
+}
+
+function checkDetectiveAnswers() {
+    // This would need more complex checking logic based on the specific errors
+    // For now, simplified version
+    let foundErrors = 0;
+    const scenario = detectiveScenarios[currentScenario];
+    
+    // Check if required fixes were made
+    if (scenario.errors.includes('Missing salesperson')) {
+        if (document.getElementById('det_salesperson').value) {
+            foundErrors++;
+        }
+    }
+    
+    if (scenario.errors.includes('Wrong phone format')) {
+        const phone = document.getElementById('det_phone').value;
+        if (phone.includes('-')) {
+            foundErrors++;
+        }
+    }
+    
+    if (scenario.errors.includes('No source selected')) {
+        if (document.getElementById('det_source').value) {
+            foundErrors++;
+        }
+    }
+    
+    document.getElementById('detErrors').textContent = `${foundErrors}/${scenario.errors.length}`;
+    
+    const feedbackEl = document.getElementById('detFeedback');
+    if (foundErrors === scenario.errors.length) {
+        score += 150;
+        document.getElementById('detScore').textContent = score;
+        feedbackEl.className = 'feedback-message feedback-success active';
+        feedbackEl.innerHTML = `
+            <i class="fas fa-check-circle"></i> Excellent detective work! You found and fixed all errors.
+        `;
+        
+        setTimeout(() => {
+            currentScenario++;
+            loadDetectiveScenario();
+        }, 3000);
+    } else {
+        feedbackEl.className = 'feedback-message feedback-warning active';
+        feedbackEl.innerHTML = `
+            <i class="fas fa-exclamation-circle"></i> You found ${foundErrors} of ${scenario.errors.length} errors. Keep looking!
+        `;
+    }
+}
+
+function revealOneError() {
+    const scenario = detectiveScenarios[currentScenario];
+    const feedbackEl = document.getElementById('detFeedback');
+    
+    score = Math.max(0, score - 10);
+    document.getElementById('detScore').textContent = score;
+    
+    feedbackEl.className = 'feedback-message feedback-warning active';
+    feedbackEl.innerHTML = `
+        <i class="fas fa-eye"></i> <strong>Hint:</strong> ${scenario.errors[0]}
+    `;
+}
+
+// Speed Challenge Functions
+function startSpeedChallenge() {
+    document.getElementById('speedMode').classList.add('active');
+    speedCustomerCount = 0;
+    speedSeconds = 0;
+    score = 0;
+    
+    // Start timer
+    speedTimer = setInterval(() => {
+        speedSeconds++;
+        const minutes = Math.floor(speedSeconds / 60);
+        const seconds = speedSeconds % 60;
+        document.getElementById('speedTimer').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+    
+    loadSpeedScenario();
+}
+
+function loadSpeedScenario() {
+    speedCustomerCount++;
+    
+    if (speedCustomerCount > 10) {
+        endSpeedChallenge();
+        return;
+    }
+    
+    document.getElementById('speedCustomer').textContent = `${speedCustomerCount}/10`;
+    
+    // Generate random quick scenario
+    const types = ['Corporate', 'Non-Profit', 'Government', 'Individual'];
+    const sources = ['Google Search', 'Walk In', 'Referral', 'Drive By'];
+    const reps = ['Nika Lao', 'Taylar Hanson', 'Ruth Nhong'];
+    
+    const scenario = {
+        company: `Test Company ${speedCustomerCount}`,
+        contact: `John Doe ${speedCustomerCount}`,
+        phone: `253-555-${1000 + speedCustomerCount}`,
+        email: `contact${speedCustomerCount}@example.com`,
+        type: types[Math.floor(Math.random() * types.length)],
+        source: sources[Math.floor(Math.random() * sources.length)],
+        rep: reps[Math.floor(Math.random() * reps.length)]
+    };
+    
+    document.getElementById('speedScenario').innerHTML = `
+        <strong>Company:</strong> ${scenario.company}<br>
+        <strong>Contact:</strong> ${scenario.contact}<br>
+        <strong>Phone:</strong> ${scenario.phone}<br>
+        <strong>Email:</strong> ${scenario.email}<br>
+        <strong>Type:</strong> ${scenario.type}<br>
+        <strong>Source:</strong> ${scenario.source}<br>
+        <strong>Assign to:</strong> ${scenario.rep}
+    `;
+    
+    // Generate simplified form
+    document.getElementById('speedInterface').innerHTML = `
+        <div class="field-section">
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Company Name</label>
+                    <input type="text" class="field-input" id="speed_company">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Contact Name</label>
+                    <input type="text" class="field-input" id="speed_contact">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Phone</label>
+                    <input type="tel" class="field-input" id="speed_phone">
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Email</label>
+                    <input type="email" class="field-input" id="speed_email">
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label required">Type</label>
+                    <select class="field-input" id="speed_type">
+                        <option value="">Select...</option>
+                        <option>Corporate</option>
+                        <option>Non-Profit</option>
+                        <option>Government</option>
+                        <option>Individual</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Source</label>
+                    <select class="field-input" id="speed_source">
+                        <option value="">Select...</option>
+                        <option>Google Search</option>
+                        <option>Walk In</option>
+                        <option>Referral</option>
+                        <option>Drive By</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label required">Salesperson</label>
+                    <select class="field-input" id="speed_rep">
+                        <option value="">Select...</option>
+                        <option>Nika Lao</option>
+                        <option>Taylar Hanson</option>
+                        <option>Ruth Nhong</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Store scenario for checking
+    window.currentSpeedScenario = scenario;
+}
+
+function submitSpeedAnswer() {
+    const scenario = window.currentSpeedScenario;
+    let correct = true;
+    
+    // Quick check of key fields
+    if (document.getElementById('speed_type').value !== scenario.type) correct = false;
+    if (document.getElementById('speed_source').value !== scenario.source) correct = false;
+    if (document.getElementById('speed_rep').value !== scenario.rep) correct = false;
+    
+    if (correct) {
+        score += 10;
+        document.getElementById('speedCorrect').textContent = 
+            parseInt(document.getElementById('speedCorrect').textContent) + 1;
+    }
+    
+    document.getElementById('speedScore').textContent = score;
+    
+    // Load next scenario
+    loadSpeedScenario();
+}
+
+function endSpeedChallenge() {
+    if (speedTimer) {
+        clearInterval(speedTimer);
+        speedTimer = null;
+    }
+    
+    showCompletion('speed');
+}
+
+// Completion Functions
+function showCompletion(mode) {
+    const modal = document.getElementById('completionModal');
+    const stats = document.getElementById('modalStats');
+    
+    let statsHTML = '';
+    
+    switch(mode) {
+        case 'simulator':
+            statsHTML = `
+                <div class="modal-stat">
+                    <span>Customers Set Up:</span>
+                    <strong>5</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Accuracy:</span>
+                    <strong>${simulatorAccuracy}%</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Total Score:</span>
+                    <strong>${score}</strong>
+                </div>
+            `;
+            break;
+        case 'detective':
+            statsHTML = `
+                <div class="modal-stat">
+                    <span>Cases Solved:</span>
+                    <strong>${currentScenario}</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Errors Found:</span>
+                    <strong>All</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Detective Score:</span>
+                    <strong>${score}</strong>
+                </div>
+            `;
+            break;
+        case 'speed':
+            statsHTML = `
+                <div class="modal-stat">
+                    <span>Customers Processed:</span>
+                    <strong>${speedCustomerCount - 1}</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Time Taken:</span>
+                    <strong>${Math.floor(speedSeconds / 60)}:${(speedSeconds % 60).toString().padStart(2, '0')}</strong>
+                </div>
+                <div class="modal-stat">
+                    <span>Speed Score:</span>
+                    <strong>${score}</strong>
+                </div>
+            `;
+            break;
+    }
+    
+    stats.innerHTML = statsHTML;
+    modal.classList.add('active');
+}
+
+function playAgain() {
+    document.getElementById('completionModal').classList.remove('active');
+    
+    // Reset and restart current mode
+    switch(currentMode) {
+        case 'simulator':
+            startSimulator();
+            break;
+        case 'detective':
+            startDetective();
+            break;
+        case 'speed':
+            startSpeedChallenge();
+            break;
+    }
+}
+</script>
+
+</body>
+</html>
