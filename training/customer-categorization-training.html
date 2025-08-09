@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Categorization Training - Northwest Custom Apparel</title>
+<link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Navigation Header */
+    .nav-header {
+        background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+
+    .back-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateX(-2px);
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-title i {
+        font-size: 1.25rem;
+        opacity: 0.9;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-container {
+        height: 35px;
+        opacity: 0.95;
+    }
+
+    .logo-container img {
+        height: 100%;
+        width: auto;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: white;
+        padding: 0.75rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .breadcrumb-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb a {
+        color: #981e32;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover {
+        color: #b82940;
+        text-decoration: underline;
+    }
+
+    .breadcrumb span {
+        color: #6b7280;
+    }
+
+    /* Game Container */
+    .game-wrapper {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        min-height: calc(100vh - 120px);
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .game-header {
+        text-align: center;
+        margin-bottom: 30px;
+        animation: slideDown 0.8s ease-out;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+        color: #4CAF50;
+        font-size: 1.2em;
+        letter-spacing: 2px;
+    }
+
+    .game-mode-selector {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .mode-btn {
+        padding: 12px 30px;
+        margin: 0 10px;
+        font-size: 1.1em;
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        border: none;
+        border-radius: 30px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .mode-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .mode-btn.active {
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+    }
+
+    .info-bar {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,0.1);
+        padding: 12px 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        font-size: 1.1em;
+    }
+
+    .training-mode {
+        display: none;
+    }
+
+    .training-mode.active {
+        display: block;
+    }
+
+    /* Learn Mode Styles */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .category-card {
+        background: white;
+        color: #333;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .category-card.selected {
+        border: 3px solid #4CAF50;
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }
+
+    .category-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .category-name {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #1e3c72;
+        margin-bottom: 10px;
+    }
+
+    .category-description {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .example-customers {
+        font-size: 0.85em;
+        color: #888;
+        font-style: italic;
+    }
+
+    .customer-count {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #4CAF50;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9em;
+    }
+
+    /* Practice Mode Styles */
+    .practice-area {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .customer-stack {
+        background: white;
+        color: #333;
+        padding: 20px;
+        border-radius: 15px;
+        width: 350px;
+        min-height: 400px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .customer-card {
+        background: linear-gradient(135deg, #2196F3, #1976D2);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        cursor: grab;
+        transition: all 0.3s;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .customer-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .customer-card.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+    }
+
+    .customer-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .customer-details {
+        font-size: 0.9em;
+        opacity: 0.9;
+    }
+
+    .categories-drop-area {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        width: 100%;
+        max-width: 900px;
+    }
+
+    .category-drop-zone {
+        background: rgba(255,255,255,0.95);
+        border: 2px dashed #ccc;
+        padding: 12px;
+        border-radius: 10px;
+        min-height: 100px;
+        transition: all 0.3s;
+        position: relative;
+        text-align: center;
+        color: #333;
+    }
+
+    .category-drop-zone.drag-over {
+        background: #e3f2fd;
+        border-color: #2196F3;
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+    }
+
+    .category-drop-zone.correct {
+        background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+        border: 2px solid #4CAF50;
+        animation: correctPulse 0.6s ease;
+    }
+
+    .category-drop-zone.incorrect {
+        background: #ffebee;
+        border-color: #f44336;
+        animation: shake 0.5s;
+    }
+
+    @keyframes correctPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .zone-icon {
+        font-size: 2em;
+        margin-bottom: 5px;
+    }
+
+    .zone-title {
+        font-weight: bold;
+        font-size: 0.9em;
+        color: #1e3c72;
+    }
+
+    .dropped-customers {
+        margin-top: 10px;
+        text-align: left;
+    }
+
+    .dropped-customer {
+        background: #4CAF50;
+        color: white;
+        padding: 5px 8px;
+        border-radius: 5px;
+        margin: 3px 0;
+        font-size: 0.85em;
+    }
+
+    /* Quiz Mode */
+    .quiz-container {
+        background: white;
+        color: #333;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 700px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .question {
+        font-size: 1.3em;
+        margin-bottom: 20px;
+        color: #1e3c72;
+    }
+
+    .quiz-customer {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .option-btn {
+        padding: 15px;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .option-btn:hover {
+        background: #e3f2fd;
+        border-color: #2196F3;
+        transform: translateY(-2px);
+    }
+
+    .option-btn.correct {
+        background: #c8e6c9;
+        border-color: #4CAF50;
+    }
+
+    .option-btn.incorrect {
+        background: #ffebee;
+        border-color: #f44336;
+    }
+
+    .feedback {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+
+    .feedback.correct {
+        background: #c8e6c9;
+        color: #2e7d32;
+    }
+
+    .feedback.incorrect {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .next-btn {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+        font-size: 1.1em;
+        margin-top: 20px;
+        transition: all 0.3s;
+    }
+
+    .next-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Results Screen */
+    .results-screen {
+        background: white;
+        color: #333;
+        padding: 40px;
+        border-radius: 15px;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .score-display {
+        font-size: 3em;
+        color: #4CAF50;
+        margin: 20px 0;
+    }
+
+    .achievement {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #333;
+        padding: 10px 20px;
+        border-radius: 20px;
+        display: inline-block;
+        margin: 10px;
+        font-weight: bold;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .tips-section {
+        background: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    .tip {
+        margin: 10px 0;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .tip:before {
+        content: "💡";
+        position: absolute;
+        left: 0;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .nav-header {
+            padding: 0.75rem 1rem;
+        }
+        
+        .nav-container {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+        }
+        
+        .back-btn span {
+            display: none;
+        }
+        
+        .logo-container {
+            height: 30px;
+        }
+        
+        .breadcrumb {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .practice-area {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .customer-stack, .categories-drop-area {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 1.8em;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1em;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation Header -->
+<nav class="nav-header">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="/staff-dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <div class="page-title">
+                <i class="fas fa-users-cog"></i>
+                <span>Customer Categorization Training</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="logo-container">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel">
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+    <div class="breadcrumb-container">
+        <a href="/staff-dashboard.html">Staff Dashboard</a>
+        <span>/</span>
+        <a href="#">Training</a>
+        <span>/</span>
+        <span>Customer Categorization Training</span>
+    </div>
+</div>
+
+<!-- Game Wrapper -->
+<div class="game-wrapper">
+    <div class="container">
+        <div class="game-header">
+            <h1>🎯 Customer Categorization Training</h1>
+            <div class="subtitle">NW CUSTOM APPAREL - SALES EXCELLENCE</div>
+        </div>
+
+        <div class="game-mode-selector">
+            <button class="mode-btn active" onclick="switchMode('learn')">📚 Learn Categories</button>
+            <button class="mode-btn" onclick="switchMode('practice')">🎮 Practice Mode</button>
+            <button class="mode-btn" onclick="switchMode('quiz')">📝 Quiz Challenge</button>
+        </div>
+
+        <div class="info-bar">
+            <div class="info-item">📊 Progress: <span id="progress">0</span>%</div>
+            <div class="info-item">🏆 Score: <span id="score">0</span></div>
+            <div class="info-item">⏱️ Best Time: <span id="bestTime">--</span></div>
+        </div>
+
+        <!-- Learn Mode -->
+        <div id="learnMode" class="training-mode active">
+            <h2 style="text-align: center; margin-bottom: 20px;">Customer Categories Overview</h2>
+            <div class="categories-grid" id="categoriesGrid"></div>
+            <div class="tips-section">
+                <h3>💡 Quick Recognition Tips:</h3>
+                <div class="tip">Corporate: Look for LLC, Inc., professional services, tech companies, marketing firms</div>
+                <div class="tip">Construction: Keywords like "construction," "concrete," "electric," "roofing," "trucking"</div>
+                <div class="tip">Food Service: Restaurants, breweries, bakeries, pubs, pizza, sushi places</div>
+                <div class="tip">Medical: Healthcare, dental, therapy, wellness, emergency services, "Dr." titles</div>
+                <div class="tip">Retail: Tattoo shops, farms, individual names (personal businesses), specialty stores</div>
+                <div class="tip">School: Schools, universities, sports teams, bands, learning centers, academic programs</div>
+                <div class="tip">Events: Clubs, reunions, YMCA, racing teams, roller derby, community organizations</div>
+                <div class="tip">Landscaper: Look for "Landscape," "Lawn," "Nursery," "Garden," "Property Services"</div>
+                <div class="tip">Fire/Police: Police, Sheriff, Fire Dept/Station, State Patrol, K9, SWAT teams</div>
+                <div class="tip">Military: JBLM, Squadron, Troop, USS ships, Veterans, ROTC, .mil emails, military ranks</div>
+                <div class="tip">Contract: Other apparel companies, promotional products, embroidery shops, ASI numbers</div>
+                <div class="tip">Alaska Charter: Alaska lodges, charters, marine services, excursions, tours</div>
+            </div>
+        </div>
+
+        <!-- Practice Mode -->
+        <div id="practiceMode" class="training-mode">
+            <h2 style="text-align: center; margin-bottom: 20px;">Drag Customers to Their Categories</h2>
+            <div class="practice-area">
+                <div class="customer-stack">
+                    <h3 style="color: #1e3c72; margin-bottom: 15px;">New Customers</h3>
+                    <div id="customerStack"></div>
+                </div>
+                <div class="categories-drop-area" id="dropZones"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Mode -->
+        <div id="quizMode" class="training-mode">
+            <div class="quiz-container" id="quizContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Customer categories with examples and characteristics
+const categories = {
+    corporate: {
+        name: "Corporate",
+        icon: "🏢",
+        description: "B2B companies, professional services, tech firms",
+        characteristics: ["LLC/Inc in name", "Professional services", "Tech companies", "Marketing firms"],
+        examples: ["AMOCAT FENCING", "Wheel Pros", "Pod Pack International, LLC", "Fenton Communication", "Custom Truck NW"],
+        realCustomers: [
+            "AMOCAT FENCING", "Skyline Properties Inc", "ISB Science", "Chukar Cherry Co.",
+            "BUK Seattle", "InFormula Team", "Troutlodge", "VRC Metal Systems, LLC",
+            "Curb Pros, LLC", "Pixel Pack Games", "BlackRock Industries", "Pod Pack International, LLC",
+            "Wheel Pros", "Fenton Communication", "Simply Labs LLC", "Custom Truck NW",
+            "Rainier Family Wealth", "Armstrong Services", "Rebar International Inc.",
+            "Experience Marketing Group, LLC", "CIMCO Americas LLC", "ALICE Technologies"
+        ]
+    },
+    construction: {
+        name: "Construction",
+        icon: "🏗️",
+        description: "Builders, contractors, concrete, electric, trucking, property development",
+        characteristics: ["Construction/Concrete in name", "Electric/Roofing", "Trucking/Transportation", "Properties/Development", "Architects"],
+        examples: ["Indra Construction", "Delta Concrete", "Max Power Electric", "Elks Roofing", "INNOVA Architects"],
+        realCustomers: [
+            "Indra Construction", "City of Roy", "Wood and Stoane", "Looker Properties",
+            "Lil Miss Truckin LLC", "Jeff Bartlett Trucking", "Konkrete Koncepts", "SV Shotcrete",
+            "Big Mountain Enterprise", "Calco Customs", "Delta Concrete", "Acropolis Const. LLC",
+            "Lawson Electric", "Allwest Transportation", "Osborn Concrete & Consulting LLC",
+            "Max Power Electric", "Yard Works Inc.", "INNOVA Architects", 
+            "England Industrial Garage Doors", "Coral Slater", "Elks Roofing"
+        ]
+    },
+    foodService: {
+        name: "Food Service",
+        icon: "🍔",
+        description: "Restaurants, cafes, breweries, bakeries, pubs, sushi, pizza",
+        characteristics: ["Restaurant/Pub/Cafe", "Bakery/Deli", "Brewing/Brewery", "Pizza/Sushi", "Food/Dining keywords"],
+        examples: ["Domino's Be Good Pizza", "Hess Bakery & Deli", "Acorn Brewing", "Nori Sushi", "Green Lantern Pub"],
+        realCustomers: [
+            "SaddleBrooke One", "Domino's Be Good Pizza LLC", "Hess Bakery & Deli",
+            "Green Lantern Pub", "Acorn Brewing", "HOPSNDROPS - Lacamas", 
+            "HOPSNDROPS - Milton", "Nori Sushi", "BAS QUE", "Blue Heron Bloom LLC"
+        ]
+    },
+    medical: {
+        name: "Medical",
+        icon: "⚕️",
+        description: "Healthcare, dental, chiropractic, wellness, therapy, emergency services",
+        characteristics: ["Medical/Dental/Health in name", "Dr./MD", "Clinic/Surgery", "Therapy/Wellness", "Emergency/ER", "Hospice/Kidney care"],
+        examples: ["Family Tree Chiropractic", "Smile Surfers Kids Dentistry", "UW Dept. Of Emergency Medicine", "Davita Kidney Care"],
+        realCustomers: [
+            "Family Tree Chiropractic", "Molen Oral & Implant Surgery", "Cedar Wellness Center",
+            "Allie Grace Aesthetics, PLLC", "Smile Surfers Kids Dentistry", "UW Dept. Of Emergency Medicine",
+            "Envision Healthcare At Home - Hospice", "Davita Kidney Care", "United Wound Healing",
+            "One to One Physical Therapy", "Parkland ER"
+        ]
+    },
+    retail: {
+        name: "Retail",
+        icon: "🛍️",
+        description: "Tattoo shops, farms, specialty stores, individual entrepreneurs, online shops",
+        characteristics: ["Tattoo/Ink shops", "Farm/Agricultural retail", "Individual names (personal businesses)", "Specialty retail", ".com businesses"],
+        examples: ["Destiny City Tattoo", "Graysmarsh Farm", "Adventure Angling", "Skorched Ice LLC"],
+        realCustomers: [
+            "Graysmarsh Farm", "Destiny City Tattoo", "Richard White", "Adventure Angling",
+            "Skorched Ice LLC", "Jayson Schafer", "Mark Retzlaff", "Pow Town",
+            "Jake Faccone", "Mimi Alvarez", "IamLightWhereIshouldBe.com"
+        ]
+    },
+    school: {
+        name: "School",
+        icon: "🎓",
+        description: "Schools, universities, sports teams, academic programs, learning centers",
+        characteristics: ["School/Academy/University", "Wrestling/Sports teams", "Band/Music programs", "Learning Center", "Educational programs"],
+        examples: ["Hilltop Heritage Middle School", "Cedar Crest Academy", "WSU Institute", "Bonney Lake Wrestling"],
+        realCustomers: [
+            "Hilltop Heritage Middle School", "Fox Island Baseball (FICRA)", "Cedar Crest Academy",
+            "BETHEL ALLSTARS JUNIOR WRESTLING CLUB", "Pilchuck Glass School", "Bonney Lake High School Band",
+            "Bonney Lake Wrestling", "Bonney Lake HS Band", "Prime Time Learning Center",
+            "Linda Wood", "Jenna Larson", "Charlie Seibel", "WSU Institute of Material Research",
+            "Carol Carlos", "Holy Family School", "UPAC - University Place Aquatic Club",
+            "Rizzlin' Raptors", "Clover Toys", "UW - School Of Medicine",
+            "Tufts Doctor Of Physical Therapy Program - Seattle"
+        ]
+    },
+    events: {
+        name: "Events",
+        icon: "🎪",
+        description: "Clubs, reunions, sports clubs, community organizations, special events",
+        characteristics: ["Club/Organization names", "Reunion events", "Sports/Hobby clubs", "Community groups", "Racing/Derby teams"],
+        examples: ["Ocean Park Eagles Club", "Tacoma Rugby Club", "Rat City Roller Derby", "Waitsburg Class of 1974"],
+        realCustomers: [
+            "Monica Murry", "Paul Feuerpfeil", "Ocean Park Eagles Club 3602", "Owen Lawrence",
+            "Cyndy Vilke", "Maria Heinze", "JTP MUSIC", "St. Joe Valley Resort",
+            "Caitlyn Trout", "Waitsburg Class of 1974", "Holden Village - Volunteer",
+            "Tacoma Rugby Club", "Kim Whitney", "Bio Decon Solutions", "NW Chapter ATHS",
+            "Little Fish Island, LLC", "Terenn Houk", "Nathan Riley", "Chris Adams",
+            "True Analytics Manufacturing Solutions", "Robert Maxcy", "PNW RC Crawlers",
+            "Devinant Ollam, LLC", "Alexandra James", "Town And County Auto Repair",
+            "Gordon Family YMCA", "Iron Horse Racing", "Rat City Roller Derby",
+            "Team Alpha Barbell", "NorthWest Samoan Section AG", 
+            "BMDCA - Bernese Mountain Dog Club of America, Inc", "Megan Sheridan for Milton Mayor",
+            "Carolyn Salter", "Tatiana Van Campenhout- Glacier Gals", "Turtles Jeep Club",
+            "Ohana Boxing Fitness", "North Corner Chamber Orchestra", "Planted Roots",
+            "Davis Reunion", "Janet Zamzow", "Anthony Bluehorse"
+        ]
+    },
+    landscaper: {
+        name: "Landscaper",
+        icon: "🌳",
+        description: "Lawn care, landscaping, nurseries, garden centers, property maintenance",
+        characteristics: ["Landscape/Landscaping", "Lawn care/maintenance", "Nursery/Garden", "Property services", "Tree care"],
+        examples: ["Olympic Landscape", "Watson's Greenhouse", "Green Effects", "Windmill Gardens", "Father Nature Landscapes"],
+        realCustomers: [
+            "Olympic Landscape", "Superior Rockeries", "Takehara Landscape", 
+            "New Dimension Lawn & Landscape, Inc.", "Watson's Greenhouse and Nursery",
+            "Green Effects, Inc.", "NW Landscape Management", "Ground Effects Landscaping",
+            "Windmill Gardens", "Furney's Nursery", "Mt. Fuji Gardening & Landscaping Inc",
+            "Summit Landscape Service", "DeGoede Brothers", "Quality Landscape Maintenance",
+            "Winterbourne Landscape", "Flores Landscape Services", "Anderson Landscape Service",
+            "Simply Green Lawn and Landscape", "Family Tree Care", "Valley Landscape Supply",
+            "Edgewood Nursery and Garden", "Father Nature Landscapes of Tacoma, Inc.",
+            "Juan Landscape Maintenance", "Thrush Lawn Care", "Green Line Landscaping",
+            "Greenleaf Landscaping", "Frost Landscape", "Valley Property Services",
+            "Absolute Life Landscape", "All Tacked Up, LLC", "Parker Truck & Equipment Repair",
+            "Aquasense", "Augusta Lawn Care"
+        ]
+    },
+    firePolice: {
+        name: "Fire/Police",
+        icon: "🚔",
+        description: "Law enforcement, fire departments, emergency services",
+        characteristics: ["Police/Sheriff", "Fire Dept/Station", "State Patrol", "K9 units", "SWAT teams"],
+        examples: ["Washington State Patrol", "Tacoma Fire Dept", "Pierce County Sheriff", "Metro K9"],
+        realCustomers: [
+            "Washington State Patrol", "Tacoma Fire Dept", "Pierce County Sheriff- MT Detachment",
+            "Puyallup Tribal Police Department", "Lewis County Sheriff's Office", "Metro K9",
+            "Shoreline Fire Station #61", "Metro Cities Swat"
+        ]
+    },
+    contract: {
+        name: "Contract",
+        icon: "🤝",
+        description: "Apparel decorators, promotional products, print shops, embroidery competitors",
+        characteristics: ["Apparel/Promotions", "Embroidery/Printing", "Merchandise/Merch", "Custom/Customs", "ASI numbers", "Promotional products"],
+        examples: ["Fully Promoted Tacoma", "4G Apparel & Promotions", "Ink Inc.", "Adrenaline Designs"],
+        realCustomers: [
+            "Cure Customs", "1338Tryon", "Adrenaline Designs", "Skyhawk Press",
+            "4G Apparel & Promotions", "Unfinished", "Eastside Apparel LLC", 
+            "Co. X Merchandise", "Basics.Co/Heart 2 Heart", "Seattle Native LLC",
+            "Copler Creek Printing Co", "Regalo International", "Suave Studios",
+            "Little Elm LLC, DBA: Community Sports", "Shell Mays", "Fully Promoted Tacoma",
+            "Ink Inc.", "Designs by Michelle (DMS Embroidery)", "DVC Mechanical Contractor",
+            "Brand Stratos", "Sound Apparel LLC", "The Group"
+        ]
+    },
+    military: {
+        name: "Military",
+        icon: "🎖️",
+        description: "Military bases, veterans organizations, ROTC, military units",
+        characteristics: ["Military base (JBLM)", "Squadron/Troop", "Veterans", "ROTC", "USS ships", ".mil email", "Military ranks"],
+        examples: ["Joint Base Lewis McChord", "UW Naval ROTC", "4th Airlift Squadron", "Pierce County Veterans"],
+        realCustomers: [
+            "4th Airlift Squadron", "UW Naval ROTC", "Pierce County Veterans Assistance",
+            "Joint Base Lewis McChord", "Child Life Services (Sub Vets)", "Troop 222",
+            "Kilo 3/1 USMC", "USS Observation Island EAG 154", "Diana Chudak",
+            "Herman Koppisch", "JBLM-NAC-ODR-Mx", "Family Life Chaplain JBLM", "Roy- US ARMY"
+        ]
+    },
+    alaska: {
+        name: "Alaska Charter",
+        icon: "✈️",
+        description: "Alaska-based lodges, charters, marine services, aviation",
+        characteristics: ["Alaska in name", "Lodge/Charter", "Marine/Air services", "Excursions/Tours", "Alaska addresses"],
+        examples: ["Beluga Air LLC", "Alaska Trophy Adventures Lodge", "Gone Fishin Lodge", "Vitus Marine"],
+        realCustomers: [
+            "Togiak Native Limited", "Frontier Excursions, Inc.", "Vitus Marine",
+            "Alaska's Lodge", "Beluga Air LLC", "Alaska Trophy Adventures Lodge",
+            "Alaska King Charter", "Gone Fishin Lodge", "Alaska Wide Open Charters",
+            "Lego Robotics Kids", "Ironside Marine", "Bald Mountain Air Service",
+            "North Tongass Vol. Fire Dept."
+        ]
+    }
+};
+
+// Practice mode sample customers (mix of real and fictional for training)
+const practiceCustomers = [
+    // Corporate customers (real)
+    { name: "AMOCAT FENCING", category: "corporate" },
+    { name: "Wheel Pros", category: "corporate" },
+    { name: "Pod Pack International, LLC", category: "corporate" },
+    { name: "BlackRock Industries", category: "corporate" },
+    { name: "Fenton Communication", category: "corporate" },
+    { name: "Custom Truck NW", category: "corporate" },
+    { name: "Simply Labs LLC", category: "corporate" },
+    { name: "Experience Marketing Group, LLC", category: "corporate" },
+    
+    // Construction customers (real)
+    { name: "Indra Construction", category: "construction" },
+    { name: "Delta Concrete", category: "construction" },
+    { name: "Max Power Electric", category: "construction" },
+    { name: "Elks Roofing", category: "construction" },
+    { name: "Konkrete Koncepts", category: "construction" },
+    { name: "Jeff Bartlett Trucking", category: "construction" },
+    { name: "Lawson Electric", category: "construction" },
+    { name: "SV Shotcrete", category: "construction" },
+    
+    // Food Service customers (real)
+    { name: "Domino's Be Good Pizza LLC", category: "foodService" },
+    { name: "Hess Bakery & Deli", category: "foodService" },
+    { name: "Green Lantern Pub", category: "foodService" },
+    { name: "Acorn Brewing", category: "foodService" },
+    { name: "Nori Sushi", category: "foodService" },
+    { name: "HOPSNDROPS - Lacamas", category: "foodService" },
+    { name: "BAS QUE", category: "foodService" },
+    
+    // Medical customers (real)
+    { name: "Family Tree Chiropractic", category: "medical" },
+    { name: "Smile Surfers Kids Dentistry", category: "medical" },
+    { name: "Cedar Wellness Center", category: "medical" },
+    { name: "Davita Kidney Care", category: "medical" },
+    { name: "United Wound Healing", category: "medical" },
+    { name: "One to One Physical Therapy", category: "medical" },
+    { name: "Parkland ER", category: "medical" },
+    { name: "Allie Grace Aesthetics, PLLC", category: "medical" },
+    
+    // Retail customers (real)
+    { name: "Destiny City Tattoo", category: "retail" },
+    { name: "Graysmarsh Farm", category: "retail" },
+    { name: "Adventure Angling", category: "retail" },
+    { name: "Skorched Ice LLC", category: "retail" },
+    { name: "Pow Town", category: "retail" },
+    { name: "IamLightWhereIshouldBe.com", category: "retail" },
+    { name: "Jake Faccone", category: "retail" },
+    { name: "Mimi Alvarez", category: "retail" },
+    
+    // School customers (real)
+    { name: "Hilltop Heritage Middle School", category: "school" },
+    { name: "Cedar Crest Academy", category: "school" },
+    { name: "Bonney Lake Wrestling", category: "school" },
+    { name: "WSU Institute of Material Research", category: "school" },
+    { name: "UW - School Of Medicine", category: "school" },
+    { name: "Prime Time Learning Center", category: "school" },
+    { name: "UPAC - University Place Aquatic Club", category: "school" },
+    { name: "Holy Family School", category: "school" },
+    { name: "Fox Island Baseball (FICRA)", category: "school" },
+    { name: "Rizzlin' Raptors", category: "school" },
+    
+    // Events customers (real - sample)
+    { name: "Ocean Park Eagles Club 3602", category: "events" },
+    { name: "Tacoma Rugby Club", category: "events" },
+    { name: "Rat City Roller Derby", category: "events" },
+    { name: "Waitsburg Class of 1974", category: "events" },
+    { name: "PNW RC Crawlers", category: "events" },
+    { name: "Gordon Family YMCA", category: "events" },
+    { name: "Iron Horse Racing", category: "events" },
+    { name: "Team Alpha Barbell", category: "events" },
+    { name: "BMDCA - Bernese Mountain Dog Club of America, Inc", category: "events" },
+    { name: "Turtles Jeep Club", category: "events" },
+    
+    // Landscaper customers (real)
+    { name: "Olympic Landscape", category: "landscaper" },
+    { name: "Watson's Greenhouse and Nursery", category: "landscaper" },
+    { name: "Green Effects, Inc.", category: "landscaper" },
+    { name: "Windmill Gardens", category: "landscaper" },
+    { name: "Father Nature Landscapes of Tacoma, Inc.", category: "landscaper" },
+    { name: "Simply Green Lawn and Landscape", category: "landscaper" },
+    { name: "Greenleaf Landscaping", category: "landscaper" },
+    { name: "Augusta Lawn Care", category: "landscaper" },
+    { name: "Valley Property Services", category: "landscaper" },
+    
+    // Fire/Police customers (real)
+    { name: "Washington State Patrol", category: "firePolice" },
+    { name: "Tacoma Fire Dept", category: "firePolice" },
+    { name: "Pierce County Sheriff- MT Detachment", category: "firePolice" },
+    { name: "Puyallup Tribal Police Department", category: "firePolice" },
+    { name: "Lewis County Sheriff's Office", category: "firePolice" },
+    { name: "Metro K9", category: "firePolice" },
+    { name: "Shoreline Fire Station #61", category: "firePolice" },
+    { name: "Metro Cities Swat", category: "firePolice" },
+    
+    // Military customers (real)
+    { name: "Joint Base Lewis McChord", category: "military" },
+    { name: "UW Naval ROTC", category: "military" },
+    { name: "4th Airlift Squadron", category: "military" },
+    { name: "Pierce County Veterans Assistance", category: "military" },
+    { name: "Kilo 3/1 USMC", category: "military" },
+    { name: "USS Observation Island EAG 154", category: "military" },
+    { name: "Family Life Chaplain JBLM", category: "military" },
+    { name: "JBLM-NAC-ODR-Mx", category: "military" },
+    
+    // Contract customers (real)
+    { name: "Fully Promoted Tacoma", category: "contract" },
+    { name: "4G Apparel & Promotions", category: "contract" },
+    { name: "Ink Inc.", category: "contract" },
+    { name: "Adrenaline Designs", category: "contract" },
+    { name: "Eastside Apparel LLC", category: "contract" },
+    { name: "Sound Apparel LLC", category: "contract" },
+    { name: "Brand Stratos", category: "contract" },
+    { name: "Seattle Native LLC", category: "contract" },
+    
+    // Alaska customers (real)
+    { name: "Togiak Native Limited", category: "alaska" },
+    { name: "Frontier Excursions, Inc.", category: "alaska" },
+    { name: "Vitus Marine", category: "alaska" },
+    { name: "Alaska Trophy Adventures Lodge", category: "alaska" },
+    { name: "Gone Fishin Lodge", category: "alaska" },
+    { name: "Bald Mountain Air Service", category: "alaska" }
+];
+
+let currentMode = 'learn';
+let score = 0;
+let progress = 0;
+let quizQuestions = [];
+let currentQuizIndex = 0;
+let practiceRound = 0;
+
+function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.training-mode').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(`${mode}Mode`).classList.add('active');
+    event.target.classList.add('active');
+    
+    if (mode === 'learn') {
+        initLearnMode();
+    } else if (mode === 'practice') {
+        initPracticeMode();
+    } else if (mode === 'quiz') {
+        initQuizMode();
+    }
+}
+
+function initLearnMode() {
+    const grid = document.getElementById('categoriesGrid');
+    grid.innerHTML = '';
+    
+    Object.entries(categories).forEach(([key, category]) => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+            <div class="customer-count">${category.realCustomers.length}</div>
+            <div class="category-icon">${category.icon}</div>
+            <div class="category-name">${category.name}</div>
+            <div class="category-description">${category.description}</div>
+            <div class="example-customers">
+                <strong>Key identifiers:</strong><br>
+                ${category.characteristics.slice(0, 3).join(' • ')}
+            </div>
+        `;
+        
+        card.onclick = () => {
+            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            showCategoryDetails(category);
+        };
+        
+        grid.appendChild(card);
+    });
+}
+
+function showCategoryDetails(category) {
+    // Could expand to show modal with full customer list
+    console.log('Selected category:', category);
+}
+
+function initPracticeMode() {
+    const stack = document.getElementById('customerStack');
+    const dropZones = document.getElementById('dropZones');
+    
+    stack.innerHTML = '';
+    dropZones.innerHTML = '';
+    
+    // Get random customers for this round from ALL categories
+    const roundCustomers = shuffle(practiceCustomers).slice(0, 12);
+    
+    roundCustomers.forEach(customer => {
+        const card = document.createElement('div');
+        card.className = 'customer-card';
+        card.draggable = true;
+        card.dataset.name = customer.name;
+        card.dataset.category = customer.category;
+        card.innerHTML = `
+            <div class="customer-name">${customer.name}</div>
+            <div class="customer-details">Categorize this customer</div>
+        `;
+        
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+        
+        stack.appendChild(card);
+    });
+    
+    // Create drop zones for ALL 12 categories
+    Object.keys(categories).forEach(key => {
+        const category = categories[key];
+        const zone = document.createElement('div');
+        zone.className = 'category-drop-zone';
+        zone.dataset.category = key;
+        zone.innerHTML = `
+            <div class="zone-icon">${category.icon}</div>
+            <div class="zone-title">${category.name}</div>
+            <div class="dropped-customers"></div>
+        `;
+        
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('drop', handleDrop);
+        zone.addEventListener('dragleave', handleDragLeave);
+        
+        dropZones.appendChild(zone);
+    });
+}
+
+function initQuizMode() {
+    quizQuestions = generateQuizQuestions();
+    currentQuizIndex = 0;
+    showQuizQuestion();
+}
+
+function generateQuizQuestions() {
+    const questions = [];
+    const allCustomers = [];
+    
+    // Include ALL 12 categories in quiz mode
+    Object.entries(categories).forEach(([key, category]) => {
+        category.realCustomers.forEach(customer => {
+            allCustomers.push({ name: customer, category: key, categoryName: category.name });
+        });
+    });
+    
+    // Generate 10 random questions
+    const shuffled = shuffle(allCustomers);
+    for (let i = 0; i < Math.min(10, shuffled.length); i++) {
+        questions.push(shuffled[i]);
+    }
+    
+    return questions;
+}
+
+function showQuizQuestion() {
+    const container = document.getElementById('quizContainer');
+    
+    if (currentQuizIndex >= quizQuestions.length) {
+        showQuizResults();
+        return;
+    }
+    
+    const question = quizQuestions[currentQuizIndex];
+    const options = generateOptions(question.category);
+    
+    container.innerHTML = `
+        <div class="question">Question ${currentQuizIndex + 1} of ${quizQuestions.length}</div>
+        <div class="quiz-customer">
+            <strong style="font-size: 1.2em;">${question.name}</strong><br>
+            <small>Select the correct category for this customer</small>
+        </div>
+        <div class="options">
+            ${options.map(opt => `
+                <button class="option-btn" onclick="checkAnswer('${opt.key}', '${question.category}')">
+                    ${opt.icon} ${opt.name}
+                </button>
+            `).join('')}
+        </div>
+        <div id="feedback"></div>
+    `;
+}
+
+function generateOptions(correctCategory) {
+    const options = [];
+    const categoryKeys = Object.keys(categories);
+    
+    // Add correct answer
+    options.push({
+        key: correctCategory,
+        name: categories[correctCategory].name,
+        icon: categories[correctCategory].icon
+    });
+    
+    // Add 3 random wrong answers
+    const wrongOptions = categoryKeys.filter(k => k !== correctCategory);
+    shuffle(wrongOptions).slice(0, 3).forEach(key => {
+        options.push({
+            key: key,
+            name: categories[key].name,
+            icon: categories[key].icon
+        });
+    });
+    
+    return shuffle(options);
+}
+
+function checkAnswer(selected, correct) {
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent.includes(categories[correct].name)) {
+            btn.classList.add('correct');
+        } else if (btn.textContent.includes(categories[selected].name) && selected !== correct) {
+            btn.classList.add('incorrect');
+        }
+    });
+    
+    const feedback = document.getElementById('feedback');
+    if (selected === correct) {
+        score += 10;
+        feedback.className = 'feedback correct';
+        feedback.innerHTML = '✅ Correct! Well done!';
+    } else {
+        feedback.className = 'feedback incorrect';
+        feedback.innerHTML = `❌ Incorrect. The correct answer is ${categories[correct].name}`;
+    }
+    
+    document.getElementById('score').textContent = score;
+    updateProgress();
+    
+    feedback.innerHTML += `
+        <button class="next-btn" onclick="nextQuestion()">Next Question →</button>
+    `;
+}
+
+function nextQuestion() {
+    currentQuizIndex++;
+    showQuizQuestion();
+}
+
+function showQuizResults() {
+    const container = document.getElementById('quizContainer');
+    const percentage = Math.round((score / (quizQuestions.length * 10)) * 100);
+    
+    container.innerHTML = `
+        <div class="results-screen">
+            <h2>Quiz Complete! 🎉</h2>
+            <div class="score-display">${percentage}%</div>
+            <p>You scored ${score} out of ${quizQuestions.length * 10} points</p>
+            ${percentage >= 80 ? 
+                '<div class="achievement">🏆 Expert Level Achieved!</div>' :
+                percentage >= 60 ?
+                '<div class="achievement">⭐ Good Progress!</div>' :
+                '<div class="achievement">📚 Keep Practicing!</div>'
+            }
+            <button class="next-btn" onclick="initQuizMode()">Try Again</button>
+        </div>
+    `;
+}
+
+// Drag and Drop handlers
+let draggedElement = null;
+
+function handleDragStart(e) {
+    draggedElement = e.target;
+    e.target.classList.add('dragging');
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('drag-over');
+    
+    const correctCategory = draggedElement.dataset.category;
+    const dropCategory = zone.dataset.category;
+    
+    if (correctCategory === dropCategory) {
+        zone.classList.add('correct');
+        const droppedArea = zone.querySelector('.dropped-customers');
+        const dropped = document.createElement('div');
+        dropped.className = 'dropped-customer';
+        dropped.textContent = draggedElement.dataset.name;
+        droppedArea.appendChild(dropped);
+        
+        draggedElement.remove();
+        score += 5;
+        document.getElementById('score').textContent = score;
+        updateProgress();
+        
+        setTimeout(() => zone.classList.remove('correct'), 1000);
+        
+        // Check if round complete
+        if (document.getElementById('customerStack').children.length === 0) {
+            setTimeout(() => {
+                alert('Round complete! Great job! Starting next round...');
+                initPracticeMode();
+            }, 1000);
+        }
+    } else {
+        zone.classList.add('incorrect');
+        setTimeout(() => zone.classList.remove('incorrect'), 600);
+    }
+}
+
+function updateProgress() {
+    progress = Math.min(100, Math.round((score / 100) * 100));
+    document.getElementById('progress').textContent = progress;
+}
+
+function shuffle(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    initLearnMode();
+});
+</script>
+
+</body>
+</html>
