@@ -746,6 +746,40 @@
             color: white !important;
         }
 
+        /* Training Games Hub Link Styling */
+        .nav-section-header-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            width: 100%;
+        }
+
+        .nav-section-header-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-section-header-link .nav-section-header {
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-section-header-link:hover .nav-section-header {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(2px);
+        }
+
+        .external-arrow {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-section-header-link:hover .external-arrow {
+            transform: translateX(2px);
+            color: white;
+        }
+
         /* Font size for submenu items */
         .sidebar .nav-section-content .nav-link {
             font-size: 0.875rem;
@@ -3147,29 +3181,17 @@
                         </div>
                     </div>
                     
-                    <!-- 6. Training Games (Collapsed by default) -->
-                    <div class="nav-section collapsed" data-section="training-games">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>🎮</span>
-                                <span>Training Games</span>
+                    <!-- 6. Training Games -->
+                    <div class="nav-section" data-section="training-games">
+                        <a href="/training/training-games-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>🎮</span>
+                                    <span>Training Games Hub</span>
+                                </div>
+                                <span class="external-arrow">→</span>
                             </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <a href="/training/team-match-game.html" class="nav-link">
-                                <span>Staff Match Game</span>
-                            </a>
-                            <a href="/training/customer-categorization-training.html" class="nav-link">
-                                <span>Customer Category Game</span>
-                            </a>
-                            <a href="/training/lead-source-training.html" class="nav-link">
-                                <span>Lead Source Game</span>
-                            </a>
-                            <a href="/training/shopworks-sales-tax-training.html" class="nav-link">
-                                <span>Sales Tax Code Game</span>
-                            </a>
-                        </div>
+                        </a>
                     </div>
                     
                     <!-- 7. Office Assistant (Collapsed by default) -->
