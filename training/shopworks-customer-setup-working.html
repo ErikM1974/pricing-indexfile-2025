@@ -225,69 +225,6 @@
             cursor: pointer;
             transition: all 0.3s;
             font-size: 1em;
-            position: relative;
-        }
-        
-        .tax-code-option {
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .tax-code-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-        
-        .tax-code-number {
-            background: #f0f0f0;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: monospace;
-            border: 1px solid #d0d0d0;
-        }
-        
-        .tax-indicators {
-            display: flex;
-            gap: 12px;
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 4px;
-        }
-        
-        .tax-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .indicator-icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        
-        .indicator-icon.active {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .indicator-icon.inactive {
-            background: #e0e0e0;
-            color: #999;
-        }
-        
-        .indicator-icon.search {
-            background: #2196F3;
-            color: white;
         }
 
         .option-btn:hover {
@@ -431,30 +368,6 @@
             color: #333;
             font-size: 1.2em;
         }
-        
-        .tax-code-display {
-            background: #f8f9fa;
-            border: 1px solid #d0d0d0;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-        
-        .tax-code-display-header {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .tax-code-display-details {
-            display: flex;
-            gap: 20px;
-            font-size: 0.85em;
-            color: #666;
-        }
 
         .progress-indicator {
             display: flex;
@@ -546,78 +459,17 @@
 
         // Update score display
         document.getElementById('bestScore').textContent = bestScore;
-        
-        // Explorer mode questions
-        const explorerQuestions = [
-            {
-                question: "What tax code should be used for a business located in Seattle, Washington?",
-                correctAnswer: '2200',
-                hint: "Seattle is in Washington State, so use the Washington State Sales Tax code."
-            },
-            {
-                question: "A wholesale distributor with a reseller permit needs to be set up. Which tax code?",
-                correctAnswer: '2203',
-                hint: "Wholesale businesses with tax exemption use 2203 - Wholesale Sales."
-            },
-            {
-                question: "What tax code applies to a business located in Portland, Oregon?",
-                correctAnswer: '2202',
-                hint: "Oregon is outside Washington State, so use Out of State Sales."
-            },
-            {
-                question: "A retail store in Tacoma, Washington needs setup. What tax code?",
-                correctAnswer: '2200',
-                hint: "Tacoma is in Washington State, so use 2200."
-            },
-            {
-                question: "What tax code for a tax-exempt nonprofit in California?",
-                correctAnswer: '2203',
-                hint: "Tax-exempt organizations use 2203 - Wholesale Sales."
-            },
-            {
-                question: "A business in Phoenix, Arizona needs to be configured. Which tax code?",
-                correctAnswer: '2202',
-                hint: "Arizona is outside Washington State, so use 2202."
-            }
-        ];
-        
-        let currentExplorerQuestion = 0;
 
         // Field definitions with business rules
         const fieldDefinitions = {
             taxCode: {
                 label: 'Tax Code',
                 rules: {
-                    '2200': 'Washington State Sales Tax',
-                    '2202': 'Out of State Sales',
-                    '2203': 'Wholesale Sales'
+                    '2200': 'Business in Vancouver (CAN)',
+                    '2202': 'Business outside Vancouver (CAN)',
+                    '2203': 'Business in USA'
                 },
-                details: {
-                    '2200': {
-                        name: 'Washington State Sales Tax',
-                        paySalesTax: true,
-                        shippingTaxable: true,
-                        taxExempt: false,
-                        description: 'For businesses located in Washington State'
-                    },
-                    '2202': {
-                        name: 'Out of State Sales',
-                        paySalesTax: true,
-                        shippingTaxable: true,
-                        taxExempt: false,
-                        description: 'For businesses located outside Washington State'
-                    },
-                    '2203': {
-                        name: 'Wholesale Sales',
-                        paySalesTax: true,
-                        shippingTaxable: false,
-                        taxExempt: true,
-                        exemptNumber: 'A353-456-3456',
-                        expirationDate: '8/1/28',
-                        description: 'For wholesale/reseller accounts with tax exemption'
-                    }
-                },
-                hint: 'Based on business location and tax status'
+                hint: 'Based on business location, not ship-to address'
             },
             salesperson: {
                 label: 'Salesperson',
@@ -643,28 +495,28 @@
                 location: 'Seattle, WA',
                 industry: 'Construction',
                 correct: {
-                    taxCode: '2200',
+                    taxCode: '2203',
                     customerType: 'Construction',
                     salesperson: 'Taylar'
                 }
             },
             {
-                company: 'Portland Medical Center',
-                location: 'Portland, OR',
+                company: 'Vancouver General Hospital',
+                location: 'Vancouver, BC',
                 industry: 'Healthcare',
                 correct: {
-                    taxCode: '2202',
+                    taxCode: '2200',
                     customerType: 'Medical',
                     salesperson: 'Ruth'
                 }
             },
             {
-                company: 'Wholesale Apparel Distributors',
-                location: 'Los Angeles, CA',
-                industry: 'Wholesale',
+                company: 'Surrey School District',
+                location: 'Surrey, BC',
+                industry: 'Education',
                 correct: {
-                    taxCode: '2203',
-                    customerType: 'Retail',
+                    taxCode: '2202',
+                    customerType: 'School',
                     salesperson: 'Nika'
                 }
             }
@@ -702,78 +554,24 @@
 
         function startFieldExplorer() {
             const gameArea = document.getElementById('gameArea');
-            const question = explorerQuestions[currentExplorerQuestion % explorerQuestions.length];
-            
             gameArea.innerHTML = `
                 <h2>🔍 Field Explorer Mode</h2>
-                <p>Learn about each field used in Shopworks customer setup. Question ${(currentExplorerQuestion % explorerQuestions.length) + 1} of ${explorerQuestions.length}</p>
+                <p>Learn about each field used in Shopworks customer setup.</p>
                 
                 <div class="question-container">
                     <div class="question">
-                        ${question.question}
+                        What tax code should be used for a business located in Seattle, Washington?
                     </div>
                     
                     <div class="options-grid">
-                        <button class="option-btn" onclick="checkExplorerAnswer('2200', '${question.correctAnswer}')">
-                            <div class="tax-code-option">
-                                <div class="tax-code-header">
-                                    <span class="tax-code-number">2200</span>
-                                    <span>Washington State Sales Tax</span>
-                                </div>
-                                <div class="tax-indicators">
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon search">🔍</span>
-                                        <span>Pay Sales Tax</span>
-                                    </span>
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon active">✓</span>
-                                        <span>Shipping Taxable</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </button>
-                        <button class="option-btn" onclick="checkExplorerAnswer('2202', '${question.correctAnswer}')">
-                            <div class="tax-code-option">
-                                <div class="tax-code-header">
-                                    <span class="tax-code-number">2202</span>
-                                    <span>Out of State Sales</span>
-                                </div>
-                                <div class="tax-indicators">
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon search">🔍</span>
-                                        <span>Pay Sales Tax</span>
-                                    </span>
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon active">✓</span>
-                                        <span>Shipping Taxable</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </button>
-                        <button class="option-btn" onclick="checkExplorerAnswer('2203', '${question.correctAnswer}')">
-                            <div class="tax-code-option">
-                                <div class="tax-code-header">
-                                    <span class="tax-code-number">2203</span>
-                                    <span>Wholesale Sales</span>
-                                </div>
-                                <div class="tax-indicators">
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon active">✓</span>
-                                        <span>Tax Exempt</span>
-                                    </span>
-                                    <span class="tax-indicator">
-                                        <span class="indicator-icon inactive">✗</span>
-                                        <span>Shipping Taxable</span>
-                                    </span>
-                                </div>
-                                <small style="color: #666; margin-top: 4px;">Exempt #: A353-456-3456 | Exp: 8/1/28</small>
-                            </div>
-                        </button>
+                        <button class="option-btn" onclick="checkAnswer('2200', '2203')">2200 - Vancouver</button>
+                        <button class="option-btn" onclick="checkAnswer('2202', '2203')">2202 - Outside Vancouver</button>
+                        <button class="option-btn" onclick="checkAnswer('2203', '2203')">2203 - USA</button>
                     </div>
                     
                     <div class="hint-box" id="hintBox">
                         <h4>💡 Hint</h4>
-                        <p>${question.hint}</p>
+                        <p>Remember: Tax codes are based on the business location, not shipping address. USA businesses always use 2203.</p>
                     </div>
                 </div>
                 
@@ -781,7 +579,7 @@
                 
                 <div class="action-buttons">
                     <button class="btn btn-secondary" onclick="showHint()">Show Hint</button>
-                    <button class="btn btn-primary" onclick="nextExplorerQuestion()">Next Question</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()">Next Question</button>
                 </div>
             `;
         }
@@ -810,15 +608,12 @@
                     <div class="input-group">
                         <div class="form-field">
                             <label>Tax Code *</label>
-                            <select id="taxCode" onchange="validateField('taxCode', '${scenario.correct.taxCode}'); updateTaxDisplay(this.value)">
+                            <select id="taxCode" onchange="validateField('taxCode', '${scenario.correct.taxCode}')">
                                 <option value="">Select...</option>
-                                <option value="2200">2200 - Washington State Sales Tax</option>
-                                <option value="2202">2202 - Out of State Sales</option>
-                                <option value="2203">2203 - Wholesale Sales</option>
+                                <option value="2200">2200 - Vancouver</option>
+                                <option value="2202">2202 - Outside Vancouver</option>
+                                <option value="2203">2203 - USA</option>
                             </select>
-                            <div id="taxCodeDisplay" class="tax-code-display" style="display: none;">
-                                <!-- Tax code details will be shown here -->
-                            </div>
                         </div>
                         
                         <div class="form-field">
@@ -863,10 +658,10 @@
                     </div>
                     
                     <div class="question">
-                        <strong>Company:</strong> California Tech Solutions<br>
-                        <strong>Location:</strong> San Francisco, CA<br>
+                        <strong>Company:</strong> Toronto Tech Solutions<br>
+                        <strong>Location:</strong> Toronto, ON, Canada<br>
                         <strong>Current Setup:</strong><br>
-                        • Tax Code: <span style="color: red; font-weight: bold;">2200</span> (Washington State Sales Tax)<br>
+                        • Tax Code: <span style="color: red; font-weight: bold;">2200</span> (Vancouver)<br>
                         • Customer Type: Corporate<br>
                         • Salesperson: Erik
                     </div>
@@ -899,7 +694,7 @@
                 
                 <div class="question-container">
                     <div class="question">
-                        Quick! A business in Tacoma, Washington needs setup. What tax code?
+                        Quick! A business in Portland, Oregon needs setup. What tax code?
                     </div>
                     
                     <div class="options-grid">
@@ -937,25 +732,6 @@
                 currentStreak = 0;
                 feedback.className = 'feedback incorrect show';
                 feedback.innerHTML = '❌ Not quite. The correct answer is ' + correct;
-                event.target.classList.add('incorrect');
-            }
-            
-            updateScores();
-        }
-        
-        function checkExplorerAnswer(selected, correct) {
-            const feedback = document.getElementById('feedback');
-            
-            if (selected === correct) {
-                currentScore += 10;
-                currentStreak++;
-                feedback.className = 'feedback correct show';
-                feedback.innerHTML = `✅ Correct! ${fieldDefinitions.taxCode.rules[correct]} is the right choice.`;
-                event.target.classList.add('correct');
-            } else {
-                currentStreak = 0;
-                feedback.className = 'feedback incorrect show';
-                feedback.innerHTML = `❌ Not quite. The correct answer is ${correct} - ${fieldDefinitions.taxCode.rules[correct]}`;
                 event.target.classList.add('incorrect');
             }
             
@@ -1009,11 +785,11 @@
                 currentScore += 15;
                 currentStreak++;
                 feedback.className = 'feedback correct show';
-                feedback.innerHTML = '✅ Correct! California businesses should use 2202 (Out of State Sales), not 2200 (Washington State).';
+                feedback.innerHTML = '✅ Correct! Toronto is outside Vancouver, so it should be 2202, not 2200.';
             } else {
                 currentStreak = 0;
                 feedback.className = 'feedback incorrect show';
-                feedback.innerHTML = '❌ Look closer at the tax code. California is not in Washington State!';
+                feedback.innerHTML = '❌ Look closer at the tax code. Toronto is not in Vancouver!';
             }
             
             updateScores();
@@ -1022,7 +798,7 @@
         function speedAnswer(selected) {
             const feedback = document.getElementById('feedback');
             
-            if (selected === '2200') {
+            if (selected === '2203') {
                 currentScore += 5;
                 currentStreak++;
                 feedback.className = 'feedback correct show';
@@ -1035,7 +811,7 @@
             } else {
                 currentStreak = 0;
                 feedback.className = 'feedback incorrect show';
-                feedback.innerHTML = '❌ Tacoma is in Washington State - use 2200';
+                feedback.innerHTML = '❌ Portland is in the USA - use 2203';
             }
             
             updateScores();
@@ -1043,14 +819,11 @@
 
         function generateSpeedQuestion() {
             const questions = [
-                { q: "Business in Portland, Oregon?", a: "2202" },
-                { q: "Business in Seattle, Washington?", a: "2200" },
-                { q: "Wholesale distributor in California?", a: "2203" },
-                { q: "Business in Spokane, Washington?", a: "2200" },
-                { q: "Business in Phoenix, Arizona?", a: "2202" },
-                { q: "Tax-exempt reseller in Texas?", a: "2203" },
-                { q: "Business in Olympia, Washington?", a: "2200" },
-                { q: "Business in Denver, Colorado?", a: "2202" }
+                { q: "Business in Calgary, Alberta?", a: "2202" },
+                { q: "Business in Vancouver, BC?", a: "2200" },
+                { q: "Business in Los Angeles, CA?", a: "2203" },
+                { q: "Business in Burnaby, BC?", a: "2200" },
+                { q: "Business in Edmonton, AB?", a: "2202" }
             ];
             
             const question = questions[Math.floor(Math.random() * questions.length)];
@@ -1069,11 +842,6 @@
 
         function nextQuestion() {
             currentQuestion++;
-            startFieldExplorer();
-        }
-        
-        function nextExplorerQuestion() {
-            currentExplorerQuestion++;
             startFieldExplorer();
         }
 
@@ -1110,50 +878,6 @@
             // Update level based on score
             currentLevel = Math.floor(currentScore / 100) + 1;
             document.getElementById('level').textContent = currentLevel;
-        }
-        
-        function updateTaxDisplay(taxCode) {
-            const display = document.getElementById('taxCodeDisplay');
-            if (!display) return;
-            
-            if (!taxCode) {
-                display.style.display = 'none';
-                return;
-            }
-            
-            const details = fieldDefinitions.taxCode.details[taxCode];
-            if (details) {
-                let html = `
-                    <div class="tax-code-display-header">
-                        <span class="tax-code-number">${taxCode}</span>
-                        <span>${details.name}</span>
-                    </div>
-                    <div class="tax-code-display-details">
-                `;
-                
-                if (details.paySalesTax) {
-                    html += `<span><span class="indicator-icon search" style="display: inline-block; width: 16px; height: 16px; text-align: center; font-size: 10px;">🔍</span> Pay Sales Tax</span>`;
-                }
-                
-                if (details.shippingTaxable) {
-                    html += `<span><span class="indicator-icon active" style="display: inline-block; width: 16px; height: 16px; text-align: center;">✓</span> Shipping Taxable</span>`;
-                } else {
-                    html += `<span><span class="indicator-icon inactive" style="display: inline-block; width: 16px; height: 16px; text-align: center;">✗</span> No Shipping Tax</span>`;
-                }
-                
-                if (details.taxExempt) {
-                    html += `<span><span class="indicator-icon active" style="display: inline-block; width: 16px; height: 16px; text-align: center;">✓</span> Tax Exempt</span>`;
-                }
-                
-                html += `</div>`;
-                
-                if (details.exemptNumber) {
-                    html += `<div style="margin-top: 8px; font-size: 0.85em; color: #666;">Exempt #: ${details.exemptNumber} | Expires: ${details.expirationDate}</div>`;
-                }
-                
-                display.innerHTML = html;
-                display.style.display = 'block';
-            }
         }
     </script>
 </body>
