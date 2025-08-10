@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Training Games Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .game-card h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .game-card .icon {
+            font-size: 2rem;
+        }
+        .game-card .description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .features {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .features h3 {
+            color: #444;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .features ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .features li {
+            margin: 0.3rem 0;
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #981e32, #b82940);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(152, 30, 50, 0.3);
+        }
+        .btn.secondary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        .btn.secondary:hover {
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .status-badge.new {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-badge.fixed {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .server-info {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .server-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .server-info p {
+            color: #666;
+            margin: 0.25rem 0;
+        }
+        .server-info .code {
+            background: #f8f9fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #d73502;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧢 Cap Training Games Hub</h1>
+            <p>Master your cap knowledge with interactive training tools</p>
+        </div>
+
+        <div class="server-info">
+            <h3>🖥️ Local Server Status</h3>
+            <p>✅ Server running on port <span class="code">8080</span></p>
+            <p>Access your training games at: <span class="code">http://localhost:8080/training/</span></p>
+        </div>
+
+        <div class="games-grid">
+            <!-- Original Cap Knowledge Trainer -->
+            <div class="game-card">
+                <span class="status-badge fixed">Recently Fixed</span>
+                <h2><span class="icon">🎯</span> Cap Knowledge Trainer</h2>
+                <p class="description">
+                    The original 3-mode cap training game with Sales Overview, Cap Gallery, and Knowledge Quiz. 
+                    Now with working gallery display showing actual product images!
+                </p>
+                <div class="features">
+                    <h3>✨ Features:</h3>
+                    <ul>
+                        <li><strong>Sales Overview:</strong> View top-selling caps with metrics</li>
+                        <li><strong>Cap Gallery:</strong> Browse all caps with real product images</li>
+                        <li><strong>Knowledge Quiz:</strong> Test your knowledge with interactive questions</li>
+                        <li>Sales statistics and revenue data</li>
+                        <li>Fixed image loading from API</li>
+                    </ul>
+                </div>
+                <div class="btn-group">
+                    <a href="http://localhost:8080/training/cap-knowledge-trainer.html" class="btn" target="_blank">
+                        Open Trainer
+                    </a>
+                    <button class="btn secondary" onclick="window.open('cap-knowledge-trainer.html', '_blank')">
+                        Local Version
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enhanced Catalog Edition -->
+            <div class="game-card">
+                <span class="status-badge new">New Feature</span>
+                <h2><span class="icon">📖</span> Cap Catalog Explorer</h2>
+                <p class="description">
+                    Enhanced catalog-style viewer with full navigation controls and color variations. 
+                    Browse through 40+ colors for each cap style with professional catalog layout.
+                </p>
+                <div class="features">
+                    <h3>✨ Features:</h3>
+                    <ul>
+                        <li><strong>Navigation Controls:</strong> Previous/Next arrows and dot indicators</li>
+                        <li><strong>Keyboard Support:</strong> Arrow keys and number shortcuts (1-9)</li>
+                        <li><strong>View Modes:</strong> Toggle between single cap and grid view</li>
+                        <li><strong>Color Gallery:</strong> See all 40+ color variations per cap</li>
+                        <li><strong>Multiple Views:</strong> Front, back, and flat views</li>
+                        <li>Interactive color swatches</li>
+                        <li>Sales statistics integration</li>
+                    </ul>
+                </div>
+                <div class="btn-group">
+                    <a href="http://localhost:8080/training/cap-knowledge-trainer-catalog.html" class="btn" target="_blank">
+                        Open Catalog
+                    </a>
+                    <button class="btn secondary" onclick="window.open('cap-knowledge-trainer-catalog.html', '_blank')">
+                        Local Version
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if server is actually running
+        fetch('http://localhost:8080/')
+            .then(response => {
+                console.log('Server check successful');
+            })
+            .catch(error => {
+                console.log('Server may not be running. Start with: npx http-server -p 8080');
+            });
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cap Knowledge Trainer - Northwest Custom Apparel</title>
+    <title>Cap Knowledge Trainer - Learn Your Top Sellers!</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -16,9 +16,10 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
-            color: #333;
+            color: white;
+            overflow-x: hidden;
         }
 
         /* Navigation Header */
@@ -88,49 +89,85 @@
             width: auto;
         }
 
-        /* Main Container */
-        .main-container {
-            max-width: 1600px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+        /* Game Container */
+        .game-wrapper {
+            min-height: calc(100vh - 120px);
+            padding: 20px;
         }
 
-        /* Game Modes */
-        .game-modes {
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #4CAF50;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Game Header */
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #4CAF50;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Game Controls */
+        .game-controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 15px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .mode-btn {
-            padding: 0.75rem 1.5rem;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 12px 25px;
+            font-size: 1em;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 30px;
+            color: white;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
         }
 
         .mode-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #981e32;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         .mode-btn.active {
-            background: linear-gradient(135deg, #981e32, #b82940);
-            color: white;
-            border-color: #981e32;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
         }
 
         /* Catalog View Styles */
@@ -654,7 +691,6 @@
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            display: none;
         }
 
         .quiz-question {
@@ -759,7 +795,7 @@
             z-index: 9999;
         }
 
-        .loading-spinner {
+        .loading-spinner, .spinner {
             width: 60px;
             height: 60px;
             border: 4px solid #f3f3f3;
@@ -1111,6 +1147,147 @@
             margin-top: 0.5rem;
         }
 
+        /* Flashcard Styles */
+        .flashcard-container {
+            max-width: 600px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .flashcard {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .flashcard-front {
+            padding: 2rem;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cap-style-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cap-image-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .cap-image-display img {
+            max-width: 100%;
+            max-height: 280px;
+            object-fit: contain;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .cap-image-display img:hover {
+            transform: scale(1.05);
+        }
+
+        .cap-description {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .sales-rank {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .flashcard-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .card-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .indicator-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .indicator-dot:hover {
+            background: rgba(255,255,255,0.8);
+        }
+
+        /* Game Info Bar */
+        .game-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-item {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item span {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
         /* Keyboard Navigation Hints */
         .keyboard-hints {
             position: fixed;
@@ -1200,6 +1377,184 @@
                 font-size: 0.75rem;
             }
         }
+
+        /* Match Game Styles */
+        .match-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .match-instructions {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #667eea;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .match-game-area {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .style-numbers, .cap-images {
+            flex: 1;
+            min-height: 400px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+
+        .style-numbers h3, .cap-images h3 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        .draggable-style {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem;
+            border-radius: 8px;
+            cursor: move;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .draggable-style:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .draggable-style.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .draggable-style.matched {
+            display: none;
+        }
+
+        .cap-drop-zone {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 3px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            min-height: 80px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cap-drop-zone:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .cap-drop-zone.drag-over {
+            border-color: #667eea;
+            border-style: solid;
+            background: #e6fffa;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: scale(1.02);
+        }
+
+        .cap-drop-zone.matched {
+            border-color: #48bb78;
+            border-style: solid;
+            background: #f0fff4;
+        }
+
+        .cap-drop-zone img {
+            pointer-events: none;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .cap-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .cap-info .style {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .cap-info .description {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        .match-score {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 1.5rem;
+        }
+
+        .drop-placeholder {
+            width: 120px;
+            height: 40px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .dropped-style {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: default;
+            transform: none !important;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 768px) {
+            .match-game-area {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .style-numbers, .cap-images {
+                min-height: 300px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1212,8 +1567,8 @@
                     <span>Back to Dashboard</span>
                 </a>
                 <div class="page-title">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Cap Knowledge Trainer</span>
+                    <i class="fas fa-gamepad"></i>
+                    <span>Cap Style Master</span>
                 </div>
             </div>
             <div class="logo-container">
@@ -1223,67 +1578,89 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Game Modes -->
-        <div class="game-modes">
-            <button class="mode-btn active" onclick="setMode('overview')">
-                <i class="fas fa-chart-bar"></i> Sales Overview
-            </button>
-            <button class="mode-btn" onclick="setMode('gallery')">
-                <i class="fas fa-images"></i> Cap Gallery
-            </button>
-            <button class="mode-btn" onclick="setMode('quiz')">
-                <i class="fas fa-question-circle"></i> Knowledge Quiz
-            </button>
-        </div>
+    <!-- Game Wrapper -->
+    <div class="game-wrapper">
+        <div class="container">
+            <!-- Game Header -->
+            <div class="game-header">
+                <h1 class="game-title">🧢 Cap Style Challenge</h1>
+                <div class="subtitle">LEARN THE TOP 9 SELLING CAP STYLES</div>
+            </div>
+            
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="mode-btn active" onclick="setGameMode('flashcards')">
+                    <i class="fas fa-images"></i> Visual Learning
+                </button>
+                <button class="mode-btn" onclick="setGameMode('quiz')">
+                    <i class="fas fa-brain"></i> Style Quiz
+                </button>
+                <button class="mode-btn" onclick="setGameMode('match')">
+                    <i class="fas fa-puzzle-piece"></i> Match Game
+                </button>
+            </div>
 
-        <!-- Overview Section -->
-        <div id="overviewSection">
-            <!-- Stats Container -->
-            <div class="stats-container">
-                <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Top Selling Caps - 2025 Performance</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalRevenue">$0</div>
-                        <div class="stat-label">Total Revenue</div>
+            <!-- Game Info -->
+            <div class="game-info" id="gameInfo">
+                <div class="info-item">📚 Style: <span id="currentStyle">1</span>/9</div>
+                <div class="info-item">⭐ Score: <span id="playerScore">0</span></div>
+                <div class="info-item">🎯 Best: <span id="highScore">0</span></div>
+            </div>
+
+            <!-- Visual Learning Mode -->
+            <div id="flashcardsMode" class="game-mode">
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-front">
+                            <div class="cap-style-number" id="styleNumber">C112</div>
+                            <div class="cap-image-display">
+                                <img id="capImage" src="" alt="Cap" />
+                            </div>
+                            <div class="cap-description" id="capDescription">Port Authority Snapback Trucker Cap</div>
+                            <div class="sales-rank" id="salesRank">#1 Best Seller</div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalUnits">0</div>
-                        <div class="stat-label">Units Sold</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalOrders">0</div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="avgOrder">$0</div>
-                        <div class="stat-label">Avg Order Value</div>
+                    <div class="flashcard-controls">
+                        <button class="nav-btn" onclick="previousCap()" id="prevBtn">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <div class="card-indicators" id="cardIndicators"></div>
+                        <button class="nav-btn" onclick="nextCap()" id="nextBtn">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Revenue Chart -->
-            <div class="chart-container">
-                <h3 class="chart-title">Revenue by Style</h3>
-                <div class="revenue-chart" id="revenueChart"></div>
+            <!-- Quiz Mode -->
+            <div id="quizMode" class="game-mode" style="display: none;">
+                <div class="quiz-container">
+                    <div class="quiz-progress">
+                        <div class="quiz-score">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></div>
+                        <div class="quiz-score">Score: <span id="quizScore">0</span> / <span id="possibleScore">0</span></div>
+                    </div>
+                    <div class="quiz-question" id="quizQuestion">What style number is this cap?</div>
+                    <div class="quiz-image" id="quizImageContainer" style="display: none;">
+                        <img id="quizImage" src="" alt="Cap to identify" />
+                    </div>
+                    <div class="quiz-options" id="quizOptions"></div>
+                    <div class="quiz-feedback" id="quizFeedback" style="display: none;"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Gallery Section -->
-        <div id="gallerySection" style="display: none;">
-            <div class="caps-grid" id="capsGrid"></div>
-        </div>
-
-        <!-- Quiz Section -->
-        <div id="quizSection" class="quiz-container">
-            <div class="quiz-progress">
-                <div>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></div>
-                <div class="quiz-score">Score: <span id="quizScore">0</span></div>
+            <!-- Match Game Mode -->
+            <div id="matchMode" class="game-mode" style="display: none;">
+                <div class="match-container">
+                    <div class="match-instructions">
+                        🧩 Drag the style numbers to match the cap images!
+                    </div>
+                    <div class="match-game-area">
+                        <div class="style-numbers" id="styleNumbers"></div>
+                        <div class="cap-images" id="capImages"></div>
+                    </div>
+                    <div class="match-score" id="matchScore">Matches: 0/9</div>
+                </div>
             </div>
-            <div class="quiz-question" id="quizQuestion">Loading question...</div>
-            <div class="quiz-image" id="quizImage"></div>
-            <div class="quiz-options" id="quizOptions"></div>
         </div>
     </div>
 
@@ -1309,78 +1686,206 @@
             { style: "C865", description: "Port Authority Flexfit Cap", units: 143, revenue: 3542.00, orders: 7 }
         ];
 
-        let currentMode = 'catalog';
         let capProductData = {};
         let quizData = [];
         let currentQuizIndex = 0;
         let quizScore = 0;
+        
+        // Data loading state flags
+        let isDataLoaded = false;
+        let isDataLoading = false;
+        
+        // Game mode variables
+        let currentMode = 'flashcards';
+        let currentCapIndex = 0;
 
         // Initialize
         async function init() {
             showLoading(true);
-            calculateStats();
+            console.log('🚀 Loading cap product data for visual learning...');
+            
+            // Load full product data including images for proper visual learning
             await loadFullProductData();
+            
             showLoading(false);
-            setMode('overview');
+            initializeGame();
         }
 
-        // Calculate and display stats
+        // Initialize the game
+        function initializeGame() {
+            console.log('🎮 Initializing Cap Knowledge Trainer Game...');
+            
+            // Load high score from localStorage
+            const savedHighScore = localStorage.getItem('capQuizHighScore');
+            if (savedHighScore) {
+                document.getElementById('highScore').textContent = savedHighScore;
+            }
+            
+            // Log loaded product data for debugging
+            const loadedStyles = Object.keys(capProductData);
+            console.log(`📊 Game initialized with ${loadedStyles.length} cap styles loaded:`, loadedStyles);
+            
+            // Test first cap image loading
+            if (loadedStyles.length > 0) {
+                const firstStyle = loadedStyles[0];
+                const imageUrl = getCapImage(firstStyle);
+                console.log(`🖼️ First cap image URL: ${imageUrl}`);
+            }
+            
+            setGameMode('flashcards'); // Start with visual learning mode
+        }
+
+        // Calculate and display stats (legacy function - keeping for potential future use)
         function calculateStats() {
             const totalRevenue = capData.reduce((sum, cap) => sum + cap.revenue, 0);
             const totalUnits = capData.reduce((sum, cap) => sum + cap.units, 0);
             const totalOrders = capData.reduce((sum, cap) => sum + cap.orders, 0);
             const avgOrder = totalRevenue / totalOrders;
 
-            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('totalUnits').textContent = totalUnits.toLocaleString();
-            document.getElementById('totalOrders').textContent = totalOrders.toLocaleString();
-            document.getElementById('avgOrder').textContent = `$${avgOrder.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            // These stats are no longer displayed in the gamified version
+            // but keeping function for potential future enhancement
         }
 
         // Load full product data including all colors
         async function loadFullProductData() {
+            // Set loading flags
+            isDataLoading = true;
+            isDataLoaded = false;
+            
+            let loaded = 0;
+            const total = capData.length;
+            
+            console.log(`📦 Loading product data for ${total} cap styles...`);
+            
             for (const cap of capData) {
                 try {
-                    console.log(`Loading product data for ${cap.style}...`);
+                    // Update loading text with progress
+                    const loadingText = document.querySelector('.loading-text');
+                    if (loadingText) {
+                        loadingText.textContent = `Loading ${cap.style}... (${loaded + 1}/${total})`;
+                    }
+                    
+                    console.log(`Loading product data for ${cap.style}... (${loaded + 1}/${total})`);
                     const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${cap.style}`);
+                    
                     if (response.ok) {
                         const data = await response.json();
+                        console.log(`🔍 Raw API response for ${cap.style}:`, data);
+                        
                         if (data && data.length > 0) {
-                            // Store all color variations
+                            // Log first item to understand the structure
+                            console.log(`🔍 First item structure for ${cap.style}:`, Object.keys(data[0]));
+                            
+                            // Log specific image fields from SanMar API
+                            const firstItem = data[0];
+                            console.log(`📸 Image URLs from API for ${cap.style}:`, {
+                                FRONT_MODEL: firstItem.FRONT_MODEL || 'not found',
+                                FRONT_FLAT: firstItem.FRONT_FLAT || 'not found',
+                                BACK_MODEL: firstItem.BACK_MODEL || 'not found',
+                                BACK_FLAT: firstItem.BACK_FLAT || 'not found',
+                                // Check for SanMar CDN URLs
+                                hasSanMarUrl: (firstItem.FRONT_MODEL && firstItem.FRONT_MODEL.includes('cdnm.sanmar.com')) || false,
+                                sampleUrl: firstItem.FRONT_MODEL || firstItem.FRONT_FLAT || 'no image found'
+                            });
+                            
+                            // Store all color variations with more comprehensive field mapping
                             capProductData[cap.style] = {
                                 ...cap,
-                                colors: data.map(item => ({
-                                    name: item.COLOR_NAME || item.CATALOG_COLOR || 'Unknown',
-                                    code: item.COLOR_CODE || '',
-                                    frontModel: item.FRONT_MODEL || item.imageURL || item.IMAGE_URL,
-                                    frontFlat: item.FRONT_FLAT || item.FRONT_FLAT_IMAGE,
-                                    backModel: item.BACK_MODEL || item.BACK_MODEL_IMAGE,
-                                    backFlat: item.BACK_FLAT || item.BACK_FLAT_IMAGE,
-                                    colorSwatch: item.COLOR_SQUARE_IMAGE || item.COLOR_SWATCH,
-                                    msrp: item.MSRP || item.msrp,
-                                    pricing: item.PRICING_TEXT || ''
-                                }))
+                                colors: data.map(item => {
+                                    // Try multiple field names for images - check all possible variations
+                                    const frontModel = item.FRONT_MODEL || item.frontModel || item.Front_Model || 
+                                                      item.imageURL || item.IMAGE_URL || item.image_url || 
+                                                      item.FrontModel || item.front_model;
+                                    const frontFlat = item.FRONT_FLAT || item.frontFlat || item.Front_Flat || 
+                                                     item.FRONT_FLAT_IMAGE || item.front_flat_image || 
+                                                     item.FrontFlat || item.front_flat;
+                                    const backModel = item.BACK_MODEL || item.backModel || item.Back_Model || 
+                                                     item.BACK_MODEL_IMAGE || item.back_model_image || 
+                                                     item.BackModel || item.back_model;
+                                    const backFlat = item.BACK_FLAT || item.backFlat || item.Back_Flat || 
+                                                    item.BACK_FLAT_IMAGE || item.back_flat_image || 
+                                                    item.BackFlat || item.back_flat;
+                                    
+                                    // Also check for any general image field
+                                    const anyImage = frontModel || frontFlat || backModel || backFlat || 
+                                                   item.IMAGE || item.image || item.Image || 
+                                                   item.PRODUCT_IMAGE || item.product_image || 
+                                                   item.ProductImage;
+                                    
+                                    const colorData = {
+                                        name: item.COLOR_NAME || item.CATALOG_COLOR || item.color_name || 
+                                              item.catalog_color || item.Color_Name || item.ColorName || 'Unknown',
+                                        code: item.COLOR_CODE || item.color_code || item.Color_Code || item.ColorCode || '',
+                                        frontModel: frontModel || anyImage,
+                                        frontFlat: frontFlat,
+                                        backModel: backModel,
+                                        backFlat: backFlat,
+                                        anyImage: anyImage, // Store any found image as fallback
+                                        colorSwatch: item.COLOR_SQUARE_IMAGE || item.COLOR_SWATCH || 
+                                                    item.color_square_image || item.color_swatch || 
+                                                    item.ColorSwatch || item.Color_Swatch,
+                                        msrp: item.MSRP || item.msrp || item.Msrp,
+                                        pricing: item.PRICING_TEXT || item.pricing_text || item.PricingText || ''
+                                    };
+                                    
+                                    console.log(`🖼️ Image URLs for ${cap.style} - ${colorData.name}:`, {
+                                        frontModel: colorData.frontModel,
+                                        frontFlat: colorData.frontFlat,
+                                        backModel: colorData.backModel,
+                                        backFlat: colorData.backFlat,
+                                        anyImage: colorData.anyImage
+                                    });
+                                    
+                                    return colorData;
+                                })
                             };
-                            console.log(`Loaded ${data.length} colors for ${cap.style}`);
+                            console.log(`✅ Loaded ${data.length} colors for ${cap.style}`);
+                        } else {
+                            console.warn(`⚠️ No data found for ${cap.style}, using fallback`);
+                            capProductData[cap.style] = createFallbackCapData(cap);
                         }
+                    } else {
+                        console.warn(`⚠️ API request failed for ${cap.style} (${response.status}), using fallback`);
+                        capProductData[cap.style] = createFallbackCapData(cap);
                     }
                 } catch (error) {
-                    console.error(`Error loading data for ${cap.style}:`, error);
-                    // Fallback with placeholder
-                    capProductData[cap.style] = {
-                        ...cap,
-                        colors: [{
-                            name: 'Default',
-                            code: '',
-                            frontModel: `https://via.placeholder.com/300x300?text=${cap.style}`,
-                            frontFlat: null,
-                            backModel: null,
-                            backFlat: null,
-                            colorSwatch: null
-                        }]
-                    };
+                    console.error(`❌ Error loading data for ${cap.style}:`, error);
+                    capProductData[cap.style] = createFallbackCapData(cap);
                 }
+                
+                loaded++;
             }
+            
+            console.log(`🎯 Product data loading complete! Loaded ${Object.keys(capProductData).length} cap styles`);
+            
+            // Debug: Log some sample data to see what we actually got
+            const firstCapStyle = Object.keys(capProductData)[0];
+            if (firstCapStyle) {
+                console.log(`🔍 Sample cap data for ${firstCapStyle}:`, capProductData[firstCapStyle]);
+            }
+            
+            // Set loading flags to indicate completion
+            isDataLoading = false;
+            isDataLoaded = true;
+            console.log('✅ Data loading flags set: isDataLoaded =', isDataLoaded);
+        }
+        
+        // Create fallback data for caps that fail to load
+        function createFallbackCapData(cap) {
+            return {
+                ...cap,
+                colors: [{
+                    name: 'Default',
+                    code: '',
+                    frontModel: `https://via.placeholder.com/300x300/4CAF50/white?text=${encodeURIComponent(cap.style)}`,
+                    frontFlat: null,
+                    backModel: null,
+                    backFlat: null,
+                    colorSwatch: null,
+                    msrp: 0,
+                    pricing: 'Contact for pricing'
+                }]
+            };
         }
 
         // Create Revenue Chart
@@ -1419,46 +1924,794 @@
             });
         }
 
+        // Helper function to validate image URL
+        function isValidImageUrl(url) {
+            if (!url || typeof url !== 'string') return false;
+            if (url === 'undefined' || url === 'null' || url === '') return false;
+            
+            // Check if it's a valid URL pattern
+            try {
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')) {
+                    return true;
+                }
+                // Could be a relative URL
+                if (url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || 
+                    url.includes('.gif') || url.includes('.webp') || url.includes('.svg')) {
+                    return true;
+                }
+            } catch (e) {
+                return false;
+            }
+            
+            return false;
+        }
+        
         // Helper function to get cap image from capProductData
         function getCapImage(style) {
+            // Check if we have product data loaded
+            if (!isDataLoaded) {
+                console.warn(`⚠️ Data not loaded yet for ${style}, using fallback`);
+                return `https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`;
+            }
+            
             const capProduct = capProductData[style];
             if (!capProduct || !capProduct.colors || capProduct.colors.length === 0) {
-                return `https://via.placeholder.com/300x300?text=${style}`;
+                console.warn(`⚠️ No product data for ${style}, using fallback`);
+                return `https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`;
             }
             
             const firstColor = capProduct.colors[0];
-            return firstColor.frontModel || firstColor.frontFlat || `https://via.placeholder.com/300x300?text=${style}`;
+            
+            // Build an array of potential image URLs to try (prioritize front images)
+            const imageUrls = [
+                firstColor.frontModel,
+                firstColor.frontFlat,
+                firstColor.backModel, 
+                firstColor.backFlat,
+                firstColor.anyImage
+            ];
+            
+            // Find the first valid image URL
+            let imageUrl = null;
+            for (const url of imageUrls) {
+                if (isValidImageUrl(url)) {
+                    imageUrl = url;
+                    break;
+                }
+            }
+            
+            // If no valid URL found, use placeholder
+            if (!imageUrl) {
+                console.warn(`⚠️ No valid image URL found for ${style}, using placeholder`);
+                imageUrl = `https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`;
+            }
+            
+            // Check if it's a SanMar CDN URL (should already be complete)
+            if (imageUrl && imageUrl.includes('cdnm.sanmar.com')) {
+                console.log(`✅ SanMar CDN URL found for ${style}: ${imageUrl.substring(0, 50)}...`);
+            } else if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('//')) {
+                console.warn(`⚠️ Relative URL detected for ${style}: ${imageUrl}`);
+                // Handle relative URLs if necessary
+            }
+            
+            console.log(`🖼️ Image for ${style}:`, {
+                dataLoaded: isDataLoaded,
+                foundData: !!capProduct,
+                hasColors: capProduct.colors.length,
+                colorName: firstColor.name,
+                triedUrls: imageUrls.filter(url => url).length,
+                isSanMarUrl: imageUrl && imageUrl.includes('cdnm.sanmar.com'),
+                imageFound: imageUrl !== `https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`,
+                finalUrl: imageUrl ? imageUrl.substring(0, 100) : 'placeholder'
+            });
+            
+            return imageUrl;
+        }
+        
+        // Helper function to preload and validate an image
+        function preloadImage(url, style) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`✅ Image loaded successfully for ${style}`);
+                    resolve(url);
+                };
+                img.onerror = () => {
+                    console.warn(`❌ Image failed to load for ${style}: ${url}`);
+                    resolve(`https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`);
+                };
+                img.src = url;
+            });
         }
 
         // Set game mode
-        function setMode(mode) {
+        function setGameMode(mode) {
             currentMode = mode;
             
-            // Update button states
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            console.log(`🎯 Switching to game mode: ${mode}`);
             
-            // Hide all sections
-            document.getElementById('overviewSection').style.display = 'none';
-            document.getElementById('gallerySection').style.display = 'none';
-            document.getElementById('quizSection').style.display = 'none';
+            // Update button states  
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+                // Check if this button matches the current mode
+                const btnMode = btn.onclick.toString().includes("'flashcards'") ? 'flashcards' :
+                               btn.onclick.toString().includes("'quiz'") ? 'quiz' :
+                               btn.onclick.toString().includes("'match'") ? 'match' : '';
+                
+                if (btnMode === mode) {
+                    btn.classList.add('active');
+                }
+            });
             
-            // Show selected section
+            // Hide all existing game mode divs
+            document.querySelectorAll('.game-mode').forEach(modeDiv => modeDiv.style.display = 'none');
+            
+            // Show selected game mode
             switch(mode) {
-                case 'overview':
-                    document.getElementById('overviewSection').style.display = 'block';
-                    createRevenueChart();
-                    break;
-                case 'gallery':
-                    document.getElementById('gallerySection').style.display = 'block';
-                    displayGallery();
+                case 'flashcards':
+                    startVisualLearning();
                     break;
                 case 'quiz':
-                    document.getElementById('quizSection').style.display = 'block';
-                    startQuiz();
+                    startStyleQuiz();
                     break;
+                case 'match':
+                    startMatchGame();
+                    break;
+                default:
+                    console.warn('Unknown game mode:', mode);
+                    startVisualLearning(); // Default to visual learning
             }
         }
+
+        // Visual Learning Mode - Flashcard style cap learning
+        function startVisualLearning() {
+            console.log('📚 Starting Visual Learning Mode...');
+            
+            // Show the flashcards mode div
+            const flashcardsMode = document.getElementById('flashcardsMode');
+            if (flashcardsMode) {
+                flashcardsMode.style.display = 'block';
+                
+                // Initialize the first cap display
+                currentCapIndex = 0;
+                updateCapDisplay();
+                updateCardIndicators();
+            } else {
+                console.error('Flashcards mode div not found');
+            }
+        }
+
+        // Style Quiz Mode - Test knowledge of cap styles
+        function startStyleQuiz() {
+            console.log('🧠 Starting Style Quiz Mode...');
+            
+            // Show the quiz mode div
+            const quizMode = document.getElementById('quizMode');
+            if (quizMode) {
+                quizMode.style.display = 'block';
+                
+                // Check if product data is loaded before generating questions
+                const loadedStylesCount = Object.keys(capProductData).length;
+                console.log(`🎯 Quiz mode activated. Product data status: ${loadedStylesCount} styles loaded out of ${capData.length}`);
+                
+                if (loadedStylesCount === 0) {
+                    console.warn('⚠️ Product data not yet loaded, questions will use fallback images');
+                }
+                
+                // Initialize quiz
+                resetQuiz();
+                generateQuizQuestions();
+                showQuizQuestion();
+            } else {
+                console.error('Quiz mode div not found');
+            }
+        }
+
+        // Match Game Mode - Drag and drop matching
+        async function startMatchGame() {
+            console.log('🎮 Starting Match Game Mode...');
+            
+            // Show the match mode div (if it exists in the HTML)
+            const matchMode = document.getElementById('matchMode');
+            if (matchMode) {
+                matchMode.style.display = 'block';
+                
+                // Check if product data is loaded
+                const loadedStylesCount = Object.keys(capProductData).length;
+                console.log(`🎯 Match Game activated. Data loading status:`, {
+                    isDataLoaded: isDataLoaded,
+                    isDataLoading: isDataLoading,
+                    stylesLoaded: loadedStylesCount,
+                    totalStyles: capData.length
+                });
+                
+                // If data is still loading, show a loading message
+                if (isDataLoading) {
+                    console.log('⏳ Data is still loading, showing loading message...');
+                    showMatchGameLoading();
+                    
+                    // Set up a check to start the game when loading completes
+                    const checkInterval = setInterval(async () => {
+                        if (isDataLoaded) {
+                            clearInterval(checkInterval);
+                            console.log('✅ Data loaded! Preloading images and starting match game...');
+                            await preloadMatchGameImages();
+                            setupMatchGame();
+                        }
+                    }, 500);
+                    
+                } else if (!isDataLoaded) {
+                    console.warn('⚠️ Data not loaded and not loading. Starting load now...');
+                    showMatchGameLoading();
+                    
+                    // Start loading data
+                    await loadFullProductData();
+                    console.log('✅ Data loaded! Preloading images and starting match game...');
+                    await preloadMatchGameImages();
+                    setupMatchGame();
+                    
+                } else {
+                    // Data is loaded, preload images then start the game
+                    console.log('✅ Data already loaded, preloading images before starting match game...');
+                    await preloadMatchGameImages();
+                    setupMatchGame();
+                }
+            } else {
+                console.log('Match game mode not implemented in HTML yet - showing placeholder');
+                alert('🚧 Match Game coming soon! Try the other modes for now.');
+                // Fall back to visual learning
+                startVisualLearning();
+            }
+        }
+        
+        // Preload images for the match game caps
+        async function preloadMatchGameImages() {
+            console.log('🖼️ Preloading images for match game...');
+            
+            // Select 5 random caps for the game (same logic as setupMatchGame)
+            const gameCaps = [...capData].sort(() => Math.random() - 0.5).slice(0, 5);
+            
+            // Preload all images
+            const preloadPromises = gameCaps.map(cap => {
+                const imageUrl = getCapImage(cap.style);
+                console.log(`📥 Preloading image for ${cap.style}: ${imageUrl.substring(0, 60)}...`);
+                return preloadImage(imageUrl, cap.style);
+            });
+            
+            const results = await Promise.all(preloadPromises);
+            console.log('✅ All match game images preloaded. Results:', results.map(url => url.substring(0, 40) + '...'));
+            return gameCaps;
+        }
+        
+        // Show loading message for match game
+        function showMatchGameLoading() {
+            const matchContainer = document.querySelector('.match-container');
+            if (matchContainer) {
+                matchContainer.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <div class="spinner" style="margin: 0 auto 2rem;"></div>
+                        <h3 style="color: #4a5568; margin-bottom: 1rem;">Loading Cap Images...</h3>
+                        <p style="color: #718096;">Please wait while we fetch product images from the server.</p>
+                        <p style="color: #718096; font-size: 0.875rem; margin-top: 1rem;">This may take a few seconds...</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Setup Match Game functionality
+        function setupMatchGame() {
+            console.log('🎯 SETUP MATCH GAME - STARTING...');
+            console.log('📊 Function called from:', new Error().stack.split('\n')[2]);
+            
+            // Verify capData exists and has content
+            if (!capData || capData.length === 0) {
+                console.error('❌ CRITICAL: capData is empty or undefined!');
+                console.log('capData status:', {
+                    exists: typeof capData !== 'undefined',
+                    isArray: Array.isArray(capData),
+                    length: capData ? capData.length : 0
+                });
+                alert('⚠️ Cap data not loaded. Please wait for data to load and try again.');
+                return;
+            }
+            
+            console.log('✅ capData loaded with', capData.length, 'caps');
+            
+            // Get match game containers
+            const styleNumbersContainer = document.getElementById('styleNumbers');
+            const capImagesContainer = document.getElementById('capImages');
+            const matchScore = document.getElementById('matchScore');
+            
+            console.log('🔍 Container check:', {
+                styleNumbers: styleNumbersContainer ? '✅ Found' : '❌ Missing',
+                capImages: capImagesContainer ? '✅ Found' : '❌ Missing',
+                matchScore: matchScore ? '✅ Found' : '❌ Missing'
+            });
+            
+            if (!styleNumbersContainer || !capImagesContainer) {
+                console.error('❌ CRITICAL: Match game containers not found!');
+                console.error('Looking for element IDs: "styleNumbers" and "capImages"');
+                
+                // Try to find the match game area
+                const matchArea = document.querySelector('.match-game-area');
+                if (matchArea) {
+                    console.log('Match game area HTML:', matchArea.innerHTML.substring(0, 500));
+                } else {
+                    console.error('❌ .match-game-area not found in DOM!');
+                }
+                return;
+            }
+            
+            // Clear containers first
+            console.log('🧹 Clearing existing content...');
+            styleNumbersContainer.innerHTML = '';
+            capImagesContainer.innerHTML = '';
+            
+            // Select random subset of caps for the game (5 caps)
+            const gameCaps = [...capData].sort(() => Math.random() - 0.5).slice(0, 5);
+            console.log('🎮 Selected caps for game:', gameCaps.map(c => ({style: c.style, desc: c.description})));
+            
+            let matchedCount = 0;
+            
+            // Build HTML for style numbers
+            const styleNumbersHTML = `
+                <h3>🏷️ Style Numbers</h3>
+                <div class="draggable-styles">
+                    ${gameCaps.map(cap => `
+                        <div class="draggable-style" draggable="true" data-style="${cap.style}">
+                            ${cap.style}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            console.log('📝 Generated style numbers HTML:', styleNumbersHTML.length, 'characters');
+            
+            // Shuffle the cap order for the drop zones to make it more challenging
+            const shuffledCaps = [...gameCaps].sort(() => Math.random() - 0.5);
+            
+            // Build HTML for cap images
+            const capImagesHTML = `
+                <h3>🧢 Cap Images</h3>
+                <div class="cap-drop-zones">
+                    ${shuffledCaps.map(cap => {
+                        const imageUrl = getCapImage(cap.style);
+                        console.log(`🖼️ Image URL for ${cap.style}: ${imageUrl.substring(0, 80)}...`);
+                        return `
+                            <div class="cap-drop-zone" data-style="${cap.style}">
+                                <img src="${imageUrl}" alt="${cap.description}" 
+                                     data-style="${cap.style}"
+                                     onerror="console.error('❌ Image failed:', '${cap.style}'); this.src='https://via.placeholder.com/200x200/667eea/white?text=${encodeURIComponent(cap.style)}'">
+                                <div class="cap-info">
+                                    <div class="description">${cap.description}</div>
+                                </div>
+                                <div class="drop-placeholder">Drop style here</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            console.log('📝 Generated cap images HTML:', capImagesHTML.length, 'characters');
+            
+            // Set innerHTML for style numbers
+            try {
+                console.log('💉 Injecting style numbers HTML...');
+                styleNumbersContainer.innerHTML = styleNumbersHTML;
+                console.log('✅ Style numbers HTML injected successfully');
+                console.log('   - Children count:', styleNumbersContainer.children.length);
+                console.log('   - First 100 chars:', styleNumbersContainer.innerHTML.substring(0, 100));
+            } catch (error) {
+                console.error('❌ ERROR setting styleNumbers HTML:', error);
+            }
+            
+            // Set innerHTML for cap images
+            try {
+                console.log('💉 Injecting cap images HTML...');
+                capImagesContainer.innerHTML = capImagesHTML;
+                console.log('✅ Cap images HTML injected successfully');
+                console.log('   - Children count:', capImagesContainer.children.length);
+                console.log('   - First 100 chars:', capImagesContainer.innerHTML.substring(0, 100));
+            } catch (error) {
+                console.error('❌ ERROR setting capImages HTML:', error);
+            }
+            
+            // Update match score if element exists
+            if (matchScore) {
+                matchScore.textContent = `Matches: ${matchedCount}/${gameCaps.length}`;
+                console.log('✅ Match score updated');
+            }
+            
+            // Final verification
+            console.log('🔍 FINAL VERIFICATION:');
+            console.log('   - styleNumbers has content:', styleNumbersContainer.innerHTML.length > 0);
+            console.log('   - capImages has content:', capImagesContainer.innerHTML.length > 0);
+            console.log('   - Draggable elements found:', document.querySelectorAll('.draggable-style').length);
+            console.log('   - Drop zones found:', document.querySelectorAll('.cap-drop-zone').length);
+            
+            // Add drag and drop event listeners
+            console.log('🎮 Setting up drag and drop...');
+            setupDragAndDrop(gameCaps, matchScore);
+            
+            // Run diagnostic test after setup
+            setTimeout(() => {
+                console.log('🔍 Running drag and drop diagnostic...');
+                testDragAndDrop();
+            }, 100);
+            
+            console.log('✅ SETUP MATCH GAME - COMPLETE!');
+        }
+
+        // Setup drag and drop functionality
+        function setupDragAndDrop(gameCaps, matchScoreElement) {
+            let draggedElement = null;
+            let matchedCount = 0;
+            
+            console.log('🎮 Setting up drag and drop for', gameCaps.length, 'caps');
+            
+            // Add event listeners to draggable style numbers
+            const draggableStyles = document.querySelectorAll('.draggable-style');
+            console.log('📦 Found', draggableStyles.length, 'draggable styles');
+            
+            draggableStyles.forEach(style => {
+                // Ensure draggable attribute is set
+                style.draggable = true;
+                
+                style.addEventListener('dragstart', (e) => {
+                    draggedElement = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', e.target.innerHTML);
+                    console.log('🎯 Started dragging:', e.target.dataset.style);
+                });
+                
+                style.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                    draggedElement = null;
+                    console.log('✋ Stopped dragging:', e.target.dataset.style);
+                });
+            });
+            
+            // Add event listeners to drop zones
+            const dropZones = document.querySelectorAll('.cap-drop-zone');
+            console.log('🎯 Found', dropZones.length, 'drop zones');
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    if (!zone.classList.contains('matched')) {
+                        zone.classList.add('drag-over');
+                    }
+                });
+                
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                
+                zone.addEventListener('dragleave', (e) => {
+                    // Only remove if we're leaving the zone entirely
+                    if (e.target === zone && !zone.contains(e.relatedTarget)) {
+                        zone.classList.remove('drag-over');
+                    }
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    zone.classList.remove('drag-over');
+                    
+                    if (!draggedElement) {
+                        console.log('⚠️ No dragged element found');
+                        return;
+                    }
+                    
+                    const draggedStyle = draggedElement.dataset.style;
+                    const targetStyle = zone.dataset.style;
+                    
+                    console.log(`🎯 Dropped ${draggedStyle} on ${targetStyle}`);
+                    
+                    // Check if zone is already matched
+                    if (zone.classList.contains('matched')) {
+                        console.log('⚠️ Zone already matched');
+                        showMatchFeedback(false, `This cap is already matched!`);
+                        return;
+                    }
+                    
+                    // Check if it's a correct match
+                    if (draggedStyle === targetStyle) {
+                        // Correct match!
+                        console.log('✅ Correct match!');
+                        const placeholder = zone.querySelector('.drop-placeholder');
+                        if (placeholder) {
+                            // Replace placeholder with the dragged style
+                            placeholder.innerHTML = `<strong>${draggedStyle}</strong>`;
+                            placeholder.classList.remove('drop-placeholder');
+                            placeholder.classList.add('dropped-style');
+                            
+                            // Mark zone as matched
+                            zone.classList.add('matched');
+                            
+                            // Mark the draggable element as matched and hide it
+                            draggedElement.classList.add('matched');
+                            
+                            // Update score
+                            matchedCount++;
+                            matchScoreElement.textContent = `Matches: ${matchedCount}/${gameCaps.length}`;
+                            
+                            // Show success feedback
+                            showMatchFeedback(true, `✅ Correct! ${draggedStyle} matches!`);
+                            
+                            // Check if game is complete
+                            if (matchedCount === gameCaps.length) {
+                                console.log('🎉 Game complete!');
+                                setTimeout(() => {
+                                    showMatchCompletion();
+                                }, 1000);
+                            }
+                        }
+                    } else {
+                        // Incorrect match
+                        console.log('❌ Incorrect match');
+                        showMatchFeedback(false, `❌ ${draggedStyle} doesn't match this cap. Try again!`);
+                        
+                        // Add shake animation to zone
+                        zone.style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            zone.style.animation = '';
+                        }, 500);
+                    }
+                });
+            });
+        }
+
+        // Show match feedback
+        function showMatchFeedback(isCorrect, message) {
+            // Create or update feedback element
+            let feedback = document.getElementById('matchFeedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.id = 'matchFeedback';
+                feedback.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: ${isCorrect ? '#d1fae5' : '#fee2e2'};
+                    color: ${isCorrect ? '#065f46' : '#991b1b'};
+                    padding: 1rem 2rem;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 1000;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                `;
+                document.body.appendChild(feedback);
+            }
+            
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+            feedback.style.background = isCorrect ? '#d1fae5' : '#fee2e2';
+            feedback.style.color = isCorrect ? '#065f46' : '#991b1b';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 2000);
+        }
+
+        // Test drag and drop functionality
+        function testDragAndDrop() {
+            console.log('🧪 Testing Drag and Drop Functionality...');
+            
+            // Test 1: Check if draggable elements exist
+            const draggables = document.querySelectorAll('.draggable-style');
+            console.log(`Test 1 - Draggable elements found: ${draggables.length}`);
+            
+            if (draggables.length > 0) {
+                draggables.forEach((elem, index) => {
+                    console.log(`  - Style ${index + 1}: ${elem.dataset.style}, draggable=${elem.draggable}`);
+                });
+            }
+            
+            // Test 2: Check if drop zones exist
+            const dropZones = document.querySelectorAll('.cap-drop-zone');
+            console.log(`Test 2 - Drop zones found: ${dropZones.length}`);
+            
+            if (dropZones.length > 0) {
+                dropZones.forEach((zone, index) => {
+                    console.log(`  - Zone ${index + 1}: ${zone.dataset.style}`);
+                });
+            }
+            
+            // Test 3: Verify images are loaded
+            const images = document.querySelectorAll('.cap-drop-zone img');
+            console.log(`Test 3 - Images in drop zones: ${images.length}`);
+            
+            images.forEach((img, index) => {
+                console.log(`  - Image ${index + 1}: ${img.complete ? '✅ Loaded' : '❌ Loading'} - ${img.src.substring(0, 60)}...`);
+            });
+            
+            // Test 4: Check CSS pointer-events
+            if (dropZones.length > 0) {
+                const zone = dropZones[0];
+                const computedStyle = window.getComputedStyle(zone);
+                console.log(`Test 4 - CSS check on first drop zone:`);
+                console.log(`  - pointer-events: ${computedStyle.pointerEvents}`);
+                console.log(`  - position: ${computedStyle.position}`);
+            }
+            
+            console.log('✅ Drag and Drop tests complete. Try dragging a style number to a cap image!');
+            
+            // Make the test function available globally for console testing
+            window.testDragAndDrop = testDragAndDrop;
+        }
+
+        // Show match game completion
+        function showMatchCompletion() {
+            const matchContainer = document.querySelector('.match-container');
+            if (matchContainer) {
+                matchContainer.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                        <h2 style="color: #48bb78; margin-bottom: 1rem;">Perfect Match!</h2>
+                        <p style="font-size: 1.2rem; color: #4a5568; margin-bottom: 2rem;">
+                            You successfully matched all cap styles! Great job learning the Richardson product line.
+                        </p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button class="mode-btn" onclick="startMatchGame()" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                <i class="fas fa-redo"></i> Play Again
+                            </button>
+                            <button class="mode-btn" onclick="setGameMode('flashcards')" style="background: linear-gradient(135deg, #48bb78, #38a169);">
+                                <i class="fas fa-images"></i> Study More
+                            </button>
+                            <button class="mode-btn" onclick="setGameMode('quiz')" style="background: linear-gradient(135deg, #ed8936, #dd6b20);">
+                                <i class="fas fa-brain"></i> Take Quiz
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Navigation functions for the existing HTML structure
+        function nextCap() {
+            if (currentCapIndex < capData.length - 1) {
+                currentCapIndex++;
+                updateCapDisplay();
+                updateCardIndicators();
+            }
+        }
+
+        function previousCap() {
+            if (currentCapIndex > 0) {
+                currentCapIndex--;
+                updateCapDisplay();
+                updateCardIndicators();
+            }
+        }
+
+        function updateCapDisplay() {
+            if (!capData || capData.length === 0) return;
+            
+            const current = capData[currentCapIndex];
+            const capProduct = capProductData[current.style];
+            
+            // Update the flashcard display
+            const styleNumber = document.getElementById('styleNumber');
+            const capImage = document.getElementById('capImage');
+            const capDescription = document.getElementById('capDescription');
+            const salesRank = document.getElementById('salesRank');
+            
+            if (styleNumber) styleNumber.textContent = current.style;
+            
+            if (capImage) {
+                capImage.src = getCapImage(current.style);
+                capImage.alt = current.description;
+                
+                // Add error handling for images
+                capImage.onerror = function() {
+                    console.warn(`Image failed to load for ${current.style}, using fallback`);
+                    this.src = `https://via.placeholder.com/300x300/4CAF50/white?text=${encodeURIComponent(current.style)}`;
+                };
+                
+                // Add loading indicator
+                capImage.onload = function() {
+                    console.log(`✅ Image loaded successfully for ${current.style}`);
+                };
+            }
+            
+            if (capDescription) capDescription.textContent = current.description;
+            if (salesRank) {
+                const revenue = current.revenue ? `$${current.revenue.toLocaleString()}` : 'N/A';
+                const units = current.units ? current.units.toLocaleString() : 'N/A';
+                salesRank.innerHTML = `
+                    <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; color: white;">
+                        #${currentCapIndex + 1} Best Seller
+                    </div>
+                    <div style="font-size: 0.9rem; color: #ffffff; display: flex; gap: 1rem; justify-content: center;">
+                        <span>💰 ${revenue} Revenue</span>
+                        <span>📦 ${units} Units</span>
+                        <span>📋 ${current.orders || 0} Orders</span>
+                    </div>
+                `;
+            }
+            
+            // Update current style indicator in game info
+            const currentStyleSpan = document.getElementById('currentStyle');
+            if (currentStyleSpan) {
+                currentStyleSpan.textContent = `${currentCapIndex + 1}`;
+            }
+        }
+
+        function updateCardIndicators() {
+            const indicators = document.getElementById('cardIndicators');
+            if (!indicators) return;
+            
+            indicators.innerHTML = '';
+            for (let i = 0; i < capData.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = `indicator-dot ${i === currentCapIndex ? 'active' : ''}`;
+                dot.onclick = () => goToCard(i);
+                indicators.appendChild(dot);
+            }
+        }
+
+        function goToCard(index) {
+            if (index >= 0 && index < capData.length) {
+                currentCapIndex = index;
+                updateCapDisplay();
+                updateCardIndicators();
+            }
+        }
+
+        // Quiz functions
+        function resetQuiz() {
+            console.log('🔄 Resetting quiz...');
+            currentQuizIndex = 0;
+            quizScore = 0;
+            quizData = generateQuizQuestions();
+            
+            console.log(`🎯 Quiz reset complete. Generated ${quizData.length} questions`);
+            
+            // Update UI elements
+            document.getElementById('totalQuestions').textContent = quizData.length;
+            document.getElementById('quizScore').textContent = '0';
+            document.getElementById('possibleScore').textContent = '0';
+        }
+
+        function generateQuizQuestion() {
+            if (!capData || capData.length === 0) return;
+            
+            // This would implement the quiz logic
+            console.log('Generating quiz question for index:', currentQuestionIndex);
+            // Implementation would go here
+        }
+
+        // Match game functions
+        // NOTE: setupMatchGame() is defined above at line 2202 with full implementation
+
+        function updateFlashcard() {
+            const cap = capData[window.currentCardIndex];
+            const flashcard = document.getElementById('currentFlashcard');
+            if (flashcard) {
+                flashcard.querySelector('img').src = getCapImage(cap.style);
+                flashcard.querySelector('h3').textContent = cap.style;
+                flashcard.querySelector('p').textContent = cap.description;
+                flashcard.querySelector('.stats').innerHTML = `
+                    <span>📦 ${cap.units} units sold</span>
+                    <span>💰 $${cap.revenue.toLocaleString()}</span>
+                `;
+                document.getElementById('cardCounter').textContent = `${window.currentCardIndex + 1} / ${capData.length}`;
+            }
+        }
+
+        // Quiz helper functions
+        function generateQuizQuestion(questionIndex) {
+            // Implementation for quiz questions
+            console.log('Generating quiz question:', questionIndex);
+        }
+
+        // Match game helper functions
+        // NOTE: setupMatchGame() is defined above at line 2202 with full implementation
 
         // Display cap gallery
         function displayGallery() {
@@ -1534,14 +2787,26 @@
 
         // Generate quiz questions
         function generateQuizQuestions() {
+            console.log('📝 Generating quiz questions...');
+            
+            // Check if we have cap data
+            if (!capData || capData.length === 0) {
+                console.error('❌ No cap data available for generating questions');
+                return [];
+            }
+            
             const questions = [];
             
             // Type 1: Identify cap by image
-            capData.forEach(cap => {
+            capData.forEach((cap, index) => {
+                const imageUrl = getCapImage(cap.style);
+                console.log(`📷 Question ${index + 1} image for ${cap.style}: ${imageUrl}`);
+                
                 questions.push({
                     type: 'identify',
                     question: 'Identify this cap style:',
-                    image: getCapImage(cap.style),
+                    image: imageUrl,
+                    style: cap.style, // Add style for better error handling
                     correctAnswer: cap.style,
                     options: generateOptions(cap.style, capData.map(c => c.style))
                 });
@@ -1574,7 +2839,14 @@
             });
             
             // Shuffle and limit to 10 questions
-            return shuffle(questions).slice(0, 10);
+            const finalQuestions = shuffle(questions).slice(0, 10);
+            console.log(`✅ Generated ${finalQuestions.length} quiz questions`);
+            
+            if (finalQuestions.length === 0) {
+                console.error('❌ Failed to generate any quiz questions!');
+            }
+            
+            return finalQuestions;
         }
 
         // Generate options for quiz
@@ -1603,20 +2875,251 @@
 
         // Show quiz question
         function showQuizQuestion() {
+            // Check if quiz data exists
+            if (!quizData || quizData.length === 0) {
+                console.error('❌ No quiz data available');
+                endQuiz();
+                return;
+            }
+            
             if (currentQuizIndex >= quizData.length) {
                 endQuiz();
                 return;
             }
             
             const question = quizData[currentQuizIndex];
+            
+            // Update progress
             document.getElementById('currentQuestion').textContent = currentQuizIndex + 1;
+            document.getElementById('totalQuestions').textContent = quizData.length;
+            document.getElementById('quizScore').textContent = quizScore;
+            document.getElementById('possibleScore').textContent = currentQuizIndex;
+            
+            // Update question text
             document.getElementById('quizQuestion').textContent = question.question;
             
-            // Show image if applicable
-            const imageContainer = document.getElementById('quizImage');
-            if (question.image) {
+            // Enhanced image display with multiple views
+            const imageContainer = document.getElementById('quizImageContainer');
+            if (question.image || question.style) {
                 imageContainer.style.display = 'block';
-                imageContainer.innerHTML = `<img src="${question.image}" alt="Cap image">`;
+                
+                // Get detailed product data for enhanced display
+                const capProduct = capProductData[question.style];
+                
+                if (capProduct && capProduct.colors && capProduct.colors.length > 0) {
+                    // Show enhanced product details with multiple views
+                    const firstColor = capProduct.colors[0];
+                    
+                    imageContainer.innerHTML = `
+                        <div class="enhanced-quiz-display">
+                            <!-- Main Image Gallery -->
+                            <div class="image-gallery">
+                                <div class="main-images">
+                                    ${firstColor.FRONT_MODEL ? `<img src="${firstColor.FRONT_MODEL}" alt="Front Model View" class="gallery-image main-image" onerror="this.style.display='none'">` : ''}
+                                    ${firstColor.FRONT_FLAT ? `<img src="${firstColor.FRONT_FLAT}" alt="Front Flat View" class="gallery-image" onerror="this.style.display='none'">` : ''}
+                                    ${firstColor.BACK_FLAT ? `<img src="${firstColor.BACK_FLAT}" alt="Back View" class="gallery-image" onerror="this.style.display='none'">` : ''}
+                                    ${firstColor.BACK_MODEL ? `<img src="${firstColor.BACK_MODEL}" alt="Back Model View" class="gallery-image" onerror="this.style.display='none'">` : ''}
+                                </div>
+                            </div>
+                            
+                            <!-- Product Details -->
+                            <div class="product-details">
+                                <div class="brand-info">
+                                    <strong>${firstColor.BRAND_NAME || 'Unknown Brand'}</strong>
+                                </div>
+                                
+                                <!-- Color Information -->
+                                <div class="color-info">
+                                    <span class="color-label">Color: ${firstColor.COLOR_NAME || firstColor.CATALOG_COLOR || 'N/A'}</span>
+                                    ${firstColor.COLOR_SQUARE_IMAGE ? `<img src="${firstColor.COLOR_SQUARE_IMAGE}" alt="Color Swatch" class="color-swatch" onerror="this.style.display='none'">` : ''}
+                                </div>
+                                
+                                <!-- Product Description -->
+                                ${firstColor.PRODUCT_DESCRIPTION ? `
+                                    <div class="product-description">
+                                        <div class="description-toggle" onclick="toggleDescription()">
+                                            <span>📋 Product Details</span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="description-content" style="display: none;">
+                                            ${firstColor.PRODUCT_DESCRIPTION}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <!-- Category Information -->
+                                <div class="category-info">
+                                    ${firstColor.CATEGORY_NAME ? `<span class="category-tag">${firstColor.CATEGORY_NAME}</span>` : ''}
+                                    ${firstColor.SUBCATEGORY_NAME ? `<span class="subcategory-tag">${firstColor.SUBCATEGORY_NAME}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <style>
+                            .enhanced-quiz-display {
+                                background: white;
+                                border-radius: 12px;
+                                padding: 1.5rem;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                max-width: 100%;
+                                margin: 0 auto;
+                            }
+                            
+                            .image-gallery {
+                                margin-bottom: 1.5rem;
+                            }
+                            
+                            .main-images {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                                gap: 1rem;
+                                justify-items: center;
+                            }
+                            
+                            .gallery-image {
+                                width: 100%;
+                                max-width: 200px;
+                                height: 200px;
+                                object-fit: cover;
+                                border-radius: 8px;
+                                border: 2px solid #e0e0e0;
+                                transition: transform 0.2s, box-shadow 0.2s;
+                                cursor: pointer;
+                            }
+                            
+                            .gallery-image:hover {
+                                transform: scale(1.05);
+                                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+                                border-color: #667eea;
+                            }
+                            
+                            .main-image {
+                                border-color: #667eea;
+                                border-width: 3px;
+                            }
+                            
+                            .product-details {
+                                text-align: left;
+                            }
+                            
+                            .brand-info {
+                                font-size: 1.1rem;
+                                color: #333;
+                                margin-bottom: 0.5rem;
+                                padding: 0.5rem;
+                                background: #f8f9fa;
+                                border-radius: 6px;
+                            }
+                            
+                            .color-info {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                margin: 0.5rem 0;
+                                padding: 0.5rem;
+                                background: #f0f8ff;
+                                border-radius: 6px;
+                            }
+                            
+                            .color-label {
+                                font-weight: 500;
+                                color: #2c5282;
+                            }
+                            
+                            .color-swatch {
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                border: 2px solid #ccc;
+                            }
+                            
+                            .product-description {
+                                margin: 1rem 0;
+                                border: 1px solid #e0e0e0;
+                                border-radius: 6px;
+                                overflow: hidden;
+                            }
+                            
+                            .description-toggle {
+                                padding: 0.75rem;
+                                background: #f8f9fa;
+                                cursor: pointer;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                font-weight: 500;
+                                color: #555;
+                            }
+                            
+                            .description-toggle:hover {
+                                background: #e9ecef;
+                            }
+                            
+                            .description-content {
+                                padding: 1rem;
+                                font-size: 0.9rem;
+                                line-height: 1.5;
+                                color: #666;
+                            }
+                            
+                            .category-info {
+                                display: flex;
+                                gap: 0.5rem;
+                                flex-wrap: wrap;
+                                margin-top: 1rem;
+                            }
+                            
+                            .category-tag, .subcategory-tag {
+                                padding: 0.25rem 0.75rem;
+                                border-radius: 20px;
+                                font-size: 0.8rem;
+                                font-weight: 500;
+                            }
+                            
+                            .category-tag {
+                                background: #e3f2fd;
+                                color: #1565c0;
+                            }
+                            
+                            .subcategory-tag {
+                                background: #f3e5f5;
+                                color: #7b1fa2;
+                            }
+                            
+                            @media (max-width: 768px) {
+                                .main-images {
+                                    grid-template-columns: repeat(2, 1fr);
+                                }
+                                
+                                .gallery-image {
+                                    height: 150px;
+                                }
+                            }
+                        </style>
+                    `;
+                    
+                    console.log(`🖼️ Enhanced quiz display for ${question.style} with ${capProduct.colors.length} color variants`);
+                } else {
+                    // Fallback to simple image display
+                    const image = document.createElement('img');
+                    image.id = 'quizImage';
+                    image.className = 'gallery-image main-image';
+                    image.src = question.image || 'https://via.placeholder.com/300x300/667eea/white?text=' + encodeURIComponent(question.style || 'Unknown');
+                    image.alt = 'Cap to identify';
+                    
+                    image.onerror = function() {
+                        console.warn(`Quiz image failed to load: ${question.image}`);
+                        const style = question.style || 'Unknown';
+                        this.src = `https://via.placeholder.com/300x300/667eea/white?text=${encodeURIComponent(style)}`;
+                    };
+                    
+                    image.onload = function() {
+                        console.log(`✅ Quiz image loaded successfully: ${question.image}`);
+                    };
+                    
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(image);
+                }
             } else {
                 imageContainer.style.display = 'none';
             }
@@ -1639,42 +3142,143 @@
                 btn.onclick = () => checkAnswer(option, question.correctAnswer);
                 optionsContainer.appendChild(btn);
             });
+            
+            // Hide feedback from previous question
+            const feedback = document.getElementById('quizFeedback');
+            if (feedback) {
+                feedback.style.display = 'none';
+            }
         }
 
         // Check quiz answer
         function checkAnswer(selected, correct) {
             const options = document.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('quizFeedback');
+            
+            // Disable all options
             options.forEach(opt => {
                 opt.style.pointerEvents = 'none';
-                if (opt.textContent.includes(selected)) {
+                const optText = opt.textContent || opt.innerHTML;
+                if (optText.includes(selected)) {
                     opt.classList.add(selected === correct ? 'correct' : 'incorrect');
                 }
-                if (opt.textContent.includes(correct)) {
+                if (optText.includes(correct)) {
                     opt.classList.add('correct');
                 }
             });
             
-            if (selected === correct) {
-                quizScore++;
-                document.getElementById('quizScore').textContent = quizScore;
+            // Show feedback
+            if (feedback) {
+                feedback.style.display = 'block';
+                if (selected === correct) {
+                    quizScore++;
+                    feedback.innerHTML = `
+                        <div style="color: #4CAF50; font-weight: bold; text-align: center; padding: 1rem; background: #e8f5e8; border-radius: 8px; margin: 1rem 0;">
+                            ✅ Correct! Great job!
+                        </div>
+                    `;
+                } else {
+                    const correctCap = capData.find(c => c.style === correct);
+                    feedback.innerHTML = `
+                        <div style="color: #f44336; font-weight: bold; text-align: center; padding: 1rem; background: #ffebee; border-radius: 8px; margin: 1rem 0;">
+                            ❌ Incorrect. The correct answer is ${correct}${correctCap ? ` - ${correctCap.description}` : ''}
+                        </div>
+                    `;
+                }
             }
+            
+            // Update score display
+            document.getElementById('quizScore').textContent = quizScore;
             
             setTimeout(() => {
                 currentQuizIndex++;
                 showQuizQuestion();
-            }, 1500);
+            }, 2500);
         }
 
         // End quiz
         function endQuiz() {
-            const percentage = (quizScore / quizData.length * 100).toFixed(0);
-            document.getElementById('quizQuestion').textContent = `Quiz Complete! You scored ${quizScore} out of ${quizData.length} (${percentage}%)`;
-            document.getElementById('quizImage').style.display = 'none';
-            document.getElementById('quizOptions').innerHTML = `
-                <button class="mode-btn" onclick="startQuiz()">
-                    <i class="fas fa-redo"></i> Try Again
-                </button>
+            // Handle case where no questions were generated
+            if (!quizData || quizData.length === 0) {
+                console.error('❌ No quiz questions were generated!');
+                document.getElementById('quizQuestion').innerHTML = `
+                    <div style="text-align: center;">
+                        <h2 style="color: #f44336; margin-bottom: 1rem;">⚠️ Quiz Error</h2>
+                        <div style="font-size: 1.2rem; margin-bottom: 1rem;">
+                            No quiz questions could be generated. This might be due to:
+                        </div>
+                        <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                            <li>API data still loading</li>
+                            <li>Network connection issues</li>
+                            <li>Missing cap data</li>
+                        </ul>
+                        <div style="margin-top: 2rem;">
+                            <button class="mode-btn" onclick="startVisualLearning()">
+                                <i class="fas fa-images"></i> Try Visual Learning
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const percentage = quizData.length > 0 ? (quizScore / quizData.length * 100).toFixed(0) : 0;
+            
+            // Update progress indicators
+            document.getElementById('currentQuestion').textContent = quizData.length;
+            document.getElementById('quizScore').textContent = quizScore;
+            document.getElementById('possibleScore').textContent = quizData.length;
+            
+            // Hide image
+            const imageContainer = document.getElementById('quizImageContainer');
+            if (imageContainer) {
+                imageContainer.style.display = 'none';
+            }
+            
+            // Show completion message
+            document.getElementById('quizQuestion').innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: #4CAF50; margin-bottom: 1rem;">🎉 Quiz Complete!</h2>
+                    <div style="font-size: 1.5rem; margin-bottom: 1rem;">
+                        You scored <strong>${quizScore}</strong> out of <strong>${quizData.length}</strong> questions
+                    </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: ${percentage >= 80 ? '#4CAF50' : percentage >= 60 ? '#FF9800' : '#f44336'};">
+                        ${percentage}%
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 1.1rem;">
+                        ${percentage >= 90 ? '🏆 Outstanding! You\'re a cap style expert!' :
+                          percentage >= 80 ? '⭐ Great job! You know your cap styles well!' :
+                          percentage >= 70 ? '👍 Good work! Keep studying those styles!' :
+                          percentage >= 60 ? '📚 Not bad! Review the visual learning mode for improvement.' :
+                          '💪 Keep practicing! Try the visual learning mode first.'}
+                    </div>
+                </div>
             `;
+            
+            // Show action buttons
+            document.getElementById('quizOptions').innerHTML = `
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button class="mode-btn" onclick="startStyleQuiz()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="mode-btn" onclick="setGameMode('flashcards')">
+                        <i class="fas fa-images"></i> Study More
+                    </button>
+                </div>
+            `;
+            
+            // Hide feedback
+            const feedback = document.getElementById('quizFeedback');
+            if (feedback) {
+                feedback.style.display = 'none';
+            }
+            
+            // Update high score
+            const currentHigh = parseInt(document.getElementById('highScore').textContent);
+            if (percentage > currentHigh) {
+                document.getElementById('highScore').textContent = percentage;
+                localStorage.setItem('capQuizHighScore', percentage);
+            }
         }
 
         // Show/hide loading
@@ -1682,8 +3286,87 @@
             document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
         }
 
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            // Only handle keyboard in flashcard mode
+            if (currentMode !== 'flashcards') return;
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    previousCap();
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    nextCap();
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    event.preventDefault();
+                    const index = parseInt(event.key) - 1;
+                    if (index < capData.length) {
+                        goToCard(index);
+                    }
+                    break;
+                case 'Home':
+                    event.preventDefault();
+                    goToCard(0);
+                    break;
+                case 'End':
+                    event.preventDefault();
+                    goToCard(capData.length - 1);
+                    break;
+            }
+        });
+
+        // Show keyboard hints on first load
+        function showKeyboardHints() {
+            const hints = document.createElement('div');
+            hints.className = 'keyboard-hints visible';
+            hints.innerHTML = `
+                <div><kbd>←</kbd> <kbd>→</kbd> Navigate caps</div>
+                <div><kbd>1-9</kbd> Jump to cap</div>
+                <div><kbd>Home/End</kbd> First/Last</div>
+                <div>Click to dismiss</div>
+            `;
+            hints.onclick = () => hints.remove();
+            
+            document.body.appendChild(hints);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                if (hints.parentNode) {
+                    hints.remove();
+                }
+            }, 5000);
+        }
+
+        // Toggle product description visibility
+        function toggleDescription() {
+            const content = document.querySelector('.description-content');
+            const toggle = document.querySelector('.description-toggle i');
+            
+            if (content && toggle) {
+                const isVisible = content.style.display === 'block';
+                content.style.display = isVisible ? 'none' : 'block';
+                toggle.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            }
+        }
+
         // Initialize on load
         window.addEventListener('DOMContentLoaded', init);
+        
+        // Show keyboard hints after a short delay
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(showKeyboardHints, 2000);
+        });
     </script>
 </body>
 </html>
