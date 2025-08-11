@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopworks Sales Tax Training - Master the 3 Tax Codes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: #d4d0c8;
+            min-height: 100vh;
+            font-size: 11px;
+            padding: 0;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            height: 35px;
+            opacity: 0.95;
+        }
+
+        .logo-container img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: #981e32;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: #b82940;
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 20px;
+        }
+
+        .training-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ece9d8;
+            border: 2px solid #848484;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(to bottom, #4a7cc6, #2B5797);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .tax-codes-reference {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tax-code-card {
+            background: white;
+            border: 1px solid #848484;
+            border-radius: 4px;
+            padding: 15px;
+        }
+
+        .tax-code-card h3 {
+            color: #2B5797;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .tax-code-details {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .tax-code-details p {
+            margin-bottom: 8px;
+        }
+
+        .use-when {
+            background: #e8f4fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .use-when strong {
+            color: #2B5797;
+            font-size: 11px;
+        }
+
+        .game-section {
+            background: white;
+            border: 2px solid #2B5797;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-value {
+            color: #2B5797;
+            font-weight: bold;
+        }
+
+        .tax-selection {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .tax-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tax-option {
+            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+            border: 2px solid #848484;
+            border-radius: 6px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .tax-option:hover {
+            border-color: #4169E1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(65, 105, 225, 0.3);
+        }
+
+        .tax-option.selected {
+            background: linear-gradient(to bottom, #4169E1, #2B5797);
+            color: white;
+            border-color: #1a3a6b;
+        }
+
+        .tax-option.correct {
+            background: linear-gradient(to bottom, #5cb85c, #4cae4c);
+            color: white;
+            border-color: #4cae4c;
+            animation: pulse-green 0.6s;
+        }
+
+        .tax-option.incorrect {
+            background: linear-gradient(to bottom, #d9534f, #c9302c);
+            color: white;
+            border-color: #c9302c;
+            animation: shake 0.6s;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(92, 184, 92, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .code-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2B5797;
+        }
+
+        .code-name {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            background: linear-gradient(to bottom, #5cb85c, #4cae4c);
+            color: white;
+            border: 2px solid #4cae4c;
+            border-radius: 6px;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #4cae4c, #449d44);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .score-section {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 6px;
+        }
+
+        .score-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2B5797;
+            margin-bottom: 10px;
+        }
+
+        .next-scenario-btn {
+            background: linear-gradient(to bottom, #4169E1, #2B5797);
+            color: white;
+            border: 2px solid #2B5797;
+            border-radius: 6px;
+            padding: 10px 25px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .next-scenario-btn:hover {
+            background: linear-gradient(to bottom, #2B5797, #1a3a6b);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4169E1, #2B5797);
+            transition: width 0.3s;
+        }
+
+        .hint-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .hint-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .decision-tree {
+            background: white;
+            border: 2px solid #2B5797;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tree-title {
+            text-align: center;
+            color: #2B5797;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .tree-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .step-number {
+            background: #2B5797;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 12px;
+        }
+
+        .step-text {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .completion-celebration {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #5cb85c, #4cae4c);
+            color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .celebration-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #2B5797;
+            border: 2px solid white;
+            border-radius: 6px;
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* Mobile Responsive Navigation */
+        @media (max-width: 768px) {
+            .nav-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.25rem;
+            }
+            
+            .back-btn span {
+                display: none;
+            }
+            
+            .logo-container {
+                height: 30px;
+            }
+            
+            .breadcrumb {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+                <div class="page-title">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Sales Tax Code Training</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="logo-container">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-container">
+            <a href="/staff-dashboard.html">Staff Dashboard</a>
+            <span>/</span>
+            <a href="#">Training</a>
+            <span>/</span>
+            <span>Sales Tax Code Training</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+    <div class="training-container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Shopworks Sales Tax Mastery Training</h1>
+            <p>Learn when to use 2200, 2202, and 2203 tax codes</p>
+        </div>
+
+        <div class="content">
+            <!-- Tax Codes Reference -->
+            <div class="tax-codes-reference">
+                <div class="tax-code-card">
+                    <h3>2200 - Washington State Sales Tax</h3>
+                    <div class="tax-code-details">
+                        <p><strong>Pay Sales Tax:</strong> ✅ Yes</p>
+                        <p><strong>Shipping Taxable:</strong> ✅ Yes</p>
+                        <div class="use-when">
+                            <strong>Use When:</strong><br>
+                            • Customer located in Washington<br>
+                            • No resale certificate<br>
+                            • Regular retail sales
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tax-code-card">
+                    <h3>2202 - Out of State Sales</h3>
+                    <div class="tax-code-details">
+                        <p><strong>Pay Sales Tax:</strong> ✅ Yes</p>
+                        <p><strong>Shipping Taxable:</strong> ✅ Yes</p>
+                        <div class="use-when">
+                            <strong>Use When:</strong><br>
+                            • Customer outside Washington<br>
+                            • No resale certificate<br>
+                            • Regular retail sales
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tax-code-card">
+                    <h3>2203 - Wholesale Sales</h3>
+                    <div class="tax-code-details">
+                        <p><strong>Pay Sales Tax:</strong> ❌ No</p>
+                        <p><strong>Shipping Taxable:</strong> ❌ No</p>
+                        <div class="use-when">
+                            <strong>Use When:</strong><br>
+                            • Customer has valid resale certificate<br>
+                            • Tax exempt number provided<br>
+                            • Wholesale/reseller customers
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decision Tree -->
+            <div class="decision-tree">
+                <div class="tree-title">Quick Decision Tree</div>
+                <div class="tree-step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">
+                        <strong>Does the customer have a valid resale certificate?</strong><br>
+                        If YES → Use <strong>2203 (Wholesale Sales)</strong><br>
+                        If NO → Continue to step 2
+                    </div>
+                </div>
+                <div class="tree-step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">
+                        <strong>Is the customer located in Washington State?</strong><br>
+                        If YES → Use <strong>2200 (Washington State Sales Tax)</strong><br>
+                        If NO → Use <strong>2202 (Out of State Sales)</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <!-- Game Section -->
+            <div class="game-section" id="gameSection">
+                <div class="score-section">
+                    <div class="score-display">
+                        Score: <span id="scoreValue">0</span>/10
+                    </div>
+                    <div>Scenario <span id="currentScenario">1</span> of 10</div>
+                </div>
+
+                <div class="scenario-card" id="scenarioCard">
+                    <!-- Scenario content will be populated here -->
+                </div>
+            </div>
+
+            <!-- Completion Section -->
+            <div class="completion-celebration" id="completionSection" style="display: none;">
+                <div class="celebration-icon">🎉</div>
+                <h2>Congratulations!</h2>
+                <p>You've mastered the Shopworks sales tax codes!</p>
+                <div style="font-size: 24px; margin: 20px 0;">
+                    Final Score: <span id="finalScore">0</span>/10
+                </div>
+                <button class="restart-btn" onclick="restartTraining()">
+                    <i class="fas fa-redo"></i> Practice Again
+                </button>
+            </div>
+        </div>
+    </div>
+    </div> <!-- End main-content -->
+
+    <script>
+        // Training scenarios focused specifically on tax code selection
+        const taxScenarios = [
+            {
+                id: 1,
+                company: "BlackStone Construction",
+                location: "Seattle, WA",
+                industry: "Construction",
+                customerType: "Corporate",
+                hasResaleCert: false,
+                resaleCertNumber: "",
+                expectedTaxCode: "2200",
+                explanation: "Washington state business without a resale certificate uses 2200 for standard WA sales tax."
+            },
+            {
+                id: 2,
+                company: "TechGear Solutions",
+                location: "Portland, OR",
+                industry: "Technology Retail",
+                customerType: "Corporate",
+                hasResaleCert: true,
+                resaleCertNumber: "OR-789-123456",
+                expectedTaxCode: "2203",
+                explanation: "Customer has a valid resale certificate, so they are tax exempt and use wholesale code 2203."
+            },
+            {
+                id: 3,
+                company: "Youth Sports Foundation",
+                location: "Los Angeles, CA",
+                industry: "Non-Profit",
+                customerType: "Non-Profit",
+                hasResaleCert: false,
+                resaleCertNumber: "",
+                expectedTaxCode: "2202",
+                explanation: "Out-of-state customer without resale certificate uses 2202 for out-of-state sales."
+            },
+            {
+                id: 4,
+                company: "City of Tacoma Parks",
+                location: "Tacoma, WA",
+                industry: "Government",
+                customerType: "Government",
+                hasResaleCert: true,
+                resaleCertNumber: "WA-GOV-456789",
+                expectedTaxCode: "2203",
+                explanation: "Government entity with tax exempt status uses 2203 for wholesale/exempt sales."
+            },
+            {
+                id: 5,
+                company: "Sarah Johnson",
+                location: "Federal Way, WA",
+                industry: "Individual",
+                customerType: "Individual",
+                hasResaleCert: false,
+                resaleCertNumber: "",
+                expectedTaxCode: "2200",
+                explanation: "Individual customer in Washington state uses 2200 for standard WA sales tax."
+            },
+            {
+                id: 6,
+                company: "Nevada Sports Shop",
+                location: "Las Vegas, NV",
+                industry: "Retail",
+                customerType: "Corporate",
+                hasResaleCert: false,
+                resaleCertNumber: "",
+                expectedTaxCode: "2202",
+                explanation: "Out-of-state retail business without resale certificate uses 2202."
+            },
+            {
+                id: 7,
+                company: "Puyallup School District",
+                location: "Puyallup, WA",
+                industry: "Education",
+                customerType: "School",
+                hasResaleCert: true,
+                resaleCertNumber: "WA-EDU-123456",
+                expectedTaxCode: "2203",
+                explanation: "Educational institution with tax exempt status uses 2203."
+            },
+            {
+                id: 8,
+                company: "First Baptist Church",
+                location: "Spokane, WA",
+                industry: "Religious",
+                customerType: "Church",
+                hasResaleCert: true,
+                resaleCertNumber: "WA-501C3-789",
+                expectedTaxCode: "2203",
+                explanation: "Non-profit religious organization with tax exempt status uses 2203."
+            },
+            {
+                id: 9,
+                company: "Mountain View Brewery",
+                location: "Denver, CO",
+                industry: "Manufacturing",
+                customerType: "Corporate",
+                hasResaleCert: true,
+                resaleCertNumber: "CO-MFG-987654",
+                expectedTaxCode: "2203",
+                explanation: "Out-of-state manufacturer with resale certificate uses 2203 for wholesale sales."
+            },
+            {
+                id: 10,
+                company: "Pacific Northwest Printing",
+                location: "Bellevue, WA",
+                industry: "Printing Services",
+                customerType: "Corporate",
+                hasResaleCert: false,
+                resaleCertNumber: "",
+                expectedTaxCode: "2200",
+                explanation: "Washington state business without resale certificate uses 2200 for standard WA sales tax."
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+        let score = 0;
+        let selectedTaxCode = null;
+
+        function displayScenario() {
+            const scenario = taxScenarios[currentScenarioIndex];
+            const scenarioCard = document.getElementById('scenarioCard');
+            
+            scenarioCard.innerHTML = `
+                <h3 style="color: #2B5797; margin-bottom: 15px; text-align: center;">
+                    Customer Setup Scenario
+                </h3>
+                
+                <div class="customer-info">
+                    <div class="info-item">
+                        <span class="info-label">Company:</span>
+                        <span class="info-value">${scenario.company}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value">${scenario.location}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Industry:</span>
+                        <span class="info-value">${scenario.industry}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Customer Type:</span>
+                        <span class="info-value">${scenario.customerType}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Has Resale Cert:</span>
+                        <span class="info-value" style="color: ${scenario.hasResaleCert ? '#5cb85c' : '#d9534f'};">
+                            ${scenario.hasResaleCert ? '✅ YES' : '❌ NO'}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Resale Cert #:</span>
+                        <span class="info-value">${scenario.resaleCertNumber || 'N/A'}</span>
+                    </div>
+                </div>
+
+                <div class="tax-selection">
+                    <h4 style="margin-bottom: 15px;">Which tax code should you use?</h4>
+                    
+                    <div class="tax-options">
+                        <div class="tax-option" onclick="selectTaxCode('2200')" data-code="2200">
+                            <div class="code-number">2200</div>
+                            <div class="code-name">Washington State<br>Sales Tax</div>
+                        </div>
+                        <div class="tax-option" onclick="selectTaxCode('2202')" data-code="2202">
+                            <div class="code-number">2202</div>
+                            <div class="code-name">Out of State<br>Sales</div>
+                        </div>
+                        <div class="tax-option" onclick="selectTaxCode('2203')" data-code="2203">
+                            <div class="code-number">2203</div>
+                            <div class="code-name">Wholesale<br>Sales</div>
+                        </div>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitAnswer()" disabled id="submitBtn">
+                        <i class="fas fa-check"></i> Submit Answer
+                    </button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div class="hint-section" style="display: none;" id="hintSection">
+                    <div class="hint-title">💡 Hint:</div>
+                    <div id="hintText"></div>
+                </div>
+            `;
+
+            updateProgress();
+            updateScenarioCounter();
+        }
+
+        function selectTaxCode(code) {
+            selectedTaxCode = code;
+            
+            // Clear previous selections
+            document.querySelectorAll('.tax-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Highlight selected option
+            document.querySelector(`[data-code="${code}"]`).classList.add('selected');
+            
+            // Enable submit button
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            const scenario = taxScenarios[currentScenarioIndex];
+            const feedback = document.getElementById('feedback');
+            const isCorrect = selectedTaxCode === scenario.expectedTaxCode;
+
+            // Update visual feedback on options
+            document.querySelectorAll('.tax-option').forEach(option => {
+                const optionCode = option.getAttribute('data-code');
+                option.classList.remove('selected');
+                
+                if (optionCode === scenario.expectedTaxCode) {
+                    option.classList.add('correct');
+                } else if (optionCode === selectedTaxCode && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedback.className = 'feedback success';
+                feedback.style.display = 'block';
+                feedback.innerHTML = `
+                    <strong><i class="fas fa-check-circle"></i> Correct!</strong><br>
+                    ${scenario.explanation}
+                `;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                feedback.innerHTML = `
+                    <strong><i class="fas fa-times-circle"></i> Incorrect.</strong><br>
+                    The correct answer is <strong>${scenario.expectedTaxCode}</strong>.<br>
+                    ${scenario.explanation}
+                `;
+                
+                // Show hint section
+                showHint();
+            }
+
+            updateScore();
+            
+            // Show next scenario button or completion
+            setTimeout(() => {
+                if (currentScenarioIndex < taxScenarios.length - 1) {
+                    feedback.innerHTML += `
+                        <button class="next-scenario-btn" onclick="nextScenario()">
+                            <i class="fas fa-arrow-right"></i> Next Scenario
+                        </button>
+                    `;
+                } else {
+                    showCompletion();
+                }
+            }, 1500);
+
+            // Disable submit button
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function showHint() {
+            const scenario = taxScenarios[currentScenarioIndex];
+            const hintSection = document.getElementById('hintSection');
+            const hintText = document.getElementById('hintText');
+            
+            let hint = "";
+            
+            if (scenario.hasResaleCert) {
+                hint = "When a customer has a valid resale certificate, they are buying for resale and are tax exempt. Use code 2203.";
+            } else if (scenario.location.includes('WA')) {
+                hint = "Washington state customers without resale certificates pay standard WA sales tax. Use code 2200.";
+            } else {
+                hint = "Out-of-state customers without resale certificates still pay sales tax. Use code 2202.";
+            }
+            
+            hintText.textContent = hint;
+            hintSection.style.display = 'block';
+        }
+
+        function nextScenario() {
+            currentScenarioIndex++;
+            selectedTaxCode = null;
+            
+            // Clear option states
+            document.querySelectorAll('.tax-option').forEach(option => {
+                option.className = 'tax-option';
+            });
+            
+            displayScenario();
+        }
+
+        function updateProgress() {
+            const progress = ((currentScenarioIndex) / taxScenarios.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateScore() {
+            document.getElementById('scoreValue').textContent = score;
+        }
+
+        function updateScenarioCounter() {
+            document.getElementById('currentScenario').textContent = currentScenarioIndex + 1;
+        }
+
+        function showCompletion() {
+            document.getElementById('gameSection').style.display = 'none';
+            document.getElementById('completionSection').style.display = 'block';
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTraining() {
+            currentScenarioIndex = 0;
+            score = 0;
+            selectedTaxCode = null;
+            
+            document.getElementById('gameSection').style.display = 'block';
+            document.getElementById('completionSection').style.display = 'none';
+            
+            updateScore();
+            displayScenario();
+        }
+
+        // Initialize the training
+        displayScenario();
+    </script>
+</body>
+</html>

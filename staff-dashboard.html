@@ -746,6 +746,40 @@
             color: white !important;
         }
 
+        /* Training Games Hub Link Styling */
+        .nav-section-header-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            width: 100%;
+        }
+
+        .nav-section-header-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-section-header-link .nav-section-header {
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-section-header-link:hover .nav-section-header {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(2px);
+        }
+
+        .external-arrow {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-section-header-link:hover .external-arrow {
+            transform: translateX(2px);
+            color: white;
+        }
+
         /* Font size for submenu items */
         .sidebar .nav-section-content .nav-link {
             font-size: 0.875rem;
@@ -3133,27 +3167,34 @@
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
                                 <span>📖</span>
-                                <span>Training</span>
+                                <span>Training Manuals</span>
                             </div>
                             <span class="chevron">▼</span>
                         </div>
                         <div class="nav-section-content">
                             <a href="/training/customer-service.html" class="nav-link">
-                                <span>Customer Service Training</span>
+                                <span>Customer Service Manual</span>
                             </a>
                             <a href="/training/sales-coordinator-manual.html" class="nav-link">
                                 <span>Sales Coordinator Manual</span>
                             </a>
-                            <a href="/training/team-match-game.html" class="nav-link">
-                                <span>Team Match Game</span>
-                            </a>
-                            <a href="/training/customer-categorization-training.html" class="nav-link">
-                                <span>Customer Categorization Training</span>
-                            </a>
                         </div>
                     </div>
                     
-                    <!-- 6. Office Assistant (Collapsed by default) -->
+                    <!-- 6. Training Games -->
+                    <div class="nav-section" data-section="training-games">
+                        <a href="/training/training-games-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>🎮</span>
+                                    <span>Training Games Hub</span>
+                                </div>
+                                <span class="external-arrow">→</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <!-- 7. Office Assistant (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="office-assistant">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
@@ -3188,7 +3229,7 @@
                         </div>
                     </div>
                     
-                    <!-- 7. Manual Calculators (Collapsed by default) -->
+                    <!-- 8. Manual Calculators (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="manual-calculators">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
@@ -3219,7 +3260,7 @@
                         </div>
                     </div>
                     
-                    <!-- 8. Art Operations (Collapsed by default) -->
+                    <!-- 9. Art Operations (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="art">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
@@ -3247,7 +3288,7 @@
                         </div>
                     </div>
                     
-                    <!-- 9. Forms (Collapsed by default) -->
+                    <!-- 10. Forms (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="forms">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">
@@ -3269,7 +3310,7 @@
                         </div>
                     </div>
                     
-                    <!-- 10. Administration (Collapsed by default) -->
+                    <!-- 11. Administration (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="admin">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
                             <div class="nav-section-title">

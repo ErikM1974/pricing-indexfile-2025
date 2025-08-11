@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Source Training - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            height: 35px;
+            opacity: 0.95;
+        }
+
+        .logo-container img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: #981e32;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: #b82940;
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #6b7280;
+        }
+
+        /* Game Container */
+        .game-wrapper {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: calc(100vh - 120px);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #ffd700;
+            font-size: 1.2em;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .important-notice {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        /* Learn Mode */
+        .learn-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .learn-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .source-card {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+            transition: all 0.3s;
+        }
+
+        .source-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .source-card.referral {
+            border-left-color: #ffd700;
+            background: linear-gradient(135deg, #fffbf0, #fff5e0);
+        }
+
+        .source-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .source-examples {
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .source-action {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* Scenario Mode */
+        .scenario-container {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .scenario-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .customer-dialogue {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            line-height: 1.6;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .customer-dialogue::before {
+            content: "👤 Customer Says:";
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .source-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .source-option {
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .source-option:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .source-option.selected {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .source-option.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #4CAF50;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .source-option.incorrect {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            border-color: #ff5252;
+            animation: shake 0.5s;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Shopworks Mockup */
+        .shopworks-mockup {
+            background: #f0f0f0;
+            border: 2px solid #999;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .shopworks-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .shopworks-label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .shopworks-dropdown {
+            padding: 5px 10px;
+            border: 1px solid #999;
+            border-radius: 3px;
+            background: white;
+            min-width: 150px;
+        }
+
+        /* Referral Action */
+        .referral-action-box {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .referral-action-box h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .wow-order {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .wow-order-title {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Score Display */
+        .score-display {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        /* Speed Challenge */
+        .speed-container {
+            display: none;
+        }
+
+        .speed-container.active {
+            display: block;
+        }
+
+        .timer-bar {
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.1s linear;
+        }
+
+        /* Navigation buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-50px);
+            }
+        }
+
+        .source-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.25rem;
+            }
+            
+            .back-btn span {
+                display: none;
+            }
+            
+            .logo-container {
+                height: 30px;
+            }
+            
+            .breadcrumb {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .source-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Header -->
+<nav class="nav-header">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="/staff-dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <div class="page-title">
+                <i class="fas fa-map-signs"></i>
+                <span>Lead Source Training</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="logo-container">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel">
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+    <div class="breadcrumb-container">
+        <a href="/staff-dashboard.html">Staff Dashboard</a>
+        <span>/</span>
+        <a href="#">Training</a>
+        <span>/</span>
+        <span>Lead Source Training</span>
+    </div>
+</div>
+
+<!-- Game Content -->
+<div class="game-wrapper">
+    <div class="container">
+        <div class="game-header">
+            <h1>🎯 Lead Source Training</h1>
+            <div class="subtitle">Master Customer Classification for Shopworks</div>
+            <div class="important-notice">
+                ⚠️ MANDATORY: Always ask "How did you hear about us?" and select Source in Shopworks!
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="mode-btn active" onclick="setGameMode('learn')">
+                <i class="fas fa-book"></i> Learn Sources
+            </button>
+            <button class="mode-btn" onclick="setGameMode('scenario')">
+                <i class="fas fa-comments"></i> Practice Scenarios
+            </button>
+            <button class="mode-btn" onclick="setGameMode('referral')">
+                <i class="fas fa-gift"></i> Referral Training
+            </button>
+            <button class="mode-btn" onclick="setGameMode('speed')">
+                <i class="fas fa-tachometer-alt"></i> Speed Challenge
+            </button>
+        </div>
+
+        <!-- Learn Mode -->
+        <div class="learn-container active" id="learnMode">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">📚 Understanding Lead Sources</h2>
+            
+            <div class="source-card referral">
+                <div class="source-title">🎁 Referral</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "Shawn at Arrow Lumber recommended you"<br>
+                    • "My friend who owns ABC Company said you do great work"<br>
+                    • "Another business in our building uses you"
+                </div>
+                <div class="source-action">
+                    ⚡ IMMEDIATE ACTION: Create WOW Order (Hot Ticket) for thank you tumbler with referrer's logo!<br>
+                    📝 Note: "New Customer X referred by Y - Send tumbler ASAP"
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-title">🚗 Drive By</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "We've been driving past for 10 years and finally stopped in"<br>
+                    • "I see your building on my commute every day"<br>
+                    • "Always wondered what you do when driving by"
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-title">📋 Old Customer</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "You did work for us 5+ years ago"<br>
+                    • "We used you before but all our contacts are gone"<br>
+                    • "Need to update everything - logos, contacts, info"<br>
+                    <em>Note: Still ask how they originally heard about us!</em>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-title">🔍 Google Search</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "I found you online"<br>
+                    • "Googled 'custom embroidery near me'"<br>
+                    • "Your website came up in my search"
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-title">🚶 Walk In</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "I was in the area and saw your sign"<br>
+                    • "Just stopped by to see what you offer"<br>
+                    • "Spontaneous visit, no prior research"
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-title">📌 Other</div>
+                <div class="source-examples">
+                    <strong>Customer Says:</strong><br>
+                    • "Saw you on Facebook/Instagram"<br>
+                    • "Met you at a trade show"<br>
+                    • "Got your email campaign"<br>
+                    • "Yellow Pages" or any other source not listed above
+                </div>
+            </div>
+
+            <div class="shopworks-mockup">
+                <h3>📊 Shopworks Customer Setup</h3>
+                <div class="shopworks-field">
+                    <span class="shopworks-label">Salesperson:</span>
+                    <select class="shopworks-dropdown">
+                        <option>Nika Lao</option>
+                        <option>Taylar Hanson</option>
+                    </select>
+                </div>
+                <div class="shopworks-field">
+                    <span class="shopworks-label">Type:</span>
+                    <select class="shopworks-dropdown">
+                        <option>Corporate</option>
+                    </select>
+                </div>
+                <div class="shopworks-field" style="background: yellow; padding: 5px;">
+                    <span class="shopworks-label"><strong>Source:</strong></span>
+                    <select class="shopworks-dropdown">
+                        <option>-- SELECT SOURCE --</option>
+                        <option>Google Search</option>
+                        <option>Walk In</option>
+                        <option>Old Customer</option>
+                        <option>Referral</option>
+                        <option>Other</option>
+                        <option>Drive By</option>
+                    </select>
+                    <span style="color: red; font-weight: bold;">← REQUIRED!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario Practice Mode -->
+        <div class="scenario-container" id="scenarioMode">
+            <div class="score-display">
+                <div class="score-item">
+                    <div class="score-label">Current Streak</div>
+                    <div class="score-value" id="currentStreak">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Correct</div>
+                    <div class="score-value" id="correctCount">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Total</div>
+                    <div class="score-value" id="totalCount">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Accuracy</div>
+                    <div class="score-value" id="accuracy">0%</div>
+                </div>
+            </div>
+
+            <div class="customer-dialogue" id="customerDialogue">
+                <!-- Dynamic content -->
+            </div>
+
+            <div class="source-options" id="sourceOptions">
+                <div class="source-option" onclick="selectSource('Google Search')">
+                    <i class="fas fa-search"></i><br>Google Search
+                </div>
+                <div class="source-option" onclick="selectSource('Walk In')">
+                    <i class="fas fa-walking"></i><br>Walk In
+                </div>
+                <div class="source-option" onclick="selectSource('Old Customer')">
+                    <i class="fas fa-history"></i><br>Old Customer
+                </div>
+                <div class="source-option" onclick="selectSource('Referral')">
+                    <i class="fas fa-user-friends"></i><br>Referral
+                </div>
+                <div class="source-option" onclick="selectSource('Other')">
+                    <i class="fas fa-ellipsis-h"></i><br>Other
+                </div>
+                <div class="source-option" onclick="selectSource('Drive By')">
+                    <i class="fas fa-car"></i><br>Drive By
+                </div>
+            </div>
+
+            <div id="feedbackArea"></div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="nextScenario()">Next Scenario →</button>
+            </div>
+        </div>
+
+        <!-- Referral Action Training -->
+        <div class="scenario-container" id="referralMode">
+            <h2 style="margin-bottom: 20px;">🎁 Referral Action Training</h2>
+            
+            <div class="customer-dialogue" id="referralDialogue">
+                <!-- Dynamic referral scenarios -->
+            </div>
+
+            <div id="referralQuestions"></div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="checkReferralAnswer()">Check Answer</button>
+                <button class="nav-btn" onclick="nextReferralScenario()">Next Scenario →</button>
+            </div>
+        </div>
+
+        <!-- Speed Challenge Mode -->
+        <div class="speed-container" id="speedMode">
+            <div class="timer-bar">
+                <div class="timer-fill" id="timerFill"></div>
+            </div>
+
+            <div class="score-display">
+                <div class="score-item">
+                    <div class="score-label">Score</div>
+                    <div class="score-value" id="speedScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Time Left</div>
+                    <div class="score-value" id="timeLeft">60s</div>
+                </div>
+            </div>
+
+            <div class="customer-dialogue" id="speedDialogue">
+                <!-- Dynamic content -->
+            </div>
+
+            <div class="source-options" id="speedOptions">
+                <!-- Quick select buttons -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Game data
+const scenarios = [
+    {
+        dialogue: "Hi, I'm Bob from Bob's Plumbing Service. Shawn over at Arrow Lumber said you guys do amazing work on their uniforms and suggested we give you a call.",
+        source: "Referral",
+        referrer: "Shawn at Arrow Lumber",
+        newCustomer: "Bob's Plumbing Service",
+        action: "Create WOW Order for Shawn - Laser tumbler with Arrow Lumber logo"
+    },
+    {
+        dialogue: "We've been driving past your building for about 10 years on our way to our warehouse. Finally decided to stop in and see what you're all about!",
+        source: "Drive By"
+    },
+    {
+        dialogue: "I found your website when I searched for 'custom embroidery Milton Washington' on Google.",
+        source: "Google Search"
+    },
+    {
+        dialogue: "You did shirts for us back in 2018, but everyone from back then has left the company. We need to update everything - new logos, new contacts, the works.",
+        source: "Old Customer"
+    },
+    {
+        dialogue: "I was just in the neighborhood running errands and noticed your sign. Thought I'd pop in to see what services you offer.",
+        source: "Walk In"
+    },
+    {
+        dialogue: "I saw your post on Facebook about the custom hats you did for that construction company. Really impressed with the quality!",
+        source: "Other"
+    },
+    {
+        dialogue: "The team at Pacific Steel recommended you. They said you handle all their safety gear embroidery and you're really reliable.",
+        source: "Referral",
+        referrer: "Pacific Steel",
+        newCustomer: "New Customer",
+        action: "Create WOW Order for Pacific Steel - Thank you tumbler"
+    },
+    {
+        dialogue: "I met one of your sales reps at the trade show last month. They gave me a card and said to reach out when we need uniforms.",
+        source: "Other"
+    },
+    {
+        dialogue: "We drive by your place every morning. My business partner and I have been talking about getting team shirts for months, so here we are!",
+        source: "Drive By"
+    },
+    {
+        dialogue: "Found you in our vendor files from 2017. We're restarting our uniform program and remembered you did good work.",
+        source: "Old Customer"
+    },
+    {
+        dialogue: "I typed 'screen printing near me' into Google and your company was the first result.",
+        source: "Google Search"
+    },
+    {
+        dialogue: "Sarah from Cascade Construction said you're the best in the area for embroidered polos. She's been using you for years.",
+        source: "Referral",
+        referrer: "Sarah from Cascade Construction",
+        newCustomer: "New Customer",
+        action: "Create WOW Order for Sarah - Tumbler with Cascade Construction logo"
+    },
+    {
+        dialogue: "I received your email newsletter about the new services you're offering. Thought it was time to check you out.",
+        source: "Other"
+    },
+    {
+        dialogue: "Just walked in off the street. Saw your 'Custom Apparel' sign and need some shirts made.",
+        source: "Walk In"
+    },
+    {
+        dialogue: "My neighbor owns Thunder Mountain Electric and he's always wearing nice embroidered shirts. He said you guys do all their work.",
+        source: "Referral",
+        referrer: "Thunder Mountain Electric",
+        newCustomer: "New Customer",
+        action: "Create WOW Order for Thunder Mountain Electric - Thank you tumbler"
+    }
+];
+
+// Referral-specific scenarios for training
+const referralScenarios = [
+    {
+        dialogue: "Hi! Mike from Summit Roofing told me you do excellent embroidery work. We're a new plumbing company and need uniforms.",
+        questions: [
+            {
+                question: "Who is the referrer?",
+                answer: "Mike from Summit Roofing",
+                options: ["Mike from Summit Roofing", "The plumbing company", "Summit Plumbing", "Mike's Roofing"]
+            },
+            {
+                question: "What action should you take?",
+                answer: "Create WOW Order for thank you tumbler",
+                options: ["Just note it in the system", "Create WOW Order for thank you tumbler", "Send an email later", "Nothing special needed"]
+            },
+            {
+                question: "What should the WOW Order note say?",
+                answer: "New plumbing company referred by Mike - Send Summit Roofing tumbler ASAP",
+                options: [
+                    "New plumbing company referred by Mike - Send Summit Roofing tumbler ASAP",
+                    "Send tumbler sometime",
+                    "Mike gets a tumbler",
+                    "Thank you gift needed"
+                ]
+            }
+        ]
+    },
+    {
+        dialogue: "Jennifer at Precision Manufacturing said you're her go-to for custom apparel. We need safety vests with our logo.",
+        questions: [
+            {
+                question: "Who gets the thank you tumbler?",
+                answer: "Jennifer at Precision Manufacturing",
+                options: ["The new customer", "Jennifer at Precision Manufacturing", "Both companies", "No one"]
+            },
+            {
+                question: "When should the tumbler be sent?",
+                answer: "ASAP",
+                options: ["Next month", "With the customer's order", "ASAP", "When convenient"]
+            }
+        ]
+    },
+    {
+        dialogue: "We're Blue Mountain Landscaping. Tom from Green Valley Nursery uses you for all his gear and said we should too.",
+        questions: [
+            {
+                question: "What is the Source classification?",
+                answer: "Referral",
+                options: ["Google Search", "Walk In", "Referral", "Other"]
+            },
+            {
+                question: "Who is the referrer?",
+                answer: "Tom from Green Valley Nursery",
+                options: ["Blue Mountain Landscaping", "Tom from Green Valley Nursery", "Green Mountain", "Tom's Landscaping"]
+            },
+            {
+                question: "What logo goes on the thank you tumbler?",
+                answer: "Green Valley Nursery logo",
+                options: ["Blue Mountain logo", "Green Valley Nursery logo", "NWCA logo", "No logo needed"]
+            }
+        ]
+    }
+];
+
+// Game state
+let currentMode = 'learn';
+let currentScenarioIndex = 0;
+let correctAnswers = 0;
+let totalAnswers = 0;
+let currentStreak = 0;
+let selectedSource = null;
+let speedTimer = null;
+let speedTimeLeft = 60;
+let speedScore = 0;
+let currentReferralIndex = 0;
+let currentReferralQuestion = 0;
+
+function setGameMode(mode) {
+    currentMode = mode;
+    
+    // Update button states
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Hide all containers
+    document.getElementById('learnMode').classList.remove('active');
+    document.getElementById('scenarioMode').classList.remove('active');
+    document.getElementById('referralMode').classList.remove('active');
+    document.getElementById('speedMode').classList.remove('active');
+    
+    // Show selected mode
+    switch(mode) {
+        case 'learn':
+            document.getElementById('learnMode').classList.add('active');
+            break;
+        case 'scenario':
+            document.getElementById('scenarioMode').classList.add('active');
+            resetScenarioStats();
+            loadScenario();
+            break;
+        case 'referral':
+            document.getElementById('referralMode').classList.add('active');
+            loadReferralScenario();
+            break;
+        case 'speed':
+            document.getElementById('speedMode').classList.add('active');
+            startSpeedChallenge();
+            break;
+    }
+}
+
+function resetScenarioStats() {
+    correctAnswers = 0;
+    totalAnswers = 0;
+    currentStreak = 0;
+    currentScenarioIndex = 0;
+    updateScoreDisplay();
+}
+
+function loadScenario() {
+    const scenario = scenarios[currentScenarioIndex];
+    document.getElementById('customerDialogue').textContent = scenario.dialogue;
+    
+    // Reset options
+    document.querySelectorAll('.source-option').forEach(option => {
+        option.classList.remove('selected', 'correct', 'incorrect');
+    });
+    
+    selectedSource = null;
+    document.getElementById('feedbackArea').innerHTML = '';
+}
+
+function selectSource(source) {
+    if (selectedSource) return; // Already selected
+    
+    selectedSource = source;
+    const scenario = scenarios[currentScenarioIndex];
+    const isCorrect = source === scenario.source;
+    
+    // Update stats
+    totalAnswers++;
+    if (isCorrect) {
+        correctAnswers++;
+        currentStreak++;
+    } else {
+        currentStreak = 0;
+    }
+    
+    // Visual feedback
+    document.querySelectorAll('.source-option').forEach(option => {
+        if (option.textContent.includes(source)) {
+            option.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+        if (option.textContent.includes(scenario.source) && !isCorrect) {
+            option.classList.add('correct');
+        }
+    });
+    
+    // Show feedback
+    let feedbackHTML = `<div class="${isCorrect ? 'referral-action-box' : 'source-action'}" style="margin-top: 20px;">`;
+    
+    if (isCorrect) {
+        feedbackHTML += `<h3>✅ Correct!</h3>`;
+        
+        if (scenario.source === 'Referral') {
+            feedbackHTML += `
+                <div class="wow-order">
+                    <div class="wow-order-title">🎁 WOW ORDER REQUIRED!</div>
+                    <strong>Referrer:</strong> ${scenario.referrer}<br>
+                    <strong>New Customer:</strong> ${scenario.newCustomer}<br>
+                    <strong>Action:</strong> ${scenario.action}<br>
+                    <strong>Note:</strong> "${scenario.newCustomer} referred by ${scenario.referrer} - Send thank you tumbler ASAP"
+                </div>
+            `;
+        }
+    } else {
+        feedbackHTML += `
+            <h3>❌ Incorrect</h3>
+            <p>The correct answer was: <strong>${scenario.source}</strong></p>
+        `;
+    }
+    
+    feedbackHTML += `</div>`;
+    document.getElementById('feedbackArea').innerHTML = feedbackHTML;
+    
+    updateScoreDisplay();
+}
+
+function updateScoreDisplay() {
+    document.getElementById('currentStreak').textContent = currentStreak;
+    document.getElementById('correctCount').textContent = correctAnswers;
+    document.getElementById('totalCount').textContent = totalAnswers;
+    
+    const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+    document.getElementById('accuracy').textContent = accuracy + '%';
+}
+
+function nextScenario() {
+    currentScenarioIndex = (currentScenarioIndex + 1) % scenarios.length;
+    loadScenario();
+}
+
+// Referral Training Functions
+function loadReferralScenario() {
+    currentReferralQuestion = 0;
+    const scenario = referralScenarios[currentReferralIndex];
+    
+    document.getElementById('referralDialogue').textContent = scenario.dialogue;
+    
+    showReferralQuestion();
+}
+
+function showReferralQuestion() {
+    const scenario = referralScenarios[currentReferralIndex];
+    const question = scenario.questions[currentReferralQuestion];
+    
+    let html = `
+        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+            <h3>${question.question}</h3>
+            <div class="source-options" style="margin-top: 15px;">
+    `;
+    
+    question.options.forEach((option, index) => {
+        html += `
+            <div class="source-option" onclick="selectReferralAnswer('${option}')" data-option="${option}">
+                ${option}
+            </div>
+        `;
+    });
+    
+    html += `</div></div>`;
+    
+    document.getElementById('referralQuestions').innerHTML = html;
+}
+
+function selectReferralAnswer(answer) {
+    const scenario = referralScenarios[currentReferralIndex];
+    const question = scenario.questions[currentReferralQuestion];
+    const isCorrect = answer === question.answer;
+    
+    // Visual feedback
+    document.querySelectorAll('.source-option').forEach(option => {
+        if (option.dataset.option === answer) {
+            option.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+        if (option.dataset.option === question.answer && !isCorrect) {
+            option.classList.add('correct');
+        }
+    });
+}
+
+function checkReferralAnswer() {
+    // Move to next question or scenario
+    const scenario = referralScenarios[currentReferralIndex];
+    
+    if (currentReferralQuestion < scenario.questions.length - 1) {
+        currentReferralQuestion++;
+        showReferralQuestion();
+    } else {
+        // Show completion message
+        document.getElementById('referralQuestions').innerHTML = `
+            <div class="referral-action-box">
+                <h3>✅ Scenario Complete!</h3>
+                <p>Great job! You've correctly identified the referral process.</p>
+                <p>Remember: Always create a WOW Order immediately for referrals!</p>
+            </div>
+        `;
+    }
+}
+
+function nextReferralScenario() {
+    currentReferralIndex = (currentReferralIndex + 1) % referralScenarios.length;
+    loadReferralScenario();
+}
+
+// Speed Challenge Functions
+function startSpeedChallenge() {
+    speedScore = 0;
+    speedTimeLeft = 60;
+    loadSpeedScenario();
+    
+    // Start timer
+    clearInterval(speedTimer);
+    speedTimer = setInterval(() => {
+        speedTimeLeft--;
+        document.getElementById('timeLeft').textContent = speedTimeLeft + 's';
+        document.getElementById('timerFill').style.width = (speedTimeLeft / 60 * 100) + '%';
+        
+        if (speedTimeLeft <= 0) {
+            endSpeedChallenge();
+        }
+    }, 1000);
+    
+    // Setup quick buttons
+    setupSpeedButtons();
+}
+
+function setupSpeedButtons() {
+    const sources = ['Google Search', 'Walk In', 'Old Customer', 'Referral', 'Other', 'Drive By'];
+    let html = '';
+    
+    sources.forEach(source => {
+        html += `
+            <div class="source-option" onclick="speedSelect('${source}')" data-source="${source}">
+                ${source}
+            </div>
+        `;
+    });
+    
+    document.getElementById('speedOptions').innerHTML = html;
+}
+
+function loadSpeedScenario() {
+    // Reset all button colors
+    document.querySelectorAll('#speedOptions .source-option').forEach(option => {
+        option.style.background = '';
+        option.classList.remove('correct', 'incorrect');
+    });
+    
+    // Add fade animation for new question
+    const dialogueEl = document.getElementById('speedDialogue');
+    dialogueEl.style.opacity = '0';
+    
+    const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    
+    setTimeout(() => {
+        dialogueEl.textContent = scenario.dialogue;
+        dialogueEl.dataset.correctSource = scenario.source;
+        dialogueEl.style.transition = 'opacity 0.3s';
+        dialogueEl.style.opacity = '1';
+    }, 100);
+}
+
+function speedSelect(source) {
+    // Prevent multiple clicks
+    const allOptions = document.querySelectorAll('#speedOptions .source-option');
+    if (event.target.classList.contains('disabled')) return;
+    
+    // Disable all buttons temporarily
+    allOptions.forEach(opt => opt.classList.add('disabled'));
+    
+    const correctSource = document.getElementById('speedDialogue').dataset.correctSource;
+    const isCorrect = source === correctSource;
+    
+    if (isCorrect) {
+        speedScore += 10;
+        document.getElementById('speedScore').textContent = speedScore;
+        
+        // Show correct answer with animation
+        event.target.classList.add('correct');
+        event.target.style.background = '#4CAF50';
+        
+        // Add floating +10 animation
+        const floater = document.createElement('div');
+        floater.textContent = '+10';
+        floater.style.cssText = `
+            position: absolute;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.5em;
+            animation: floatUp 1s ease-out;
+            pointer-events: none;
+            z-index: 1000;
+        `;
+        event.target.style.position = 'relative';
+        event.target.appendChild(floater);
+        
+        setTimeout(() => {
+            floater.remove();
+            allOptions.forEach(opt => opt.classList.remove('disabled'));
+            loadSpeedScenario();
+        }, 500);
+    } else {
+        // Show incorrect answer
+        event.target.classList.add('incorrect');
+        event.target.style.background = '#ff6b6b';
+        
+        // Also highlight the correct answer
+        allOptions.forEach(opt => {
+            if (opt.dataset.source === correctSource) {
+                opt.classList.add('correct');
+                opt.style.background = '#4CAF50';
+            }
+        });
+        
+        setTimeout(() => {
+            allOptions.forEach(opt => opt.classList.remove('disabled'));
+            loadSpeedScenario();
+        }, 800);
+    }
+}
+
+function endSpeedChallenge() {
+    clearInterval(speedTimer);
+    
+    document.getElementById('speedDialogue').innerHTML = `
+        <h2>⏱️ Time's Up!</h2>
+        <p>Final Score: ${speedScore} points</p>
+        <button class="nav-btn" onclick="startSpeedChallenge()">Try Again</button>
+    `;
+    
+    document.getElementById('speedOptions').innerHTML = '';
+}
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    // Start with learn mode active
+    setGameMode('learn');
+});
+</script>
+
+</body>
+</html>

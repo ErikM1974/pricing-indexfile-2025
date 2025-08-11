@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sales Tax Code Training - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Root variables - NWCA Green Theme */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --error-bg: #fee;
+            --error-text: #c00;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--primary-color);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Game Card */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-description {
+            opacity: 0.95;
+            font-size: 1rem;
+        }
+
+        /* Question Section */
+        .question-section {
+            padding: 3rem 2rem;
+        }
+
+        .question-number {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .scenario-box {
+            background: var(--bg-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .scenario-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 179, 84, 0.2);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--success-bg);
+        }
+
+        .option-btn.correct {
+            background: var(--success-bg);
+            border-color: var(--success-text);
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option-btn.incorrect {
+            background: var(--error-bg);
+            border-color: var(--error-text);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .option-code {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .option-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .option-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.25rem;
+            display: none;
+        }
+
+        .option-btn.correct .option-icon {
+            display: block;
+            color: var(--success-text);
+        }
+
+        .option-btn.incorrect .option-icon {
+            display: block;
+            color: var(--error-text);
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            padding: 2rem;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .feedback-section.show {
+            display: block;
+        }
+
+        .feedback-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-message.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .feedback-message.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .feedback-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feedback-content {
+            flex: 1;
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-text {
+            line-height: 1.5;
+        }
+
+        /* Control Buttons */
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 179, 84, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(76, 179, 84, 0.5);
+        }
+
+        /* Results Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            width: 90%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            background: var(--bg-color);
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/training/training-hub.html">Training Hub</a>
+                    <span>/</span>
+                    <span>Sales Tax Codes</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Title Section -->
+        <div class="title-section">
+            <h1 class="title">
+                <i class="fas fa-receipt"></i>
+                Sales Tax Code Training
+            </h1>
+            <p class="subtitle">Master Washington State tax codes for accurate order processing</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="scoreDisplay">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="streakDisplay">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracyDisplay">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="progressDisplay">0/10</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+
+        <!-- Game Card -->
+        <div class="game-card">
+            <div class="game-header">
+                <h2 class="game-title">Tax Code Challenge</h2>
+                <p class="game-description">Select the correct tax code for each customer scenario</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Section -->
+            <div class="question-section">
+                <div class="question-number" id="questionNumber">Question 1 of 10</div>
+                <h3 class="question-text" id="questionText">Loading question...</h3>
+                
+                <div class="scenario-box" id="scenarioBox">
+                    <div class="scenario-title">Scenario:</div>
+                    <div class="scenario-text" id="scenarioText">Loading scenario...</div>
+                </div>
+
+                <!-- Options Grid -->
+                <div class="options-grid" id="optionsGrid">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback-section" id="feedbackSection">
+                <div class="feedback-message" id="feedbackMessage">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-content">
+                        <div class="feedback-title" id="feedbackTitle"></div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="control-buttons">
+                <button class="btn btn-secondary" id="skipBtn" style="display: none;">
+                    <i class="fas fa-forward"></i>
+                    Skip Question
+                </button>
+                <button class="btn btn-primary" id="nextBtn" style="display: none;">
+                    <i class="fas fa-arrow-right"></i>
+                    Next Question
+                </button>
+                <button class="btn btn-primary" id="submitBtn" style="display: none;">
+                    <i class="fas fa-check"></i>
+                    Submit Answer
+                </button>
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fas fa-play"></i>
+                    Start Training
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Results Modal -->
+    <div class="modal-overlay" id="resultsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-trophy" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h2 style="margin: 0;">Training Complete!</h2>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; font-weight: bold; color: var(--primary-color);" id="finalScore">0%</div>
+                    <div style="color: var(--text-secondary);">Final Score</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--success-text);" id="correctCount">0</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Correct</div>
+                    </div>
+                    <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--error-text);" id="incorrectCount">0</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Incorrect</div>
+                    </div>
+                </div>
+                
+                <div id="performanceMessage" style="text-align: center; padding: 1rem; background: var(--bg-color); border-radius: 8px;">
+                    <!-- Performance message will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeResults()">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+                <button class="btn btn-primary" onclick="restartGame()">
+                    <i class="fas fa-redo"></i>
+                    Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sales Tax Code Training Game
+        class SalesTaxTrainer {
+            constructor() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.streak = 0;
+                this.maxStreak = 0;
+                this.correct = 0;
+                this.incorrect = 0;
+                this.selectedOption = null;
+                this.questions = this.generateQuestions();
+                this.isAnswered = false;
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                // Stats elements
+                this.scoreDisplay = document.getElementById('scoreDisplay');
+                this.streakDisplay = document.getElementById('streakDisplay');
+                this.accuracyDisplay = document.getElementById('accuracyDisplay');
+                this.progressDisplay = document.getElementById('progressDisplay');
+                
+                // Question elements
+                this.questionNumber = document.getElementById('questionNumber');
+                this.questionText = document.getElementById('questionText');
+                this.scenarioText = document.getElementById('scenarioText');
+                this.optionsGrid = document.getElementById('optionsGrid');
+                
+                // Feedback elements
+                this.feedbackSection = document.getElementById('feedbackSection');
+                this.feedbackMessage = document.getElementById('feedbackMessage');
+                this.feedbackIcon = document.getElementById('feedbackIcon');
+                this.feedbackTitle = document.getElementById('feedbackTitle');
+                this.feedbackText = document.getElementById('feedbackText');
+                
+                // Control buttons
+                this.startBtn = document.getElementById('startBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.submitBtn = document.getElementById('submitBtn');
+                this.skipBtn = document.getElementById('skipBtn');
+                
+                // Progress bar
+                this.progressBar = document.getElementById('progressBar');
+                
+                // Modal elements
+                this.resultsModal = document.getElementById('resultsModal');
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startGame());
+                this.nextBtn.addEventListener('click', () => this.nextQuestion());
+                this.submitBtn.addEventListener('click', () => this.submitAnswer());
+                this.skipBtn.addEventListener('click', () => this.skipQuestion());
+            }
+
+            generateQuestions() {
+                const taxCodes = {
+                    'WAC': {
+                        description: 'Washington Construction',
+                        explanation: 'Used for construction companies and contractors working on buildings or infrastructure'
+                    },
+                    'WAM': {
+                        description: 'Washington Manufacturing',
+                        explanation: 'Applied to manufacturing and production companies creating physical goods'
+                    },
+                    'WAR': {
+                        description: 'Washington Retail',
+                        explanation: 'Standard retail sales tax for regular business purchases'
+                    },
+                    'WAW': {
+                        description: 'Washington Wholesale',
+                        explanation: 'Wholesale/reseller rate for businesses buying for resale'
+                    },
+                    'WARE': {
+                        description: 'Washington Reseller Exempt',
+                        explanation: 'Tax-exempt status for registered resellers with valid permits'
+                    },
+                    'WANP': {
+                        description: 'Washington Non-Profit',
+                        explanation: 'Tax-exempt status for registered 501(c)(3) organizations'
+                    },
+                    'OUT': {
+                        description: 'Out of State',
+                        explanation: 'No Washington tax collected for out-of-state shipments'
+                    }
+                };
+
+                const scenarios = [
+                    {
+                        question: "What tax code should be used for this customer?",
+                        scenario: "BlackStone Construction is ordering 50 safety shirts for their crew working on the new Seattle high-rise project. They are a licensed general contractor.",
+                        correctCode: 'WAC',
+                        explanation: "Construction companies like BlackStone Construction should use WAC (Washington Construction) code for their business purchases."
+                    },
+                    {
+                        question: "Select the appropriate tax code for this order:",
+                        scenario: "Seattle Children's Hospital Foundation, a registered 501(c)(3) non-profit, is ordering 200 t-shirts for their annual charity run.",
+                        correctCode: 'WANP',
+                        explanation: "Registered non-profit organizations with 501(c)(3) status use WANP (Washington Non-Profit) for tax-exempt purchases."
+                    },
+                    {
+                        question: "Which tax code applies to this customer?",
+                        scenario: "ABC Manufacturing in Tacoma is ordering uniforms for their factory workers. They produce automotive parts.",
+                        correctCode: 'WAM',
+                        explanation: "Manufacturing companies use WAM (Washington Manufacturing) code for their business purchases."
+                    },
+                    {
+                        question: "What's the correct tax code for this situation?",
+                        scenario: "Joe's T-Shirt Shop is buying 100 blank shirts to print and resell in their store. They have a valid reseller permit on file.",
+                        correctCode: 'WARE',
+                        explanation: "Resellers with valid permits buying inventory for resale use WARE (Washington Reseller Exempt) to avoid double taxation."
+                    },
+                    {
+                        question: "Identify the tax code for this order:",
+                        scenario: "A Portland, Oregon company is ordering 25 polos to be shipped to their Portland headquarters.",
+                        correctCode: 'OUT',
+                        explanation: "Orders shipped out of Washington State use OUT code - no Washington sales tax is collected."
+                    },
+                    {
+                        question: "Select the appropriate tax code:",
+                        scenario: "Northwest Dental Clinic is ordering 30 embroidered scrubs for their staff. They are a regular retail business.",
+                        correctCode: 'WAR',
+                        explanation: "Regular retail businesses like dental clinics use WAR (Washington Retail) for standard taxable purchases."
+                    },
+                    {
+                        question: "What tax code should be applied?",
+                        scenario: "Turner Construction is purchasing 75 high-visibility vests for their road construction project on I-5.",
+                        correctCode: 'WAC',
+                        explanation: "Construction companies working on infrastructure projects use WAC (Washington Construction) code."
+                    },
+                    {
+                        question: "Choose the correct tax code:",
+                        scenario: "Habitat for Humanity of King County needs 40 volunteer shirts for their next build. They provided their 501(c)(3) certificate.",
+                        correctCode: 'WANP',
+                        explanation: "Verified non-profit organizations like Habitat for Humanity use WANP for tax-exempt status."
+                    },
+                    {
+                        question: "What's the right tax code here?",
+                        scenario: "Costco Wholesale is ordering 500 branded caps through their procurement department for employee uniforms.",
+                        correctCode: 'WAW',
+                        explanation: "Large wholesale businesses typically use WAW (Washington Wholesale) for their corporate purchases."
+                    },
+                    {
+                        question: "Identify the correct tax code:",
+                        scenario: "Boeing's Everett facility is ordering 200 safety shirts for their assembly line workers.",
+                        correctCode: 'WAM',
+                        explanation: "Manufacturing facilities like Boeing use WAM (Washington Manufacturing) for their business purchases."
+                    }
+                ];
+
+                // Shuffle scenarios
+                return scenarios.sort(() => Math.random() - 0.5);
+            }
+
+            startGame() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.streak = 0;
+                this.correct = 0;
+                this.incorrect = 0;
+                this.startBtn.style.display = 'none';
+                this.submitBtn.style.display = 'inline-flex';
+                this.skipBtn.style.display = 'inline-flex';
+                this.loadQuestion();
+                this.updateStats();
+            }
+
+            loadQuestion() {
+                this.isAnswered = false;
+                this.selectedOption = null;
+                this.feedbackSection.classList.remove('show');
+                
+                const question = this.questions[this.currentQuestion];
+                this.questionNumber.textContent = `Question ${this.currentQuestion + 1} of ${this.questions.length}`;
+                this.questionText.textContent = question.question;
+                this.scenarioText.textContent = question.scenario;
+                
+                // Create options
+                const taxOptions = [
+                    { code: 'WAC', desc: 'Washington Construction' },
+                    { code: 'WAM', desc: 'Washington Manufacturing' },
+                    { code: 'WAR', desc: 'Washington Retail' },
+                    { code: 'WAW', desc: 'Washington Wholesale' },
+                    { code: 'WARE', desc: 'Washington Reseller Exempt' },
+                    { code: 'WANP', desc: 'Washington Non-Profit' },
+                    { code: 'OUT', desc: 'Out of State' }
+                ];
+                
+                // Shuffle options
+                taxOptions.sort(() => Math.random() - 0.5);
+                
+                // Display options
+                this.optionsGrid.innerHTML = '';
+                taxOptions.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.dataset.code = option.code;
+                    btn.innerHTML = `
+                        <div class="option-code">${option.code}</div>
+                        <div class="option-description">${option.desc}</div>
+                        <i class="option-icon fas"></i>
+                    `;
+                    btn.addEventListener('click', () => this.selectOption(btn));
+                    this.optionsGrid.appendChild(btn);
+                });
+                
+                // Update progress
+                this.updateProgress();
+            }
+
+            selectOption(button) {
+                if (this.isAnswered) return;
+                
+                // Remove previous selection
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                // Select new option
+                button.classList.add('selected');
+                this.selectedOption = button.dataset.code;
+            }
+
+            submitAnswer() {
+                if (!this.selectedOption || this.isAnswered) return;
+                
+                this.isAnswered = true;
+                const question = this.questions[this.currentQuestion];
+                const isCorrect = this.selectedOption === question.correctCode;
+                
+                // Update stats
+                if (isCorrect) {
+                    this.correct++;
+                    this.score += 10;
+                    this.streak++;
+                    if (this.streak > this.maxStreak) this.maxStreak = this.streak;
+                } else {
+                    this.incorrect++;
+                    this.streak = 0;
+                }
+                
+                // Show feedback
+                this.showFeedback(isCorrect, question);
+                
+                // Update button states
+                this.submitBtn.style.display = 'none';
+                this.skipBtn.style.display = 'none';
+                
+                if (this.currentQuestion < this.questions.length - 1) {
+                    this.nextBtn.style.display = 'inline-flex';
+                } else {
+                    setTimeout(() => this.showResults(), 2000);
+                }
+                
+                this.updateStats();
+            }
+
+            skipQuestion() {
+                if (this.isAnswered) return;
+                
+                this.incorrect++;
+                this.streak = 0;
+                this.currentQuestion++;
+                
+                if (this.currentQuestion < this.questions.length) {
+                    this.loadQuestion();
+                } else {
+                    this.showResults();
+                }
+                
+                this.updateStats();
+            }
+
+            nextQuestion() {
+                this.currentQuestion++;
+                
+                if (this.currentQuestion < this.questions.length) {
+                    this.nextBtn.style.display = 'none';
+                    this.submitBtn.style.display = 'inline-flex';
+                    this.skipBtn.style.display = 'inline-flex';
+                    this.loadQuestion();
+                } else {
+                    this.showResults();
+                }
+            }
+
+            showFeedback(isCorrect, question) {
+                // Mark options
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.dataset.code === question.correctCode) {
+                        btn.classList.add('correct');
+                        btn.querySelector('.option-icon').classList.add('fa-check-circle');
+                    } else if (btn.dataset.code === this.selectedOption && !isCorrect) {
+                        btn.classList.add('incorrect');
+                        btn.querySelector('.option-icon').classList.add('fa-times-circle');
+                    }
+                });
+                
+                // Show feedback message
+                this.feedbackSection.classList.add('show');
+                this.feedbackMessage.className = `feedback-message ${isCorrect ? 'success' : 'error'}`;
+                this.feedbackIcon.className = `feedback-icon fas ${isCorrect ? 'fa-check-circle' : 'fa-times-circle'}`;
+                this.feedbackTitle.textContent = isCorrect ? 'Correct!' : `Incorrect - The answer is ${question.correctCode}`;
+                this.feedbackText.textContent = question.explanation;
+            }
+
+            updateStats() {
+                this.scoreDisplay.textContent = this.score;
+                this.streakDisplay.textContent = this.streak;
+                
+                const total = this.correct + this.incorrect;
+                const accuracy = total > 0 ? Math.round((this.correct / total) * 100) : 0;
+                this.accuracyDisplay.textContent = `${accuracy}%`;
+                
+                this.progressDisplay.textContent = `${this.currentQuestion + 1}/${this.questions.length}`;
+            }
+
+            updateProgress() {
+                const progress = ((this.currentQuestion + 1) / this.questions.length) * 100;
+                this.progressBar.style.width = `${progress}%`;
+            }
+
+            showResults() {
+                const accuracy = Math.round((this.correct / this.questions.length) * 100);
+                
+                document.getElementById('finalScore').textContent = `${accuracy}%`;
+                document.getElementById('correctCount').textContent = this.correct;
+                document.getElementById('incorrectCount').textContent = this.incorrect;
+                
+                let message = '';
+                if (accuracy >= 90) {
+                    message = `<i class="fas fa-star" style="color: gold;"></i> Outstanding! You're a tax code expert!`;
+                } else if (accuracy >= 70) {
+                    message = `<i class="fas fa-thumbs-up" style="color: var(--primary-color);"></i> Good job! You're getting the hang of it!`;
+                } else if (accuracy >= 50) {
+                    message = `<i class="fas fa-chart-line" style="color: var(--warning-text);"></i> Keep practicing! You're improving!`;
+                } else {
+                    message = `<i class="fas fa-book" style="color: var(--text-secondary);"></i> Review the tax codes and try again!`;
+                }
+                
+                document.getElementById('performanceMessage').innerHTML = message;
+                this.resultsModal.classList.add('active');
+            }
+        }
+
+        // Initialize game
+        let game = new SalesTaxTrainer();
+
+        // Modal functions
+        function closeResults() {
+            document.getElementById('resultsModal').classList.remove('active');
+        }
+
+        function restartGame() {
+            closeResults();
+            game = new SalesTaxTrainer();
+            game.startGame();
+        }
+    </script>
+</body>
+</html>
