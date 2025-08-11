@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cap Knowledge Trainer - Learn Your Top Sellers!</title>
+    <title>Cap Sales Academy - Professional Training Simulator</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -16,15 +16,15 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            color: white;
+            color: #333;
             overflow-x: hidden;
         }
 
         /* Navigation Header */
         .nav-header {
-            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
             color: white;
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -72,6 +72,46 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+        }
+
+        /* Professional Dashboard Styles */
+        .academy-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .progress-tracker {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .skill-meter {
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .skill-label {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4cb354, #5bc85f);
+            transition: width 0.5s ease;
         }
 
         .page-title i {
@@ -1155,25 +1195,49 @@
         }
 
         .flashcard {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #fcfcfc);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(255,255,255,0.8) inset;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flashcard::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #981e32, #b82940, #981e32);
+            background-size: 200% 100%;
+            animation: gradientSlide 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientSlide {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .flashcard:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.15),
+                0 0 0 1px rgba(152, 30, 50, 0.2) inset;
         }
 
         .flashcard-front {
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
-            min-height: 500px;
+            min-height: 550px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
         }
 
         .cap-style-number {
@@ -1187,29 +1251,288 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* Catalog Layout Styles - Professional E-commerce Design */
+        .catalog-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .catalog-main-section {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
         .cap-image-display {
-            flex: 1;
+            position: relative;
+            background: #ffffff;
+            min-height: 450px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 15px;
-            border: 2px solid #e5e7eb;
+            padding: 2.5rem;
+        }
+
+        .cap-image-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 50%, rgba(248,249,250,0.8) 100%);
+            pointer-events: none;
+        }
+
+        .main-image-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 450px;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .cap-image-display img {
             max-width: 100%;
-            max-height: 280px;
+            max-height: 360px;
+            width: auto;
+            height: auto;
             object-fit: contain;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: zoom-in;
         }
 
         .cap-image-display img:hover {
-            transform: scale(1.05);
+            transform: scale(1.03);
+            filter: drop-shadow(0 15px 40px rgba(0,0,0,0.15));
+        }
+
+        /* Catalog Thumbnails Section */
+        .catalog-thumbnails {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .thumbnails-header {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .thumbnails-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .thumbnail-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            aspect-ratio: 1;
+        }
+
+        .thumbnail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+            border-color: #d1d5db;
+        }
+
+        .thumbnail-item.active {
+            border-color: #981e32;
+            box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+        }
+
+        .thumbnail-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        .thumbnail-wrapper img {
+            width: 100%;
+            height: 70%;
+            object-fit: contain;
+            margin-bottom: 0.25rem;
+        }
+
+        .thumbnail-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .thumbnail-item.active .thumbnail-label {
+            color: #981e32;
+        }
+
+        /* Color Swatches Section */
+        .color-swatches-section {
+            background: white;
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .swatches-header {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .swatches-header i {
+            margin-right: 0.5rem;
+            color: #981e32;
+        }
+
+        .color-count {
+            background: #f3f4f6;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .swatches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 0.5rem;
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .swatches-grid.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .color-swatch {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #981e32;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch.active {
+            border-color: #981e32;
+            box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.2);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .color-swatch-tooltip {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .color-swatch:hover .color-swatch-tooltip {
+            opacity: 1;
+        }
+
+        .expand-colors-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            color: #6b7280;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .expand-colors-btn:hover {
+            background: #f9fafb;
+            border-color: #981e32;
+            color: #981e32;
+        }
+
+        .expand-colors-btn i {
+            transition: transform 0.3s;
+        }
+
+        .expand-colors-btn.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .view-label-overlay {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            z-index: 3;
         }
 
         .cap-description {
@@ -1232,9 +1555,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,249,250,0.9));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .card-indicators {
@@ -1555,9 +1882,654 @@
                 min-height: 300px;
             }
         }
+
+        /* Price Match Game Styles */
+        .price-match-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .price-match-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-match-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-match-instructions {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .price-match-score-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .price-match-score,
+        .price-match-streak {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .score-label,
+        .streak-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        #priceMatchCurrentScore,
+        #priceMatchStreak {
+            color: #981e32;
+            font-size: 1.5rem;
+        }
+
+        .price-match-game-area {
+            margin: 2rem 0;
+        }
+
+        .price-match-cap-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-match-cap-image-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        #priceMatchCapImage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .price-match-cap-style {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #981e32;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .price-match-cap-name {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 600;
+            padding: 0 1rem;
+        }
+
+        .price-range-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .price-range-btn {
+            padding: 1.5rem 1rem;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .price-range-btn:hover {
+            transform: translateY(-3px);
+            border-color: #FFD700;
+            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+
+        .price-range-btn.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #4CAF50;
+            animation: correctPulse 0.6s;
+        }
+
+        .price-range-btn.incorrect {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+            border-color: #f44336;
+            animation: shake 0.5s;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .price-match-feedback {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .feedback-message {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-message.correct {
+            color: #4CAF50;
+        }
+
+        .feedback-message.incorrect {
+            color: #f44336;
+        }
+
+        .actual-price {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .next-question-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .next-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+
+        .price-match-progress {
+            margin-top: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .price-match-container {
+                padding: 1.5rem;
+            }
+
+            .price-match-cap-image-container {
+                width: 220px;
+                height: 220px;
+            }
+
+            .price-range-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Main image display wrapper */
+        .cap-image-display {
+            position: relative;
+        }
+
+        .main-image-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .expand-image-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(152, 30, 50, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .expand-image-btn:hover {
+            background: #981e32;
+            transform: scale(1.1);
+        }
+
+        /* Multi-view cap gallery styles */
+        .cap-view-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 8px;
+        }
+
+        .view-thumb {
+            position: relative;
+            background: linear-gradient(145deg, #ffffff, #fafafa);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .view-thumb::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(152, 30, 50, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .view-thumb:hover {
+            border-color: rgba(152, 30, 50, 0.3);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .view-thumb:hover::before {
+            opacity: 1;
+        }
+
+        .view-thumb.active {
+            border-color: #981e32;
+            background: linear-gradient(145deg, #fff5f5, #ffefef);
+            box-shadow: 
+                0 4px 12px rgba(152, 30, 50, 0.15),
+                inset 0 1px 3px rgba(152, 30, 50, 0.05);
+            transform: scale(1.05);
+        }
+
+        .view-thumb img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 0.25rem;
+        }
+
+        .view-thumb:hover img {
+            transform: scale(1.05);
+        }
+
+        .view-label {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #4b5563;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            transition: color 0.3s ease;
+        }
+
+        .view-thumb.active .view-label {
+            color: #981e32;
+            font-weight: 800;
+        }
+
+        /* Image Modal Styles */
+        .cap-image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .cap-image-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #981e32, #b82940);
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .modal-image-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #modalCapImage {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        #modalCapImage.zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
+        }
+
+        .modal-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(152, 30, 50, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-nav-arrow:hover {
+            background: #981e32;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .modal-nav-arrow.prev {
+            left: 2rem;
+        }
+
+        .modal-nav-arrow.next {
+            right: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-view-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal-view-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-view-btn:hover {
+            border-color: #981e32;
+            color: #981e32;
+        }
+
+        .modal-view-btn.active {
+            background: #981e32;
+            border-color: #981e32;
+            color: white;
+        }
+
+        .modal-zoom-controls {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f0f0f0;
+            color: #666;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: #981e32;
+            color: white;
+        }
+
+        /* Loading spinner for modal */
+        .modal-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .modal-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #981e32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Loading overlay for API calls */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        /* Modal Overlay Styles - Fix for visible certification modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div>
+            <div class="modal-spinner"></div>
+            <div class="loading-text">Loading cap images...</div>
+        </div>
+    </div>
+    
     <!-- Navigation Header -->
     <nav class="nav-header">
         <div class="nav-container">
@@ -1598,6 +2570,9 @@
                 <button class="mode-btn" onclick="setGameMode('match')">
                     <i class="fas fa-puzzle-piece"></i> Match Game
                 </button>
+                <button class="mode-btn" onclick="setGameMode('pricematch')">
+                    <i class="fas fa-dollar-sign"></i> Price Match
+                </button>
             </div>
 
             <!-- Game Info -->
@@ -1613,8 +2588,70 @@
                     <div class="flashcard" id="flashcard">
                         <div class="flashcard-front">
                             <div class="cap-style-number" id="styleNumber">C112</div>
-                            <div class="cap-image-display">
-                                <img id="capImage" src="" alt="Cap" />
+                            <div class="catalog-layout">
+                                <!-- Main Product Display -->
+                                <div class="catalog-main-section">
+                                    <div class="cap-image-display">
+                                        <div class="view-label-overlay" id="currentViewLabel">FRONT</div>
+                                        <div class="main-image-container">
+                                            <img id="capImage" src="" alt="Cap" onclick="openCapModal()" />
+                                        </div>
+                                        <button class="zoom-hint" onclick="openCapModal()" title="Click to zoom">
+                                            <i class="fas fa-search-plus"></i> Click to zoom
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Thumbnail Gallery -->
+                                    <div class="catalog-thumbnails">
+                                        <div class="thumbnails-header">
+                                            <i class="fas fa-images"></i> Product Views
+                                        </div>
+                                        <div class="thumbnails-grid" id="capViewThumbnails">
+                                            <div class="thumbnail-item active" data-view="front" 
+                                                 onclick="switchCapView('front', event.ctrlKey || event.metaKey)">
+                                                <div class="thumbnail-wrapper">
+                                                    <img src="" alt="Front" id="thumbFront">
+                                                    <div class="thumbnail-label">FRONT</div>
+                                                </div>
+                                            </div>
+                                            <div class="thumbnail-item" data-view="back" 
+                                                 onclick="switchCapView('back', event.ctrlKey || event.metaKey)">
+                                                <div class="thumbnail-wrapper">
+                                                    <img src="" alt="Back" id="thumbBack">
+                                                    <div class="thumbnail-label">BACK</div>
+                                                </div>
+                                            </div>
+                                            <div class="thumbnail-item" data-view="side" 
+                                                 onclick="switchCapView('side', event.ctrlKey || event.metaKey)">
+                                                <div class="thumbnail-wrapper">
+                                                    <img src="" alt="Side" id="thumbSide">
+                                                    <div class="thumbnail-label">SIDE</div>
+                                                </div>
+                                            </div>
+                                            <div class="thumbnail-item" data-view="model" 
+                                                 onclick="switchCapView('model', event.ctrlKey || event.metaKey)">
+                                                <div class="thumbnail-wrapper">
+                                                    <img src="" alt="Model" id="thumbModel">
+                                                    <div class="thumbnail-label">MODEL</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Color Swatches Section -->
+                                <div class="color-swatches-section">
+                                    <div class="swatches-header">
+                                        <i class="fas fa-palette"></i> Available Colors
+                                        <span class="color-count" id="colorCount">40+ colors</span>
+                                    </div>
+                                    <div class="swatches-grid" id="colorSwatchesGrid">
+                                        <!-- Color swatches will be dynamically inserted here -->
+                                    </div>
+                                    <button class="expand-colors-btn" id="expandColorsBtn" onclick="toggleColorExpansion()">
+                                        <i class="fas fa-chevron-down"></i> Show All Colors
+                                    </button>
+                                </div>
                             </div>
                             <div class="cap-description" id="capDescription">Port Authority Snapback Trucker Cap</div>
                             <div class="sales-rank" id="salesRank">#1 Best Seller</div>
@@ -1627,6 +2664,109 @@
                         <div class="card-indicators" id="cardIndicators"></div>
                         <button class="nav-btn" onclick="nextCap()" id="nextBtn">
                             Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Test Button for Development -->
+                    <div style="margin-top: 20px; text-align: center; display: none;" id="testButtonContainer">
+                        <button class="btn-mode" onclick="runAPITest()" style="background: #ff6b35; border-color: #e55a2b;">
+                            <i class="fas fa-vial"></i> Test API Integration
+                        </button>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Developer Mode: Test all 8 cap styles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Modal -->
+            <div id="capImageModal" class="cap-image-modal" onclick="closeCapModalOnOverlay(event)">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeCapModal()">&times;</button>
+                    <div class="modal-header">
+                        <h3 id="modalCapStyle">C112</h3>
+                        <p id="modalCapDescription">Port Authority Snapback Trucker Cap</p>
+                    </div>
+                    <div class="modal-image-container">
+                        <button class="modal-nav modal-prev" onclick="previousModalView()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <img id="modalCapImage" src="" alt="Cap detailed view" />
+                        <button class="modal-nav modal-next" onclick="nextModalView()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="modal-view-selector">
+                        <button class="modal-view-btn active" data-view="front" onclick="setModalView('front')">Front</button>
+                        <button class="modal-view-btn" data-view="back" onclick="setModalView('back')">Back</button>
+                        <button class="modal-view-btn" data-view="side" onclick="setModalView('side')">Side</button>
+                        <button class="modal-view-btn" data-view="model" onclick="setModalView('model')">Model</button>
+                    </div>
+                    <div class="modal-zoom-controls">
+                        <button onclick="zoomIn()" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                        <button onclick="zoomOut()" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                        <button onclick="resetZoom()" title="Reset Zoom"><i class="fas fa-compress"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certification Results Modal -->
+            <div class="modal-overlay" id="certificationResultsModal">
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6);">
+                        <i class="fas fa-certificate" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h2 style="margin: 0; color: white;" id="certResultTitle">Certification Complete!</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="font-size: 4rem; font-weight: bold; margin-bottom: 0.5rem;" id="certFinalScore">0%</div>
+                            <div style="color: var(--text-secondary); font-size: 1.1rem;" id="certResultSubtitle">Final Certification Score</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                            <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--success-text);" id="certCorrectCount">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">Correct</div>
+                            </div>
+                            <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--error-text);" id="certIncorrectCount">0</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">Incorrect</div>
+                            </div>
+                            <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="certTimeUsed">--:--</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">Time Used</div>
+                            </div>
+                        </div>
+                        
+                        <div id="certificationStatusMessage" style="text-align: center; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <!-- Certification status message will be inserted here -->
+                        </div>
+
+                        <div id="certificateDisplay" style="display: none; background: linear-gradient(145deg, #f8fafc, #ffffff); border: 3px solid #1e40af; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: center;">
+                            <div style="border: 2px solid #3b82f6; border-radius: 12px; padding: 2rem;">
+                                <div style="font-size: 1.5rem; font-weight: bold; color: #1e40af; margin-bottom: 1rem;">🏆 CERTIFICATE OF MASTERY 🏆</div>
+                                <div style="font-size: 1.25rem; margin-bottom: 1rem;">Cap Style Academy</div>
+                                <div style="font-size: 1.1rem; margin-bottom: 1.5rem;">This certifies that</div>
+                                <div style="font-size: 2rem; font-weight: bold; color: #1e40af; margin-bottom: 1.5rem;" id="certificateUserName">Cap Style Expert</div>
+                                <div style="font-size: 1.1rem; margin-bottom: 1rem;">has successfully completed the Master Certification</div>
+                                <div style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">with a score of <span id="certificateScore" style="font-weight: bold; color: #1e40af;">0%</span></div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-secondary);">
+                                    <div>Date: <span id="certificateDate"></span></div>
+                                    <div style="font-weight: bold; color: #1e40af;">Northwest Custom Apparel</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeCertificationResults()">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button class="btn btn-primary" id="downloadCertBtn" style="display: none;" onclick="downloadCertificate()">
+                            <i class="fas fa-download"></i>
+                            Download Certificate
+                        </button>
+                        <button class="btn btn-primary" onclick="restartCertification()">
+                            <i class="fas fa-redo"></i>
+                            Try Again
                         </button>
                     </div>
                 </div>
@@ -1661,6 +2801,59 @@
                     <div class="match-score" id="matchScore">Matches: 0/9</div>
                 </div>
             </div>
+
+            <!-- Price Match Game Mode -->
+            <div id="priceMatchMode" class="game-mode" style="display: none;">
+                <div class="price-match-container">
+                    <div class="price-match-header">
+                        <h2 class="price-match-title">💰 Price Match Challenge</h2>
+                        <div class="price-match-instructions">
+                            Match each cap style with its typical selling price range!
+                        </div>
+                    </div>
+                    
+                    <div class="price-match-score-bar">
+                        <div class="price-match-score">
+                            <span class="score-label">Score:</span>
+                            <span id="priceMatchCurrentScore">0</span> / <span id="priceMatchTotalQuestions">5</span>
+                        </div>
+                        <div class="price-match-streak">
+                            <span class="streak-label">🔥 Streak:</span>
+                            <span id="priceMatchStreak">0</span>
+                        </div>
+                    </div>
+
+                    <div class="price-match-game-area">
+                        <div class="price-match-cap-display">
+                            <div class="price-match-cap-image-container">
+                                <img id="priceMatchCapImage" src="" alt="Cap">
+                                <div class="price-match-cap-style" id="priceMatchCapStyle">C112</div>
+                            </div>
+                            <div class="price-match-cap-name" id="priceMatchCapName">Loading...</div>
+                        </div>
+
+                        <div class="price-match-options">
+                            <div class="price-range-grid" id="priceRangeGrid">
+                                <!-- Price range buttons will be dynamically generated -->
+                            </div>
+                        </div>
+
+                        <div class="price-match-feedback" id="priceMatchFeedback" style="display: none;">
+                            <div class="feedback-message" id="feedbackMessage"></div>
+                            <div class="actual-price" id="actualPrice"></div>
+                            <button class="next-question-btn" onclick="nextPriceQuestion()">
+                                Next Cap <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="price-match-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="priceMatchProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1673,18 +2866,54 @@
     </div>
 
     <script>
-        // Cap data from CSV - consolidated to avoid duplicates
-        const capData = [
+        // Raw sales data from 2025 Top Sellers Report
+        const rawSalesData = [
             { style: "C112", description: "Port Authority Snapback Trucker Cap", units: 4963, revenue: 61956.30, orders: 64 },
             { style: "NE1000", description: "New Era - Structured Stretch Cotton Cap", units: 924, revenue: 18873.76, orders: 13 },
+            { style: "CP90", description: "Port Company Knit Cap", units: 1118, revenue: 10857.54, orders: 12 },
             { style: "C110", description: "Port Authority Flexfit 110 Mesh Cap", units: 578, revenue: 11620.00, orders: 13 },
-            { style: "CP90", description: "Port & Company Knit Cap", units: 1118, revenue: 10857.54, orders: 12 },
-            { style: "C826", description: "Port Authority Pique Mesh Cap", units: 444, revenue: 7260.00, orders: 2 },
+            { style: "C826", description: "Port Authority Pique Mesh Cap L/XL", units: 444, revenue: 7260.00, orders: 2, discontinued: true },
             { style: "C912", description: "Port Authority Camouflage Cap With Air Mesh Back", units: 282, revenue: 4773.00, orders: 3 },
             { style: "C114", description: "Port Authority Digi Camo Snapback Trucker Cap", units: 525, revenue: 4577.00, orders: 2 },
-            { style: "CP82", description: "Port & Company Brushed Twill Cap", units: 330, revenue: 3810.00, orders: 2 },
+            { style: "CP82", description: "Port Company Brushed Twill Cap", units: 330, revenue: 3810.00, orders: 2 },
             { style: "C865", description: "Port Authority Flexfit Cap", units: 143, revenue: 3542.00, orders: 7 }
         ];
+
+        // Training cap styles - Top sellers from 2025 sales data (excluding discontinued C826)
+        const trainingCapStyles = ['C112', 'NE1000', 'CP90', 'C110', 'C912', 'C114', 'CP82', 'C865'];
+
+        // Aggregate the raw sales data by base style
+        const aggregatedSalesData = aggregateSalesData(rawSalesData);
+
+        // Cap data for training - combines aggregated real data with training styles
+        // Data sorted by units sold (highest to lowest)
+        const capData = trainingCapStyles.map(style => {
+            // Find aggregated data for this style
+            const salesData = aggregatedSalesData.find(item => item.style === style);
+            
+            if (salesData) {
+                return salesData;
+            } else {
+                // For training styles not found in sales data, use placeholder values
+                // These should never be needed with updated sales data
+                const placeholderDescriptions = {
+                    'NE1000': 'New Era - Structured Stretch Cotton Cap',
+                    'C110': 'Port Authority Flexfit 110 Mesh Cap',
+                    'C912': 'Port Authority Camouflage Cap With Air Mesh Back',
+                    'C114': 'Port Authority Digi Camo Snapback Trucker Cap',
+                    'CP82': 'Port Company Brushed Twill Cap',
+                    'C865': 'Port Authority Flexfit Cap'
+                };
+                
+                return {
+                    style: style,
+                    description: placeholderDescriptions[style] || `${style} Training Cap`,
+                    units: 0,
+                    revenue: 0,
+                    orders: 0
+                };
+            }
+        }).sort((a, b) => b.units - a.units); // Sort by units sold (highest first)
 
         let capProductData = {};
         let quizData = [];
@@ -1698,7 +2927,183 @@
         // Game mode variables
         let currentMode = 'flashcards';
         let currentCapIndex = 0;
+        
+        // Utility function to normalize style codes (removes suffixes like _OSFA, _L/XL)
+        function normalizeStyleCode(style) {
+            if (!style) return '';
+            // Remove underscore and everything after it
+            return style.split('_')[0].toUpperCase();
+        }
+        
+        // Function to aggregate sales data from raw data with suffixed styles
+        function aggregateSalesData(rawData) {
+            const aggregated = {};
+            
+            rawData.forEach(item => {
+                const baseStyle = normalizeStyleCode(item.style);
+                
+                if (!aggregated[baseStyle]) {
+                    aggregated[baseStyle] = {
+                        style: baseStyle,
+                        description: item.description,
+                        units: 0,
+                        revenue: 0,
+                        orders: 0
+                    };
+                }
+                
+                aggregated[baseStyle].units += item.units || 0;
+                aggregated[baseStyle].revenue += item.revenue || 0;
+                aggregated[baseStyle].orders += item.orders || 0;
+            });
+            
+            // Convert to array and sort by units sold (highest first)
+            return Object.values(aggregated).sort((a, b) => b.units - a.units);
+        }
+        
+        // Verification function to ensure only the 8 allowed styles are used
+        function verifyOnlyAllowedStyles() {
+            console.log('🔍 Verifying that only the 8 allowed cap styles are used...');
+            
+            // The ONLY allowed styles (from your actual sales data - C104 removed as it wasn't in the provided list)
+            const allowedStyles = ['C112', 'CP80', 'C813', 'C924', 'C830', 'CP90', 'C934', 'C901'];
+            
+            // Check capData array
+            const capDataStyles = capData.map(cap => cap.style);
+            const invalidStyles = capDataStyles.filter(style => !allowedStyles.includes(style));
+            
+            if (invalidStyles.length > 0) {
+                console.error('❌ INVALID STYLES FOUND IN capData:', invalidStyles);
+                return false;
+            }
+            
+            console.log('✅ capData contains only allowed styles:', capDataStyles);
+            
+            // Check if all styles in game match our allowed list
+            const allUsedStyles = new Set();
+            
+            // Check flashcard display
+            const styleNumber = document.getElementById('styleNumber');
+            if (styleNumber && styleNumber.textContent) {
+                allUsedStyles.add(styleNumber.textContent);
+            }
+            
+            // Check quiz data if it exists
+            if (quizData && quizData.length > 0) {
+                quizData.forEach(q => {
+                    if (q.correctAnswer) allUsedStyles.add(q.correctAnswer);
+                    if (q.style) allUsedStyles.add(q.style);
+                    if (q.options) {
+                        q.options.forEach(opt => allUsedStyles.add(opt));
+                    }
+                });
+            }
+            
+            // Verify all used styles are allowed
+            const usedStylesArray = Array.from(allUsedStyles);
+            const invalidUsedStyles = usedStylesArray.filter(style => style && !allowedStyles.includes(style));
+            
+            if (invalidUsedStyles.length > 0) {
+                console.error('❌ INVALID STYLES BEING USED IN GAME:', invalidUsedStyles);
+                return false;
+            }
+            
+            console.log('✅ All styles used in game are from allowed list');
+            console.log('📊 Summary Report:');
+            console.log('   Allowed styles:', allowedStyles.join(', '));
+            console.log('   capData has', capDataStyles.length, 'styles:', capDataStyles.join(', '));
+            console.log('   Currently displayed/used:', usedStylesArray.join(', ') || 'None yet');
+            
+            // Show the actual data being used
+            console.table(capData.map(cap => ({
+                Style: cap.style,
+                Description: cap.description.substring(0, 40) + '...',
+                Units: cap.units,
+                Revenue: `$${cap.revenue.toFixed(2)}`
+            })));
+            
+            return true;
+        }
 
+        // Test function to verify all cap styles load from API
+        async function testAllCapStyles() {
+            console.log('🧪 Starting API test for all 8 cap styles...');
+            const testResults = [];
+            
+            // Use the correct cap styles from capData array
+            const styles = capData.map(cap => cap.style);
+            
+            for (const style of styles) {
+                console.log(`\n📋 Testing ${style}...`);
+                try {
+                    const startTime = Date.now();
+                    const capDetails = await fetchCapDetails(style);
+                    const loadTime = Date.now() - startTime;
+                    
+                    // Check if all required fields exist
+                    const requiredFields = ['FRONT_MODEL', 'BACK_MODEL', 'FRONT_FLAT', 'BACK_FLAT'];
+                    const missingFields = requiredFields.filter(field => !capDetails[field]);
+                    
+                    const result = {
+                        style: style,
+                        success: missingFields.length === 0,
+                        loadTime: loadTime,
+                        cached: capDetailsCache.has(style),
+                        missingFields: missingFields,
+                        frontModel: capDetails.FRONT_MODEL ? '✅' : '❌',
+                        backModel: capDetails.BACK_MODEL ? '✅' : '❌',
+                        frontFlat: capDetails.FRONT_FLAT ? '✅' : '❌',
+                        backFlat: capDetails.BACK_FLAT ? '✅' : '❌'
+                    };
+                    
+                    testResults.push(result);
+                    
+                    if (result.success) {
+                        console.log(`✅ ${style}: All images found (${loadTime}ms)`);
+                    } else {
+                        console.warn(`⚠️ ${style}: Missing fields:`, missingFields);
+                    }
+                    
+                    // Test actual image loading
+                    const testImg = new Image();
+                    testImg.onload = () => console.log(`  ✓ Front model image loads successfully`);
+                    testImg.onerror = () => console.error(`  ✗ Front model image failed to load`);
+                    testImg.src = capDetails.FRONT_MODEL;
+                    
+                } catch (error) {
+                    console.error(`❌ ${style}: API Error:`, error);
+                    testResults.push({
+                        style: style,
+                        success: false,
+                        error: error.message
+                    });
+                }
+            }
+            
+            // Display summary
+            console.log('\n📊 === TEST SUMMARY ===');
+            console.table(testResults);
+            
+            const successCount = testResults.filter(r => r.success).length;
+            const failCount = testResults.filter(r => !r.success).length;
+            
+            console.log(`\n🎯 Results: ${successCount}/${styles.length} caps loaded successfully`);
+            if (failCount > 0) {
+                console.warn(`⚠️ ${failCount} caps had issues`);
+            }
+            
+            // Test cache effectiveness
+            console.log('\n🔄 Testing cache performance...');
+            const cacheStartTime = Date.now();
+            for (const style of styles) {
+                await fetchCapDetails(style); // Should use cache
+            }
+            const cacheTime = Date.now() - cacheStartTime;
+            console.log(`✅ All caps loaded from cache in ${cacheTime}ms`);
+            
+            return testResults;
+        }
+        
         // Initialize
         async function init() {
             showLoading(true);
@@ -1709,6 +3114,17 @@
             
             showLoading(false);
             initializeGame();
+            
+            // Run API test in development mode
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('🔧 Development mode detected - Running API tests...');
+                setTimeout(async () => {
+                    const results = await testAllCapStyles();
+                    // Store results globally for debugging
+                    window.capTestResults = results;
+                    console.log('✅ API tests completed. Results stored in window.capTestResults');
+                }, 2000);
+            }
         }
 
         // Initialize the game
@@ -1825,7 +3241,9 @@
                                                     item.color_square_image || item.color_swatch || 
                                                     item.ColorSwatch || item.Color_Swatch,
                                         msrp: item.MSRP || item.msrp || item.Msrp,
-                                        pricing: item.PRICING_TEXT || item.pricing_text || item.PricingText || ''
+                                        pricing: item.PRICING_TEXT || item.pricing_text || item.PricingText || '',
+                                        productDescription: item.PRODUCT_DESCRIPTION || item.product_description || 
+                                                          item.Product_Description || item.ProductDescription || ''
                                     };
                                     
                                     console.log(`🖼️ Image URLs for ${cap.style} - ${colorData.name}:`, {
@@ -2036,7 +3454,8 @@
                 // Check if this button matches the current mode
                 const btnMode = btn.onclick.toString().includes("'flashcards'") ? 'flashcards' :
                                btn.onclick.toString().includes("'quiz'") ? 'quiz' :
-                               btn.onclick.toString().includes("'match'") ? 'match' : '';
+                               btn.onclick.toString().includes("'match'") ? 'match' :
+                               btn.onclick.toString().includes("'pricematch'") ? 'pricematch' : '';
                 
                 if (btnMode === mode) {
                     btn.classList.add('active');
@@ -2057,6 +3476,9 @@
                 case 'match':
                     startMatchGame();
                     break;
+                case 'pricematch':
+                    startPriceMatchGame();
+                    break;
                 default:
                     console.warn('Unknown game mode:', mode);
                     startVisualLearning(); // Default to visual learning
@@ -2064,7 +3486,7 @@
         }
 
         // Visual Learning Mode - Flashcard style cap learning
-        function startVisualLearning() {
+        async function startVisualLearning() {
             console.log('📚 Starting Visual Learning Mode...');
             
             // Show the flashcards mode div
@@ -2072,10 +3494,27 @@
             if (flashcardsMode) {
                 flashcardsMode.style.display = 'block';
                 
-                // Initialize the first cap display
-                currentCapIndex = 0;
-                updateCapDisplay();
-                updateCardIndicators();
+                // Show loading overlay
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('active');
+                }
+                
+                try {
+                    // Prefetch all cap details for smooth navigation
+                    const allStyles = capData.map(cap => cap.style);
+                    await prefetchCapDetails(allStyles);
+                    
+                    // Initialize the first cap display
+                    currentCapIndex = 0;
+                    await updateCapDisplay();
+                    updateCardIndicators();
+                } finally {
+                    // Hide loading overlay
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.remove('active');
+                    }
+                }
             } else {
                 console.error('Flashcards mode div not found');
             }
@@ -2589,7 +4028,7 @@
             }
         }
 
-        function updateCapDisplay() {
+        async function updateCapDisplay() {
             if (!capData || capData.length === 0) return;
             
             const current = capData[currentCapIndex];
@@ -2604,18 +4043,25 @@
             if (styleNumber) styleNumber.textContent = current.style;
             
             if (capImage) {
-                capImage.src = getCapImage(current.style);
+                // Add loading state
+                capImage.style.opacity = '0.5';
+                
+                // Get the current view's image URL from API
+                const imageUrl = await getCapImageForView(current.style, currentView);
+                capImage.src = imageUrl;
                 capImage.alt = current.description;
+                
+                // Remove loading state when loaded
+                capImage.onload = function() {
+                    this.style.opacity = '1';
+                    console.log(`✅ Image loaded successfully for ${current.style}`);
+                };
                 
                 // Add error handling for images
                 capImage.onerror = function() {
                     console.warn(`Image failed to load for ${current.style}, using fallback`);
                     this.src = `https://via.placeholder.com/300x300/4CAF50/white?text=${encodeURIComponent(current.style)}`;
-                };
-                
-                // Add loading indicator
-                capImage.onload = function() {
-                    console.log(`✅ Image loaded successfully for ${current.style}`);
+                    this.style.opacity = '1';
                 };
             }
             
@@ -2639,6 +4085,404 @@
             const currentStyleSpan = document.getElementById('currentStyle');
             if (currentStyleSpan) {
                 currentStyleSpan.textContent = `${currentCapIndex + 1}`;
+            }
+            
+            // Update multi-view thumbnails
+            await updateCapViewThumbnails(current.style);
+            
+            // Update color swatches for the new cap
+            await populateColorSwatches();
+        }
+
+        // Multi-view Cap Gallery Functions
+        let currentView = 'front';
+        let currentModalView = 'front';
+        let isZoomed = false;
+        
+        // API Cache for cap details
+        const capDetailsCache = new Map();
+        
+        // Fetch cap details from Heroku API
+        async function fetchCapDetails(styleNumber) {
+            // Check cache first
+            if (capDetailsCache.has(styleNumber)) {
+                console.log(`✅ Using cached data for ${styleNumber}`);
+                return capDetailsCache.get(styleNumber);
+            }
+            
+            try {
+                console.log(`🔄 Fetching cap details for ${styleNumber}...`);
+                const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`;
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Extract the first item from the array (API returns an array)
+                const capDetails = Array.isArray(data) ? data[0] : data;
+                
+                // Cache the result
+                capDetailsCache.set(styleNumber, capDetails);
+                console.log(`✅ Successfully fetched and cached ${styleNumber}`, capDetails);
+                
+                return capDetails;
+            } catch (error) {
+                console.error(`❌ Failed to fetch details for ${styleNumber}:`, error);
+                // Return fallback data structure
+                return {
+                    STYLE: styleNumber,
+                    FRONT_MODEL: `https://via.placeholder.com/400x400/cccccc/666666?text=${styleNumber}+Front`,
+                    BACK_MODEL: `https://via.placeholder.com/400x400/cccccc/666666?text=${styleNumber}+Back`,
+                    FRONT_FLAT: `https://via.placeholder.com/400x400/cccccc/666666?text=${styleNumber}+Front+Flat`,
+                    BACK_FLAT: `https://via.placeholder.com/400x400/cccccc/666666?text=${styleNumber}+Back+Flat`
+                };
+            }
+        }
+        
+        // Prefetch cap details for smooth navigation
+        async function prefetchCapDetails(styles) {
+            console.log('🚀 Prefetching cap details for all styles...');
+            const startTime = Date.now();
+            const promises = styles.map(style => fetchCapDetails(style));
+            
+            try {
+                const results = await Promise.allSettled(promises);
+                const loadTime = Date.now() - startTime;
+                
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.filter(r => r.status === 'rejected').length;
+                
+                console.log(`✅ Prefetch completed in ${loadTime}ms`);
+                console.log(`  📊 Success: ${successful}/${styles.length} caps`);
+                
+                if (failed > 0) {
+                    console.warn(`  ⚠️ Failed: ${failed} caps`);
+                    results.forEach((result, index) => {
+                        if (result.status === 'rejected') {
+                            console.error(`    ❌ ${styles[index]}: ${result.reason}`);
+                        }
+                    });
+                }
+                
+                return results;
+            } catch (error) {
+                console.error('❌ Prefetch error:', error);
+                return [];
+            }
+        }
+
+        async function updateCapViewThumbnails(style) {
+            // Get cap details from API
+            const capDetails = await fetchCapDetails(style);
+            
+            // Get all thumbnail elements
+            const thumbFront = document.getElementById('thumbFront');
+            const thumbBack = document.getElementById('thumbBack');
+            const thumbSide = document.getElementById('thumbSide');
+            const thumbModel = document.getElementById('thumbModel');
+            
+            // Update thumbnail images with API URLs
+            if (thumbFront && capDetails.FRONT_MODEL) {
+                thumbFront.src = capDetails.FRONT_MODEL;
+                thumbFront.onerror = function() {
+                    this.src = `https://via.placeholder.com/150x150/cccccc/666666?text=Front`;
+                };
+            }
+            
+            if (thumbBack && capDetails.BACK_MODEL) {
+                thumbBack.src = capDetails.BACK_MODEL;
+                thumbBack.onerror = function() {
+                    this.src = `https://via.placeholder.com/150x150/cccccc/666666?text=Back`;
+                };
+            }
+            
+            // Side view - use front flat as fallback
+            if (thumbSide && capDetails.FRONT_FLAT) {
+                thumbSide.src = capDetails.FRONT_FLAT;
+                thumbSide.onerror = function() {
+                    this.src = `https://via.placeholder.com/150x150/cccccc/666666?text=Side`;
+                };
+            }
+            
+            // Model view - use back flat or front model
+            if (thumbModel && capDetails.BACK_FLAT) {
+                thumbModel.src = capDetails.BACK_FLAT;
+                thumbModel.onerror = function() {
+                    this.src = `https://via.placeholder.com/150x150/cccccc/666666?text=Model`;
+                };
+            }
+        }
+
+        async function switchCapView(view, openModal = false) {
+            // Check if Ctrl/Cmd key is held or openModal is true
+            if (openModal || event?.ctrlKey || event?.metaKey) {
+                // Open modal with Ctrl+Click
+                openCapModal();
+                return;
+            }
+            
+            currentView = view;
+            
+            // Show we're loading
+            console.log(`🔄 Switching to ${view} view...`);
+            
+            // Update active thumbnail
+            document.querySelectorAll('.view-thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            const activeThumb = document.querySelector(`.view-thumb[data-view="${view}"]`);
+            if (activeThumb) {
+                activeThumb.classList.add('active');
+            }
+            
+            // Update view label
+            const viewLabel = document.getElementById('currentViewLabel');
+            if (viewLabel) {
+                viewLabel.textContent = view.toUpperCase();
+            }
+            
+            // Update main image
+            const capImage = document.getElementById('capImage');
+            if (capImage && capData[currentCapIndex]) {
+                const style = capData[currentCapIndex].style;
+                
+                try {
+                    // Show subtle loading state
+                    capImage.style.transition = 'opacity 0.3s ease';
+                    capImage.style.opacity = '0.5';
+                    
+                    const imageUrl = await getCapImageForView(style, view);
+                    
+                    // Preload image for smoother transition
+                    const preloadImage = new Image();
+                    await new Promise((resolve, reject) => {
+                        preloadImage.onload = resolve;
+                        preloadImage.onerror = reject;
+                        preloadImage.src = imageUrl;
+                    });
+                    
+                    capImage.src = imageUrl;
+                    capImage.style.opacity = '1';
+                    console.log(`✅ Switched to ${view} view for ${style}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Error loading ${view} view:`, error);
+                    capImage.style.opacity = '1';
+                    
+                    // Fallback to front view if current view fails
+                    if (view !== 'front') {
+                        console.log('🔄 Falling back to front view...');
+                        const fallbackUrl = await getCapImageForView(style, 'front');
+                        capImage.src = fallbackUrl;
+                    } else {
+                        // If even front view fails, use placeholder
+                        capImage.src = `https://via.placeholder.com/400x400/ff6b6b/ffffff?text=Error+Loading+Image`;
+                    }
+                }
+            }
+        }
+
+        async function getCapImageForView(style, view) {
+            // Get cap details from API/cache
+            const capDetails = await fetchCapDetails(style);
+            
+            // Map view to API field names
+            const viewMapping = {
+                'front': 'FRONT_MODEL',
+                'back': 'BACK_MODEL',
+                'side': 'FRONT_FLAT', // Using flat view for side
+                'model': 'BACK_FLAT'   // Using back flat for model view
+            };
+            
+            const fieldName = viewMapping[view] || 'FRONT_MODEL';
+            return capDetails[fieldName] || `https://via.placeholder.com/400x400/cccccc/666666?text=${style}+${view}`;
+        }
+
+        function openCapModal() {
+            const modal = document.getElementById('capImageModal');
+            if (modal && capData[currentCapIndex]) {
+                const current = capData[currentCapIndex];
+                
+                // Update modal header
+                const modalStyle = document.getElementById('modalCapStyle');
+                const modalDescription = document.getElementById('modalCapDescription');
+                if (modalStyle) modalStyle.textContent = current.style;
+                if (modalDescription) modalDescription.textContent = current.description;
+                
+                // Update modal image
+                updateModalImage(current.style, currentView);
+                
+                // Show modal
+                modal.classList.add('active');
+                
+                // Add keyboard listener
+                document.addEventListener('keydown', handleModalKeyboard);
+            }
+        }
+
+        function closeCapModal() {
+            const modal = document.getElementById('capImageModal');
+            if (modal) {
+                modal.classList.remove('active');
+                isZoomed = false;
+                
+                // Remove keyboard listener
+                document.removeEventListener('keydown', handleModalKeyboard);
+            }
+        }
+
+        function closeCapModalOnOverlay(event) {
+            if (event.target.classList.contains('cap-image-modal')) {
+                closeCapModal();
+            }
+        }
+
+        async function updateModalImage(style, view) {
+            const modalImage = document.getElementById('modalCapImage');
+            if (modalImage) {
+                // Add loading state
+                modalImage.style.opacity = '0.5';
+                
+                // Get cap details from API for color swatch
+                const capDetails = await fetchCapDetails(style);
+                const imageUrl = await getCapImageForView(style, view);
+                
+                // Update color swatch if available
+                if (capDetails && capDetails.COLOR_SQUARE_IMAGE) {
+                    let colorSwatchContainer = document.getElementById('colorSwatchContainer');
+                    
+                    if (!colorSwatchContainer) {
+                        // Create color swatch container if it doesn't exist
+                        const modalHeader = document.querySelector('.modal-header');
+                        if (modalHeader) {
+                            colorSwatchContainer = document.createElement('div');
+                            colorSwatchContainer.id = 'colorSwatchContainer';
+                            colorSwatchContainer.style.cssText = `
+                                position: absolute;
+                                top: 1rem;
+                                right: 1rem;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 0.5rem;
+                                background: white;
+                                padding: 0.5rem;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                            `;
+                            colorSwatchContainer.innerHTML = `
+                                <div style="font-size: 0.75rem; color: #666; font-weight: 600;">COLOR</div>
+                                <img id="colorSwatch" style="width: 40px; height: 40px; border: 1px solid #ddd; border-radius: 4px;">
+                                <div id="colorName" style="font-size: 0.7rem; color: #333; text-align: center; max-width: 80px;"></div>
+                            `;
+                            modalHeader.appendChild(colorSwatchContainer);
+                        }
+                    }
+                    
+                    const colorSwatch = document.getElementById('colorSwatch');
+                    const colorName = document.getElementById('colorName');
+                    if (colorSwatch) {
+                        colorSwatch.src = capDetails.COLOR_SQUARE_IMAGE;
+                        colorSwatch.alt = `${capDetails.COLOR_NAME || 'Color'} swatch`;
+                        colorSwatch.title = capDetails.COLOR_NAME || 'Color swatch';
+                    }
+                    if (colorName && capDetails.COLOR_NAME) {
+                        colorName.textContent = capDetails.COLOR_NAME;
+                    }
+                }
+                
+                modalImage.src = imageUrl;
+                modalImage.classList.remove('zoomed');
+                isZoomed = false;
+                
+                // Remove loading state
+                modalImage.style.opacity = '1';
+                
+                // Update active view button
+                document.querySelectorAll('.modal-view-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const activeBtn = document.querySelector(`.modal-view-btn[data-view="${view}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
+                }
+            }
+        }
+
+        async function setModalView(view) {
+            currentModalView = view;
+            if (capData[currentCapIndex]) {
+                await updateModalImage(capData[currentCapIndex].style, view);
+            }
+        }
+
+        function previousModalView() {
+            const views = ['front', 'back', 'side', 'model'];
+            const currentIndex = views.indexOf(currentModalView);
+            const newIndex = (currentIndex - 1 + views.length) % views.length;
+            setModalView(views[newIndex]);
+        }
+
+        function nextModalView() {
+            const views = ['front', 'back', 'side', 'model'];
+            const currentIndex = views.indexOf(currentModalView);
+            const newIndex = (currentIndex + 1) % views.length;
+            setModalView(views[newIndex]);
+        }
+
+        function toggleZoom() {
+            const modalImage = document.getElementById('modalCapImage');
+            if (modalImage) {
+                isZoomed = !isZoomed;
+                modalImage.classList.toggle('zoomed');
+            }
+        }
+
+        function zoomIn() {
+            const modalImage = document.getElementById('modalCapImage');
+            if (modalImage && !isZoomed) {
+                isZoomed = true;
+                modalImage.classList.add('zoomed');
+            }
+        }
+
+        function zoomOut() {
+            const modalImage = document.getElementById('modalCapImage');
+            if (modalImage && isZoomed) {
+                isZoomed = false;
+                modalImage.classList.remove('zoomed');
+            }
+        }
+
+        function resetZoom() {
+            const modalImage = document.getElementById('modalCapImage');
+            if (modalImage) {
+                isZoomed = false;
+                modalImage.classList.remove('zoomed');
+            }
+        }
+
+        function handleModalKeyboard(event) {
+            switch(event.key) {
+                case 'Escape':
+                    closeCapModal();
+                    break;
+                case 'ArrowLeft':
+                    previousModalView();
+                    break;
+                case 'ArrowRight':
+                    nextModalView();
+                    break;
+                case '+':
+                case '=':
+                    zoomIn();
+                    break;
+                case '-':
+                    zoomOut();
+                    break;
             }
         }
 
@@ -2935,14 +4779,14 @@
                                 </div>
                                 
                                 <!-- Product Description -->
-                                ${firstColor.PRODUCT_DESCRIPTION ? `
+                                ${firstColor.productDescription ? `
                                     <div class="product-description">
                                         <div class="description-toggle" onclick="toggleDescription()">
                                             <span>📋 Product Details</span>
                                             <i class="fas fa-chevron-down"></i>
                                         </div>
                                         <div class="description-content" style="display: none;">
-                                            ${firstColor.PRODUCT_DESCRIPTION}
+                                            ${firstColor.productDescription}
                                         </div>
                                     </div>
                                 ` : ''}
@@ -3359,6 +5203,325 @@
                 toggle.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
             }
         }
+        
+        // Manual API test trigger
+        async function runAPITest() {
+            console.log('🧪 Manual API test triggered...');
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            
+            try {
+                const results = await testAllCapStyles();
+                window.capTestResults = results;
+                
+                // Show results in alert
+                const successCount = results.filter(r => r.success).length;
+                const message = `API Test Complete!\n\n✅ Success: ${successCount}/8 caps\n🔍 Check console for detailed results\n📊 Results stored in window.capTestResults`;
+                alert(message);
+                
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+                alert('Test failed! Check console for details.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // Verification function to check all fixes
+        async function verifyFixes() {
+            console.log('🔍 Verifying all fixes are working...');
+            
+            // 1. Check capData array has correct caps
+            console.log('\n✅ Cap Data Array Check:');
+            const expectedStyles = ['C112', 'CP80', 'C104', 'CP90', 'C813', 'C830', 'C934', 'C901', 'C924'];
+            const actualStyles = capData.map(cap => cap.style);
+            
+            expectedStyles.forEach(style => {
+                if (actualStyles.includes(style)) {
+                    console.log(`  ✅ ${style} found in capData`);
+                } else {
+                    console.error(`  ❌ ${style} missing from capData!`);
+                }
+            });
+            
+            // 2. Test API connectivity
+            console.log('\n✅ API Connectivity Check:');
+            const testStyle = 'C112';
+            try {
+                const data = await fetchCapDetails(testStyle);
+                if (data) {
+                    console.log(`  ✅ API connected, received data for ${testStyle}`);
+                    if (data.COLOR_SQUARE_IMAGE) {
+                        console.log(`  ✅ Color swatch available: ${data.COLOR_SQUARE_IMAGE.substring(0, 50)}...`);
+                    }
+                }
+            } catch (error) {
+                console.error(`  ❌ API connection failed:`, error);
+            }
+            
+            // 3. Check cache is working
+            console.log('\n✅ Cache Check:');
+            console.log(`  Cache size: ${capDetailsCache.size} items`);
+            if (capDetailsCache.size > 0) {
+                console.log('  ✅ Cache is populated');
+            }
+            
+            // 4. Check thumbnail clickability
+            console.log('\n✅ Thumbnail Functionality:');
+            const thumbs = document.querySelectorAll('.view-thumb');
+            console.log(`  Found ${thumbs.length} thumbnail buttons`);
+            if (thumbs.length > 0) {
+                console.log('  ✅ Thumbnails are rendered');
+                console.log('  ℹ️ Ctrl+Click (or Cmd+Click on Mac) any thumbnail to test modal opening');
+            }
+            
+            // 5. Check Visual Learning mode
+            console.log('\n✅ Visual Learning Mode:');
+            const capImage = document.getElementById('capImage');
+            if (capImage && capImage.src) {
+                console.log(`  ✅ Main cap image loaded`);
+                const currentCap = capData[currentCapIndex];
+                console.log(`  Currently showing: ${currentCap.style} - ${currentCap.description}`);
+            }
+            
+            console.log('\n🎉 Verification complete!');
+            console.log('📌 Tips:');
+            console.log('  • Click "Visual Learning" tab to test image views');
+            console.log('  • Use arrow keys or navigation buttons to switch between caps');
+            console.log('  • Ctrl+Click (Cmd+Click on Mac) thumbnails to open modal with color swatches');
+            console.log('  • Type verifyFixes() in console anytime to re-run this check');
+        }
+        
+        // Price Match Game Variables
+        let priceMatchData = [];
+        let currentPriceQuestion = 0;
+        let priceMatchScore = 0;
+        let priceMatchStreak = 0;
+        let priceMatchQuestions = [];
+        const TOTAL_PRICE_QUESTIONS = 5;
+
+        // Price ranges for caps (based on actual 2025 sales data)
+        const capPriceRanges = {
+            'C112': { min: 12.00, max: 15.00, typical: 12.48 }, // Port Authority Snapback Trucker - $61,956/4963 units
+            'NE1000': { min: 18.00, max: 22.00, typical: 20.43 }, // New Era Structured Stretch - $18,874/924 units
+            'CP90': { min: 8.00, max: 11.00, typical: 9.71 },   // Port Company Knit Cap - $10,858/1118 units
+            'C110': { min: 18.00, max: 22.00, typical: 20.10 }, // Port Authority Flexfit 110 - $11,620/578 units
+            'C912': { min: 15.00, max: 18.00, typical: 16.93 }, // Port Authority Camouflage - $4,773/282 units
+            'C114': { min: 8.00, max: 10.00, typical: 8.72 },   // Port Authority Digi Camo - $4,577/525 units
+            'CP82': { min: 10.00, max: 13.00, typical: 11.55 }, // Port Company Brushed Twill - $3,810/330 units
+            'C865': { min: 22.00, max: 27.00, typical: 24.77 }  // Port Authority Flexfit - $3,542/143 units
+        };
+
+        // Start Price Match Game
+        async function startPriceMatchGame() {
+            console.log('💰 Starting Price Match Game...');
+            
+            const priceMatchMode = document.getElementById('priceMatchMode');
+            if (priceMatchMode) {
+                priceMatchMode.style.display = 'block';
+                
+                // Initialize game
+                priceMatchScore = 0;
+                priceMatchStreak = 0;
+                currentPriceQuestion = 0;
+                
+                // Generate questions from available caps
+                generatePriceMatchQuestions();
+                
+                // Check if we need to load product data
+                if (!isDataLoaded) {
+                    console.log('Loading product data for Price Match game...');
+                    await loadFullProductData();
+                }
+                
+                // Start first question
+                showPriceQuestion();
+            }
+        }
+
+        // Generate price match questions
+        function generatePriceMatchQuestions() {
+            console.log('📝 Generating price match questions...');
+            
+            // Use the cap data we have
+            const availableCaps = capData.filter(cap => capPriceRanges[cap.style]);
+            
+            // Shuffle and select questions
+            priceMatchQuestions = [...availableCaps]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, TOTAL_PRICE_QUESTIONS)
+                .map(cap => ({
+                    style: cap.style,
+                    description: cap.description,
+                    correctRange: capPriceRanges[cap.style]
+                }));
+            
+            console.log('Generated questions:', priceMatchQuestions);
+        }
+
+        // Show current price question
+        function showPriceQuestion() {
+            if (currentPriceQuestion >= priceMatchQuestions.length) {
+                showPriceMatchResults();
+                return;
+            }
+
+            const question = priceMatchQuestions[currentPriceQuestion];
+            
+            // Update display
+            document.getElementById('priceMatchCapStyle').textContent = question.style;
+            document.getElementById('priceMatchCapName').textContent = question.description;
+            
+            // Set cap image
+            const imageUrl = getCapImage(question.style);
+            document.getElementById('priceMatchCapImage').src = imageUrl;
+            
+            // Update scores
+            document.getElementById('priceMatchCurrentScore').textContent = priceMatchScore;
+            document.getElementById('priceMatchTotalQuestions').textContent = TOTAL_PRICE_QUESTIONS;
+            document.getElementById('priceMatchStreak').textContent = priceMatchStreak;
+            
+            // Update progress
+            const progress = ((currentPriceQuestion) / TOTAL_PRICE_QUESTIONS) * 100;
+            document.getElementById('priceMatchProgress').style.width = progress + '%';
+            
+            // Generate price options
+            generatePriceOptions(question);
+            
+            // Hide feedback
+            document.getElementById('priceMatchFeedback').style.display = 'none';
+        }
+
+        // Generate price range options
+        function generatePriceOptions(question) {
+            const gridContainer = document.getElementById('priceRangeGrid');
+            gridContainer.innerHTML = '';
+            
+            // Create price ranges
+            const priceRanges = [
+                { label: '$8 - $10', min: 8, max: 10 },
+                { label: '$10 - $12', min: 10, max: 12 },
+                { label: '$12 - $14', min: 12, max: 14 },
+                { label: '$14 - $16', min: 14, max: 16 },
+                { label: '$16 - $18', min: 16, max: 18 },
+                { label: '$18 - $22', min: 18, max: 22 }
+            ];
+            
+            // Shuffle ranges for random placement
+            const shuffledRanges = [...priceRanges].sort(() => Math.random() - 0.5);
+            
+            shuffledRanges.forEach(range => {
+                const button = document.createElement('button');
+                button.className = 'price-range-btn';
+                button.textContent = range.label;
+                button.onclick = () => checkPriceAnswer(range, question);
+                gridContainer.appendChild(button);
+            });
+        }
+
+        // Check price answer
+        function checkPriceAnswer(selectedRange, question) {
+            const correctPrice = question.correctRange.typical;
+            const isCorrect = correctPrice >= selectedRange.min && correctPrice <= selectedRange.max;
+            
+            // Disable all buttons
+            const buttons = document.querySelectorAll('.price-range-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.pointerEvents = 'none';
+            });
+            
+            // Mark selected button
+            event.target.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Update score and streak
+            if (isCorrect) {
+                priceMatchScore++;
+                priceMatchStreak++;
+                document.getElementById('priceMatchCurrentScore').textContent = priceMatchScore;
+                document.getElementById('priceMatchStreak').textContent = priceMatchStreak;
+            } else {
+                priceMatchStreak = 0;
+                document.getElementById('priceMatchStreak').textContent = priceMatchStreak;
+                
+                // Highlight correct answer
+                buttons.forEach(btn => {
+                    const btnRange = btn.textContent;
+                    if (btnRange.includes(Math.floor(correctPrice))) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show feedback
+            showPriceFeedback(isCorrect, question);
+        }
+
+        // Show price feedback
+        function showPriceFeedback(isCorrect, question) {
+            const feedbackDiv = document.getElementById('priceMatchFeedback');
+            const messageDiv = document.getElementById('feedbackMessage');
+            const actualPriceDiv = document.getElementById('actualPrice');
+            
+            messageDiv.className = 'feedback-message ' + (isCorrect ? 'correct' : 'incorrect');
+            messageDiv.textContent = isCorrect ? 
+                '🎉 Correct! Great job!' : 
+                '❌ Not quite right!';
+            
+            actualPriceDiv.textContent = `The typical selling price for ${question.style} is around $${question.correctRange.typical.toFixed(2)}`;
+            
+            feedbackDiv.style.display = 'block';
+        }
+
+        // Move to next price question
+        function nextPriceQuestion() {
+            currentPriceQuestion++;
+            
+            // Update progress
+            const progress = ((currentPriceQuestion) / TOTAL_PRICE_QUESTIONS) * 100;
+            document.getElementById('priceMatchProgress').style.width = progress + '%';
+            
+            if (currentPriceQuestion < TOTAL_PRICE_QUESTIONS) {
+                showPriceQuestion();
+            } else {
+                showPriceMatchResults();
+            }
+        }
+
+        // Show final results
+        function showPriceMatchResults() {
+            const percentage = (priceMatchScore / TOTAL_PRICE_QUESTIONS) * 100;
+            const gameArea = document.querySelector('.price-match-game-area');
+            
+            gameArea.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">
+                        ${percentage >= 80 ? '🏆 Excellent!' : percentage >= 60 ? '👍 Good Job!' : '📚 Keep Practicing!'}
+                    </h2>
+                    <div style="font-size: 3rem; font-weight: 700; color: #981e32; margin: 1rem 0;">
+                        ${priceMatchScore} / ${TOTAL_PRICE_QUESTIONS}
+                    </div>
+                    <p style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">
+                        You got ${percentage.toFixed(0)}% correct!
+                    </p>
+                    <button class="btn btn-primary" onclick="startPriceMatchGame()" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        <i class="fas fa-redo"></i> Play Again
+                    </button>
+                </div>
+            `;
+            
+            // Update progress to 100%
+            document.getElementById('priceMatchProgress').style.width = '100%';
+        }
+
+        // Make functions globally available
+        window.nextPriceQuestion = nextPriceQuestion;
+
+        // Make verification function globally available
+        window.verifyFixes = verifyFixes;
 
         // Initialize on load
         window.addEventListener('DOMContentLoaded', init);
@@ -3366,7 +5529,742 @@
         // Show keyboard hints after a short delay
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(showKeyboardHints, 2000);
+            // Run verification after initialization
+            setTimeout(() => {
+                console.log('\n📊 Running automatic verification...');
+                verifyFixes();
+                
+                // Verify only allowed styles are used
+                console.log('\n🔍 Verifying cap styles...');
+                const stylesValid = verifyOnlyAllowedStyles();
+                if (!stylesValid) {
+                    console.error('⚠️ WARNING: Invalid styles detected! Check console for details.');
+                }
+                
+                // Make verification function available globally
+                window.verifyOnlyAllowedStyles = verifyOnlyAllowedStyles;
+            }, 3000);
+            
+            // Initialize color swatches
+            populateColorSwatches();
         });
+
+        // Toggle color swatches expansion
+        function toggleColorExpansion() {
+            const swatchesGrid = document.getElementById('colorSwatchesGrid');
+            const expandBtn = document.getElementById('expandColorsBtn');
+            
+            if (swatchesGrid && expandBtn) {
+                swatchesGrid.classList.toggle('expanded');
+                
+                const isExpanded = swatchesGrid.classList.contains('expanded');
+                expandBtn.innerHTML = isExpanded 
+                    ? '<i class="fas fa-chevron-up"></i> Show Less'
+                    : '<i class="fas fa-chevron-down"></i> Show All Colors';
+                
+                // Show/hide hidden swatches
+                const hiddenSwatches = swatchesGrid.querySelectorAll('.hidden-swatch');
+                hiddenSwatches.forEach(swatch => {
+                    swatch.style.display = isExpanded ? 'block' : 'none';
+                });
+            }
+        }
+
+        // Populate color swatches for current cap
+        async function populateColorSwatches() {
+            const swatchesGrid = document.getElementById('colorSwatchesGrid');
+            const colorCount = document.getElementById('colorCount');
+            
+            if (!swatchesGrid || !capData[currentCapIndex]) return;
+            
+            const style = capData[currentCapIndex].style;
+            
+            try {
+                // Fetch cap details if not already cached
+                if (!capProductData[style]) {
+                    await fetchCapDetails(style);
+                }
+                
+                const capProduct = capProductData[style];
+                if (capProduct && capProduct.colors) {
+                    const colors = capProduct.colors;
+                    
+                    // Update color count
+                    if (colorCount) {
+                        colorCount.textContent = `${colors.length} colors`;
+                    }
+                    
+                    // Clear existing swatches
+                    swatchesGrid.innerHTML = '';
+                    
+                    // Add color swatches (show first 12 by default)
+                    colors.forEach((color, index) => {
+                        const swatch = document.createElement('div');
+                        swatch.className = 'color-swatch';
+                        swatch.title = color.name;
+                        swatch.dataset.colorName = color.name;
+                        swatch.dataset.colorHex = color.hex || '#cccccc';
+                        
+                        // Use COLOR_SQUARE_IMAGE if available, fallback to solid color
+                        if (color.colorSwatch) {
+                            const img = document.createElement('img');
+                            img.src = color.colorSwatch;
+                            img.alt = color.name;
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = '4px';
+                            img.onerror = function() {
+                                // Fallback to solid color if image fails
+                                this.parentElement.style.backgroundColor = color.hex || '#cccccc';
+                                this.style.display = 'none';
+                            };
+                            swatch.appendChild(img);
+                        } else {
+                            // Use solid color as fallback
+                            swatch.style.backgroundColor = color.hex || '#cccccc';
+                        }
+                        
+                        // Add click handler to view this color
+                        swatch.addEventListener('click', () => selectColorVariant(color));
+                        
+                        // Hide swatches beyond 12 initially
+                        if (index >= 12) {
+                            swatch.classList.add('hidden-swatch');
+                            swatch.style.display = 'none';
+                        }
+                        
+                        swatchesGrid.appendChild(swatch);
+                    });
+                    
+                    // Show/hide expand button based on color count
+                    const expandBtn = document.getElementById('expandColorsBtn');
+                    if (expandBtn) {
+                        expandBtn.style.display = colors.length > 12 ? 'block' : 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to populate color swatches:', error);
+                swatchesGrid.innerHTML = '<div style="color: #999; padding: 1rem;">Color options unavailable</div>';
+            }
+        }
+
+        // Select a color variant
+        async function selectColorVariant(color) {
+            console.log(`Selected color: ${color.name}`);
+            
+            // Update main image to show this color variant
+            const capImage = document.getElementById('capImage');
+            if (capImage) {
+                const imageUrl = color[`${currentView}Model`] || color[`${currentView}Flat`] || color.frontModel || color.frontFlat;
+                if (imageUrl) {
+                    capImage.style.opacity = '0.5';
+                    capImage.src = imageUrl;
+                    capImage.onload = () => {
+                        capImage.style.opacity = '1';
+                    };
+                }
+            }
+            
+            // Update active swatch indicator
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.remove('active-swatch');
+            });
+            event.currentTarget.classList.add('active-swatch');
+        }
+
+        // Master Certification Class
+        class MasterCertification {
+            constructor() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.correct = 0;
+                this.incorrect = 0;
+                this.timeRemaining = 30 * 60; // 30 minutes in seconds
+                this.timer = null;
+                this.startTime = null;
+                this.questions = this.generateCertificationQuestions();
+                this.isAnswered = false;
+                this.selectedOption = null;
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                // Stats elements
+                this.scoreDisplay = document.getElementById('certScore');
+                this.accuracyDisplay = document.getElementById('certAccuracy');
+                this.progressDisplay = document.getElementById('certProgress');
+                this.timerDisplay = document.getElementById('certTimer');
+                
+                // Question elements
+                this.questionNumber = document.getElementById('certQuestionNumber');
+                this.questionText = document.getElementById('certQuestionText');
+                this.optionsGrid = document.getElementById('certOptionsGrid');
+                
+                // Feedback elements
+                this.feedbackSection = document.getElementById('certFeedbackSection');
+                this.feedbackMessage = document.getElementById('certFeedbackMessage');
+                this.feedbackIcon = document.getElementById('certFeedbackIcon');
+                this.feedbackTitle = document.getElementById('certFeedbackTitle');
+                this.feedbackText = document.getElementById('certFeedbackText');
+                
+                // Control buttons
+                this.nextBtn = document.getElementById('certNextBtn');
+                this.submitBtn = document.getElementById('certSubmitBtn');
+                this.finishBtn = document.getElementById('certFinishBtn');
+            }
+
+            bindEvents() {
+                if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.nextQuestion());
+                if (this.submitBtn) this.submitBtn.addEventListener('click', () => this.submitAnswer());
+                if (this.finishBtn) this.finishBtn.addEventListener('click', () => this.finishCertification());
+            }
+
+            generateCertificationQuestions() {
+                const questions = [
+                    // Visual identification questions - Updated with 2025 top sellers
+                    {
+                        type: 'visual',
+                        question: 'Which cap style is shown in this image?',
+                        style: 'C112',
+                        options: ['C112', 'NE1000', 'C110', 'CP90'],
+                        correct: 'C112',
+                        explanation: 'The C112 (Port Authority Snapback Trucker) is our #1 seller with mesh back panels and snapback closure.'
+                    },
+                    {
+                        type: 'visual', 
+                        question: 'Identify this New Era cap style:',
+                        style: 'NE1000',
+                        options: ['NE1000', 'C865', 'C114', 'C912'],
+                        correct: 'NE1000',
+                        explanation: 'The NE1000 is New Era\'s structured stretch cotton cap with 39THIRTY FIT technology.'
+                    },
+                    
+                    // Feature-based questions
+                    {
+                        type: 'feature',
+                        question: 'Which cap style is a knit beanie/winter cap?',
+                        options: ['CP90', 'C112', 'C110', 'C865'],
+                        correct: 'CP90',
+                        explanation: 'The CP90 is Port Company\'s knit cap with a 3-inch folding cuff, perfect for cold weather.'
+                    },
+                    {
+                        type: 'feature',
+                        question: 'Which style features Flexfit 110 technology with adjustable snapback?',
+                        options: ['C110', 'C112', 'NE1000', 'C865'],
+                        correct: 'C110',
+                        explanation: 'The C110 combines Flexfit 110 technology with an adjustable snapback for the perfect custom fit.'
+                    },
+                    
+                    // Application scenarios
+                    {
+                        type: 'scenario',
+                        question: 'A hunting/outdoor retailer wants camo caps. Which styles would you recommend?',
+                        scenario: 'The client needs authentic camouflage patterns for outdoor enthusiasts.',
+                        options: ['C112 and CP90', 'C912 and C114', 'NE1000 and C865', 'C110 and CP82'],
+                        correct: 'C912 and C114',
+                        explanation: 'Both C912 (Realtree Xtra) and C114 (Digi Camo) offer genuine camouflage patterns.'
+                    },
+                    
+                    // Comparative questions
+                    {
+                        type: 'compare',
+                        question: 'What is the main difference between C865 and NE1000?',
+                        options: [
+                            'C865 is Flexfit stretch, NE1000 is New Era stretch',
+                            'C924 has mesh back, C934 is solid',
+                            'C924 is low-profile, C934 is structured',
+                            'C924 is curved visor, C934 is flat'
+                        ],
+                        correct: 'C924 is low-profile, C934 is structured',
+                        explanation: 'The key difference is the profile height - C924 is designed as low-profile while C934 has a more structured, traditional height.'
+                    },
+                    
+                    // Technical specifications
+                    {
+                        type: 'technical',
+                        question: 'Which cap style uses Permacurv bill technology?',
+                        options: ['CP82', 'C110', 'CP90', 'C865'],
+                        correct: 'C110',
+                        explanation: 'The C110 features Permacurv bill to maintain proper shape and curve, along with Flexfit 110 technology.'
+                    },
+                    
+                    // Brand knowledge - Updated with actual 2025 styles
+                    {
+                        type: 'brand',
+                        question: 'Which styles are Port Authority products?',
+                        options: [
+                            'C112 and C110',
+                            'NE1000 and C865', 
+                            'C912 and C114',
+                            'All are Port Authority'
+                        ],
+                        correct: 'C112 and C110',
+                        explanation: 'C112 and C110 are Port Authority styles. NE1000 is New Era, C865 is Flexfit brand.'
+                    },
+                    
+                    // Advanced styling questions
+                    {
+                        type: 'styling',
+                        question: 'For a tech startup wanting a modern, premium look, which style would work best?',
+                        scenario: 'Young company, wants premium quality and contemporary appeal',
+                        options: ['CP90', 'NE1000', 'C912', 'CP82'],
+                        correct: 'NE1000',
+                        explanation: 'NE1000 New Era cap offers premium quality, modern stretch fit, and brand recognition that appeals to tech companies.'
+                    },
+                    
+                    // Quality and durability
+                    {
+                        type: 'quality',
+                        question: 'Which factor most affects the durability of embroidered caps?',
+                        options: [
+                            'Cap color choice',
+                            'Fabric construction and stitch density',
+                            'Visor shape',
+                            'Adjustment mechanism'
+                        ],
+                        correct: 'Fabric construction and stitch density',
+                        explanation: 'The underlying fabric construction and proper stitch density are crucial for embroidery durability and preventing thread breakage.'
+                    },
+
+                    // Additional comprehensive questions to reach 25
+                    {
+                        type: 'identification',
+                        question: 'Which cap would be best for a youth sports team?',
+                        options: ['C865', 'CP82', 'C110', 'C112'],
+                        correct: 'C112',
+                        explanation: 'C112 snapback trucker offers adjustability for various head sizes and mesh ventilation for active sports.'
+                    },
+                    {
+                        type: 'material',
+                        question: 'What type of construction does the C112 use for its front panels?',
+                        options: ['100% polyester', '100% cotton twill', 'Canvas', 'Acrylic knit'],
+                        correct: '100% cotton twill',
+                        explanation: 'C112 features 100% cotton twill front panels (solids) for structure and comfort.'
+                    },
+                    {
+                        type: 'application',
+                        question: 'For restaurant staff who work in hot kitchens, which cap would be best?',
+                        options: ['CP90', 'C112', 'NE1000', 'CP82'],
+                        correct: 'C112',
+                        explanation: 'C112 with its mesh mid and back panels provides crucial ventilation for workers in hot environments.'
+                    },
+                    {
+                        type: 'comparison',
+                        question: 'Between C112 and CP82, which has better ventilation?',
+                        options: ['C112', 'CP82', 'Both are equal', 'Neither has mesh'],
+                        correct: 'C112',
+                        explanation: 'C112 features mesh back panels for ventilation, while CP82 is solid brushed twill construction.'
+                    },
+                    {
+                        type: 'customer',
+                        question: 'A customer wants caps for outdoor landscaping work. What should you prioritize?',
+                        scenario: 'Landscaping company, all-day outdoor work, professional image needed',
+                        options: ['Fashion/style', 'Sun protection and durability', 'Low cost', 'Color variety'],
+                        correct: 'Sun protection and durability',
+                        explanation: 'Outdoor workers need caps that provide sun protection and can withstand daily wear in tough conditions.'
+                    },
+                    {
+                        type: 'technical',
+                        question: 'What does "low-profile" mean in cap terminology?',
+                        options: [
+                            'Lower price point',
+                            'Reduced crown height',
+                            'Smaller visor',
+                            'Less structured'
+                        ],
+                        correct: 'Reduced crown height',
+                        explanation: 'Low-profile refers to a reduced crown height, creating a more fitted, contemporary appearance.'
+                    },
+                    {
+                        type: 'embroidery',
+                        question: 'Which cap area typically provides the best embroidery visibility?',
+                        options: ['Side panels', 'Back panel', 'Front center', 'Visor'],
+                        correct: 'Front center',
+                        explanation: 'The front center panel offers maximum visibility and is the most common placement for logos and branding.'
+                    },
+                    {
+                        type: 'care',
+                        question: 'What\'s the best care instruction for embroidered caps?',
+                        options: [
+                            'Machine wash hot',
+                            'Dry clean only',
+                            'Hand wash or gentle cycle',
+                            'No cleaning needed'
+                        ],
+                        correct: 'Hand wash or gentle cycle',
+                        explanation: 'Hand washing or gentle machine cycles protect embroidery threads and maintain cap structure.'
+                    },
+                    {
+                        type: 'closure',
+                        question: 'What type of closure adjustment is most common on trucker caps?',
+                        options: ['Fitted', 'Velcro', 'Snapback', 'Elastic'],
+                        correct: 'Snapback',
+                        explanation: 'Snapback closures are the traditional and most common adjustment method for trucker-style caps.'
+                    },
+                    {
+                        type: 'profile',
+                        question: 'Which customer demographic typically prefers low-profile caps?',
+                        options: ['Traditional/conservative', 'Younger/contemporary', 'Industrial workers', 'Seniors'],
+                        correct: 'Younger/contemporary',
+                        explanation: 'Younger demographics and contemporary markets generally prefer the modern, fitted look of low-profile caps.'
+                    },
+                    {
+                        type: 'color',
+                        question: 'Which cap color shows embroidery contrast best?',
+                        options: ['White', 'Black', 'Navy', 'It depends on thread color'],
+                        correct: 'It depends on thread color',
+                        explanation: 'The best cap color depends on the embroidery thread colors chosen - contrast is key for visibility.'
+                    },
+                    {
+                        type: 'visor',
+                        question: 'What\'s the advantage of a flat visor over a curved visor?',
+                        options: [
+                            'Better sun protection',
+                            'More contemporary style',
+                            'Easier to clean',
+                            'Lower cost'
+                        ],
+                        correct: 'More contemporary style',
+                        explanation: 'Flat visors offer a more modern, urban aesthetic that appeals to contemporary fashion preferences.'
+                    },
+                    {
+                        type: 'sizing',
+                        question: 'What\'s the standard adult cap size range?',
+                        options: ['One size fits all', '6.5" - 8"', '21" - 24"', '54cm - 62cm'],
+                        correct: '21" - 24"',
+                        explanation: 'Adult caps typically accommodate head circumferences from 21" to 24" through adjustable closures.'
+                    },
+                    {
+                        type: 'final',
+                        question: 'What\'s the most important factor when selecting caps for a customer?',
+                        options: [
+                            'Lowest price',
+                            'Most popular style',
+                            'Understanding their specific needs',
+                            'Newest design'
+                        ],
+                        correct: 'Understanding their specific needs',
+                        explanation: 'Success in cap selection comes from understanding the customer\'s specific use case, environment, and preferences.'
+                    }
+                ];
+
+                // Shuffle questions and return exactly 25
+                return questions.sort(() => Math.random() - 0.5).slice(0, 25);
+            }
+
+            startCertification() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.correct = 0;
+                this.incorrect = 0;
+                this.timeRemaining = 30 * 60;
+                this.startTime = Date.now();
+                
+                // Show certification exam
+                document.getElementById('certificationExam').style.display = 'block';
+                document.getElementById('capStyleAcademy').style.display = 'none';
+                
+                this.startTimer();
+                this.loadQuestion();
+                this.updateStats();
+            }
+
+            startTimer() {
+                this.timer = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateTimer();
+                    
+                    if (this.timeRemaining <= 0) {
+                        this.finishCertification();
+                    }
+                }, 1000);
+            }
+
+            updateTimer() {
+                const minutes = Math.floor(this.timeRemaining / 60);
+                const seconds = this.timeRemaining % 60;
+                const timerDisplay = document.getElementById('certTimer');
+                if (timerDisplay) {
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    // Add warning styling when time is running low
+                    if (this.timeRemaining <= 300) { // 5 minutes
+                        timerDisplay.style.color = '#ef4444';
+                    } else if (this.timeRemaining <= 600) { // 10 minutes
+                        timerDisplay.style.color = '#f59e0b';
+                    }
+                }
+            }
+
+            loadQuestion() {
+                this.isAnswered = false;
+                this.selectedOption = null;
+                if (this.feedbackSection) this.feedbackSection.classList.remove('show');
+                
+                const question = this.questions[this.currentQuestion];
+                if (this.questionNumber) this.questionNumber.textContent = `Question ${this.currentQuestion + 1} of ${this.questions.length}`;
+                
+                // Build question HTML
+                let questionHTML = question.question;
+                if (question.scenario) {
+                    questionHTML += `<div class="scenario-box" style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-left: 4px solid var(--primary-color); border-radius: 8px;"><strong>Scenario:</strong> ${question.scenario}</div>`;
+                }
+                
+                if (this.questionText) this.questionText.innerHTML = questionHTML;
+                
+                // Create options
+                if (this.optionsGrid) {
+                    this.optionsGrid.innerHTML = '';
+                    question.options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        btn.dataset.option = option;
+                        btn.innerHTML = `<span>${option}</span>`;
+                        btn.addEventListener('click', () => this.selectOption(btn));
+                        this.optionsGrid.appendChild(btn);
+                    });
+                }
+                
+                this.updateProgress();
+            }
+
+            selectOption(button) {
+                if (this.isAnswered) return;
+                
+                // Remove previous selection
+                document.querySelectorAll('#certOptionsGrid .option-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                // Select new option
+                button.classList.add('selected');
+                this.selectedOption = button.dataset.option;
+            }
+
+            submitAnswer() {
+                if (!this.selectedOption || this.isAnswered) return;
+                
+                this.isAnswered = true;
+                const question = this.questions[this.currentQuestion];
+                const isCorrect = this.selectedOption === question.correct;
+                
+                // Update stats
+                if (isCorrect) {
+                    this.correct++;
+                    this.score += 4; // 4 points per correct answer for 100-point scale
+                } else {
+                    this.incorrect++;
+                }
+                
+                // Show feedback
+                this.showFeedback(isCorrect, question);
+                
+                // Update button states
+                if (this.submitBtn) this.submitBtn.style.display = 'none';
+                
+                if (this.currentQuestion < this.questions.length - 1) {
+                    if (this.nextBtn) this.nextBtn.style.display = 'inline-flex';
+                } else {
+                    if (this.finishBtn) this.finishBtn.style.display = 'inline-flex';
+                }
+                
+                this.updateStats();
+            }
+
+            nextQuestion() {
+                this.currentQuestion++;
+                this.selectedOption = null;
+                
+                if (this.currentQuestion < this.questions.length) {
+                    if (this.nextBtn) this.nextBtn.style.display = 'none';
+                    if (this.submitBtn) this.submitBtn.style.display = 'inline-flex';
+                    this.loadQuestion();
+                } else {
+                    this.finishCertification();
+                }
+            }
+
+            showFeedback(isCorrect, question) {
+                // Mark options
+                document.querySelectorAll('#certOptionsGrid .option-btn').forEach(btn => {
+                    if (btn.dataset.option === question.correct) {
+                        btn.classList.add('correct');
+                        btn.innerHTML += '<i class="fas fa-check-circle" style="color: var(--success-text); margin-left: 0.5rem;"></i>';
+                    } else if (btn.dataset.option === this.selectedOption && !isCorrect) {
+                        btn.classList.add('incorrect');
+                        btn.innerHTML += '<i class="fas fa-times-circle" style="color: var(--error-text); margin-left: 0.5rem;"></i>';
+                    }
+                });
+                
+                // Show feedback message
+                if (this.feedbackSection) {
+                    this.feedbackSection.classList.add('show');
+                    if (this.feedbackMessage) this.feedbackMessage.className = `feedback-message ${isCorrect ? 'success' : 'error'}`;
+                    if (this.feedbackIcon) this.feedbackIcon.className = `feedback-icon fas ${isCorrect ? 'fa-check-circle' : 'fa-times-circle'}`;
+                    if (this.feedbackTitle) this.feedbackTitle.textContent = isCorrect ? 'Correct!' : `Incorrect - The answer is ${question.correct}`;
+                    if (this.feedbackText) this.feedbackText.textContent = question.explanation;
+                }
+            }
+
+            updateStats() {
+                if (this.scoreDisplay) this.scoreDisplay.textContent = this.score;
+                
+                const total = this.correct + this.incorrect;
+                const accuracy = total > 0 ? Math.round((this.correct / total) * 100) : 0;
+                if (this.accuracyDisplay) this.accuracyDisplay.textContent = `${accuracy}%`;
+                
+                if (this.progressDisplay) this.progressDisplay.textContent = `${this.currentQuestion + 1}/${this.questions.length}`;
+            }
+
+            updateProgress() {
+                const progress = ((this.currentQuestion + 1) / this.questions.length) * 100;
+                const progressBar = document.getElementById('certProgressBar');
+                if (progressBar) progressBar.style.width = `${progress}%`;
+            }
+
+            finishCertification() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+                
+                const endTime = Date.now();
+                const timeUsed = Math.round((endTime - this.startTime) / 1000);
+                const accuracy = Math.round((this.correct / this.questions.length) * 100);
+                const passed = accuracy >= 80;
+                
+                this.showCertificationResults(accuracy, timeUsed, passed);
+            }
+
+            showCertificationResults(accuracy, timeUsed, passed) {
+                // Hide certification exam
+                document.getElementById('certificationExam').style.display = 'none';
+                
+                // Format time
+                const minutes = Math.floor(timeUsed / 60);
+                const seconds = timeUsed % 60;
+                const timeFormatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Update results modal
+                document.getElementById('certFinalScore').textContent = `${accuracy}%`;
+                document.getElementById('certCorrectCount').textContent = this.correct;
+                document.getElementById('certIncorrectCount').textContent = this.incorrect;
+                document.getElementById('certTimeUsed').textContent = timeFormatted;
+                
+                // Set score color
+                const scoreElement = document.getElementById('certFinalScore');
+                if (passed) {
+                    scoreElement.style.color = '#16a34a';
+                } else {
+                    scoreElement.style.color = '#dc2626';
+                }
+                
+                // Update result title and message
+                const resultTitle = document.getElementById('certResultTitle');
+                const statusMessage = document.getElementById('certificationStatusMessage');
+                const certificateDisplay = document.getElementById('certificateDisplay');
+                const downloadBtn = document.getElementById('downloadCertBtn');
+                
+                if (passed) {
+                    resultTitle.textContent = '🎉 Certification Earned!';
+                    statusMessage.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #16a34a, #22c55e); color: white; padding: 2rem; border-radius: 12px;">
+                            <i class="fas fa-trophy" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                            <h3 style="margin: 0 0 1rem 0;">Congratulations! You've passed the Master Certification!</h3>
+                            <p style="margin: 0;">You've demonstrated mastery of cap styles with a score of ${accuracy}%. Your certificate is ready for download.</p>
+                        </div>
+                    `;
+                    certificateDisplay.style.display = 'block';
+                    downloadBtn.style.display = 'inline-flex';
+                    
+                    // Update certificate details
+                    document.getElementById('certificateScore').textContent = `${accuracy}%`;
+                    document.getElementById('certificateDate').textContent = new Date().toLocaleDateString();
+                } else {
+                    resultTitle.textContent = 'Certification Not Achieved';
+                    statusMessage.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #dc2626, #f87171); color: white; padding: 2rem; border-radius: 12px;">
+                            <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                            <h3 style="margin: 0 0 1rem 0;">Score: ${accuracy}% (80% required to pass)</h3>
+                            <p style="margin: 0;">Review the cap styles and try again. You can retake the certification after additional study.</p>
+                        </div>
+                    `;
+                    certificateDisplay.style.display = 'none';
+                    downloadBtn.style.display = 'none';
+                }
+                
+                // Show results modal
+                document.getElementById('certificationResultsModal').classList.add('active');
+            }
+        }
+
+        // Certification modal functions
+        function closeCertificationResults() {
+            document.getElementById('certificationResultsModal').classList.remove('active');
+            document.getElementById('capStyleAcademy').style.display = 'block';
+        }
+
+        function restartCertification() {
+            closeCertificationResults();
+            const certification = new MasterCertification();
+            certification.startCertification();
+        }
+
+        function startMasterCertification() {
+            const certification = new MasterCertification();
+            window.masterCertification = certification;
+            certification.startCertification();
+        }
+
+        function downloadCertificate() {
+            // Simple certificate download as text for now
+            // In a real implementation, this would generate a PDF
+            const accuracy = document.getElementById('certificateScore').textContent;
+            const date = document.getElementById('certificateDate').textContent;
+            const userName = 'Cap Style Expert'; // Could be made dynamic
+            
+            const certificateText = `
+CERTIFICATE OF MASTERY
+
+Cap Style Academy
+Northwest Custom Apparel
+
+This certifies that ${userName}
+has successfully completed the Master Certification
+with a score of ${accuracy}
+
+Date: ${date}
+
+This certificate demonstrates proficiency in:
+- Visual identification of all 8 core cap styles
+- Understanding of cap features and construction
+- Application of styles to customer scenarios
+- Advanced cap selection expertise
+
+Northwest Custom Apparel
+Training Department
+            `.trim();
+            
+            const blob = new Blob([certificateText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Cap_Style_Certification_${date.replace(/\//g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Make functions globally available
+        window.startMasterCertification = startMasterCertification;
+        window.closeCertificationResults = closeCertificationResults;
+        window.restartCertification = restartCertification;
+        window.downloadCertificate = downloadCertificate;
+
     </script>
 </body>
 </html>

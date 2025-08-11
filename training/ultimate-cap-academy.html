@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Cap Training Academy - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4cb354 0%, #3a8f41 100%);
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .logo {
+            height: 50px;
+            margin-bottom: 15px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: white;
+            color: #4cb354;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .mode-btn.active {
+            background: #fbbf24;
+            color: #1f2937;
+            transform: scale(1.05);
+        }
+
+        .stats-bar {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4cb354;
+        }
+
+        .study-progress {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.studied {
+            background: #10b981;
+            color: white;
+        }
+
+        .main-content {
+            position: relative;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            perspective: 1000px;
+            height: 500px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            transform: rotateY(180deg);
+            padding: 20px;
+            font-size: 0.9em;
+            overflow-y: auto;
+        }
+
+        .card-status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-discontinued {
+            background: #ef4444;
+            color: white;
+        }
+
+        .cap-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin: 20px auto;
+        }
+
+        .cap-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .cap-description {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .flip-hint {
+            color: #4cb354;
+            font-weight: 600;
+            margin-top: auto;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .back-section {
+            margin-bottom: 20px;
+        }
+
+        .back-section h4 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 5px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .sales-script {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .objection-handler {
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .objection-handler strong {
+            color: #ef4444;
+        }
+
+        .sales-data {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .sales-data-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .sales-data-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .sales-data-label {
+            font-size: 0.8em;
+            color: #9ca3af;
+        }
+
+        .compare-mode {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fbbf24;
+            color: #1f2937;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .compare-mode:hover {
+            transform: scale(1.05);
+        }
+
+        .compare-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.3);
+            padding: 30px;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+            z-index: 99;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .compare-panel.active {
+            transform: translateY(0);
+        }
+
+        .timer-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 100;
+        }
+
+        .timer-display.active {
+            display: block;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .scenario-box {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4cb354;
+        }
+
+        .scenario-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4cb354;
+            margin-bottom: 10px;
+        }
+
+        .customer-voice {
+            font-style: italic;
+            color: #4b5563;
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quiz-option {
+            padding: 20px;
+            border: 3px solid #e5e7eb;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+        }
+
+        .quiz-option:hover {
+            border-color: #4cb354;
+            background: #f0fff4;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            border-color: #4cb354;
+            background: #4cb354;
+            color: white;
+        }
+
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: #10b981;
+            color: white;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: #ef4444;
+            color: white;
+        }
+
+        .quote-builder {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .quote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .quote-total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4cb354;
+            text-align: right;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.5s ease;
+        }
+
+        .achievement-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .achievement-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .achievement-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4cb354;
+            margin-bottom: 10px;
+        }
+
+        .leaderboard {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f3f4f6;
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4cb354;
+            width: 50px;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .leaderboard-score {
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .audio-btn {
+            background: #4cb354;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: #3a8f41;
+            transform: scale(1.05);
+        }
+
+        .battle-mode-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .battle-player {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .battle-vs {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .battle-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .player1-score { color: #4cb354; }
+        .player2-score { color: #ec4899; }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-btn {
+                width: 80%;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+            <h1>🧢 Ultimate Cap Training Academy</h1>
+            <p>Master the art of cap sales with comprehensive interactive training!</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('study')">📚 Study Mode</button>
+            <button class="mode-btn" onclick="setMode('test')">⏱️ Test Mode</button>
+            <button class="mode-btn" onclick="setMode('battle')">⚔️ Battle Mode</button>
+            <button class="mode-btn" onclick="setMode('scenario')">🎭 Real Scenarios</button>
+            <button class="mode-btn" onclick="setMode('quote')">💰 Quote Builder</button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Progress:</span>
+                <div class="study-progress" id="progressTracker">
+                    <div class="progress-dot" data-cap="0">1</div>
+                    <div class="progress-dot" data-cap="1">2</div>
+                    <div class="progress-dot" data-cap="2">3</div>
+                    <div class="progress-dot" data-cap="3">4</div>
+                    <div class="progress-dot" data-cap="4">5</div>
+                    <div class="progress-dot" data-cap="5">6</div>
+                    <div class="progress-dot" data-cap="6">7</div>
+                    <div class="progress-dot" data-cap="7">8</div>
+                    <div class="progress-dot" data-cap="8">9</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Current Streak:</span>
+                <span class="stat-value" id="streakCount">0 🔥</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Points:</span>
+                <span class="stat-value" id="totalPoints">0</span>
+            </div>
+        </div>
+
+        <div class="timer-display" id="timerDisplay">00:00</div>
+
+        <div class="main-content">
+            <!-- Flash Cards Grid -->
+            <div id="flashcardSection" class="product-grid">
+                <!-- Cards will be generated here -->
+            </div>
+
+            <!-- Battle Mode -->
+            <div id="battleSection" class="battle-mode-container">
+                <h2 style="text-align: center; color: #4cb354; margin-bottom: 30px;">⚔️ Cap Knowledge Battle!</h2>
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 30px; align-items: center;">
+                    <div class="battle-player">
+                        <h3>Player 1</h3>
+                        <div class="battle-score player1-score" id="player1Score">0</div>
+                    </div>
+                    <div class="battle-vs">VS</div>
+                    <div class="battle-player">
+                        <h3>Player 2</h3>
+                        <div class="battle-score player2-score" id="player2Score">0</div>
+                    </div>
+                </div>
+                <div id="battleQuestion" style="margin-top: 40px;">
+                    <!-- Battle questions appear here -->
+                </div>
+            </div>
+
+            <!-- Scenario Training -->
+            <div id="scenarioSection" style="display: none;">
+                <div class="quiz-container">
+                    <h2 style="text-align: center; color: #4cb354; margin-bottom: 30px;">🎭 Real Customer Scenarios</h2>
+                    <div id="scenarioContainer">
+                        <!-- Scenarios will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Builder -->
+            <div id="quoteSection" style="display: none;">
+                <div class="quote-builder">
+                    <h2 style="text-align: center; color: #4cb354; margin-bottom: 30px;">💰 Build a Quote</h2>
+                    <div id="quoteContainer">
+                        <!-- Quote builder will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="leaderboard" id="leaderboard" style="display: none;">
+                <h2 style="text-align: center; color: #4cb354; margin-bottom: 30px;">🏆 Top Sales Champions</h2>
+                <div id="leaderboardList">
+                    <!-- Leaderboard entries -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Compare Mode Button -->
+        <div class="compare-mode" id="compareModeBtn" onclick="toggleCompare()">
+            📊 Compare Caps (0/3)
+        </div>
+
+        <!-- Compare Panel -->
+        <div class="compare-panel" id="comparePanel">
+            <h3 style="margin-bottom: 20px;">Cap Comparison</h3>
+            <div id="compareContent">
+                <!-- Comparison content -->
+            </div>
+            <button onclick="clearCompare()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 20px;">Clear Comparison</button>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div class="achievement-popup" id="achievementPopup">
+        <div class="achievement-icon" id="achievementIcon">🏆</div>
+        <div class="achievement-title" id="achievementTitle">Achievement Unlocked!</div>
+        <p id="achievementDesc">You're becoming a cap sales expert!</p>
+    </div>
+
+    <script>
+        // Enhanced cap data with all 9 caps from 2025 sales data
+        const capData = [
+            {
+                id: 'C112',
+                name: 'Port Authority Snapback Trucker Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/C112.jpg',
+                status: 'ACTIVE',
+                bestSeller: true,
+                features: [
+                    'Two-toned design with breathable mesh',
+                    '100% cotton twill front (premium feel)',
+                    '7-position adjustable snapback',
+                    'Structured mid-profile',
+                    'Perfect for outdoor events'
+                ],
+                salesData: {
+                    revenue: '$61,956.30',
+                    orders: 64,
+                    units: 4963,
+                    avgOrder: '$968.07'
+                },
+                salesScript: "I'd recommend our C112 - it's our absolute best seller with nearly 5,000 units sold. The breathable mesh and adjustable snapback make it perfect for your outdoor company events. Most clients order around 80 units for the best value.",
+                objections: [
+                    { objection: "Too expensive", response: "Actually, at an average of $968 per order for about 80 caps, you're looking at just $12 per cap - and these are proven sellers that employees love to wear." },
+                    { objection: "Need it faster", response: "Great news! The C112 is our most stocked item with 2-day shipping available. It's why 64 companies chose it last quarter." }
+                ],
+                pronunciation: 'See-One-Twelve',
+                price: 12.48
+            },
+            {
+                id: 'NE1000',
+                name: 'New Era - Structured Stretch Cotton Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/NE1000.jpg',
+                status: 'ACTIVE',
+                premium: true,
+                features: [
+                    '97/3 cotton/spandex stretch fit',
+                    'New Era brand recognition',
+                    '39THIRTY FIT technology',
+                    'No closure - clean fitted look',
+                    'Must be embellished before resale'
+                ],
+                salesData: {
+                    revenue: '$18,873.76',
+                    orders: 13,
+                    units: 924,
+                    avgOrder: '$1,451.83'
+                },
+                salesScript: "For your executive team, I highly recommend the New Era NE1000. The New Era brand adds instant prestige - it's the same quality worn in Major League Baseball. Our corporate clients typically invest around $1,450 for their leadership team gifts.",
+                objections: [
+                    { objection: "Why so expensive?", response: "The New Era brand commands premium pricing because of its reputation. Your executives will recognize and appreciate the quality - it's an investment in your company image." },
+                    { objection: "What about sizing?", response: "The 39THIRTY stretch technology adapts to different head sizes, which is why it's perfect for gifting when you might not know exact sizes." }
+                ],
+                pronunciation: 'New Era - N-E-One-Thousand',
+                price: 20.44
+            },
+            {
+                id: 'C110',
+                name: 'Port Authority Flexfit 110 Mesh Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/C110.jpg',
+                status: 'ACTIVE',
+                techFavorite: true,
+                features: [
+                    'Flexfit 110 technology',
+                    'Adjustable + stretch comfort',
+                    'Permacurv bill maintains shape',
+                    'Silver undervisor reduces glare',
+                    '8-row stitching for durability'
+                ],
+                salesData: {
+                    revenue: '$11,620.00',
+                    orders: 13,
+                    units: 578,
+                    avgOrder: '$893.85'
+                },
+                salesScript: "The C110 gives you the best of both worlds - it has Flexfit stretch technology AND an adjustable snapback. Perfect for diverse teams where one-size-fits-all truly needs to fit all. Tech companies love this modern look.",
+                objections: [
+                    { objection: "Looks complicated", response: "It's actually the simplest solution - employees get the comfort of a fitted cap with the flexibility of adjustment. No more ordering multiple sizes!" },
+                    { objection: "Not sure about mesh", response: "The mesh panels make it incredibly breathable - your team can wear these all day at outdoor events without discomfort." }
+                ],
+                pronunciation: 'See-One-Ten Flex-fit',
+                price: 20.11
+            },
+            {
+                id: 'CP90',
+                name: 'Port Company Knit Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/CP90.jpg',
+                status: 'ACTIVE',
+                seasonal: true,
+                features: [
+                    '100% acrylic warmth',
+                    '3-inch folding cuff',
+                    'Easy embroidery on cuff',
+                    'Multiple material blends',
+                    'Note: White is cream-colored'
+                ],
+                salesData: {
+                    revenue: '$10,857.54',
+                    orders: 12,
+                    units: 1118,
+                    avgOrder: '$904.80'
+                },
+                salesScript: "With winter coming, the CP90 knit cap is perfect for holiday gifts or cold-weather teams. The 3-inch cuff gives you a huge embroidery area for your logo. We sold over 1,100 last winter!",
+                objections: [
+                    { objection: "Only need them in winter", response: "That's exactly why they make great holiday corporate gifts! Order in bulk now for December gifting - most companies order about 90-100 units." },
+                    { objection: "Worried about sizing", response: "Knit caps are the most forgiving - the acrylic stretches to fit virtually everyone comfortably." }
+                ],
+                pronunciation: 'See-Pee-Ninety',
+                price: 9.71
+            },
+            {
+                id: 'C826',
+                name: 'Port Authority Pique Mesh Cap L/XL',
+                image: 'https://cdnm.sanmar.com/catalog/images/C826.jpg',
+                status: 'DISCONTINUED',
+                limited: true,
+                features: [
+                    'Ultra-breathable polyester pique',
+                    'Athletic performance look',
+                    'Structured mid-profile',
+                    'L/XL sizing available',
+                    'LIMITED STOCK'
+                ],
+                salesData: {
+                    revenue: '$7,260.00',
+                    orders: 2,
+                    units: 444,
+                    avgOrder: '$3,630.00'
+                },
+                salesScript: "I need to let you know about a special opportunity - the C826 athletic cap has been discontinued, but I can check our remaining inventory. When available, these command premium prices. Can I suggest the C110 as an alternative? It has similar breathability with better availability.",
+                objections: [
+                    { objection: "Why discontinued?", response: "The manufacturer is focusing on newer models, but this creates an opportunity - you'd have an exclusive cap that others can't get. Let me check current stock levels." },
+                    { objection: "Need reliable supply", response: "You're absolutely right. That's why I'd recommend the C110 Flexfit - similar athletic styling with guaranteed availability for reorders." }
+                ],
+                pronunciation: 'See-Eight-Twenty-Six Pee-kay',
+                price: 16.35
+            },
+            {
+                id: 'C912',
+                name: 'Port Authority Camouflage Cap With Air Mesh Back',
+                image: 'https://cdnm.sanmar.com/catalog/images/C912.jpg',
+                status: 'ACTIVE',
+                niche: true,
+                features: [
+                    'Realtree Xtra camo pattern',
+                    'Breathable air mesh back',
+                    'Structured mid-profile',
+                    'Hook and loop closure',
+                    '60/40 cotton/poly blend'
+                ],
+                salesData: {
+                    revenue: '$4,773.00',
+                    orders: 3,
+                    units: 282,
+                    avgOrder: '$1,591.00'
+                },
+                salesScript: "For outdoor industry clients, our C912 camo cap connects your brand to the hunting and fishing lifestyle. It's a specialty item that commands premium pricing - our average order is over $1,500.",
+                objections: [
+                    { objection: "Too niche", response: "That's exactly the point - when you match the right product to the right audience, they become brand ambassadors. These aren't just caps, they're lifestyle statements." },
+                    { objection: "Low demand", response: "Lower volume means less competition. The clients who want camo REALLY want camo and will pay premium prices for quality." }
+                ],
+                pronunciation: 'See-Nine-Twelve',
+                price: 16.93
+            },
+            {
+                id: 'C114',
+                name: 'Port Authority Digi Camo Snapback Trucker Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/C114.jpg',
+                status: 'ACTIVE',
+                tactical: true,
+                features: [
+                    '100% cotton twill front panels',
+                    '100% polyester mesh back',
+                    'Digital camo pattern',
+                    '7-position adjustable snapback',
+                    'Structured mid-profile'
+                ],
+                salesData: {
+                    revenue: '$4,577.00',
+                    orders: 2,
+                    units: 525,
+                    avgOrder: '$2,288.50'
+                },
+                salesScript: "The C114 features a modern digital camo pattern that appeals to military, law enforcement, and tactical enthusiasts. It's perfect for security companies or veteran organizations. The large orders averaging $2,200+ show its bulk appeal.",
+                objections: [
+                    { objection: "Is digital camo still popular?", response: "Digital camo is huge in the tactical and veteran community. It's more modern than traditional camo and shows support for military personnel." },
+                    { objection: "Limited audience", response: "True, but they're loyal customers. Our data shows orders of 250+ units at a time - these organizations buy in serious bulk." }
+                ],
+                pronunciation: 'See-One-Fourteen',
+                price: 8.72
+            },
+            {
+                id: 'CP82',
+                name: 'Port Company Brushed Twill Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/CP82b.jpg',
+                status: 'ACTIVE',
+                classic: true,
+                features: [
+                    '100% cotton brushed twill',
+                    'Soft, comfortable feel',
+                    'Structured mid-profile',
+                    'Self-fabric closure with brass buckle',
+                    'Traditional styling'
+                ],
+                salesData: {
+                    revenue: '$3,810.00',
+                    orders: 2,
+                    units: 330,
+                    avgOrder: '$1,905.00'
+                },
+                salesScript: "The CP82 is our classic cap - timeless style with a soft brushed twill that feels premium. The brass buckle closure adds a touch of class. Perfect for country clubs, traditional businesses, or anyone wanting that classic American cap look.",
+                objections: [
+                    { objection: "Looks too basic", response: "Sometimes classic is exactly what you need. This cap never goes out of style and the brushed twill feels more expensive than it is." },
+                    { objection: "Metal buckle concerns", response: "The brass buckle is actually a selling point - it's durable, adjustable, and gives a premium feel that plastic snapbacks can't match." }
+                ],
+                pronunciation: 'See-Pee-Eighty-Two',
+                price: 11.55
+            },
+            {
+                id: 'C865',
+                name: 'Port Authority Flexfit Cap',
+                image: 'https://cdnm.sanmar.com/catalog/images/C865.jpg',
+                status: 'ACTIVE',
+                fitted: true,
+                features: [
+                    '63/34/3 poly/cotton/spandex',
+                    'Original Flexfit technology',
+                    'No closure needed',
+                    'Permacurv bill',
+                    'Available in multiple sizes'
+                ],
+                salesData: {
+                    revenue: '$3,542.00',
+                    orders: 7,
+                    units: 143,
+                    avgOrder: '$506.00'
+                },
+                salesScript: "The C865 is the original Flexfit - no adjustments needed, just pure comfort. Popular with teams that want a clean, professional look without visible closures. Though orders are smaller, customers reorder regularly because people love the fit.",
+                objections: [
+                    { objection: "Need to order multiple sizes", response: "Yes, but that ensures everyone gets a perfect fit. We can help you estimate size distribution based on typical orders." },
+                    { objection: "Smaller order sizes", response: "The data shows 7 orders for 143 units - that's repeat customers coming back because their teams love these caps." }
+                ],
+                pronunciation: 'See-Eight-Sixty-Five',
+                price: 24.76
+            }
+        ];
+
+        // Global variables
+        let currentMode = 'study';
+        let studiedCaps = new Set();
+        let compareList = [];
+        let currentStreak = 0;
+        let totalPoints = 0;
+        let testModeTimer = null;
+        let flipTimeouts = {};
+        let currentScenario = 0;
+        let battleTurn = 'player1';
+        let battleScores = { player1: 0, player2: 0 };
+
+        // Initialize the application
+        function init() {
+            renderFlashcards();
+            loadLeaderboard();
+            updateStats();
+        }
+
+        // Set the training mode
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Hide all sections
+            document.getElementById('flashcardSection').style.display = 'none';
+            document.getElementById('battleSection').style.display = 'none';
+            document.getElementById('scenarioSection').style.display = 'none';
+            document.getElementById('quoteSection').style.display = 'none';
+            document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('compareModeBtn').style.display = 'none';
+            document.getElementById('timerDisplay').classList.remove('active');
+
+            // Clear any active timers
+            if (testModeTimer) clearInterval(testModeTimer);
+            Object.values(flipTimeouts).forEach(timeout => clearTimeout(timeout));
+
+            switch(mode) {
+                case 'study':
+                    document.getElementById('flashcardSection').style.display = 'grid';
+                    document.getElementById('compareModeBtn').style.display = 'block';
+                    showNotification('📚 Study Mode', 'Click cards to study. They stay flipped for easy learning!');
+                    break;
+                case 'test':
+                    document.getElementById('flashcardSection').style.display = 'grid';
+                    startTestMode();
+                    break;
+                case 'battle':
+                    document.getElementById('battleSection').style.display = 'block';
+                    startBattleMode();
+                    break;
+                case 'scenario':
+                    document.getElementById('scenarioSection').style.display = 'block';
+                    loadScenario();
+                    break;
+                case 'quote':
+                    document.getElementById('quoteSection').style.display = 'block';
+                    initQuoteBuilder();
+                    break;
+            }
+        }
+
+        // Render flashcards
+        function renderFlashcards() {
+            const container = document.getElementById('flashcardSection');
+            container.innerHTML = '';
+
+            capData.forEach((cap, index) => {
+                const card = document.createElement('div');
+                card.className = 'card fade-in';
+                card.style.animationDelay = `${index * 100}ms`;
+                card.dataset.capId = cap.id;
+
+                const statusClass = cap.status === 'DISCONTINUED' ? 'status-discontinued' : 'status-active';
+                const statusText = cap.bestSeller ? 'BEST SELLER!' : 
+                                  cap.premium ? 'PREMIUM' : 
+                                  cap.techFavorite ? 'TECH FAVORITE' : 
+                                  cap.seasonal ? 'SEASONAL' : 
+                                  cap.niche ? 'SPECIALTY' :
+                                  cap.tactical ? 'TACTICAL' :
+                                  cap.classic ? 'CLASSIC' :
+                                  cap.fitted ? 'FITTED' :
+                                  cap.status;
+
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span class="card-status-badge ${statusClass}">${statusText}</span>
+                            <img src="${cap.image}" alt="${cap.name}" class="cap-image" onerror="this.src='https://placehold.co/300x300/e2e8f0/4a5568?text=Image+Not+Found'">
+                            <h3 class="cap-title">${cap.id}
+                                <button class="audio-btn" onclick="playPronunciation('${cap.id}'); event.stopPropagation();">🔊</button>
+                            </h3>
+                            <p class="cap-description">${cap.name}</p>
+                            <div class="flip-hint">Click to flip for sales mastery! 🔄</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="back-section">
+                                <h4>🎯 Key Features</h4>
+                                <ul class="feature-list">
+                                    ${cap.features.map(f => `<li>${f}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="back-section">
+                                <h4>💬 Your Sales Script</h4>
+                                <div class="sales-script">"${cap.salesScript}"</div>
+                            </div>
+                            <div class="back-section">
+                                <h4>🛡️ Objection Handlers</h4>
+                                ${cap.objections.map(obj => `
+                                    <div class="objection-handler">
+                                        <strong>❌ "${obj.objection}"</strong><br>
+                                        ✅ ${obj.response}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="sales-data">
+                                <div class="sales-data-item">
+                                    <div class="sales-data-value">${cap.salesData.revenue}</div>
+                                    <div class="sales-data-label">Revenue</div>
+                                </div>
+                                <div class="sales-data-item">
+                                    <div class="sales-data-value">${cap.salesData.orders}</div>
+                                    <div class="sales-data-label">Orders</div>
+                                </div>
+                                <div class="sales-data-item">
+                                    <div class="sales-data-value">${cap.salesData.units}</div>
+                                    <div class="sales-data-label">Units</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => handleCardClick(card, index));
+                container.appendChild(card);
+            });
+        }
+
+        // Handle card clicks based on mode
+        function handleCardClick(card, index) {
+            if (currentMode === 'study') {
+                card.classList.toggle('flipped');
+                if (card.classList.contains('flipped')) {
+                    studiedCaps.add(index);
+                    updateProgress();
+                    
+                    // Check for achievements
+                    if (studiedCaps.size === 3) {
+                        showAchievement('🎓', 'Quick Learner!', 'You studied 3 caps!');
+                        addPoints(50);
+                    }
+                    if (studiedCaps.size === 6) {
+                        showAchievement('📚', 'Dedicated Student!', 'You studied 6 caps!');
+                        addPoints(75);
+                    }
+                    if (studiedCaps.size === capData.length) {
+                        showAchievement('🏆', 'Cap Master!', 'You studied all 9 caps! Ready for the test?');
+                        addPoints(150);
+                    }
+                }
+            } else if (currentMode === 'test') {
+                if (!card.classList.contains('flipped')) {
+                    card.classList.add('flipped');
+                    
+                    // Auto-flip back after 10 seconds
+                    flipTimeouts[index] = setTimeout(() => {
+                        card.classList.remove('flipped');
+                    }, 10000);
+                }
+            }
+        }
+
+        // Start test mode
+        function startTestMode() {
+            document.getElementById('flashcardSection').style.display = 'grid';
+            document.getElementById('timerDisplay').classList.add('active');
+            showNotification('⏱️ Test Mode', 'Cards auto-flip back after 10 seconds. Test your memory!');
+            
+            let seconds = 0;
+            testModeTimer = setInterval(() => {
+                seconds++;
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Battle mode functionality
+        function startBattleMode() {
+            battleScores = { player1: 0, player2: 0 };
+            battleTurn = 'player1';
+            updateBattleScore();
+            nextBattleQuestion();
+            showNotification('⚔️ Battle Mode', 'Two players compete! Player 1 starts first.');
+        }
+
+        function nextBattleQuestion() {
+            const container = document.getElementById('battleQuestion');
+            const randomCap = capData[Math.floor(Math.random() * capData.length)];
+            const questions = [
+                {
+                    q: `What's the main selling point of ${randomCap.id}?`,
+                    a: randomCap.features[0]
+                },
+                {
+                    q: `How many units of ${randomCap.id} were sold in 2025?`,
+                    a: randomCap.salesData.units.toString()
+                },
+                {
+                    q: `What's the average order value for ${randomCap.id}?`,
+                    a: randomCap.salesData.avgOrder
+                }
+            ];
+            
+            const question = questions[Math.floor(Math.random() * questions.length)];
+            
+            container.innerHTML = `
+                <div class="scenario-box">
+                    <div class="scenario-title">${battleTurn === 'player1' ? 'Player 1' : 'Player 2'}'s Turn</div>
+                    <p style="font-size: 1.2em; margin: 20px 0;">${question.q}</p>
+                    <button onclick="checkBattleAnswer(true)" style="background: #10b981; color: white; border: none; padding: 15px 30px; border-radius: 20px; margin: 10px; cursor: pointer; font-size: 1.1em;">I Know! ✓</button>
+                    <button onclick="checkBattleAnswer(false)" style="background: #ef4444; color: white; border: none; padding: 15px 30px; border-radius: 20px; margin: 10px; cursor: pointer; font-size: 1.1em;">Pass ✗</button>
+                    <div id="battleAnswer" style="margin-top: 20px; display: none; background: #f3f4f6; padding: 15px; border-radius: 10px;">
+                        <strong>Answer:</strong> ${question.a}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkBattleAnswer(correct) {
+            document.getElementById('battleAnswer').style.display = 'block';
+            
+            if (correct) {
+                battleScores[battleTurn]++;
+                showNotification('✅ Correct!', `${battleTurn} scores a point!`);
+            }
+            
+            updateBattleScore();
+            
+            // Check for winner
+            if (battleScores.player1 >= 5 || battleScores.player2 >= 5) {
+                const winner = battleScores.player1 >= 5 ? 'Player 1' : 'Player 2';
+                showAchievement('🏆', `${winner} Wins!`, `Final Score: ${battleScores.player1} - ${battleScores.player2}`);
+                setTimeout(() => setMode('study'), 3000);
+            } else {
+                battleTurn = battleTurn === 'player1' ? 'player2' : 'player1';
+                setTimeout(nextBattleQuestion, 2000);
+            }
+        }
+
+        function updateBattleScore() {
+            document.getElementById('player1Score').textContent = battleScores.player1;
+            document.getElementById('player2Score').textContent = battleScores.player2;
+        }
+
+        // Enhanced scenarios with all cap types
+        const scenarios = [
+            {
+                title: "The Brewery Owner",
+                voice: "We're opening a new craft brewery and need caps for our staff and to sell as merch. We want something trendy that people will actually want to wear around town.",
+                correctCap: 'C112',
+                reason: "The C112 is perfect - it's our best seller because it's trendy and comfortable. The breathable mesh is great for brewery staff working in warm conditions."
+            },
+            {
+                title: "The Corporate Executive",
+                voice: "I need high-quality caps for our annual executive golf tournament. Price isn't the main concern - we want to impress our top clients.",
+                correctCap: 'NE1000',
+                reason: "The New Era brand carries prestige that executives recognize. It's the same quality as MLB caps - perfect for impressing high-value clients."
+            },
+            {
+                title: "The Construction Manager",
+                voice: "My crew works outside all winter in Minnesota. I need warm hats with our logo for about 100 workers.",
+                correctCap: 'CP90',
+                reason: "The CP90 knit cap is essential for cold weather. The 3-inch cuff provides great logo visibility and the acrylic material provides excellent warmth."
+            },
+            {
+                title: "The Tech Startup",
+                voice: "We're a tech company with employees aged 22-45. We need caps that look modern and fit everyone comfortably for our company swag store.",
+                correctCap: 'C110',
+                reason: "The Flexfit 110 technology is perfect for tech companies - it combines stretch comfort with adjustability, ensuring a great fit for your diverse team."
+            },
+            {
+                title: "The Hunting Lodge",
+                voice: "We run a hunting lodge and want caps for our guides and to sell in our pro shop. Need something that fits our outdoor brand.",
+                correctCap: 'C912',
+                reason: "The camo pattern instantly connects with your hunting audience. It's a specialty item that your customers will pay premium prices for."
+            },
+            {
+                title: "The Military Contractor",
+                voice: "We're a defense contractor and want caps for our veterans appreciation event. Looking for something tactical that shows support for our military personnel.",
+                correctCap: 'C114',
+                reason: "The digital camo pattern is perfect for military and veteran organizations. It shows respect for service members and has that modern tactical look."
+            },
+            {
+                title: "The Country Club",
+                voice: "We need caps for our golf pro shop. Want something classic and timeless that looks premium.",
+                correctCap: 'CP82',
+                reason: "The brushed twill with brass buckle closure is perfect for country clubs. It has that classic, refined look that golfers appreciate."
+            }
+        ];
+
+        function loadScenario() {
+            const container = document.getElementById('scenarioContainer');
+            const scenario = scenarios[currentScenario];
+            
+            container.innerHTML = `
+                <div class="scenario-box">
+                    <div class="scenario-title">${scenario.title}</div>
+                    <div class="customer-voice">"${scenario.voice}"</div>
+                </div>
+                <p style="font-size: 1.2em; margin: 20px 0; text-align: center;">Which cap would you recommend?</p>
+                <div class="quiz-options">
+                    ${capData.filter(cap => cap.status === 'ACTIVE').map(cap => `
+                        <div class="quiz-option" onclick="checkScenarioAnswer('${cap.id}', '${scenario.correctCap}')">
+                            <strong>${cap.id}</strong> - ${cap.name}
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="scenarioFeedback" style="margin-top: 20px;"></div>
+            `;
+        }
+
+        function checkScenarioAnswer(selected, correct) {
+            const feedback = document.getElementById('scenarioFeedback');
+            const scenario = scenarios[currentScenario];
+            
+            if (selected === correct) {
+                feedback.innerHTML = `
+                    <div style="background: #d1fae5; border: 2px solid #10b981; padding: 20px; border-radius: 10px;">
+                        <strong style="color: #065f46;">✅ Excellent choice!</strong><br>
+                        ${scenario.reason}
+                    </div>
+                `;
+                addPoints(25);
+                currentStreak++;
+            } else {
+                feedback.innerHTML = `
+                    <div style="background: #fee2e2; border: 2px solid #ef4444; padding: 20px; border-radius: 10px;">
+                        <strong style="color: #991b1b;">❌ Not quite right.</strong><br>
+                        The best choice would be <strong>${correct}</strong>. ${scenario.reason}
+                    </div>
+                `;
+                currentStreak = 0;
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                currentScenario = (currentScenario + 1) % scenarios.length;
+                loadScenario();
+            }, 3000);
+        }
+
+        // Quote builder
+        function initQuoteBuilder() {
+            const container = document.getElementById('quoteContainer');
+            container.innerHTML = `
+                <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="font-size: 1.1em;"><strong>Client:</strong> Local Tech Company</p>
+                    <p><strong>Need:</strong> 100 caps for summer company picnic</p>
+                    <p><strong>Budget:</strong> Around $1,500</p>
+                </div>
+                <h3 style="margin: 20px 0;">Build Your Quote:</h3>
+                <div id="quoteItems"></div>
+                <div class="quote-total" id="quoteTotal">Total: $0.00</div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="checkQuote()" style="background: #4cb354; color: white; border: none; padding: 15px 30px; border-radius: 20px; cursor: pointer; font-size: 1.1em;">Submit Quote</button>
+                </div>
+            `;
+            
+            const itemsContainer = document.getElementById('quoteItems');
+            capData.filter(cap => cap.status === 'ACTIVE').forEach(cap => {
+                const item = document.createElement('div');
+                item.className = 'quote-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${cap.id}</strong> - ${cap.name}<br>
+                        <small>$${cap.price} each</small>
+                    </div>
+                    <div>
+                        <input type="number" min="0" max="100" value="0" 
+                               onchange="updateQuoteTotal()" 
+                               data-cap-id="${cap.id}" 
+                               data-price="${cap.price}"
+                               style="width: 60px; padding: 5px; border: 1px solid #e5e7eb; border-radius: 5px;">
+                    </div>
+                `;
+                itemsContainer.appendChild(item);
+            });
+        }
+
+        function updateQuoteTotal() {
+            let total = 0;
+            document.querySelectorAll('#quoteItems input').forEach(input => {
+                const quantity = parseInt(input.value) || 0;
+                const price = parseFloat(input.dataset.price);
+                total += quantity * price;
+            });
+            document.getElementById('quoteTotal').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        function checkQuote() {
+            const total = parseFloat(document.getElementById('quoteTotal').textContent.replace('Total: $', ''));
+            
+            if (total >= 1400 && total <= 1600) {
+                showAchievement('💰', 'Perfect Quote!', 'You nailed the budget! Great job!');
+                addPoints(50);
+            } else if (total < 1400) {
+                showNotification('📊 Too Low', 'You\'re under budget. Try adding more value!');
+            } else {
+                showNotification('📊 Too High', 'You\'re over budget. Consider adjusting quantities.');
+            }
+        }
+
+        // Compare functionality
+        function toggleCompare() {
+            if (compareList.length > 0) {
+                document.getElementById('comparePanel').classList.add('active');
+                updateComparePanel();
+            }
+        }
+
+        function addToCompare(capId) {
+            if (compareList.length < 3 && !compareList.includes(capId)) {
+                compareList.push(capId);
+                updateCompareButton();
+                
+                if (compareList.length === 3) {
+                    showNotification('📊 Ready to Compare!', 'Click the compare button to see side-by-side comparison.');
+                }
+            }
+        }
+
+        function updateCompareButton() {
+            const btn = document.getElementById('compareModeBtn');
+            btn.textContent = `📊 Compare Caps (${compareList.length}/3)`;
+            btn.style.display = compareList.length > 0 ? 'block' : 'none';
+        }
+
+        function updateComparePanel() {
+            const content = document.getElementById('compareContent');
+            const caps = compareList.map(id => capData.find(cap => cap.id === id));
+            
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(${caps.length}, 1fr); gap: 20px;">
+                    ${caps.map(cap => `
+                        <div style="text-align: center;">
+                            <h4>${cap.id}</h4>
+                            <p style="font-size: 0.9em; color: #6b7280;">${cap.name}</p>
+                            <div style="margin: 15px 0;">
+                                <div style="color: #4cb354; font-weight: bold;">${cap.salesData.revenue}</div>
+                                <div style="font-size: 0.8em; color: #9ca3af;">Revenue</div>
+                            </div>
+                            <div style="font-size: 0.9em; text-align: left; margin-top: 15px;">
+                                <strong>Best for:</strong><br>
+                                ${cap.bestSeller ? '• High volume orders' : ''}
+                                ${cap.premium ? '• Executive gifts' : ''}
+                                ${cap.techFavorite ? '• Tech companies' : ''}
+                                ${cap.seasonal ? '• Winter promotions' : ''}
+                                ${cap.niche ? '• Specialty markets' : ''}
+                                ${cap.tactical ? '• Military/tactical' : ''}
+                                ${cap.classic ? '• Traditional style' : ''}
+                                ${cap.fitted ? '• Clean fitted look' : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function clearCompare() {
+            compareList = [];
+            document.getElementById('comparePanel').classList.remove('active');
+            updateCompareButton();
+        }
+
+        // Progress and achievements
+        function updateProgress() {
+            const dots = document.querySelectorAll('.progress-dot');
+            studiedCaps.forEach(index => {
+                if (dots[index]) {
+                    dots[index].classList.add('studied');
+                }
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('streakCount').textContent = `${currentStreak} 🔥`;
+            document.getElementById('totalPoints').textContent = totalPoints;
+        }
+
+        function addPoints(points) {
+            totalPoints += points;
+            updateStats();
+            saveProgress();
+        }
+
+        function showAchievement(icon, title, description) {
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('achievementIcon').textContent = icon;
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementDesc').textContent = description;
+            
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 3000);
+        }
+
+        function showNotification(title, message) {
+            // Simple notification for now - could be enhanced
+            console.log(`${title}: ${message}`);
+        }
+
+        // Audio pronunciation
+        function playPronunciation(capId) {
+            const cap = capData.find(c => c.id === capId);
+            if (cap && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(cap.pronunciation);
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Leaderboard
+        function loadLeaderboard() {
+            const leaderboard = [
+                { name: 'Sarah M.', score: 2850 },
+                { name: 'Mike D.', score: 2340 },
+                { name: 'Jennifer L.', score: 1920 },
+                { name: 'You', score: totalPoints }
+            ].sort((a, b) => b.score - a.score);
+
+            const container = document.getElementById('leaderboardList');
+            if (container) {
+                container.innerHTML = leaderboard.map((entry, index) => `
+                    <div class="leaderboard-item ${entry.name === 'You' ? 'highlight' : ''}">
+                        <div class="leaderboard-rank">#${index + 1}</div>
+                        <div class="leaderboard-name">${entry.name}</div>
+                        <div class="leaderboard-score">${entry.score} pts</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Save/Load progress
+        function saveProgress() {
+            const data = {
+                studiedCaps: Array.from(studiedCaps),
+                totalPoints: totalPoints,
+                currentStreak: currentStreak
+            };
+            localStorage.setItem('ultimateCapTrainingProgress', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('ultimateCapTrainingProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                studiedCaps = new Set(data.studiedCaps);
+                totalPoints = data.totalPoints || 0;
+                currentStreak = data.currentStreak || 0;
+                updateProgress();
+                updateStats();
+            }
+        }
+
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                // Swipe left - could navigate to next mode
+            }
+            if (touchEndX > touchStartX + 50) {
+                // Swipe right - could navigate to previous mode
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            init();
+        });
+    </script>
+</body>
+</html>

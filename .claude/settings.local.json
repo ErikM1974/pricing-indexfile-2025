@@ -55,7 +55,13 @@
       "Bash(awk:*)",
       "Bash(echo:*)",
       "WebFetch(domain:caspio-pricing-proxy-ab30a049961a.herokuapp.com)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(for file in *.html)",
+      "Bash(do)",
+      "Bash(if grep -q \"certFinalScore\\|certResultSubtitle\\|certCorrectCount\" \"$file\")",
+      "Bash(then)",
+      "Bash(__NEW_LINE__ fi)",
+      "Bash(__NEW_LINE__ done)"
     ],
     "deny": []
   }
