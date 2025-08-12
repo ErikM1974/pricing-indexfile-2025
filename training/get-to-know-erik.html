@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get to Know Erik Mickelson - Northwest Custom Apparel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--primary-green);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #f0fdf4;
+            transform: translateX(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tagline {
+            font-size: 1.125rem;
+            color: var(--primary-dark);
+            font-style: italic;
+            padding: 1rem;
+            background: #f0fdf4;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        /* Video Section */
+        .video-section {
+            margin-bottom: 3rem;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .video-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+        }
+
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Bio Sections */
+        .bio-section {
+            margin-bottom: 2rem;
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .bio-section:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: #f0fdf4;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+
+        .chevron {
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+            font-size: 1.25rem;
+        }
+
+        .bio-section.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            padding: 1.5rem;
+            max-height: 2000px;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+        }
+
+        .bio-section.collapsed .section-content {
+            max-height: 0;
+            padding: 0 1.5rem;
+        }
+
+        .section-content ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.75rem;
+            line-height: 1.8;
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Special Highlights */
+        .highlight-box {
+            background: #f0fdf4;
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .best-day-ever {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-logo {
+            height: 30px;
+            opacity: 0.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.125rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .video-section,
+            .back-link,
+            .chevron {
+                display: none;
+            }
+
+            .bio-section {
+                page-break-inside: avoid;
+            }
+
+            .bio-section.collapsed .section-content {
+                max-height: none !important;
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+            </div>
+            <a href="/staff-dashboard.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">Getting to Know Erik Mickelson</h1>
+            <p class="hero-subtitle">For New Employees - 2025</p>
+            <div class="tagline">
+                "Let's have the best day ever!" - Erik
+            </div>
+        </div>
+
+        <!-- Video Section -->
+        <div class="video-section">
+            <div class="video-header">
+                <h2 class="video-title">
+                    <i class="fas fa-play-circle"></i>
+                    Meet Erik - A Personal Introduction
+                </h2>
+            </div>
+            <div class="video-container">
+                <iframe 
+                    src="https://www.youtube.com/embed/o2PC4CTSQko" 
+                    title="Getting to Know Erik Mickelson"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- Introduction -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">👋</span>
+                    <span>Introduction</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <p>Since I sometimes struggle with talking about myself, I wrote this down so you know who you're working for and with. I'm Erik Mickelson, and while my dad Jim founded this company in 1977, I've been running day-to-day operations and working to modernize things since 1997.</p>
+            </div>
+        </div>
+
+        <!-- My Background -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">📚</span>
+                    <span>My Background</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <p>I literally grew up in this business. During summers in junior high and high school, I did every grunt job imaginable – shipping, receiving, cleaning, maintenance, mowing lawns. I started from the ground up, which means I understand and respect every role in this company.</p>
+                <p>After graduating from WSU <strong>(Go Cougs!)</strong> with an accounting/finance degree, I came back to help my dad when my siblings weren't interested. Got my MBA later while working here.</p>
+            </div>
+        </div>
+
+        <!-- My Management Style -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">💼</span>
+                    <span>My Management Style</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li><strong>Open Door Policy:</strong> My door is genuinely always open. There are NO stupid questions – I'd rather you ask me something 10 times than make one costly mistake</li>
+                    <li><strong>Communication:</strong> We have meetings on Tuesdays and quick huddles on Fridays. I believe in keeping everyone informed so nobody has to guess what's happening</li>
+                    <li><strong>I Back My Team:</strong> When Steve suggested we get into sticker printing, I bought the $30,000 printer without blinking. Good ideas can come from anywhere</li>
+                    <li><strong>Systems Over Chaos:</strong> My dad ran things pretty loose – "Jim and the Gang" style. I've worked hard to create processes and procedures so we're not constantly putting out fires</li>
+                    <li><strong>Quick Decision Maker:</strong> Sometimes TOO quick – I get excited about new ideas and want to implement them immediately. The team has learned to tell me to slow down, and I've learned to listen</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- What Makes Me Tick -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">⚡</span>
+                    <span>What Makes Me Tick</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li>I genuinely want us to have <span class="best-day-ever">"the best day ever"</span> – every day (yes, I actually say this)</li>
+                    <li>I love new technology, machinery, and finding better ways to do things</li>
+                    <li>Success to me = a day when nobody has to run into my office with problems</li>
+                    <li>I want you to enjoy coming to work</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- The Personal Stuff -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">👨‍👩‍👧</span>
+                    <span>The Personal Stuff</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li><strong>Family:</strong> Married to my wife Wendy (she's a nurse educator) since 2015</li>
+                    <li><strong>Grandpa:</strong> Proud grandpa to 1-year-old Daisy (my stepdaughter Taylar worked here for 10 years)</li>
+                    <li><strong>Fitness enthusiast:</strong> Work out 4-5 times a week with Bradley from accounting</li>
+                    <li><strong>Hobby farmer:</strong> Just got a greenhouse, love my John Deere mower, proud Sumner resident ("best soil in Washington!")</li>
+                    <li><strong>Travel bug:</strong> Recently went to Greece, love biking the Orting Trail with Wendy</li>
+                    <li><strong>Quirky sense of humor:</strong> I once dressed as the Texas Chainsaw Killer (chainless chainsaw) and scared the entire factory on Halloween</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- About My Dad Jim -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">👨‍👦</span>
+                    <span>About My Dad Jim</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <p>He's 82 and still comes in daily (lives 4 minutes away). I make sure he has lunch and drinks his 4 bottles of water. This is still his company, but I handle the day-to-day. Respecting his legacy while modernizing has been my biggest challenge and achievement.</p>
+            </div>
+        </div>
+
+        <!-- What I Need From You -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">🤝</span>
+                    <span>What I Need From You</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <ul>
+                    <li><strong>Ask questions</strong> – seriously, ask away</li>
+                    <li><strong>Bring me ideas</strong> – I love them and will actually act on good ones</li>
+                    <li><strong>Communicate openly</strong> – no drama, just straight talk</li>
+                    <li><strong>Help us make this the best place to work in the industry</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Fair Warning -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">⚠️</span>
+                    <span>Fair Warning</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="highlight-box">
+                    <p>I can be a little quirky and shoot from the hip. When I get excited about something, I want it done NOW. Feel free to tell me to slow down – the team does it all the time, and I've learned to appreciate it.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Line -->
+        <div class="bio-section">
+            <div class="section-header" onclick="toggleSection(this.parentElement)">
+                <div class="section-title">
+                    <span class="section-icon">✅</span>
+                    <span>Bottom Line</span>
+                </div>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <p><strong>I'm here to make sure you succeed, the company thrives, and we all enjoy the journey.</strong></p>
+                <div class="highlight-box">
+                    <p style="font-size: 1.25rem; color: var(--primary-green); font-weight: 600; margin: 0;">
+                        Let's have the best day ever!
+                    </p>
+                </div>
+                <p style="margin-top: 1.5rem;">– Erik</p>
+                <p style="font-style: italic; color: var(--text-secondary);">
+                    P.S. If you see me getting too ahead of myself with a new idea (like wanting to engrave patches the same day we get a laser engraver), just remind me about procedures. Old Erik vs. New Erik is an ongoing battle! 😊
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+             alt="Northwest Custom Apparel" class="footer-logo">
+        <p>© 2025 Northwest Custom Apparel - Family Owned & Operated Since 1977</p>
+    </footer>
+
+    <script>
+        function toggleSection(section) {
+            section.classList.toggle('collapsed');
+        }
+
+        // Expand all sections for printing
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.bio-section').forEach(section => {
+                section.classList.remove('collapsed');
+            });
+        });
+    </script>
+</body>
+</html>
