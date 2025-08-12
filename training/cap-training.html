@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Cap Training - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 3px solid #4cb354;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 45px;
+            width: auto;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            flex: 1;
+        }
+
+        .breadcrumb {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: #4cb354;
+            text-decoration: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            background: linear-gradient(135deg, #4cb354, #409a47);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(76, 179, 84, 0.3);
+        }
+
+        .stats-summary h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.95;
+        }
+
+        /* Cap Grid */
+        .cap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Cap Card */
+        .cap-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cap-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .cap-card.best-seller {
+            border: 3px solid #f59e0b;
+            position: relative;
+        }
+
+        .best-seller-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f59e0b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .cap-image-container {
+            position: relative;
+            height: 300px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .cap-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+
+        .cap-card:hover .cap-image {
+            transform: scale(1.1);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-discontinued {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .cap-content {
+            padding: 1.5rem;
+        }
+
+        .cap-header {
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cap-style {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4cb354;
+            margin-bottom: 0.25rem;
+        }
+
+        .cap-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .cap-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .sales-stats {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .sales-stat {
+            text-align: center;
+        }
+
+        .sales-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4cb354;
+            margin-bottom: 0.25rem;
+        }
+
+        .sales-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Category Section */
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid #4cb354;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .category-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cap-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sales-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .cap-image-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel" class="logo">
+            <h1 class="header-title">🧢 Cap Training - Know Your Best Sellers</h1>
+            <div class="breadcrumb">
+                <a href="/staff-dashboard.html">Dashboard</a> / 
+                <a href="/training/training-games-hub.html">Training</a> / 
+                Cap Training
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <h2>📊 Our Cap Sales Success Story</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">9,307</div>
+                    <div class="stat-label">Total Caps Sold</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">$131,270</div>
+                    <div class="stat-label">Total Revenue Generated</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Top Selling Styles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">C112</div>
+                    <div class="stat-label">#1 Best Seller</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cap Grid -->
+        <div class="cap-grid">
+            <!-- C112 - TOP SELLER -->
+            <div class="cap-card best-seller">
+                <div class="best-seller-badge">🏆 #1 BEST SELLER</div>
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C112.jpg" 
+                         alt="C112 Port Authority Snapback Trucker Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C112</div>
+                        <div class="cap-name">Port Authority Snapback Trucker Cap</div>
+                        <div class="cap-description">
+                            Our absolute champion! This two-toned trucker features breathable mesh back and 7-position snapback. 
+                            Perfect for construction crews, outdoor events, and company branding. The structured mid-profile 
+                            maintains its shape while the cotton/poly blend ensures comfort.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">4,963</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$61,956</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NE1000 -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/NE1000.jpg" 
+                         alt="NE1000 New Era Structured Stretch Cotton Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">NE1000</div>
+                        <div class="cap-name">New Era - Structured Stretch Cotton Cap</div>
+                        <div class="cap-description">
+                            Premium New Era quality with 39THIRTY stretch fit technology. The 97/3 cotton/spandex blend 
+                            provides exceptional comfort. Structured crown maintains professional appearance. 
+                            Perfect for upscale brands and sports teams.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">924</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$18,874</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CP90 - Knit Cap -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/CP90.jpg" 
+                         alt="CP90 Port Company Knit Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">CP90</div>
+                        <div class="cap-name">Port Company Knit Cap</div>
+                        <div class="cap-description">
+                            Essential winter headwear! 100% acrylic with 3-inch folding cuff for easy embroidery. 
+                            Perfect for cold weather workers, outdoor events, and winter promotions. 
+                            Great for construction, landscaping, and outdoor retail teams.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">1,118</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$10,858</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C110 -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C110.jpg" 
+                         alt="C110 Port Authority Flexfit 110 Mesh Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C110</div>
+                        <div class="cap-name">Port Authority Flexfit 110 Mesh Cap</div>
+                        <div class="cap-description">
+                            Combines Flexfit comfort with snapback adjustability! Features Permacurv bill, 
+                            8-row stitching, and silver undervisor. The 60/40 cotton/poly front with mesh back 
+                            provides breathability. Ideal for athletic teams and active lifestyles.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">578</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$11,620</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C826 - Discontinued but notable -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-discontinued">Discontinued</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C826.jpg" 
+                         alt="C826 Port Authority Pique Mesh Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C826</div>
+                        <div class="cap-name">Port Authority Pique Mesh Cap L/XL</div>
+                        <div class="cap-description">
+                            DISCONTINUED - Still popular when available! Ultra-breathable with pique front and air mesh back. 
+                            100% polyester construction. Was great for hot weather and athletic applications. 
+                            Consider C110 or C112 as alternatives.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">444</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$7,260</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C912 - Camo -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C912.jpg" 
+                         alt="C912 Port Authority Camouflage Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C912</div>
+                        <div class="cap-name">Port Authority Camouflage Cap With Air Mesh Back</div>
+                        <div class="cap-description">
+                            Perfect for outdoor enthusiasts! Realtree camo print with breathable air mesh back. 
+                            60/40 cotton/poly canvas front. Hook and loop closure. Great for hunting shops, 
+                            outdoor retailers, and rural markets.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">282</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$4,773</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C114 - Digi Camo -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C114.jpg" 
+                         alt="C114 Port Authority Digi Camo Snapback" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C114</div>
+                        <div class="cap-name">Port Authority Digi Camo Snapback Trucker Cap</div>
+                        <div class="cap-description">
+                            Modern digital camo pattern meets classic trucker style. 100% cotton twill front 
+                            with polyester mesh back. 7-position snapback. Appeals to younger demographics 
+                            and tactical/outdoor markets.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">525</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$4,577</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CP82 -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/CP82b.jpg" 
+                         alt="CP82 Port Company Brushed Twill Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">CP82</div>
+                        <div class="cap-name">Port Company Brushed Twill Cap</div>
+                        <div class="cap-description">
+                            Classic soft-brushed twill that never goes out of style. 100% cotton with 
+                            self-fabric closure, brass buckle and grommet. Traditional look perfect for 
+                            golf courses, country clubs, and professional settings.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">330</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$3,810</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C865 -->
+            <div class="cap-card">
+                <div class="cap-image-container">
+                    <span class="status-badge status-active">Active</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/C865.jpg" 
+                         alt="C865 Port Authority Flexfit Cap" 
+                         class="cap-image">
+                </div>
+                <div class="cap-content">
+                    <div class="cap-header">
+                        <div class="cap-style">C865</div>
+                        <div class="cap-name">Port Authority Flexfit Cap</div>
+                        <div class="cap-description">
+                            The original Flexfit with poly-weave spandex for perfect fit. 63/34/3 poly/cotton/spandex 
+                            blend. Permacurv bill maintains shape. No adjustment needed - one size fits most. 
+                            Premium option for uniforms and team wear.
+                        </div>
+                    </div>
+                    <div class="sales-stats">
+                        <div class="sales-stat">
+                            <div class="sales-number">143</div>
+                            <div class="sales-label">Caps Sold</div>
+                        </div>
+                        <div class="sales-stat">
+                            <div class="sales-number">$3,542</div>
+                            <div class="sales-label">Revenue Generated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference Guide -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-title">💡 Quick Selling Tips</div>
+                <div class="category-description">
+                    <strong>Trucker Caps (C112, C110, C114):</strong> Best for outdoor workers, casual brands, and hot weather<br>
+                    <strong>Knit Caps (CP90):</strong> Essential for winter, construction, and cold weather promotions<br>
+                    <strong>Stretch Fit (NE1000, C865):</strong> Premium option for sports teams and upscale brands<br>
+                    <strong>Classic Caps (CP82):</strong> Traditional choice for golf, professional settings<br>
+                    <strong>Camo Caps (C912, C114):</strong> Perfect for outdoor enthusiasts and rural markets
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
