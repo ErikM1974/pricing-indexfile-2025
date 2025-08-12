@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual Sticker Pricing - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* NWCA Green Theme Variables */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Header with NWCA Branding */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Page Title */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        /* Video Section */
+        .video-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .video-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--hover-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        
+        .video-header:hover {
+            background: var(--success-bg);
+        }
+        
+        .video-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            margin: 0;
+        }
+        
+        .video-duration {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: normal;
+        }
+        
+        .toggle-icon {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+        
+        .video-content {
+            display: none;
+            padding: 1.5rem;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .video-content.show {
+            display: block;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-notes {
+            background: var(--success-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .video-notes p {
+            color: var(--success-text);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* Main Content Grid */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Input and Results Sections */
+        .input-section, .results-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+        
+        small {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .size-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Preset Buttons */
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .preset-btn {
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--success-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.15);
+        }
+        
+        .preset-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .preset-size {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .preset-area {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        /* Price Display */
+        .price-display {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+        }
+        
+        .total-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-per-unit {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        /* Breakdown Section */
+        .breakdown {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .breakdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.75rem;
+            margin: -1.5rem -1.5rem 1rem -1.5rem;
+            background: var(--hover-bg);
+            border-radius: 10px 10px 0 0;
+            user-select: none;
+        }
+        
+        .breakdown-header:hover {
+            background: var(--success-bg);
+        }
+        
+        .breakdown-header h3 {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            margin: 0;
+        }
+        
+        .breakdown-toggle {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .breakdown-toggle.open {
+            transform: rotate(180deg);
+        }
+        
+        .breakdown-content {
+            display: none;
+        }
+        
+        .breakdown-content.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .breakdown-item.total {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--primary-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid var(--primary-color);
+        }
+        
+        /* Warnings */
+        .warning {
+            background: var(--warning-bg);
+            border: 1px solid #fbbf24;
+            color: var(--warning-text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Admin Panel */
+        .admin-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .admin-toggle:hover {
+            background: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        
+        .admin-panel {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        
+        .admin-panel h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .admin-input {
+            margin-bottom: 1rem;
+        }
+        
+        .admin-input label {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-secondary);
+        }
+        
+        .admin-input input {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Cost Breakdown (Internal) */
+        #costBreakdown {
+            background: var(--hover-bg);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
+        }
+        
+        #costBreakdown h4 {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        #costBreakdown .breakdown-item {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            padding: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with NWCA Branding -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Manual Sticker Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Manual Sticker Pricing Calculator</h1>
+            <p>Professional pricing for custom die-cut stickers and labels</p>
+        </div>
+        
+        <!-- Industry Research Video -->
+        <div class="video-section">
+            <div class="video-header" onclick="toggleVideo()">
+                <h3>
+                    <span>📹</span>
+                    Sticker Industry Research Video
+                    <span class="video-duration">- Learn about industry pricing strategies</span>
+                </h3>
+                <span class="toggle-icon" id="videoToggle">▼</span>
+            </div>
+            <div class="video-content" id="videoContent">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/2hchq73qpCU" 
+                            title="Sticker Industry Research" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>
+                <div class="video-notes">
+                    <p>
+                        <strong>Key Takeaways:</strong> Understanding market pricing, material costs, and competitor strategies 
+                        helps us position NWCA competitively while maintaining healthy margins. Pay attention to volume discounts 
+                        and specialty material upcharges discussed in the video.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <span>📐</span> Sticker Details
+                </h2>
+                
+                <div class="form-group">
+                    <label>Quick Size Selection</label>
+                    <div class="preset-buttons">
+                        <div class="preset-btn" onclick="setPresetSize(2, 2)">
+                            <div class="preset-size">2"×2"</div>
+                            <div class="preset-area">4 sq in</div>
+                        </div>
+                        <div class="preset-btn" onclick="setPresetSize(3, 3)">
+                            <div class="preset-size">3"×3"</div>
+                            <div class="preset-area">9 sq in</div>
+                        </div>
+                        <div class="preset-btn" onclick="setPresetSize(4, 4)">
+                            <div class="preset-size">4"×4"</div>
+                            <div class="preset-area">16 sq in</div>
+                        </div>
+                        <div class="preset-btn" onclick="setPresetSize(5, 5)">
+                            <div class="preset-size">5"×5"</div>
+                            <div class="preset-area">25 sq in</div>
+                        </div>
+                        <div class="preset-btn" onclick="setPresetSize(3, 4)">
+                            <div class="preset-size">3"×4"</div>
+                            <div class="preset-area">12 sq in</div>
+                        </div>
+                        <div class="preset-btn" onclick="setPresetSize(6, 4)">
+                            <div class="preset-size">6"×4"</div>
+                            <div class="preset-area">24 sq in</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Custom Size (inches)</label>
+                    <div class="size-inputs">
+                        <input type="number" id="width" placeholder="Width" min="0.5" max="20" step="0.25" value="3" onchange="calculatePrice()">
+                        <input type="number" id="height" placeholder="Height" min="0.5" max="20" step="0.25" value="3" onchange="calculatePrice()">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="quantity" min="50" value="100" onchange="calculatePrice()">
+                    <small>Minimum order: 50 stickers</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Material Type</label>
+                    <select id="material" onchange="calculatePrice()">
+                        <option value="1">Standard Vinyl (Glossy/Matte)</option>
+                        <option value="1.15">Clear Vinyl (+15%)</option>
+                        <option value="1.30">Holographic/Glitter (+30%)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Lamination</label>
+                    <select id="lamination" onchange="calculatePrice()">
+                        <option value="true">Yes - Laminated (Outdoor/Durable)</option>
+                        <option value="false">No - Unlaminated (Indoor/Short-term)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Number of Unique Designs</label>
+                    <input type="number" id="designs" min="1" value="1" onchange="calculatePrice()">
+                    <small>Additional setup fee for multiple designs</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Art Preparation Required?</label>
+                    <select id="artPrep" onchange="calculatePrice()">
+                        <option value="false">No - Files are print-ready</option>
+                        <option value="true">Yes - Need art preparation ($50 first design, $25 additional)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="results-section">
+                <h2 class="section-title">
+                    <span>💰</span> Pricing
+                </h2>
+                
+                <div class="price-display">
+                    <div class="total-price" id="totalPrice">$0.00</div>
+                    <div class="price-per-unit" id="pricePerUnit">$0.00 per sticker</div>
+                    <div id="artChargeDisplay" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
+                        <div style="font-size: 1rem; margin-bottom: 0.25rem;">Art Preparation: <span id="artChargeAmount">$0.00</span></div>
+                        <div style="font-size: 0.875rem; opacity: 0.9;" id="artChargeDetails"></div>
+                    </div>
+                </div>
+                
+                <div class="breakdown">
+                    <div class="breakdown-header" onclick="toggleBreakdown()">
+                        <h3>Invoice Summary</h3>
+                        <span class="breakdown-toggle" id="breakdownToggle">▼</span>
+                    </div>
+                    <div class="breakdown-content" id="breakdownContent">
+                        <div class="breakdown-item">
+                            <span>Sticker Total:</span>
+                            <span id="stickerTotal">$0.00</span>
+                        </div>
+                        <div class="breakdown-item" id="artPrepLine" style="display: none;">
+                            <span>Art Preparation:</span>
+                            <span id="artPrepFeeDisplay">$0.00</span>
+                        </div>
+                        <div class="breakdown-item total">
+                            <span>Total Price:</span>
+                            <span id="finalPrice">$0.00</span>
+                        </div>
+                        
+                        <div id="costBreakdown" style="display: none;">
+                            <h4>Cost Breakdown (Internal)</h4>
+                            <div class="breakdown-item">
+                                <span>Materials Cost:</span>
+                                <span id="materialsCost">$0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Machine Time:</span>
+                                <span id="machineCost">$0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Labor Cost:</span>
+                                <span id="laborCost">$0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Base Cost:</span>
+                                <span id="baseCost">$0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Markup Applied:</span>
+                                <span id="markupInfo">2.5x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning" id="minimumWarning" style="display: none;">
+                    <span>⚠️</span>
+                    <span>Minimum order value is $100.00</span>
+                </div>
+                
+                <div class="warning" id="ltmWarning" style="display: none;">
+                    <span>⚠️</span>
+                    <span>Less than minimum fee of $50.00 applied (under 50 stickers)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="admin-toggle" onclick="toggleAdmin()">Admin Settings</button>
+    
+    <div class="admin-panel" id="adminPanel">
+        <h3>Admin Settings</h3>
+        <div class="admin-input">
+            <label>BHR ($/hour)</label>
+            <input type="number" id="bhr" value="114.29" step="0.01" onchange="calculatePrice()">
+        </div>
+        <div class="admin-input">
+            <label>Labor Rate ($/hour)</label>
+            <input type="number" id="laborRate" value="30" step="0.01" onchange="calculatePrice()">
+        </div>
+        <div class="admin-input">
+            <label>Markup Multiplier</label>
+            <input type="number" id="markup" value="2.5" step="0.1" onchange="calculatePrice()">
+        </div>
+        <div class="admin-input">
+            <label>Setup Time (hours)</label>
+            <input type="number" id="setupTime" value="0.15" step="0.01" onchange="calculatePrice()">
+        </div>
+        <div class="admin-input">
+            <label>Print Speed (sq in/hour)</label>
+            <input type="number" id="printSpeed" value="720" step="10" onchange="calculatePrice()">
+        </div>
+    </div>
+    
+    <script>
+        // Constants - Based on NWCA specific costs
+        const COSTS = {
+            BHR: 114.29, // Calculated from printer costs
+            LABOR_RATE: 30.00,
+            SETUP_TIME_HOURS: 0.15,
+            PRINT_CUT_RATE_SQIN_PER_HOUR: 720,
+            WASTE_FACTOR: 1.055,
+            
+            // Material costs with 10% added
+            COST_SQFT_VINYL: 0.84 * 1.10,
+            COST_SQFT_LAMINATION: 0.95 * 1.10,
+            COST_SQFT_INK: 0.60 * 1.10,
+            
+            MINIMUM_ORDER: 100.00,
+            MINIMUM_QUANTITY: 50,
+            LTM_FEE: 50.00, // Less than minimum fee
+            ART_PREP_FEE: 50.00, // First design art prep
+            ART_PREP_ADDITIONAL: 25.00, // Additional designs art prep
+            SETUP_FEE_PER_DESIGN: 25.00,
+            
+            // Markup tiers
+            MARKUP_TIERS: {
+                50: 2.5,
+                100: 2.3,
+                250: 2.0,
+                500: 1.8,
+                1000: 1.6
+            }
+        };
+        
+        let breakdownUnlocked = false;
+        
+        function toggleVideo() {
+            const content = document.getElementById('videoContent');
+            const toggle = document.getElementById('videoToggle');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.classList.remove('open');
+            } else {
+                content.classList.add('show');
+                toggle.classList.add('open');
+            }
+        }
+        
+        function toggleBreakdown() {
+            const content = document.getElementById('breakdownContent');
+            const toggle = document.getElementById('breakdownToggle');
+            const costBreakdown = document.getElementById('costBreakdown');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.classList.remove('open');
+            } else {
+                content.classList.add('show');
+                toggle.classList.add('open');
+                
+                // Check if cost breakdown should be shown (password protected)
+                if (!breakdownUnlocked && costBreakdown.style.display === 'none') {
+                    const password = prompt('Enter password to view cost breakdown:');
+                    if (password === 'nwca2025') {
+                        breakdownUnlocked = true;
+                        costBreakdown.style.display = 'block';
+                    }
+                } else if (breakdownUnlocked) {
+                    costBreakdown.style.display = 'block';
+                }
+            }
+        }
+        
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function setPresetSize(width, height) {
+            document.getElementById('width').value = width;
+            document.getElementById('height').value = height;
+            
+            // Update active state
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.preset-btn').classList.add('active');
+            
+            calculatePrice();
+        }
+        
+        function getAdminValues() {
+            return {
+                BHR: parseFloat(document.getElementById('bhr').value) || COSTS.BHR,
+                LABOR_RATE: parseFloat(document.getElementById('laborRate').value) || COSTS.LABOR_RATE,
+                MARKUP: parseFloat(document.getElementById('markup').value) || 2.5,
+                SETUP_TIME: parseFloat(document.getElementById('setupTime').value) || COSTS.SETUP_TIME_HOURS,
+                PRINT_SPEED: parseFloat(document.getElementById('printSpeed').value) || COSTS.PRINT_CUT_RATE_SQIN_PER_HOUR
+            };
+        }
+        
+        function calculatePrice() {
+            // Get inputs
+            const width = parseFloat(document.getElementById('width').value) || 0;
+            const height = parseFloat(document.getElementById('height').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const materialMultiplier = parseFloat(document.getElementById('material').value) || 1;
+            const isLaminated = document.getElementById('lamination').value === 'true';
+            const numDesigns = parseInt(document.getElementById('designs').value) || 1;
+            const needsArtPrep = document.getElementById('artPrep').value === 'true';
+            
+            // Get admin values
+            const admin = getAdminValues();
+            
+            // Calculate areas
+            const stickerArea_sqin = width * height;
+            const stickerArea_sqft = stickerArea_sqin / 144;
+            const totalMaterialArea_sqft = stickerArea_sqft * quantity * COSTS.WASTE_FACTOR;
+            
+            // Calculate time costs
+            const totalMachineTime_hours = (stickerArea_sqin * quantity) / admin.PRINT_SPEED;
+            const totalLaborTime_hours = admin.SETUP_TIME + totalMachineTime_hours;
+            
+            // Calculate material costs
+            let materialCostPerSqFt = COSTS.COST_SQFT_VINYL + COSTS.COST_SQFT_INK;
+            if (isLaminated) {
+                materialCostPerSqFt += COSTS.COST_SQFT_LAMINATION;
+            }
+            materialCostPerSqFt *= materialMultiplier;
+            
+            const totalMaterialCost = totalMaterialArea_sqft * materialCostPerSqFt;
+            const totalMachineCost = totalMachineTime_hours * admin.BHR;
+            const totalLaborCost = totalLaborTime_hours * admin.LABOR_RATE;
+            const setupFees = (numDesigns - 1) * COSTS.SETUP_FEE_PER_DESIGN;
+            
+            // Calculate art prep fees correctly
+            let artPrepFee = 0;
+            let artPrepDetails = '';
+            if (needsArtPrep) {
+                artPrepFee = COSTS.ART_PREP_FEE; // $50 for first design
+                if (numDesigns > 1) {
+                    const additionalDesigns = numDesigns - 1;
+                    const additionalFee = additionalDesigns * COSTS.ART_PREP_ADDITIONAL;
+                    artPrepFee += additionalFee;
+                    artPrepDetails = `($50 first + $${additionalFee} for ${additionalDesigns} additional)`;
+                } else {
+                    artPrepDetails = '(First design)';
+                }
+            }
+            
+            const ltmFee = quantity < COSTS.MINIMUM_QUANTITY ? COSTS.LTM_FEE : 0;
+            
+            const totalBaseCost = totalMaterialCost + totalMachineCost + totalLaborCost + setupFees;
+            
+            // Apply tiered markup
+            let markupMultiplier = admin.MARKUP;
+            for (const [tier, multiplier] of Object.entries(COSTS.MARKUP_TIERS).reverse()) {
+                if (quantity >= parseInt(tier)) {
+                    markupMultiplier = multiplier;
+                    break;
+                }
+            }
+            
+            // Calculate sticker price (without art prep)
+            let stickerPrice = (totalBaseCost + ltmFee) * markupMultiplier;
+            
+            // Apply minimum to sticker price only
+            if (stickerPrice < COSTS.MINIMUM_ORDER) {
+                stickerPrice = COSTS.MINIMUM_ORDER;
+            }
+            
+            // Final price includes art prep on top
+            const finalPrice = stickerPrice + artPrepFee;
+            
+            // Update main price display
+            document.getElementById('totalPrice').textContent = `$${finalPrice.toFixed(2)}`;
+            document.getElementById('pricePerUnit').textContent = `$${(finalPrice / quantity).toFixed(2)} per sticker`;
+            
+            // Update art charge display
+            const artChargeDisplay = document.getElementById('artChargeDisplay');
+            if (needsArtPrep && artPrepFee > 0) {
+                artChargeDisplay.style.display = 'block';
+                document.getElementById('artChargeAmount').textContent = `$${artPrepFee.toFixed(2)}`;
+                document.getElementById('artChargeDetails').textContent = artPrepDetails;
+            } else {
+                artChargeDisplay.style.display = 'none';
+            }
+            
+            // Update invoice breakdown
+            document.getElementById('stickerTotal').textContent = `$${stickerPrice.toFixed(2)}`;
+            
+            const artPrepLine = document.getElementById('artPrepLine');
+            if (needsArtPrep && artPrepFee > 0) {
+                artPrepLine.style.display = 'flex';
+                document.getElementById('artPrepFeeDisplay').textContent = `$${artPrepFee.toFixed(2)}`;
+            } else {
+                artPrepLine.style.display = 'none';
+            }
+            
+            document.getElementById('finalPrice').textContent = `$${finalPrice.toFixed(2)}`;
+            
+            // Update cost breakdown (internal)
+            document.getElementById('materialsCost').textContent = `$${totalMaterialCost.toFixed(2)}`;
+            document.getElementById('machineCost').textContent = `$${totalMachineCost.toFixed(2)}`;
+            document.getElementById('laborCost').textContent = `$${totalLaborCost.toFixed(2)}`;
+            document.getElementById('baseCost').textContent = `$${totalBaseCost.toFixed(2)}`;
+            document.getElementById('markupInfo').textContent = `${markupMultiplier}x`;
+            
+            // Show/hide warnings
+            document.getElementById('minimumWarning').style.display = 
+                (stickerPrice === COSTS.MINIMUM_ORDER) ? 'flex' : 'none';
+            document.getElementById('ltmWarning').style.display = 
+                (quantity < COSTS.MINIMUM_QUANTITY) ? 'flex' : 'none';
+        }
+        
+        // Calculate BHR based on NWCA specific numbers
+        function calculateBHR() {
+            // NWCA specific costs
+            const printerCost = 30000;
+            const depreciationYears = 5;
+            const annualDepreciation = printerCost / depreciationYears;
+            const serviceAgreement = 3000;
+            const annualMaintenance = 1000;
+            
+            // 5 hours/week * 50 weeks = 250 hours/year
+            const annualProductionHours = 250;
+            
+            // Total annual overhead
+            const totalAnnualOverhead = annualDepreciation + serviceAgreement + annualMaintenance;
+            
+            // BHR = Total Annual Overhead / Production Hours
+            const calculatedBHR = totalAnnualOverhead / annualProductionHours;
+            
+            // Add 10% for utilities and other overhead
+            return calculatedBHR * 1.10;
+        }
+        
+        // Initialize with calculated BHR
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculatedBHR = calculateBHR();
+            document.getElementById('bhr').value = calculatedBHR.toFixed(2);
+            calculatePrice();
+        });
+    </script>
+</body>
+</html>
