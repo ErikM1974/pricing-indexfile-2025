@@ -1,0 +1,212 @@
+/* ============================================ */
+/* RICHARDSON 2025 CALCULATOR SPECIFIC STYLES  */
+/* ============================================ */
+
+/* Richardson-specific grand total section */
+.grand-total-section {
+    background: linear-gradient(135deg, var(--primary-green) 0%, #359947 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.grand-total-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+.grand-total-label {
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.grand-total-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.grand-total-section:hover .grand-total-amount {
+    transform: scale(1.05);
+}
+
+/* Richardson-specific notes section */
+.notes-section {
+    box-shadow: 0 1px 3px rgba(252, 196, 25, 0.1);
+    transition: all 0.2s ease;
+}
+
+.notes-section:hover {
+    box-shadow: 0 3px 8px rgba(252, 196, 25, 0.15);
+    border-color: #ffc107;
+}
+
+/* Richardson cap icon styling */
+.cap-icon {
+    font-size: 1.5rem;
+    color: var(--primary-green);
+    margin-right: 0.5rem;
+}
+
+/* Style color swatches */
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    display: inline-block;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Richardson logo */
+.richardson-logo {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Setup fees section */
+.setup-fees-section {
+    margin-top: 1.5rem;
+}
+
+.setup-fees-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.setup-fees-container:hover {
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
+    border-color: var(--primary-green);
+}
+
+.setup-fee-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.setup-fee-item:last-child {
+    border-bottom: none;
+}
+
+.setup-fee-item:hover {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Add cap button */
+.add-cap-button {
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.add-cap-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+}
+
+.add-cap-button i {
+    font-size: 1.2rem;
+}
+
+/* Style search container */
+.style-search-container {
+    position: relative;
+}
+
+.style-search-container input {
+    padding-right: 2.5rem;
+}
+
+.style-search-container .search-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* Richardson-specific table styles */
+.richardson-table thead {
+    background: var(--primary-green);
+    color: white;
+}
+
+.richardson-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.richardson-table tbody tr:hover {
+    background-color: rgba(76, 179, 84, 0.05);
+}
+
+/* Print section for Richardson */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    #printContent {
+        display: block !important;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid var(--primary-green);
+        padding-bottom: 20px;
+    }
+    
+    .print-logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+}
