@@ -1,53 +1,23 @@
 /**
  * Customer Screen Print Quote Service
  * Handles saving Customer Supplied Screen Print quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class CustomerScreenPrintQuoteService {
+class CustomerScreenPrintQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    }
-
-    /**
-     * Generate unique quote ID for Customer Screen Print quotes
-     */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `customer_screenprint_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        // Use SPC prefix for customer screen print quotes
-        return `SPC${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up sequence numbers from previous days
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('customer_screenprint_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
+        super({
+            prefix: 'SPC',
+            storagePrefix: 'customer_screenprint',
+            sessionPrefix: 'spc_sess'
         });
     }
 
     /**
-     * Generate session ID
+     * Get embellishment type for screen print
      */
-    generateSessionID() {
-        return `spc_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'screenprint';
     }
 
     /**

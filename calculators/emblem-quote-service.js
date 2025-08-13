@@ -1,53 +1,23 @@
 /**
  * Emblem Quote Service
  * Handles saving embroidered emblem quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class EmblemQuoteService {
+class EmblemQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    }
-
-    /**
-     * Generate unique quote ID for emblem quotes
-     */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `emblem_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        // Use PATCH prefix for emblem quotes
-        return `PATCH${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up sequence numbers from previous days
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('emblem_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
+        super({
+            prefix: 'PATCH',
+            storagePrefix: 'emblem',
+            sessionPrefix: 'emblem_sess'
         });
     }
 
     /**
-     * Generate session ID
+     * Get embellishment type for emblems
      */
-    generateSessionID() {
-        return `emblem_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'emblem';
     }
 
     /**

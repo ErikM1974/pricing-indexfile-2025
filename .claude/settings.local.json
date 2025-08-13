@@ -67,7 +67,8 @@
       "Bash(fi)",
       "Bash(done)",
       "Bash(for:*)",
-      "Bash(then echo \"$file\")"
+      "Bash(then echo \"$file\")",
+      "Bash(do if ! grep -q \"extends BaseQuoteService\" \"$file\")"
     ],
     "deny": []
   }
