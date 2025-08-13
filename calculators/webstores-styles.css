@@ -1,0 +1,223 @@
+/* ============================================ */
+/* WEBSTORES CALCULATOR SPECIFIC STYLES        */
+/* ============================================ */
+
+/* Store Type Selection */
+.store-type-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.store-type-card {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.store-type-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.store-type-card.selected {
+    border-color: var(--primary-color);
+    background: var(--success-bg);
+}
+
+.store-type-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.store-type-card p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.store-type-card .surcharge {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Information Accordion */
+.info-section {
+    margin-top: 3rem;
+}
+
+.accordion {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.accordion-item {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.accordion-item:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--card-bg);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.accordion-header:hover {
+    background: var(--hover-bg);
+}
+
+.accordion-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+}
+
+.accordion-icon {
+    color: var(--text-secondary);
+    transition: transform 0.3s;
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 1000px;
+}
+
+.accordion-body {
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Info Cards */
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-card {
+    background: var(--bg-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.info-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.info-card h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.info-card p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Sample Store Image */
+.sample-store {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.sample-store img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.sample-store img:hover {
+    transform: scale(1.02);
+}
+
+/* Price Breakdown - Webstore specific */
+.price-breakdown {
+    margin-bottom: 1.5rem;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.price-item:last-child {
+    border-bottom: none;
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--primary-color);
+    padding-top: 1rem;
+}
+
+/* Price Display Override */
+.price-display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.price-display.prompt {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Webstore-specific responsive */
+@media (max-width: 768px) {
+    .store-type-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .accordion-body {
+        padding: 0 1rem 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .info-section,
+    .accordion {
+        display: none !important;
+    }
+    
+    .store-type-card {
+        break-inside: avoid;
+    }
+}
