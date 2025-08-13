@@ -2,14 +2,14 @@
  * Shared CSS for NWCA Manual and Contract Calculators
  * Provides consistent styling across all pricing calculators
  * 
- * Color Theme: NWCA Green (#3a7c52)
+ * Color Theme: NWCA Green (#4cb354)
  * Font: Inter
  * Layout: Clean, functional, card-based design
  */
 
 /* Root variables - Consistent Green Theme */
 :root {
-    --primary-color: #3a7c52;
+    --primary-color: #4cb354;
     --primary-dark: #2d5f3f;
     --primary-light: #4cb861;
     --primary-lighter: #e8f5e9;
@@ -25,7 +25,7 @@
     --warning-text: #92400e;
     --error-bg: #fee;
     --error-text: #c53030;
-    --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+    --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
 }
 
 /* Reset and Base Styles */
