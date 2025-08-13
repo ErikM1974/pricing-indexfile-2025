@@ -1,0 +1,221 @@
+/* ============================================ */
+/* DTG CONTRACT CALCULATOR SPECIFIC STYLES     */
+/* ============================================ */
+
+/* Tier Progress Bar (DTG-specific quantity indicator) */
+.tier-progress {
+    margin-top: 0.5rem;
+    background: var(--hover-bg);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.tier-bar {
+    height: 100%;
+    background: var(--primary-green);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.tier-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Print Locations Grid (DTG-specific location selector) */
+.locations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.location-card {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.location-card:hover {
+    border-color: var(--primary-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
+}
+
+.location-card.selected {
+    border-color: var(--primary-green);
+    background-color: #f0fdf4;
+}
+
+.location-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.location-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.location-size {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.location-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.location-toggle {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.location-toggle::before {
+    content: '';
+    width: 12px;
+    height: 8px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg) scale(0);
+    transition: transform 0.2s;
+}
+
+.location-checkbox:checked ~ .location-header .location-toggle {
+    background: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.location-checkbox:checked ~ .location-header .location-toggle::before {
+    transform: rotate(-45deg) scale(1);
+}
+
+/* DTG-Specific Contact Card Styles */
+.contact-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-top: 2rem;
+    border: 2px solid var(--primary-green);
+}
+
+.contact-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.contact-header i {
+    font-size: 2rem;
+    color: var(--primary-green);
+}
+
+/* Quote Requirements Box (DTG-specific) */
+.quote-requirements {
+    background: #f0fdf4;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.quote-requirements h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.requirements-list {
+    list-style: none;
+    padding: 0;
+}
+
+.requirements-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text-secondary);
+}
+
+.requirements-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--primary-green);
+    font-weight: bold;
+}
+
+/* Order Summary (DTG-specific green styling) */
+.order-summary {
+    background: #f0fdf4;
+    border: 2px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.order-total-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.order-total-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+/* Important Note Box */
+.important-note {
+    background: var(--warning-bg);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.important-note i {
+    color: #f59e0b;
+    margin-top: 0.125rem;
+}
+
+.important-note p {
+    margin: 0;
+    color: var(--warning-text);
+    font-size: 0.875rem;
+}
+
+/* Mobile Responsive Overrides for DTG */
+@media (max-width: 768px) {
+    .locations-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}

@@ -71,7 +71,8 @@
       "Bash(do if ! grep -q \"extends BaseQuoteService\" \"$file\")",
       "Bash(do if grep -q \"<style>\" \"$file\")",
       "Bash(cd:*)",
-      "Bash(if [ -f \"$file\" ])"
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(do wc:*)"
     ],
     "deny": []
   }
