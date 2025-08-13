@@ -1,53 +1,40 @@
 /**
  * Customer Embroidery Quote Service
  * Handles saving Customer Supplied Embroidery quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class CustomerEmbroideryQuoteService {
+class CustomerEmbroideryQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        super({
+            prefix: 'EMBC',
+            storagePrefix: 'customer_embroidery',
+            sessionPrefix: 'embc_sess'
+        });
     }
 
     /**
      * Generate unique quote ID for Customer Embroidery quotes
+     * Override to handle add-on and program account prefixes
      */
     generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
+        // Get base quote ID from parent
+        const baseQuoteId = super.generateQuoteID();
         
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `customer_embroidery_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        // Use EMBC prefix for customer embroidery quotes
-        // Add suffixes based on order type
-        let prefix = 'EMBC';
+        // Modify prefix based on order type
         if (this.isProgramAccount) {
-            prefix = 'EMBC-PA';
+            return baseQuoteId.replace('EMBC', 'EMBC-PA');
         } else if (this.isAddonOrder) {
-            prefix = 'EMBC-AO';
+            return baseQuoteId.replace('EMBC', 'EMBC-AO');
         }
-        return `${prefix}${dateKey}-${sequence}`;
+        return baseQuoteId;
     }
     
     /**
-     * Clean up sequence numbers from previous days
+     * Get embellishment type for customer embroidery
      */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('customer_embroidery_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
-        });
+    getEmbellishmentType() {
+        return 'embroidery';
     }
 
     /**

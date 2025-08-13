@@ -61,7 +61,13 @@
       "Bash(if grep -q \"certFinalScore\\|certResultSubtitle\\|certCorrectCount\" \"$file\")",
       "Bash(then)",
       "Bash(__NEW_LINE__ fi)",
-      "Bash(__NEW_LINE__ done)"
+      "Bash(__NEW_LINE__ done)",
+      "Bash(do if [ -f \"$file\" ])",
+      "Bash(then grep -q \"<style>\" \"$file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(for:*)",
+      "Bash(then echo \"$file\")"
     ],
     "deny": []
   }
