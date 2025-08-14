@@ -507,75 +507,262 @@ class LaserTumblerCalculator {
     }
 }
 
-// Print functionality event listeners
-window.addEventListener('beforeprint', () => {
+// Print Quote function - clean invoice style
+function printQuote() {
     const calc = window.laserTumblerCalculator;
-    if (!calc?.currentQuote) return;
+    if (!calc?.currentQuote) {
+        alert('Please calculate a quote first');
+        return;
+    }
     
     const quote = calc.currentQuote;
-    const printContent = document.getElementById('printContent');
+    const printWindow = window.open('', '_blank');
     
-    printContent.innerHTML = `
-        <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="margin: 0;">Northwest Custom Apparel</h1>
-                <p style="margin: 5px 0;">Laser Engraved Tumbler Quote</p>
-                <p style="margin: 5px 0;">Date: ${new Date().toLocaleDateString()}</p>
+    const printHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Quote - Northwest Custom Apparel</title>
+            <style>
+                @page { margin: 0.5in; }
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.4;
+                    color: #333;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .invoice-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: start;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #333;
+                }
+                .logo-section h1 {
+                    margin: 0;
+                    font-size: 24px;
+                    color: #333;
+                }
+                .logo-section p {
+                    margin: 2px 0;
+                    color: #666;
+                    font-size: 12px;
+                }
+                .invoice-info {
+                    text-align: right;
+                }
+                .invoice-info h2 {
+                    margin: 0 0 10px 0;
+                    font-size: 28px;
+                    color: #333;
+                }
+                .invoice-info p {
+                    margin: 2px 0;
+                    font-size: 14px;
+                }
+                .bill-to {
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: #f5f5f5;
+                    border-left: 4px solid #4cb354;
+                }
+                .bill-to h3 {
+                    margin: 0 0 10px 0;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    color: #666;
+                }
+                .bill-to p {
+                    margin: 3px 0;
+                    font-size: 14px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                }
+                th {
+                    background: #f5f5f5;
+                    padding: 10px;
+                    text-align: left;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    color: #666;
+                    border-bottom: 2px solid #ddd;
+                }
+                td {
+                    padding: 12px 10px;
+                    border-bottom: 1px solid #eee;
+                    font-size: 14px;
+                }
+                .text-right { text-align: right; }
+                .total-section {
+                    margin-top: 20px;
+                }
+                .total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    font-size: 14px;
+                }
+                .total-row.subtotal {
+                    border-top: 1px solid #ddd;
+                    padding-top: 15px;
+                }
+                .total-row.grand-total {
+                    border-top: 2px solid #333;
+                    padding-top: 10px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #333;
+                }
+                .color-breakdown {
+                    margin: 15px 0;
+                    padding: 10px;
+                    background: #f9f9f9;
+                }
+                .color-item {
+                    margin: 5px 0;
+                    font-size: 13px;
+                }
+                .terms {
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                    font-size: 11px;
+                    color: #666;
+                }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #888;
+                }
+                @media print {
+                    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="invoice-header">
+                <div class="logo-section">
+                    <h1>NORTHWEST CUSTOM APPAREL</h1>
+                    <p>2025 Freeman Road East, Milton, WA 98354</p>
+                    <p>Phone: 253-922-5793 | Fax: 253-922-5735</p>
+                    <p>sales@nwcustomapparel.com</p>
+                </div>
+                <div class="invoice-info">
+                    <h2>QUOTE</h2>
+                    <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Valid For:</strong> 30 Days</p>
+                </div>
             </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3>Quote For:</h3>
+
+            <div class="bill-to">
+                <h3>Quote For</h3>
                 <p><strong>${quote.customerName || 'Customer'}</strong></p>
                 ${quote.projectName ? `<p>Project: ${quote.projectName}</p>` : ''}
             </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3>Product Details:</h3>
-                <p><strong>Polar Camel 16 oz. Pint</strong></p>
-                <p>Premium stainless steel tumbler with laser engraving</p>
-                <p>Quantity: ${quote.quantity} tumblers (${quote.caseCount} ${quote.caseCount === 1 ? 'case' : 'cases'})</p>
-                <p>Price per unit: $${quote.unitPrice.toFixed(2)}</p>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h4>Color Breakdown:</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Description</th>
+                        <th class="text-right">Quantity</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Polar Camel 16 oz. Pint</strong><br>
+                            <span style="font-size: 12px; color: #666;">Laser Engraved - Premium Stainless Steel Tumbler</span>
+                        </td>
+                        <td class="text-right">${quote.quantity}</td>
+                        <td class="text-right">$${quote.unitPrice.toFixed(2)}</td>
+                        <td class="text-right">$${quote.subtotal.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>One-Time Setup Fee</strong><br>
+                            <span style="font-size: 12px; color: #666;">Includes professional mockup for approval</span>
+                        </td>
+                        <td class="text-right">1</td>
+                        <td class="text-right">$${quote.setupFee.toFixed(2)}</td>
+                        <td class="text-right">$${quote.setupFee.toFixed(2)}</td>
+                    </tr>
+                    ${quote.hasSecondLogo ? `
+                    <tr>
+                        <td>
+                            <strong>Second Logo Engraving</strong><br>
+                            <span style="font-size: 12px; color: #666;">Additional engraving location</span>
+                        </td>
+                        <td class="text-right">${quote.quantity}</td>
+                        <td class="text-right">$3.16</td>
+                        <td class="text-right">$${quote.secondLogoTotal.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
+                </tbody>
+            </table>
+
+            <div class="color-breakdown">
+                <strong>Color Selection (${quote.caseCount} ${quote.caseCount === 1 ? 'case' : 'cases'}):</strong>
                 ${quote.colors.map(color => 
-                    `<p style="margin: 5px 0;">• ${color.name} (${color.model}) - ${color.quantity} units</p>`
+                    `<div class="color-item">• ${color.name} (${color.model}) - ${color.quantity} units</div>`
                 ).join('')}
             </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">Subtotal</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.subtotal.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">Setup Fee</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.setupFee.toFixed(2)}</td>
-                </tr>
+
+            <div class="total-section">
+                <div class="total-row subtotal">
+                    <span>Subtotal:</span>
+                    <span>$${quote.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Setup Fee:</span>
+                    <span>$${quote.setupFee.toFixed(2)}</span>
+                </div>
                 ${quote.hasSecondLogo ? `
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">Second Logo</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">$${quote.secondLogoTotal.toFixed(2)}</td>
-                </tr>
+                <div class="total-row">
+                    <span>Second Logo:</span>
+                    <span>$${quote.secondLogoTotal.toFixed(2)}</span>
+                </div>
                 ` : ''}
-                <tr>
-                    <td style="padding: 8px; font-weight: bold; font-size: 1.2em;">Total</td>
-                    <td style="padding: 8px; text-align: right; font-weight: bold; font-size: 1.2em;">$${quote.total.toFixed(2)}</td>
-                </tr>
-            </table>
-            
-            <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #666;">
-                <p>Thank you for your business!</p>
-                <p>Prices valid for 30 days</p>
-                <p>Contact: 253-922-5793 | sales@nwcustomapparel.com</p>
+                <div class="total-row grand-total">
+                    <span>TOTAL:</span>
+                    <span>$${quote.total.toFixed(2)}</span>
+                </div>
             </div>
-        </div>
+
+            <div class="terms">
+                <p><strong>Terms & Conditions:</strong></p>
+                <p>• This quote is valid for 30 days from the date issued.</p>
+                <p>• 50% deposit required to begin production.</p>
+                <p>• Production time is typically 10-14 business days after artwork approval.</p>
+                <p>• Prices subject to change without notice after expiration date.</p>
+                <p>• Minimum order quantity: 24 tumblers (1 case)</p>
+            </div>
+
+            <div class="footer">
+                <p>Thank you for choosing Northwest Custom Apparel!</p>
+                <p>Family Owned & Operated Since 1977</p>
+            </div>
+
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
     `;
     
-    printContent.style.display = 'block';
-});
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+}
 
-window.addEventListener('afterprint', () => {
-    document.getElementById('printContent').style.display = 'none';
-});
+// Make printQuote available globally
+window.printQuote = printQuote;
