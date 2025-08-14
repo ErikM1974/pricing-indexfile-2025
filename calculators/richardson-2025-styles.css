@@ -2,7 +2,168 @@
 /* RICHARDSON 2025 CALCULATOR SPECIFIC STYLES  */
 /* ============================================ */
 
-/* Richardson-specific grand total section */
+/* Enhanced Quote Display Container */
+#resultsDisplay {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Quote Header Section */
+.quote-header {
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+    border: 2px solid var(--primary-green);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.quote-header::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-green), #5bc85f);
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.quote-id-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--success-bg);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.quote-id-label {
+    font-size: 0.875rem;
+    color: var(--success-text);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quote-id-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    font-family: 'Courier New', monospace;
+}
+
+.quote-date {
+    text-align: right;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* Pricing Table Enhancement */
+.pricing-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.pricing-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pricing-table thead {
+    background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
+}
+
+.pricing-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.pricing-table th:last-child {
+    text-align: right;
+}
+
+.pricing-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.pricing-table tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.pricing-table td {
+    padding: 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pricing-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: var(--primary-green);
+}
+
+.pricing-table .item-quantity {
+    display: inline-block;
+    background: var(--bg-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.pricing-table .item-embellishment {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #0369a1;
+}
+
+.pricing-table .item-embellishment i {
+    font-size: 0.75rem;
+}
+
+/* Subtotal Row */
+.subtotal-row {
+    background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+}
+
+.subtotal-row td {
+    padding: 1.25rem 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    border-top: 2px solid var(--border-color);
+}
+
+/* Richardson-specific grand total section - Enhanced */
 .grand-total-section {
     background: linear-gradient(135deg, var(--primary-green) 0%, #359947 100%);
     color: white;
