@@ -435,7 +435,7 @@ class EmblemCalculator {
             // Send email
             const emailResult = await emailjs.send(
                 'service_1c4k67j',
-                'template_94rbfol',  // Correct template ID for embroidered emblems
+                'template_vpou6va',
                 emailData
             );
             
