@@ -572,7 +572,7 @@ Price: $0.75 each</pre>
 
     <!-- Email Quote Modal -->
     <div class="modal-backdrop" id="quoteModal">
-        <div class="modal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Send Quote</h3>
                 <button class="modal-close" onclick="closeModal()">×</button>
@@ -668,6 +668,13 @@ Price: $0.75 each</pre>
             // Initialize FAQ accordion
             initializeFAQ();
         });
+        
+        // Global function for closing modal (used by onclick handlers)
+        function closeModal() {
+            if (window.emblemCalculator) {
+                window.emblemCalculator.closeModal();
+            }
+        }
     </script>
 </body>
 </html>

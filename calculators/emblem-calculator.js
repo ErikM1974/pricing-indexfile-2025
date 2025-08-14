@@ -254,15 +254,15 @@ class EmblemCalculator {
         // Update preview
         this.updateQuotePreview();
         
-        // Show modal
-        this.elements.modal.classList.add('show');
+        // Show modal - use 'active' class to match calculator-base.css
+        this.elements.modal.classList.add('active');
         
         // Focus first input
         document.getElementById('customerName').focus();
     }
     
     closeModal() {
-        this.elements.modal.classList.remove('show');
+        this.elements.modal.classList.remove('active');
         this.elements.quoteForm.reset();
         // Keep Jim as default
         document.getElementById('salesRep').value = 'jim@nwcustomapparel.com';
