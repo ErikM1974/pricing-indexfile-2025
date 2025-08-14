@@ -88,6 +88,17 @@ class EmblemCalculator {
             quoteIdDisplay: document.getElementById('quoteIdDisplay')
         };
         
+        // Debug: Check if critical elements are found
+        console.log('[EmblemCalculator] Initializing elements...');
+        console.log('[EmblemCalculator] Modal element:', this.elements.modal);
+        console.log('[EmblemCalculator] Email button:', this.elements.emailQuoteBtn);
+        console.log('[EmblemCalculator] Quote form:', this.elements.quoteForm);
+        
+        // Warn about missing elements
+        if (!this.elements.modal) console.warn('[EmblemCalculator] Modal element #quoteModal not found!');
+        if (!this.elements.emailQuoteBtn) console.warn('[EmblemCalculator] Email button #emailQuoteBtn not found!');
+        if (!this.elements.quoteForm) console.warn('[EmblemCalculator] Quote form #quoteForm not found!');
+        
         // Get all inputs for event binding
         this.inputs = [
             this.elements.width,
@@ -256,12 +267,25 @@ class EmblemCalculator {
             return;
         }
         
+        // Check if modal element exists
+        if (!this.elements.modal) {
+            console.error('[EmblemCalculator] Modal element not found!');
+            alert('Modal not found - please refresh the page');
+            return;
+        }
+        
+        console.log('[EmblemCalculator] Modal element found:', this.elements.modal);
+        
         // Update preview
         this.updateQuotePreview();
         
         // Show modal - use 'active' class to match calculator-base.css
         this.elements.modal.classList.add('active');
-        console.log('[EmblemCalculator] Modal should now be visible');
+        console.log('[EmblemCalculator] Added active class to modal');
+        console.log('[EmblemCalculator] Modal classes now:', this.elements.modal.classList.toString());
+        console.log('[EmblemCalculator] Modal style display:', getComputedStyle(this.elements.modal).display);
+        console.log('[EmblemCalculator] Modal style visibility:', getComputedStyle(this.elements.modal).visibility);
+        console.log('[EmblemCalculator] Modal style opacity:', getComputedStyle(this.elements.modal).opacity);
         
         // Focus first input
         setTimeout(() => {
