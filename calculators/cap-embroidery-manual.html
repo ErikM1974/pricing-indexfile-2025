@@ -1960,6 +1960,11 @@
             }
 
             calculateTotalPrice() {
+                // Return 0 if no blank cost is entered
+                if (manualBlankCost <= 0) {
+                    return 0;
+                }
+                
                 const tierLabel = this.getQuantityTier(currentQuantity);
                 
                 // Get tier info for margin
@@ -2017,6 +2022,11 @@
             }
 
             showBasicCalculation() {
+                // Return early if no blank cost is entered
+                if (manualBlankCost <= 0) {
+                    return;
+                }
+                
                 // Fallback calculation when API data is not available
                 const fallbackMargin = 0.6;
                 const markedUpBlank = manualBlankCost / fallbackMargin;
