@@ -578,115 +578,380 @@ function printQuote() {
     const calc = calculator.currentCalculation;
     const printWindow = window.open('', '_blank');
     
-    printWindow.document.write(`
+    // Build clean invoice HTML
+    const printHTML = `
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Quote ${data.quoteId}</title>
+            <title>Quote ${data.quoteId} - Northwest Custom Apparel</title>
             <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
+                @page { 
+                    margin: 0.5in;
+                    size: letter;
                 }
-                .header {
-                    text-align: center;
+                
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body { 
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12pt;
+                    line-height: 1.4;
+                    color: #000;
+                    background: white;
+                }
+                
+                /* Header */
+                .invoice-header {
+                    display: table;
+                    width: 100%;
                     margin-bottom: 30px;
                 }
-                .logo {
-                    max-width: 300px;
-                    margin-bottom: 20px;
+                
+                .company-section {
+                    display: table-cell;
+                    vertical-align: top;
+                    width: 60%;
                 }
-                .quote-info {
-                    margin-bottom: 30px;
+                
+                .invoice-section {
+                    display: table-cell;
+                    vertical-align: top;
+                    width: 40%;
+                    text-align: right;
                 }
-                .info-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-                    margin-bottom: 30px;
+                
+                .company-logo {
+                    max-width: 220px;
+                    height: auto;
+                    margin-bottom: 10px;
                 }
-                table {
+                
+                .company-info {
+                    font-size: 10pt;
+                    color: #555;
+                    line-height: 1.3;
+                }
+                
+                .invoice-title {
+                    font-size: 32pt;
+                    font-weight: bold;
+                    color: #4cb354;
+                    margin-bottom: 10px;
+                }
+                
+                .invoice-details {
+                    font-size: 10pt;
+                    line-height: 1.5;
+                }
+                
+                .invoice-details strong {
+                    display: inline-block;
+                    width: 80px;
+                    text-align: right;
+                    margin-right: 10px;
+                }
+                
+                /* Bill To Section */
+                .bill-to-section {
+                    margin: 30px 0;
+                    padding: 15px;
+                    border: 1px solid #ddd;
+                    background: #f9f9f9;
+                }
+                
+                .bill-to-title {
+                    font-size: 11pt;
+                    font-weight: bold;
+                    color: #4cb354;
+                    margin-bottom: 10px;
+                }
+                
+                .bill-to-content {
+                    font-size: 11pt;
+                    line-height: 1.5;
+                }
+                
+                /* Main Table */
+                .invoice-table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 30px;
+                    margin: 30px 0;
+                    font-size: 11pt;
                 }
-                th, td {
+                
+                .invoice-table thead {
+                    background: #4cb354;
+                    color: white;
+                }
+                
+                .invoice-table th {
                     padding: 10px;
                     text-align: left;
-                    border-bottom: 1px solid #ddd;
-                }
-                th {
-                    background-color: #f5f5f5;
                     font-weight: bold;
+                    border: 1px solid #4cb354;
                 }
-                .total {
-                    font-size: 1.2em;
-                    font-weight: bold;
+                
+                .invoice-table th:nth-child(2),
+                .invoice-table th:nth-child(3),
+                .invoice-table th:nth-child(4) {
                     text-align: right;
+                    width: 100px;
+                }
+                
+                .invoice-table tbody td {
+                    padding: 8px 10px;
+                    border: 1px solid #ddd;
+                    vertical-align: top;
+                }
+                
+                .invoice-table tbody td:nth-child(2),
+                .invoice-table tbody td:nth-child(3),
+                .invoice-table tbody td:nth-child(4) {
+                    text-align: right;
+                }
+                
+                .description-detail {
+                    font-size: 9pt;
+                    color: #666;
+                    display: block;
+                    margin-top: 2px;
+                }
+                
+                /* Totals Section */
+                .totals-section {
+                    margin-left: auto;
+                    width: 300px;
                     margin-top: 20px;
                 }
-                .notice {
-                    background: #fffbeb;
-                    border: 1px solid #fde68a;
+                
+                .total-row {
+                    display: table;
+                    width: 100%;
+                    padding: 5px 0;
+                    border-bottom: 1px solid #eee;
+                }
+                
+                .total-label {
+                    display: table-cell;
+                    text-align: right;
+                    padding-right: 20px;
+                    font-size: 11pt;
+                }
+                
+                .total-value {
+                    display: table-cell;
+                    text-align: right;
+                    width: 100px;
+                    font-size: 11pt;
+                }
+                
+                .grand-total {
+                    border-top: 2px solid #4cb354;
+                    border-bottom: 2px solid #4cb354;
+                    padding: 8px 0;
+                    margin-top: 5px;
+                    font-weight: bold;
+                    font-size: 12pt;
+                }
+                
+                .grand-total .total-value {
+                    color: #4cb354;
+                    font-size: 14pt;
+                }
+                
+                /* Notes Section */
+                .notes-section {
+                    margin: 30px 0;
                     padding: 15px;
-                    margin-top: 30px;
+                    background: #fff7ed;
+                    border: 1px solid #fbbf24;
+                }
+                
+                .notes-title {
+                    font-weight: bold;
+                    margin-bottom: 5px;
                     color: #92400e;
                 }
+                
+                .notes-content {
+                    color: #78350f;
+                    font-size: 10pt;
+                }
+                
+                /* Terms Section */
+                .terms-section {
+                    margin-top: 40px;
+                    padding: 15px;
+                    background: #fee2e2;
+                    border: 1px solid #f87171;
+                }
+                
+                .terms-title {
+                    font-weight: bold;
+                    color: #991b1b;
+                    margin-bottom: 8px;
+                    font-size: 11pt;
+                }
+                
+                .terms-content {
+                    font-size: 10pt;
+                    line-height: 1.4;
+                    color: #7f1d1d;
+                }
+                
+                /* Footer */
+                .invoice-footer {
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 2px solid #e5e7eb;
+                    text-align: center;
+                    font-size: 9pt;
+                    color: #666;
+                }
+                
                 @media print {
-                    body { margin: 0; }
+                    body { 
+                        print-color-adjust: exact;
+                        -webkit-print-color-adjust: exact;
+                    }
                 }
             </style>
         </head>
         <body>
-            <div class="header">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel" class="logo">
-                <h2>Customer Supplied Screen Print Quote</h2>
-            </div>
-            
-            <div class="quote-info">
-                <p><strong>Quote ID:</strong> ${data.quoteId}</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            </div>
-            
-            <div class="info-grid">
-                <div>
-                    <h3>Customer Information</h3>
-                    <p><strong>Name:</strong> ${data.customerName}</p>
-                    <p><strong>Email:</strong> ${data.customerEmail}</p>
-                    ${data.customerPhone ? `<p><strong>Phone:</strong> ${data.customerPhone}</p>` : ''}
-                    ${data.companyName ? `<p><strong>Company:</strong> ${data.companyName}</p>` : ''}
+            <!-- Invoice Header -->
+            <div class="invoice-header">
+                <div class="company-section">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel" class="company-logo">
+                    <div class="company-info">
+                        2025 Freeman Road East<br>
+                        Milton, WA 98354<br>
+                        Phone: (253) 922-5793<br>
+                        Email: sales@nwcustomapparel.com<br>
+                        Web: www.nwcustomapparel.com
+                    </div>
                 </div>
-                <div>
-                    <h3>Order Details</h3>
-                    <p><strong>Quantity:</strong> ${data.quantity}</p>
-                    <p><strong>Front Colors:</strong> ${data.frontColors}</p>
-                    <p><strong>Back Colors:</strong> ${data.backColors}</p>
-                    ${data.isDarkGarment ? '<p><strong>Dark Garment:</strong> Yes (white base added)</p>' : ''}
-                    ${data.safetyStripes ? '<p><strong>Safety Stripes:</strong> Yes</p>' : ''}
-                    ${data.projectName ? `<p><strong>Project:</strong> ${data.projectName}</p>` : ''}
+                <div class="invoice-section">
+                    <div class="invoice-title">QUOTE</div>
+                    <div class="invoice-details">
+                        <div><strong>Quote #:</strong> ${data.quoteId}</div>
+                        <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+                        <div><strong>Valid Until:</strong> ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}</div>
+                    </div>
                 </div>
             </div>
             
-            ${calculator.generateQuoteHTML(data)}
+            <!-- Bill To Section -->
+            <div class="bill-to-section">
+                <div class="bill-to-title">BILL TO:</div>
+                <div class="bill-to-content">
+                    <strong>${data.customerName}</strong><br>
+                    ${data.companyName ? data.companyName + '<br>' : ''}
+                    ${data.customerEmail}<br>
+                    ${data.customerPhone ? 'Phone: ' + data.customerPhone + '<br>' : ''}
+                    ${data.projectName ? 'Project: ' + data.projectName : ''}
+                </div>
+            </div>
+            
+            <!-- Main Invoice Table -->
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${calc.frontColors > 0 ? `
+                    <tr>
+                        <td>
+                            Screen Print - Front
+                            <span class="description-detail">
+                                ${calc.effectiveFrontColors} color${calc.effectiveFrontColors > 1 ? 's' : ''}
+                                ${calc.isDarkShirt && calc.frontColors > 0 ? ' (includes white base)' : ''}
+                            </span>
+                        </td>
+                        <td>${calc.quantity}</td>
+                        <td>$${(this.RETAIL_PRINT_PRICING[calc.priceTier][calc.effectiveFrontColors] || 0).toFixed(2)}</td>
+                        <td>$${((this.RETAIL_PRINT_PRICING[calc.priceTier][calc.effectiveFrontColors] || 0) * calc.quantity).toFixed(2)}</td>
+                    </tr>` : ''}
+                    
+                    ${calc.backColors > 0 ? `
+                    <tr>
+                        <td>
+                            Screen Print - Back
+                            <span class="description-detail">${calc.backColors} color${calc.backColors > 1 ? 's' : ''}</span>
+                        </td>
+                        <td>${calc.quantity}</td>
+                        <td>$${(this.RETAIL_PRINT_PRICING[calc.priceTier][calc.backColors] || 0).toFixed(2)}</td>
+                        <td>$${((this.RETAIL_PRINT_PRICING[calc.priceTier][calc.backColors] || 0) * calc.quantity).toFixed(2)}</td>
+                    </tr>` : ''}
+                    
+                    ${calc.hasSafetyStripes ? `
+                    <tr>
+                        <td>
+                            Safety Stripes
+                            <span class="description-detail">Pocket/Shoulder placement</span>
+                        </td>
+                        <td>${calc.quantity}</td>
+                        <td>$2.00</td>
+                        <td>$${(2.00 * calc.quantity).toFixed(2)}</td>
+                    </tr>` : ''}
+                </tbody>
+            </table>
+            
+            <!-- Totals Section -->
+            <div class="totals-section">
+                <div class="total-row">
+                    <div class="total-label">Subtotal:</div>
+                    <div class="total-value">$${calc.orderSubtotal.toFixed(2)}</div>
+                </div>
+                
+                ${calc.ltmFeeTotal > 0 ? `
+                <div class="total-row">
+                    <div class="total-label">Less Than Minimum Fee:</div>
+                    <div class="total-value">$${calc.ltmFeeTotal.toFixed(2)}</div>
+                </div>` : ''}
+                
+                <div class="total-row">
+                    <div class="total-label">Setup Fee (${calc.totalScreenColors} screens):</div>
+                    <div class="total-value">$${calc.totalSetupFee.toFixed(2)}</div>
+                </div>
+                
+                <div class="total-row grand-total">
+                    <div class="total-label">TOTAL:</div>
+                    <div class="total-value">$${calc.finalTotal.toFixed(2)}</div>
+                </div>
+            </div>
             
             ${data.notes ? `
-                <div style="background: #f5f5f5; padding: 15px; margin-top: 30px;">
-                    <h3>Notes</h3>
-                    <p>${data.notes}</p>
-                </div>
-            ` : ''}
+            <div class="notes-section">
+                <div class="notes-title">Notes:</div>
+                <div class="notes-content">${data.notes}</div>
+            </div>` : ''}
             
-            <div class="notice">
-                <h3>Important Notice: Customer Supplied Garments</h3>
-                <p>Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments. Should items be damaged while in our facility, we will NOT reimburse you for their value or replace them.</p>
+            <!-- Terms & Conditions -->
+            <div class="terms-section">
+                <div class="terms-title">IMPORTANT NOTICE - Customer Supplied Garments</div>
+                <div class="terms-content">
+                    Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments. 
+                    Should items be damaged while in our facility, we will NOT reimburse you for their value or replace them. 
+                    A signed garment waiver form is required upon drop-off. This quote is valid for 30 days from the date above. 
+                    Pricing is subject to change after expiration.
+                </div>
             </div>
             
-            <div style="margin-top: 50px; text-align: center; color: #666;">
-                <p>Family Owned & Operated Since 1977</p>
-                <p>253-922-5793 | sales@nwcustomapparel.com</p>
+            <!-- Footer -->
+            <div class="invoice-footer">
+                <strong>Northwest Custom Apparel</strong><br>
+                Family Owned & Operated Since 1977<br>
+                Thank you for your business!
             </div>
             
             <script>
@@ -697,5 +962,8 @@ function printQuote() {
             <\/script>
         </body>
         </html>
-    `);
+    `;
+    
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
 }
