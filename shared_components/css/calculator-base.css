@@ -22,6 +22,11 @@
     --warning-bg: #fef3c7;
     --warning-text: #92400e;
     --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+    
+    /* Compatibility variables for emblem calculator */
+    --surface-color: var(--card-bg);
+    --text-color: var(--text-primary);
+    --muted-text-color: var(--text-secondary);
 }
 
 /* ============================================

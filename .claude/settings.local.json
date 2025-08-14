@@ -72,8 +72,10 @@
       "Bash(do if grep -q \"<style>\" \"$file\")",
       "Bash(cd:*)",
       "Bash(if [ -f \"$file\" ])",
-      "Bash(do wc:*)"
+      "Bash(do wc:*)",
+      "Bash(cd:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }
