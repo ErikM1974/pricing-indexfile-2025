@@ -13,6 +13,12 @@
     box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);
     position: relative;
     overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grand-total-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.3);
 }
 
 .grand-total-section::before {
@@ -29,6 +35,11 @@
 @keyframes pulse {
     0%, 100% { transform: scale(1); opacity: 0.5; }
     50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
 }
 
 .grand-total-label {
@@ -125,6 +136,8 @@
 .setup-fee-item:hover {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    background: rgba(76, 179, 84, 0.05);
+    border-radius: 4px;
 }
 
 /* Add cap button */
@@ -153,6 +166,33 @@
 
 .add-cap-button i {
     font-size: 1.2rem;
+}
+
+/* Line items section improvements */
+.line-items-container {
+    background: #fafbfc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.line-item {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.line-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-color: var(--primary-green);
+}
+
+.line-item:last-child {
+    margin-bottom: 0;
 }
 
 /* Style search container */
@@ -187,6 +227,666 @@
     background-color: rgba(76, 179, 84, 0.05);
 }
 
+/* ============================================ */
+/* PRICING REFERENCE SECTION IMPROVEMENTS      */
+/* ============================================ */
+
+/* Fix the cramped pricing reference section */
+.pricing-reference {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(to bottom, #ffffff, #fafbfc);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.reference-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--primary-green);
+}
+
+.reference-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.reference-note {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.reference-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.reference-table {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.reference-table h4 {
+    color: var(--primary-green);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reference-table h4 i {
+    font-size: 1rem;
+}
+
+.reference-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reference-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.reference-table tbody tr:nth-child(even) {
+    background: rgba(76, 179, 84, 0.03);
+}
+
+.reference-table tbody tr:hover {
+    background: rgba(76, 179, 84, 0.08);
+}
+
+.reference-table td,
+.reference-table th {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.reference-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.reference-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(76, 179, 84, 0.05);
+}
+
+.reference-table .text-right {
+    text-align: right;
+}
+
+/* Fix the formula display */
+.reference-footer {
+    background: #f0f7f1;
+    border: 1px solid rgba(76, 179, 84, 0.3);
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.reference-footer p {
+    margin: 0.5rem 0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.reference-footer p i {
+    color: var(--primary-green);
+    font-size: 1rem;
+}
+
+.reference-footer p:last-child {
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-top: 0.75rem;
+    border: 1px solid rgba(76, 179, 84, 0.2);
+    font-size: 0.875rem;
+}
+
+/* Mobile responsiveness for pricing reference */
+@media (max-width: 768px) {
+    .reference-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-reference {
+        padding: 1.5rem 1rem;
+        margin-top: 2rem;
+    }
+    
+    .reference-table {
+        padding: 1rem;
+    }
+    
+    .reference-table td,
+    .reference-table th {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Quote summary improvements */
+.quote-summary {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    border-left: 4px solid var(--primary-green);
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1.5rem 0;
+}
+
+.quote-summary h4 {
+    color: var(--primary-green);
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+}
+
+.quote-summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.quote-summary-item:last-child {
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--primary-green);
+    font-size: 1.125rem;
+    padding-top: 1rem;
+}
+
+/* Enhanced button states */
+.btn-primary {
+    background: var(--primary-green);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn-primary:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Success message animation */
+.success-message {
+    animation: slideInDown 0.4s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Error message animation */
+.error-message {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* ============================================ */
+/* QUOTE DISPLAY SECTION STYLES                */
+/* ============================================ */
+
+/* Quote ID Banner */
+.quote-id-banner {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid var(--primary-green);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
+}
+
+.quote-id-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.quote-id-content > i {
+    font-size: 2.5rem;
+    color: var(--primary-green);
+    opacity: 0.8;
+}
+
+.quote-id-text {
+    flex: 1;
+}
+
+.quote-id-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.quote-id-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    letter-spacing: 1px;
+}
+
+.quote-id-banner .btn-secondary {
+    background: white;
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.quote-id-banner .btn-secondary:hover {
+    background: var(--primary-green);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+}
+
+/* Quote Status Section */
+.quote-status {
+    background: #f0f7f1;
+    border: 1px solid rgba(76, 179, 84, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.quote-status i {
+    color: var(--primary-green);
+    font-size: 1.25rem;
+}
+
+.status-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.status-value {
+    font-size: 1rem;
+    color: var(--success-text);
+    font-weight: 600;
+}
+
+/* Quote Section Cards */
+.quote-section {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.quote-section:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: rgba(76, 179, 84, 0.3);
+}
+
+.quote-section h3,
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-green);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quote-section h3 i,
+.section-title i {
+    color: var(--primary-green);
+    font-size: 1rem;
+}
+
+/* Quote Overview Section */
+.quote-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.overview-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.overview-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.overview-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Enhanced LTM Warning */
+.quote-section .ltm-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
+}
+
+.quote-section .ltm-warning i {
+    color: #f59e0b;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.quote-section .ltm-warning span {
+    color: var(--warning-text);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* Pricing Table Styles */
+.pricing-table {
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 1rem;
+}
+
+.pricing-table table,
+.quote-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.pricing-table thead,
+.quote-table thead {
+    background: linear-gradient(135deg, var(--primary-green) 0%, #409a47 100%);
+    color: white;
+}
+
+.pricing-table th,
+.quote-table th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pricing-table th.text-center,
+.quote-table th.text-center {
+    text-align: center;
+}
+
+.pricing-table th.text-right,
+.quote-table th.text-right {
+    text-align: right;
+}
+
+.pricing-table tbody tr,
+.quote-table tbody tr {
+    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    transition: background 0.2s ease;
+}
+
+.pricing-table tbody tr:nth-child(even),
+.quote-table tbody tr:nth-child(even) {
+    background: rgba(76, 179, 84, 0.03);
+}
+
+.pricing-table tbody tr:hover,
+.quote-table tbody tr:hover {
+    background: rgba(76, 179, 84, 0.08);
+}
+
+.pricing-table td,
+.quote-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.pricing-table td.text-center,
+.quote-table td.text-center {
+    text-align: center;
+}
+
+.pricing-table td.text-right,
+.quote-table td.text-right {
+    text-align: right;
+    font-weight: 500;
+}
+
+/* Products Subtotal Row */
+.subtotal-row {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.subtotal-row td {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+}
+
+/* Setup Fees Section */
+.setup-fees-section h3 {
+    border-bottom-color: #fbbf24;
+}
+
+/* Notes Section Styling */
+.notes-content {
+    background: #f8f9fa;
+    border-left: 3px solid var(--primary-green);
+    padding: 1rem;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Enhanced Grand Total Section */
+.quote-section .grand-total-section {
+    background: linear-gradient(135deg, var(--primary-green) 0%, #359947 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.25);
+    position: relative;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.quote-section .grand-total-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-bottom: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.quote-section .grand-total-amount {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    animation: fadeInScale 0.5s ease;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Button Container Improvements */
+.quote-section .button-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #fafbfc;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.quote-section .button-container .btn {
+    min-width: 140px;
+    padding: 0.875rem 1.5rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.quote-section .btn-success {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+}
+
+.quote-section .btn-success:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 179, 84, 0.3);
+}
+
+.quote-section .btn-warning {
+    background: #fbbf24;
+    color: #78350f;
+    border: none;
+}
+
+.quote-section .btn-warning:hover {
+    background: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(251, 191, 36, 0.3);
+}
+
+/* Small button variant */
+.btn-sm {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+}
+
+/* Loading/Disabled State */
+.quote-section .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive Design for Quote Display */
+@media (max-width: 768px) {
+    .quote-id-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .quote-id-content > i {
+        font-size: 2rem;
+    }
+    
+    .quote-id-value {
+        font-size: 1.5rem;
+    }
+    
+    .quote-section .grand-total-amount {
+        font-size: 2.5rem;
+    }
+    
+    .pricing-table {
+        overflow-x: auto;
+    }
+    
+    .pricing-table table {
+        min-width: 500px;
+    }
+    
+    .quote-section .button-container {
+        flex-direction: column;
+    }
+    
+    .quote-section .button-container .btn {
+        width: 100%;
+    }
+}
+
 /* Print section for Richardson */
 @media print {
     .no-print {
@@ -208,5 +908,22 @@
         max-width: 200px;
         height: auto;
         margin-bottom: 10px;
+    }
+    
+    .pricing-reference {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .quote-section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .quote-id-banner,
+    .button-container {
+        display: none !important;
     }
 }
