@@ -697,6 +697,10 @@ input[type="number"]::-webkit-outer-spin-button {
     display: block;
 }
 
+#quoteModal.active {
+    display: block;
+}
+
 #quotePreview {
     background: #f9fafb;
     border-radius: 8px;
