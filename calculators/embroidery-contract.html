@@ -15,6 +15,9 @@
     <!-- Embroidery-Specific Styles -->
     <link href="embroidery-contract-styles.css" rel="stylesheet">
     
+    <!-- Embroidery Contract Fix CSS - Enhances NWCA green theme and improves visual design -->
+    <link href="embroidery-contract-fix.css" rel="stylesheet">
+    
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
@@ -583,10 +586,12 @@
     </div>
 
     <script>
-        // Initialize calculator when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            window.embroideryCalculator = new EmbroideryCalculator();
-        });
+        // The EmbroideryCalculator class and all functions are loaded from embroidery-contract-calculator.js
+        // This script just ensures everything is properly initialized
+        
+        console.log('Contract Embroidery Calculator HTML loaded');
+        console.log('EmailJS available:', typeof emailjs !== 'undefined');
+        console.log('EmbroideryCalculator class available:', typeof EmbroideryCalculator !== 'undefined');
     </script>
 </body>
 </html>
