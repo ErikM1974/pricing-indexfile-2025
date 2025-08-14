@@ -1,0 +1,840 @@
+/**
+ * Contract DTG Pricing Calculator - CSS Fixes & Enhancements
+ * Purpose: Strengthen NWCA green theme and improve visual design
+ * Created: 2025
+ */
+
+/* ========================================
+   Enhanced NWCA Green Theme Variables
+   ======================================== */
+
+:root {
+    --primary-green: #4cb354 !important;
+    --primary-dark: #409a47 !important;
+    --primary-light: #5bc85f !important;
+    --primary-lighter: #e8f5e9 !important;
+    --success-bg: #d1fae5 !important;
+    --success-text: #065f46 !important;
+    --green-gradient: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    --light-gradient: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    --card-hover-shadow: 0 4px 12px rgba(76, 179, 84, 0.15) !important;
+    --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25) !important;
+}
+
+/* ========================================
+   Page Background & Container
+   ======================================== */
+
+body {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f7f5 100%) !important;
+}
+
+.main-container {
+    background: transparent !important;
+}
+
+/* ========================================
+   Header Improvements
+   ======================================== */
+
+.header {
+    background: white !important;
+    border-bottom: 2px solid #4cb354 !important;
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1) !important;
+}
+
+.breadcrumb a {
+    color: #4cb354 !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.breadcrumb a:hover {
+    color: #409a47 !important;
+    text-decoration: none !important;
+}
+
+.breadcrumb span {
+    color: #6b7280 !important;
+}
+
+/* ========================================
+   Page Title & Subtitle
+   ======================================== */
+
+.page-title {
+    color: #2d5f3f !important;
+    font-weight: 800 !important;
+    font-size: 2.5rem !important;
+    text-shadow: 0 2px 4px rgba(76, 179, 84, 0.1) !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.page-subtitle {
+    color: #6b7280 !important;
+    font-size: 1.125rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* ========================================
+   Card Enhancements
+   ======================================== */
+
+.input-section,
+.results-card {
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(76, 179, 84, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.input-section:hover,
+.results-card:hover {
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ========================================
+   Section Titles with Green Accent
+   ======================================== */
+
+.section-title {
+    color: #2d5f3f !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding-bottom: 1rem !important;
+    border-bottom: 2px solid #4cb354 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.section-title i {
+    color: #4cb354 !important;
+    font-size: 1.125rem !important;
+}
+
+/* ========================================
+   Form Input Improvements
+   ======================================== */
+
+.form-input,
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+    background: white !important;
+}
+
+.form-input:hover,
+.form-control:hover,
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: #4cb354 !important;
+    box-shadow: 0 1px 3px rgba(76, 179, 84, 0.1) !important;
+}
+
+.form-input:focus,
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25) !important;
+}
+
+/* Number input specific */
+input[type="number"] {
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    font-size: 1.125rem !important;
+}
+
+/* ========================================
+   Tier Progress Bar Enhancement
+   ======================================== */
+
+.tier-progress {
+    background: #e5e7eb !important;
+    border-radius: 8px !important;
+    height: 10px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    margin-top: 1rem !important;
+}
+
+.tier-bar {
+    height: 100% !important;
+    background: linear-gradient(90deg, #4cb354 0%, #5bc85f 100%) !important;
+    width: 0% !important;
+    transition: width 0.5s ease !important;
+    box-shadow: 0 0 10px rgba(76, 179, 84, 0.5) !important;
+    position: relative !important;
+}
+
+.tier-bar::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+    animation: shimmer 2s infinite !important;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.tier-labels {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: 0.5rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
+}
+
+.tier-labels span {
+    padding: 0.25rem 0.5rem !important;
+    background: #e8f5e9 !important;
+    border-radius: 4px !important;
+    color: #409a47 !important;
+}
+
+/* ========================================
+   Location Cards Enhancement
+   ======================================== */
+
+.locations-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+.location-card {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    padding: 1rem !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+    background: white !important;
+}
+
+.location-card:hover {
+    border-color: #4cb354 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 16px rgba(76, 179, 84, 0.15) !important;
+    background: #f8fffe !important;
+}
+
+.location-checkbox:checked ~ .location-header {
+    color: #409a47 !important;
+}
+
+.location-checkbox:checked ~ .location-header .location-name {
+    color: #409a47 !important;
+    font-weight: 700 !important;
+}
+
+.location-card.selected,
+.location-checkbox:checked + .location-header,
+.location-card:has(.location-checkbox:checked) {
+    border-color: #4cb354 !important;
+    background: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2) !important;
+}
+
+.location-name {
+    font-weight: 600 !important;
+    color: #374151 !important;
+    font-size: 1rem !important;
+}
+
+.location-size {
+    font-size: 0.875rem !important;
+    color: #9ca3af !important;
+    margin-top: 0.25rem !important;
+}
+
+.location-toggle {
+    width: 24px !important;
+    height: 24px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    background: white !important;
+}
+
+.location-checkbox:checked ~ .location-header .location-toggle,
+.location-checkbox:checked ~ .location-toggle {
+    background: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%) !important;
+    border-color: #4cb354 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.3) !important;
+}
+
+.location-toggle::before {
+    content: '' !important;
+    width: 14px !important;
+    height: 10px !important;
+    border-left: 3px solid white !important;
+    border-bottom: 3px solid white !important;
+    transform: rotate(-45deg) scale(0) !important;
+    transition: transform 0.3s ease !important;
+}
+
+.location-checkbox:checked ~ .location-header .location-toggle::before,
+.location-checkbox:checked ~ .location-toggle::before {
+    transform: rotate(-45deg) scale(1) !important;
+}
+
+/* ========================================
+   Additional Options Enhancement
+   ======================================== */
+
+.option-card {
+    background: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 10px !important;
+    padding: 1.25rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.option-card:hover {
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+.option-label {
+    font-weight: 600 !important;
+    color: #2d5f3f !important;
+    font-size: 1rem !important;
+}
+
+/* ========================================
+   Results Section Enhancement
+   ======================================== */
+
+.results-card {
+    background: linear-gradient(135deg, white 0%, #f8fffe 100%) !important;
+    border: 2px solid #4cb354 !important;
+    position: sticky !important;
+    top: 20px !important;
+}
+
+.results-header {
+    padding: 1.5rem !important;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    border-radius: 10px 10px 0 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.results-title {
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+    margin: 0 !important;
+}
+
+#tierBadge {
+    background: white !important;
+    color: #409a47 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+#resultsContent {
+    padding: 1.5rem !important;
+}
+
+/* Price Display Enhancement */
+.price-display {
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    color: #4cb354 !important;
+    text-shadow: 0 2px 4px rgba(76, 179, 84, 0.1) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+    margin: 1rem 0 !important;
+}
+
+.price-per-shirt {
+    font-size: 1.125rem !important;
+    color: #6b7280 !important;
+    font-weight: 500 !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Order Summary Box */
+.order-summary {
+    background: linear-gradient(135deg, #e8f5e9 0%, #d1fae5 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    margin-top: 1rem !important;
+}
+
+.summary-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.5rem 0 !important;
+    color: #374151 !important;
+}
+
+.summary-row.total {
+    border-top: 2px solid #4cb354 !important;
+    margin-top: 0.5rem !important;
+    padding-top: 1rem !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    color: #409a47 !important;
+}
+
+/* Email Quote Button */
+.btn-email-quote {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1.125rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2) !important;
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+}
+
+.btn-email-quote:hover {
+    background: linear-gradient(135deg, #409a47 0%, #2d5f3f 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(76, 179, 84, 0.3) !important;
+}
+
+.btn-email-quote i {
+    margin-right: 0.5rem !important;
+}
+
+/* ========================================
+   Contact Section Enhancement
+   ======================================== */
+
+.contact-card {
+    background: linear-gradient(135deg, white 0%, #f8fffe 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 12px !important;
+    padding: 2rem !important;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.1) !important;
+    margin-top: 2rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.contact-card:hover {
+    box-shadow: 0 6px 16px rgba(76, 179, 84, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.contact-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 1rem !important;
+    border-bottom: 2px solid #4cb354 !important;
+}
+
+.contact-header i {
+    font-size: 2.5rem !important;
+    color: #4cb354 !important;
+    animation: pulse 2s infinite !important;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.contact-title {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #2d5f3f !important;
+}
+
+.contact-subtitle {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    margin-top: 0.25rem !important;
+}
+
+.contact-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.contact-info h3 {
+    color: #409a47 !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+}
+
+.contact-detail {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.5rem 0 !important;
+    color: #374151 !important;
+}
+
+.contact-detail i {
+    color: #4cb354 !important;
+    width: 20px !important;
+}
+
+.contact-detail a {
+    color: #4cb354 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.contact-detail a:hover {
+    color: #409a47 !important;
+    text-decoration: underline !important;
+}
+
+/* Quote Requirements Box */
+.quote-requirements {
+    background: linear-gradient(135deg, #e8f5e9 0%, #d1fae5 100%) !important;
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    border: 1px solid #4cb354 !important;
+}
+
+.quote-requirements h4 {
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+    color: #2d5f3f !important;
+}
+
+.requirements-list {
+    list-style: none !important;
+    padding: 0 !important;
+}
+
+.requirements-list li {
+    padding: 0.5rem 0 !important;
+    padding-left: 1.75rem !important;
+    position: relative !important;
+    color: #374151 !important;
+    font-size: 0.9375rem !important;
+}
+
+.requirements-list li::before {
+    content: "✓" !important;
+    position: absolute !important;
+    left: 0 !important;
+    color: #4cb354 !important;
+    font-weight: bold !important;
+    font-size: 1.125rem !important;
+}
+
+/* Important Note Box */
+.important-note {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+    border: 2px solid #f59e0b !important;
+    border-radius: 8px !important;
+    padding: 1rem 1.25rem !important;
+    margin-top: 1.5rem !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+}
+
+.important-note i {
+    color: #f59e0b !important;
+    font-size: 1.25rem !important;
+    margin-top: 0.125rem !important;
+}
+
+.important-note-text {
+    flex: 1 !important;
+}
+
+.important-note-text strong {
+    color: #92400e !important;
+    font-weight: 700 !important;
+}
+
+.important-note-text {
+    color: #78350f !important;
+    font-size: 0.9375rem !important;
+    line-height: 1.5 !important;
+}
+
+/* ========================================
+   Button Styles
+   ======================================== */
+
+.btn,
+.btn-primary {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.2) !important;
+}
+
+.btn:hover,
+.btn-primary:hover {
+    background: linear-gradient(135deg, #409a47 0%, #2d5f3f 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(76, 179, 84, 0.3) !important;
+}
+
+.btn-secondary {
+    background: white !important;
+    color: #4cb354 !important;
+    border: 2px solid #4cb354 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-secondary:hover {
+    background: #e8f5e9 !important;
+    border-color: #409a47 !important;
+    color: #409a47 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ========================================
+   Modal Improvements
+   ======================================== */
+
+.modal {
+    border-radius: 12px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    padding: 1.5rem !important;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.modal-title {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+.modal-close {
+    background: white !important;
+    color: #4cb354 !important;
+    border: none !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.modal-close:hover {
+    background: #f3f4f6 !important;
+    transform: scale(1.1) !important;
+}
+
+.quote-preview {
+    background: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+}
+
+.quote-preview h4 {
+    color: #2d5f3f !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+
+.loading,
+.spinner {
+    border-color: #e8f5e9 !important;
+    border-top-color: #4cb354 !important;
+}
+
+/* ========================================
+   Smooth Transitions
+   ======================================== */
+
+* {
+    transition: color 0.2s ease,
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+}
+
+/* ========================================
+   Focus Visible States
+   ======================================== */
+
+*:focus-visible {
+    outline: 2px solid #4cb354 !important;
+    outline-offset: 2px !important;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none !important;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .calculator-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .contact-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+    
+    .locations-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .page-title {
+        font-size: 2rem !important;
+    }
+    
+    .price-display {
+        font-size: 2.5rem !important;
+    }
+    
+    .results-card {
+        position: static !important;
+        margin-top: 2rem !important;
+    }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    .no-print,
+    .btn,
+    button,
+    .modal {
+        display: none !important;
+    }
+    
+    .card,
+    .contact-card {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+}
+
+/* ========================================
+   Final Polish
+   ======================================== */
+
+/* Add subtle animation to cards on page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-section,
+.results-card,
+.contact-card {
+    animation: fadeInUp 0.5s ease-out !important;
+}
+
+.results-card {
+    animation-delay: 0.1s !important;
+}
+
+.contact-card {
+    animation-delay: 0.2s !important;
+}
+
+/* Green glow effect for active elements */
+.location-checkbox:checked ~ .location-header {
+    position: relative !important;
+}
+
+.location-checkbox:checked ~ .location-header::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: -2px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #4cb354, #5bc85f) !important;
+    opacity: 0.2 !important;
+    z-index: -1 !important;
+    animation: pulse-glow 2s infinite !important;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.3; }
+}
