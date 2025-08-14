@@ -297,77 +297,30 @@ class EmbroideryManualQuoteService {
     }
 
     /**
-     * Build comprehensive size breakdown data for reference
+     * Build simplified size breakdown data for database storage
+     * Matches working calculator patterns (Richardson, Emblem)
      */
     buildSizeBreakdown(quoteData) {
         return {
-            // Manual input data
-            manualBlankCost: quoteData.manualBlankCost,
-            calculatorType: 'Manual Embroidery (Flat Items)',
+            // Basic embroidery details
+            stitchCount: quoteData.frontStitches,
+            quantity: quoteData.quantity,
+            calculatorType: 'Manual Embroidery',
             
-            // Front logo configuration (8K base with ±$1.25 per thousand)
-            frontLogo: {
-                stitches: quoteData.frontStitches,
-                roundedStitches: Math.ceil(quoteData.frontStitches / 1000) * 1000,
-                baseStitches: 8000,
-                adjustment: Math.ceil(quoteData.frontStitches / 1000) * 1000 - 8000,
-                adjustmentCost: ((Math.ceil(quoteData.frontStitches / 1000) * 1000 - 8000) / 1000) * 1.25,
-                pricingMethod: 'base_plus_adjustment' // 8K included, adjust up/down
-            },
+            // Pricing summary
+            basePrice: this.calculateBasePrice(quoteData),
+            finalPrice: quoteData.unitPrice,
             
-            // Additional logos (matches live page pricing: stitches / 1000 * $1.25)
-            additionalLogos: {
-                logo1: quoteData.logo1Enabled ? {
-                    enabled: true,
-                    stitches: quoteData.logo1Stitches,
-                    roundedStitches: Math.ceil(quoteData.logo1Stitches / 1000) * 1000,
-                    pricePerThousand: 1.25,
-                    totalCost: (Math.ceil(quoteData.logo1Stitches / 1000) * 1.25),
-                    pricingMethod: 'straight_per_thousand' // No base fee
-                } : { enabled: false },
-                logo2: quoteData.logo2Enabled ? {
-                    enabled: true,
-                    stitches: quoteData.logo2Stitches,
-                    roundedStitches: Math.ceil(quoteData.logo2Stitches / 1000) * 1000,
-                    pricePerThousand: 1.25,
-                    totalCost: (Math.ceil(quoteData.logo2Stitches / 1000) * 1.25),
-                    pricingMethod: 'straight_per_thousand' // No base fee
-                } : { enabled: false },
-                logo3: quoteData.logo3Enabled ? {
-                    enabled: true,
-                    stitches: quoteData.logo3Stitches,
-                    roundedStitches: Math.ceil(quoteData.logo3Stitches / 1000) * 1000,
-                    pricePerThousand: 1.25,
-                    totalCost: (Math.ceil(quoteData.logo3Stitches / 1000) * 1.25),
-                    pricingMethod: 'straight_per_thousand' // No base fee
-                } : { enabled: false }
-            },
+            // LTM information
+            hasLTM: quoteData.hasLTM,
+            ltmFeeTotal: quoteData.ltmFee || 0,
             
-            // API data reference (from live pricing system)
-            apiDataUsed: {
-                tierLabel: quoteData.tier,
-                marginDenominator: quoteData.marginDenominator || 0.6,
-                roundingMethod: 'CeilDollar', // Standard for embroidery
-                baseCost8k: quoteData.apiBaseCost || this.getBaseCost8k(quoteData.tier),
-                apiEndpoint: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=EMB&styleNumber=MANUAL',
-                dataFetchTime: new Date().toISOString()
-            },
+            // Additional logos
+            additionalLogos: quoteData.logo1Enabled || quoteData.logo2Enabled || quoteData.logo3Enabled,
             
-            // Pricing breakdown
-            pricing: {
-                baseUnitPrice: this.calculateBasePrice(quoteData),
-                ltmFeePerUnit: quoteData.hasLTM ? (quoteData.ltmFee / quoteData.quantity) : 0,
-                finalUnitPrice: quoteData.unitPrice,
-                quantity: quoteData.quantity,
-                totalCost: quoteData.totalCost
-            },
-            
-            // Size information (garments have various sizes)
-            garmentSizes: {
-                sizeType: 'Standard Garment Sizing',
-                availableSizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'],
-                pricingNote: 'Uniform pricing across all garment sizes'
-            }
+            // Order flags
+            isAddon: quoteData.isAddon || false,
+            isProgramAccount: quoteData.isProgramAccount || false
         };
     }
 
