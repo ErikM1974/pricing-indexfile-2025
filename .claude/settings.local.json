@@ -73,7 +73,8 @@
       "Bash(cd:*)",
       "Bash(if [ -f \"$file\" ])",
       "Bash(do wc:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

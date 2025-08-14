@@ -572,3 +572,282 @@ function initializeFAQ() {
         });
     });
 }
+
+// Print Quote Function - Added to fix undefined printQuote() error
+function printQuote() {
+    const calc = window.emblemCalculator;
+    if (!calc?.currentQuote) {
+        alert('Please calculate a quote first');
+        return;
+    }
+    
+    const quote = calc.currentQuote;
+    const printWindow = window.open('', '_blank');
+    
+    // Build options text for display
+    let optionsText = [];
+    if (quote.metallicThread) optionsText.push('Metallic Thread (+25%)');
+    if (quote.velcroBacking) optionsText.push('Velcro Backing (+25%)');
+    if (quote.extraColors > 0) {
+        optionsText.push(`${quote.extraColors} Extra Color${quote.extraColors > 1 ? 's' : ''} (+${quote.extraColors * 10}%)`);
+    }
+    const optionsDisplay = optionsText.length > 0 ? optionsText.join(', ') : 'Standard embroidery';
+    
+    // Check if LTM fee applies
+    const hasLTMFee = quote.quantity < 200;
+    const ltmFeeMessage = hasLTMFee ? `Note: Less Than Minimum fee of $50.00 is included in the per-emblem price` : '';
+    
+    const printHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Embroidered Emblem Quote - Northwest Custom Apparel</title>
+            <style>
+                @page { margin: 0.5in; }
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.4;
+                    color: #333;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .invoice-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: start;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #333;
+                }
+                .logo-section h1 {
+                    margin: 0;
+                    font-size: 24px;
+                    color: #333;
+                }
+                .logo-section p {
+                    margin: 2px 0;
+                    color: #666;
+                    font-size: 12px;
+                }
+                .invoice-meta {
+                    text-align: right;
+                }
+                .invoice-meta h2 {
+                    margin: 0 0 10px 0;
+                    font-size: 20px;
+                    color: #333;
+                }
+                .invoice-meta p {
+                    margin: 2px 0;
+                    color: #666;
+                    font-size: 12px;
+                }
+                .section {
+                    margin-bottom: 25px;
+                }
+                .section-title {
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: #333;
+                    border-bottom: 1px solid #ddd;
+                    padding-bottom: 5px;
+                    margin-bottom: 10px;
+                }
+                .details-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+                .detail-item {
+                    margin-bottom: 8px;
+                }
+                .detail-label {
+                    font-weight: bold;
+                    color: #666;
+                    font-size: 12px;
+                }
+                .detail-value {
+                    color: #333;
+                    font-size: 14px;
+                    margin-top: 2px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }
+                th {
+                    background: #f5f5f5;
+                    padding: 10px;
+                    text-align: left;
+                    font-size: 12px;
+                    font-weight: bold;
+                    border: 1px solid #ddd;
+                }
+                td {
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    font-size: 12px;
+                }
+                .text-right {
+                    text-align: right;
+                }
+                .text-center {
+                    text-align: center;
+                }
+                .total-section {
+                    margin-top: 20px;
+                    padding-top: 15px;
+                    border-top: 2px solid #333;
+                }
+                .total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 5px;
+                    font-size: 14px;
+                }
+                .total-row.grand-total {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #333;
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    border-top: 1px solid #ddd;
+                }
+                .note-box {
+                    background: #fff9e6;
+                    border: 1px solid #ffcc00;
+                    padding: 10px;
+                    margin-top: 15px;
+                    font-size: 12px;
+                    color: #666;
+                }
+                .footer {
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                    text-align: center;
+                    font-size: 11px;
+                    color: #666;
+                }
+                @media print {
+                    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="invoice-header">
+                <div class="logo-section">
+                    <h1>NORTHWEST CUSTOM APPAREL</h1>
+                    <p>Professional Embroidery & Custom Apparel Since 1977</p>
+                    <p>2025 Freeman Road East, Milton, WA 98354</p>
+                    <p>Phone: 253-922-5793 | Fax: 253-922-5883</p>
+                    <p>sales@nwcustomapparel.com</p>
+                </div>
+                <div class="invoice-meta">
+                    <h2>EMBLEM QUOTE</h2>
+                    <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    <p><strong>Valid For:</strong> 30 Days</p>
+                    <p><strong>Contact:</strong> Jim Mickelson</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">EMBLEM SPECIFICATIONS</div>
+                <div class="details-grid">
+                    <div>
+                        <div class="detail-item">
+                            <div class="detail-label">Emblem Size</div>
+                            <div class="detail-value">${quote.width}" × ${quote.height}"</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Quantity</div>
+                            <div class="detail-value">${quote.quantity} pieces</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="detail-item">
+                            <div class="detail-label">Options</div>
+                            <div class="detail-value">${optionsDisplay}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Production Time</div>
+                            <div class="detail-value">30-45 days from approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">PRICING BREAKDOWN</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-right">Unit Price</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Embroidered Emblem (${quote.width}" × ${quote.height}")</td>
+                            <td class="text-center">${quote.quantity}</td>
+                            <td class="text-right">$${quote.pricePerPatch.toFixed(2)}</td>
+                            <td class="text-right">$${quote.orderSubtotal.toFixed(2)}</td>
+                        </tr>
+                        ${quote.totalOneTimeFees > 0 ? `
+                        <tr>
+                            <td>Digitizing & Setup Fee</td>
+                            <td class="text-center">1</td>
+                            <td class="text-right">$${quote.totalOneTimeFees.toFixed(2)}</td>
+                            <td class="text-right">$${quote.totalOneTimeFees.toFixed(2)}</td>
+                        </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Order Subtotal:</span>
+                    <span>$${quote.orderSubtotal.toFixed(2)}</span>
+                </div>
+                ${quote.totalOneTimeFees > 0 ? `
+                <div class="total-row">
+                    <span>One-Time Fees:</span>
+                    <span>$${quote.totalOneTimeFees.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <div class="total-row grand-total">
+                    <span>ESTIMATED TOTAL:</span>
+                    <span>$${quote.estimatedTotal.toFixed(2)}</span>
+                </div>
+            </div>
+
+            ${ltmFeeMessage ? `
+            <div class="note-box">
+                <strong>Note:</strong> ${ltmFeeMessage}
+            </div>
+            ` : ''}
+
+            <div class="footer">
+                <p><strong>Thank you for choosing Northwest Custom Apparel!</strong></p>
+                <p>All emblems are produced by Yung Ming-UMDesign Technology (Vendor #1503)</p>
+                <p>This quote is valid for 30 days from the date shown above.</p>
+                <p>Prices subject to change after expiration date.</p>
+            </div>
+
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+}
