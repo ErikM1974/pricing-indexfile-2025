@@ -123,6 +123,7 @@ body {
 /* ============================================
    CARD STYLES
    ============================================ */
+.card,
 .input-section,
 .results-section,
 .contact-card {
@@ -130,6 +131,13 @@ body {
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
 }
 
 .section-title {
@@ -153,7 +161,8 @@ body {
     margin-bottom: 1.5rem;
 }
 
-.form-label {
+.form-label,
+.form-group label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
@@ -162,7 +171,8 @@ body {
 }
 
 .form-input,
-.form-select {
+.form-select,
+.form-control {
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -174,14 +184,58 @@ body {
 }
 
 .form-input:focus,
-.form-select:focus {
+.form-select:focus,
+.form-control:focus {
     outline: none;
     border-color: var(--primary-green);
     box-shadow: var(--focus-shadow);
 }
 
-.form-input:invalid {
+.form-input:invalid,
+.form-control:invalid {
     border-color: #ef4444;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Selector Button Groups */
+.selector-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.selector-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    background: white;
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.selector-btn:hover {
+    border-color: var(--primary-green);
+    background: var(--hover-bg);
+}
+
+.selector-btn.active {
+    background: var(--primary-green);
+    color: white;
+    border-color: var(--primary-green);
 }
 
 /* ============================================
@@ -231,9 +285,75 @@ body {
 }
 
 /* ============================================
+   TOGGLE SWITCH STYLES
+   ============================================ */
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: var(--primary-green);
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.addon-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--hover-bg);
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+/* ============================================
    MODAL STYLES
    ============================================ */
-.modal-backdrop {
+.modal-backdrop,
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -249,12 +369,14 @@ body {
     transition: opacity 0.3s, visibility 0.3s;
 }
 
-.modal-backdrop.active {
+.modal-backdrop.active,
+.modal-overlay.active {
     opacity: 1;
     visibility: visible;
 }
 
-.modal-content {
+.modal-content,
+.modal-container {
     background: white;
     border-radius: 16px;
     max-width: 600px;
@@ -335,6 +457,105 @@ body {
     color: var(--text-secondary);
     font-weight: 400;
     margin-top: 0.5rem;
+}
+
+.price-label {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.price-display.prompt {
+    color: var(--text-secondary);
+    background: var(--hover-bg);
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   SUMMARY SECTION STYLES
+   ============================================ */
+.summary-section {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item.total {
+    font-weight: 600;
+    font-size: 1rem;
+    border-top: 2px solid var(--border-color);
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    color: var(--primary-green);
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   ADD-ON ORDER STYLES
+   ============================================ */
+.addon-section {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.addon-section.hidden {
+    display: none;
+}
+
+.addon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.addon-summary {
+    background: white;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.addon-summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.discount-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-radius: 6px;
+    margin-top: 1rem;
+    font-size: 0.875rem;
 }
 
 /* ============================================
@@ -438,6 +659,109 @@ body {
     background: var(--primary-green);
     color: white;
     border-color: var(--primary-green);
+}
+
+/* ============================================
+   NOTICE & WARNING STYLES
+   ============================================ */
+.notice-section {
+    background: var(--warning-bg);
+    border: 2px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.notice-section h2 {
+    color: var(--warning-text);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notice-section p {
+    color: var(--warning-text);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.notice-section p:last-child {
+    margin-bottom: 0;
+}
+
+.ltm-warning {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.quote-preview {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.quote-preview h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+/* ============================================
+   CALCULATOR TITLE STYLES
+   ============================================ */
+.calculator-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.calculator-title i {
+    color: var(--primary-green);
+}
+
+/* ============================================
+   HELP BUTTON STYLES
+   ============================================ */
+.help-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.help-btn:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.hidden {
+    display: none !important;
 }
 
 /* ============================================
