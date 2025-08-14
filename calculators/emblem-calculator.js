@@ -249,16 +249,27 @@ class EmblemCalculator {
     }
     
     openModal() {
-        if (!this.currentQuote) return;
+        console.log('[EmblemCalculator] Opening modal, currentQuote:', this.currentQuote);
+        if (!this.currentQuote) {
+            console.error('[EmblemCalculator] No current quote - modal not opening');
+            alert('Please enter emblem dimensions and quantity first');
+            return;
+        }
         
         // Update preview
         this.updateQuotePreview();
         
         // Show modal - use 'active' class to match calculator-base.css
         this.elements.modal.classList.add('active');
+        console.log('[EmblemCalculator] Modal should now be visible');
         
         // Focus first input
-        document.getElementById('customerName').focus();
+        setTimeout(() => {
+            const customerNameInput = document.getElementById('customerName');
+            if (customerNameInput) {
+                customerNameInput.focus();
+            }
+        }, 100);
     }
     
     closeModal() {
@@ -329,8 +340,13 @@ class EmblemCalculator {
     
     async handleQuoteSubmit(e) {
         e.preventDefault();
+        console.log('[EmblemCalculator] Form submitted');
         
-        if (!this.currentQuote) return;
+        if (!this.currentQuote) {
+            console.error('[EmblemCalculator] No current quote data');
+            alert('Please calculate a quote first');
+            return;
+        }
         
         // Show loading state
         this.setLoadingState(true);
@@ -344,7 +360,7 @@ class EmblemCalculator {
             const projectName = document.getElementById('projectName').value.trim();
             const salesRepEmail = document.getElementById('salesRep').value;
             const notes = document.getElementById('notes').value.trim();
-            const saveToDatabase = document.getElementById('saveToDatabase').checked;
+            const saveToDatabase = document.getElementById('saveToDatabase') ? document.getElementById('saveToDatabase').checked : false;
             
             const salesRepName = this.salesRepNames[salesRepEmail] || 'Sales Team';
             
@@ -419,7 +435,7 @@ class EmblemCalculator {
             // Send email
             const emailResult = await emailjs.send(
                 'service_1c4k67j',
-                'template_vpou6va',
+                'template_94rbfol',  // Correct template ID for embroidered emblems
                 emailData
             );
             
