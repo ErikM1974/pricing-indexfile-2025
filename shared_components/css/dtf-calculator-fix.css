@@ -1,0 +1,670 @@
+/**
+ * DTF Calculator Fix CSS
+ * Fixes styling issues and ensures NWCA green theme consistency
+ * Overrides conflicting styles with proper specificity
+ */
+
+/* ============================================
+   ROOT THEME OVERRIDES - NWCA GREEN
+   ============================================ */
+:root {
+    --primary-color: #4cb354 !important;
+    --primary: #4cb354 !important;
+    --primary-dark: #409a47 !important;
+    --primary-light: #5bc85f !important;
+    --nwca-primary: #4cb354 !important;
+    --primary-hover: #409a47 !important;
+    --bs-primary: #4cb354 !important;
+    --bs-primary-rgb: 76, 179, 84 !important;
+}
+
+/* ============================================
+   MAIN CONTAINER FIXES
+   ============================================ */
+body.dtf-pricing-page {
+    background: #f5f7fa;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+    max-width: 1400px;
+    padding: 2rem;
+}
+
+/* ============================================
+   CALCULATOR CONTAINER STYLING
+   ============================================ */
+#dtf-calculator-container {
+    background: transparent;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+/* Main calculator wrapper */
+.dtf-calculator-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    margin: 0;
+}
+
+@media (max-width: 992px) {
+    .dtf-calculator-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   INFO BOX STYLING (Top notice)
+   ============================================ */
+.alert-info,
+.info-box {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    border: 1px solid #60a5fa !important;
+    border-radius: 8px;
+    padding: 0.875rem 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #1e40af;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-info i,
+.info-box i {
+    color: #2563eb;
+    font-size: 1.125rem;
+}
+
+/* ============================================
+   CALCULATOR MAIN SECTION
+   ============================================ */
+.dtf-calculator-main {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+.dtf-calculator-main h3,
+.quantity-section h3,
+.transfers-section h3 {
+    color: #1f2937 !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 1.25rem !important;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* ============================================
+   FORM INPUTS STYLING
+   ============================================ */
+.form-control,
+input[type="text"],
+input[type="number"],
+select.form-control,
+.form-select {
+    width: 100%;
+    padding: 0.75rem 1rem !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    color: #1f2937 !important;
+    background: white !important;
+    transition: all 0.2s !important;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+select.form-control:focus,
+.form-select:focus {
+    outline: none !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.1) !important;
+    background: white !important;
+}
+
+.form-control:hover,
+input:hover,
+select:hover {
+    border-color: #9ca3af !important;
+}
+
+/* Labels */
+.form-group label,
+.form-label,
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Help text */
+.form-text,
+.help-text,
+small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6b7280;
+    font-size: 0.813rem;
+}
+
+/* ============================================
+   QUANTITY SECTION
+   ============================================ */
+.quantity-section {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #d1fae5;
+}
+
+.quantity-input-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quantity-input-group input {
+    width: 120px !important;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.125rem !important;
+}
+
+/* ============================================
+   TRANSFER LOCATIONS SECTION
+   ============================================ */
+.transfers-section {
+    margin-bottom: 2rem;
+}
+
+.transfer-location-item {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+}
+
+.transfer-location-item:hover {
+    border-color: #4cb354;
+    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.15);
+}
+
+.transfer-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.transfer-number {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.125rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.transfer-header h4 {
+    font-size: 1.125rem;
+    margin: 0;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.btn-remove-transfer {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: white;
+    border: 2px solid #ef4444;
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.25rem;
+}
+
+.btn-remove-transfer:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+.transfer-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ============================================
+   BUTTONS STYLING
+   ============================================ */
+.btn,
+.add-transfer-btn,
+button[type="button"],
+button[type="submit"] {
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    transition: all 0.2s !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+}
+
+.btn-primary,
+.add-transfer-btn {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+}
+
+.btn-primary:hover,
+.add-transfer-btn:hover {
+    background: linear-gradient(135deg, #409a47 0%, #358a3a 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 179, 84, 0.3);
+}
+
+.btn-secondary {
+    background: #6b7280 !important;
+    color: white !important;
+}
+
+.btn-secondary:hover {
+    background: #4b5563 !important;
+}
+
+.add-transfer-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.add-transfer-btn i {
+    font-size: 1.125rem;
+}
+
+/* ============================================
+   DTF TRANSFER SIZES BOX
+   ============================================ */
+.size-guide,
+.dtf-sizes-box,
+.accordion-body {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Specific styling for the DTF sizes info box */
+#dtf-calculator-container > .dtf-calculator-main + div,
+.transfers-section + div[style*="background"] {
+    background: linear-gradient(135deg, #d1fae5 0%, #bbf7d0 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    margin-top: 1.5rem !important;
+}
+
+.size-guide h4,
+.dtf-sizes-box h4 {
+    color: #065f46;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.size-guide h4 i,
+.dtf-sizes-box h4 i {
+    color: #4cb354;
+}
+
+/* Size grid */
+.pricing-tiers-grid,
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.size-tier-section,
+.size-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #d1fae5;
+    text-align: center;
+}
+
+.size-tier-section h5,
+.size-item h5 {
+    color: #4cb354;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.size-tier-section p,
+.size-item p {
+    color: #374151;
+    font-size: 0.875rem;
+    margin: 0.25rem 0;
+}
+
+/* ============================================
+   PRICING BREAKDOWN SECTION (Right Side)
+   ============================================ */
+.dtf-calculator-summary,
+.pricing-breakdown {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+    position: sticky;
+    top: 200px;
+    min-height: 400px;
+}
+
+.dtf-calculator-summary h3,
+.pricing-breakdown h3 {
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+    text-align: center;
+}
+
+/* Empty state */
+.pricing-placeholder,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    color: #9ca3af;
+    padding: 2rem;
+    text-align: center;
+}
+
+.pricing-placeholder i,
+.empty-state i {
+    font-size: 3.5rem;
+    color: #e5e7eb;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.pricing-placeholder h5 {
+    color: #9ca3af;
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.pricing-placeholder p,
+.empty-state p {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Summary sections when populated */
+.summary-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.summary-section:last-child {
+    border-bottom: none;
+}
+
+.summary-section h5 {
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.summary-line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.summary-line-item span:first-child {
+    color: #6b7280;
+}
+
+.summary-line-item span:last-child {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Total section */
+.summary-total {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border: 2px solid #4cb354;
+}
+
+.summary-total .summary-line-item {
+    font-size: 1.125rem;
+}
+
+.price-highlight {
+    color: #4cb354 !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+/* ============================================
+   ACCORDION STYLES
+   ============================================ */
+.accordion-button {
+    background: white !important;
+    color: #1f2937 !important;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e5e7eb;
+}
+
+.accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+    color: #065f46 !important;
+    border-color: #4cb354;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.1) !important;
+    border-color: #4cb354 !important;
+}
+
+.accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234cb354'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+}
+
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+.dtf-calculator-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    color: #6b7280;
+}
+
+.dtf-calculator-loading i {
+    font-size: 3rem;
+    color: #4cb354;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.dtf-calculator-error,
+.alert-danger {
+    background: #fee2e2 !important;
+    color: #991b1b !important;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 2px solid #ef4444 !important;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+    .container {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .dtf-calculator-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .dtf-calculator-summary,
+    .pricing-breakdown {
+        position: static;
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #dtf-calculator-container {
+        padding: 1.5rem;
+    }
+    
+    .transfer-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-tiers-grid,
+    .size-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quantity-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quantity-input-group input {
+        width: 100% !important;
+    }
+}
+
+/* ============================================
+   OVERRIDE CONFLICTING STYLES
+   ============================================ */
+/* Force green theme over any blue */
+.page-header {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+}
+
+/* Override Bootstrap blue */
+.text-primary {
+    color: #4cb354 !important;
+}
+
+.bg-primary {
+    background-color: #4cb354 !important;
+}
+
+.border-primary {
+    border-color: #4cb354 !important;
+}
+
+/* Ensure links are green */
+a {
+    color: #4cb354;
+}
+
+a:hover {
+    color: #409a47;
+}
+
+/* ============================================
+   STAFF VIEW TOGGLE
+   ============================================ */
+.staff-view-toggle {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.staff-view-toggle a {
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+
+.staff-view-toggle a:hover {
+    color: #4cb354;
+}
+
+body.show-internal .staff-view-toggle a {
+    color: #4cb354;
+    font-weight: 600;
+}
+
+body.show-internal .staff-view-toggle a::after {
+    content: " ✓";
+    color: #4cb354;
+}

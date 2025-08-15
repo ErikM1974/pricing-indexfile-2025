@@ -1,53 +1,24 @@
 /**
  * Webstore Quote Service
  * Handles saving webstore setup quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class WebstoreQuoteService {
+class WebstoreQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-        this.quotePrefix = 'WEB';
-    }
-
-    /**
-     * Generate unique quote ID for webstore quotes
-     */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `webstore_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        return `WEB${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up sequence numbers from previous days
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('webstore_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
+        super({
+            prefix: 'WEB',
+            storagePrefix: 'webstore',
+            sessionPrefix: 'web_sess'
         });
+        this.quotePrefix = 'WEB'; // Keep for backward compatibility
     }
 
     /**
-     * Generate session ID
+     * Get embellishment type for webstores
      */
-    generateSessionID() {
-        return `web_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'service';
     }
 
     /**

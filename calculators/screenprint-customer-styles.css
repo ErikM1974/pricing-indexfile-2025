@@ -1,0 +1,137 @@
+/* ============================================ */
+/* SCREEN PRINT CUSTOMER CALCULATOR SPECIFIC   */
+/* ============================================ */
+
+/* Screen print location cards */
+.location-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.location-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.location-card.selected {
+    border-color: var(--primary-color);
+    background: rgba(58, 124, 82, 0.05);
+}
+
+.location-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.location-card.selected .location-icon {
+    color: var(--primary-dark);
+}
+
+/* Color count selector */
+.color-count-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.color-count-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-count-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--hover-bg);
+}
+
+.color-count-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Setup fee display */
+.setup-fee-display {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.setup-fee-amount {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+/* Screen print specific pricing display */
+.location-pricing {
+    background: var(--hover-bg);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.location-pricing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.location-pricing-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.location-pricing-details {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Customer supplied note */
+.customer-supplied-banner {
+    background: linear-gradient(135deg, #e8f4ea 0%, #d1fae5 100%);
+    border: 1px solid #10b981;
+    color: #065f46;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.customer-supplied-banner i {
+    font-size: 1.25rem;
+}
+
+/* LTM warning for screen print */
+.ltm-warning {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+.ltm-warning strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}

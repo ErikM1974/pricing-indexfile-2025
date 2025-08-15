@@ -1,0 +1,95 @@
+/* ============================================ */
+/* CUSTOMER EMBROIDERY CALCULATOR SPECIFIC     */
+/* ============================================ */
+
+/* Program account section */
+.program-account-container {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.program-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f59e0b;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Customer supplied specific */
+.customer-supplied-note {
+    background: #e8f4ea;
+    border-left: 4px solid var(--primary-green);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.customer-supplied-note h4 {
+    color: var(--primary-green);
+    margin-bottom: 0.5rem;
+}
+
+/* Addon order styling */
+.addon-order-container {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.addon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #0ea5e9;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Discount display */
+.discount-display {
+    background: var(--success-bg);
+    color: var(--success-text);
+    padding: 0.75rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.discount-amount {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+/* No garment cost note */
+.no-garment-note {
+    background: #f0f9ff;
+    border: 1px solid #0284c7;
+    color: #075985;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.no-garment-note i {
+    flex-shrink: 0;
+    margin-top: 2px;
+}

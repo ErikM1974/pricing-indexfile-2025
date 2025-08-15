@@ -1,11 +1,17 @@
 /**
  * Leatherette Patch Quote Service
  * Handles saving leatherette patch quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class LeatherettePatchQuoteService {
+class LeatherettePatchQuoteService extends BaseQuoteService {
     constructor() {
-        this.apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        super({
+            prefix: 'LP',
+            storagePrefix: 'lp',
+            sessionPrefix: 'lp_sess'
+        });
+        this.apiUrl = this.baseURL; // Use baseURL from parent
         this.caspioToken = null;
         this.tokenExpiry = null;
     }
@@ -47,39 +53,15 @@ class LeatherettePatchQuoteService {
     }
 
     /**
-     * Generate quote ID
+     * Get embellishment type for leatherette patches
      */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get and increment sequence for today
-        const storageKey = `lp_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old sequences
-        const currentDateKey = dateKey;
-        Object.keys(sessionStorage).forEach(key => {
-            if (key.startsWith('lp_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
-        });
-        
-        return `LP${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Generate session ID
-     */
-    generateSessionID() {
-        return `lp_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'patch';
     }
 
     /**
      * Get pricing tier for leatherette patches
+     * Override base class with patch-specific tiers
      */
     getPricingTier(quantity) {
         if (quantity < 24) return '6-23';

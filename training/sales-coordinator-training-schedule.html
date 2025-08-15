@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sales Coordinator Training Schedule - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* NWCA Green Theme Variables */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* Professional Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar > ul > li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar a {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .sidebar a:hover {
+            background: var(--hover-bg);
+            color: var(--primary-color);
+        }
+
+        .sidebar a.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(76, 179, 84, 0.3);
+        }
+        
+        .sidebar a.active:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-width: 900px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+
+        .content h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .content h2 {
+            color: var(--primary-dark);
+            font-size: 1.75rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .content h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Card Components */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Enhanced Details/Summary */
+        details {
+            margin-bottom: 1rem;
+        }
+
+        details > summary {
+            cursor: pointer;
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            background-color: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        details > summary:hover,
+        details > summary:focus {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        details[open] > summary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        details > summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary::after {
+            transform: rotate(180deg);
+        }
+
+        details > div {
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background: white;
+        }
+
+        /* Pro Tips Enhancement */
+        .pro-tip {
+            background: linear-gradient(135deg, var(--warning-bg) 0%, #fef3c7 100%);
+            border: 1px solid #f59e0b;
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .pro-tip strong {
+            color: var(--primary-color);
+        }
+
+        /* Lists Enhancement */
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .checklist li {
+            padding: 0.5rem 0 0.5rem 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist li::before {
+            content: '✓';
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Table Improvements */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .content {
+                height: auto;
+                padding: 1.5rem;
+            }
+
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            .header-left {
+                gap: 1rem;
+            }
+
+            .breadcrumb {
+                font-size: 0.75rem;
+            }
+
+            .content h1 {
+                font-size: 2rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Enhanced Animation */
+        .sidebar a {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar a::before {
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .sidebar a:hover::before {
+            left: 100%;
+        }
+
+        /* Loading Animation */
+        .content-section {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Interactive Elements */
+        .decision-box {
+            background: var(--hover-bg);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .decision-box:hover {
+            transform: translateX(8px);
+            background: var(--success-bg);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .decision-box .question {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .decision-box .answer {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Game Section Styling */
+        .notes-game-container {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .notes-game-header {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .notes-game-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .notes-game-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .game-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .game-section h2 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .scenario {
+            background: var(--bg-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .practice-area textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .practice-area textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--focus-shadow);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
+        }
+
+        .feedback {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .feedback.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid var(--primary-color);
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        /* Space utilities for content */
+        .space-y-4 > * + * { margin-top: 1rem; }
+
+        /* Styles for Notes Game */
+        .notes-game-body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            padding: 20px;
+        }
+        .notes-game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .notes-game-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .notes-game-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .notes-game-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .stat-card .label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .main-content-game {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 768px) {
+            .main-content-game {
+                grid-template-columns: 1fr;
+            }
+        }
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .section-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+        .section-title {
+            flex: 1;
+        }
+        .section-title h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        .section-title .usage {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .purpose {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        .purpose strong {
+            color: var(--primary-color);
+        }
+        .examples-section {
+            margin-bottom: 20px;
+        }
+        .examples-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .example-note {
+            background: #f0f7ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--primary-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #333;
+        }
+        .example-note.bad {
+            background: #fff0f0;
+            border-left-color: #f44336;
+        }
+        .action-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .action-word {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .hall-of-shame {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .hall-of-shame h2 {
+            color: #856404;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .hall-of-shame > p {
+            text-align: center;
+            color: #856404;
+            margin-bottom: 30px;
+        }
+
+        .shame-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .shame-box {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .shame-box h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .shame-box ol {
+            color: #721c24;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .fix-box {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #0c5460;
+        }
+
+        .fix-box h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        .fix-box p {
+            color: #0c5460;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .impact-box {
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .impact-box h3 {
+            color: #c62828;
+            margin-bottom: 15px;
+        }
+
+        .impact-box p {
+            color: #b71c1c;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        .practice-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .practice-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+        .scenario {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .scenario h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .scenario p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .game-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .game-button:hover,
+        .game-button:focus {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 179, 84, 0.3);
+            outline: none;
+        }
+        .game-button.secondary {
+            background: #48bb78;
+        }
+        .game-button.secondary:hover,
+        .game-button.secondary:focus {
+            background: #38a169;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .feedback.success {
+            background: var(--success-bg);
+            border: 1px solid #c3e6cb;
+            color: var(--success-text);
+        }
+        .feedback.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .quick-tips {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .quick-tips h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .tip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .tip h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .tip p {
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+        .decision-tree {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .decision-tree h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        .decision-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s;
+        }
+        .decision-box:hover {
+            transform: translateX(10px);
+            background: var(--success-bg);
+        }
+        .decision-box .question {
+            font-weight: bold;
+            color: #333;
+        }
+        .decision-box .answer {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <a href="/staff-dashboard.html#training">Training</a>
+                    <span>/</span>
+                    <span>Sales Coordinator Training Schedule</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Professional Sidebar -->
+        <aside class="sidebar">
+            <h2>Training Schedule</h2>
+            <nav>
+                <ul>
+                    <li><a href="#day1" class="active" onclick="showSection('day1', this)">Day 1: Foundations</a></li>
+                    <li><a href="#day2" onclick="showSection('day2', this)">Day 2: Communication & Leads</a></li>
+                    <li><a href="#day3" onclick="showSection('day3', this)">Day 3: Shopworks Fundamentals</a></li>
+                    <li><a href="#day4" onclick="showSection('day4', this)">Day 4: Practical Shopworks</a></li>
+                    <li><a href="#day5" onclick="showSection('day5', this)">Day 5: The Big Picture</a></li>
+                    <li><a href="#notes-game" onclick="showSection('notes-game', this)">Notes Training Game</a></li>
+                    <li><a href="#log" onclick="showSection('log', this)">Training Log & Action Items</a></li>
+                </ul>
+            </nav>
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
+                © 2025 NW Custom Apparel
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            
+            <!-- Day 1 Section -->
+            <section id="day1" class="content-section active">
+                <h1>Day 1: Foundations (Completed)</h1>
+                <div class="card">
+                    <h2>The NW Custom Apparel Way</h2>
+                    <details>
+                        <summary>Mission & Core Values</summary>
+                        <div class="details-content">
+                            <p><strong>Mission Statement:</strong> Northwest Custom Apparel is dedicated to providing the utmost satisfaction to customers through caring service, assured quality, innovation, and reliable delivery of distinct customized garments and products.</p>
+                            <p><strong>Our Core Values are the foundation of everything we do. They are not just words on a wall; they are the principles that guide every decision:</strong></p>
+                            <ul >
+                                <li><strong>Respect:</strong> We treat every customer and team member with consideration. This means listening to understand, not just to reply. It means valuing their time and perspective.</li>
+                                <li><strong>Excellence:</strong> We strive for the highest quality in our work and service. Our goal is to make customers say "WOW!" when they open their box. Excellence is in the details.</li>
+                                <li><strong>Accountability:</strong> We own our actions and outcomes. If we make a mistake, we own it, we learn from it, and we fix it. We don't make excuses or blame others.</li>
+                                <li><strong>Compassion:</strong> We show empathy and understanding. Customers have bad days too, and a little compassion can turn a negative experience into a positive one.</li>
+                                <li><strong>Honesty:</strong> We are truthful and transparent in all dealings. It's always better to be upfront about a potential delay than to make a promise we can't keep. Honesty builds trust for life.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>The Customer Dating Game</summary>
+                        <div class="details-content">
+                            <p>Think of every new customer like a first date. Our goal isn't just one order; it's to build a long-term relationship (a marriage!). This concept comes from our "Jab, Jab, Right Hook" philosophy.</p>
+                            <ol >
+                                <li><strong>The "Jabs" (Building the Relationship):</strong> These are the small, consistent actions we take to show we care. They are the "little wins" that build trust and show we're different.
+                                    <ul class="sub-list">
+                                        <li>Sending a "WOW" gift (a surprise sample shirt with their logo).</li>
+                                        <li>Mailing a handwritten thank you card using Send Out Cards.</li>
+                                        <li>A quick "Table Touch" phone call to check in while their order is in production.</li>
+                                        <li>Remembering a detail from a previous conversation and bringing it up later.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>The "Right Hook" (Asking for the Order):</strong> After you've built value and trust with your "jabs," asking for the order becomes a natural next step, not a hard sell. Often, the customer will be so impressed they'll ask you for the next order.</li>
+                                <li><strong>The Marriage (Loyal Customer):</strong> We've earned their trust. They don't shop around anymore because they know we have their back. But even in a marriage, you can't take the other person for granted. We must keep "jabbing" to maintain the relationship and show our appreciation.</li>
+                            </ol>
+                            <div class="pro-tip">
+                                <strong>What upsets a customer (and a date)?</strong> Lack of communication, not listening, sloppiness, missing due dates, and not feeling appreciated.
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <div class="card">
+                    <h2 >Introduction to Shopworks: Our All-in-One System</h2>
+                    <p>Shopworks is the brain of our operation. It's not just for orders; it's our single hub for tracking everything from the first phone call (a lead) to a happy, repeat customer. Using one system prevents errors and gives everyone a 360-degree view of the customer relationship. Understanding how to navigate it is the most critical part of your job.</p>
+                    <div >
+                        <h3 >Activity: Guided Tour</h3>
+                        <p class="text-gray-600">Let's look up an existing customer like <strong>Arrow Lumber</strong>. We'll find their main contact info, look at the notes to see our communication history, and then pull up one of their past orders to see how it's structured.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 2 Section -->
+            <section id="day2" class="content-section">
+                <h1>Day 2: System Setup & Professional Communication</h1>
+                <div class="card">
+                    <h2>Getting the Sales Coordinator Set Up</h2>
+                    <details>
+                        <summary>Computer & Core Software Setup</summary>
+                         <div class="details-content">
+                            <ul>
+                                <li><strong>Computer Login:</strong> We'll get you logged into your computer.</li>
+                                <li><strong>Outlook Email:</strong> Log in to your email. We'll set up a professional email signature. A great signature builds trust with customers.</li>
+                                <li><strong>Shopworks:</strong> Log in with your new credentials. We'll take a quick look at the main dashboard.</li>
+                            </ul>
+                        </div>
+                    </details>
+                     <details >
+                        <summary>Microsoft Outlook on your iPhone</summary>
+                        <div class="details-content">
+                            <h4>Why you need this:</h4>
+                            <p>Having work email on your phone allows you to stay connected and respond to urgent matters when you're away from your desk. It's a key part of our "Sunshine Law" to be responsive to customers.</p>
+                            
+                            <h4>How to Set It Up:</h4>
+                            <ol>
+                                <li><strong>Go to the App Store:</strong> On your iPhone, open the App Store.</li>
+                                <li><strong>Search for "Microsoft Outlook":</strong> Type it in the search bar.</li>
+                                <li><strong>Download the App:</strong> Tap "Get" to download and install the free app.</li>
+                                <li><strong>Open Outlook and Add Account:</strong> Open the app and enter your full work email address (`[email protected]`). Tap "Add Account."</li>
+                                <li><strong>Enter Your Password:</strong> You'll be redirected to the Microsoft login page. Enter your password.</li>
+                                <li><strong>Approve with Duo:</strong> Since we use Duo Security, you will receive a push notification from the "Duo Mobile" app. Open the notification and tap "Approve" to complete the sign-in.</li>
+                                <li><strong>Configure Notifications:</strong> The app will ask about notifications. It's a good idea to enable them so you see new emails as they arrive.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Duo Security for Microsoft 365</summary>
+                        <div class="details-content">
+                            <h4>What is Duo?</h4>
+                            <p>Duo is our two-factor authentication (2FA) service. Think of it like the second lock on a door. Your password is the first lock. Duo is the second, and it requires you to approve a login from your phone. This means even if someone steals your password, they can't get into your account without your phone. It's a critical part of keeping our company and customer data secure.</p>
+                            
+                            <h4>How to Set It Up on an iPhone:</h4>
+                            <ol>
+                                <li><strong>Go to the App Store:</strong> On your iPhone, open the App Store.</li>
+                                <li><strong>Search for "Duo Mobile":</strong> Type "Duo Mobile" in the search bar. The app developer will be Duo Security LLC.</li>
+                                <li><strong>Download the App:</strong> Tap "Get" to download and install the free app. You may need to enter your Apple ID password.</li>
+                                <li><strong>Begin Login on Your Computer:</strong> On your work computer, open a web browser and go to the Microsoft 365 login page. Enter your email and password.</li>
+                                <li><strong>Start Duo Enrollment:</strong> Because it's your first time, the Microsoft login will automatically prompt you to set up Duo. It will display a QR code on the screen.</li>
+                                <li><strong>Scan the QR Code with the App:</strong> Open the Duo Mobile app on your iPhone. Tap the "+" button or "Add Account." Your phone's camera will activate. Point it at the QR code on your computer screen.</li>
+                                <li><strong>Complete Setup:</strong> The app will automatically link to your account. From now on, when you log in to Microsoft 365, you'll get a notification on your phone. Just tap "Approve" in the Duo app to finish logging in.</li>
+                            </ol>
+                        </div>
+                    </details>
+                     <details>
+                        <summary>Slack for Internal Communication</summary>
+                        <div class="details-content">
+                            <h4>What is Slack?</h4>
+                            <p>Slack is our internal instant messaging tool. Think of it as professional texting for our team. It's perfect for quick questions, sharing updates, and collaborating on orders. It keeps our email inboxes clean for customer communication. Everyone on the team uses it except for Jim.</p>
+                            
+                            <h4>Getting Started:</h4>
+                            <ol>
+                                <li><strong>Accept the Invitation:</strong> Erik will send an invitation to your email address. Click the link in the email to join our workspace.</li>
+                                <li><strong>Create Your Profile:</strong> Add your name and a professional profile picture so we know who you are.</li>
+                                <li><strong>Download the Desktop App:</strong> While you can use Slack in a web browser, the desktop app is much better for notifications. Go to <a href="https://slack.com/downloads" target="_blank" class="link">slack.com/downloads</a> to get it.</li>
+                                <li><strong>Join Channels:</strong> Channels are group conversations organized by topic. You'll be automatically added to key channels like #general and #sales.</li>
+                            </ol>
+                            <h4>Best Practices:</h4>
+                             <ul>
+                                <li><strong>Use Channels for Group Topics:</strong> Have a question about a sales process? Ask in the #sales channel so everyone can see the question and answer.</li>
+                                <li><strong>Use Direct Messages (DMs) for 1-on-1s:</strong> Need to ask a specific person a quick question? Send them a DM.</li>
+                                <li><strong>Use "@" to Mention People:</strong> If you need to get someone's attention in a channel, type "@" followed by their name (e.g., @Erik Mickelson). They'll get a notification.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Grammarly for Professional Communication</summary>
+                        <div class="details-content">
+                            <h4>What is Grammarly?</h4>
+                            <p>Grammarly is an AI-powered writing assistant that helps ensure all our written communication is professional, clear, and error-free. It checks for grammar, spelling, punctuation, clarity, and even tone. Using it consistently is a key part of our "Excellence" core value.</p>
+                            
+                            <h4>Getting Started:</h4>
+                            <ol>
+                                <li><strong>Accept the Invitation:</strong> Erik has sent a Grammarly sign-up link to your email. Click it to create your account and join the company's subscription.</li>
+                                <li><strong>Install for Windows:</strong> Download and install <a href="https://www.grammarly.com/desktop" target="_blank" class="link">Grammarly for Windows</a>. This is the most important step, as it automatically integrates Grammarly into Microsoft Word and Outlook.</li>
+                                <li><strong>How it Works in Word/Outlook:</strong> As you type, Grammarly will underline potential issues. You can hover over the underlines to see suggestions and click to accept them. A sidebar will also appear, giving you an overall score and more detailed feedback.</li>
+                            </ol>
+                            <h4>Using Grammarly AI:</h4>
+                             <ul>
+                                <li>Grammarly includes a generative AI feature called GrammarlyGO. You can use it to compose drafts, shorten long emails, brainstorm ideas, or change the tone of your writing to be more formal or friendly.</li>
+                                <li>Look for the Grammarly icon (a green circle) and click it to access AI features.</li>
+                            </ul>
+                             <div class="pro-tip">
+                                <strong>Training Resources:</strong> Grammarly has great tutorials to get you started.
+                                 <ul >
+                                    <li><a href="https://support.grammarly.com/hc/en-us/articles/360003462992-Getting-started-with-Grammarly-for-Microsoft-Office" target="_blank" class="link">Guide to Grammarly for Microsoft Office</a></li>
+                                    <li><a href="https://www.grammarly.com/grammarlygo" target="_blank" class="link">Introduction to GrammarlyGO (AI Features)</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>GoTo Connect Phone System (Ext. 111)</summary>
+                        <div class="details-content">
+                            <p>Our phone system is more than just a phone; it's a powerful communication tool. The Sales Coordinator's extension is <strong>111</strong>.</p>
+                            <h4>Key Features:</h4>
+                             <ul>
+                                <li><strong>Desktop App:</strong> You can make and receive calls directly from your computer, which is much more efficient than using a physical handset.</li>
+                                <li><strong>Text Messaging:</strong> You have the ability to send and receive text messages from our main company line (253-922-5793). This is fantastic for quick updates to customers, like "Your order is ready for pickup!" or sending an address.</li>
+                            </ul>
+                            <h4>Getting Started:</h4>
+                            <ol>
+                                <li><strong>Download the App:</strong> Go to the <a href="https://www.goto.com/download" target="_blank" class="link">GoTo Download Center</a> and get the "GoTo" desktop app for your computer.</li>
+                                <li><strong>Login:</strong> Once installed, open the app and log in using the credentials provided. The login portal is also available at <a href="https://www.goto.com/connect" target="_blank" class="link">goto.com/connect</a>.</li>
+                                <li><strong>Explore:</strong> Take a few minutes to click around the app. Find the dialer, contacts, and the text message section.</li>
+                            </ol>
+                             <h4>Staff Extension List</h4>
+                             <p>You can dial these extensions directly from your GoTo Connect app.</p>
+                             <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Extension</th>
+                                            <th>Name</th>
+                                            <th>Title</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr >
+                                            <td >103</td>
+                                            <td >Steve Deland</td>
+                                            <td >Artist</td>
+                                        </tr>
+                                        <tr >
+                                            <td >105</td>
+                                            <td >Jim Mickelson</td>
+                                            <td >CEO</td>
+                                        </tr>
+                                         <tr >
+                                            <td >109</td>
+                                            <td >Nika Lao</td>
+                                            <td >Sales</td>
+                                        </tr>
+                                        <tr >
+                                            <td >111</td>
+                                            <td >Taneisha Clark</td>
+                                            <td >Sales Coordinator</td>
+                                        </tr>
+                                        <tr >
+                                            <td >113</td>
+                                            <td >Bradley Wright</td>
+                                            <td >Bookkeeper</td>
+                                        </tr>
+                                        <tr >
+                                            <td >114</td>
+                                            <td >Adriyella</td>
+                                            <td >Office Assistant</td>
+                                        </tr>
+                                        <tr >
+                                            <td >117</td>
+                                            <td >Mikalhah Hede</td>
+                                            <td >Shipping/Receiving</td>
+                                        </tr>
+                                        <tr >
+                                            <td >118</td>
+                                            <td >Taylar Hanson</td>
+                                            <td >Sales</td>
+                                        </tr>
+                                        <tr >
+                                            <td >119</td>
+                                            <td >Ruth Nhoung</td>
+                                            <td >Manager</td>
+                                        </tr>
+                                        <tr >
+                                            <td >120</td>
+                                            <td >Erik Mickelson</td>
+                                            <td >Operations</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                             </div>
+                             <div class="pro-tip">
+                                <strong>Training Resource:</strong> GoTo has an excellent <a href="https://support.goto.com/connect" target="_blank" class="link">Support & Training Center</a>. Bookmark this page. If you have a question about how to do something (like transfer a call), the answer is likely there.
+                            </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Polycom SoundPoint IP 650 Office Phone</summary>
+                        <div class="details-content">
+                            <p>While we encourage using the GoTo Connect desktop app, you also have a physical Polycom phone on your desk. This phone is connected to the same GoTo system.</p>
+                            <h4 >Common Functions:</h4>
+                             <ul >
+                                <li><strong>Answering a Call:</strong> Pick up the handset.</li>
+                                <li><strong>Placing a Call on Hold:</strong> During a call, press the "Hold" button. The line key will flash green. Press the flashing line key again to resume the call.</li>
+                                <li><strong>Transferring a Call:</strong> During a call, press the "Transfer" button. Dial the extension of the person you want to transfer to. You can either speak to them first (attended transfer) or just hang up to complete the transfer immediately (blind transfer).</li>
+                                <li><strong>Checking Voicemail:</strong> Press the "Messages" button on your phone and follow the audio prompts.</li>
+                            </ul>
+                             <div class="pro-tip">
+                                <strong>Training Resources:</strong> For a visual guide, watch this <a href="https://www.youtube.com/watch?v=A_s-14Ie2_s" target="_blank" class="link">Polycom IP 650 Video Tutorial</a>. For a complete reference, you can download the <a href="https://support.polycom.com/content/dam/polycom-support/products/voice/soundpoint-ip/user-guides/en/soundpoint-ip-650-user-guide-sip-3-2.pdf" target="_blank" class="link">Official User Guide</a>.
+                            </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Epson ET-2850 Office Printer</summary>
+                        <div class="details-content">
+                            <p>The printer in your office is an Epson EcoTank ET-2850. You'll use this for printing work orders, customer approvals, and other general office documents.</p>
+                            <h4 >Key Features:</h4>
+                            <ul >
+                                <li><strong>EcoTank System:</strong> This printer doesn't use traditional cartridges. It has ink tanks that are refilled from bottles, which is more cost-effective and environmentally friendly.</li>
+                                <li><strong>Functions:</strong> It can print, copy, and scan.</li>
+                                <li><strong>Connectivity:</strong> It's connected to our network, so you can print directly from your computer.</li>
+                            </ul>
+                            <h4 >Getting Started:</h4>
+                            <ol >
+                                <li><strong>Driver Installation:</strong> The printer driver should already be installed on your computer. We'll do a test print to make sure it's connected.</li>
+                                <li><strong>Loading Paper:</strong> The paper tray is at the back of the printer. Ensure it has standard 8.5" x 11" paper.</li>
+                                <li><strong>Basic Operations:</strong> The control panel on the front allows you to make copies or scan documents directly to a connected computer.</li>
+                            </ol>
+                            <div class="pro-tip">
+                                <strong>Training Resources:</strong> For detailed instructions on any function, refer to the official Epson support materials.
+                                <ul >
+                                    <li><a href="https://www.youtube.com/watch?v=s_4D2-d3-hA" target="_blank" class="link">Epson ET-2850 Video Guide</a> (Covers setup and basic use)</li>
+                                    <li><a href="https://epson.com/support/ecotank-et-2850" target="_blank" class="link">Official Epson ET-2850 Support & Manuals Page</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <div class="card">
+                    <h2 >Professional Customer Communication</h2>
+                    <details>
+                        <summary>Phone Scripts & Best Practices</summary>
+                        <div class="details-content">
+                           <p><strong>Your Greeting:</strong> Always answer with, <em>"Thank you for calling Northwest Custom Apparel, this is [Your Name], how can I help you?"</em></p>
+                           <p><strong>The Goal:</strong> Your main job is to direct the call. If it's a sales inquiry, get them to a sales rep. You are not expected to give pricing.</p>
+                           <p><strong>If a Rep is Busy:</strong> Use this script: <em>"[Sales Rep's Name] is with a customer right now. I'd be happy to take down your information and have them call you back before the end of the day. May I start with your name and company?"</em></p>
+                           <p><strong>The "Sunshine Law":</strong> This is a non-negotiable rule. Every customer inquiry must get a response before the sun sets. It builds incredible trust and sets us apart from the competition.</p>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Qualifying Questions to Ask</summary>
+                        <div class="details-content">
+                            <p>When a new customer calls, you're like a detective. The more clues you gather, the better the sales rep can serve them. Ask these questions:</p>
+                            <ul >
+                                <li>What are you using the items for? (This helps us recommend the right products).</li>
+                                <li>How many are you looking for? (This determines the best decoration method).</li>
+                                <li>Do you have a specific date you need them by? (This tells us if it's a rush order).</li>
+                                <li>Do you have a design or logo ready? (This tells us if art charges are needed).</li>
+                                <li>Have you ordered custom apparel before? (This tells us their experience level).</li>
+                            </ul>
+                        </div>
+                    </details>
+                     <details >
+                        <summary>Handling "Mosquito Customers"</summary>
+                        <div class="details-content">
+                            <p>A "Mosquito Customer" is our term for someone with a very small order who calls repeatedly with questions, "sucking all the blood out of you." It's important to be polite but firm.</p>
+                            <p><strong>The Strategy:</strong> Reassure them their questions will be answered, but channel them through the proper process. Say, <em>"That's a great question for the sales rep. I've made a note of it and they will cover it when they call you back."</em> Don't let the call drag on. Your time is valuable!</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="card">
+                    <h2 >Shopworks: Leads & Customer Management</h2>
+                    <p>Before a person has an order, they are a **Lead** in Shopworks. Your first step after a call with a new prospect is to create a lead record for them. Accurate data entry is crucial for marketing and follow-ups.</p>
+                    <div class="pro-tip">
+                        <strong>Activity:</strong> Let's create a new lead in Shopworks right now for a fake company. We'll call it "The Coordinator's Test Company". Be sure to fill out every field you can, especially **Customer Type** (e.g., Corporate, Construction) and **Lead Source** (e.g., Google Search, Referral).
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 3 Section -->
+            <section id="day3" class="content-section">
+                 <h1 >Day 3: Shopworks Fundamentals</h1>
+                 <div class="card">
+                    <h2 >Our Training Method: "I Do, We Do, You Do"</h2>
+                    <div class="details-content">
+                        <p>Today's training will follow a simple but powerful model to help you learn effectively. It's designed to build your skills and confidence step-by-step.</p>
+                        <ol >
+                            <li><strong>I Do (Watch & Learn):</strong> First, we'll watch the official Shopworks training video for a specific task. Then, I (Erik) will demonstrate how we apply that task here at NW Custom Apparel, adding our own best practices.</li>
+                            <li><strong>We Do (Guided Practice):</strong> Next, we'll do the task together. I'll guide you through the process on your computer, step-by-step.</li>
+                            <li><strong>You Do (Independent Practice):</strong> Finally, you'll do the task on your own. This is where the real learning happens, and it's okay to make mistakes!</li>
+                        </ol>
+                        <p>This method ensures you not only see how something is done, but you get the hands-on practice you need to master it.</p>
+                    </div>
+                </div>
+                 <div class="card">
+                    <h2 >Today's Shopworks Training Plan</h2>
+                     <details>
+                        <summary>Your First Resource: The Help Button</summary>
+                        <div class="details-content">
+                            <p>Before we dive into videos, the most important tool you can learn to use is the built-in **Help** feature in Shopworks. If you ever have a "how do I do this?" question, this is your first stop.</p>
+                            <p>You can find it in the bottom toolbar of the Shopworks screen. It's the icon with the question mark.</p>
+                            <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092941" alt="Shopworks Help Button Screenshot" class="mt-2 rounded-lg border">
+                            <h4 >Navigating the Help Menu</h4>
+                            <p>When you click the Help button, a new window opens with a navigation menu on the left. This is your library of training materials.</p>
+                             <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092945" alt="Shopworks Help Menu Screenshot" class="mt-2 rounded-lg border">
+                            <p >Here are the key sections you'll use most often:</p>
+                             <ul >
+                                <li><strong>System Basics:</strong> Covers general navigation and how the system is laid out.</li>
+                                <li><strong>Customers:</strong> Everything you need to know about adding, finding, and editing customer records.</li>
+                                <li><strong>Order Entry:</strong> This is a critical section covering how to build an order from start to finish.</li>
+                                <li><strong>Training Videos:</strong> This section contains the video modules we will be watching together.</li>
+                            </ul>
+                             <div class="pro-tip">
+                                <strong>Empower Yourself:</strong> Learning to find answers in the Help Menu is a superpower. It will help you solve problems quickly and become a knowledgeable resource for our customers and our team.
+                            </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Video 1: System Navigation and Basics (ID 1024)</summary>
+                        <div class="details-content">
+                           <p>Our first training module will cover the fundamentals of navigating the Shopworks OnSite system. This video is approximately 25 minutes long.</p>
+                           <h4 >How to Find the Video:</h4>
+                           <ol >
+                               <li>Click the **Help** button (the question mark icon) in the bottom toolbar of Shopworks.</li>
+                               <li>In the Help window, go to the "How We Can Help" search bar at the top.</li>
+                               <li>Type in the ID number **1024** and press Enter.</li>
+                               <li>The "System Navigation and Basics" video, presented by Greg Stevens, will appear.</li>
+                           </ol>
+                           <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Basics%20for%20Using%20Onsite.png?ver=1" alt="Screenshot of the Shopworks video page for System Navigation and Basics" class="mt-2 rounded-lg border">
+                           <div class="pro-tip">
+                                <strong>Our Process:</strong> We will watch this video together ("I Do"), then I will demonstrate these basics on the main screen ("We Do"), and finally, you will practice navigating on your own computer ("You Do").
+                           </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Video 2: Order Entry Basics (ID 1042)</summary>
+                        <div class="details-content">
+                           <p>This is the most important process in Shopworks. If Order Entry is done correctly, everything else flows smoothly. If it's done incorrectly, it can cause problems across multiple departments.</p>
+                           <h4 >How to Find the Videos:</h4>
+                           <ol >
+                               <li>Click the **Help** button in Shopworks.</li>
+                               <li>In the "How We Can Help" search bar, type in the ID number **1042** and press Enter.</li>
+                               <li>This will bring you to the Order Entry Basics page.</li>
+                           </ol>
+                           <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092997" alt="Screenshot of the Shopworks video page for Order Entry Basics" class="mt-2 rounded-lg border">
+                           <h4 >Videos to Watch:</h4>
+                           <ul >
+                                <li><strong>Important Concepts - Order Types (Approx. 24 mins):</strong> Presented by Jay Malanga, the founder of Shopworks. This explains the "why" behind different order types.</li>
+                                <li><strong>Order Entry Basics (Approx. 40 mins):</strong> Presented by Greg Stevens. This is the core "how-to" for building an order.</li>
+                                <li><strong>Order Entry Shipping (Approx. 10 mins):</strong> Presented by Greg Stevens. This covers the critical shipping tab on the order.</li>
+                           </ul>
+                           <div class="pro-tip">
+                                <strong>Skip This One:</strong> You do not need to watch "Order Entry Line Items for Administrators." That video is for high-level system setup, not daily tasks.
+                           </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+            
+            <!-- Day 4 Section -->
+            <section id="day4" class="content-section">
+                <h1 >Day 4: Practical Shopworks: Order Creation</h1>
+                <div class="card">
+                    <h2 >Today's Shopworks Training Plan</h2>
+                     <details>
+                        <summary>Video 3: How to Add and Edit Customers (ID 1030)</summary>
+                        <div class="details-content">
+                           <p>This module covers the essential skills for managing customer records, which is the foundation of every order.</p>
+                           <h4 >How to Find the Video:</h4>
+                           <ol >
+                               <li>Click the **Help** button in Shopworks.</li>
+                               <li>In the "How We Can Help" search bar, type in the ID number **1030** and press Enter.</li>
+                               <li>This will bring you to the "Adding and Editing Customers" page.</li>
+                           </ol>
+                           <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9093022" alt="Screenshot of the Shopworks video page for Adding and Editing Customers" class="mt-2 rounded-lg border">
+                           <h4 >Video to Watch:</h4>
+                           <ul >
+                                <li><strong>How to Add and Edit Customers (Approx. 31 mins):</strong> Presented by Maria Maddox. This will walk you through creating new customer records and updating existing ones.</li>
+                           </ul>
+                           <div class="pro-tip">
+                                <strong>Skip This One:</strong> You do not need to watch the first video, "Customer Setup for Administrators."
+                           </div>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Video 4: Contacts and How to use Them (ID 1026)</summary>
+                        <div class="details-content">
+                           <p>This short video explains the difference between a "Customer" (the company) and a "Contact" (the people who work there). This is a vital concept for keeping our records organized.</p>
+                           <h4 >How to Find the Video:</h4>
+                           <ol >
+                               <li>Click the **Help** button in Shopworks.</li>
+                               <li>In the "How We Can Help" search bar, type in the ID number **1026** and press Enter.</li>
+                               <li>The "Contacts and How to use Them" video, presented by Roy Marques, will appear.</li>
+                           </ol>
+                           <h4 >Video to Watch:</h4>
+                           <ul >
+                                <li><strong>Contacts and How to use Them (Approx. 6 mins):</strong> This video explains that contacts are the individuals within an organization. We track communication with specific contacts, and they can also be leads or prospects in the marketing section.</li>
+                           </ul>
+                        </div>
+                    </details>
+                </div>
+                 <div class="card">
+                    <h2 >Hands-On Practice</h2>
+                    <p>Now we'll apply what we've learned from the videos.</p>
+                     <details>
+                        <summary>Activity: From Lead to Order</summary>
+                        <div class="details-content">
+                            <p>This is where it all comes together. We will go through the entire process from start to finish.</p>
+                            <ol >
+                               <li>**Find the Lead:** Search for "The Coordinator's Test Company" that you created on Day 2.</li>
+                               <li>**Log an Activity:** Add a new note to the lead record. Let's say they called back and are ready to move forward.</li>
+                               <li>**Convert to Customer:** We'll convert the lead into a full customer record.</li>
+                               <li>**Build the Order:** Now, we'll create a mock order for this new customer, applying everything from the "Order Entry Basics" video. We'll add line items, select a design, and fill out the shipping information.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </section>
+            
+            <!-- Day 5 Section -->
+            <section id="day5" class="content-section">
+                <h1 >Day 5: The Big Picture: Production & Policies</h1>
+                 <div class="card">
+                    <h2 >Factory Walk-Through & Production Basics</h2>
+                    <p>Let's go see how the magic happens. This will help you understand why the details you enter in Shopworks are so important.</p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2 mt-4">
+                       <li><strong>Embroidery Basics:</strong> We'll look at thread, needles, and **backing** (the material that stabilizes the fabric during sewing). We'll see different types like tear-away and cut-away.</li>
+                       <li><strong>Hooping:</strong> We'll see how a garment is placed in a hoop to keep it taut for sewing.</li>
+                       <li><strong>DTG Printing:</strong> We'll watch the printer and see why 100% cotton is so important for the ink to bond correctly.</li>
+                       <li><strong>The Flow:</strong> We'll visit the staging areas, the QC/Trimming station, and the shipping department so you can see the full lifecycle of an order.</li>
+                       <li><strong>Activity:</strong> We'll time an 8,000 stitch logo on an embroidery machine. This will give you a real sense of how long production takes and why rush orders require careful scheduling and a 25% upcharge.</li>
+                    </ul>
+                </div>
+                 <div class="card">
+                    <h2 >Key Scenarios & Wrap-Up</h2>
+                    <details>
+                        <summary>Sample Policy</summary>
+                        <div class="details-content">
+                             <ul >
+                                <li>Samples must be returned within **7 days**.</li>
+                                <li>A customer can check out **3 samples** without payment info.</li>
+                                <li>More than 3 requires a credit card, which is charged for the items and refunded upon their return.</li>
+                                <li>All sample checkouts MUST be logged in the sample book.</li>
+                                <li><strong>The "44 Account":</strong> This is our marketing fund from Sanmar. We can use it to order low-cost samples (under $30) for good customers that they can keep. It's a powerful "WOW" tool.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Customer Supplied Garments</summary>
+                        <div class="details-content">
+                            <p>We strongly discourage this because we can't guarantee the quality of the garment. However, we can sometimes do it for **embroidery only**.</p>
+                             <ul class="checklist space-y-2">
+                                <li>Minimum is 12 pieces, must be new with tags.</li>
+                                <li>The production manager must approve them first to make sure they can be hooped.</li>
+                                <li>The customer **MUST sign our waiver**. We are not responsible for damage. Things like needle breaks happen and can ruin a garment.</li>
+                                <li>We charge a higher price for the embroidery ($15-$25 for a left chest) because it's a riskier, non-standard job.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details >
+                        <summary>Customer Complaint Procedure</summary>
+                        <div class="details-content">
+                            <p>We use the **L.A.S.T. Method** (Listen, Apologize, Solve, Thank).</p>
+                             <ol >
+                                <li><strong>Listen:</strong> Let them finish. Don't interrupt. Understand their frustration.</li>
+                                <li><strong>Apologize:</strong> "I'm so sorry to hear that." It shows empathy and de-escalates the situation.</li>
+                                <li><strong>Solve:</strong> Ask, "What would be an acceptable solution for you?" This empowers them. Then discuss options (reprint, credit) with a manager. Our first choice is always to reprint the order correctly.</li>
+                                <li><strong>Thank:</strong> Thank them for bringing the issue to your attention. It gives us an opportunity to improve.</li>
+                            </ol>
+                            <p><strong>Case Study: The Muckleshoot Tribe Order.</strong> We printed 100 tie-dye shirts that had fixation marks (a faint box from the pre-treatment process). They are a key account. Since they kept and used the shirts, we offered them a choice: a 100% credit for the damaged shirts on their next order, or a 50% refund. We prefer credits because it encourages repeat business.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Training Log Section -->
+            <section id="log" class="content-section">
+                <h1 >Training Log & Action Items</h1>
+                <div class="card">
+                    <h2 >Our Training "Parking Lot"</h2>
+                    <div class="details-content">
+                        <p>This section is our "parking lot" for great questions and ideas that come up during training. When a question leads to a deeper discussion or requires a follow-up, we'll log it here. This ensures we don't forget to address it and serves as a record of our process improvements.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 >Follow-Up Items</h2>
+                     <details>
+                        <summary>August 14: Inconsistency in Order Entry for Caps & Garments</summary>
+                        <div class="details-content">
+                            <h4 >Question/Issue Raised:</h4>
+                            <p>The Sales Coordinator asked for the proper way to enter an order that includes both embroidered caps and embroidered garments. It was discovered that while the official process is to create two separate orders (a "Cap Order" and an "Embroidery Order"), an informal "secret system" is sometimes used where both are combined on one order. This creates inconsistencies and potential for errors.</p>
+                            
+                            <h4 >Action Item:</h4>
+                            <p>Erik to meet with Nika and Ruthie to discuss the inconsistency. The goal is to standardize the process to **one official method** for all employees to follow.</p>
+
+                            <h4 >Resolution:</h4>
+                            <p><em>(To be filled in after the follow-up is complete).</em></p>
+                        </div>
+                    </details>
+                    <details  open>
+                        <summary>August 14: Clarifying the Use of Different "Notes" Sections</summary>
+                        <div class="details-content">
+                            <h4 >Question/Issue Raised:</h4>
+                            <p>The Sales Coordinator asked for clarification on when to use the different "Notes" fields in Shopworks (e.g., "Notes on Order," "Notes to Production"). It was noted that different people use different sections, which can cause confusion.</p>
+                            
+                            <h4 >Action Item:</h4>
+                            <p>Erik to create and distribute a simple guide defining the purpose of each note section to standardize their use across the company.</p>
+
+                            <h4 >Proposed Standard:</h4>
+                             <ul >
+                                <li><strong>Notes on Order (Main Page):</strong> For the order's "story" - major status updates and customer communications.</li>
+                                <li><strong>Notes to Production:</strong> For specific, actionable instructions for the production team (e.g., thread colors, placement details).</li>
+                                <li><strong>Notes to Shipping:</strong> For specific, actionable instructions for shipping (e.g., use customer's UPS account).</li>
+                                <li><strong>Notes to Accounting:</strong> For specific, actionable instructions for billing (e.g., apply 10% discount).</li>
+                            </ul>
+                            
+                            <details >
+                                <summary>Analysis of Sample Notes (Real-World Examples)</summary>
+                                <div class="details-content">
+                                    <p>Based on the sample spreadsheet, here are examples of notes that cause confusion and how to fix them:</p>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left border-collapse">
+                                            <thead class="bg-gray-100">
+                                                <tr>
+                                                    <th >"Bad" Example</th>
+                                                    <th >Why It's a Problem</th>
+                                                    <th >The "Better" Way</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr >
+                                                    <td class="p-2 border italic">"going to add more shirts" (in Notes to Shipping)</td>
+                                                    <td >This is a vague status update in a section meant for action. The shipping team can't do anything with this information.</td>
+                                                    <td >The note should be in **"Notes on Order"** as: "8/15 - EM: Customer may add more shirts. Waiting on confirmation."</td>
+                                                </tr>
+                                                <tr >
+                                                    <td class="p-2 border italic">"Blank shirt bring to Erik and turn into billing" (in Notes to Shipping)</td>
+                                                    <td >This has multiple instructions for different people and is in the wrong section. Shipping doesn't handle billing.</td>
+                                                    <td >This should be two separate communications: a Slack message or verbal instruction to the person getting the shirt, and a note in **"Notes to Accounting"** saying "Per Erik, bill for 1 blank shirt."</td>
+                                                </tr>
+                                                <tr >
+                                                    <td class="p-2 border italic">"will you call kevin when this is done, he's picking up" (in Notes to Shipping)</td>
+                                                    <td >It's informal and phrased as a question. Notes should be clear, direct commands.</td>
+                                                    <td >The note in **"Notes to Shipping"** should be: "Hold for Pickup. Call Kevin at [Phone Number] when complete."</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <h4 >Resolution:</h4>
+                            <p><em>(To be filled in after the follow-up is complete).</em></p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+            
+            <!-- Notes Game Section -->
+            <section id="notes-game" class="content-section">
+                 <div class="notes-game-body">
+                    <div class="notes-game-container">
+                        <!-- Header -->
+                        <div class="notes-game-header">
+                            <h1>📝 Shopworks Notes Training</h1>
+                            <p>Learn how to write effective notes that help the entire team deliver excellent service</p>
+                        </div>
+
+                        <!-- Stats Bar -->
+                        <div class="stats-bar">
+                            <div class="stat-card">
+                                <div class="number">70%</div>
+                                <div class="label">Notes go in "Order"</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">25%</div>
+                                <div class="label">Notes go to "Production"</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">5%</div>
+                                <div class="label">All other sections</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">&lt; 20</div>
+                                <div class="label">Words per note</div>
+                            </div>
+                        </div>
+
+                       <!-- Hall of Shame Section -->
+                        <div class="hall-of-shame">
+                            <h2>⚠️ Hall of Shame - Phrases to NEVER Use</h2>
+                            <p>These are actual vague notes from our system that cause confusion and delays</p>
+                            
+                            <div class="shame-grid">
+                                <div class="shame-box">
+                                    <h3>🚫 Top 10 Worst Phrases</h3>
+                                    <ol>
+                                        <li><strong>"PO sent"</strong> - Used 24+ times by RL without details</li>
+                                        <li><strong>"See attached"</strong> - TH's favorite, never explains what</li>
+                                        <li><strong>"Reorder"</strong> - Of what? How many? From where?</li>
+                                        <li><strong>"Same as last time"</strong> - Which time? What specs?</li>
+                                        <li><strong>"Ok with BO"</strong> - What's backordered? Until when?</li>
+                                        <li><strong>"Samples"</strong> - For whom? Which products?</li>
+                                        <li><strong>"White logo"</strong> - Size? Placement? Which item?</li>
+                                        <li><strong>"Drop at eds"</strong> - Who's Ed? What location?</li>
+                                        <li><strong>"Check on this"</strong> - Check on what exactly?</li>
+                                        <li><strong>"LC"</strong> - What does this even mean?</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="fix-box">
+                                    <h3>✅ How to Fix These</h3>
+                                    <p><strong>Instead of:</strong> "PO sent"<br>
+                                    <strong>Write:</strong> "PO #12345 sent to Sanmar for 50 navy tees"</p>
+                                    
+                                    <p><strong>Instead of:</strong> "See attached"<br>
+                                    <strong>Write:</strong> "Customer's logo file attached for approval"</p>
+                                    
+                                    <p><strong>Instead of:</strong> "Reorder"<br>
+                                    <strong>Write:</strong> "Reorder 25 black hoodies from order #13000"</p>
+                                    
+                                    <p><strong>Instead of:</strong> "White logo"<br>
+                                    <strong>Write:</strong> "White logo, 3 inch, left chest centered"</p>
+                                    
+                                    <p><strong>Instead of:</strong> "Samples"<br>
+                                    <strong>Write:</strong> "3 sample polos sent to John for color review"</p>
+                                </div>
+                            </div>
+                            
+                            <div class="impact-box">
+                                <h3>📊 Impact of Vague Notes</h3>
+                                <p>
+                                    <strong>3,829 vague notes</strong> in our system = <strong>40% of all notes</strong><br>
+                                    Each vague note wastes ~5 minutes of clarification time<br>
+                                    That's <strong>320 hours</strong> of wasted productivity!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Main Sections -->
+                        <div class="main-content-game">
+                            <!-- Notes on Order Section -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <div class="section-icon">📋</div>
+                                    <div class="section-title">
+                                        <h2>Notes on Order</h2>
+                                        <div class="usage">Used in 70% of all notes - Your PRIMARY location</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="purpose">
+                                    <strong>Purpose:</strong> Document the order's journey and all customer communications. This is where the "story" of the order lives.
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>✅ Good Examples from Your Team:</h3>
+                                    <div class="example-note">"PO #12345 submitted to Sanmar"</div>
+                                    <div class="example-note">"Customer approved artwork via email"</div>
+                                    <div class="example-note">"Waiting for color selection from customer"</div>
+                                    <div class="example-note">"Called customer - will pick up Monday"</div>
+                                    <div class="example-note">"Payment received - paid online"</div>
+                                    <div class="example-note">"Rush order - needed by Friday 2/14"</div>
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>❌ What NOT to Write (Real examples from your team):</h3>
+                                    <div class="example-note bad">"PO sent" (Which PO? To whom? For what?)</div>
+                                    <div class="example-note bad">"See attached" (What's attached? Why?)</div>
+                                    <div class="example-note bad">"Reorder" (What? How many? From where?)</div>
+                                    <div class="example-note bad">"Same as last time" (Which time? What exactly?)</div>
+                                    <div class="example-note bad">"Ok with BO" (What's on backorder? Until when?)</div>
+                                    <div class="example-note bad">"Samples" (For whom? Which products?)</div>
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>🔑 Key Action Words:</h3>
+                                    <div class="action-words">
+                                        <span class="action-word">Waiting</span>
+                                        <span class="action-word">Emailed</span>
+                                        <span class="action-word">Called</span>
+                                        <span class="action-word">Approved</span>
+                                        <span class="action-word">Submitted</span>
+                                        <span class="action-word">Received</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes to Production Section -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <div class="section-icon">🏭</div>
+                                    <div class="section-title">
+                                        <h2>Notes to Production</h2>
+                                        <div class="usage">Used in 25% of all notes - Technical specs only</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="purpose">
+                                    <strong>Purpose:</strong> Specific, actionable instructions for production. No backstory needed - just technical details.
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>✅ Good Examples from Your Team:</h3>
+                                    <div class="example-note">"White logo on black shirts, 3 inch, left chest"</div>
+                                    <div class="example-note">"Use tear away backing on all"</div>
+                                    <div class="example-note">"Name & year 2024 on left chest"</div>
+                                    <div class="example-note">"Charcoal thread for embroidery"</div>
+                                    <div class="example-note">"2.5 inch logo centered on back"</div>
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>❌ What NOT to Write (Real examples from your team):</h3>
+                                    <div class="example-note bad">"White logo" (Size? Placement? Which garment?)</div>
+                                    <div class="example-note bad">"Full front logo" (How big? What color?)</div>
+                                    <div class="example-note bad">"Same as last order" (Order number? Specifications?)</div>
+                                    <div class="example-note bad">"See design" (Where? Which design?)</div>
+                                    <div class="example-note bad">"Use regular thread" (What color? Type?)</div>
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>🔑 Key Elements:</h3>
+                                    <div class="action-words">
+                                        <span class="action-word">Colors</span>
+                                        <span class="action-word">Placement</span>
+                                        <span class="action-word">Size</span>
+                                        <span class="action-word">Material</span>
+                                        <span class="action-word">Thread type</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Sections -->
+                        <div class="main-content-game">
+                            <!-- Notes to Shipping -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <div class="section-icon">📦</div>
+                                    <div class="section-title">
+                                        <h2>Notes to Shipping</h2>
+                                        <div class="usage">Used in 2% of notes - Special shipping only</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="purpose">
+                                    <strong>Purpose:</strong> Only for non-standard shipping situations
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>✅ When to Use:</h3>
+                                    <div class="example-note">"Ship on customer's UPS #973214"</div>
+                                    <div class="example-note">"Call 425-652-6690 for pickup"</div>
+                                    <div class="example-note">"Rush - Ship Monday morning"</div>
+                                    <div class="example-note">"Combine with orders #133025, #133026"</div>
+                                </div>
+                            </div>
+
+                            <!-- Notes to Accounting -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <div class="section-icon">💰</div>
+                                    <div class="section-title">
+                                        <h2>Notes to Accounting</h2>
+                                        <div class="usage">Used in 1.5% of notes - Special billing only</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="purpose">
+                                    <strong>Purpose:</strong> Only for special billing situations
+                                </div>
+
+                                <div class="examples-section">
+                                    <h3>✅ When to Use:</h3>
+                                    <div class="example-note">"Tax exempt - cert on file"</div>
+                                    <div class="example-note">"Apply 10% first-time discount"</div>
+                                    <div class="example-note">"Bill to Paul, not company"</div>
+                                    <div class="example-note">"Gift certificate #E3GF-2FFE"</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Practice Section -->
+                        <div class="practice-section">
+                            <h2>🎯 Practice Writing Notes</h2>
+                            
+                            <div class="scenario">
+                                <h3>Scenario 1: Customer Communication</h3>
+                                <p>A customer just called to check on their order status. You told them it will be ready Friday. Where do you put this note and what do you write?</p>
+                                <textarea id="practice1" placeholder="Type your note here..."></textarea>
+                                <div class="button-group">
+                                    <button class="game-button" onclick="checkAnswer(1)">Check Answer</button>
+                                    <button class="game-button secondary" onclick="showExample(1)">Show Example</button>
+                                </div>
+                                <div id="feedback1" class="feedback"></div>
+                            </div>
+
+                            <div class="scenario">
+                                <h3>Scenario 2: Production Specification</h3>
+                                <p>Customer wants their company logo in white on navy blue shirts, 3 inches wide, centered on the left chest. Write the production note.</p>
+                                <textarea id="practice2" placeholder="Type your note here..."></textarea>
+                                <div class="button-group">
+                                    <button class="game-button" onclick="checkAnswer(2)">Check Answer</button>
+                                    <button class="game-button secondary" onclick="showExample(2)">Show Example</button>
+                                </div>
+                                <div id="feedback2" class="feedback"></div>
+                            </div>
+
+                            <div class="scenario">
+                                <h3>Scenario 3: Shipping Instructions</h3>
+                                <p>Customer wants to use their own FedEx account #445566 for shipping. Write the appropriate note.</p>
+                                <textarea id="practice3" placeholder="Type your note here..."></textarea>
+                                <div class="button-group">
+                                    <button class="game-button" onclick="checkAnswer(3)">Check Answer</button>
+                                    <button class="game-button secondary" onclick="showExample(3)">Show Example</button>
+                                </div>
+                                <div id="feedback3" class="feedback"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Tips -->
+                        <div class="quick-tips">
+                            <h2>💡 Golden Rules for Great Notes</h2>
+                            <div class="tips-grid">
+                                <div class="tip">
+                                    <h3>Be Specific</h3>
+                                    <p>Say "Called John about artwork approval" not just "Called customer"</p>
+                                </div>
+                                <div class="tip">
+                                    <h3>Include Dates</h3>
+                                    <p>For time-sensitive items, always include the date: "Need by Friday 2/14"</p>
+                                </div>
+                                <div class="tip">
+                                    <h3>Use Action Words</h3>
+                                    <p>Start with verbs: Emailed, Called, Waiting, Received, Approved</p>
+                                </div>
+                                <div class="tip">
+                                    <h3>Keep It Short</h3>
+                                    <p>Most effective notes are under 20 words. Be concise!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decision Tree -->
+                        <div class="decision-tree">
+                            <h2>🤔 Quick Decision Guide</h2>
+                            <div class="decision-box">
+                                <span class="question">Customer called or emailed?</span>
+                                <span class="answer">Notes on Order</span>
+                            </div>
+                            <div class="decision-box">
+                                <span class="question">How to make the product?</span>
+                                <span class="answer">Notes to Production</span>
+                            </div>
+                            <div class="decision-box">
+                                <span class="question">Special shipping needs?</span>
+                                <span class="answer">Notes to Shipping</span>
+                            </div>
+                            <div class="decision-box">
+                                <span class="question">Payment or billing issue?</span>
+                                <span class="answer">Notes to Accounting</span>
+                            </div>
+                            <div class="decision-box">
+                                <span class="question">Everything else?</span>
+                                <span class="answer">Notes on Order</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+
+            const updateActiveState = (hash) => {
+                links.forEach(link => {
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                sections.forEach(section => {
+                    if ('#' + section.id === hash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            };
+
+            const initialHash = window.location.hash || '#day1';
+            updateActiveState(initialHash);
+
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetHash = this.getAttribute('href');
+                    // Simple scroll to top of content area on new section
+                    document.querySelector('main').scrollTop = 0;
+                    history.pushState(null, null, targetHash);
+                    updateActiveState(targetHash);
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                const hash = window.location.hash || '#day1';
+                updateActiveState(hash);
+            });
+        });
+
+        // Practice scenarios with correct answers
+        const scenarios = {
+            1: {
+                section: "Notes on Order",
+                goodExamples: [
+                    "Customer called - order ready Friday",
+                    "Called customer about status - ready Friday",
+                    "Customer inquiry - will be ready Friday"
+                ],
+                keywords: ["called", "customer", "Friday", "ready"]
+            },
+            2: {
+                section: "Notes to Production",
+                goodExamples: [
+                    "White logo on navy shirts, 3\" wide, left chest centered",
+                    "3 inch white logo centered on left chest",
+                    "Logo: white, 3\" wide, left chest center"
+                ],
+                keywords: ["white", "navy", "3", "left chest", "centered"]
+            },
+            3: {
+                section: "Notes to Shipping",
+                goodExamples: [
+                    "Ship on customer's FedEx #445566",
+                    "Use customer FedEx account #445566",
+                    "Customer's FedEx #445566"
+                ],
+                keywords: ["FedEx", "445566", "customer", "account"]
+            }
+        };
+
+        function checkAnswer(scenarioNum) {
+            const textarea = document.getElementById(`practice${scenarioNum}`);
+            const feedback = document.getElementById(`feedback${scenarioNum}`);
+            const answer = textarea.value.toLowerCase().trim();
+            const scenario = scenarios[scenarioNum];
+            
+            if (answer.length === 0) {
+                showFeedback(feedback, "Please write a note first!", false);
+                return;
+            }
+
+            // Check if answer contains key elements
+            const hasKeywords = scenario.keywords.filter(keyword => 
+                answer.includes(keyword.toLowerCase())
+            ).length;
+
+            const keywordPercentage = hasKeywords / scenario.keywords.length;
+
+            if (keywordPercentage >= 0.5) {
+                showFeedback(feedback, 
+                    `✅ Great job! This would go in "${scenario.section}". Your note is clear and includes the key information.`, 
+                    true
+                );
+            } else if (keywordPercentage >= 0.25) {
+                showFeedback(feedback, 
+                    `⚠️ Good start! This would go in "${scenario.section}". Try to include more specific details like: ${scenario.keywords.join(', ')}`, 
+                    false
+                );
+            } else {
+                showFeedback(feedback, 
+                    `❌ This needs more detail. Remember to include key information: ${scenario.keywords.join(', ')}. This should go in "${scenario.section}"`, 
+                    false
+                );
+            }
+        }
+
+        function showExample(scenarioNum) {
+            const textarea = document.getElementById(`practice${scenarioNum}`);
+            const feedback = document.getElementById(`feedback${scenarioNum}`);
+            const scenario = scenarios[scenarioNum];
+            
+            textarea.value = scenario.goodExamples[0];
+            showFeedback(feedback, 
+                `📝 Example note for "${scenario.section}": ${scenario.goodExamples.join(' OR ')}`, 
+                true
+            );
+        }
+
+        function showFeedback(element, message, isSuccess) {
+            element.textContent = message;
+            element.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+            element.style.display = 'block';
+        }
+
+        // Navigation function for switching between sections
+        function showSection(sectionId, clickedElement) {
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+                selectedSection.classList.add('active');
+            }
+            
+            // Update navigation active state
+            document.querySelectorAll('.sidebar nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        // Initialize the page - show Day 1 by default
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('day1', document.querySelector('[href="#day1"]'));
+        });
+
+        // Add some interactivity to decision boxes
+        document.querySelectorAll('.decision-box').forEach(box => {
+            box.addEventListener('click', function() {
+                // Reset all boxes
+                document.querySelectorAll('.decision-box').forEach(b => {
+                    b.style.background = '#f8f9fa';
+                });
+                // Highlight clicked box
+                this.style.background = 'var(--success-bg)';
+            });
+        });
+    </script>
+</body>
+</html>

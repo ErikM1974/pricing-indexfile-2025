@@ -1,57 +1,28 @@
 /**
  * Embroidery Quote Service
  * Handles saving Contract Embroidery quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class EmbroideryQuoteService {
+class EmbroideryQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    }
-
-    /**
-     * Generate unique quote ID for Embroidery quotes
-     */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `embroidery_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        // Use EMB prefix for embroidery quotes
-        return `EMB${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up sequence numbers from previous days
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('embroidery_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
+        super({
+            prefix: 'EMB',
+            storagePrefix: 'embroidery',
+            sessionPrefix: 'emb_sess'
         });
     }
 
     /**
-     * Generate session ID
+     * Get embellishment type for Embroidery
      */
-    generateSessionID() {
-        return `emb_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'embroidery';
     }
 
     /**
      * Get pricing tier based on quantity
+     * Override base class with Embroidery-specific tiers
      */
     getPricingTier(quantity) {
         if (quantity <= 15) return '1-15';

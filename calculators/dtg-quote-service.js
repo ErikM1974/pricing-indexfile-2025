@@ -1,53 +1,23 @@
 /**
  * DTG Quote Service
  * Handles saving DTG contract quotes to Caspio database
+ * Extends BaseQuoteService for common functionality
  */
 
-class DTGQuoteService {
+class DTGQuoteService extends BaseQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    }
-
-    /**
-     * Generate unique quote ID for DTG quotes
-     */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Get or initialize daily sequence from sessionStorage
-        const storageKey = `dtg_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        
-        // Store the updated sequence
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old date keys
-        this.cleanupOldSequences(dateKey);
-        
-        // Use DTG prefix for contract DTG quotes
-        return `DTG${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up sequence numbers from previous days
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith('dtg_quote_sequence_') && !key.endsWith(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
+        super({
+            prefix: 'DTG',
+            storagePrefix: 'dtg',
+            sessionPrefix: 'dtg_sess'
         });
     }
 
     /**
-     * Generate session ID
+     * Get embellishment type for DTG
      */
-    generateSessionID() {
-        return `dtg_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    getEmbellishmentType() {
+        return 'dtg';
     }
 
     /**
