@@ -15,15 +15,15 @@
         }
 
         @page {
-            size: letter;
-            margin: 0.25in;
+            size: letter landscape;
+            margin: 0.2in;
         }
 
         @media print {
             body {
                 background: white !important;
-                font-size: 9pt !important;
-                line-height: 1.2 !important;
+                font-size: 7pt !important;
+                line-height: 1.1 !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
@@ -40,52 +40,60 @@
                 max-width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                height: 7.5in !important;
+                overflow: hidden !important;
             }
             
             .header {
-                margin-bottom: 10px !important;
-                padding: 8px !important;
+                margin-bottom: 4px !important;
+                padding: 4px !important;
                 border: 1px solid #333 !important;
                 page-break-inside: avoid;
+                text-align: center !important;
             }
             
             .header h1 {
-                font-size: 14pt !important;
-                margin-bottom: 2px !important;
+                font-size: 11pt !important;
+                margin: 0 !important;
                 color: #000 !important;
+                display: inline !important;
             }
             
             .header .subtitle {
-                font-size: 9pt !important;
-                margin-bottom: 2px !important;
+                font-size: 7pt !important;
+                margin: 0 !important;
+                display: inline !important;
+                margin-left: 10px !important;
             }
             
             .header .version {
-                font-size: 8pt !important;
+                display: none !important;
             }
             
             .cards-grid {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 8px !important;
-                margin-bottom: 8px !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 4px !important;
+                margin-bottom: 4px !important;
             }
             
             .card {
                 page-break-inside: avoid;
                 box-shadow: none !important;
                 border: 1px solid #333 !important;
-                padding: 8px !important;
+                padding: 4px !important;
                 margin: 0 !important;
-                border-radius: 4px !important;
+                border-radius: 2px !important;
+                overflow: hidden !important;
             }
             
             .card h2 {
-                font-size: 10pt !important;
-                margin-bottom: 6px !important;
-                padding-bottom: 4px !important;
+                font-size: 8pt !important;
+                margin-bottom: 3px !important;
+                padding-bottom: 2px !important;
                 color: #000 !important;
                 border-bottom: 1px solid #333 !important;
+                font-weight: bold !important;
             }
             
             .card h2 .icon {
@@ -93,128 +101,157 @@
             }
             
             .section {
-                margin-bottom: 6px !important;
+                margin-bottom: 3px !important;
             }
             
             .section h3 {
-                font-size: 9pt !important;
-                margin-bottom: 4px !important;
-                padding: 2px 4px !important;
-                background: #f0f0f0 !important;
+                font-size: 7pt !important;
+                margin-bottom: 2px !important;
+                padding: 1px 2px !important;
+                background: #e8e8e8 !important;
                 color: #000 !important;
                 border-left: 2px solid #333 !important;
+                font-weight: bold !important;
             }
             
             .item {
-                padding: 2px 0 !important;
-                grid-template-columns: 60px 1fr !important;
-                font-size: 8pt !important;
+                padding: 1px 0 !important;
+                grid-template-columns: 40px 1fr !important;
+                font-size: 6pt !important;
+                line-height: 1.1 !important;
             }
             
             .term {
-                font-size: 8pt !important;
+                font-size: 6pt !important;
                 color: #000 !important;
                 font-weight: bold !important;
             }
             
             .definition {
-                font-size: 8pt !important;
-                padding-left: 4px !important;
+                font-size: 6pt !important;
+                padding-left: 2px !important;
             }
             
             .format-example, .format-wrong {
-                font-size: 8pt !important;
-                padding: 3px 6px !important;
-                margin: 2px 0 !important;
+                font-size: 6pt !important;
+                padding: 1px 3px !important;
+                margin: 1px 0 !important;
                 background: none !important;
+                line-height: 1.2 !important;
             }
             
             .format-example {
-                border-left: 2px solid #000 !important;
+                border-left: 1px solid #000 !important;
                 background: #f9f9f9 !important;
             }
             
             .format-wrong {
-                border-left: 2px solid #000 !important;
+                border-left: 1px solid #000 !important;
                 background: #fff !important;
                 text-decoration: line-through !important;
+                opacity: 0.6 !important;
             }
             
             .quick-rules {
                 background: #f0f0f0 !important;
                 color: #000 !important;
-                padding: 8px !important;
+                padding: 4px !important;
                 border: 1px solid #333 !important;
-                border-radius: 4px !important;
-                margin-top: 8px !important;
+                border-radius: 2px !important;
+                margin-top: 4px !important;
                 page-break-inside: avoid;
             }
             
             .quick-rules h2 {
-                font-size: 10pt !important;
+                font-size: 8pt !important;
                 color: #000 !important;
                 border-bottom: 1px solid #333 !important;
-                padding-bottom: 4px !important;
-                margin-bottom: 6px !important;
+                padding-bottom: 2px !important;
+                margin-bottom: 3px !important;
             }
             
             .rule {
-                margin: 4px 0 !important;
-                font-size: 8pt !important;
+                margin: 2px 0 !important;
+                font-size: 6pt !important;
+                line-height: 1.1 !important;
             }
             
             .rule .emoji {
-                font-size: 10pt !important;
-                margin-right: 4px !important;
+                font-size: 7pt !important;
+                margin-right: 2px !important;
             }
             
             .sizes-grid {
                 display: inline-flex !important;
-                gap: 3px !important;
+                gap: 2px !important;
                 flex-wrap: wrap !important;
-                margin-top: 4px !important;
+                margin-top: 2px !important;
             }
             
             .size-badge {
-                padding: 2px 4px !important;
-                font-size: 7pt !important;
+                padding: 1px 2px !important;
+                font-size: 5pt !important;
                 border: 1px solid #333 !important;
                 background: white !important;
                 color: #000 !important;
             }
             
-            /* Key Action Words - more compact */
+            /* Key Action Words - ultra compact */
             .card[style*="margin-top: 20px"] {
-                margin-top: 8px !important;
+                margin-top: 4px !important;
             }
             
             .card div[style*="display: grid; grid-template-columns: repeat(4, 1fr)"] {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
-                gap: 4px !important;
+                gap: 2px !important;
+            }
+            
+            .card div[style*="text-align: center"] {
+                text-align: left !important;
             }
             
             .card div[style*="text-align: center"] h3 {
-                font-size: 8pt !important;
-                padding: 2px !important;
-                margin-bottom: 2px !important;
+                font-size: 6pt !important;
+                padding: 1px !important;
+                margin-bottom: 1px !important;
+                text-align: center !important;
             }
             
             .card div[style*="padding: 10px"] {
-                padding: 4px !important;
-                font-size: 7pt !important;
-                line-height: 1.1 !important;
+                padding: 2px !important;
+                font-size: 5pt !important;
+                line-height: 1.0 !important;
             }
             
-            /* Ensure everything fits on one page */
+            /* Force single page */
             html, body {
-                height: auto !important;
-                overflow: visible !important;
+                height: 7.8in !important;
+                width: 10.5in !important;
+                overflow: hidden !important;
             }
             
             /* Compact the Quick Rules grid */
             .quick-rules div[style*="display: grid"] {
-                gap: 8px !important;
+                gap: 4px !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            /* Hide footer completely in print */
+            .footer {
+                display: none !important;
+            }
+            
+            /* Further compress specific sections for print */
+            .card:nth-child(2) .section {
+                margin-bottom: 2px !important;
+            }
+            
+            .card:nth-child(2) .format-example,
+            .card:nth-child(2) .format-wrong {
+                font-size: 5.5pt !important;
+                padding: 0px 2px !important;
+                margin: 0px 0 !important;
             }
         }
 
