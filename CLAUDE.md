@@ -141,40 +141,19 @@ Service ID: service_1c4k67j
 
 ## Development Guides
 
-### Calculator Implementation
-@memory/CALCULATOR_IMPLEMENTATION.md
-- Step-by-step guide for building new calculators
-- Updated with Customer Supplied Embroidery best practices
-- Success modal and print functionality patterns
-
-### Calculator Blueprint
-@memory/CALCULATOR_BLUEPRINT.md
-- Complete template based on Customer Supplied Embroidery success
-- Full HTML template with success modal
-- JavaScript calculator class template
-- Quote service implementation
-- Print functionality and EmailJS integration
-
-### Calculator Templates
-@memory/CALCULATOR_TEMPLATES.md
-- Ready-to-use code templates for new calculators
-- Complete HTML, JavaScript, and service templates
-- Common customization patterns
-- Quick setup checklist
+### Calculator Implementation Guide
+@memory/CALCULATOR_GUIDE.md
+- Comprehensive guide for building new calculators
+- Combines best practices from all successful implementations
+- Required patterns, EmailJS setup, database integration
+- Active calculator registry and common pitfalls
 
 ### EmailJS Integration
 @memory/EMAILJS_GUIDE.md
 - Complete EmailJS setup and configuration
 - Anti-corruption strategies and variable management
-- Success modal implementation
-- Print functionality pattern
-
-### EmailJS Complete Guide
-@memory/EMAILJS_COMPLETE_GUIDE.md
-- Master reference for EmailJS implementation
-- Variable validation and error handling
-- HTML email templates and responsive design
-- Testing procedures and common patterns
+- Template best practices and error handling
+- Testing procedures and debugging
 
 ### Quote Workflow Guide
 @memory/QUOTE_WORKFLOW_GUIDE.md
@@ -192,9 +171,9 @@ Service ID: service_1c4k67j
 
 ### API Documentation
 @memory/API_DOCUMENTATION.md
-- Comprehensive Caspio Pricing Proxy API reference
-- All endpoints for Cart, Pricing, Products, Orders, Quotes
-- Includes curl examples for every endpoint
+- Compact Caspio Pricing Proxy API reference
+- All endpoints organized by module (cart, pricing, products, orders, quotes)
+- Standard CRUD patterns and critical schemas
 - Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api
 
 ### Troubleshooting
