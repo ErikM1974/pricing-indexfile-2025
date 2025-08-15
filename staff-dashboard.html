@@ -1126,6 +1126,123 @@
         .welcome-subtitle {
             color: var(--text-secondary);
         }
+
+        /* Weather Widget */
+        .weather-widget {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .weather-widget:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .weather-loading {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .weather-icon {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .weather-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .weather-temp {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .weather-desc {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-condition {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .weather-location {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .weather-extra {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        .weather-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 1rem;
+            border-left: 1px solid var(--border-light);
+        }
+
+        .weather-stat:first-child {
+            border-left: none;
+        }
+
+        .weather-stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .weather-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .weather-widget {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .weather-extra {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
         
         /* KPI Dashboard Cards */
         .kpi-grid {
@@ -3465,6 +3582,13 @@
                     <div class="welcome-section">
                         <h1 class="welcome-greeting" id="welcomeGreeting">Welcome back!</h1>
                         <p class="welcome-subtitle">Here's what's happening at Northwest Custom Apparel today.</p>
+                    </div>
+                    
+                    <!-- Weather Widget -->
+                    <div class="weather-widget" id="weatherWidget">
+                        <div class="weather-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading weather...
+                        </div>
                     </div>
                     
                     <!-- Quick Access Calculator Grid -->
@@ -6067,6 +6191,92 @@
             }
         }
         
+        // Weather Widget Functions
+        async function loadWeatherData() {
+            const widget = document.getElementById('weatherWidget');
+            if (!widget) return;
+
+            const API_KEY = '698f949da5e313a1b30eeb6ffc4bd5c8';
+            const CITY = 'Milton';
+            const STATE = 'WA';
+            const COUNTRY = 'US';
+            const UNITS = 'imperial';
+
+            try {
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY},${STATE},${COUNTRY}&appid=${API_KEY}&units=${UNITS}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Weather data not available');
+                }
+
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                console.error('Weather fetch error:', error);
+                widget.innerHTML = `
+                    <div class="weather-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Weather data unavailable
+                    </div>
+                `;
+            }
+        }
+
+        function displayWeather(data) {
+            const widget = document.getElementById('weatherWidget');
+            if (!widget) return;
+
+            const temp = Math.round(data.main.temp);
+            const feelsLike = Math.round(data.main.feels_like);
+            const description = data.weather[0].description;
+            const humidity = data.main.humidity;
+            const windSpeed = Math.round(data.wind.speed);
+            const icon = getWeatherIcon(data.weather[0].main);
+
+            widget.innerHTML = `
+                <div class="weather-details">
+                    <div class="weather-main">
+                        <div class="weather-icon">${icon}</div>
+                        <div class="weather-temp">${temp}°F</div>
+                        <div class="weather-desc">
+                            <span class="weather-condition">${description}</span>
+                            <span class="weather-location">Milton, WA</span>
+                        </div>
+                    </div>
+                    <div class="weather-extra">
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${feelsLike}°F</span>
+                            <span class="weather-stat-label">Feels Like</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${humidity}%</span>
+                            <span class="weather-stat-label">Humidity</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${windSpeed} mph</span>
+                            <span class="weather-stat-label">Wind</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getWeatherIcon(condition) {
+            const icons = {
+                'Clear': '☀️',
+                'Clouds': '☁️',
+                'Rain': '🌧️',
+                'Drizzle': '🌦️',
+                'Thunderstorm': '⛈️',
+                'Snow': '❄️',
+                'Mist': '🌫️',
+                'Fog': '🌫️',
+                'Haze': '🌫️'
+            };
+            return icons[condition] || '🌤️';
+        }
+
         // Initialize dashboard on DOM load
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
@@ -6076,6 +6286,11 @@
             
             // Load section preferences (collapsed/expanded states)
             loadSectionPreferences();
+            
+            // Load weather data
+            loadWeatherData();
+            // Refresh weather every 10 minutes
+            setInterval(loadWeatherData, 600000);
             
             // Load all dashboard data
             await Promise.all([
