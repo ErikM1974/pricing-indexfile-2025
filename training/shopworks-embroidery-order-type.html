@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Order Process - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation Header - NWCA Style */
+        .nav-header {
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            height: 35px;
+            opacity: 0.95;
+        }
+
+        .logo-container img {
+            height: 100%;
+            width: auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3, #9C27B0);
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .effective-date {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: #FFF3CD;
+            border: 2px solid #FFC107;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
+        }
+
+        .alert-box::before {
+            content: '⚠️';
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: white;
+            padding: 0 10px;
+            font-size: 2em;
+        }
+
+        .alert-box h2 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .removed-text {
+            color: #dc3545;
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+
+        .new-text {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        /* Main Content Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .card-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 15px;
+        }
+
+        .card-title {
+            flex: 1;
+        }
+
+        .card-title h2 {
+            color: #333;
+            font-size: 1.6em;
+            margin: 0;
+        }
+
+        .card-content {
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .highlight-box strong {
+            color: #1976D2;
+        }
+
+        /* Examples Section */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .example-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            border-color: #2196F3;
+            transform: scale(1.02);
+        }
+
+        .example-card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+        }
+
+        .example-card h3 .icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .order-items {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .order-items ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .order-items li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .order-items li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-method {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #4CAF50;
+        }
+
+        .pricing-method h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .price-group {
+            background: white;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-group .quantity {
+            font-weight: bold;
+            color: #1976D2;
+        }
+
+        .price-group .price-break {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        /* Special Note */
+        .special-note {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .special-note h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .special-note .beanie-rule {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .special-note .beanie-rule h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        /* Quick Reference Table */
+        .reference-table {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .reference-table h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .yes {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .no {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .note {
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .nav-header {
+                display: none;
+            }
+            
+            .card, .alert-box, .reference-table {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="training-games-hub.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Training Hub
+                </a>
+                <h1 class="page-title">
+                    <i class="fas fa-tshirt"></i>
+                    Shopworks: Embroidery Order Type
+                </h1>
+            </div>
+            <div class="nav-right">
+                <div class="logo-container">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📋 New Embroidery Order Process</h1>
+            <p style="color: #666; font-size: 1.2em; margin-top: 10px;">Simplified system for all embroidered items</p>
+            <div class="effective-date">✨ Effective: August 15, 2025</div>
+        </div>
+
+        <!-- Important Alert -->
+        <div class="alert-box">
+            <h2>Important Change!</h2>
+            <p style="font-size: 1.15em; color: #856404;">
+                The <span class="removed-text">"Caps" order type has been REMOVED</span> from Shopworks.<br>
+                All embroidered items now use the <span class="new-text">"Embroidery" order type</span> only.
+            </p>
+        </div>
+
+        <!-- Rule 1 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-number">1</div>
+                <div class="card-title">
+                    <h2>One Order Type for All Embroidery</h2>
+                </div>
+            </div>
+            <div class="card-content">
+                <p>All embroidered items—whether caps, garments, or other items—are now written as an <strong>"Embroidery"</strong> order type in Shopworks.</p>
+                
+                <div class="highlight-box">
+                    <strong>What this means:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Caps → Use "Embroidery"</li>
+                        <li>✅ Jackets → Use "Embroidery"</li>
+                        <li>✅ Polos → Use "Embroidery"</li>
+                        <li>✅ Beanies → Use "Embroidery"</li>
+                        <li>✅ Any embroidered item → Use "Embroidery"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-number">2</div>
+                <div class="card-title">
+                    <h2>Critical: Price Caps and Garments Separately</h2>
+                </div>
+            </div>
+            <div class="card-content">
+                <p>Even though caps and garments are on the same order, they <strong>MUST be priced separately</strong> based on their individual quantities.</p>
+                
+                <div class="highlight-box">
+                    <strong>Why?</strong> Caps and garments run on different embroidery machines, so they cannot be combined for quantity pricing.
+                </div>
+
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h3><span class="icon">❌</span> Wrong Way</h3>
+                        <div class="order-items">
+                            <ul>
+                                <li>12 Caps + 12 Jackets = <span style="color: #dc3545; font-weight: bold;">24 pieces total</span></li>
+                            </ul>
+                        </div>
+                        <div class="pricing-method" style="border-color: #dc3545; background: #ffebee;">
+                            <h4 style="color: #c62828;">Incorrect Pricing:</h4>
+                            <div class="price-group" style="background: #ffcdd2;">
+                                <span>Using 24-piece price break</span>
+                                <span style="color: #c62828;">❌ WRONG</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="example-card">
+                        <h3><span class="icon">✅</span> Right Way</h3>
+                        <div class="order-items">
+                            <ul>
+                                <li>12 Caps <span style="color: #666;">(separate group)</span></li>
+                                <li>12 Jackets <span style="color: #666;">(separate group)</span></li>
+                            </ul>
+                        </div>
+                        <div class="pricing-method">
+                            <h4>Correct Pricing:</h4>
+                            <div class="price-group">
+                                <span class="quantity">Caps:</span>
+                                <span class="price-break">12-piece pricing</span>
+                            </div>
+                            <div class="price-group">
+                                <span class="quantity">Jackets:</span>
+                                <span class="price-break">12-piece pricing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rule 3 - Special Note about Beanies -->
+        <div class="special-note">
+            <h2>🎩 Special Rule: Beanies are "Flats"</h2>
+            <div class="beanie-rule">
+                <h3>Important Exception!</h3>
+                <p style="font-size: 1.15em; line-height: 1.8;">
+                    Beanies are embroidered on our <strong>flat machines</strong>, not cap drivers.<br>
+                    This means beanies are priced as <strong>"Flats" (regular Embroidery)</strong>.<br><br>
+                    <span style="background: rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 8px; display: inline-block; margin-top: 10px;">
+                        💡 <strong>You CAN combine</strong> beanies with other flat embroidery items for quantity price breaks!
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Reference Table -->
+        <div class="reference-table">
+            <h2>🔍 Quick Reference Guide</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Type</th>
+                        <th>Order Type</th>
+                        <th>Machine Type</th>
+                        <th>Can Combine for Pricing?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Caps</strong></td>
+                        <td>Embroidery</td>
+                        <td>Cap Driver</td>
+                        <td class="no">No - Price separately</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Beanies</strong></td>
+                        <td>Embroidery</td>
+                        <td>Flat Machine</td>
+                        <td class="yes">Yes - With other flats</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jackets</strong></td>
+                        <td>Embroidery</td>
+                        <td>Flat Machine</td>
+                        <td class="yes">Yes - With other flats</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Polos</strong></td>
+                        <td>Embroidery</td>
+                        <td>Flat Machine</td>
+                        <td class="yes">Yes - With other flats</td>
+                    </tr>
+                    <tr>
+                        <td><strong>T-Shirts</strong></td>
+                        <td>Embroidery</td>
+                        <td>Flat Machine</td>
+                        <td class="yes">Yes - With other flats</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px; text-align: center;">
+                <h3 style="color: #1565C0; margin-bottom: 15px;">📌 Example Scenario</h3>
+                <p style="font-size: 1.1em; color: #333;">
+                    <strong>Order:</strong> 12 caps + 12 beanies + 12 jackets<br><br>
+                    <span style="display: inline-block; background: white; padding: 10px 20px; border-radius: 8px; margin: 5px;">
+                        <strong>Caps:</strong> 12-piece price (separate)
+                    </span>
+                    <span style="display: inline-block; background: #e8f5e9; padding: 10px 20px; border-radius: 8px; margin: 5px;">
+                        <strong>Beanies + Jackets:</strong> 24-piece price (combined)
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
