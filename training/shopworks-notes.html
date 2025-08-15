@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopworks Notes Training - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* NWCA Design System Variables */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+            --crimson: #981e32;
+            --crimson-dark: #7a1829;
+            --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, var(--crimson) 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            height: 35px;
+            opacity: 0.95;
+        }
+
+        .logo-container img {
+            height: 100%;
+            width: auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .section-title {
+            flex: 1;
+        }
+
+        .section-title h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .section-title .usage {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .purpose {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .purpose strong {
+            color: #667eea;
+        }
+
+        .examples-section {
+            margin-bottom: 20px;
+        }
+
+        .examples-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .example-note {
+            background: #f0f7ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #4CAF50;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #333;
+        }
+
+        .example-note.bad {
+            background: #fff0f0;
+            border-left-color: #f44336;
+        }
+
+        .action-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-word {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        /* Hall of Shame */
+        .hall-of-shame {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .hall-of-shame h2 {
+            color: #856404;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .hall-of-shame > p {
+            text-align: center;
+            color: #856404;
+            margin-bottom: 30px;
+        }
+
+        .shame-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .shame-box {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .shame-box h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .shame-box ol {
+            color: #721c24;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .fix-box {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #0c5460;
+        }
+
+        .fix-box h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        .fix-box p {
+            color: #0c5460;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .impact-box {
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .impact-box h3 {
+            color: #c62828;
+            margin-bottom: 15px;
+        }
+
+        .impact-box p {
+            color: #b71c1c;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        /* Practice Section */
+        .practice-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .practice-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .scenario {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .scenario h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .scenario p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button.secondary {
+            background: #48bb78;
+        }
+
+        button.secondary:hover {
+            background: #38a169;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        /* Quick Tips */
+        .quick-tips {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .quick-tips h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .tip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tip h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .tip p {
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .decision-tree h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .decision-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s;
+        }
+
+        .decision-box:hover {
+            transform: translateX(10px);
+            background: #e8f5e9;
+        }
+
+        .decision-box .question {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .decision-box .answer {
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="training-games-hub.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Training Hub</span>
+                </a>
+                <div class="page-title">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Shopworks Notes Training</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="logo-container">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📝 Shopworks Notes Training</h1>
+            <p>Learn how to write effective notes that help the entire team deliver excellent service</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="number">70%</div>
+                <div class="label">Notes go in "Order"</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">25%</div>
+                <div class="label">Notes go to "Production"</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">5%</div>
+                <div class="label">All other sections</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">< 20</div>
+                <div class="label">Words per note</div>
+            </div>
+        </div>
+
+        <!-- Hall of Shame Section -->
+        <div class="hall-of-shame">
+            <h2>⚠️ Hall of Shame - Phrases to NEVER Use</h2>
+            <p>These are actual vague notes from our system that cause confusion and delays</p>
+            
+            <div class="shame-grid">
+                <div class="shame-box">
+                    <h3>🚫 Top 10 Worst Phrases</h3>
+                    <ol>
+                        <li><strong>"PO sent"</strong> - Used 24+ times by RL without details</li>
+                        <li><strong>"See attached"</strong> - TH's favorite, never explains what</li>
+                        <li><strong>"Reorder"</strong> - Of what? How many? From where?</li>
+                        <li><strong>"Same as last time"</strong> - Which time? What specs?</li>
+                        <li><strong>"Ok with BO"</strong> - What's backordered? Until when?</li>
+                        <li><strong>"Samples"</strong> - For whom? Which products?</li>
+                        <li><strong>"White logo"</strong> - Size? Placement? Which item?</li>
+                        <li><strong>"Drop at eds"</strong> - Who's Ed? What location?</li>
+                        <li><strong>"Check on this"</strong> - Check on what exactly?</li>
+                        <li><strong>"LC"</strong> - What does this even mean?</li>
+                    </ol>
+                </div>
+                
+                <div class="fix-box">
+                    <h3>✅ How to Fix These</h3>
+                    <p><strong>Instead of:</strong> "PO sent"<br>
+                    <strong>Write:</strong> "PO #12345 sent to Sanmar for 50 navy tees"</p>
+                    
+                    <p><strong>Instead of:</strong> "See attached"<br>
+                    <strong>Write:</strong> "Customer's logo file attached for approval"</p>
+                    
+                    <p><strong>Instead of:</strong> "Reorder"<br>
+                    <strong>Write:</strong> "Reorder 25 black hoodies from order #13000"</p>
+                    
+                    <p><strong>Instead of:</strong> "White logo"<br>
+                    <strong>Write:</strong> "White logo, 3 inch, left chest centered"</p>
+                    
+                    <p><strong>Instead of:</strong> "Samples"<br>
+                    <strong>Write:</strong> "3 sample polos sent to John for color review"</p>
+                </div>
+            </div>
+            
+            <div class="impact-box">
+                <h3>📊 Impact of Vague Notes</h3>
+                <p>
+                    <strong>3,829 vague notes</strong> in our system = <strong>40% of all notes</strong><br>
+                    Each vague note wastes ~5 minutes of clarification time<br>
+                    That's <strong>320 hours</strong> of wasted productivity!
+                </p>
+            </div>
+        </div>
+
+        <!-- Main Sections -->
+        <div class="main-content">
+            <!-- Notes on Order Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <div class="section-title">
+                        <h2>Notes on Order</h2>
+                        <div class="usage">Used in 70% of all notes - Your PRIMARY location</div>
+                    </div>
+                </div>
+                
+                <div class="purpose">
+                    <strong>Purpose:</strong> Document the order's journey and all customer communications. This is where the "story" of the order lives.
+                </div>
+
+                <div class="examples-section">
+                    <h3>✅ Good Examples from Your Team:</h3>
+                    <div class="example-note">"PO #12345 submitted to Sanmar"</div>
+                    <div class="example-note">"Customer approved artwork via email"</div>
+                    <div class="example-note">"Waiting for color selection from customer"</div>
+                    <div class="example-note">"Called customer - will pick up Monday"</div>
+                    <div class="example-note">"Payment received - paid online"</div>
+                    <div class="example-note">"Rush order - needed by Friday 2/14"</div>
+                </div>
+
+                <div class="examples-section">
+                    <h3>❌ What NOT to Write (Real examples from your team):</h3>
+                    <div class="example-note bad">"PO sent" (Which PO? To whom? For what?)</div>
+                    <div class="example-note bad">"See attached" (What's attached? Why?)</div>
+                    <div class="example-note bad">"Reorder" (What? How many? From where?)</div>
+                    <div class="example-note bad">"Same as last time" (Which time? What exactly?)</div>
+                    <div class="example-note bad">"Ok with BO" (What's on backorder? Until when?)</div>
+                    <div class="example-note bad">"Samples" (For whom? Which products?)</div>
+                </div>
+
+                <div class="examples-section">
+                    <h3>🔑 Key Action Words:</h3>
+                    <div class="action-words">
+                        <span class="action-word">Waiting</span>
+                        <span class="action-word">Emailed</span>
+                        <span class="action-word">Called</span>
+                        <span class="action-word">Approved</span>
+                        <span class="action-word">Submitted</span>
+                        <span class="action-word">Received</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes to Production Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">🏭</div>
+                    <div class="section-title">
+                        <h2>Notes to Production</h2>
+                        <div class="usage">Used in 25% of all notes - Technical specs only</div>
+                    </div>
+                </div>
+                
+                <div class="purpose">
+                    <strong>Purpose:</strong> Specific, actionable instructions for production. No backstory needed - just technical details.
+                </div>
+
+                <div class="examples-section">
+                    <h3>✅ Good Examples from Your Team:</h3>
+                    <div class="example-note">"White logo on black shirts, 3 inch, left chest"</div>
+                    <div class="example-note">"Use tear away backing on all"</div>
+                    <div class="example-note">"Name & year 2024 on left chest"</div>
+                    <div class="example-note">"Charcoal thread for embroidery"</div>
+                    <div class="example-note">"2.5 inch logo centered on back"</div>
+                </div>
+
+                <div class="examples-section">
+                    <h3>❌ What NOT to Write (Real examples from your team):</h3>
+                    <div class="example-note bad">"White logo" (Size? Placement? Which garment?)</div>
+                    <div class="example-note bad">"Full front logo" (How big? What color?)</div>
+                    <div class="example-note bad">"Same as last order" (Order number? Specifications?)</div>
+                    <div class="example-note bad">"See design" (Where? Which design?)</div>
+                    <div class="example-note bad">"Use regular thread" (What color? Type?)</div>
+                </div>
+
+                <div class="examples-section">
+                    <h3>🔑 Key Elements:</h3>
+                    <div class="action-words">
+                        <span class="action-word">Colors</span>
+                        <span class="action-word">Placement</span>
+                        <span class="action-word">Size</span>
+                        <span class="action-word">Material</span>
+                        <span class="action-word">Thread type</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Sections -->
+        <div class="main-content">
+            <!-- Notes to Shipping -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">📦</div>
+                    <div class="section-title">
+                        <h2>Notes to Shipping</h2>
+                        <div class="usage">Used in 2% of notes - Special shipping only</div>
+                    </div>
+                </div>
+                
+                <div class="purpose">
+                    <strong>Purpose:</strong> Only for non-standard shipping situations
+                </div>
+
+                <div class="examples-section">
+                    <h3>✅ When to Use:</h3>
+                    <div class="example-note">"Ship on customer's UPS #973214"</div>
+                    <div class="example-note">"Call 425-652-6690 for pickup"</div>
+                    <div class="example-note">"Rush - Ship Monday morning"</div>
+                    <div class="example-note">"Combine with orders #133025, #133026"</div>
+                </div>
+            </div>
+
+            <!-- Notes to Accounting -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">💰</div>
+                    <div class="section-title">
+                        <h2>Notes to Accounting</h2>
+                        <div class="usage">Used in 1.5% of notes - Special billing only</div>
+                    </div>
+                </div>
+                
+                <div class="purpose">
+                    <strong>Purpose:</strong> Only for special billing situations
+                </div>
+
+                <div class="examples-section">
+                    <h3>✅ When to Use:</h3>
+                    <div class="example-note">"Tax exempt - cert on file"</div>
+                    <div class="example-note">"Apply 10% first-time discount"</div>
+                    <div class="example-note">"Bill to Paul, not company"</div>
+                    <div class="example-note">"Gift certificate #E3GF-2FFE"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Section -->
+        <div class="practice-section">
+            <h2>🎯 Practice Writing Notes</h2>
+            
+            <div class="scenario">
+                <h3>Scenario 1: Customer Communication</h3>
+                <p>A customer just called to check on their order status. You told them it will be ready Friday. Where do you put this note and what do you write?</p>
+                <textarea id="practice1" placeholder="Type your note here..."></textarea>
+                <div class="button-group">
+                    <button onclick="checkAnswer(1)">Check Answer</button>
+                    <button class="secondary" onclick="showExample(1)">Show Example</button>
+                </div>
+                <div id="feedback1" class="feedback"></div>
+            </div>
+
+            <div class="scenario">
+                <h3>Scenario 2: Production Specification</h3>
+                <p>Customer wants their company logo in white on navy blue shirts, 3 inches wide, centered on the left chest. Write the production note.</p>
+                <textarea id="practice2" placeholder="Type your note here..."></textarea>
+                <div class="button-group">
+                    <button onclick="checkAnswer(2)">Check Answer</button>
+                    <button class="secondary" onclick="showExample(2)">Show Example</button>
+                </div>
+                <div id="feedback2" class="feedback"></div>
+            </div>
+
+            <div class="scenario">
+                <h3>Scenario 3: Shipping Instructions</h3>
+                <p>Customer wants to use their own FedEx account #445566 for shipping. Write the appropriate note.</p>
+                <textarea id="practice3" placeholder="Type your note here..."></textarea>
+                <div class="button-group">
+                    <button onclick="checkAnswer(3)">Check Answer</button>
+                    <button class="secondary" onclick="showExample(3)">Show Example</button>
+                </div>
+                <div id="feedback3" class="feedback"></div>
+            </div>
+
+            <div class="scenario">
+                <h3>Scenario 4: The "PO Sent" Problem</h3>
+                <p>You just sent a purchase order to Sanmar for 50 navy blue t-shirts, PO #12345. How do you write this note? (This scenario addresses RL's most common vague note)</p>
+                <textarea id="practice4" placeholder="Type your note here..."></textarea>
+                <div class="button-group">
+                    <button onclick="checkAnswer(4)">Check Answer</button>
+                    <button class="secondary" onclick="showExample(4)">Show Example</button>
+                </div>
+                <div id="feedback4" class="feedback"></div>
+            </div>
+            
+            <div class="scenario">
+                <h3>Scenario 5: The "See Attached" Problem</h3>
+                <p>Customer emailed their new logo file for embroidery approval. You attached it to the order. Write the note. (This addresses TH's most common issue)</p>
+                <textarea id="practice5" placeholder="Type your note here..."></textarea>
+                <div class="button-group">
+                    <button onclick="checkAnswer(5)">Check Answer</button>
+                    <button class="secondary" onclick="showExample(5)">Show Example</button>
+                </div>
+                <div id="feedback5" class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="quick-tips">
+            <h2>💡 Golden Rules for Great Notes</h2>
+            <div class="tips-grid">
+                <div class="tip">
+                    <h3>Be Specific</h3>
+                    <p>Say "Called John about artwork approval" not just "Called customer"</p>
+                </div>
+                <div class="tip">
+                    <h3>Include Dates</h3>
+                    <p>For time-sensitive items, always include the date: "Need by Friday 2/14"</p>
+                </div>
+                <div class="tip">
+                    <h3>Use Action Words</h3>
+                    <p>Start with verbs: Emailed, Called, Waiting, Received, Approved</p>
+                </div>
+                <div class="tip">
+                    <h3>Keep It Short</h3>
+                    <p>Most effective notes are under 20 words. Be concise!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decision Tree -->
+        <div class="decision-tree">
+            <h2>🤔 Quick Decision Guide</h2>
+            <div class="decision-box">
+                <span class="question">Customer called or emailed?</span>
+                <span class="answer">Notes on Order</span>
+            </div>
+            <div class="decision-box">
+                <span class="question">How to make the product?</span>
+                <span class="answer">Notes to Production</span>
+            </div>
+            <div class="decision-box">
+                <span class="question">Special shipping needs?</span>
+                <span class="answer">Notes to Shipping</span>
+            </div>
+            <div class="decision-box">
+                <span class="question">Payment or billing issue?</span>
+                <span class="answer">Notes to Accounting</span>
+            </div>
+            <div class="decision-box">
+                <span class="question">Everything else?</span>
+                <span class="answer">Notes on Order</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Practice scenarios with correct answers
+        const scenarios = {
+            1: {
+                section: "Notes on Order",
+                goodExamples: [
+                    "Customer called - order ready Friday",
+                    "Called customer about status - ready Friday",
+                    "Customer inquiry - will be ready Friday"
+                ],
+                keywords: ["called", "customer", "Friday", "ready"]
+            },
+            2: {
+                section: "Notes to Production",
+                goodExamples: [
+                    "White logo on navy shirts, 3\" wide, left chest centered",
+                    "3 inch white logo centered on left chest",
+                    "Logo: white, 3\" wide, left chest center"
+                ],
+                keywords: ["white", "navy", "3", "left chest", "centered"]
+            },
+            3: {
+                section: "Notes to Shipping",
+                goodExamples: [
+                    "Ship on customer's FedEx #445566",
+                    "Use customer FedEx account #445566",
+                    "Customer's FedEx #445566"
+                ],
+                keywords: ["FedEx", "445566", "customer", "account"]
+            },
+            4: {
+                section: "Notes on Order",
+                goodExamples: [
+                    "PO #12345 sent to Sanmar for 50 navy tees",
+                    "Sent PO #12345 to Sanmar - 50 navy blue t-shirts",
+                    "Sanmar PO #12345 submitted - 50 navy shirts"
+                ],
+                keywords: ["12345", "Sanmar", "50", "navy"]
+            },
+            5: {
+                section: "Notes on Order",
+                goodExamples: [
+                    "Customer logo file attached for embroidery approval",
+                    "Attached customer's new logo for approval",
+                    "Logo file from customer email attached - needs approval"
+                ],
+                keywords: ["logo", "attached", "approval", "customer"]
+            }
+        };
+
+        function checkAnswer(scenarioNum) {
+            const textarea = document.getElementById(`practice${scenarioNum}`);
+            const feedback = document.getElementById(`feedback${scenarioNum}`);
+            const answer = textarea.value.toLowerCase().trim();
+            const scenario = scenarios[scenarioNum];
+            
+            if (answer.length === 0) {
+                showFeedback(feedback, "Please write a note first!", false);
+                return;
+            }
+
+            // Check if answer contains key elements
+            const hasKeywords = scenario.keywords.filter(keyword => 
+                answer.includes(keyword.toLowerCase())
+            ).length;
+
+            const keywordPercentage = hasKeywords / scenario.keywords.length;
+
+            if (keywordPercentage >= 0.5) {
+                showFeedback(feedback, 
+                    `✅ Great job! This would go in "${scenario.section}". Your note is clear and includes the key information.`, 
+                    true
+                );
+            } else if (keywordPercentage >= 0.25) {
+                showFeedback(feedback, 
+                    `⚠️ Good start! This would go in "${scenario.section}". Try to include more specific details like: ${scenario.keywords.join(', ')}`, 
+                    false
+                );
+            } else {
+                showFeedback(feedback, 
+                    `❌ This needs more detail. Remember to include key information: ${scenario.keywords.join(', ')}. This should go in "${scenario.section}"`, 
+                    false
+                );
+            }
+        }
+
+        function showExample(scenarioNum) {
+            const textarea = document.getElementById(`practice${scenarioNum}`);
+            const feedback = document.getElementById(`feedback${scenarioNum}`);
+            const scenario = scenarios[scenarioNum];
+            
+            textarea.value = scenario.goodExamples[0];
+            showFeedback(feedback, 
+                `📝 Example note for "${scenario.section}": ${scenario.goodExamples.join(' OR ')}`, 
+                true
+            );
+        }
+
+        function showFeedback(element, message, isSuccess) {
+            element.textContent = message;
+            element.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+            element.style.display = 'block';
+        }
+
+        // Add some interactivity to decision boxes
+        document.querySelectorAll('.decision-box').forEach(box => {
+            box.addEventListener('click', function() {
+                // Reset all boxes
+                document.querySelectorAll('.decision-box').forEach(b => {
+                    b.style.background = '#f8f9fa';
+                });
+                // Highlight clicked box
+                this.style.background = '#e8f5e9';
+            });
+        });
+    </script>
+</body>
+</html>
