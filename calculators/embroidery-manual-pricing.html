@@ -26,6 +26,173 @@
             line-height: 1.6;
         }
 
+        /* Embroidery Product Showcase */
+        .embroidery-showcase {
+            background: linear-gradient(135deg, #f0f9f1 0%, #e8f5e9 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(76, 179, 84, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .embroidery-showcase::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 40%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(76, 179, 84, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(200%) rotate(45deg); }
+        }
+
+        .showcase-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .showcase-image-container {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .showcase-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .showcase-image:hover {
+            transform: scale(1.05);
+        }
+
+        .showcase-text {
+            padding: 1rem;
+        }
+
+        .showcase-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .showcase-title::before {
+            content: '🧵';
+            font-size: 1.5rem;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .showcase-description {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .embroidery-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .embroidery-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .embroidery-feature:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);
+        }
+
+        .embroidery-feature-icon {
+            font-size: 1.25rem;
+            color: #4cb354;
+        }
+
+        .embroidery-feature-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Embroidery Badge */
+        .embroidery-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .showcase-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .showcase-image-container {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .embroidery-features {
+                grid-template-columns: 1fr;
+            }
+
+            .embroidery-badge {
+                position: static;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+        }
+
         /* Header */
         .header {
             background: var(--card-bg);
@@ -544,6 +711,44 @@
             Manual Embroidery Calculator
         </h1>
         <p class="page-subtitle">Calculate embroidery pricing for items not in our standard catalog</p>
+        
+        <!-- Embroidery Product Showcase -->
+        <div class="embroidery-showcase">
+            <div class="embroidery-badge">Premium Quality</div>
+            <div class="showcase-content">
+                <div class="showcase-image-container">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094557" 
+                         alt="Embroidered Jacket" 
+                         class="showcase-image">
+                </div>
+                <div class="showcase-text">
+                    <h2 class="showcase-title">Premium Custom Embroidery</h2>
+                    <p class="showcase-description">
+                        Transform your garments with our professional embroidery services. 
+                        From corporate jackets to team uniforms, we deliver exceptional quality 
+                        with precision stitching and vibrant colors that last.
+                    </p>
+                    <div class="embroidery-features">
+                        <div class="embroidery-feature">
+                            <span class="embroidery-feature-icon">✨</span>
+                            <span class="embroidery-feature-text">Up to 15 Colors</span>
+                        </div>
+                        <div class="embroidery-feature">
+                            <span class="embroidery-feature-icon">🎯</span>
+                            <span class="embroidery-feature-text">Precision Stitching</span>
+                        </div>
+                        <div class="embroidery-feature">
+                            <span class="embroidery-feature-icon">💪</span>
+                            <span class="embroidery-feature-text">Durable Threading</span>
+                        </div>
+                        <div class="embroidery-feature">
+                            <span class="embroidery-feature-icon">🏆</span>
+                            <span class="embroidery-feature-text">Professional Finish</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div class="calculator-layout">
             <!-- Input Section -->

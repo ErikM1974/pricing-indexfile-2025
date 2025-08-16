@@ -95,15 +95,43 @@
             padding: 2rem;
         }
         
-        /* Page Title */
+        /* Enhanced Page Header with Hero Image */
         .page-header {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             padding: 2rem;
             border-radius: 12px;
             margin-bottom: 2rem;
-            text-align: center;
             box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .page-header-content {
+            flex: 1;
+            text-align: left;
+            position: relative;
+            z-index: 1;
         }
         
         .page-header h1 {
@@ -114,6 +142,145 @@
         .page-header p {
             font-size: 1.1rem;
             opacity: 0.95;
+        }
+        
+        .page-header-image {
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-header-image img {
+            width: 180px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border: 3px solid rgba(255,255,255,0.3);
+            animation: float 3s ease-in-out infinite;
+            transition: transform 0.3s ease;
+        }
+        
+        .page-header-image img:hover {
+            transform: scale(1.05);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .page-header-content {
+                text-align: center;
+            }
+            
+            .page-header-image img {
+                width: 150px;
+            }
+        }
+        
+        /* Product Showcase Section */
+        .product-showcase {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark), var(--primary-color));
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .product-showcase-inner {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .product-showcase-image {
+            text-align: center;
+        }
+        
+        .product-showcase-image img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-showcase-image img:hover {
+            transform: scale(1.02) rotate(1deg);
+            box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
+        }
+        
+        .product-showcase-content h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .product-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--success-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .feature-item i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+        
+        .feature-item span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .product-showcase-inner {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-features {
+                grid-template-columns: 1fr;
+            }
         }
         
         /* Video Section */
@@ -528,10 +695,17 @@
     </header>
     
     <div class="container">
-        <!-- Page Header -->
+        <!-- Enhanced Page Header with Hero Image -->
         <div class="page-header">
-            <h1>Manual Sticker Pricing Calculator</h1>
-            <p>Professional pricing for custom die-cut stickers and labels</p>
+            <div class="page-header-content">
+                <h1>Manual Sticker Pricing Calculator</h1>
+                <p>Professional pricing for custom die-cut stickers and labels</p>
+            </div>
+            <div class="page-header-image">
+                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531" 
+                     alt="Custom Die-Cut Stickers" 
+                     title="Premium Quality Custom Stickers">
+            </div>
         </div>
         
         <!-- Industry Research Video -->
@@ -558,6 +732,42 @@
                         helps us position NWCA competitively while maintaining healthy margins. Pay attention to volume discounts 
                         and specialty material upcharges discussed in the video.
                     </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Showcase Section -->
+        <div class="product-showcase">
+            <div class="product-showcase-inner">
+                <div class="product-showcase-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531" 
+                         alt="Premium Custom Stickers" 
+                         title="High-Quality Die-Cut Stickers">
+                </div>
+                <div class="product-showcase-content">
+                    <h3><i class="fas fa-star"></i> Premium Custom Stickers</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Our state-of-the-art printing technology delivers vibrant, durable custom stickers that make your brand stand out. 
+                        From small logos to large decals, we provide professional quality at competitive prices.
+                    </p>
+                    <div class="product-features">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Die-Cut Precision</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Vibrant Colors</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Weather Resistant</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Fast Turnaround</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

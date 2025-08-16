@@ -766,3 +766,480 @@ function printQuote() {
 
 // Make printQuote available globally
 window.printQuote = printQuote;
+
+// Print Promotional Flyer function - Full-color 8.5x11 marketing flyer
+function printFlyer() {
+    const calc = window.laserTumblerCalculator;
+    if (!calc?.currentQuote) {
+        alert('Please calculate a quote first');
+        return;
+    }
+    
+    const quote = calc.currentQuote;
+    const printWindow = window.open('', '_blank');
+    
+    // Generate color swatches HTML
+    const colorSwatchesHTML = tumblerColors.map(color => `
+        <div style="text-align: center; margin: 5px;">
+            <div style="width: 30px; height: 30px; background: ${color.hex}; border: 2px solid #e5e7eb; border-radius: 50%; margin: 0 auto 2px;"></div>
+            <div style="font-size: 7pt; line-height: 1;">${color.name}</div>
+        </div>
+    `).join('');
+    
+    const flyerHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Polar Camel Tumblers - Northwest Custom Apparel</title>
+            <style>
+                @page { 
+                    size: letter;
+                    margin: 0;
+                }
+                * {
+                    print-color-adjust: exact;
+                    -webkit-print-color-adjust: exact;
+                }
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                    color: #1f2937;
+                }
+                
+                /* Header Section */
+                .header {
+                    background: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .header::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    right: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    animation: none;
+                }
+                .header h1 {
+                    font-size: 32pt;
+                    margin: 0 0 10px 0;
+                    font-weight: 800;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+                }
+                .header p {
+                    font-size: 14pt;
+                    margin: 0;
+                    opacity: 0.95;
+                }
+                
+                /* Content Layout */
+                .content {
+                    padding: 20px 30px;
+                }
+                
+                .two-column {
+                    display: flex;
+                    gap: 30px;
+                    margin: 20px 0;
+                }
+                
+                .column {
+                    flex: 1;
+                }
+                
+                /* Product Showcase */
+                .product-showcase {
+                    text-align: center;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                    border-radius: 12px;
+                    border: 2px solid #4cb354;
+                }
+                
+                .product-image {
+                    width: 250px;
+                    height: auto;
+                    border-radius: 8px;
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+                    margin-bottom: 15px;
+                }
+                
+                /* Features */
+                .features {
+                    display: flex;
+                    gap: 15px;
+                    margin: 20px 0;
+                }
+                
+                .feature-box {
+                    flex: 1;
+                    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                    border: 2px solid #4cb354;
+                    border-radius: 8px;
+                    padding: 15px;
+                    text-align: center;
+                }
+                
+                .feature-icon {
+                    font-size: 24pt;
+                    margin-bottom: 5px;
+                }
+                
+                .feature-text {
+                    font-weight: 600;
+                    font-size: 11pt;
+                    color: #1f2937;
+                }
+                
+                /* Pricing Table */
+                .pricing-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+                
+                .pricing-table th {
+                    background: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
+                    color: white;
+                    padding: 12px;
+                    font-size: 11pt;
+                    font-weight: 600;
+                }
+                
+                .pricing-table td {
+                    padding: 10px 12px;
+                    border-bottom: 1px solid #e5e7eb;
+                    font-size: 10pt;
+                    background: white;
+                }
+                
+                .pricing-table tr.highlight {
+                    background: linear-gradient(90deg, rgba(76,179,84,0.1) 0%, rgba(76,179,84,0.05) 100%);
+                }
+                
+                .price-big {
+                    font-size: 16pt;
+                    font-weight: 700;
+                    color: #4cb354;
+                }
+                
+                /* Quote Box */
+                .quote-box {
+                    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                    border: 2px solid #f59e0b;
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin: 20px 0;
+                }
+                
+                .quote-box h3 {
+                    color: #92400e;
+                    margin: 0 0 10px 0;
+                    font-size: 14pt;
+                }
+                
+                .quote-detail {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 5px 0;
+                    font-size: 11pt;
+                }
+                
+                .quote-total {
+                    border-top: 2px solid #f59e0b;
+                    padding-top: 10px;
+                    margin-top: 10px;
+                    font-size: 16pt;
+                    font-weight: 700;
+                    color: #92400e;
+                }
+                
+                /* Specifications */
+                .specs-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 15px;
+                    margin: 20px 0;
+                }
+                
+                .spec-card {
+                    background: #f5f7fa;
+                    border-radius: 8px;
+                    padding: 12px;
+                    border: 1px solid #e5e7eb;
+                }
+                
+                .spec-card h4 {
+                    color: #4cb354;
+                    margin: 0 0 8px 0;
+                    font-size: 10pt;
+                    font-weight: 600;
+                }
+                
+                .spec-card ul {
+                    margin: 0;
+                    padding-left: 15px;
+                    font-size: 8pt;
+                    color: #6b7280;
+                }
+                
+                /* Color Grid */
+                .colors-section {
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: #fafafa;
+                    border-radius: 8px;
+                }
+                
+                .colors-section h3 {
+                    color: #4cb354;
+                    margin: 0 0 10px 0;
+                    font-size: 12pt;
+                }
+                
+                .color-grid {
+                    display: grid;
+                    grid-template-columns: repeat(9, 1fr);
+                    gap: 5px;
+                }
+                
+                /* CTA Section */
+                .cta {
+                    background: linear-gradient(135deg, #4cb354 0%, #5bc85f 100%);
+                    color: white;
+                    padding: 25px;
+                    border-radius: 12px;
+                    text-align: center;
+                    margin: 20px 0;
+                    box-shadow: 0 8px 16px rgba(76,179,84,0.3);
+                }
+                
+                .cta h2 {
+                    margin: 0 0 10px 0;
+                    font-size: 18pt;
+                }
+                
+                .cta p {
+                    margin: 5px 0;
+                    font-size: 12pt;
+                }
+                
+                .phone-big {
+                    font-size: 20pt;
+                    font-weight: 700;
+                    margin: 10px 0;
+                }
+                
+                /* Footer */
+                .footer {
+                    background: #f5f7fa;
+                    padding: 15px;
+                    text-align: center;
+                    border-top: 2px solid #4cb354;
+                    margin-top: 30px;
+                }
+                
+                .footer p {
+                    margin: 3px 0;
+                    font-size: 9pt;
+                    color: #6b7280;
+                }
+                
+                .badge {
+                    display: inline-block;
+                    background: #4cb354;
+                    color: white;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    font-size: 8pt;
+                    font-weight: 600;
+                    margin: 0 5px;
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Header -->
+            <div class="header">
+                <h1>LASER ENGRAVED POLAR CAMEL TUMBLERS</h1>
+                <p>Premium Quality • Custom Designs • Fast Turnaround</p>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="content">
+                <!-- Product and Features Row -->
+                <div class="two-column">
+                    <div class="column">
+                        <div class="product-showcase">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Tumbler%20from%20JDS%20Mountain%20Top%20Propane.JPG?ver=1" 
+                                 class="product-image" alt="Polar Camel Tumbler">
+                            <h2 style="color: #4cb354; margin: 10px 0;">Polar Camel 16 oz. Pint</h2>
+                            <p style="font-size: 10pt; color: #6b7280;">Premium Stainless Steel • Double-Wall Vacuum Insulated</p>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <h2 style="color: #1f2937; margin-top: 0;">Why Choose Polar Camel?</h2>
+                        
+                        <div class="features">
+                            <div class="feature-box">
+                                <div class="feature-icon">🔥</div>
+                                <div class="feature-text">Keeps Hot<br>8+ Hours</div>
+                            </div>
+                            <div class="feature-box">
+                                <div class="feature-icon">❄️</div>
+                                <div class="feature-text">Keeps Cold<br>24+ Hours</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing Table -->
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th style="text-align: right;">Price per Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>24 Tumblers</strong> (1 Case)</td>
+                                    <td style="text-align: right;"><span class="price-big">$16.68</span></td>
+                                </tr>
+                                <tr class="highlight">
+                                    <td><strong>120 Tumblers</strong> (5 Cases)</td>
+                                    <td style="text-align: right;"><span class="price-big">$16.10</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>240 Tumblers</strong> (10 Cases)</td>
+                                    <td style="text-align: right;"><span class="price-big">$15.53</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <p style="background: #d1fae5; padding: 10px; border-radius: 6px; font-size: 10pt; color: #065f46; margin-top: 10px;">
+                            ✨ <strong>All prices include 1-Sided Laser Engraving (approx. 2.5" x 3")</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Your Custom Quote -->
+                <div class="quote-box">
+                    <h3>Your Custom Quote</h3>
+                    <div class="quote-detail">
+                        <span>Customer: ${quote.customerName || 'Valued Customer'}</span>
+                        <span>Date: ${new Date().toLocaleDateString()}</span>
+                    </div>
+                    ${quote.projectName ? `<div class="quote-detail"><span>Project: ${quote.projectName}</span></div>` : ''}
+                    <div class="quote-detail">
+                        <span>Quantity: ${quote.quantity} tumblers (${quote.caseCount} ${quote.caseCount === 1 ? 'case' : 'cases'})</span>
+                        <span>$${quote.unitPrice.toFixed(2)}/unit</span>
+                    </div>
+                    <div class="quote-detail">
+                        <span>Colors: ${quote.colors.map(c => c.name).join(', ')}</span>
+                    </div>
+                    <div class="quote-detail">
+                        <span>Subtotal:</span>
+                        <span>$${quote.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="quote-detail">
+                        <span>One-Time Setup Fee:</span>
+                        <span>$${quote.setupFee.toFixed(2)}</span>
+                    </div>
+                    ${quote.hasSecondLogo ? `
+                    <div class="quote-detail">
+                        <span>Second Logo Engraving:</span>
+                        <span>$${quote.secondLogoTotal.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="quote-detail quote-total">
+                        <span>TOTAL:</span>
+                        <span>$${quote.total.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <!-- Specifications -->
+                <div class="specs-grid">
+                    <div class="spec-card">
+                        <h4>Product Specs</h4>
+                        <ul>
+                            <li>Capacity: 16 oz.</li>
+                            <li>18/8 stainless steel</li>
+                            <li>Double-wall vacuum</li>
+                            <li>Clear slider lid included</li>
+                            <li>Gift box included</li>
+                        </ul>
+                    </div>
+                    <div class="spec-card">
+                        <h4>Dimensions</h4>
+                        <ul>
+                            <li>Size: 3 3/8" x 6"</li>
+                            <li>Base: 2 5/8" diameter</li>
+                            <li>Circumference: 10.25"</li>
+                            <li>Engraving: 2.5" x 3"</li>
+                        </ul>
+                    </div>
+                    <div class="spec-card">
+                        <h4>Care & Info</h4>
+                        <ul>
+                            <li>Hand wash only</li>
+                            <li>Not dishwasher safe</li>
+                            <li>BPA-free lid</li>
+                            <li>Indoor/outdoor use</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Colors -->
+                <div class="colors-section">
+                    <h3>Available Colors (18 Options)</h3>
+                    <div class="color-grid">
+                        ${colorSwatchesHTML}
+                    </div>
+                </div>
+                
+                <!-- Call to Action -->
+                <div class="cta">
+                    <h2>Ready to Order Your Custom Tumblers?</h2>
+                    <p>Contact our sales team today for a personalized quote!</p>
+                    <div class="phone-big">📞 253-922-5793</div>
+                    <p>✉️ sales@nwcustomapparel.com</p>
+                    <p>🌐 www.nwcustomapparel.com</p>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p><strong>NORTHWEST CUSTOM APPAREL</strong></p>
+                <p>2025 Freeman Road East, Milton, WA 98354</p>
+                <p>
+                    <span class="badge">Family Owned Since 1977</span>
+                    <span class="badge">Fast Turnaround</span>
+                    <span class="badge">No Hidden Fees</span>
+                </p>
+            </div>
+            
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(flyerHTML);
+    printWindow.document.close();
+}
+
+// Make printFlyer available globally
+window.printFlyer = printFlyer;
