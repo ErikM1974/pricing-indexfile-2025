@@ -95,6 +95,13 @@
             padding: 2rem;
         }
         
+        /* Main Container - Prevents page from stretching too wide */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
         /* Enhanced Page Header with Hero Image */
         .page-header {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
@@ -694,46 +701,11 @@
         </div>
     </header>
     
-    <div class="container">
-        <!-- Enhanced Page Header with Hero Image -->
-        <div class="page-header">
-            <div class="page-header-content">
-                <h1>Manual Sticker Pricing Calculator</h1>
-                <p>Professional pricing for custom die-cut stickers and labels</p>
-            </div>
-            <div class="page-header-image">
-                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531" 
-                     alt="Custom Die-Cut Stickers" 
-                     title="Premium Quality Custom Stickers">
-            </div>
-        </div>
-        
-        <!-- Industry Research Video -->
-        <div class="video-section">
-            <div class="video-header" onclick="toggleVideo()">
-                <h3>
-                    <span>📹</span>
-                    Sticker Industry Research Video
-                    <span class="video-duration">- Learn about industry pricing strategies</span>
-                </h3>
-                <span class="toggle-icon" id="videoToggle">▼</span>
-            </div>
-            <div class="video-content" id="videoContent">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/2hchq73qpCU" 
-                            title="Sticker Industry Research" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen></iframe>
-                </div>
-                <div class="video-notes">
-                    <p>
-                        <strong>Key Takeaways:</strong> Understanding market pricing, material costs, and competitor strategies 
-                        helps us position NWCA competitively while maintaining healthy margins. Pay attention to volume discounts 
-                        and specialty material upcharges discussed in the video.
-                    </p>
-                </div>
-            </div>
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="calculator-title text-center">
+            <h1>Manual Sticker Pricing Calculator</h1>
+            <p>Professional pricing for custom die-cut stickers and labels</p>
         </div>
         
         <!-- Product Showcase Section -->
@@ -768,6 +740,34 @@
                             <span>Fast Turnaround</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Industry Research Video -->
+        <div class="video-section">
+            <div class="video-header" onclick="toggleVideo()">
+                <h3>
+                    <span>📹</span>
+                    Sticker Industry Research Video
+                    <span class="video-duration">- Learn about industry pricing strategies</span>
+                </h3>
+                <span class="toggle-icon" id="videoToggle">▼</span>
+            </div>
+            <div class="video-content" id="videoContent">
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/2hchq73qpCU" 
+                            title="Sticker Industry Research" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>
+                <div class="video-notes">
+                    <p>
+                        <strong>Key Takeaways:</strong> Understanding market pricing, material costs, and competitor strategies 
+                        helps us position NWCA competitively while maintaining healthy margins. Pay attention to volume discounts 
+                        and specialty material upcharges discussed in the video.
+                    </p>
                 </div>
             </div>
         </div>
@@ -927,7 +927,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
     
     <button class="admin-toggle" onclick="toggleAdmin()">Admin Settings</button>
     

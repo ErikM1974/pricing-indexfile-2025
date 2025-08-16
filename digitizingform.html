@@ -262,6 +262,94 @@
             color: var(--text-secondary);
         }
 
+        /* Digitizer Spotlight Section */
+        .digitizer-spotlight {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            border: 2px solid var(--primary-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .digitizer-spotlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .digitizer-image {
+            flex-shrink: 0;
+        }
+
+        .digitizer-image img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+        }
+
+        .digitizer-content {
+            flex: 1;
+        }
+
+        .digitizer-content h3 {
+            color: var(--primary-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .digitizer-content h4 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .digitizer-title {
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .digitizer-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .digitizer-features {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .digitizer-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .digitizer-stat i {
+            color: var(--primary-color);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .main-container {
@@ -287,6 +375,22 @@
 
             .info-cards {
                 grid-template-columns: 1fr;
+            }
+
+            .digitizer-spotlight {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .digitizer-image img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .digitizer-features {
+                flex-direction: column;
+                gap: 0.5rem;
             }
         }
 
@@ -339,16 +443,37 @@
             <p class="page-subtitle">Submit digitizing requests to Ruthie for embroidery design conversion</p>
         </div>
 
+        <!-- Meet Your Digitizer -->
+        <div class="digitizer-spotlight">
+            <div class="digitizer-image">
+                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094678" 
+                     alt="Ruth Nhong - Production Manager & Expert Digitizer" 
+                     title="Ruth Nhong">
+            </div>
+            <div class="digitizer-content">
+                <h3>Meet Your Digitizer</h3>
+                <h4>Ruth Nhong</h4>
+                <p class="digitizer-title">Production Manager & Expert Digitizer</p>
+                <p>With years of experience in embroidery digitizing, Ruth personally handles all digitizing requests to ensure the highest quality results. She specializes in converting your artwork into beautiful embroidered designs that bring your vision to life.</p>
+                <div class="digitizer-features">
+                    <div class="digitizer-stat">
+                        <i class="fas fa-clock"></i>
+                        <span>24-48 hour turnaround</span>
+                    </div>
+                    <div class="digitizer-stat">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Expert quality assurance</span>
+                    </div>
+                    <div class="digitizer-stat">
+                        <i class="fas fa-envelope"></i>
+                        <span>Direct communication</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Information Cards -->
         <div class="info-cards">
-            <div class="info-card">
-                <div class="info-card-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h3 class="info-card-title">Digitizer</h3>
-                <p class="info-card-text">All requests are processed by Ruth Nhong, our Production Manager and expert digitizer</p>
-            </div>
-            
             <div class="info-card">
                 <div class="info-card-icon">
                     <i class="fas fa-clock"></i>
@@ -363,6 +488,14 @@
                 </div>
                 <h3 class="info-card-title">File Requirements</h3>
                 <p class="info-card-text">Please provide high-resolution images (JPG, PNG, PDF) for best results</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="info-card-title">Quality Guarantee</h3>
+                <p class="info-card-text">We ensure all designs are optimized for clean, professional embroidery results</p>
             </div>
         </div>
 

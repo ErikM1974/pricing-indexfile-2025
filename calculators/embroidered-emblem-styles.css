@@ -2,6 +2,99 @@
 /* EMBROIDERED EMBLEM CALCULATOR SPECIFIC      */
 /* ============================================ */
 
+/* Main app container constraint */
+#emblem-app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Product Showcase Section */
+.product-showcase {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.product-showcase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+}
+
+.product-showcase-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.product-showcase-image {
+    text-align: center;
+}
+
+.product-showcase-image img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.product-showcase-image img:hover {
+    transform: scale(1.02) rotate(1deg);
+    box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
+}
+
+.product-showcase-content h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.feature-item i {
+    color: var(--primary-color);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .product-showcase-inner {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-features {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Emblem-specific addon section styles */
 .addon-section h3 {
     font-size: 16px;
