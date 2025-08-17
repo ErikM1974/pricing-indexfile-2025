@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing Products Search API</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="results"></pre>
+    
+    <script>
+    async function testAPI() {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.textContent = 'Testing...';
+        
+        try {
+            // Test 1: Basic search
+            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?q=polo&limit=3');
+            const data = await response.json();
+            
+            resultsDiv.textContent = JSON.stringify(data, null, 2);
+            
+            if (data.success) {
+                console.log('✅ API is working!');
+                console.log(`Found ${data.data.products.length} products`);
+            }
+        } catch (error) {
+            resultsDiv.textContent = 'Error: ' + error.message;
+            console.error('❌ API test failed:', error);
+        }
+    }
+    </script>
+</body>
+</html>
