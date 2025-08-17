@@ -12,12 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="training/adriyella-task-service.js"></script>
     
-    <!-- Dashboard JavaScript Modules -->
-    <script src="shared_components/js/dashboard-employees.js"></script>
-    <script src="shared_components/js/dashboard-navigation.js"></script>
-    <script src="shared_components/js/dashboard-utilities.js"></script>
-    <script src="shared_components/js/dashboard-main.js"></script>
-    
     <style>
         /* =====================================================
            CALCULATOR-SPECIFIC & WIDGET STYLES (Preserved)
@@ -3743,15 +3737,16 @@
     </div>
 
     <script>
-        // Most JavaScript has been extracted to external modules
-        // Keeping only inline-specific code and event handlers
+        // REMOVED: Conflicting sidebar functionality that was creating duplicate chevrons and conflicts
+        
+        // Rest of existing JavaScript code follows...
         
         // =====================================================
-        // INLINE-SPECIFIC CODE
+        // EMPLOYEE CELEBRATIONS DATA & FUNCTIONS
         // =====================================================
         
-        // Reference to employees from module (fallback to empty array)
-        const employees = window.DashboardEmployees ? window.DashboardEmployees.employees : [
+        // Employee data with birthdays and tenure information
+        const employees = [
             {
                 firstName: "Jim",
                 lastName: "Mickelson",
@@ -3888,13 +3883,8 @@
             }
         ];
 
-        // Functions are now available from modules
-        // Use window.DashboardEmployees for employee functions
-        // Use window.DashboardNavigation for navigation functions
-        // Use window.DashboardUtilities for utility functions
-        
-        // Create local references for compatibility
-        const getDaysUntilDate = window.DashboardEmployees ? window.DashboardEmployees.getDaysUntilDate : function(monthDay, isAnniversary = false, year = null) {
+        // Function to calculate days until a date (for birthdays and anniversaries)
+        function getDaysUntilDate(monthDay, isAnniversary = false, year = null) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -3927,9 +3917,9 @@
             
             return diffDays;
         }
-        
-        // Reference module functions for compatibility
-        const formatCelebrationDate = window.DashboardEmployees ? window.DashboardEmployees.formatCelebrationDate : function(monthDay, isAnniversary = false) {
+
+        // Function to format date for display
+        function formatCelebrationDate(monthDay, isAnniversary = false) {
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                               'July', 'August', 'September', 'October', 'November', 'December'];
             
@@ -4553,8 +4543,8 @@
             console.log('Portal initialized for:', firstName);
         }
 
-        // Navigation functions now from module
-        const toggleSidebarSection = window.DashboardNavigation ? window.DashboardNavigation.toggleSidebarSection : function(section) {
+        // Toggle collapsible sections - CONSOLIDATED FUNCTION
+        function toggleSidebarSection(section) {
             section.classList.toggle('collapsed');
             
             // Update chevron rotation
