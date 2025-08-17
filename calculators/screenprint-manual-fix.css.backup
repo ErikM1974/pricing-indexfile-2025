@@ -1,0 +1,591 @@
+/**
+ * Manual Screen Print Pricing Calculator - CSS Fixes
+ * Purpose: Fix styling issues and enhance NWCA green theme
+ * Created: 2025
+ */
+
+/* ========================================
+   CRITICAL: Fix Double Arrow on Dropdowns
+   ======================================== */
+
+/* Remove native dropdown arrows across all browsers */
+select.form-control {
+    /* Remove native arrows */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    /* Custom arrow using background image */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234cb354' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1rem !important;
+    padding-right: 2.5rem !important;
+    
+    /* Consistent styling */
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+    padding: 0.75rem !important;
+    padding-right: 2.5rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Hover state for dropdowns */
+select.form-control:hover {
+    border-color: #4cb354 !important;
+    box-shadow: 0 1px 3px rgba(76, 179, 84, 0.1) !important;
+}
+
+/* Focus state for dropdowns */
+select.form-control:focus {
+    outline: none !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23409a47' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E") !important;
+}
+
+/* ========================================
+   Enhanced NWCA Green Theme
+   ======================================== */
+
+:root {
+    --primary-color: #4cb354 !important;
+    --primary-dark: #409a47 !important;
+    --primary-light: #5bc85f !important;
+    --primary-lighter: #e8f5e9 !important;
+    --success-bg: #d1fae5 !important;
+    --success-text: #065f46 !important;
+    --warning-bg: #e8f5e9 !important;
+    --warning-text: #409a47 !important;
+    --warning-border: #4cb354 !important;
+}
+
+/* ========================================
+   Visual Hierarchy & Card Improvements
+   ======================================== */
+
+/* Main container improvements */
+.main-container {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f7f5 100%);
+    min-height: 100vh;
+}
+
+/* Enhanced card styling */
+.card {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(76, 179, 84, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+/* Section headers with green accent */
+.card h2,
+.section-title {
+    color: #2d5f3f !important;
+    font-weight: 700 !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #4cb354;
+    margin-bottom: 1.5rem;
+}
+
+.card h2 i,
+.section-title i {
+    color: #4cb354 !important;
+}
+
+/* ========================================
+   Pricing Display Enhancement
+   ======================================== */
+
+/* Main price display */
+.price-display {
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    color: #4cb354 !important;
+    text-shadow: 0 2px 4px rgba(76, 179, 84, 0.1);
+    letter-spacing: -0.02em;
+}
+
+/* Price subtitle */
+.price-display + .price-subtitle,
+.price-display + div {
+    color: #6b7280 !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    margin-top: 0.5rem;
+}
+
+/* Current tier badge */
+.tier-badge,
+.current-tier {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    display: inline-block;
+    margin-top: 1rem;
+    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.3);
+}
+
+/* ========================================
+   Warning Box - Green Theme
+   ======================================== */
+
+/* Replace yellow warning with green-themed alert */
+.warning-box,
+.alert-warning {
+    background: #e8f5e9 !important;
+    border: 2px solid #4cb354 !important;
+    color: #2d5f3f !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 8px !important;
+    margin: 1rem 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.warning-box i,
+.alert-warning i {
+    color: #4cb354 !important;
+    font-size: 1.25rem !important;
+}
+
+.warning-box strong,
+.alert-warning strong {
+    color: #409a47 !important;
+}
+
+/* ========================================
+   Form Element Consistency
+   ======================================== */
+
+/* All input fields */
+.form-control {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 0.75rem !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+    background: white !important;
+}
+
+.form-control:hover {
+    border-color: #4cb354 !important;
+    box-shadow: 0 1px 3px rgba(76, 179, 84, 0.1) !important;
+}
+
+.form-control:focus {
+    outline: none !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25) !important;
+}
+
+/* Number inputs */
+input[type="number"].form-control {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Labels */
+.form-label {
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.875rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Required indicator */
+.form-label .required,
+.form-label span[style*="color: red"] {
+    color: #4cb354 !important;
+    font-weight: 700 !important;
+}
+
+/* ========================================
+   Button Styling - All Green Theme
+   ======================================== */
+
+/* Primary buttons */
+.btn,
+.btn-primary,
+.add-location-btn,
+button[type="submit"] {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 4px rgba(76, 179, 84, 0.2) !important;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.add-location-btn:hover,
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, #409a47 0%, #2d5f3f 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.3) !important;
+}
+
+/* Secondary buttons */
+.btn-secondary,
+.btn-outline {
+    background: white !important;
+    color: #4cb354 !important;
+    border: 2px solid #4cb354 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover,
+.btn-outline:hover {
+    background: #e8f5e9 !important;
+    border-color: #409a47 !important;
+    color: #409a47 !important;
+}
+
+/* Remove button styling */
+.remove-btn {
+    background: #fee !important;
+    color: #dc2626 !important;
+    border: 1px solid #fecaca !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 6px !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.remove-btn:hover {
+    background: #dc2626 !important;
+    color: white !important;
+    transform: scale(1.1) !important;
+}
+
+/* ========================================
+   Checkbox Improvements
+   ======================================== */
+
+input[type="checkbox"] {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    cursor: pointer !important;
+    accent-color: #4cb354 !important;
+    margin-right: 0.5rem !important;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+    color: #374151 !important;
+}
+
+.checkbox-label:hover {
+    color: #4cb354 !important;
+}
+
+/* ========================================
+   Location Sections Styling
+   ======================================== */
+
+/* Location cards */
+.location-section {
+    background: #f8fffe !important;
+    border: 1px solid #4cb354 !important;
+    border-radius: 8px !important;
+    padding: 1.25rem !important;
+    margin-bottom: 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.location-section:hover {
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.15) !important;
+}
+
+/* Location headers */
+.location-header {
+    font-weight: 700 !important;
+    color: #2d5f3f !important;
+    margin-bottom: 1rem !important;
+    font-size: 1.125rem !important;
+}
+
+/* Location grid improvements */
+.location-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr auto !important;
+    gap: 1rem !important;
+    align-items: center !important;
+}
+
+.location-grid {
+    display: grid !important;
+    gap: 1rem !important;
+}
+
+/* ========================================
+   Order Summary Section
+   ======================================== */
+
+.order-summary-section {
+    background: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+}
+
+.order-summary-section h3 {
+    color: #2d5f3f !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.75rem !important;
+    border-bottom: 2px solid #4cb354 !important;
+}
+
+/* Summary items */
+.summary-item,
+.order-summary-section > div {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px solid rgba(76, 179, 84, 0.1) !important;
+}
+
+.summary-item:last-child {
+    border-bottom: none !important;
+}
+
+.summary-item strong {
+    color: #2d5f3f !important;
+}
+
+/* Total row */
+.summary-total,
+.order-summary-section > div:last-child {
+    margin-top: 0.5rem !important;
+    padding-top: 1rem !important;
+    border-top: 2px solid #4cb354 !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #4cb354 !important;
+}
+
+/* ========================================
+   Accordion Improvements
+   ======================================== */
+
+.accordion-item {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    margin-bottom: 0.5rem !important;
+    overflow: hidden !important;
+}
+
+.accordion-header {
+    background: linear-gradient(135deg, #f8fffe 0%, #e8f5e9 100%) !important;
+    padding: 1rem 1.25rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.accordion-header:hover {
+    background: linear-gradient(135deg, #e8f5e9 0%, #d1fae5 100%) !important;
+}
+
+.accordion-header h3 {
+    color: #2d5f3f !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin: 0 !important;
+}
+
+.accordion-icon {
+    color: #4cb354 !important;
+    transition: transform 0.3s ease !important;
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg) !important;
+}
+
+.accordion-content {
+    background: white !important;
+    padding: 1.25rem !important;
+}
+
+/* ========================================
+   Safety Stripes Checkbox
+   ======================================== */
+
+.safety-stripe-option {
+    background: #e8f5e9 !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.safety-stripe-option:hover {
+    background: #d1fae5 !important;
+    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.2) !important;
+}
+
+.safety-stripe-option label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    color: #2d5f3f !important;
+}
+
+.safety-stripe-option .price {
+    color: #4cb354 !important;
+    font-weight: 700 !important;
+}
+
+/* ========================================
+   Typography Improvements
+   ======================================== */
+
+h1 {
+    color: #2d5f3f !important;
+    font-weight: 800 !important;
+    font-size: 2rem !important;
+}
+
+h2 {
+    color: #2d5f3f !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+h3 {
+    color: #409a47 !important;
+    font-weight: 600 !important;
+    font-size: 1.25rem !important;
+}
+
+p {
+    color: #6b7280 !important;
+    line-height: 1.6 !important;
+}
+
+/* Small text improvements */
+small,
+.help-text,
+.field-help {
+    color: #9ca3af !important;
+    font-size: 0.875rem !important;
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+
+.loading {
+    border-color: #e8f5e9 !important;
+    border-top-color: #4cb354 !important;
+}
+
+/* ========================================
+   Smooth Transitions
+   ======================================== */
+
+* {
+    transition: color 0.2s ease,
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+    }
+    
+    .btn,
+    button {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   Responsive Improvements
+   ======================================== */
+
+@media (max-width: 768px) {
+    .price-display {
+        font-size: 2.5rem !important;
+    }
+    
+    .location-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .remove-btn {
+        width: 100% !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    .order-summary-section {
+        padding: 1rem !important;
+    }
+}
+
+/* ========================================
+   Final Touch: Focus Visible
+   ======================================== */
+
+*:focus-visible {
+    outline: 2px solid #4cb354 !important;
+    outline-offset: 2px !important;
+}
+
+/* Remove default focus for mouse users */
+*:focus:not(:focus-visible) {
+    outline: none !important;
+}
