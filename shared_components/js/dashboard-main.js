@@ -149,8 +149,9 @@
             const orderData = await window.DashboardUtilities.loadOrderTypesBreakdown(currentOrderTypesRange);
             updateOrderTypesDisplay(orderData);
             
-            // Load announcements
-            loadAnnouncements();
+            // Announcements are loaded by the HTML file's own loadAnnouncements function
+            // Don't override with static announcements
+            // loadAnnouncements();
             
         } catch (error) {
             console.error('[Dashboard] Error loading initial data:', error);
@@ -314,96 +315,11 @@
     // ANNOUNCEMENTS SYSTEM
     // =====================================================
     
-    /**
-     * Load and display announcements
-     */
-    function loadAnnouncements() {
-        // This would typically load from an API or data source
-        // For now, using static announcements
-        const announcements = getStaticAnnouncements();
-        displayAnnouncements(announcements);
-    }
+    // Note: The announcement system is handled by the HTML file's own loadAnnouncements function
+    // which fetches real announcements from the API. We just provide the global handlers here.
     
-    /**
-     * Get static announcements (placeholder)
-     */
-    function getStaticAnnouncements() {
-        return [
-            {
-                id: 'ann-001',
-                type: 'info',
-                title: 'Dashboard Updated',
-                content: 'The staff dashboard has been modularized for better performance.',
-                date: new Date().toISOString(),
-                priority: 1
-            }
-        ];
-    }
-    
-    /**
-     * Display announcements
-     * @param {Array} announcements - Array of announcement objects
-     */
-    function displayAnnouncements(announcements) {
-        const container = document.getElementById('announcementsContainer');
-        if (!container) return;
-        
-        const showDismissed = document.getElementById('showDismissedCheckbox')?.checked || false;
-        
-        const filteredAnnouncements = announcements.filter(ann => 
-            showDismissed || !dismissedAnnouncements.has(ann.id)
-        );
-        
-        if (filteredAnnouncements.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No announcements</p>';
-            return;
-        }
-        
-        container.innerHTML = filteredAnnouncements.map(ann => createAnnouncementHTML(ann)).join('');
-    }
-    
-    /**
-     * Create HTML for an announcement
-     * @param {Object} announcement - Announcement object
-     * @returns {string} HTML string
-     */
-    function createAnnouncementHTML(announcement) {
-        const isDismissed = dismissedAnnouncements.has(announcement.id);
-        const typeIcon = {
-            urgent: '🚨',
-            important: '⚠️',
-            info: 'ℹ️'
-        }[announcement.type] || 'ℹ️';
-        
-        return `
-            <div class="announcement-card ${isDismissed ? 'dismissed' : 'unread'}" 
-                 data-id="${announcement.id}" 
-                 data-type="${announcement.type}">
-                <div class="announcement-card-header" onclick="toggleAnnouncementCard('${announcement.id}')">
-                    <span class="announcement-card-icon">${typeIcon}</span>
-                    <div>
-                        <div class="announcement-card-title">${announcement.title}</div>
-                        <div class="announcement-card-meta">
-                            ${new Date(announcement.date).toLocaleDateString()}
-                        </div>
-                    </div>
-                    <div class="announcement-card-actions">
-                        <button class="announcement-card-expand" title="Toggle">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        ${!isDismissed ? `
-                            <button class="dismiss-btn" onclick="dismissAnnouncement('${announcement.id}')" title="Dismiss">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="announcement-card-content">
-                    ${announcement.content}
-                </div>
-            </div>
-        `;
-    }
+    // The static announcement functions have been removed to prevent conflicts
+    // with the real announcement system in the HTML file
     
     // =====================================================
     // UTILITY FUNCTIONS
@@ -452,7 +368,10 @@
     window.dismissAnnouncement = function(id) {
         dismissedAnnouncements.add(id);
         localStorage.setItem('dismissedAnnouncements', JSON.stringify([...dismissedAnnouncements]));
-        loadAnnouncements();
+        // Call the HTML file's loadAnnouncements if it exists
+        if (typeof loadAnnouncements === 'function') {
+            loadAnnouncements();
+        }
     };
     
     window.changeDateRange = changeDateRange;
