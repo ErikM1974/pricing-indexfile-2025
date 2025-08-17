@@ -375,7 +375,7 @@ button[type="submit"],
 /* Price Display */
 .price-display {
     background: var(--primary-color);
-    color: white;
+    color: white !important;
     font-size: 2.5rem;
     font-weight: 700;
     text-align: center;
@@ -386,9 +386,16 @@ button[type="submit"],
     animation: fadeIn 0.3s ease-out;
 }
 
+/* Ensure price display text is always white, even with other classes */
+.price-display,
+.price-display.text-primary,
+.price-display * {
+    color: white !important;
+}
+
 .price-display.prompt {
     background: #e5e7eb;
-    color: #6b7280;
+    color: #6b7280 !important;
     font-weight: 500;
     font-size: 1.25rem;
 }
