@@ -8,15 +8,196 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="shared_components/css/dashboard-styles.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="training/adriyella-task-service.js"></script>
     
     <style>
         /* =====================================================
-           CALCULATOR-SPECIFIC & WIDGET STYLES (Preserved)
-           These styles are specific to individual features
+           NORTHWEST CUSTOM APPAREL - STAFF DASHBOARD CSS
+           Organized by Component - Cleaned & Optimized
            ===================================================== */
+           
+        /* =====================================================
+           WSU CORPORATE THEME - ROOT VARIABLES
+           ===================================================== */
+        :root {
+            /* Primary WSU Colors - Now Primary Theme */
+            --wsu-crimson: #981e32;
+            --wsu-dark-crimson: #7a1829;
+            --wsu-grey: #53565a;
+            --wsu-light-grey: #8d959c;
+            --wsu-dark-grey: #2a3033;
+            
+            /* Clean Backgrounds */
+            --white: #ffffff;
+            --light-bg: #f7f8f9;
+            --card-bg: #ffffff;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            /* Text Colors */
+            --text-primary: #2a3033;
+            --text-secondary: #53565a;
+            --text-light: #8d959c;
+            
+            /* Border Colors */
+            --border-color: #e1e5e8;
+            --border-light: #f0f1f3;
+            
+            /* Hover States */
+            --hover-bg: #f3f4f6;
+            --hover-crimson: #7a1829;
+            
+            /* Professional Shadows - No Color Tints */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+            
+            /* Legacy NWCA Green - Deprecated, use sparingly */
+            --nwca-green: #4cb354;
+            --nwca-green-dark: #409a47;
+        }
+
+        /* =====================================================
+           BASE STYLES & RESETS
+           ===================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* =====================================================
+           LAYOUT COMPONENTS
+           ===================================================== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           SIDEBAR - WSU CRIMSON PROFESSIONAL THEME
+           ===================================================== */
+        .sidebar {
+            width: 250px;
+            background: var(--wsu-crimson);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: white;
+        }
+
+        .company-logo {
+            width: 100%;
+            max-width: 160px;
+            height: auto;
+            margin: 0 auto 1rem auto;
+            display: block;
+        }
+
+        .logo-link {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .logo-link:hover {
+            opacity: 0.8;
+        }
+
+        .logo-link:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .company-name {
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .company-year {
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Sidebar Search */
+        .sidebar-search {
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .sidebar-search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            padding-left: 2.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: rgba(255, 255, 255, 0.1) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%23ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>') no-repeat 0.5rem center;
+            background-size: 16px;
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .sidebar-search-input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Sidebar Content */
+        .sidebar-content {
+            flex: 1;
+            padding: 0.5rem;
+            overflow-y: auto;
+        }
 
         /* Collapsible Nav Sections */
         .nav-section {
@@ -385,7 +566,12 @@
         
         /* Removed - All calculator buttons now use unified .quick-btn styling */
         
-        /* Unified Grey Theme for All Sections - Additional Styles */
+        /* Unified Grey Theme for All Sections */
+        .nav-section {
+            margin-bottom: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
         
         /* Modern subtle backgrounds for expanded sections */
         .nav-section:not(.collapsed) {
@@ -617,10 +803,13 @@
             color: white !important;
         }
 
-        /* Main Content Area - Additional Styles for Dashboard */
+        /* Main Content Area - Adjusted for Fixed Sidebar */
         .main-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
+            margin-left: 250px;
+            min-height: 100vh;
         }
 
         /* Top Header with User Info - Enhanced */
@@ -1796,8 +1985,21 @@
             color: white !important;
         }
 
-        /* Responsive - Additional Command Bar Styles */
+        /* Responsive */
         @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .top-header {
+                position: relative;
+            }
             
             .command-bar {
                 padding: 0.75rem 1rem;
