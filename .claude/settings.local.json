@@ -74,7 +74,8 @@
       "Bash(if [ -f \"$file\" ])",
       "Bash(do wc:*)",
       "Bash(cd:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(do cp \"$file\" \"$file.backup\")"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
