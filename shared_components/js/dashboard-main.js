@@ -133,9 +133,11 @@
             const revenueData = await window.DashboardUtilities.loadRevenueData(currentDateRange);
             updateRevenueDisplay(revenueData);
             
-            // Load production schedule
-            const schedule = await window.DashboardUtilities.loadProductionSchedule();
-            window.DashboardUtilities.updateProductionDisplay(schedule);
+            // Production schedule is loaded by the HTML file's own loadProductionSchedule function
+            // which expects different field names than the utilities version
+            // Don't override it here
+            // const schedule = await window.DashboardUtilities.loadProductionSchedule();
+            // window.DashboardUtilities.updateProductionDisplay(schedule);
             
             // Load year-over-year comparison
             const yoyData = await window.DashboardUtilities.loadYearOverYear();
@@ -169,12 +171,13 @@
                 .catch(console.error);
         }, 5 * 60 * 1000);
         
-        // Refresh production schedule every 10 minutes
-        setInterval(() => {
-            window.DashboardUtilities.loadProductionSchedule()
-                .then(window.DashboardUtilities.updateProductionDisplay)
-                .catch(console.error);
-        }, 10 * 60 * 1000);
+        // Production schedule refresh is handled by the HTML file
+        // which uses different field names
+        // setInterval(() => {
+        //     window.DashboardUtilities.loadProductionSchedule()
+        //         .then(window.DashboardUtilities.updateProductionDisplay)
+        //         .catch(console.error);
+        // }, 10 * 60 * 1000);
         
         // Refresh weather every 30 minutes
         setInterval(() => {
