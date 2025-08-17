@@ -75,7 +75,8 @@
       "Bash(do wc:*)",
       "Bash(cd:*)",
       "Bash(git log:*)",
-      "Bash(do cp \"$file\" \"$file.backup\")"
+      "Bash(do cp \"$file\" \"$file.backup\")",
+      "Bash(test:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
