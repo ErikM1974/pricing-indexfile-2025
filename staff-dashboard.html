@@ -5528,12 +5528,14 @@
             }
         }
         
-        function toggleAnnouncementCard(id) {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            if (!card) return;
-            
-            const isExpanded = card.classList.contains('expanded');
-            const expandButton = card.querySelector('.announcement-card-expand i');
+        // Keep local version as fallback if module hasn't loaded yet
+        if (typeof window.toggleAnnouncementCard === 'undefined') {
+            window.toggleAnnouncementCard = function(id) {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                if (!card) return;
+                
+                const isExpanded = card.classList.contains('expanded');
+                const expandButton = card.querySelector('.announcement-card-expand i');
             
             // Toggle the expanded state
             card.classList.toggle('expanded');
@@ -5565,6 +5567,7 @@
                     });
                 }, 150);
             }
+            };
         }
         
         function markAsRead(id) {
@@ -5575,15 +5578,18 @@
             }
         }
         
-        function dismissAnnouncement(id) {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            if (card) {
+        // Keep local version as fallback if module hasn't loaded yet
+        if (typeof window.dismissAnnouncement === 'undefined') {
+            window.dismissAnnouncement = function(id) {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                if (card) {
                 card.style.animation = 'slideOut 0.3s ease-out';
                 card.addEventListener('animationend', () => {
                     card.remove();
                 });
                 localStorage.setItem(`announcement-dismissed-${id}`, 'true');
             }
+            };
         }
         
         function toggleDismissedAnnouncements() {
