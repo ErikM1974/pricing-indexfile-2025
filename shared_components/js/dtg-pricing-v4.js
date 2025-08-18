@@ -735,6 +735,16 @@
 
         // Listen for pricing data updates
         window.addEventListener('pricingDataLoaded', handlePricingDataLoaded);
+        
+        // Also listen for master bundle ready event from BaseAdapter
+        window.addEventListener('dtgMasterBundleReady', (event) => {
+            console.log('[DTG-v4] Master bundle ready event received');
+            // Give a small delay to ensure window.dtgMasterPriceBundle is set
+            setTimeout(() => {
+                updatePricing();
+                updateLocationPrices();
+            }, 100);
+        });
     }
 
     function handleQuantityChange(quantity) {
@@ -789,6 +799,7 @@
 
         // Get pricing from master bundle
         if (window.dtgMasterPriceBundle && window.dtgMasterPriceBundle.allLocationPrices) {
+            console.log('[DTG-v4] Master bundle found, updating pricing display');
             const allLocationPrices = window.dtgMasterPriceBundle.allLocationPrices;
             const tier = getPriceTier(state.quantity);
             let basePrice = 0;
@@ -844,6 +855,7 @@
             }
         } else {
             // No pricing data yet
+            console.log('[DTG-v4] Master bundle not yet available, keeping Loading state');
             unitPriceEl.textContent = 'Loading...';
             totalPriceEl.textContent = '';
         }
