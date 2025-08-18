@@ -126,10 +126,12 @@ class ProductPageApp {
 
     async checkUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
-        const styleNumber = urlParams.get('StyleNumber');
+        // Check for both 'style' (lowercase) and 'StyleNumber' (uppercase) for compatibility
+        const styleNumber = urlParams.get('style') || urlParams.get('StyleNumber');
+        const colorParam = urlParams.get('color') || urlParams.get('COLOR');
         
         if (styleNumber) {
-            await this.loadProduct(styleNumber);
+            await this.loadProduct(styleNumber, colorParam);
         }
     }
 
@@ -137,7 +139,7 @@ class ProductPageApp {
         await this.loadProduct(styleNumber);
     }
 
-    async loadProduct(styleNumber) {
+    async loadProduct(styleNumber, requestedColorName = null) {
         try {
             this.showLoading(true);
             
@@ -152,16 +154,33 @@ class ProductPageApp {
             // Update state
             this.state.set('product', productData);
             
-            // Check if we have colors and select the first one
+            // Check if we have colors and select the appropriate one
             if (productData.colors && productData.colors.length > 0) {
-                const firstColor = productData.colors[0];
-                console.log('First color data:', firstColor);
+                let selectedColor = productData.colors[0]; // Default to first color
+                
+                // If a specific color was requested, try to find it
+                if (requestedColorName) {
+                    const foundColor = productData.colors.find(color => {
+                        // Check various possible color name properties
+                        const colorName = color.COLOR_NAME || color.colorName || color.color_name || color.name || '';
+                        return colorName.toLowerCase() === requestedColorName.toLowerCase();
+                    });
+                    
+                    if (foundColor) {
+                        selectedColor = foundColor;
+                        console.log('Found requested color:', requestedColorName);
+                    } else {
+                        console.log('Requested color not found:', requestedColorName, 'Using first color instead');
+                    }
+                }
+                
+                console.log('Selected color data:', selectedColor);
                 
                 // Check which property name is used for catalog color
-                const catalogColor = firstColor.CATALOG_COLOR || firstColor.catalogColor || firstColor.catalog_color || 'NA';
+                const catalogColor = selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA';
                 console.log('Catalog color:', catalogColor);
                 
-                this.state.set('selectedColor', firstColor);
+                this.state.set('selectedColor', selectedColor);
                 
                 // Update URL
                 this.updateUrl(styleNumber, catalogColor);
@@ -252,8 +271,9 @@ class ProductPageApp {
 
     updateUrl(styleNumber, colorCode) {
         const url = new URL(window.location);
-        url.searchParams.set('StyleNumber', styleNumber);
-        url.searchParams.set('COLOR', colorCode);
+        // Use lowercase parameters for consistency with catalog links
+        url.searchParams.set('style', styleNumber);
+        url.searchParams.set('color', colorCode);
         window.history.replaceState({}, '', url);
     }
 
