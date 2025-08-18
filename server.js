@@ -193,6 +193,11 @@ app.get('/test-api.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'test-api.html'));
 });
 
+app.get('/test-catalog-layout.html', (req, res) => {
+  console.log('Serving test-catalog-layout.html for layout testing');
+  res.sendFile(path.join(__dirname, 'test-catalog-layout.html'));
+});
+
 // Also serve the new JS files explicitly if needed
 app.get('/app-new.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'app-new.js'));

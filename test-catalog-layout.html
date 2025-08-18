@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog Layout Test</title>
+    <link rel="stylesheet" href="main-redesign.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1a472a;
+            margin-bottom: 2rem;
+        }
+        .test-controls {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4cb354;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        .test-button:hover {
+            background: #409a47;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        #resultsCount {
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Catalog Layout Test - 6 Column Grid</h1>
+        
+        <div class="test-controls">
+            <button class="test-button" onclick="loadTestProducts()">Load Test Products</button>
+            <button class="test-button" onclick="loadPolosKnits()">Load Polos/Knits</button>
+            <button class="test-button" onclick="clearProducts()">Clear</button>
+        </div>
+
+        <div class="results-header">
+            <div id="resultsCount">0 products</div>
+        </div>
+
+        <div class="results-grid" id="resultsGrid">
+            <!-- Products will appear here -->
+        </div>
+
+        <div id="loadMoreContainer"></div>
+    </div>
+
+    <script src="product-search-service.js"></script>
+    <script>
+        const searchService = new ProductSearchService();
+
+        async function loadTestProducts() {
+            const grid = document.getElementById('resultsGrid');
+            const count = document.getElementById('resultsCount');
+            
+            grid.innerHTML = '<div style="grid-column: 1 / -1;">Loading...</div>';
+            
+            try {
+                const data = await searchService.searchProducts({ 
+                    q: 'shirt', 
+                    limit: 48 
+                });
+                
+                if (data.products && data.products.length > 0) {
+                    count.textContent = `${data.products.length} products`;
+                    
+                    grid.innerHTML = data.products.map(product => {
+                        const imageUrl = product.images?.display || 
+                                       product.images?.main || 
+                                       product.images?.thumbnail || 
+                                       '/placeholder.jpg';
+                        
+                        const colorCount = product.colors ? product.colors.length : 0;
+                        
+                        return `
+                            <div class="product-card">
+                                <a href="#" class="product-link">
+                                    <div class="product-image">
+                                        <img src="${imageUrl}" 
+                                             alt="${product.productName}" 
+                                             loading="lazy"
+                                             onerror="this.src='/placeholder.jpg'">
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-style">${product.styleNumber}</div>
+                                        <div class="product-title">${product.productName}</div>
+                                        ${colorCount > 1 ? `
+                                            <div class="product-colors-count">${colorCount} Colors Available</div>
+                                        ` : ''}
+                                        <div class="product-price">${product.displayPrice}</div>
+                                    </div>
+                                </a>
+                                <div class="product-actions">
+                                    <button class="btn-compare">
+                                        <span class="compare-icon">⊞</span> Compare
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    grid.innerHTML = '<div style="grid-column: 1 / -1;">No products found</div>';
+                }
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: 1 / -1; color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function loadPolosKnits() {
+            const grid = document.getElementById('resultsGrid');
+            const count = document.getElementById('resultsCount');
+            
+            grid.innerHTML = '<div style="grid-column: 1 / -1;">Loading Polos/Knits...</div>';
+            
+            try {
+                const data = await searchService.searchByCategory('Polos/Knits', null, { limit: 48 });
+                
+                if (data.products && data.products.length > 0) {
+                    count.textContent = `Showing ${data.products.length} of ${data.pagination?.total || data.products.length} products`;
+                    
+                    grid.innerHTML = data.products.map(product => {
+                        const imageUrl = product.images?.display || 
+                                       product.images?.main || 
+                                       product.images?.thumbnail || 
+                                       '/placeholder.jpg';
+                        
+                        const colorCount = product.colors ? product.colors.length : 0;
+                        
+                        return `
+                            <div class="product-card">
+                                <a href="#" class="product-link">
+                                    <div class="product-image">
+                                        <img src="${imageUrl}" 
+                                             alt="${product.productName}" 
+                                             loading="lazy"
+                                             onerror="this.src='/placeholder.jpg'">
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-style">${product.styleNumber}</div>
+                                        <div class="product-title">${product.productName}</div>
+                                        ${colorCount > 1 ? `
+                                            <div class="product-colors-count">${colorCount} Colors Available</div>
+                                        ` : ''}
+                                        <div class="product-price">${product.displayPrice}</div>
+                                    </div>
+                                </a>
+                                <div class="product-actions">
+                                    <button class="btn-compare">
+                                        <span class="compare-icon">⊞</span> Compare
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Add Load More button if needed
+                    if (data.pagination && data.pagination.page < data.pagination.totalPages) {
+                        document.getElementById('loadMoreContainer').innerHTML = `
+                            <div class="load-more-container">
+                                <button class="load-more-btn">
+                                    Load More Products
+                                    <span class="load-more-count">(Showing ${data.products.length} of ${data.pagination.total})</span>
+                                </button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    grid.innerHTML = '<div style="grid-column: 1 / -1;">No products found in Polos/Knits</div>';
+                }
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: 1 / -1; color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        function clearProducts() {
+            document.getElementById('resultsGrid').innerHTML = '';
+            document.getElementById('resultsCount').textContent = '0 products';
+            document.getElementById('loadMoreContainer').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
