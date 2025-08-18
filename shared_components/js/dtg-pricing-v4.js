@@ -86,6 +86,10 @@
         showAllLocations: false,
         isInitialized: false
     };
+    
+    // New Direct API Service instance (for migration)
+    let directAPIService = null;
+    let directAPIData = null;
 
     // Wait for DOM ready
     if (document.readyState === 'loading') {
@@ -96,6 +100,14 @@
 
     function initialize() {
         console.log('[DTG-v4] DOM ready, initializing components');
+        
+        // Check if we should use the new Direct API system
+        if (window.USE_DIRECT_API) {
+            console.log('[DTG-v4] 🚀 Using NEW Direct API System');
+            initializeDirectAPI();
+        } else {
+            console.log('[DTG-v4] Using OLD Master Bundle System');
+        }
         
         // Inject the simplified UI structure
         injectUIStructure();
@@ -110,8 +122,14 @@
         
         // Trigger initial pricing load
         setTimeout(() => {
-            if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
-                window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
+            if (window.USE_DIRECT_API) {
+                // New system: Load pricing directly
+                loadDirectAPIPricing();
+            } else {
+                // Old system: Use adapter
+                if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
+                    window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
+                }
             }
             
             // Trigger initial quantity change event for tier highlighting after pricing data loads
@@ -920,6 +938,121 @@
         }
     }
 
+    // =================================================================
+    // NEW DIRECT API SYSTEM FUNCTIONS (Phase 1 Migration)
+    // =================================================================
+    
+    function initializeDirectAPI() {
+        console.log('[DTG-v4 Direct API] Initializing Direct API Service');
+        
+        // Create service instance
+        directAPIService = new window.DTGPricingService();
+        
+        // Get style and color from URL
+        const params = new URLSearchParams(window.location.search);
+        const styleNumber = params.get('StyleNumber');
+        const color = params.get('COLOR') ? decodeURIComponent(params.get('COLOR').replace(/\+/g, ' ')) : null;
+        
+        console.log('[DTG-v4 Direct API] Product:', styleNumber, color);
+        
+        // Store in state for later use
+        state.styleNumber = styleNumber;
+        state.color = color;
+    }
+    
+    async function loadDirectAPIPricing() {
+        if (!directAPIService || !state.styleNumber) {
+            console.error('[DTG-v4 Direct API] Service not initialized or no style number');
+            return;
+        }
+        
+        console.log('[DTG-v4 Direct API] Loading pricing data...');
+        const startTime = performance.now();
+        
+        try {
+            // Fetch all pricing data
+            directAPIData = await directAPIService.fetchPricingData(state.styleNumber, state.color);
+            
+            const fetchTime = performance.now() - startTime;
+            console.log(`[DTG-v4 Direct API] ✅ Data loaded in ${fetchTime.toFixed(0)}ms`);
+            
+            // Track performance metrics
+            if (window.DTG_PERFORMANCE) {
+                window.DTG_PERFORMANCE.metrics.apiLoadTime = fetchTime;
+                window.DTG_PERFORMANCE.metrics.totalLoadTime = performance.now() - window.DTG_PERFORMANCE.loadStartTime;
+                
+                // Log performance summary
+                console.log('📊 PERFORMANCE METRICS:');
+                console.log(`  System: ${window.DTG_PERFORMANCE.systemUsed}`);
+                console.log(`  API Load: ${fetchTime.toFixed(0)}ms`);
+                console.log(`  Total Time: ${window.DTG_PERFORMANCE.metrics.totalLoadTime.toFixed(0)}ms`);
+                
+                // Compare to expected old system time
+                const expectedOldTime = 2000; // Based on documentation
+                const improvement = ((expectedOldTime - fetchTime) / expectedOldTime * 100).toFixed(1);
+                console.log(`  Improvement: ${improvement}% faster than old system`);
+            }
+            
+            // Build compatibility bundle for seamless integration
+            const compatBundle = directAPIService.buildCompatibilityBundle(directAPIData, state.quantity);
+            
+            // Store it where the old system expects it
+            window.dtgMasterPriceBundle = compatBundle;
+            console.log('[DTG-v4 Direct API] Compatibility bundle stored in window.dtgMasterPriceBundle');
+            
+            // Compare with old system if both are loaded
+            if (window.USE_DIRECT_API && window.dtgAdapter && window.dtgAdapter.masterBundle) {
+                comparePricingSystems(compatBundle, window.dtgAdapter.masterBundle);
+            }
+            
+            // Update pricing displays
+            updatePricing();
+            updateLocationPrices();
+            
+            // Dispatch event for other components
+            window.dispatchEvent(new CustomEvent('directAPIPricingLoaded', {
+                detail: compatBundle
+            }));
+            
+        } catch (error) {
+            console.error('[DTG-v4 Direct API] Failed to load pricing:', error);
+            // Fall back to old system if available
+            if (window.DTGAdapter && window.DTGAdapter.displayPricingForSelectedLocation) {
+                console.log('[DTG-v4 Direct API] Falling back to old system');
+                window.USE_DIRECT_API = false;
+                window.DTGAdapter.displayPricingForSelectedLocation(state.selectedLocation);
+            }
+        }
+    }
+    
+    function comparePricingSystems(newBundle, oldBundle) {
+        console.log('=== PRICING COMPARISON ===');
+        console.log('NEW System:', newBundle);
+        console.log('OLD System:', oldBundle);
+        
+        // Compare specific location prices
+        if (newBundle.allLocationPrices && oldBundle.allLocationPrices) {
+            const location = 'LC';
+            const size = 'M';
+            const tier = '24-47';
+            
+            const newPrice = newBundle.allLocationPrices[location]?.[size]?.[tier];
+            const oldPrice = oldBundle.allLocationPrices[location]?.[size]?.[tier];
+            
+            console.log(`Price for ${location}/${size}/${tier}:`);
+            console.log(`  NEW: $${newPrice}`);
+            console.log(`  OLD: $${oldPrice}`);
+            
+            if (newPrice !== oldPrice) {
+                console.warn('⚠️ PRICE MISMATCH DETECTED!');
+            } else {
+                console.log('✅ Prices match!');
+            }
+        }
+        
+        console.log('=========================');
+    }
+    
     // Expose API for external access
     window.DTGPricingV4 = {
         getState: () => state,
@@ -936,7 +1069,17 @@
                 input.value = qty;
                 handleQuantityChange(qty);
             }
-        }
+        },
+        // New Direct API methods for testing
+        toggleSystem: () => {
+            window.USE_DIRECT_API = !window.USE_DIRECT_API;
+            console.log(`Switched to: ${window.USE_DIRECT_API ? 'NEW Direct API' : 'OLD Master Bundle'}`);
+            console.log('Reload page to apply change');
+            return window.USE_DIRECT_API;
+        },
+        getService: () => directAPIService,
+        getData: () => directAPIData,
+        reloadPricing: () => loadDirectAPIPricing()
     };
 
 })();

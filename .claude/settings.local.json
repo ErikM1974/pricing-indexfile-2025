@@ -78,7 +78,8 @@
       "Bash(do cp \"$file\" \"$file.backup\")",
       "Bash(test:*)",
       "WebFetch(domain:catalog.companycasuals.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
