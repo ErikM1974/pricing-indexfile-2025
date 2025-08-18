@@ -22,6 +22,8 @@ class CatalogSearch {
         this.currentResults = null;
         this.isLoading = false;
         this.searchTimeout = null;
+        this.compareList = new Set(); // Track products in compare list
+        this.maxCompareItems = 4; // Maximum items to compare
         
         this.init();
     }
@@ -362,28 +364,38 @@ class CatalogSearch {
         // Get color count for display
         const colorCount = product.colors ? product.colors.length : 0;
         
+        // Check if product is in compare list
+        const isInCompare = this.compareList.has(product.styleNumber);
+        
         return `
             <div class="product-card" data-style="${product.styleNumber}">
-                <a href="/product-detail.html?style=${product.styleNumber}" class="product-link">
-                    <div class="product-image">
-                        ${product.features?.isTopSeller ? '<div class="top-seller-badge">TOP SELLER</div>' : ''}
-                        <img src="${imageUrl}" 
-                             alt="${product.productName}" 
-                             loading="lazy"
-                             onerror="this.src='/placeholder.jpg'">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-style">${product.styleNumber}</div>
-                        <div class="product-title">${product.productName}</div>
-                        ${colorCount > 1 ? `
-                            <div class="product-colors-count">${colorCount} Colors Available</div>
-                        ` : ''}
-                        <div class="product-price">${product.displayPrice}</div>
-                    </div>
-                </a>
+                <div class="product-image-container">
+                    <a href="/product-detail.html?style=${product.styleNumber}" class="product-link">
+                        <div class="product-image">
+                            ${product.features?.isTopSeller ? '<div class="top-seller-badge">TOP SELLER</div>' : ''}
+                            <img src="${imageUrl}" 
+                                 alt="${product.productName}" 
+                                 loading="lazy"
+                                 onerror="this.src='/placeholder.jpg'">
+                        </div>
+                    </a>
+                    <button class="btn-quick-view" onclick="catalogSearch.showQuickView('${product.styleNumber}')" data-style="${product.styleNumber}">
+                        <span class="eye-icon">👁</span> Quick View
+                    </button>
+                </div>
+                <div class="product-info">
+                    <div class="product-style">${product.styleNumber}</div>
+                    <div class="product-title">${product.productName}</div>
+                    ${colorCount > 1 ? `
+                        <div class="product-colors-count">${colorCount} Colors Available</div>
+                    ` : ''}
+                    <div class="product-price">${product.displayPrice}</div>
+                </div>
                 <div class="product-actions">
-                    <button class="btn-compare" data-style="${product.styleNumber}">
-                        <span class="compare-icon">⊞</span> Compare
+                    <button class="btn-compare ${isInCompare ? 'active' : ''}" 
+                            onclick="catalogSearch.toggleCompare('${product.styleNumber}')"
+                            data-style="${product.styleNumber}">
+                        <span class="compare-icon">${isInCompare ? '✓' : '⊞'}</span> ${isInCompare ? 'Added' : 'Compare'}
                     </button>
                 </div>
             </div>
@@ -772,6 +784,301 @@ class CatalogSearch {
     truncateTitle(title, maxLength = 30) {
         if (title.length <= maxLength) return title;
         return title.substring(0, maxLength) + '...';
+    }
+
+    /**
+     * Toggle product in compare list
+     */
+    toggleCompare(styleNumber) {
+        if (this.compareList.has(styleNumber)) {
+            this.compareList.delete(styleNumber);
+            this.updateCompareButton(styleNumber, false);
+            this.updateCompareBar();
+        } else {
+            if (this.compareList.size >= this.maxCompareItems) {
+                alert(`You can only compare up to ${this.maxCompareItems} products at a time.`);
+                return;
+            }
+            this.compareList.add(styleNumber);
+            this.updateCompareButton(styleNumber, true);
+            this.updateCompareBar();
+        }
+    }
+
+    /**
+     * Update compare button state
+     */
+    updateCompareButton(styleNumber, isActive) {
+        const button = document.querySelector(`.btn-compare[data-style="${styleNumber}"]`);
+        if (button) {
+            if (isActive) {
+                button.classList.add('active');
+                button.innerHTML = '<span class="compare-icon">✓</span> Added';
+            } else {
+                button.classList.remove('active');
+                button.innerHTML = '<span class="compare-icon">⊞</span> Compare';
+            }
+        }
+    }
+
+    /**
+     * Update compare bar at bottom of page
+     */
+    updateCompareBar() {
+        let compareBar = document.getElementById('compareBar');
+        
+        if (this.compareList.size === 0) {
+            if (compareBar) {
+                compareBar.remove();
+            }
+            return;
+        }
+
+        if (!compareBar) {
+            compareBar = document.createElement('div');
+            compareBar.id = 'compareBar';
+            compareBar.className = 'compare-bar';
+            document.body.appendChild(compareBar);
+        }
+
+        compareBar.innerHTML = `
+            <div class="compare-bar-content">
+                <div class="compare-count">
+                    Comparing ${this.compareList.size} of ${this.maxCompareItems} products
+                </div>
+                <div class="compare-items">
+                    ${Array.from(this.compareList).map(style => `
+                        <span class="compare-item">
+                            ${style}
+                            <button onclick="catalogSearch.toggleCompare('${style}')" class="remove-compare">×</button>
+                        </span>
+                    `).join('')}
+                </div>
+                <div class="compare-actions">
+                    <button onclick="catalogSearch.showCompareModal()" class="btn-view-compare">Compare Now</button>
+                    <button onclick="catalogSearch.clearCompare()" class="btn-clear-compare">Clear All</button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Clear all compare items
+     */
+    clearCompare() {
+        this.compareList.forEach(style => {
+            this.updateCompareButton(style, false);
+        });
+        this.compareList.clear();
+        this.updateCompareBar();
+    }
+
+    /**
+     * Show compare modal
+     */
+    async showCompareModal() {
+        if (this.compareList.size < 2) {
+            alert('Please select at least 2 products to compare.');
+            return;
+        }
+
+        // Create modal HTML
+        const modal = document.createElement('div');
+        modal.className = 'compare-modal';
+        modal.id = 'compareModal';
+        
+        modal.innerHTML = `
+            <div class="compare-modal-content">
+                <div class="compare-modal-header">
+                    <h2>Product Comparison</h2>
+                    <button onclick="catalogSearch.closeCompareModal()" class="modal-close">×</button>
+                </div>
+                <div class="compare-modal-body">
+                    <div class="compare-loading">Loading product details...</div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Load product details for comparison
+        const products = [];
+        for (const styleNumber of this.compareList) {
+            const result = await this.searchService.searchByStyle(styleNumber);
+            if (result.products && result.products.length > 0) {
+                products.push(result.products[0]);
+            }
+        }
+
+        // Build comparison table
+        const compareHTML = this.buildCompareTable(products);
+        modal.querySelector('.compare-modal-body').innerHTML = compareHTML;
+    }
+
+    /**
+     * Build comparison table HTML
+     */
+    buildCompareTable(products) {
+        if (products.length === 0) {
+            return '<div class="no-products">No products to compare</div>';
+        }
+
+        return `
+            <div class="compare-table">
+                <div class="compare-row compare-header">
+                    <div class="compare-cell compare-label">Product</div>
+                    ${products.map(p => `
+                        <div class="compare-cell">
+                            <img src="${p.images?.thumbnail || '/placeholder.jpg'}" alt="${p.productName}">
+                            <div class="compare-product-title">${p.productName}</div>
+                            <div class="compare-product-style">${p.styleNumber}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Price</div>
+                    ${products.map(p => `<div class="compare-cell">${p.displayPrice}</div>`).join('')}
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Colors</div>
+                    ${products.map(p => `<div class="compare-cell">${p.colors ? p.colors.length : 0} Available</div>`).join('')}
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Sizes</div>
+                    ${products.map(p => `<div class="compare-cell">${p.sizes ? p.sizes.join(', ') : 'N/A'}</div>`).join('')}
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Brand</div>
+                    ${products.map(p => `<div class="compare-cell">${p.brand || 'N/A'}</div>`).join('')}
+                </div>
+                <div class="compare-row">
+                    <div class="compare-cell compare-label">Actions</div>
+                    ${products.map(p => `
+                        <div class="compare-cell">
+                            <button onclick="catalogSearch.showQuickView('${p.styleNumber}')" class="btn-view-details">View Details</button>
+                            <button onclick="catalogSearch.toggleCompare('${p.styleNumber}')" class="btn-remove-from-compare">Remove</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Close compare modal
+     */
+    closeCompareModal() {
+        const modal = document.getElementById('compareModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    /**
+     * Show quick view modal for a product
+     */
+    async showQuickView(styleNumber) {
+        // Store product data if we need it later
+        let productData = null;
+        
+        // Find product in current results first
+        if (this.currentResults && this.currentResults.products) {
+            productData = this.currentResults.products.find(p => p.styleNumber === styleNumber);
+        }
+        
+        // If not found, fetch it
+        if (!productData) {
+            const result = await this.searchService.searchByStyle(styleNumber);
+            if (result.products && result.products.length > 0) {
+                productData = result.products[0];
+            }
+        }
+        
+        if (!productData) {
+            alert('Product not found');
+            return;
+        }
+
+        // Create quick view modal
+        const modal = document.createElement('div');
+        modal.className = 'quick-view-modal';
+        modal.id = 'quickViewModal';
+        
+        modal.innerHTML = `
+            <div class="quick-view-content">
+                <div class="quick-view-header">
+                    <h2>Quick View</h2>
+                    <button onclick="catalogSearch.closeQuickView()" class="modal-close">×</button>
+                </div>
+                <div class="quick-view-body">
+                    <div class="quick-view-images">
+                        <img src="${productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
+                             alt="${productData.productName}">
+                    </div>
+                    <div class="quick-view-details">
+                        <h1 class="quick-view-style">${productData.styleNumber}</h1>
+                        <h2 class="quick-view-title">${productData.productName}</h2>
+                        
+                        <div class="quick-view-price">${productData.displayPrice}</div>
+                        
+                        ${productData.sizes ? `
+                            <div class="quick-view-section">
+                                <h3>Available Sizes:</h3>
+                                <div class="size-list">${productData.sizes.join(' – ')}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${productData.colors && productData.colors.length > 0 ? `
+                            <div class="quick-view-section">
+                                <h3>Color selected: <span class="selected-color">${productData.colors[0].name}</span></h3>
+                                <div class="color-swatches">
+                                    ${productData.colors.slice(0, 6).map(color => `
+                                        <div class="color-swatch" 
+                                             title="${color.name}"
+                                             style="background: ${color.hex || '#ccc'}">
+                                        </div>
+                                    `).join('')}
+                                    ${productData.colors.length > 6 ? `
+                                        <div class="more-colors">+${productData.colors.length - 6} more</div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${productData.description ? `
+                            <div class="quick-view-section">
+                                <h3>Description:</h3>
+                                <p class="product-description">${productData.description}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="quick-view-actions">
+                            <button onclick="catalogSearch.toggleCompare('${productData.styleNumber}')" 
+                                    class="btn-add-compare ${this.compareList.has(productData.styleNumber) ? 'active' : ''}">
+                                ${this.compareList.has(productData.styleNumber) ? '✓ Added to Compare' : 'Add To Compare'}
+                            </button>
+                            <a href="/product-detail.html?style=${productData.styleNumber}" class="btn-full-details">
+                                View full Product Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    /**
+     * Close quick view modal
+     */
+    closeQuickView() {
+        const modal = document.getElementById('quickViewModal');
+        if (modal) {
+            modal.remove();
+            document.body.style.overflow = ''; // Restore scrolling
+        }
     }
 }
 
