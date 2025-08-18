@@ -346,7 +346,8 @@
                 lineItem.id = lineItemId;
                 
                 lineItem.innerHTML = `
-                    <div class="line-item-grid">
+                    <div class="style-input-group">
+                        <label>Style Number</label>
                         <div class="autocomplete-wrapper">
                             <input type="text" 
                                    class="form-input style-input" 
@@ -354,13 +355,17 @@
                                    autocomplete="off">
                             <div class="autocomplete-list hidden"></div>
                         </div>
+                    </div>
+                    <div class="quantity-input-group">
+                        <label>Quantity</label>
                         <input type="number" 
                                class="form-input quantity-input" 
-                               placeholder="Quantity" 
+                               placeholder="Enter quantity" 
                                min="1">
                     </div>
-                    <button type="button" class="remove-btn" aria-label="Remove item">
+                    <button type="button" class="remove-btn remove-style-btn" aria-label="Remove item">
                         <i class="fas fa-times"></i>
+                        <span>Remove</span>
                     </button>
                 `;
                 
@@ -415,9 +420,11 @@
                             input.dataset.price = cap.price;
                             list.classList.add('hidden');
                             
-                            // Move to quantity input
+                            // Move to quantity input if it exists
                             const quantityInput = input.parentElement.parentElement.querySelector('.quantity-input');
-                            quantityInput.focus();
+                            if (quantityInput) {
+                                quantityInput.focus();
+                            }
                         });
                         
                         list.appendChild(item);
@@ -838,45 +845,47 @@
                 
                 const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, projectName, quoteId } = this.currentQuote;
                 
-                // Build items table
+                // Build items table with clean structure
                 let itemsHtml = '';
                 items.forEach(item => {
                     itemsHtml += `
                         <tr>
-                            <td>
-                                <div class="style-info">${item.styleNumber}</div>
+                            <td class="style-column">
+                                <div class="style-number">${item.styleNumber}</div>
                                 <div class="style-description">${item.description}</div>
                             </td>
-                            <td class="text-center">${item.quantity}</td>
-                            <td class="text-right">$${item.pricePerPiece.toFixed(2)}</td>
-                            <td class="text-right">$${item.lineTotal.toFixed(2)}</td>
+                            <td class="quantity-column">${item.quantity}</td>
+                            <td class="price-column">$${item.pricePerPiece.toFixed(2)}</td>
+                            <td class="total-column">$${item.lineTotal.toFixed(2)}</td>
                         </tr>
                     `;
                 });
 
-                // Build setup fees HTML
+                // Build setup fees HTML with modern card design
                 let setupFeesHtml = '';
                 if (setupFees && setupFees.total > 0) {
                     setupFeesHtml += `
-                        <div class="quote-section">
-                            <h3 class="section-title">Setup & Additional Fees</h3>
-                            <div class="setup-fees-breakdown">
+                        <div class="quote-card setup-fees-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Setup Fees</h3>
+                            </div>
+                            <div class="fees-list">
                     `;
                     
                     if (setupFees.digitizing > 0) {
                         setupFeesHtml += `
-                            <div class="fee-item">
-                                <span>Digitizing Fee</span>
-                                <span>$${setupFees.digitizing.toFixed(2)}</span>
+                            <div class="fee-row">
+                                <span class="fee-label">Digitizing Fee</span>
+                                <span class="fee-amount">$${setupFees.digitizing.toFixed(2)}</span>
                             </div>
                         `;
                     }
                     
                     if (setupFees.graphicDesign > 0) {
                         setupFeesHtml += `
-                            <div class="fee-item">
-                                <span>Graphic Design Fee</span>
-                                <span>$${setupFees.graphicDesign.toFixed(2)}</span>
+                            <div class="fee-row">
+                                <span class="fee-label">Graphic Design Fee</span>
+                                <span class="fee-amount">$${setupFees.graphicDesign.toFixed(2)}</span>
                             </div>
                         `;
                     }
@@ -884,30 +893,35 @@
                     if (setupFees.additional && setupFees.additional.length > 0) {
                         setupFees.additional.forEach(fee => {
                             setupFeesHtml += `
-                                <div class="fee-item">
-                                    <span>${fee.name}</span>
-                                    <span>$${fee.amount.toFixed(2)}</span>
+                                <div class="fee-row">
+                                    <span class="fee-label">${fee.name}</span>
+                                    <span class="fee-amount">$${fee.amount.toFixed(2)}</span>
                                 </div>
                             `;
                         });
                     }
                     
                     setupFeesHtml += `
-                                <div class="fee-total">
-                                    <span>Setup Fees Total</span>
-                                    <span>$${setupFees.total.toFixed(2)}</span>
+                                <div class="fee-total-row">
+                                    <span class="fee-total-label">Total Setup Fees</span>
+                                    <span class="fee-total-amount">$${setupFees.total.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
                     `;
                 }
 
-                // Build notes HTML
+                // Build notes HTML with clean design
                 let notesHtml = '';
                 if (notes) {
                     notesHtml = `
-                        <div class="quote-section">
-                            <h3 class="section-title">Notes</h3>
+                        <div class="quote-card notes-card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-sticky-note"></i>
+                                    Notes
+                                </h3>
+                            </div>
                             <div class="notes-content">
                                 ${notes}
                             </div>
@@ -915,103 +929,120 @@
                     `;
                 }
 
-                // Build complete results HTML
+                // Build complete results HTML with modern layout
                 const resultsHtml = `
-                    <!-- Quote ID Banner -->
-                    <div class="quote-id-banner">
-                        <div class="quote-id-content">
-                            <i class="fas fa-file-alt"></i>
-                            <div class="quote-id-text">
-                                <div class="quote-id-label">Quote Generated</div>
-                                <div class="quote-id-value">${quoteId}</div>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="navigator.clipboard.writeText('${quoteId}')">
-                                <i class="fas fa-copy"></i>
-                                Copy ID
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Quote Status -->
-                    <div class="quote-status-banner">
-                        <div class="quote-status-content">
+                    <!-- Quote Success Header -->
+                    <div class="quote-success-header">
+                        <div class="success-icon">
                             <i class="fas fa-check-circle"></i>
-                            <div class="quote-status-text">
-                                <div class="quote-status-label">Status</div>
-                                <div class="quote-status-value saved" id="quoteStatus">Saved to Database</div>
+                        </div>
+                        <div class="success-content">
+                            <h2 class="success-title">QUOTE GENERATED</h2>
+                            <div class="quote-id-display">
+                                <span class="quote-id-large">${quoteId}</span>
                             </div>
+                        </div>
+                        <div class="status-badge">
+                            <span class="badge-success">Saved to Database</span>
                         </div>
                     </div>
 
-                    <!-- Quote Overview -->
-                    <div class="quote-section">
-                        <div class="quote-header">
-                            <h3 class="section-title">Quote Overview</h3>
-                            <div class="quote-meta">
-                                <span>Total Quantity: <strong>${totalQuantity} pieces</strong></span>
-                                <span>Embellishment: <strong>${embellishmentType === 'embroidery' ? stitchCountText : 'Leatherette Patch'}</strong></span>
-                                ${projectName ? `<span>Project: <strong>${projectName}</strong></span>` : ''}
-                            </div>
+                    <!-- Quote Overview Card -->
+                    <div class="quote-card customer-info-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quote Overview</h3>
                         </div>
-
-                        ${ltmFeeTotal > 0 ? `
-                            <div class="ltm-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Less than minimum charge of $${ltmFeeTotal.toFixed(2)} has been applied ($${(ltmFeeTotal/totalQuantity).toFixed(2)}/piece)</span>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Total Quantity</span>
+                                <span class="info-value">${totalQuantity} pieces</span>
                             </div>
-                        ` : ''}
+                            <div class="info-item">
+                                <span class="info-label">Embellishment</span>
+                                <span class="info-value">${embellishmentType === 'embroidery' ? `Up to ${stitchCountText.toLowerCase()}` : 'Leatherette Patch'}</span>
+                            </div>
+                            ${projectName ? `
+                            <div class="info-item">
+                                <span class="info-label">Project</span>
+                                <span class="info-value">${projectName}</span>
+                            </div>
+                            ` : ''}
+                        </div>
                     </div>
 
-                    <!-- Cap Pricing Details -->
-                    <div class="quote-section">
-                        <h3 class="section-title">Cap Pricing Details</h3>
-                        <div class="pricing-table">
-                            <table>
+                    ${ltmFeeTotal > 0 ? `
+                        <div class="ltm-notice">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="ltm-content">
+                                <strong>Less Than Minimum Fee Applied</strong>
+                                <p>A fee of $${ltmFeeTotal.toFixed(2)} has been added ($${(ltmFeeTotal/totalQuantity).toFixed(2)} per piece) for orders under 24 pieces.</p>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Pricing Table Card -->
+                    <div class="quote-card pricing-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Cap Pricing Details</h3>
+                        </div>
+                        <div class="pricing-table-wrapper">
+                            <table class="pricing-table">
                                 <thead>
                                     <tr>
-                                        <th>Style</th>
-                                        <th>Qty</th>
-                                        <th>Each</th>
-                                        <th>Total</th>
+                                        <th class="style-column">Style</th>
+                                        <th class="quantity-column">Qty</th>
+                                        <th class="price-column">Each</th>
+                                        <th class="total-column">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${itemsHtml}
                                 </tbody>
+                                <tfoot>
+                                    <tr class="subtotal-row">
+                                        <td colspan="3" class="subtotal-label">Products Subtotal:</td>
+                                        <td class="subtotal-amount">$${subtotal.toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
                             </table>
-                            <div class="pricing-summary">
-                                <div class="summary-row">
-                                    <span>Products Subtotal:</span>
-                                    <span>$${subtotal.toFixed(2)}</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
                     ${setupFeesHtml}
                     ${notesHtml}
 
-                    <!-- Grand Total Section -->
-                    <div class="quote-section">
-                        <div class="grand-total-section">
-                            <div class="grand-total-label">Your Total Quote Amount</div>
-                            <div class="grand-total-amount">$${grandTotal.toFixed(2)}</div>
+                    <!-- Price Per Cap Display Section -->
+                    <div class="total-display-section">
+                        <div class="per-cap-section">
+                            <div class="per-cap-label">PRICE PER CAP</div>
+                            <div class="per-cap-amount">
+                                <span class="currency-symbol">$</span>
+                                <span class="amount-value">${(grandTotal / totalQuantity).toFixed(2)}</span>
+                            </div>
+                            <div class="per-cap-detail">for ${totalQuantity} caps</div>
                         </div>
-                        
-                        <div class="button-container">
-                            <button type="button" class="btn btn-secondary" id="printQuoteBtn" disabled>
-                                <i class="fas fa-print"></i>
-                                Print Quote ${quoteId}
-                            </button>
-                            <button type="button" class="btn btn-success" id="sendQuoteBtn" disabled>
-                                <i class="fas fa-paper-plane"></i>
-                                Send Quote ${quoteId}
-                            </button>
-                            <button type="button" class="btn btn-warning" id="newQuoteBtn" disabled>
-                                <i class="fas fa-plus"></i>
-                                New Quote
-                            </button>
+                        <div class="total-section-small">
+                            <span class="total-label-small">Total Order:</span>
+                            <span class="total-amount-small">$${grandTotal.toFixed(2)}</span>
                         </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-print" id="printQuoteBtn" disabled>
+                            <i class="fas fa-print"></i>
+                            <span>Print Quote</span>
+                            <span class="quote-ref">${quoteId}</span>
+                        </button>
+                        <button type="button" class="btn btn-send" id="sendQuoteBtn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send Quote</span>
+                            <span class="quote-ref">${quoteId}</span>
+                        </button>
+                        <button type="button" class="btn btn-new" id="newQuoteBtn" disabled>
+                            <i class="fas fa-plus"></i>
+                            <span>New Quote</span>
+                        </button>
                     </div>
                 `;
                 
@@ -1486,10 +1517,15 @@
                     
                     // Map sales rep emails to names
                     const salesRepNames = {
-                        'taylar@nwcustomapparel.com': 'Taylar',
-                        'nika@nwcustomapparel.com': 'Nika',
-                        'erik@nwcustomapparel.com': 'Erik',
+                        'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                        'taylar@nwcustomapparel.com': 'Taylar Hanson',
+                        'nika@nwcustomapparel.com': 'Nika Lao',
+                        'taneisha@nwcustomapparel.com': 'Taneisha Clark',
+                        'erik@nwcustomapparel.com': 'Erik Mickelson',
                         'adriyella@nwcustomapparel.com': 'Adriyella',
+                        'bradley@nwcustomapparel.com': 'Bradley Wright',
+                        'jim@nwcustomapparel.com': 'Jim Mickelson',
+                        'art@nwcustomapparel.com': 'Steve Deland',
                         'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
                     };
                     

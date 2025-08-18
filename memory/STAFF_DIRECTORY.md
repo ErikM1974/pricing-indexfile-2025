@@ -3,7 +3,7 @@
 ## Overview
 This is the authoritative source for all staff contact information. Always reference this document when implementing staff dropdowns or contact lists.
 
-**Last Updated**: 2025-01-29
+**Last Updated**: 2025-08-18
 
 ## Sales Representatives
 
@@ -13,6 +13,7 @@ This is the authoritative source for all staff contact information. Always refer
 | Ruth Nhong | ruth@nwcustomapparel.com | Production Manager | No |
 | Taylar Hanson | taylar@nwcustomapparel.com | Account Executive | No |
 | Nika Lao | nika@nwcustomapparel.com | Account Executive | No |
+| Taneisha Clark | taneisha@nwcustomapparel.com | Account Executive | No |
 | Erik Mickelson | erik@nwcustomapparel.com | Operations Manager | No |
 | Adriyella | adriyella@nwcustomapparel.com | Office Assistant | No |
 | Bradley Wright | bradley@nwcustomapparel.com | Accountant | No |
@@ -24,29 +25,31 @@ This is the authoritative source for all staff contact information. Always refer
 ### For Dropdown Lists
 ```javascript
 const salesReps = [
-    { email: 'ruth@nwcustomapparel.com', name: 'Ruth', default: true },
-    { email: 'taylar@nwcustomapparel.com', name: 'Taylar' },
-    { email: 'nika@nwcustomapparel.com', name: 'Nika' },
-    { email: 'erik@nwcustomapparel.com', name: 'Erik' },
+    { email: 'sales@nwcustomapparel.com', name: 'General Sales', default: true },
+    { email: 'ruth@nwcustomapparel.com', name: 'Ruth Nhong' },
+    { email: 'taylar@nwcustomapparel.com', name: 'Taylar Hanson' },
+    { email: 'nika@nwcustomapparel.com', name: 'Nika Lao' },
+    { email: 'taneisha@nwcustomapparel.com', name: 'Taneisha Clark' },
+    { email: 'erik@nwcustomapparel.com', name: 'Erik Mickelson' },
     { email: 'adriyella@nwcustomapparel.com', name: 'Adriyella' },
-    { email: 'bradley@nwcustomapparel.com', name: 'Bradley' },
-    { email: 'jim@nwcustomapparel.com', name: 'Jim' },
-    { email: 'art@nwcustomapparel.com', name: 'Steve (Artist)' },
-    { email: 'sales@nwcustomapparel.com', name: 'General Sales' }
+    { email: 'bradley@nwcustomapparel.com', name: 'Bradley Wright' },
+    { email: 'jim@nwcustomapparel.com', name: 'Jim Mickelson' },
+    { email: 'art@nwcustomapparel.com', name: 'Steve Deland' }
 ];
 ```
 
 ### For Email Mapping
 ```javascript
 const salesRepEmails = {
-    'ruth@nwcustomapparel.com': 'Ruth',
-    'taylar@nwcustomapparel.com': 'Taylar',
-    'nika@nwcustomapparel.com': 'Nika',
-    'erik@nwcustomapparel.com': 'Erik',
+    'ruth@nwcustomapparel.com': 'Ruth Nhong',
+    'taylar@nwcustomapparel.com': 'Taylar Hanson',
+    'nika@nwcustomapparel.com': 'Nika Lao',
+    'taneisha@nwcustomapparel.com': 'Taneisha Clark',
+    'erik@nwcustomapparel.com': 'Erik Mickelson',
     'adriyella@nwcustomapparel.com': 'Adriyella',
-    'bradley@nwcustomapparel.com': 'Bradley',
-    'jim@nwcustomapparel.com': 'Jim',
-    'art@nwcustomapparel.com': 'Steve (Artist)',
+    'bradley@nwcustomapparel.com': 'Bradley Wright',
+    'jim@nwcustomapparel.com': 'Jim Mickelson',
+    'art@nwcustomapparel.com': 'Steve Deland',
     'sales@nwcustomapparel.com': 'Northwest Custom Apparel Sales Team'
 };
 ```
@@ -55,15 +58,16 @@ const salesRepEmails = {
 ```html
 <select id="salesRep" class="form-select" required>
     <option value="">Select a sales rep...</option>
-    <option value="ruth@nwcustomapparel.com" selected>Ruth</option>
-    <option value="taylar@nwcustomapparel.com">Taylar</option>
-    <option value="nika@nwcustomapparel.com">Nika</option>
-    <option value="erik@nwcustomapparel.com">Erik</option>
+    <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+    <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-    <option value="bradley@nwcustomapparel.com">Bradley</option>
-    <option value="jim@nwcustomapparel.com">Jim</option>
-    <option value="art@nwcustomapparel.com">Steve (Artist)</option>
-    <option value="sales@nwcustomapparel.com">General Sales</option>
+    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+    <option value="art@nwcustomapparel.com">Steve Deland</option>
 </select>
 ```
 
@@ -87,6 +91,7 @@ const salesRepEmails = {
 
 ## Update History
 
+- 2025-08-18: Added Taneisha Clark as Account Executive
 - 2025-01-29: Initial creation, consolidated from various documentation files
 - Removed duplicate "Ruthie" entry
 - Confirmed "Taylar" spelling

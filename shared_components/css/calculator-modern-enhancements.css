@@ -1,0 +1,548 @@
+/**
+ * Calculator Modern Enhancements
+ * Progressive CSS enhancements for 2024-2025
+ * Optional layer that can be included by individual calculators
+ * Gracefully degrades in unsupported browsers
+ */
+
+/* ============================================
+   MODERN CSS CUSTOM PROPERTIES
+   ============================================ */
+@layer enhancements {
+  :root {
+    /* Fluid Typography Scale */
+    --fluid-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --fluid-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+    --fluid-base: clamp(1rem, 0.9rem + 0.4vw, 1.125rem);
+    --fluid-lg: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+    --fluid-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+    --fluid-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+    --fluid-3xl: clamp(2rem, 1.5rem + 2vw, 2.5rem);
+    
+    /* Fluid Spacing Scale */
+    --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+    --space-sm: clamp(0.5rem, 0.45rem + 0.25vw, 0.75rem);
+    --space-md: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
+    --space-lg: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+    --space-xl: clamp(2rem, 1.75rem + 1.25vw, 3rem);
+    
+    /* Modern Shadow System */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.04);
+    
+    /* Glass Effect Variables */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --glass-blur: blur(10px);
+  }
+}
+
+/* ============================================
+   CONTAINER QUERIES
+   ============================================ */
+@supports (container-type: inline-size) {
+  /* Define container contexts - REMOVED main-container to prevent layout issues */
+  /* Container queries should be opt-in per calculator */
+  
+  .input-section,
+  .results-section {
+    container-type: inline-size;
+    container-name: section;
+  }
+  
+  .form-group {
+    container-type: inline-size;
+    container-name: form-group;
+  }
+  
+  /* Container-responsive typography */
+  @container section (min-width: 400px) {
+    .section-title {
+      font-size: var(--fluid-lg);
+    }
+  }
+  
+  @container section (min-width: 600px) {
+    .section-title {
+      font-size: var(--fluid-xl);
+    }
+  }
+  
+  /* Container-responsive form layouts */
+  @container form-group (min-width: 500px) {
+    .embellishment-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  }
+  
+  /* Grid adjustments removed - let base CSS handle this */
+  /* Calculator-specific styles should handle their own grid layouts */
+}
+
+/* ============================================
+   MODERN GRID ENHANCEMENTS
+   ============================================ */
+@supports (grid-template-rows: subgrid) {
+  /* Subgrid for better form alignment */
+  .form-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+  
+  /* Multi-column form sections with subgrid */
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+  }
+  
+  .form-row > * {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+  }
+}
+
+/* Named grid areas for semantic layouts - DISABLED to prevent conflicts */
+/* Calculators should define their own grid areas if needed */
+/* @supports (grid-template-areas: "header") {
+  .calculator-layout {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "form results"
+      "footer footer";
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-lg);
+  }
+  
+  .page-header { grid-area: header; }
+  .input-section { grid-area: form; }
+  .results-section { grid-area: results; }
+  .page-footer { grid-area: footer; }
+} */
+
+/* ============================================
+   FIELD SIZING (AUTO-GROWING INPUTS)
+   ============================================ */
+@supports (field-sizing: content) {
+  textarea {
+    field-sizing: content;
+    min-height: 3rem;
+    max-height: 15rem;
+  }
+  
+  input[type="text"],
+  input[type="email"] {
+    field-sizing: content;
+    min-width: 200px;
+  }
+  
+  select {
+    field-sizing: content;
+  }
+}
+
+/* ============================================
+   MODERN SELECTORS
+   ============================================ */
+/* Enhanced form group styling with :has() */
+@supports selector(:has(*)) {
+  /* Highlight form groups with errors */
+  .form-group:has(.error) {
+    background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent);
+    border-left: 3px solid #ef4444;
+    padding-left: 1rem;
+    margin-left: -1rem;
+  }
+  
+  /* Style labels when their inputs are focused */
+  .form-group:has(input:focus) .form-label,
+  .form-group:has(select:focus) .form-label,
+  .form-group:has(textarea:focus) .form-label {
+    color: var(--primary-green);
+    font-weight: 600;
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+  
+  /* Adjust spacing when optional fields are present */
+  .form-group:has([data-optional]) {
+    margin-bottom: var(--space-sm);
+  }
+  
+  /* Show/hide helper text dynamically */
+  .form-group:has(input:focus) .helper-text {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus-within for better visual feedback */
+.form-group:focus-within {
+  background: linear-gradient(to right, rgba(76, 179, 84, 0.03), transparent);
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+/* ============================================
+   GLASSMORPHISM EFFECTS
+   ============================================ */
+/* Glassmorphism disabled by default to prevent rendering issues */
+/* Calculators can opt-in by adding .enable-glass class to body */
+body.enable-glass .glass-card {
+  @supports (backdrop-filter: blur(10px)) {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+}
+
+body.enable-glass .results-section.glass {
+  @supports (backdrop-filter: blur(12px)) {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.8) 0%, 
+      rgba(255, 255, 255, 0.6) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Glass effect for modals - keep this as it's less likely to cause issues */
+@supports (backdrop-filter: blur(5px)) {
+  .modal-backdrop {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ============================================
+   MODERN TYPOGRAPHY
+   ============================================ */
+/* Balanced text wrapping */
+@supports (text-wrap: balance) {
+  h1, h2, h3, h4, h5, h6,
+  .page-title,
+  .section-title,
+  .card-title {
+    text-wrap: balance;
+  }
+}
+
+/* Better text rendering */
+.page-title,
+.section-title {
+  font-size: var(--fluid-2xl);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ============================================
+   COLOR ENHANCEMENTS
+   ============================================ */
+@supports (color: color-mix(in srgb, red, blue)) {
+  :root {
+    /* Dynamic color variations using color-mix */
+    --primary-hover: color-mix(in srgb, var(--primary-green) 90%, black);
+    --primary-light: color-mix(in srgb, var(--primary-green) 80%, white);
+    --primary-ultra-light: color-mix(in srgb, var(--primary-green) 20%, white);
+    
+    /* Semantic color tokens */
+    --success-subtle: color-mix(in srgb, var(--primary-green) 10%, white);
+    --warning-subtle: color-mix(in srgb, #f59e0b 10%, white);
+    --error-subtle: color-mix(in srgb, #ef4444 10%, white);
+  }
+}
+
+/* ============================================
+   MODERN ANIMATIONS
+   ============================================ */
+@supports (animation-timeline: scroll()) {
+  /* Scroll-driven animations for sections */
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .scroll-reveal {
+    animation: reveal linear;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+}
+
+/* Smooth number transitions */
+@property --number-value {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+
+.animated-number {
+  transition: --number-value 0.5s ease-out;
+  counter-reset: num var(--number-value);
+}
+
+.animated-number::after {
+  content: counter(num);
+}
+
+/* ============================================
+   ENHANCED BUTTONS & INTERACTIONS
+   ============================================ */
+/* Modern button styles with better states */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: var(--fluid-base);
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* Ripple effect on click */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Modern hover effects */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   SKELETON LOADING STATES
+   ============================================ */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.skeleton-button {
+  height: 2.5rem;
+  width: 120px;
+  border-radius: 6px;
+}
+
+/* ============================================
+   RESPONSIVE TABLES WITH CONTAINER QUERIES
+   ============================================ */
+@container section (max-width: 600px) {
+  .pricing-table {
+    font-size: var(--fluid-sm);
+  }
+  
+  .pricing-table th,
+  .pricing-table td {
+    padding: var(--space-xs);
+  }
+  
+  /* Stack table on very small containers */
+  @container section (max-width: 400px) {
+    .pricing-table table,
+    .pricing-table thead,
+    .pricing-table tbody,
+    .pricing-table th,
+    .pricing-table td,
+    .pricing-table tr {
+      display: block;
+    }
+    
+    .pricing-table thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    .pricing-table tr {
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    
+    .pricing-table td {
+      border: none;
+      position: relative;
+      padding-left: 50%;
+    }
+    
+    .pricing-table td:before {
+      content: attr(data-label);
+      position: absolute;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+/* Content visibility for better rendering */
+@supports (content-visibility: auto) {
+  .results-section:not(.active) {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   MODERN FORM PATTERNS
+   ============================================ */
+/* Floating labels without JavaScript */
+.form-field {
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 1rem 0.75rem 0.5rem;
+  font-size: var(--fluid-base);
+}
+
+.form-field label {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  color: var(--text-secondary);
+}
+
+.form-field input:focus + label,
+.form-field input:not(:placeholder-shown) + label,
+.form-field select:focus + label,
+.form-field select:valid + label,
+.form-field textarea:focus + label,
+.form-field textarea:not(:placeholder-shown) + label {
+  top: 0.5rem;
+  transform: translateY(0);
+  font-size: var(--fluid-xs);
+  color: var(--primary-green);
+  background: white;
+  padding: 0 0.25rem;
+}
+
+/* ============================================
+   ENHANCED CARDS WITH MODERN SHADOWS
+   ============================================ */
+.card {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.02),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 16px 32px rgba(0, 0, 0, 0.10);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fluid-container {
+  width: min(100%, 1200px);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
