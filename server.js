@@ -79,6 +79,7 @@ app.use('/guides', express.static(path.join(__dirname, 'guides'), staticOptions)
 app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
 app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
 app.use('/training', express.static(path.join(__dirname, 'training'), staticOptions));
+app.use('/shared_components', express.static(path.join(__dirname, 'shared_components'), staticOptions));
 
 // Serve CSS and JS files from root directory
 app.get('/*.css', (req, res) => {
@@ -179,6 +180,35 @@ app.get('/sanmar-credits.html', (req, res) => {
 
 app.get('/sanmar-vendor-portal.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'sanmar-vendor-portal.html'));
+});
+
+// Test files for new search implementation
+app.get('/index-new.html', (req, res) => {
+  console.log('Serving index-new.html for testing new search');
+  res.sendFile(path.join(__dirname, 'index-new.html'));
+});
+
+app.get('/test-api.html', (req, res) => {
+  console.log('Serving test-api.html for API testing');
+  res.sendFile(path.join(__dirname, 'test-api.html'));
+});
+
+app.get('/test-catalog-layout.html', (req, res) => {
+  console.log('Serving test-catalog-layout.html for layout testing');
+  res.sendFile(path.join(__dirname, 'test-catalog-layout.html'));
+});
+
+// Also serve the new JS files explicitly if needed
+app.get('/app-new.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'app-new.js'));
+});
+
+app.get('/autocomplete-new.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'autocomplete-new.js'));
+});
+
+app.get('/catalog-search.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'catalog-search.css'));
 });
 
 // API configuration

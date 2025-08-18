@@ -34,6 +34,7 @@ All resources follow RESTful conventions:
 ### Pricing & Products
 | Endpoint | Method | Description | Key Params |
 |----------|--------|-------------|------------|
+| **`/products/search`** | **GET** | **Advanced product search** | **q, category, brand, color, size, minPrice, maxPrice, sort, page, limit, includeFacets** |
 | `/pricing-tiers` | GET | Get pricing tiers | method (DTG/ScreenPrint/Embroidery) |
 | `/embroidery-costs` | GET | Embroidery pricing | itemType, stitchCount |
 | `/dtg-costs` | GET | DTG pricing | - |
@@ -42,6 +43,32 @@ All resources follow RESTful conventions:
 | `/product-details` | GET | Product info | styleNumber, color |
 | `/color-swatches` | GET | Available colors | styleNumber |
 | `/inventory` | GET | Stock levels | styleNumber, color |
+
+#### Products Search Endpoint (NEW - Live August 2025)
+The `/products/search` endpoint provides Google-like search with faceted filtering:
+
+**Query Parameters:**
+- `q` - Search text across style, title, description, keywords
+- `category` - Filter by category (supports arrays)
+- `brand` - Filter by brand (supports arrays)  
+- `color` - Filter by color (supports arrays)
+- `size` - Filter by size (supports arrays)
+- `minPrice`/`maxPrice` - Price range filtering
+- `status` - Active/Discontinued/all (default: Active)
+- `isTopSeller` - Boolean for top sellers
+- `sort` - name_asc/desc, price_asc/desc, newest, style
+- `page`/`limit` - Pagination (default: page 1, limit 24)
+- `includeFacets` - Include filter counts for UI
+
+**Response includes:**
+- Grouped products by style number
+- Comprehensive images (thumbnail, main, model, flat, swatches)
+- Aggregated colors and sizes per style
+- Price ranges across variants
+- Optional facet counts for dynamic filtering
+- Pagination metadata
+
+Example: `GET /api/products/search?q=polo&category=Polos/Knits&includeFacets=true`
 
 ### Quote System (Critical for Calculators)
 | Endpoint | Method | Description | Key Fields |

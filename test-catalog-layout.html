@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog Layout Test</title>
+    <link rel="stylesheet" href="main-redesign.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1a472a;
+            margin-bottom: 2rem;
+        }
+        .test-controls {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4cb354;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        .test-button:hover {
+            background: #409a47;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        #resultsCount {
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Catalog Layout Test - 6 Column Grid with Quick View & Compare</h1>
+        
+        <div class="test-controls">
+            <button class="test-button" onclick="loadTestProducts()">Load Test Products</button>
+            <button class="test-button" onclick="loadPolosKnits()">Load Polos/Knits</button>
+            <button class="test-button" onclick="testQuickView()">Test Quick View (Load First)</button>
+            <button class="test-button" onclick="clearProducts()">Clear</button>
+        </div>
+
+        <div class="results-header">
+            <div id="resultsCount">0 products</div>
+        </div>
+
+        <div class="results-grid" id="resultsGrid">
+            <!-- Products will appear here -->
+        </div>
+
+        <div id="loadMoreContainer"></div>
+    </div>
+
+    <script src="product-search-service.js"></script>
+    <script src="catalog-search.js"></script>
+    <script>
+        const searchService = new ProductSearchService();
+        let catalogSearch;
+
+        // Initialize catalog search when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.ProductSearchService) {
+                catalogSearch = new CatalogSearch();
+                window.catalogSearch = catalogSearch;
+            }
+        });
+
+        async function loadTestProducts() {
+            if (!catalogSearch) {
+                catalogSearch = new CatalogSearch();
+                window.catalogSearch = catalogSearch;
+            }
+            
+            catalogSearch.currentFilters.q = 'shirt';
+            catalogSearch.currentFilters.page = 1;
+            await catalogSearch.performSearch();
+        }
+
+        async function loadPolosKnits() {
+            if (!catalogSearch) {
+                catalogSearch = new CatalogSearch();
+                window.catalogSearch = catalogSearch;
+            }
+            
+            catalogSearch.currentFilters.category = 'Polos/Knits';
+            catalogSearch.currentFilters.subcategory = null;
+            catalogSearch.currentFilters.q = '';
+            catalogSearch.currentFilters.page = 1;
+            await catalogSearch.performSearch();
+        }
+        
+        function testQuickView() {
+            // Find first product card and trigger quick view
+            const firstProduct = document.querySelector('.product-card');
+            if (firstProduct) {
+                const styleNumber = firstProduct.dataset.style;
+                if (styleNumber && catalogSearch) {
+                    catalogSearch.showQuickView(styleNumber);
+                } else {
+                    alert('Please load products first');
+                }
+            } else {
+                alert('Please load products first');
+            }
+        }
+
+        function clearProducts() {
+            document.getElementById('resultsGrid').innerHTML = '';
+            document.getElementById('resultsCount').textContent = '0 products';
+            document.getElementById('loadMoreContainer').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

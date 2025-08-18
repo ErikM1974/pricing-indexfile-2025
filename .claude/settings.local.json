@@ -76,7 +76,8 @@
       "Bash(cd:*)",
       "Bash(git log:*)",
       "Bash(do cp \"$file\" \"$file.backup\")",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "WebFetch(domain:catalog.companycasuals.com)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
