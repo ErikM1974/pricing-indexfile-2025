@@ -296,6 +296,12 @@
     <!-- DTG Specific JavaScript -->
     <script src="/shared_components/js/dtg-config.js"></script>
     <script src="/shared_components/js/dtg-page-setup.js"></script>
+    
+    <!-- New Direct API Service (Phase 1 Migration) -->
+    <script src="/shared_components/js/dtg-pricing-service.js"></script>
+    
+    <!-- Legacy Master Bundle System (To be removed after migration) -->
+    <script src="/shared_components/js/base-adapter.js"></script>
     <script src="/shared_components/js/dtg-adapter.js"></script>
     <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
     
@@ -340,6 +346,23 @@
             console.log('[DTG-Cart] Cart integration called');
             return Promise.resolve();
         };
+        
+        // FEATURE FLAG: Toggle between old master bundle and new direct API
+        // Set to true to use new system, false for old system
+        window.USE_DIRECT_API = true; // ENABLED: Both systems produce identical prices
+        
+        // Performance tracking
+        window.DTG_PERFORMANCE = {
+            systemUsed: window.USE_DIRECT_API ? 'Direct API' : 'Master Bundle',
+            loadStartTime: performance.now(),
+            metrics: {}
+        };
+        
+        // Log which system is active
+        console.log('===================================');
+        console.log(`🚀 DTG Pricing System: ${window.USE_DIRECT_API ? 'NEW Direct API (ACTIVE)' : 'OLD Master Bundle'}`);
+        console.log('To switch back: window.USE_DIRECT_API = false');
+        console.log('===================================');
         
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', function() {

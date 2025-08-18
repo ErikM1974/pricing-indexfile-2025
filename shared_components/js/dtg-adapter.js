@@ -67,6 +67,10 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version with BaseAd
         async processSpecificData(masterBundle) {
             this.debugLog('Processing DTG-specific data');
             
+            // Store master bundle globally for compatibility with dtg-pricing-v4.js
+            window.dtgMasterPriceBundle = masterBundle;
+            this.debugLog('Stored master bundle in window.dtgMasterPriceBundle');
+            
             // Update location dropdown with data from Caspio
             this.updateLocationDropdownFromBundle(masterBundle);
             
