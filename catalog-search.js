@@ -370,7 +370,7 @@ class CatalogSearch {
         return `
             <div class="product-card" data-style="${product.styleNumber}">
                 <div class="product-image-container">
-                    <a href="/product-detail.html?style=${product.styleNumber}" class="product-link">
+                    <a href="/product.html?style=${product.styleNumber}" class="product-link">
                         <div class="product-image">
                             ${product.features?.isTopSeller ? '<div class="top-seller-badge">TOP SELLER</div>' : ''}
                             <img src="${imageUrl}" 
@@ -1018,9 +1018,13 @@ class CatalogSearch {
                 </div>
                 <div class="quick-view-body">
                     <div class="quick-view-images">
-                        <img id="quickViewMainImage" 
-                             src="${selectedColor?.productImageUrl || productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
-                             alt="${productData.productName}">
+                        <a href="/product.html?style=${productData.styleNumber}" 
+                           id="quickViewImageLink"
+                           class="quick-view-image-link">
+                            <img id="quickViewMainImage" 
+                                 src="${selectedColor?.productImageUrl || productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
+                                 alt="${productData.productName}">
+                        </a>
                     </div>
                     <div class="quick-view-details">
                         <h1 class="quick-view-style">${productData.styleNumber}</h1>
@@ -1068,7 +1072,7 @@ class CatalogSearch {
                                     class="btn-add-compare ${this.compareList.has(productData.styleNumber) ? 'active' : ''}">
                                 ${this.compareList.has(productData.styleNumber) ? '✓ Added to Compare' : 'Add To Compare'}
                             </button>
-                            <a href="/product-detail.html?style=${productData.styleNumber}" class="btn-full-details">
+                            <a href="/product.html?style=${productData.styleNumber}" class="btn-full-details">
                                 View full Product Details
                             </a>
                         </div>
@@ -1112,6 +1116,12 @@ class CatalogSearch {
                 swatch.classList.remove('selected');
             }
         });
+        
+        // Update the product link to include the selected color
+        const imageLink = document.getElementById('quickViewImageLink');
+        if (imageLink && this.currentQuickViewProduct) {
+            imageLink.href = `/product.html?style=${this.currentQuickViewProduct.styleNumber}&color=${encodeURIComponent(color.name)}`;
+        }
     }
 
     /**

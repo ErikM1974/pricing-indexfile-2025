@@ -2203,6 +2203,23 @@
     max-height: 500px;
 }
 
+/* Clickable product image in Quick View */
+.quick-view-image-link {
+    display: block;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+}
+
+.quick-view-image-link:hover {
+    opacity: 0.9;
+}
+
+.quick-view-image-link:hover img {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
 .quick-view-details {
     display: flex;
     flex-direction: column;
