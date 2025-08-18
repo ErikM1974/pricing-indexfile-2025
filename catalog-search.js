@@ -999,6 +999,12 @@ class CatalogSearch {
             return;
         }
 
+        // Store product data for color switching
+        this.currentQuickViewProduct = productData;
+        
+        // Get initial selected color (first one)
+        const selectedColor = productData.colors && productData.colors.length > 0 ? productData.colors[0] : null;
+
         // Create quick view modal
         const modal = document.createElement('div');
         modal.className = 'quick-view-modal';
@@ -1012,7 +1018,8 @@ class CatalogSearch {
                 </div>
                 <div class="quick-view-body">
                     <div class="quick-view-images">
-                        <img src="${productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
+                        <img id="quickViewMainImage" 
+                             src="${selectedColor?.productImageUrl || productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
                              alt="${productData.productName}">
                     </div>
                     <div class="quick-view-details">
@@ -1030,17 +1037,21 @@ class CatalogSearch {
                         
                         ${productData.colors && productData.colors.length > 0 ? `
                             <div class="quick-view-section">
-                                <h3>Color selected: <span class="selected-color">${productData.colors[0].name}</span></h3>
+                                <h3>Color selected: <span id="selectedColorName" class="selected-color">${selectedColor.name}</span></h3>
                                 <div class="color-swatches">
-                                    ${productData.colors.slice(0, 6).map(color => `
-                                        <div class="color-swatch" 
-                                             title="${color.name}"
-                                             style="background: ${color.hex || '#ccc'}">
+                                    ${productData.colors.map((color, index) => `
+                                        <div class="color-swatch ${index === 0 ? 'selected' : ''}" 
+                                             data-color-index="${index}"
+                                             data-color-name="${color.name}"
+                                             data-product-image="${color.productImageUrl || ''}"
+                                             onclick="catalogSearch.selectQuickViewColor(${index})"
+                                             title="${color.name}">
+                                            ${color.swatchUrl ? 
+                                                `<img src="${color.swatchUrl}" alt="${color.name}" />` :
+                                                `<div class="color-swatch-fallback" style="background: ${color.hex || '#ccc'}"></div>`
+                                            }
                                         </div>
                                     `).join('')}
-                                    ${productData.colors.length > 6 ? `
-                                        <div class="more-colors">+${productData.colors.length - 6} more</div>
-                                    ` : ''}
                                 </div>
                             </div>
                         ` : ''}
@@ -1068,6 +1079,39 @@ class CatalogSearch {
         
         document.body.appendChild(modal);
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    /**
+     * Handle color swatch selection in quick view
+     */
+    selectQuickViewColor(colorIndex) {
+        if (!this.currentQuickViewProduct || !this.currentQuickViewProduct.colors) return;
+        
+        const color = this.currentQuickViewProduct.colors[colorIndex];
+        if (!color) return;
+        
+        // Update selected color name
+        const colorNameElement = document.getElementById('selectedColorName');
+        if (colorNameElement) {
+            colorNameElement.textContent = color.name;
+        }
+        
+        // Update main image if color has a product image
+        if (color.productImageUrl) {
+            const mainImage = document.getElementById('quickViewMainImage');
+            if (mainImage) {
+                mainImage.src = color.productImageUrl;
+            }
+        }
+        
+        // Update selected state on swatches
+        document.querySelectorAll('.color-swatch').forEach((swatch, index) => {
+            if (index === colorIndex) {
+                swatch.classList.add('selected');
+            } else {
+                swatch.classList.remove('selected');
+            }
+        });
     }
 
     /**
