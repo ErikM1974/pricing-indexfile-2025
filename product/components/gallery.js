@@ -94,21 +94,12 @@ export class ProductGallery {
         const images = [];
         const colorName = colorData.COLOR_NAME || colorData.colorName || colorData.color_name || 'Product';
         
-        // Primary product image
-        const mainImage = colorData.MAIN_IMAGE_URL || colorData.mainImageUrl || colorData.main_image_url;
-        if (mainImage && mainImage.trim()) {
-            images.push({
-                url: mainImage,
-                alt: `${colorName} - Main View`,
-                type: 'main'
-            });
-        }
-        
-        // Model images
+        // PRIORITY 1: Model images (people wearing the product) - like Sanmar
         const modelImages = [
-            { url: colorData.FRONT_MODEL || colorData.frontModel, alt: 'Front Model' },
-            { url: colorData.BACK_MODEL || colorData.backModel, alt: 'Back Model' },
-            { url: colorData.SIDE_MODEL || colorData.sideModel, alt: 'Side Model' }
+            { url: colorData.FRONT_MODEL || colorData.frontModel || colorData.front_model, alt: 'Front Model' },
+            { url: colorData.BACK_MODEL || colorData.backModel || colorData.back_model, alt: 'Back Model' },
+            { url: colorData.SIDE_MODEL || colorData.sideModel || colorData.side_model, alt: 'Side Model' },
+            { url: colorData.MODEL_3Q || colorData.model3q || colorData.model_3q, alt: '3/4 View Model' }
         ];
         
         modelImages.forEach(img => {
@@ -121,10 +112,11 @@ export class ProductGallery {
             }
         });
         
-        // Flat images
+        // PRIORITY 2: Flat/product images
         const flatImages = [
-            { url: colorData.FRONT_FLAT || colorData.frontFlat, alt: 'Front Flat' },
-            { url: colorData.BACK_FLAT || colorData.backFlat, alt: 'Back Flat' }
+            { url: colorData.FRONT_FLAT || colorData.frontFlat || colorData.front_flat, alt: 'Front Flat' },
+            { url: colorData.BACK_FLAT || colorData.backFlat || colorData.back_flat, alt: 'Back Flat' },
+            { url: colorData.SIDE_FLAT || colorData.sideFlat || colorData.side_flat, alt: 'Side Flat' }
         ];
         
         flatImages.forEach(img => {
@@ -137,11 +129,23 @@ export class ProductGallery {
             }
         });
         
-        // Additional product images (if any)
-        for (let i = 1; i <= 6; i++) {
+        // PRIORITY 3: Primary/main product image (if not already included)
+        const mainImage = colorData.MAIN_IMAGE_URL || colorData.mainImageUrl || colorData.main_image_url;
+        if (mainImage && mainImage.trim() && !images.find(img => img.url === mainImage)) {
+            images.push({
+                url: mainImage,
+                alt: `${colorName} - Main View`,
+                type: 'main'
+            });
+        }
+        
+        // PRIORITY 4: Additional product images (lifestyle, detail shots, etc.)
+        for (let i = 1; i <= 10; i++) {
             const imageUrl = colorData[`COLOR_PRODUCT_IMAGE_${i}`] || 
                            colorData[`colorProductImage${i}`] || 
-                           colorData[`color_product_image_${i}`];
+                           colorData[`color_product_image_${i}`] ||
+                           colorData[`PRODUCT_IMAGE_${i}`] ||
+                           colorData[`productImage${i}`];
             if (imageUrl && imageUrl.trim() && !images.find(img => img.url === imageUrl)) {
                 images.push({
                     url: imageUrl,
@@ -150,6 +154,24 @@ export class ProductGallery {
                 });
             }
         }
+        
+        // PRIORITY 5: Check for lifestyle or additional named images
+        const additionalImages = [
+            { url: colorData.LIFESTYLE_IMAGE || colorData.lifestyleImage, alt: 'Lifestyle' },
+            { url: colorData.DETAIL_IMAGE || colorData.detailImage, alt: 'Detail' },
+            { url: colorData.ALT_IMAGE_1 || colorData.altImage1, alt: 'Alternate View 1' },
+            { url: colorData.ALT_IMAGE_2 || colorData.altImage2, alt: 'Alternate View 2' }
+        ];
+        
+        additionalImages.forEach(img => {
+            if (img.url && img.url.trim() && !images.find(existing => existing.url === img.url)) {
+                images.push({
+                    url: img.url,
+                    alt: `${colorName} - ${img.alt}`,
+                    type: 'additional'
+                });
+            }
+        });
         
         return images;
     }
