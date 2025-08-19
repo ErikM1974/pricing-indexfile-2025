@@ -155,19 +155,20 @@
     text-decoration: underline;
 }
 
-/* Product Section */
+/* Product Section - Enhanced like Sanmar */
 .product-section {
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
 }
 
 /* Product Grid Layout - Enhanced */
 .product-layout {
     display: grid;
     grid-template-columns: 100px 1fr 380px;
-    gap: 25px;
+    gap: 20px;
 }
 
 /* Thumbnails */
@@ -201,10 +202,10 @@
     object-fit: cover;
 }
 
-/* Main Gallery - Enhanced */
+/* Main Gallery - Enhanced like Sanmar */
 .product-gallery .gallery-main {
-    background: #f8f8f8;
-    border-radius: 8px;
+    background: #fafafa;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -213,6 +214,8 @@
     overflow: hidden;
     cursor: zoom-in;
     transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .product-gallery .main-image {
@@ -222,6 +225,7 @@
     height: auto;
     transition: transform 0.3s ease;
     will-change: transform;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
 }
 
 
@@ -229,26 +233,36 @@
 .product-info-column {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
 
-/* Product Header */
+/* Product Header - Enhanced like Sanmar */
 .product-info .product-header {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
     padding-bottom: 15px;
-    margin-bottom: 0;
+    margin-bottom: 15px;
 }
 
 .product-info .product-title {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 600;
-    margin: 0 0 5px 0;
+    margin: 0 0 8px 0;
+    font-family: Georgia, serif; /* Serif font like Sanmar */
+    color: #333;
 }
 
 .product-info .product-style {
-    color: var(--text-light);
+    color: #666;
+    font-size: 18px;
+    margin: 0 0 10px 0;
+    font-weight: 500;
+}
+
+.product-info .product-sizes {
     font-size: 16px;
-    margin: 0;
+    font-weight: 600;
+    color: #333;
+    margin: 10px 0;
 }
 
 /* Inventory Button */
@@ -273,40 +287,43 @@
     background: #106ebe;
 }
 
-/* Color Swatches - Squares */
+/* Color Swatches - Enhanced like Sanmar */
 .color-swatches {
     background: transparent;
     padding: 0;
+    margin-top: 0;
 }
 
 .color-swatches h3 {
     margin: 0 0 12px 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+    color: #333;
 }
 
 /* Selected Color Display - SanMar Style */
 .selected-color-display {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: #f0f7f0;
     border: 1px solid #d4e8d4;
-    padding: 8px 16px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    font-size: 15px;
     color: var(--text-color);
 }
 
 .selected-color-display .checkmark {
     color: #4caf50;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .selected-color-display .selected-label {
     color: var(--text-light);
+    font-weight: 400;
 }
 
 .selected-color-display .selected-name {
@@ -316,8 +333,10 @@
 
 .swatches-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .color-swatch {
@@ -327,35 +346,40 @@
 }
 
 .color-swatch:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .color-swatch .swatch-image {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
     margin: 0 auto 4px;
-    border: 2px solid #ddd;
-    border-radius: 4px; /* Square corners */
+    border: 2px solid #e0e0e0;
+    border-radius: 4px; /* Square corners like Sanmar */
     background-size: cover;
     background-position: center;
     transition: all 0.2s;
     position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .color-swatch.selected .swatch-image {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.2);
+    border-width: 3px;
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.15);
 }
 
 .color-swatch:hover .swatch-image {
-    border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-color: #999;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
 .color-swatch .swatch-name {
-    font-size: 11px;
-    color: var(--text-light);
-    line-height: 1.2;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.3;
+    font-weight: 500;
+    max-width: 60px;
+    margin: 0 auto;
 }
 
 .color-swatch .fallback-color {
@@ -364,18 +388,21 @@
     border-radius: 2px;
 }
 
-/* Decoration Selector */
+/* Decoration Selector - Enhanced */
 .decoration-selector {
-    background: var(--background-light);
+    background: #f8f9fa;
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
+    border: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 
 .decoration-selector h3 {
     margin: 0 0 15px 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+    color: #333;
 }
 
 /* Segmented Control */
@@ -472,9 +499,9 @@
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 4px;
-    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -482,13 +509,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .cta-button:hover {
     background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(47, 102, 30, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(47, 102, 30, 0.25);
+}
+
+.cta-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Product Description */
@@ -548,7 +583,7 @@
     }
 
     .swatches-grid {
-        grid-template-columns: repeat(8, 1fr);
+        grid-template-columns: repeat(10, 1fr);
     }
 }
 

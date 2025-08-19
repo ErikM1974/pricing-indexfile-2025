@@ -38,10 +38,22 @@ export class ProductInfo {
                 Check Inventory
             </button>
             
+            <!-- TODO: QUOTE FEATURE - COMING SOON (Date: 2025-01-20)
+            ================================================
+            The quote functionality is built but not ready for production.
+            To re-enable:
+            1. Uncomment the quote button code below (QUOTE-BUTTON)
+            2. Re-enable event listener in app.js (search for QUOTE-LISTENER)
+            3. Test email service integration
+            4. Remove the "coming soon" notice at bottom of product info
+            ================================================
+            
+            QUOTE-BUTTON: Temporarily disabled - uncomment when ready
             <button class="send-quote-btn" id="send-quote-btn">
                 <i class="fas fa-envelope"></i>
                 Send Quote
             </button>
+            -->
             
             ${product.AVAILABLE_SIZES ? `
                 <div class="available-sizes">
@@ -58,6 +70,11 @@ export class ProductInfo {
             <div class="selected-color hidden">
                 <strong>Selected Color:</strong> 
                 <span id="selected-color-name">${this.escapeHtml(colorName)}</span>
+            </div>
+            
+            <!-- Quote Feature Coming Soon Notice -->
+            <div class="feature-coming-soon">
+                <small><i class="fas fa-info-circle"></i> Quote feature coming soon</small>
             </div>
         `;
 

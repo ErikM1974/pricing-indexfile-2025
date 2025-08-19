@@ -116,12 +116,15 @@ class ProductPageApp {
             }
         });
         
+        // QUOTE-LISTENER: Temporarily disabled - uncomment when quote feature is ready
         // Listen for send quote button clicks
+        /*
         document.addEventListener('click', (e) => {
             if (e.target.closest('#send-quote-btn')) {
                 this.handleSendQuote();
             }
         });
+        */
     }
 
     async checkUrlParameters() {
