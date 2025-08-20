@@ -198,6 +198,7 @@
         <!-- Tab Buttons -->
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('submit')">Submit Art Request</button>
+            <button class="tab-button" onclick="showTab('mockup')">Request Mockup Steve</button>
             <button class="tab-button" onclick="showTab('view')">View My Requests</button>
             <button class="tab-button" onclick="showTab('generator')">Design Name Generator</button>
         </div>
@@ -213,6 +214,67 @@
                 </div>
                 <!-- Caspio Submit Form DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
+            </div>
+            
+            <!-- Request Mockup Steve Tab -->
+            <div id="mockup-tab" class="tab-pane">
+                <h2 class="tab-title">Request Mockup Steve</h2>
+                
+                <!-- Compact Side-by-Side Layout -->
+                <div style="display: flex; gap: 30px; background: #fff5f5; border: 2px solid #981e32; border-radius: 8px; padding: 20px; margin-bottom: 20px; align-items: center;">
+                    
+                    <!-- Left Column: Steve's Photo -->
+                    <div style="flex-shrink: 0; text-align: center; width: 180px;">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/steve.JPEG?ver=1" 
+                             alt="Steve - Graphic Artist" 
+                             style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #981e32; box-shadow: 0 4px 12px rgba(152,30,50,0.15);">
+                        <h4 style="margin: 10px 0 5px 0; font-weight: 600; color: #333; font-size: 16px;">Steve Deland</h4>
+                        <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;">Graphic Artist</p>
+                        <span style="display: inline-block; padding: 4px 10px; background: #981e32; color: white; border-radius: 15px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;">Design Specialist</span>
+                    </div>
+                    
+                    <!-- Right Column: Important Notice -->
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <!-- Warning Icon -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#981e32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h3 style="margin: 0; color: #981e32; font-size: 18px; font-weight: 700; text-transform: uppercase;">
+                                MANDATORY: Design Verification for All Orders
+                            </h3>
+                        </div>
+                        
+                        <p style="margin: 0 0 12px 0; color: #333; line-height: 1.5; font-size: 14px;">
+                            <strong>Complete this form for EVERY order (new and repeat)</strong> to ensure the correct design thumbnail appears in ShopWorks. This quality control step helps our growing team verify customer artwork accurately.
+                        </p>
+                        
+                        <!-- Compact Key Points -->
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Required for ALL orders
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Prevents production errors
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Ensures accurate artwork
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Quality control measure
+                            </span>
+                        </div>
+                        
+                        <div style="background: #981e32; color: white; padding: 8px 12px; border-radius: 4px; text-align: center; font-weight: 600; font-size: 13px;">
+                            ⚠️ This step should NEVER be skipped - Required for every order ⚠️
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Caspio Form for Mockup Request -->
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500049bc80a2bbbb4704a299/emb"></script>
+                </div>
             </div>
             
             <!-- View Requests Tab -->
@@ -283,12 +345,16 @@
                 document.querySelectorAll('.tab-button')[0].classList.add('active');
                 document.getElementById('submit-tab').classList.add('active');
                 break;
-            case 'view':
+            case 'mockup':
                 document.querySelectorAll('.tab-button')[1].classList.add('active');
+                document.getElementById('mockup-tab').classList.add('active');
+                break;
+            case 'view':
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
                 document.getElementById('view-tab').classList.add('active');
                 break;
             case 'generator':
-                document.querySelectorAll('.tab-button')[2].classList.add('active');
+                document.querySelectorAll('.tab-button')[3].classList.add('active');
                 document.getElementById('generator-tab').classList.add('active');
                 break;
         }
