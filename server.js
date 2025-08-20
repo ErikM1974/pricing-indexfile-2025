@@ -137,6 +137,10 @@ app.get('/announcements-manage.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'announcements-manage.html'));
 });
 
+app.get('/design-name-generator.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'design-name-generator.html'));
+});
+
 app.get('/ae-art-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
 });

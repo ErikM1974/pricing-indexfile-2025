@@ -199,6 +199,7 @@
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('submit')">Submit Art Request</button>
             <button class="tab-button" onclick="showTab('view')">View My Requests</button>
+            <button class="tab-button" onclick="showTab('generator')">Design Name Generator</button>
         </div>
         
         <!-- Tab Content -->
@@ -223,6 +224,19 @@
                 </div>
                 <!-- Caspio Art Request Report DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500056c95cb6e408495e8c4d/emb"></script>
+            </div>
+            
+            <!-- Design Name Generator Tab -->
+            <div id="generator-tab" class="tab-pane">
+                <h2 class="tab-title">Design Name Generator</h2>
+                <div class="info-message">
+                    <p>Create consistent design names for ShopWorks using this interactive tool. 
+                    Build professional design descriptions step by step.</p>
+                </div>
+                <!-- Design Name Generator Iframe -->
+                <iframe src="/design-name-generator.html" 
+                        style="width: 100%; height: 2000px; border: none; border-radius: 8px;">
+                </iframe>
             </div>
         </div>
     </div>
@@ -272,6 +286,10 @@
             case 'view':
                 document.querySelectorAll('.tab-button')[1].classList.add('active');
                 document.getElementById('view-tab').classList.add('active');
+                break;
+            case 'generator':
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
+                document.getElementById('generator-tab').classList.add('active');
                 break;
         }
         

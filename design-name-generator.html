@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Name Generator - NW Custom Apparel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #2f661e 0%, #4a8f2f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2f661e 0%, #1a3d0f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            opacity: 0.95;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .step {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            border-color: #2f661e;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(47, 102, 30, 0.2);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #2f661e;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step h3 {
+            display: inline-block;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .option-btn {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .option-btn:hover {
+            border-color: #2f661e;
+            background: #f0f8f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .option-btn.selected {
+            background: #2f661e;
+            color: white;
+            border-color: #2f661e;
+        }
+        
+        .custom-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .custom-input:focus {
+            outline: none;
+            border-color: #2f661e;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, #2f661e 0%, #4a8f2f 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(47, 102, 30, 0.3);
+        }
+        
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .result-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        
+        .copy-btn {
+            background: white;
+            color: #2f661e;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+        }
+        
+        .copy-btn.copied {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .reset-btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .reset-btn:hover {
+            background: #6B3410;
+            transform: translateY(-2px);
+        }
+        
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .examples h4 {
+            color: #2f661e;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .example-item {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .example-item:last-child {
+            border-bottom: none;
+        }
+        
+        .skip-btn {
+            background: transparent;
+            color: #2f661e;
+            border: 1px solid #2f661e;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        
+        .skip-btn:hover {
+            background: #2f661e;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step.active {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 NW Custom Apparel Design Name Generator</h1>
+            <p>Create consistent design descriptions for ShopWorks</p>
+        </div>
+        
+        <div class="content">
+            <!-- Example Image -->
+            <div style="background: #f0f8f0; padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center;">
+                <h3 style="color: #2f661e; margin-bottom: 15px; font-size: 20px; font-weight: 600;">How Your Design Name Will Appear:</h3>
+                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9098508" 
+                     alt="Design Name Example - ShopWorks Integration" 
+                     style="width: 80%; max-width: 600px; height: auto; border-radius: 8px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); margin: 0 auto; display: block;">
+                <p style="margin-top: 15px; color: #555; font-size: 16px; font-style: italic;">
+                    Example: "L/C Excavator Steve's Construction" - This tool helps you create consistent design names for ShopWorks
+                </p>
+            </div>
+            <!-- Step 1: Placement -->
+            <div class="step active" id="step1">
+                <span class="step-number">1</span>
+                <h3>Where does this design go?</h3>
+                <div class="options">
+                    <button class="option-btn" onclick="selectPlacement('L/C')">L/C (Left Chest)</button>
+                    <button class="option-btn" onclick="selectPlacement('R/C')">R/C (Right Chest)</button>
+                    <button class="option-btn" onclick="selectPlacement('CAP')">CAP (Hat)</button>
+                    <button class="option-btn" onclick="selectPlacement('FRONT')">FRONT (Full)</button>
+                    <button class="option-btn" onclick="selectPlacement('BACK')">BACK (Full)</button>
+                    <button class="option-btn" onclick="selectPlacement('SLEEVE')">SLEEVE</button>
+                    <button class="option-btn" onclick="selectPlacement('FRONT/BACK')">FRONT/BACK</button>
+                    <button class="option-btn" onclick="selectPlacement('')">General/Multiple</button>
+                </div>
+                <button class="skip-btn" onclick="selectPlacement('')">Skip - No specific placement</button>
+            </div>
+            
+            <!-- Step 2: Main Graphic -->
+            <div class="step" id="step2">
+                <span class="step-number">2</span>
+                <h3>What's the main graphic element?</h3>
+                <div class="options">
+                    <button class="option-btn" onclick="selectMainGraphic('Logo')">Logo (Generic)</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Circle Logo')">Circle Logo</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Shield')">Shield/Badge</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Text Only')">Text Only</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Truck')">Truck</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Mountain')">Mountain</button>
+                    <button class="option-btn" onclick="selectMainGraphic('House')">House/Building</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Tree')">Tree/Forest</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Tools')">Tools</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Eagle')">Eagle</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Flag')">Flag</button>
+                    <button class="option-btn" onclick="selectMainGraphic('Excavator')">Excavator</button>
+                </div>
+                <input type="text" class="custom-input" placeholder="Or type your own (e.g., Hammer, Crane, Concrete, Roof, Tractor)..." 
+                       onkeyup="customMainGraphic(this.value)" id="customMain">
+            </div>
+            
+            <!-- Step 3: Secondary Elements -->
+            <div class="step" id="step3">
+                <span class="step-number">3</span>
+                <h3>Any secondary elements? (Optional)</h3>
+                <div class="options">
+                    <button class="option-btn" onclick="selectSecondary('Lake')">Lake/Water</button>
+                    <button class="option-btn" onclick="selectSecondary('Sun')">Sun/Sunset</button>
+                    <button class="option-btn" onclick="selectSecondary('Stars')">Stars</button>
+                    <button class="option-btn" onclick="selectSecondary('Arrow')">Arrow</button>
+                    <button class="option-btn" onclick="selectSecondary('Rock')">Rock/Stone</button>
+                    <button class="option-btn" onclick="selectSecondary('Roof')">Roof/Roofline</button>
+                    <button class="option-btn" onclick="selectSecondary('Gear')">Gear/Cog</button>
+                    <button class="option-btn" onclick="selectSecondary('Wrench')">Wrench</button>
+                    <button class="option-btn" onclick="selectSecondary('Hammer')">Hammer</button>
+                    <button class="option-btn" onclick="selectSecondary('Border')">Border/Frame</button>
+                </div>
+                <input type="text" class="custom-input" placeholder="Or type your own (e.g., Concrete, Steel, Lumber, Pine)..." 
+                       onkeyup="customSecondary(this.value)" id="customSecond">
+                <button class="skip-btn" onclick="selectSecondary('')">Skip - No secondary elements</button>
+            </div>
+            
+            <!-- Step 4: Text/Year -->
+            <div class="step" id="step4">
+                <span class="step-number">4</span>
+                <h3>Does it include company name or other text?</h3>
+                <div class="options">
+                    <button class="option-btn" onclick="selectText('Text')">Text (Company Name)</button>
+                    <button class="option-btn" onclick="selectText('No Text')">No Text</button>
+                    <button class="option-btn" onclick="selectText('Text Est 2024')">Text + Year</button>
+                    <button class="option-btn" onclick="selectText('Slogan')">Text + Slogan</button>
+                    <button class="option-btn" onclick="selectText('2025')">2025 Only</button>
+                    <button class="option-btn" onclick="selectText('Anniversary')">Anniversary</button>
+                </div>
+                <input type="text" class="custom-input" placeholder="Or describe specific text elements (e.g., Text Since 1985, Two Line Text)..." 
+                       onkeyup="customText(this.value)" id="customText">
+                <button class="skip-btn" onclick="selectText('')">Skip - Design only, no text</button>
+            </div>
+            
+            <!-- Result -->
+            <div class="result-box">
+                <div class="result-label">YOUR DESIGN NAME:</div>
+                <div class="result-text" id="result">Start building your design name...</div>
+                <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn" style="display:none;">Copy to Clipboard</button>
+            </div>
+            
+            <button class="reset-btn" onclick="resetAll()">Start Over</button>
+            
+            <!-- Examples -->
+            <div class="examples">
+                <h4>✅ Good Examples for Corporate Logos:</h4>
+                <div class="example-item">• L/C Logo Text</div>
+                <div class="example-item">• Circle Logo Text</div>
+                <div class="example-item">• Mountain Lake Text</div>
+                <div class="example-item">• Shield Badge Text Est 1985</div>
+                <div class="example-item">• CAP Truck Logo Text</div>
+                <div class="example-item">• Crossed Tools Text</div>
+                <div class="example-item">• FRONT/BACK Logo Text Slogan</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let designParts = {
+            placement: '',
+            mainGraphic: '',
+            secondary: '',
+            text: ''
+        };
+        
+        let currentStep = 1;
+        
+        function selectPlacement(value) {
+            designParts.placement = value;
+            clearSelection('step1');
+            if (value) {
+                event.target.classList.add('selected');
+            }
+            moveToStep(2);
+            updateResult();
+        }
+        
+        function selectMainGraphic(value) {
+            designParts.mainGraphic = value;
+            clearSelection('step2');
+            document.getElementById('customMain').value = '';
+            event.target.classList.add('selected');
+            moveToStep(3);
+            updateResult();
+        }
+        
+        function customMainGraphic(value) {
+            designParts.mainGraphic = value;
+            clearSelection('step2');
+            if (value.trim()) {
+                moveToStep(3);
+            }
+            updateResult();
+        }
+        
+        function selectSecondary(value) {
+            designParts.secondary = value;
+            clearSelection('step3');
+            document.getElementById('customSecond').value = '';
+            if (value) {
+                event.target.classList.add('selected');
+            }
+            moveToStep(4);
+            updateResult();
+        }
+        
+        function customSecondary(value) {
+            designParts.secondary = value;
+            clearSelection('step3');
+            if (value.trim() || value === '') {
+                moveToStep(4);
+            }
+            updateResult();
+        }
+        
+        function selectText(value) {
+            designParts.text = value;
+            clearSelection('step4');
+            document.getElementById('customText').value = '';
+            if (value) {
+                event.target.classList.add('selected');
+            }
+            updateResult();
+        }
+        
+        function customText(value) {
+            designParts.text = value;
+            clearSelection('step4');
+            updateResult();
+        }
+        
+        function clearSelection(stepId) {
+            document.querySelectorAll(`#${stepId} .option-btn`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function moveToStep(stepNum) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step' + stepNum).classList.add('active');
+            currentStep = stepNum;
+        }
+        
+        function updateResult() {
+            let result = [];
+            
+            if (designParts.placement) {
+                result.push(designParts.placement);
+            }
+            if (designParts.mainGraphic) {
+                result.push(designParts.mainGraphic);
+            }
+            if (designParts.secondary) {
+                result.push(designParts.secondary);
+            }
+            if (designParts.text) {
+                result.push(designParts.text);
+            }
+            
+            let finalName = result.join(' ');
+            
+            if (finalName) {
+                document.getElementById('result').textContent = finalName;
+                document.getElementById('copyBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('result').textContent = 'Start building your design name...';
+                document.getElementById('copyBtn').style.display = 'none';
+            }
+        }
+        
+        function copyToClipboard() {
+            const text = document.getElementById('result').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy to Clipboard';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        function resetAll() {
+            designParts = {
+                placement: '',
+                mainGraphic: '',
+                secondary: '',
+                text: ''
+            };
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.custom-input').forEach(input => {
+                input.value = '';
+            });
+            
+            moveToStep(1);
+            updateResult();
+        }
+    </script>
+</body>
+</html>
