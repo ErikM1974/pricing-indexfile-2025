@@ -184,8 +184,18 @@ class CatalogSearch {
         try {
             let results;
             
-            // If we have category/subcategory, use smart search
-            if (this.currentFilters.category) {
+            // If we have a search query, use smart search
+            if (this.currentFilters.q) {
+                console.log('[CatalogSearch] Using smart search for query:', this.currentFilters.q);
+                
+                // Extract other filters for additional params
+                const { q, category, subcategory, ...otherFilters } = this.currentFilters;
+                
+                // Use the new smart search method
+                results = await this.searchService.smartSearch(q, otherFilters);
+                
+            } else if (this.currentFilters.category) {
+                // If we have category/subcategory, use category search
                 console.log('[CatalogSearch] Using smart category search');
                 
                 // Extract other filters
@@ -207,7 +217,7 @@ class CatalogSearch {
                     additionalFilters
                 );
             } else {
-                // Regular search (by query or other filters)
+                // Regular search (by other filters)
                 const params = this.buildSearchParams();
                 console.log('[CatalogSearch] Searching with params:', params);
                 results = await this.searchService.searchWithFacets(params);
@@ -529,6 +539,51 @@ class CatalogSearch {
             
             container.innerHTML = topSellerHTML;
         }
+    }
+
+    /**
+     * Search by brand name
+     */
+    async searchByBrand(brandName) {
+        console.log('[CatalogSearch] Searching by brand:', brandName);
+        
+        // Hide homepage sections
+        document.querySelector('.hero-section').style.display = 'none';
+        document.querySelector('.homepage-sections').style.display = 'none';
+        
+        // Show results section
+        const resultsSection = document.querySelector('.results-section');
+        if (resultsSection) {
+            resultsSection.style.display = 'block';
+        }
+        
+        // Update title
+        const resultsTitle = document.getElementById('resultsTitle');
+        if (resultsTitle) {
+            resultsTitle.textContent = `${brandName} Products`;
+        }
+        
+        // Clear breadcrumb
+        const breadcrumb = document.getElementById('categoryBreadcrumb');
+        if (breadcrumb) {
+            breadcrumb.textContent = '';
+        }
+        
+        // Set filters and search
+        this.currentFilters = {
+            q: '',
+            category: null,
+            subcategory: null,
+            brand: [brandName],
+            color: [],
+            size: [],
+            minPrice: null,
+            maxPrice: null,
+            sort: null,
+            page: 1
+        };
+        
+        await this.performSearch();
     }
 
     /**
