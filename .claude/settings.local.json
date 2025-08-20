@@ -79,7 +79,9 @@
       "Bash(test:*)",
       "WebFetch(domain:catalog.companycasuals.com)",
       "WebSearch",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(start training/sales-coordinator-training-schedule.html)",
+      "Bash(cmd.exe /c start training\\sales-coordinator-training-schedule.html)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
