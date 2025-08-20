@@ -542,6 +542,51 @@ class CatalogSearch {
     }
 
     /**
+     * Search by brand name
+     */
+    async searchByBrand(brandName) {
+        console.log('[CatalogSearch] Searching by brand:', brandName);
+        
+        // Hide homepage sections
+        document.querySelector('.hero-section').style.display = 'none';
+        document.querySelector('.homepage-sections').style.display = 'none';
+        
+        // Show results section
+        const resultsSection = document.querySelector('.results-section');
+        if (resultsSection) {
+            resultsSection.style.display = 'block';
+        }
+        
+        // Update title
+        const resultsTitle = document.getElementById('resultsTitle');
+        if (resultsTitle) {
+            resultsTitle.textContent = `${brandName} Products`;
+        }
+        
+        // Clear breadcrumb
+        const breadcrumb = document.getElementById('categoryBreadcrumb');
+        if (breadcrumb) {
+            breadcrumb.textContent = '';
+        }
+        
+        // Set filters and search
+        this.currentFilters = {
+            q: '',
+            category: null,
+            subcategory: null,
+            brand: [brandName],
+            color: [],
+            size: [],
+            minPrice: null,
+            maxPrice: null,
+            sort: null,
+            page: 1
+        };
+        
+        await this.performSearch();
+    }
+
+    /**
      * Search by style number (for quick buttons)
      */
     async searchByStyle(styleNumber) {

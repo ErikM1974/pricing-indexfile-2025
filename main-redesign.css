@@ -6,7 +6,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f5f5f5;
+            background: #fafafa;  /* Lighter background like Company Casuals */
             color: #333;
             display: flex;
             flex-direction: column;
@@ -19,7 +19,7 @@
             background: #1a472a;
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);  /* Softer shadow */
             flex-shrink: 0;
         }
 
@@ -77,11 +77,11 @@
         /* Top Navigation */
         .top-navigation {
             background: white;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #e5e5e5;  /* Lighter border */
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: none;  /* Remove shadow for cleaner look */
         }
 
         .nav-container {
@@ -680,7 +680,7 @@
         .sidebar {
             width: 250px;
             background: white;
-            box-shadow: 1px 0 5px rgba(0,0,0,0.08);
+            border-right: 1px solid #e5e5e5;  /* Clean border instead of shadow */
             overflow-y: auto;
             overflow-x: visible;
             flex-shrink: 0;
@@ -1057,7 +1057,8 @@
         /* Hero Section - SanMar Style */
         .hero-section {
             width: 100%;
-            height: 500px;
+            height: 443px;
+            max-height: 443px;
             position: relative;
             overflow: hidden;
             margin-bottom: 3rem;
@@ -1071,17 +1072,26 @@
             position: relative;
             width: 100%;
             height: 100%;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
         }
         
         .hero-image-placeholder {
             width: 100%;
             height: 100%;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
         }
         
         .hero-bg-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .hero-image-placeholder:hover .hero-bg-img {
+            transform: scale(1.02);
+            opacity: 0.95;
         }
         
         .hero-overlay {
@@ -2007,9 +2017,9 @@
 }
 
 .btn-compare.active {
-    background: #4cb354;
+    background: #1a472a;
     color: white;
-    border-color: #4cb354;
+    border-color: #1a472a;
 }
 
 .btn-compare.active:hover {
@@ -2024,7 +2034,7 @@
     left: 0;
     right: 0;
     background: white;
-    border-top: 2px solid #4cb354;
+    border-top: 2px solid #1a472a;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
     z-index: 1000;
     animation: slideUp 0.3s ease;
@@ -2096,7 +2106,7 @@
 }
 
 .btn-view-compare {
-    background: #4cb354;
+    background: #1a472a;
     color: white;
 }
 
@@ -2242,7 +2252,7 @@
 .quick-view-price {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #4cb354;
+    color: #1a472a;
 }
 
 .quick-view-section {
@@ -2378,9 +2388,9 @@
 }
 
 .btn-add-compare.active {
-    background: #4cb354;
+    background: #1a472a;
     color: white;
-    border-color: #4cb354;
+    border-color: #1a472a;
 }
 
 .btn-full-details {
@@ -2423,7 +2433,7 @@
     align-items: center;
     padding: 1.5rem;
     border-bottom: 1px solid #e5e7eb;
-    background: #4cb354;
+    background: #1a472a;
     color: white;
 }
 
