@@ -236,6 +236,96 @@
             margin-bottom: 2rem;
         }
 
+        /* Design Name Generator Section */
+        .design-generator-section {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .generator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .generator-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .generator-toggle {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .generator-toggle:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .generator-toggle i {
+            transition: transform 0.3s;
+        }
+
+        .generator-toggle.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .generator-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .generator-content {
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .generator-content.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .generator-iframe {
+            width: 100%;
+            height: 1600px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+        }
+
         .info-card {
             background: linear-gradient(135deg, var(--success-bg), #f0f9ff);
             border: 1px solid #a7f3d0;
@@ -499,6 +589,30 @@
             </div>
         </div>
 
+        <!-- Design Name Generator Section -->
+        <div class="design-generator-section">
+            <div class="generator-header" onclick="toggleGenerator()">
+                <div class="generator-title">
+                    <i class="fas fa-magic"></i>
+                    <span>Design Name Generator Tool</span>
+                </div>
+                <button class="generator-toggle" id="generatorToggle">
+                    <span id="toggleText">Open Tool</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <p class="generator-description">
+                Create consistent design names for ShopWorks before submitting your digitizing request. 
+                This tool helps you build professional design descriptions that match our naming standards.
+            </p>
+            <div class="generator-content" id="generatorContent">
+                <iframe src="/design-name-generator.html" 
+                        class="generator-iframe"
+                        title="Design Name Generator">
+                </iframe>
+            </div>
+        </div>
+
         <!-- Form Container -->
         <div class="form-container">
             <div class="form-intro">
@@ -530,6 +644,23 @@
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.style.display = 'none';
+            }
+        }
+
+        // Toggle Design Name Generator
+        function toggleGenerator() {
+            const content = document.getElementById('generatorContent');
+            const toggle = document.getElementById('generatorToggle');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.classList.remove('expanded');
+                toggleText.textContent = 'Open Tool';
+            } else {
+                content.classList.add('active');
+                toggle.classList.add('expanded');
+                toggleText.textContent = 'Close Tool';
             }
         }
 

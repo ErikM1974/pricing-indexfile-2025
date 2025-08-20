@@ -211,6 +211,7 @@
             <button class="tab-button" onclick="showTab('unified')">
                 <i class="fas fa-file-invoice"></i> Unified View
             </button>
+            <button class="tab-button" onclick="showTab('generator')">Design Name Generator</button>
         </div>
         
         <!-- Tab Content -->
@@ -286,6 +287,19 @@
                         style="width: 100%; height: 800px; border: none; border-radius: 8px;">
                 </iframe>
             </div>
+            
+            <!-- Design Name Generator Tab -->
+            <div id="generator-tab" class="tab-pane">
+                <h2 class="tab-title">Design Name Generator</h2>
+                <div class="info-message">
+                    <p>Create consistent design names for ShopWorks using this interactive tool. 
+                    Build professional design descriptions step by step.</p>
+                </div>
+                <!-- Design Name Generator Iframe -->
+                <iframe src="/design-name-generator.html" 
+                        style="width: 100%; height: 2000px; border: none; border-radius: 8px;">
+                </iframe>
+            </div>
         </div>
     </div>
     
@@ -346,6 +360,10 @@
             case 'unified':
                 document.querySelectorAll('.tab-button')[4].classList.add('active');
                 document.getElementById('unified-tab').classList.add('active');
+                break;
+            case 'generator':
+                document.querySelectorAll('.tab-button')[5].classList.add('active');
+                document.getElementById('generator-tab').classList.add('active');
                 break;
             case 'details':
                 // Details tab is not in the navigation but can still be shown programmatically
