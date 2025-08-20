@@ -199,6 +199,129 @@ class ProductSearchService {
     }
 
     /**
+     * Detect if a search term looks like a style number
+     * Style numbers typically start with letters and include numbers
+     */
+    isStyleNumber(term) {
+        if (!term || term.length < 2) return false;
+        
+        // Common patterns for style numbers:
+        // - Start with 1-4 letters followed by numbers (e.g., PC61, C112, PC450)
+        // - May have hyphens or spaces (e.g., ST-350, PC 54)
+        // - Usually 3-10 characters total
+        const stylePattern = /^[A-Za-z]{1,4}[\s-]?\d+[A-Za-z]?$/;
+        return stylePattern.test(term.trim());
+    }
+
+    /**
+     * Search using the style autocomplete endpoint (more accurate for style numbers)
+     */
+    async searchByStyleAutocomplete(styleNumber) {
+        try {
+            const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(styleNumber)}`);
+            
+            if (!response.ok) {
+                throw new Error(`Style search failed: ${response.statusText}`);
+            }
+            
+            const suggestions = await response.json();
+            
+            // Transform autocomplete results to match our standard format
+            const products = suggestions.map(item => ({
+                styleNumber: item.value,
+                productName: item.label,
+                displayPrice: 'View Details',
+                images: {
+                    thumbnail: '/placeholder.jpg'
+                },
+                features: {}
+            }));
+            
+            return {
+                products: products,
+                pagination: {
+                    page: 1,
+                    limit: products.length,
+                    total: products.length,
+                    totalPages: 1
+                }
+            };
+        } catch (error) {
+            console.error('[ProductSearch] Style autocomplete error:', error);
+            // Fall back to regular search
+            return this.searchByStyle(styleNumber);
+        }
+    }
+
+    /**
+     * Smart search that combines style search and text search
+     */
+    async smartSearch(query, params = {}) {
+        if (!query || query.length < 2) {
+            return { products: [], pagination: { page: 1, limit: 0, total: 0, totalPages: 0 } };
+        }
+        
+        const trimmedQuery = query.trim();
+        const isStyle = this.isStyleNumber(trimmedQuery);
+        
+        console.log(`[ProductSearch] Smart search for "${trimmedQuery}" - isStyle: ${isStyle}`);
+        
+        if (isStyle) {
+            // For style numbers, try both searches and combine results
+            try {
+                // Get style-specific results first
+                const [styleResults, broadResults] = await Promise.all([
+                    this.searchByStyleAutocomplete(trimmedQuery),
+                    this.searchProducts({ ...params, q: trimmedQuery, limit: 20 })
+                ]);
+                
+                // Combine results, prioritizing exact style matches
+                const combinedProducts = [];
+                const seenStyles = new Set();
+                
+                // Add style search results first (these are most accurate)
+                if (styleResults.products) {
+                    styleResults.products.forEach(product => {
+                        if (!seenStyles.has(product.styleNumber)) {
+                            combinedProducts.push(product);
+                            seenStyles.add(product.styleNumber);
+                        }
+                    });
+                }
+                
+                // Add broad search results (avoiding duplicates)
+                if (broadResults.products) {
+                    broadResults.products.forEach(product => {
+                        if (!seenStyles.has(product.styleNumber)) {
+                            combinedProducts.push(product);
+                            seenStyles.add(product.styleNumber);
+                        }
+                    });
+                }
+                
+                return {
+                    products: combinedProducts,
+                    pagination: {
+                        page: 1,
+                        limit: combinedProducts.length,
+                        total: combinedProducts.length,
+                        totalPages: 1
+                    },
+                    facets: broadResults.facets || null
+                };
+                
+            } catch (error) {
+                console.error('[ProductSearch] Smart search error, falling back:', error);
+                // Fall back to regular search
+                return this.searchProducts({ ...params, q: trimmedQuery });
+            }
+        } else {
+            // For non-style searches, use the broad search
+            return this.searchProducts({ ...params, q: trimmedQuery });
+        }
+    }
+
+    /**
      * Search by category with optional subcategory - with smart fallback
      */
     async searchByCategory(category, subcategory = null, additionalFilters = {}) {
