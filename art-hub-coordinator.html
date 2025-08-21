@@ -46,24 +46,27 @@
         
         .tab-buttons {
             display: flex;
+            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
             background: white;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
         }
         
         .tab-button {
             background: #f0f0f0;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 10px 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             border-radius: 6px;
             transition: all 0.3s;
             color: #333;
+            white-space: nowrap;
         }
         
         .tab-button:hover {
@@ -73,6 +76,120 @@
         .tab-button.active {
             background: #005A9C;
             color: white;
+        }
+        
+        /* More Dropdown Styles */
+        .more-dropdown {
+            position: relative;
+        }
+        
+        .more-button {
+            background: #f0f0f0;
+            border: none;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .more-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .more-button.active {
+            background: #005A9C;
+            color: white;
+        }
+        
+        .more-button svg {
+            transition: transform 0.3s;
+        }
+        
+        .more-button.open svg {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 220px;
+            z-index: 1000;
+            overflow: hidden;
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-category {
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            background: #f8f8f8;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+            color: #005A9C;
+        }
+        
+        .dropdown-item.active {
+            background: #e6f2ff;
+            color: #005A9C;
+            font-weight: 500;
+        }
+        
+        .dropdown-item svg {
+            flex-shrink: 0;
+            opacity: 0.6;
         }
         
         /* Tab Content */
@@ -197,21 +314,94 @@
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
+            <!-- Visible Priority Tabs -->
             <button class="tab-button active" onclick="showTab('requests')">
                 Art Request Management
                 <span id="needsInvoiceCount" class="badge" style="display: none; background: #dc3545; color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px;"></span>
             </button>
             <button class="tab-button" onclick="showTab('submit')">Submit New Design</button>
-            <button class="tab-button" onclick="showTab('create-invoice')">
-                <i class="fas fa-file-invoice-dollar"></i> Create Invoice
-            </button>
-            <button class="tab-button" onclick="showTab('invoices')">
-                <i class="fas fa-chart-line"></i> Invoice Dashboard
-            </button>
-            <button class="tab-button" onclick="showTab('unified')">
-                <i class="fas fa-file-invoice"></i> Unified View
-            </button>
-            <button class="tab-button" onclick="showTab('generator')">Design Name Generator</button>
+            <button class="tab-button" onclick="showTab('mockup')">Request Mockup Steve</button>
+            <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
+            <button class="tab-button" onclick="showTab('create-invoice')">Create Invoice</button>
+            
+            <!-- More Dropdown -->
+            <div class="more-dropdown" style="margin-left: auto;">
+                <button class="more-button" onclick="toggleMoreDropdown()" id="moreButton">
+                    More
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="dropdown-menu" id="moreDropdown">
+                    <!-- Invoice Management Section -->
+                    <div class="dropdown-category">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#005A9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        Invoice Management
+                    </div>
+                    <button class="dropdown-item" onclick="showTab('invoices'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Invoice Dashboard
+                    </button>
+                    <button class="dropdown-item" onclick="showTab('unified'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="12" x2="15" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Unified View
+                    </button>
+                    
+                    <!-- Resources Section -->
+                    <div class="dropdown-category">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        Resources
+                    </div>
+                    <button class="dropdown-item" onclick="showTab('gallery'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        Mockup Gallery
+                    </button>
+                    <button class="dropdown-item" onclick="showTab('requirements'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Art Requirements & Fees
+                    </button>
+                    
+                    <!-- Tools Section -->
+                    <div class="dropdown-category">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                        Tools
+                    </div>
+                    <button class="dropdown-item" onclick="showTab('generator'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                        Design Name Generator
+                    </button>
+                </div>
+            </div>
         </div>
         
         <!-- Tab Content -->
@@ -300,6 +490,312 @@
                         style="width: 100%; height: 2000px; border: none; border-radius: 8px;">
                 </iframe>
             </div>
+            
+            <!-- Request Mockup Steve Tab -->
+            <div id="mockup-tab" class="tab-pane">
+                <h2 class="tab-title">Request Mockup Steve</h2>
+                
+                <!-- Compact Side-by-Side Layout -->
+                <div style="display: flex; gap: 30px; background: #e6f2ff; border: 2px solid #005A9C; border-radius: 8px; padding: 20px; margin-bottom: 20px; align-items: center;">
+                    
+                    <!-- Left Column: Steve's Photo -->
+                    <div style="flex-shrink: 0; text-align: center; width: 180px;">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/steve.JPEG?ver=1" 
+                             alt="Steve - Graphic Artist" 
+                             style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #005A9C; box-shadow: 0 4px 12px rgba(0,90,156,0.15);">
+                        <h4 style="margin: 10px 0 5px 0; font-weight: 600; color: #333; font-size: 16px;">Steve Deland</h4>
+                        <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;">Graphic Artist</p>
+                        <span style="display: inline-block; padding: 4px 10px; background: #005A9C; color: white; border-radius: 15px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;">Design Specialist</span>
+                    </div>
+                    
+                    <!-- Right Column: Important Notice -->
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <!-- Warning Icon -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#005A9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h3 style="margin: 0; color: #005A9C; font-size: 18px; font-weight: 700; text-transform: uppercase;">
+                                MANDATORY: Design Verification for All Orders
+                            </h3>
+                        </div>
+                        
+                        <p style="margin: 0 0 12px 0; color: #333; line-height: 1.5; font-size: 14px;">
+                            <strong>Complete this form for EVERY order (new and repeat)</strong> to ensure the correct design thumbnail appears in ShopWorks. This quality control step helps our growing team verify customer artwork accurately.
+                        </p>
+                        
+                        <!-- Compact Key Points -->
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Required for ALL orders
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Prevents production errors
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Ensures accurate artwork
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Quality control measure
+                            </span>
+                        </div>
+                        
+                        <div style="background: #005A9C; color: white; padding: 8px 12px; border-radius: 4px; text-align: center; font-weight: 600; font-size: 13px;">
+                            ⚠️ This step should NEVER be skipped - Required for every order ⚠️
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Caspio Form for Mockup Request -->
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500049bc80a2bbbb4704a299/emb"></script>
+                </div>
+            </div>
+            
+            <!-- Request Mockup Ruth Tab -->
+            <div id="mockup-ruth-tab" class="tab-pane">
+                <h2 class="tab-title">Request Mockup Ruth</h2>
+                
+                <!-- Compact Side-by-Side Layout -->
+                <div style="display: flex; gap: 30px; background: #e6f2ff; border: 2px solid #005A9C; border-radius: 8px; padding: 20px; margin-bottom: 20px; align-items: center;">
+                    
+                    <!-- Left Column: Ruth's Photo -->
+                    <div style="flex-shrink: 0; text-align: center; width: 180px;">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094678" 
+                             alt="Ruth - Production Manager" 
+                             style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #005A9C; box-shadow: 0 4px 12px rgba(0,90,156,0.15);">
+                        <h4 style="margin: 10px 0 5px 0; font-weight: 600; color: #333; font-size: 16px;">Ruth Nhong</h4>
+                        <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;">Production Manager</p>
+                        <span style="display: inline-block; padding: 4px 10px; background: #005A9C; color: white; border-radius: 15px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;">Digitizing Specialist</span>
+                    </div>
+                    
+                    <!-- Right Column: Important Notice -->
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <!-- Warning Icon -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#005A9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h3 style="margin: 0; color: #005A9C; font-size: 18px; font-weight: 700; text-transform: uppercase;">
+                                MANDATORY: Embroidery Design Verification for All Orders
+                            </h3>
+                        </div>
+                        
+                        <p style="margin: 0 0 12px 0; color: #333; line-height: 1.5; font-size: 14px;">
+                            <strong>Complete this form for EVERY embroidery order (new and repeat)</strong> to ensure the correct digitized design appears in ShopWorks. This quality control step helps our production team verify embroidery artwork accurately.
+                        </p>
+                        
+                        <!-- Compact Key Points -->
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Required for ALL embroidery orders
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Prevents digitizing errors
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Ensures accurate stitch files
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: white; border-radius: 4px; font-size: 13px; color: #333;">
+                                <span style="color: #22c55e; font-weight: bold;">✓</span> Quality control for production
+                            </span>
+                        </div>
+                        
+                        <div style="background: #005A9C; color: white; padding: 8px 12px; border-radius: 4px; text-align: center; font-weight: 600; font-size: 13px;">
+                            ⚠️ This step should NEVER be skipped - Required for every embroidery order ⚠️
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Caspio Form for Mockup Request -->
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000b16eb864a2924121b1fd/emb"></script>
+                </div>
+            </div>
+            
+            <!-- Mockup Gallery Tab -->
+            <div id="gallery-tab" class="tab-pane">
+                <h2 class="tab-title">Design Mockup Gallery</h2>
+                <div class="info-message">
+                    <p>Browse our collection of design mockups from completed projects. 
+                    Use this gallery as a reference for design ideas and to view examples of our work across different product categories.</p>
+                </div>
+                <!-- Caspio Mockup Gallery DataPage Embed -->
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000bd44fb132a0f4a0f9e1d/emb"></script>
+            </div>
+            
+            <!-- Art Requirements & Fees Tab -->
+            <div id="requirements-tab" class="tab-pane">
+                <h2 class="tab-title">Art File Requirements & Fee Structure</h2>
+                
+                <!-- ShopWorks Billing Codes Section -->
+                <div style="background: linear-gradient(135deg, #e6f2ff 0%, #cce7ff 100%); border: 2px solid #005A9C; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,90,156,0.1);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <div style="background: #005A9C; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <h3 style="margin: 0; color: #005A9C; font-size: 20px; font-weight: 600;">ShopWorks Billing Codes - Quick Reference</h3>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <!-- GRT-50 Card -->
+                        <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                            <div style="background: #4caf50; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold;">GRT-50</div>
+                                    <div style="font-size: 14px; opacity: 0.95; margin-top: 2px;">Part Number for Base Art Fee</div>
+                                </div>
+                                <div style="font-size: 28px; font-weight: bold;">$50</div>
+                            </div>
+                            <div style="padding: 20px;">
+                                <div style="font-weight: 600; color: #333; margin-bottom: 10px; font-size: 15px;">Logo Mockup & Print Review</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                                    Includes a mockup of your logo on the ordered products for preview, and a print readiness check for clarity and sizing.
+                                </div>
+                                <div style="background: #f0f9ff; border-left: 3px solid #2196f3; padding: 10px 15px; border-radius: 4px;">
+                                    <div style="font-weight: 600; color: #1976d2; font-size: 13px; margin-bottom: 5px;">When to Use:</div>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 13px; color: #555;">
+                                        <li>Customer supplied art needs re-work</li>
+                                        <li>Mockup on customer preferred garments</li>
+                                        <li>Preparing digital files for print</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- GRT-75 Card -->
+                        <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                            <div style="background: #2196f3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold;">GRT-75</div>
+                                    <div style="font-size: 14px; opacity: 0.95; margin-top: 2px;">Part Number for Hourly Design</div>
+                                </div>
+                                <div style="font-size: 28px; font-weight: bold;">$75/hr</div>
+                            </div>
+                            <div style="padding: 20px;">
+                                <div style="font-weight: 600; color: #333; margin-bottom: 10px; font-size: 15px;">Graphic Design Services</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                                    Billed in 15-minute increments. Covers essential tasks like T-shirt graphic design, custom artwork and creative work.
+                                </div>
+                                <div style="background: #fff8e1; border-left: 3px solid #ffc107; padding: 10px 15px; border-radius: 4px;">
+                                    <div style="font-weight: 600; color: #f57c00; font-size: 13px; margin-bottom: 5px;">Billing Increments:</div>
+                                    <div style="display: grid; grid-template-columns: auto auto; gap: 5px 15px; font-size: 13px; color: #555;">
+                                        <span>15 minutes:</span><span style="font-weight: 600;">$18.75</span>
+                                        <span>30 minutes:</span><span style="font-weight: 600;">$37.50</span>
+                                        <span>45 minutes:</span><span style="font-weight: 600;">$56.25</span>
+                                        <span>60 minutes:</span><span style="font-weight: 600;">$75.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Navigation -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button onclick="document.getElementById('file-requirements').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #005A9C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        📋 File Requirements
+                    </button>
+                    <button onclick="document.getElementById('file-definitions').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #005A9C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        📁 File Definitions
+                    </button>
+                    <button onclick="document.getElementById('fee-structure').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #005A9C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        💵 Fee Structure
+                    </button>
+                </div>
+                
+                <!-- Section 1: File Requirements by Method -->
+                <div id="file-requirements" style="margin-bottom: 40px;">
+                    <h3 style="color: #005A9C; border-bottom: 2px solid #005A9C; padding-bottom: 10px; margin-bottom: 20px;">Art File Requirements by Decoration Method</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                        <!-- DTG Card -->
+                        <div style="background: white; border: 2px solid #005A9C; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #005A9C; color: white; padding: 12px; font-weight: bold; font-size: 18px;">DTG</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Screenprint Card -->
+                        <div style="background: white; border: 2px solid #005A9C; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #005A9C; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Screenprint</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Transfers Card -->
+                        <div style="background: white; border: 2px solid #005A9C; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #005A9C; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Transfers</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Embroidery Card -->
+                        <div style="background: white; border: 2px solid #005A9C; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #005A9C; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Embroidery</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -333,42 +829,88 @@
     // Track if a note was successfully submitted
     let noteWasSubmitted = false;
     
+    // Dropdown functionality
+    function toggleMoreDropdown() {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+            button.classList.remove('open');
+        } else {
+            dropdown.classList.add('show');
+            button.classList.add('open');
+        }
+    }
+    
+    function closeMoreDropdown() {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        dropdown.classList.remove('show');
+        button.classList.remove('open');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        
+        if (!event.target.closest('.more-dropdown')) {
+            dropdown.classList.remove('show');
+            button.classList.remove('open');
+        }
+    });
+    
     // Tab switching functionality
     function showTab(tabName) {
         // Remove active class from all buttons and panes
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         
-        // Add active class to selected button and pane
-        switch(tabName) {
-            case 'requests':
-                document.querySelectorAll('.tab-button')[0].classList.add('active');
-                document.getElementById('requests-tab').classList.add('active');
-                break;
-            case 'submit':
-                document.querySelectorAll('.tab-button')[1].classList.add('active');
-                document.getElementById('submit-tab').classList.add('active');
-                break;
-            case 'create-invoice':
-                document.querySelectorAll('.tab-button')[2].classList.add('active');
-                document.getElementById('create-invoice-tab').classList.add('active');
-                break;
-            case 'invoices':
-                document.querySelectorAll('.tab-button')[3].classList.add('active');
-                document.getElementById('invoices-tab').classList.add('active');
-                break;
-            case 'unified':
-                document.querySelectorAll('.tab-button')[4].classList.add('active');
-                document.getElementById('unified-tab').classList.add('active');
-                break;
-            case 'generator':
-                document.querySelectorAll('.tab-button')[5].classList.add('active');
-                document.getElementById('generator-tab').classList.add('active');
-                break;
-            case 'details':
-                // Details tab is not in the navigation but can still be shown programmatically
-                document.getElementById('details-tab').classList.add('active');
-                break;
+        // Update visible tabs - 5 visible tabs
+        const visibleTabs = ['requests', 'submit', 'mockup', 'mockup-ruth', 'create-invoice'];
+        const visibleIndex = visibleTabs.indexOf(tabName);
+        
+        if (visibleIndex !== -1) {
+            // It's a visible tab
+            document.querySelectorAll('.tab-button')[visibleIndex].classList.add('active');
+            // Remove active from More button
+            document.getElementById('moreButton').classList.remove('active');
+        } else {
+            // It's in the dropdown
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const dropdownTabNames = ['invoices', 'unified', 'gallery', 'requirements', 'generator'];
+            const dropdownIndex = dropdownTabNames.indexOf(tabName);
+            
+            if (dropdownIndex !== -1) {
+                dropdownItems[dropdownIndex].classList.add('active');
+                // Add active to More button to indicate selection is in dropdown
+                document.getElementById('moreButton').classList.add('active');
+            }
+        }
+        
+        // Show the corresponding tab pane
+        const tabPaneMap = {
+            'requests': 'requests-tab',
+            'submit': 'submit-tab',
+            'mockup': 'mockup-tab',
+            'mockup-ruth': 'mockup-ruth-tab',
+            'create-invoice': 'create-invoice-tab',
+            'invoices': 'invoices-tab',
+            'unified': 'unified-tab',
+            'gallery': 'gallery-tab',
+            'requirements': 'requirements-tab',
+            'generator': 'generator-tab'
+        };
+        
+        if (tabPaneMap.hasOwnProperty(tabName)) {
+            document.getElementById(tabPaneMap[tabName]).classList.add('active');
+        }
+        
+        // Handle details tab if needed (not in navigation but can be shown programmatically)
+        if (tabName === 'details') {
+            document.getElementById('details-tab').classList.add('active');
         }
         
         // Save preference
