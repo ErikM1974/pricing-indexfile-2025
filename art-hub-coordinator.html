@@ -322,7 +322,8 @@
             </button>
             <button class="tab-button" onclick="showTab('mockup')">Request Mockup Steve</button>
             <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
-            <button class="tab-button" onclick="showTab('create-invoice')">Create Invoice</button>
+            <button class="tab-button" onclick="showTab('gallery')">Mockup Gallery</button>
+            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
             
             <!-- More Dropdown -->
             <div class="more-dropdown" style="margin-left: auto;">
@@ -359,30 +360,16 @@
                         </svg>
                         Unified View
                     </button>
-                    
-                    <!-- Resources Section -->
-                    <div class="dropdown-category">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                        Resources
-                    </div>
-                    <button class="dropdown-item" onclick="showTab('gallery'); closeMoreDropdown();">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        Mockup Gallery
-                    </button>
-                    <button class="dropdown-item" onclick="showTab('requirements'); closeMoreDropdown();">
+                    <button class="dropdown-item" onclick="showTab('create-invoice'); closeMoreDropdown();">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="13"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
                         </svg>
-                        Art Requirements & Fees
+                        Create Invoice
                     </button>
+                    
                     
                     <!-- Tools Section -->
                     <div class="dropdown-category">
@@ -869,7 +856,7 @@
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         
         // Update visible tabs - 5 visible tabs
-        const visibleTabs = ['submit', 'requests', 'mockup', 'mockup-ruth', 'create-invoice'];
+        const visibleTabs = ['submit', 'requests', 'mockup', 'mockup-ruth', 'gallery', 'requirements'];
         const visibleIndex = visibleTabs.indexOf(tabName);
         
         if (visibleIndex !== -1) {
@@ -880,7 +867,7 @@
         } else {
             // It's in the dropdown
             const dropdownItems = document.querySelectorAll('.dropdown-item');
-            const dropdownTabNames = ['invoices', 'unified', 'gallery', 'requirements', 'generator'];
+            const dropdownTabNames = ['invoices', 'unified', 'create-invoice', 'generator'];
             const dropdownIndex = dropdownTabNames.indexOf(tabName);
             
             if (dropdownIndex !== -1) {
