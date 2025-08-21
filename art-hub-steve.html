@@ -185,6 +185,7 @@
             <button class="tab-button active" onclick="showTab('gallery')">Gallery View</button>
             <button class="tab-button" onclick="showTab('table')">Table View</button>
             <button class="tab-button" onclick="showTab('express')">Express Submit Form</button>
+            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
         </div>
         
         <!-- Tab Content -->
@@ -208,6 +209,97 @@
                 <h2 class="tab-title">Steve's Express Art Submission Form</h2>
                 <!-- Caspio Express Form DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500073092d827fb74d968d9d/emb"></script>
+            </div>
+            
+            <!-- Art Requirements & Fees Tab -->
+            <div id="requirements-tab" class="tab-pane">
+                <h2 class="tab-title">Art Requirements & Fees</h2>
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <!-- Art Requirements Section -->
+                    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                        <h3 style="color: #009900; margin-top: 0; font-size: 20px;">Artwork Requirements</h3>
+                        <ul style="line-height: 1.8; color: #333;">
+                            <li><strong>Vector Files Preferred:</strong> .AI, .EPS, .PDF (with fonts outlined)</li>
+                            <li><strong>High-Resolution Raster:</strong> .PNG, .JPG (300 DPI minimum)</li>
+                            <li><strong>Design Files:</strong> .PSD with layers preserved</li>
+                            <li><strong>Embroidery:</strong> .DST files or vector art for digitizing</li>
+                            <li><strong>Screen Printing:</strong> Separated artwork with Pantone colors specified</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Design Services & Fees -->
+                    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                        <h3 style="color: #009900; margin-top: 0; font-size: 20px;">Design Services & Fees</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #009900; color: white;">
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #007a00;">Service</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #007a00;">ShopWorks Part#</th>
+                                    <th style="padding: 12px; text-align: right; border: 1px solid #007a00;">Fee</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Basic Design Setup</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-25</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$25.00</td>
+                                </tr>
+                                <tr style="background: #f9f9f9;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Standard Design Work</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-50</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$50.00</td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Complex Design (per hour)</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-75</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$75.00/hr</td>
+                                </tr>
+                                <tr style="background: #f9f9f9;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Rush Service (24hr)</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-RUSH</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">+50%</td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Vector Conversion</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-VECTOR</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$35.00</td>
+                                </tr>
+                                <tr style="background: #f9f9f9;">
+                                    <td style="padding: 12px; border: 1px solid #ddd;">Digitizing for Embroidery</td>
+                                    <td style="padding: 12px; border: 1px solid #ddd; font-family: monospace; font-weight: bold;">GRT-DIGIT</td>
+                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">$45.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- ShopWorks Entry Instructions -->
+                    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #009900;">
+                        <h3 style="color: #009900; margin-top: 0; font-size: 20px;">How to Enter in ShopWorks</h3>
+                        <ol style="line-height: 1.8; color: #333;">
+                            <li><strong>Open Order Entry:</strong> Navigate to the customer's order</li>
+                            <li><strong>Add Line Item:</strong> Click "Add Item" or press F7</li>
+                            <li><strong>Enter Part Number:</strong> Type the part number (e.g., "GRT-50")</li>
+                            <li><strong>Quantity:</strong> Enter 1 for flat fees, or hours for hourly work</li>
+                            <li><strong>Description:</strong> Auto-populates from part number</li>
+                            <li><strong>Save:</strong> Press Enter or click Save to add to order</li>
+                        </ol>
+                        <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 4px;">
+                            <strong style="color: #009900;">Pro Tip:</strong> For custom design work exceeding 2 hours, use multiple GRT-75 line items with quantity = hours worked.
+                        </div>
+                    </div>
+                    
+                    <!-- Important Notes -->
+                    <div style="margin-top: 25px; padding: 15px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffc107;">
+                        <h4 style="color: #856404; margin-top: 0;">Important Notes:</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: #856404;">
+                            <li>Art fees are waived for repeat orders using existing artwork</li>
+                            <li>Complex designs requiring more than 2 hours will be quoted</li>
+                            <li>Rush service requires manager approval</li>
+                            <li>All artwork becomes property of Northwest Custom Apparel</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -262,6 +354,10 @@
                 document.querySelectorAll('.tab-button')[2].classList.add('active');
                 document.getElementById('express-tab').classList.add('active');
                 break;
+            case 'requirements':
+                document.querySelectorAll('.tab-button')[3].classList.add('active');
+                document.getElementById('requirements-tab').classList.add('active');
+                break;
         }
         
         // Save preference
@@ -271,7 +367,7 @@
     // Restore saved tab preference on load
     document.addEventListener('DOMContentLoaded', function() {
         const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && ['table', 'express'].includes(savedTab)) {
+        if (savedTab && ['table', 'express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
         }
     });
