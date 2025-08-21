@@ -46,24 +46,141 @@
         
         .tab-buttons {
             display: flex;
+            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
             background: white;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
         }
         
-        .tab-button {
+        /* More Dropdown Styles */
+        .more-dropdown {
+            position: relative;
+        }
+        
+        .more-button {
             background: #f0f0f0;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 10px 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             border-radius: 6px;
             transition: all 0.3s;
             color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .more-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .more-button.active {
+            background: #981e32;
+            color: white;
+        }
+        
+        .more-button svg {
+            transition: transform 0.3s;
+        }
+        
+        .more-button.open svg {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 220px;
+            z-index: 1000;
+            overflow: hidden;
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-category {
+            padding: 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            background: #f8f8f8;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+            color: #981e32;
+        }
+        
+        .dropdown-item.active {
+            background: #fff5f5;
+            color: #981e32;
+            font-weight: 500;
+        }
+        
+        .dropdown-item svg {
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+        
+        .tab-button {
+            background: #f0f0f0;
+            border: none;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            color: #333;
+            white-space: nowrap;
         }
         
         .tab-button:hover {
@@ -197,12 +314,42 @@
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
+            <!-- Visible Tabs (6 total) -->
             <button class="tab-button active" onclick="showTab('submit')">Submit Art Request</button>
             <button class="tab-button" onclick="showTab('mockup')">Request Mockup Steve</button>
             <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
             <button class="tab-button" onclick="showTab('gallery')">Mockup Gallery</button>
             <button class="tab-button" onclick="showTab('view')">View My Requests</button>
-            <button class="tab-button" onclick="showTab('generator')">Design Name Generator</button>
+            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
+            
+            <!-- More Dropdown -->
+            <div class="more-dropdown" style="margin-left: auto;">
+                <button class="more-button" onclick="toggleMoreDropdown()" id="moreButton">
+                    More
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="dropdown-menu" id="moreDropdown">
+                    <!-- Tools Section -->
+                    <div class="dropdown-category">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                        Tools
+                    </div>
+                    <button class="dropdown-item" onclick="showTab('generator'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                        Design Name Generator
+                    </button>
+                </div>
+            </div>
         </div>
         
         <!-- Tab Content -->
@@ -216,6 +363,351 @@
                 </div>
                 <!-- Caspio Submit Form DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
+            </div>
+            
+            <!-- Art Requirements & Fees Tab -->
+            <div id="requirements-tab" class="tab-pane">
+                <h2 class="tab-title">Art File Requirements & Fee Structure</h2>
+                
+                <!-- ShopWorks Billing Codes Section -->
+                <div style="background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%); border: 2px solid #981e32; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(152,30,50,0.1);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <div style="background: #981e32; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <h3 style="margin: 0; color: #981e32; font-size: 20px; font-weight: 600;">ShopWorks Billing Codes - Quick Reference</h3>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <!-- GRT-50 Card -->
+                        <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                            <div style="background: #4caf50; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold;">GRT-50</div>
+                                    <div style="font-size: 14px; opacity: 0.95; margin-top: 2px;">Part Number for Base Art Fee</div>
+                                </div>
+                                <div style="font-size: 28px; font-weight: bold;">$50</div>
+                            </div>
+                            <div style="padding: 20px;">
+                                <div style="font-weight: 600; color: #333; margin-bottom: 10px; font-size: 15px;">Logo Mockup & Print Review</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                                    Includes a mockup of your logo on the ordered products for preview, and a print readiness check for clarity and sizing.
+                                </div>
+                                <div style="background: #f0f9ff; border-left: 3px solid #2196f3; padding: 10px 15px; border-radius: 4px;">
+                                    <div style="font-weight: 600; color: #1976d2; font-size: 13px; margin-bottom: 5px;">When to Use:</div>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 13px; color: #555;">
+                                        <li>Customer supplied art needs re-work</li>
+                                        <li>Mockup on customer preferred garments</li>
+                                        <li>Preparing digital files for print</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- GRT-75 Card -->
+                        <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                            <div style="background: #2196f3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold;">GRT-75</div>
+                                    <div style="font-size: 14px; opacity: 0.95; margin-top: 2px;">Part Number for Hourly Design</div>
+                                </div>
+                                <div style="font-size: 28px; font-weight: bold;">$75/hr</div>
+                            </div>
+                            <div style="padding: 20px;">
+                                <div style="font-weight: 600; color: #333; margin-bottom: 10px; font-size: 15px;">Graphic Design Services</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                                    Billed in 15-minute increments. Covers essential tasks like T-shirt graphic design, custom artwork and creative work.
+                                </div>
+                                <div style="background: #fff8e1; border-left: 3px solid #ffc107; padding: 10px 15px; border-radius: 4px;">
+                                    <div style="font-weight: 600; color: #f57c00; font-size: 13px; margin-bottom: 5px;">Billing Increments:</div>
+                                    <div style="display: grid; grid-template-columns: auto auto; gap: 5px 15px; font-size: 13px; color: #555;">
+                                        <span>15 minutes:</span><span style="font-weight: 600;">$18.75</span>
+                                        <span>30 minutes:</span><span style="font-weight: 600;">$37.50</span>
+                                        <span>45 minutes:</span><span style="font-weight: 600;">$56.25</span>
+                                        <span>60 minutes:</span><span style="font-weight: 600;">$75.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#981e32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                            </svg>
+                            <div style="font-size: 14px; color: #333;">
+                                <strong>Pro Tip:</strong> Always enter these part numbers in ShopWorks when billing for art services. This ensures accurate invoicing and proper tracking of design work.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Navigation -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button onclick="document.getElementById('file-requirements').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #981e32; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        📋 File Requirements
+                    </button>
+                    <button onclick="document.getElementById('file-definitions').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #981e32; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        📁 File Definitions
+                    </button>
+                    <button onclick="document.getElementById('fee-structure').scrollIntoView({behavior: 'smooth'})" 
+                            style="padding: 8px 16px; background: #981e32; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                        💵 Fee Structure
+                    </button>
+                </div>
+                
+                <!-- Section 1: File Requirements by Method -->
+                <div id="file-requirements" style="margin-bottom: 40px;">
+                    <h3 style="color: #981e32; border-bottom: 2px solid #981e32; padding-bottom: 10px; margin-bottom: 20px;">Art File Requirements by Decoration Method</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                        <!-- DTG Card -->
+                        <div style="background: white; border: 2px solid #981e32; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #981e32; color: white; padding: 12px; font-weight: bold; font-size: 18px;">DTG</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Screenprint Card -->
+                        <div style="background: white; border: 2px solid #981e32; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #981e32; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Screenprint</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Transfers Card -->
+                        <div style="background: white; border: 2px solid #981e32; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #981e32; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Transfers</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Embroidery Card -->
+                        <div style="background: white; border: 2px solid #981e32; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="background: #981e32; color: white; padding: 12px; font-weight: bold; font-size: 18px;">Embroidery</div>
+                            <div style="padding: 15px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">1. Vector Art</h4>
+                                <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 14px; color: #555;">
+                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
+                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
+                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
+                                </ul>
+                                <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                                    <strong style="color: #1976d2;">2. .PNG</strong> 300 DPI <span style="color: #1976d2;">(Transparent Background)</span>
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
+                                </div>
+                                <div style="margin: 10px 0; font-size: 14px; color: #555;">
+                                    <strong>4. .PDF</strong> (saved and sent as editable)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 2: File Definitions -->
+                <div id="file-definitions" style="margin-bottom: 40px;">
+                    <h3 style="color: #981e32; border-bottom: 2px solid #981e32; padding-bottom: 10px; margin-bottom: 20px;">Art File Definitions</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Picture Files Column -->
+                        <div>
+                            <h4 style="background: #53565a; color: white; padding: 10px; margin: 0 0 15px 0; border-radius: 4px;">Picture Files</h4>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #4caf50; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.PNG</span>
+                                    <span style="color: #666; font-size: 13px;">(Portable Network Graphic)</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    Used for website development. <span style="color: #2196f3; font-weight: bold;">Transparent Background</span>
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.JPG</span>
+                                    <span style="color: #666; font-size: 13px;">(Joint Photographic Group)</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    Used for digital images across the internet and social media
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #9c27b0; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.PSD</span>
+                                    <span style="color: #666; font-size: 13px;">(Photoshop Document)</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    File created in Adobe Photoshop with layers. All Layers are editable and can be saved in layers or combined into a single image.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Vector Files Column -->
+                        <div>
+                            <h4 style="background: #53565a; color: white; padding: 10px; margin: 0 0 15px 0; border-radius: 4px;">Vector Files</h4>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #ff5722; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.AI</span>
+                                    <span style="color: #666; font-size: 13px;">(Adobe Illustrator)</span>
+                                    <span style="background: #4caf50; color: white; padding: 1px 6px; border-radius: 10px; font-size: 11px;">Vector</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    File created in Adobe Illustrator with layers. All Layers are editable and can be saved in layers or combined into a single image.
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #3f51b5; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.CDR</span>
+                                    <span style="color: #666; font-size: 13px;">(Coreldraw)</span>
+                                    <span style="background: #4caf50; color: white; padding: 1px 6px; border-radius: 10px; font-size: 11px;">Vector</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    File created in Coreldraw with layers. All Layers are editable and can be saved in layers or combined into a single image.
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #e91e63; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.PDF</span>
+                                    <span style="color: #666; font-size: 13px;">(Portable Document File)</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    Used for sending document and text formatting independent of proprietary software applications. If saved and sent as editable, it is <span style="color: #e91e63; font-weight: bold;">Vector</span> art.
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="background: #607d8b; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 12px;">.EPS</span>
+                                    <span style="color: #666; font-size: 13px;">(Encapsulated Postscript)</span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">
+                                    .EPS files are an old standard that was used in print. It is <span style="color: #e91e63; font-weight: bold;">Vector</span> based and will work for the most part but not an ideal <span style="color: #e91e63; font-weight: bold;">Vector</span> file.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 3: Fee Structure -->
+                <div id="fee-structure" style="margin-bottom: 40px;">
+                    <h3 style="color: #981e32; border-bottom: 2px solid #981e32; padding-bottom: 10px; margin-bottom: 20px;">Art Fee Structure</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                        <!-- Base Fee Card -->
+                        <div style="background: linear-gradient(135deg, #981e32 0%, #b91c3c 100%); border-radius: 12px; padding: 25px; color: white; box-shadow: 0 8px 16px rgba(152,30,50,0.2);">
+                            <div style="font-size: 36px; font-weight: bold; margin-bottom: 15px;">$50.00</div>
+                            <div style="font-size: 18px; font-weight: 500; margin-bottom: 20px; opacity: 0.95;">Base Art Fee</div>
+                            <div style="font-size: 15px; line-height: 1.6; opacity: 0.9;">
+                                <div style="margin-bottom: 12px;">This includes:</div>
+                                <div style="display: flex; align-items: start; gap: 10px; margin-bottom: 10px;">
+                                    <span style="background: white; color: #981e32; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</span>
+                                    <span>Customer supplied art that needs Re-work</span>
+                                </div>
+                                <div style="display: flex; align-items: start; gap: 10px; margin-bottom: 10px;">
+                                    <span style="background: white; color: #981e32; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</span>
+                                    <span>Customer supplied art that needs Mockup on customer preferred Garments</span>
+                                </div>
+                                <div style="display: flex; align-items: start; gap: 10px;">
+                                    <span style="background: white; color: #981e32; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</span>
+                                    <span>Prepare digital art files for Print</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hourly Rate Card -->
+                        <div style="background: white; border: 2px solid #981e32; border-radius: 12px; padding: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.1);">
+                            <div style="font-size: 36px; font-weight: bold; color: #981e32; margin-bottom: 15px;">$75.00</div>
+                            <div style="font-size: 18px; font-weight: 500; color: #333; margin-bottom: 20px;">Per Hour Rate</div>
+                            <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Art fee per hour. Charged per 1/4 hour increments above initial art fee.</div>
+                            
+                            <div style="background: #f5f5f5; border-radius: 8px; padding: 15px;">
+                                <div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">Time Increment Pricing:</div>
+                                <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; font-size: 15px;">
+                                    <span style="color: #666;">15 min:</span>
+                                    <span style="color: #981e32; font-weight: bold;">$18.75</span>
+                                    <span style="color: #666;">30 min:</span>
+                                    <span style="color: #981e32; font-weight: bold;">$37.50</span>
+                                    <span style="color: #666;">45 min:</span>
+                                    <span style="color: #981e32; font-weight: bold;">$56.25</span>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px; padding: 12px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px;">
+                                <div style="font-size: 13px; color: #e65100; font-weight: 600; margin-bottom: 5px;">Additional Work Includes:</div>
+                                <div style="font-size: 13px; color: #666;">Additional Mockups, Edits, Complex Revisions, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Important Note -->
+                    <div style="margin-top: 30px; padding: 20px; background: #fff5f5; border: 2px solid #981e32; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background: #981e32; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #981e32; margin-bottom: 5px;">Important Billing Information</div>
+                                <div style="font-size: 14px; color: #666; line-height: 1.5;">
+                                    All art fees are billable to the customer. Please inform customers of potential art charges when files require modification or enhancement. Time tracking begins after the initial setup fee.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Request Mockup Steve Tab -->
@@ -407,38 +899,80 @@
     // Track if a note was successfully submitted
     let noteWasSubmitted = false;
     
+    // Dropdown functionality
+    function toggleMoreDropdown() {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+            button.classList.remove('open');
+        } else {
+            dropdown.classList.add('show');
+            button.classList.add('open');
+        }
+    }
+    
+    function closeMoreDropdown() {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        dropdown.classList.remove('show');
+        button.classList.remove('open');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('moreDropdown');
+        const button = document.getElementById('moreButton');
+        
+        if (!event.target.closest('.more-dropdown')) {
+            dropdown.classList.remove('show');
+            button.classList.remove('open');
+        }
+    });
+    
     // Tab switching functionality
     function showTab(tabName) {
         // Remove active class from all buttons and panes
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         
-        // Add active class to selected button and pane
-        switch(tabName) {
-            case 'submit':
-                document.querySelectorAll('.tab-button')[0].classList.add('active');
-                document.getElementById('submit-tab').classList.add('active');
-                break;
-            case 'mockup':
-                document.querySelectorAll('.tab-button')[1].classList.add('active');
-                document.getElementById('mockup-tab').classList.add('active');
-                break;
-            case 'mockup-ruth':
-                document.querySelectorAll('.tab-button')[2].classList.add('active');
-                document.getElementById('mockup-ruth-tab').classList.add('active');
-                break;
-            case 'gallery':
-                document.querySelectorAll('.tab-button')[3].classList.add('active');
-                document.getElementById('gallery-tab').classList.add('active');
-                break;
-            case 'view':
-                document.querySelectorAll('.tab-button')[4].classList.add('active');
-                document.getElementById('view-tab').classList.add('active');
-                break;
-            case 'generator':
-                document.querySelectorAll('.tab-button')[5].classList.add('active');
-                document.getElementById('generator-tab').classList.add('active');
-                break;
+        // Update visible tabs - now we have 6 visible tabs
+        const visibleTabs = ['submit', 'mockup', 'mockup-ruth', 'gallery', 'view', 'requirements'];
+        const visibleIndex = visibleTabs.indexOf(tabName);
+        
+        if (visibleIndex !== -1) {
+            // It's a visible tab
+            document.querySelectorAll('.tab-button')[visibleIndex].classList.add('active');
+            // Remove active from More button
+            document.getElementById('moreButton').classList.remove('active');
+        } else {
+            // It's in the dropdown (only Design Name Generator now)
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const dropdownTabNames = ['generator'];
+            const dropdownIndex = dropdownTabNames.indexOf(tabName);
+            
+            if (dropdownIndex !== -1) {
+                dropdownItems[dropdownIndex].classList.add('active');
+                // Add active to More button to indicate selection is in dropdown
+                document.getElementById('moreButton').classList.add('active');
+            }
+        }
+        
+        // Show the corresponding tab pane
+        const tabPaneMap = {
+            'submit': 'submit-tab',
+            'mockup': 'mockup-tab',
+            'mockup-ruth': 'mockup-ruth-tab',
+            'requirements': 'requirements-tab',
+            'gallery': 'gallery-tab',
+            'generator': 'generator-tab',
+            'view': 'view-tab'
+        };
+        
+        if (tabPaneMap.hasOwnProperty(tabName)) {
+            document.getElementById(tabPaneMap[tabName]).classList.add('active');
         }
         
         // Save preference
