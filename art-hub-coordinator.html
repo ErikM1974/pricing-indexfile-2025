@@ -315,11 +315,11 @@
         <!-- Tab Buttons -->
         <div class="tab-buttons">
             <!-- Visible Priority Tabs -->
-            <button class="tab-button active" onclick="showTab('requests')">
+            <button class="tab-button active" onclick="showTab('submit')">Submit Art Steve</button>
+            <button class="tab-button" onclick="showTab('requests')">
                 Art Request Management
                 <span id="needsInvoiceCount" class="badge" style="display: none; background: #dc3545; color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px;"></span>
             </button>
-            <button class="tab-button" onclick="showTab('submit')">Submit Art Steve</button>
             <button class="tab-button" onclick="showTab('mockup')">Request Mockup Steve</button>
             <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
             <button class="tab-button" onclick="showTab('create-invoice')">Create Invoice</button>
@@ -407,7 +407,7 @@
         <!-- Tab Content -->
         <div class="tab-content">
             <!-- Art Request Management Tab -->
-            <div id="requests-tab" class="tab-pane active">
+            <div id="requests-tab" class="tab-pane">
                 <h2 class="tab-title">Art Request Management</h2>
                 <div class="info-message">
                     <p>Manage all art requests from this dashboard. You can view, add notes, and track the progress of all requests. 
@@ -418,7 +418,7 @@
             </div>
             
             <!-- Submit Art Steve Tab -->
-            <div id="submit-tab" class="tab-pane">
+            <div id="submit-tab" class="tab-pane active">
                 <h2 class="tab-title">Submit Art Steve</h2>
                 <div class="info-message">
                     <p>Use this form to submit new design concepts or artwork. This form is for Art Hub coordinators to submit 
