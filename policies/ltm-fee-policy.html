@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Less Than Minimum (LTM) Fee Policy - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../shared_components/css/dashboard-styles.css" rel="stylesheet">
+    
+    <style>
+        /* Policy Page Styles */
+        body {
+            background: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .policy-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb a {
+            color: var(--wsu-crimson);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        
+        .breadcrumb a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Policy Header */
+        .policy-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--wsu-crimson);
+        }
+        
+        .policy-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .policy-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .policy-metadata {
+            display: flex;
+            gap: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metadata-item i {
+            color: var(--wsu-grey);
+        }
+        
+        /* Policy Actions Bar */
+        .policy-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .policy-action-btn {
+            padding: 0.5rem 1rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .policy-action-btn:hover {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+        }
+        
+        /* Quick Reference Box */
+        .quick-reference {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-reference h3 {
+            color: #15803d;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quick-ref-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-ref-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .quick-ref-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        /* Content Sections */
+        .policy-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* Tables */
+        .policy-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .policy-table th {
+            background: var(--light-bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .policy-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9375rem;
+        }
+        
+        .policy-table tr:hover {
+            background: var(--light-bg);
+        }
+        
+        /* Example Boxes */
+        .example-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Calculator */
+        .calculator-box {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .calculator-input {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calculator-input input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .calculator-result {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 2px solid var(--primary-color);
+        }
+        
+        /* FAQ Section */
+        .faq-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding-left: 1rem;
+        }
+        
+        /* Communication Scripts */
+        .script-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+        
+        .script-label {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            font-style: normal;
+        }
+        
+        /* Approval Badge */
+        .approval-required {
+            display: inline-block;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .no-approval {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .policy-container {
+                padding: 1rem;
+            }
+            
+            .policy-header {
+                padding: 1.5rem;
+            }
+            
+            .policy-title {
+                font-size: 1.5rem;
+            }
+            
+            .quick-reference-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .policy-metadata {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="policy-container">
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb">
+            <a href="../staff-dashboard.html">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="../policies-hub.html">Policies Hub</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>LTM Fee Policy</span>
+        </div>
+        
+        <!-- Policy Header -->
+        <div class="policy-header">
+            <h1 class="policy-title">Less Than Minimum (LTM) Fee Policy</h1>
+            <p class="policy-subtitle">Essential guide for orders under 24 pieces</p>
+            <div class="policy-metadata">
+                <div class="metadata-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Effective: July 10, 2025</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-sync"></i>
+                    <span>Review: Annually</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Owner: Erik Mickelson</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Version: 1.0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Policy Actions Bar -->
+        <div class="policy-actions">
+            <button class="policy-action-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Policy
+            </button>
+            <a href="mailto:erik@nwcustomapparel.com?subject=LTM%20Policy%20Question" class="policy-action-btn">
+                <i class="fas fa-envelope"></i> Ask Question
+            </a>
+            <button class="policy-action-btn" onclick="document.getElementById('calculator').scrollIntoView()">
+                <i class="fas fa-calculator"></i> Fee Calculator
+            </button>
+            <button class="policy-action-btn" onclick="document.getElementById('faq').scrollIntoView()">
+                <i class="fas fa-question-circle"></i> Jump to FAQ
+            </button>
+        </div>
+        
+        <!-- Quick Reference Box -->
+        <div class="quick-reference">
+            <h3><i class="fas fa-bolt"></i> Quick Reference</h3>
+            <div class="quick-reference-grid">
+                <div class="quick-ref-item">
+                    <div class="quick-ref-label">Fee Amount</div>
+                    <div class="quick-ref-value">$50.00 flat fee</div>
+                </div>
+                <div class="quick-ref-item">
+                    <div class="quick-ref-label">Applies To</div>
+                    <div class="quick-ref-value">All orders under 24 pieces</div>
+                </div>
+                <div class="quick-ref-item">
+                    <div class="quick-ref-label">Services Covered</div>
+                    <div class="quick-ref-value">Embroidery, DTG, DTF, Screen Print</div>
+                </div>
+                <div class="quick-ref-item">
+                    <div class="quick-ref-label">Exceptions</div>
+                    <div class="quick-ref-value">Webstores (always waived)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Purpose Section -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Purpose</h2>
+            <div class="section-content">
+                <p>The Less Than Minimum (LTM) fee ensures we recover administrative costs associated with small orders while maintaining transparency and fairness. This $50 fee applies to orders under 24 pieces and covers:</p>
+                <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                    <li><strong>CSR Coordination:</strong> Order entry, quoting, and customer communication</li>
+                    <li><strong>Purchasing:</strong> Sourcing blanks from suppliers like SanMar</li>
+                    <li><strong>Receiving:</strong> Unboxing, counting, and quality checks</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>Important:</strong> The LTM fee does NOT include production setup, design, or digitizing costs. These are billed separately if applicable.</p>
+            </div>
+        </div>
+        
+        <!-- How It Works Section -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-cogs"></i> How the Fee Works</h2>
+            <div class="section-content">
+                <p>The $50 fee is prorated across all items in the order and added to the 24-piece base price:</p>
+                
+                <div class="example-box">
+                    <div class="example-title">Example Calculation:</div>
+                    <p><strong>10 embroidered hats</strong></p>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Base price (24-piece rate): $15.00 per hat</li>
+                        <li>LTM fee per item: $50 ÷ 10 = $5.00</li>
+                        <li><strong>Final price per hat: $20.00</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="example-box" style="margin-top: 1rem;">
+                    <div class="example-title">Another Example:</div>
+                    <p><strong>5 DTG shirts</strong></p>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Base price (24-piece rate): $12.00 per shirt</li>
+                        <li>LTM fee per item: $50 ÷ 5 = $10.00</li>
+                        <li><strong>Final price per shirt: $22.00</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Waiver Eligibility Matrix -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-check-circle"></i> Waiver Eligibility Matrix</h2>
+            <div class="section-content">
+                <p>Waivers are limited to specific scenarios to maintain consistency:</p>
+                
+                <table class="policy-table">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Eligible Services</th>
+                            <th>Waiver Amount</th>
+                            <th>Conditions</th>
+                            <th>Approval</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Webstore Orders</strong></td>
+                            <td>All services</td>
+                            <td>Full waiver (100%)</td>
+                            <td>Automated via Insoft/Shopworks</td>
+                            <td><span class="no-approval">Automatic</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fill-In After Large Order</strong></td>
+                            <td>Embroidery, DTG only</td>
+                            <td>Full waiver (100%)</td>
+                            <td>• Within 30 days of $500+ order<br>• Limit 1-5 items<br>• NOT for Screen Print or DTF</td>
+                            <td><span class="no-approval">CSR Discretion</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Loyal/Repeat Customer</strong></td>
+                            <td>Embroidery, DTG only</td>
+                            <td>Partial ($25 instead of $50)</td>
+                            <td>• 3+ orders in past year<br>• NOT for Screen Print or DTF</td>
+                            <td><span class="approval-required">Erik Approval</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Screen Print/DTF</strong></td>
+                            <td>Screen Print, DTF</td>
+                            <td>No waiver</td>
+                            <td>Always apply full $50 fee</td>
+                            <td>N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 1rem; font-style: italic;">
+                    <strong>Note:</strong> All waivers must be documented in Shopworks with the reason and any required approvals.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Step-by-Step Process -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-list-ol"></i> Step-by-Step Process</h2>
+            <div class="section-content">
+                <ol style="line-height: 2;">
+                    <li><strong>Check Order Quantity:</strong> Is it under 24 pieces? If yes, continue.</li>
+                    <li><strong>Identify Service Type:</strong> Embroidery, DTG, DTF, or Screen Print?</li>
+                    <li><strong>Check for Webstore:</strong> If webstore order, waive automatically.</li>
+                    <li><strong>Review Order History:</strong> Look for recent large orders or repeat customer status.</li>
+                    <li><strong>Apply Fee or Waiver:</strong> Based on the eligibility matrix above.</li>
+                    <li><strong>Document in Shopworks:</strong> Include waiver reason if applicable.</li>
+                    <li><strong>Communicate to Customer:</strong> Use the scripts provided below.</li>
+                    <li><strong>Finalize Quote:</strong> Ensure system reflects the correct pricing.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Customer Communication Scripts -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-comments"></i> Customer Communication Scripts</h2>
+            <div class="section-content">
+                <div class="script-box">
+                    <div class="script-label">When Applying the Fee:</div>
+                    "Since your order is under our 24-piece minimum, there's a $50 administrative fee that covers our order processing costs. This is divided across your items, adding $[X] per piece. Would you like to add more items to reach 24 pieces and avoid this fee?"
+                </div>
+                
+                <div class="script-box">
+                    <div class="script-label">When Waiving for Fill-In:</div>
+                    "Great news! Since you had that large order with us recently, we'll waive the minimum fee for these additional items as a courtesy."
+                </div>
+                
+                <div class="script-box">
+                    <div class="script-label">When Partially Waiving for Loyalty:</div>
+                    "As a valued repeat customer, we're reducing the minimum fee from $50 to $25 for your order. We appreciate your continued business!"
+                </div>
+                
+                <div class="script-box">
+                    <div class="script-label">For Screen Print/DTF (No Waiver):</div>
+                    "For screen print and DTF orders under 24 pieces, we apply a $50 minimum fee to cover our administrative costs. This helps us maintain quality service even on smaller orders. The fee is divided across your items."
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interactive Calculator -->
+        <div class="policy-section" id="calculator">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> LTM Fee Calculator</h2>
+            <div class="section-content">
+                <p>Use this calculator to quickly determine how the LTM fee affects per-item pricing:</p>
+                
+                <div class="calculator-box">
+                    <div class="calculator-input">
+                        <label>Number of items:</label>
+                        <input type="number" id="itemCount" min="1" max="23" value="10" onchange="calculateLTM()">
+                        <label>Base price per item:</label>
+                        <input type="number" id="basePrice" min="0" step="0.01" value="15.00" onchange="calculateLTM()">
+                    </div>
+                    <div class="calculator-result" id="calcResult">
+                        <!-- Result will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="policy-section" id="faq">
+            <h2 class="section-title"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+            <div class="section-content">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Why do we have this fee?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        The LTM fee covers the same administrative costs for a 5-piece order as a 24-piece order - CSR time, purchasing, receiving, and processing. Without this fee, we would lose money on small orders.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can customers combine orders to avoid the fee?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! We encourage customers to combine orders or add items to reach 24 pieces. This is the best way to avoid the fee and get better per-item pricing.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What if a customer orders exactly 23 pieces?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        The fee still applies to orders of 23 pieces. We strongly recommend adding one more item to reach 24 and avoid the $50 fee entirely - it's almost always more cost-effective for the customer.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Does the fee apply to sample orders?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes, the LTM fee applies to all orders under 24 pieces, including samples. However, if the sample leads to a large order within 30 days, we may waive the fee retroactively.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What about add-on orders for existing customers?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        If the customer had a $500+ order within the last 30 days and needs 1-5 additional items (embroidery or DTG only), we can waive the fee. This doesn't apply to screen print or DTF.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do I request an exception?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        For situations not covered by the standard waiver scenarios, contact Erik directly with the order details and reason for the exception request. Document the approval in Shopworks.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Responsibilities Section -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-users"></i> Staff Responsibilities</h2>
+            <div class="section-content">
+                <table class="policy-table">
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Responsibilities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>CSRs</strong><br>(Nika, Taylar, Taneisha, Adriyella, Jim, Ruth, Bradley, Steve)</td>
+                            <td>
+                                • Apply policy consistently to all qualifying orders<br>
+                                • Check eligibility for waivers using Shopworks history<br>
+                                • Document all waivers with reasons<br>
+                                • Communicate transparently with customers<br>
+                                • Suggest upsells to reach 24 pieces
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Erik (Manager)</strong></td>
+                            <td>
+                                • Approve edge-case waivers<br>
+                                • Review waiver logs monthly<br>
+                                • Update policy as needed<br>
+                                • Ensure profitability targets are met<br>
+                                • Train staff on policy updates
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>All Staff</strong></td>
+                            <td>
+                                • Refer to this document for guidance<br>
+                                • Escalate uncertainties to Erik<br>
+                                • Maintain consistent application<br>
+                                • Track and report any issues
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Related Resources -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-link"></i> Related Resources</h2>
+            <div class="section-content">
+                <ul style="line-height: 2;">
+                    <li><a href="../staff-dashboard.html" style="color: var(--wsu-crimson);">Staff Dashboard</a> - Main hub for all tools and calculators</li>
+                    <li><a href="../policies-hub.html" style="color: var(--wsu-crimson);">Policies Hub</a> - Browse all company policies</li>
+                    <li><a href="payment-terms.html" style="color: var(--wsu-crimson);">Payment Terms Guide</a> - Related payment policies</li>
+                    <li>Shopworks Documentation - Check order history and apply waivers</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Tags Section -->
+        <div class="policy-section">
+            <h2 class="section-title"><i class="fas fa-tags"></i> Tags</h2>
+            <div class="section-content">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">LTM Fee</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Less Than Minimum</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Waivers</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Pricing Policy</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Admin Fees</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Order Processing</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Embroidery</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">DTG</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">DTF</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Screen Print</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Customer Service</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Shopworks</span>
+                    <span style="background: var(--light-bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">Webstores</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // LTM Fee Calculator
+        function calculateLTM() {
+            const itemCount = parseInt(document.getElementById('itemCount').value) || 0;
+            const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
+            
+            if (itemCount > 0 && itemCount < 24 && basePrice > 0) {
+                const ltmPerItem = 50 / itemCount;
+                const finalPrice = basePrice + ltmPerItem;
+                const totalCost = finalPrice * itemCount;
+                
+                document.getElementById('calcResult').innerHTML = `
+                    <div style="display: grid; gap: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Base price per item:</span>
+                            <strong>$${basePrice.toFixed(2)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>LTM fee per item ($50 ÷ ${itemCount}):</span>
+                            <strong>$${ltmPerItem.toFixed(2)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 2px solid var(--border-color);">
+                            <span>Final price per item:</span>
+                            <strong style="color: var(--wsu-crimson); font-size: 1.25rem;">$${finalPrice.toFixed(2)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total order cost (${itemCount} items):</span>
+                            <strong>$${totalCost.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 4px; font-size: 0.875rem;">
+                        <strong>Tip:</strong> ${itemCount < 23 ? `Adding ${24 - itemCount} more items would eliminate the $50 fee entirely!` : `Adding just 1 more item would eliminate the $50 fee and reduce your per-item cost!`}
+                    </div>
+                `;
+            } else if (itemCount >= 24) {
+                document.getElementById('calcResult').innerHTML = `
+                    <div style="padding: 1rem; background: #dcfce7; border-radius: 4px; text-align: center;">
+                        <i class="fas fa-check-circle" style="color: #22c55e; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <div style="font-weight: 600; color: #15803d;">No LTM fee applies!</div>
+                        <div style="color: #15803d; margin-top: 0.5rem;">Orders of 24+ pieces use standard pricing.</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('calcResult').innerHTML = `
+                    <div style="padding: 1rem; text-align: center; color: var(--text-secondary);">
+                        Enter values above to calculate pricing
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize calculator on page load
+        calculateLTM();
+        
+        // FAQ Toggle (optional - makes FAQ expandable/collapsible)
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                
+                if (answer.style.display === 'none' || !answer.style.display) {
+                    answer.style.display = 'block';
+                    icon.className = 'fas fa-chevron-up';
+                } else {
+                    answer.style.display = 'none';
+                    icon.className = 'fas fa-chevron-down';
+                }
+            });
+        });
+        
+        // Start with FAQs collapsed
+        document.querySelectorAll('.faq-answer').forEach(answer => {
+            answer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
