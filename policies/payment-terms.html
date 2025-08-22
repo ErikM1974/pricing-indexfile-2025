@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Payment Terms Guide - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../shared_components/css/dashboard-styles.css" rel="stylesheet">
+    
+    <style>
+        /* Policy Page Styles */
+        body {
+            background: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .policy-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb a {
+            color: var(--wsu-crimson);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        
+        .breadcrumb a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Policy Header */
+        .policy-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--wsu-crimson);
+        }
+        
+        .policy-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .policy-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .policy-metadata {
+            display: flex;
+            gap: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metadata-item i {
+            color: var(--wsu-grey);
+        }
+        
+        /* Policy Actions Bar */
+        .policy-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .policy-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .policy-action-btn:hover {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+            transform: translateY(-1px);
+        }
+        
+        /* Term Cards */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .term-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--wsu-crimson);
+            transition: all 0.3s ease;
+        }
+        
+        .term-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .term-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .term-badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background: var(--wsu-crimson);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .term-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        /* Highlight Box */
+        .term-highlight {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .term-highlight-title {
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .term-highlight-title i {
+            color: #22c55e;
+        }
+        
+        .term-highlight ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #166534;
+        }
+        
+        .term-highlight li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .term-highlight strong {
+            font-weight: 600;
+            color: #14532d;
+        }
+        
+        /* Special Cases */
+        .term-card.no-charge {
+            border-left-color: var(--wsu-grey);
+        }
+        
+        .term-card.no-charge .term-badge {
+            background: var(--wsu-grey);
+        }
+        
+        /* Footer Navigation */
+        .policy-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--wsu-crimson);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        .footer-link:hover {
+            opacity: 0.8;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .policy-actions,
+            .breadcrumb,
+            .policy-footer {
+                display: none;
+            }
+            
+            .policy-container {
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            .term-card {
+                page-break-inside: avoid;
+                border: 1px solid #ddd;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .policy-container {
+                padding: 1rem;
+            }
+            
+            .policy-title {
+                font-size: 1.5rem;
+            }
+            
+            .policy-metadata {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="policy-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="../staff-dashboard.html">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="../policies-hub.html">Policies Hub</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Payment Terms</span>
+        </div>
+        
+        <!-- Policy Header -->
+        <div class="policy-header">
+            <h1 class="policy-title">Payment Terms Guide</h1>
+            <p class="policy-subtitle">A comprehensive reference for all NWCA payment terms and procedures</p>
+            <div class="policy-metadata">
+                <div class="metadata-item">
+                    <i class="far fa-calendar"></i>
+                    <span>Last Updated: August 22, 2025</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="far fa-user"></i>
+                    <span>Policy Owner: Erik Mickelson</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Category: Financial</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Policy Actions -->
+        <div class="policy-actions">
+            <button class="policy-action-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Policy
+            </button>
+            <button class="policy-action-btn" onclick="sharePolicy()">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="policy-action-btn" onclick="emailPolicy()">
+                <i class="fas fa-envelope"></i> Email to Team
+            </button>
+            <button class="policy-action-btn" onclick="downloadPDF()">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </button>
+        </div>
+        
+        <!-- Terms Grid -->
+        <div class="terms-grid">
+            <!-- Pay On Pickup -->
+            <div class="term-card">
+                <h3 class="term-title">
+                    Pay On Pickup
+                    <span class="term-badge">Most Common</span>
+                </h3>
+                <p class="term-description">
+                    The order must be paid in full when the customer picks it up. This is our most common term, used for the majority of local orders.
+                </p>
+                <div class="term-highlight">
+                    <div class="term-highlight-title">
+                        <i class="fas fa-info-circle"></i>
+                        Standard Procedure
+                    </div>
+                    <ul>
+                        <li>A <strong>50% deposit</strong> or full <strong>Prepayment</strong> is required to begin production.</li>
+                        <li>This applies especially to new customers or large, complex jobs.</li>
+                        <li>The final balance is always due before the goods are released to the customer.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Prepaid -->
+            <div class="term-card">
+                <h3 class="term-title">
+                    Prepaid
+                </h3>
+                <p class="term-description">
+                    The order must be paid in full before any work begins. This is standard policy for all first-time customers, online orders, and any orders that require shipping.
+                </p>
+            </div>
+            
+            <!-- Due on Receipt -->
+            <div class="term-card">
+                <h3 class="term-title">
+                    Due on Receipt
+                </h3>
+                <p class="term-description">
+                    Payment is due immediately when the customer receives our invoice. This is used for trusted, established clients when work is completed before payment, but no formal credit (like Net 30) is offered.
+                </p>
+            </div>
+            
+            <!-- Net Terms -->
+            <div class="term-card">
+                <h3 class="term-title">
+                    Net 10 / Net 15 / Net 30
+                    <span class="term-badge">Credit Required</span>
+                </h3>
+                <p class="term-description">
+                    These are credit terms offered <strong>only</strong> to pre-approved clients, such as schools, government agencies, and large corporations with established credit history. The number indicates the days the client has to pay in full from the invoice date.
+                </p>
+            </div>
+            
+            <!-- No Charge -->
+            <div class="term-card no-charge">
+                <h3 class="term-title">
+                    No Charge
+                    <span class="term-badge" style="background: var(--wsu-grey);">Internal Only</span>
+                </h3>
+                <p class="term-description">
+                    Used for internal tracking of non-revenue orders such as: <strong>replacement orders, marketing samples, Hot Ticket orders, and WOW's.</strong>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer Navigation -->
+        <div class="policy-footer">
+            <a href="../policies-hub.html" class="footer-link">
+                <i class="fas fa-arrow-left"></i> Back to Policies Hub
+            </a>
+            <a href="../staff-dashboard.html" class="footer-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function sharePolicy() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'NWCA Payment Terms Guide',
+                    text: 'Check out the updated payment terms policy',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Policy link copied to clipboard!');
+            }
+        }
+        
+        function emailPolicy() {
+            const subject = encodeURIComponent('NWCA Payment Terms Guide');
+            const body = encodeURIComponent(`Please review the updated Payment Terms Guide:\n\n${window.location.href}`);
+            window.location.href = `mailto:team@nwcustomapparel.com?subject=${subject}&body=${body}`;
+        }
+        
+        function downloadPDF() {
+            // This would typically trigger a server-side PDF generation
+            // For now, we'll use print
+            window.print();
+        }
+    </script>
+</body>
+</html>

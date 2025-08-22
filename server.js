@@ -173,6 +173,14 @@ app.get('/monogramform.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'monogramform.html'));
 });
 
+// Policies pages
+app.get('/policies-hub.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'policies-hub.html'));
+});
+
+// Serve the policies directory as static files
+app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOptions));
+
 // Sanmar Vendor Management Pages
 app.get('/sanmar-invoices.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'sanmar-invoices.html'));
