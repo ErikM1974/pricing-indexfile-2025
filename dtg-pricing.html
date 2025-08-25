@@ -411,6 +411,50 @@
                 }
             });
         }
+        
+        // Enable debug mode for problematic styles
+        document.addEventListener('DOMContentLoaded', function() {
+            // Watch for product selection changes
+            const observer = new MutationObserver(function(mutations) {
+                const styleInput = document.getElementById('styleInput2');
+                if (styleInput && styleInput.value) {
+                    const debugStyles = ['PC78', 'S700'];
+                    const isDebugStyle = debugStyles.some(style => styleInput.value.startsWith(style));
+                    
+                    if (isDebugStyle) {
+                        // Enable debug mode
+                        window.DTG_PERFORMANCE = window.DTG_PERFORMANCE || {};
+                        window.DTG_PERFORMANCE.debug = true;
+                        console.log(`[DTG-Page] Debug mode enabled for ${styleInput.value}`);
+                        
+                        // Add debug helper button
+                        if (!document.getElementById('debug-refresh-btn')) {
+                            const container = document.querySelector('.dtg-pricing-container');
+                            if (container) {
+                                const btn = document.createElement('button');
+                                btn.id = 'debug-refresh-btn';
+                                btn.className = 'btn btn-warning';
+                                btn.style.margin = '10px';
+                                btn.textContent = 'Clear Cache & Refresh Pricing';
+                                btn.onclick = function() {
+                                    console.log('Manual refresh triggered for:', styleInput.value);
+                                    if (window.DTG_PRICING_V4?.clearStyleCache) {
+                                        window.DTG_PRICING_V4.clearStyleCache(styleInput.value);
+                                    }
+                                    if (window.DTG_PRICING_V4?.refresh) {
+                                        window.DTG_PRICING_V4.refresh(true);
+                                    }
+                                };
+                                container.appendChild(btn);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Start observing
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
     </script>
 </body>
 </html>

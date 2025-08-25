@@ -35,24 +35,34 @@ class DTGPricingService {
      * @param {string} color - Color name (optional, for inventory filtering)
      * @returns {Object} Combined pricing data
      */
-    async fetchPricingData(styleNumber, color = null) {
+    async fetchPricingData(styleNumber, color = null, forceRefresh = false) {
         const cacheKey = `${styleNumber}-${color || 'all'}`;
         
-        // Special debug logging for PC78ZH
-        if (styleNumber === 'PC78ZH' && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] PC78ZH pricing request:', {
+        // Special debug logging for problematic styles
+        const debugStyles = ['PC78ZH', 'PC78', 'S700'];
+        const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
+        
+        if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
+            console.log(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
                 styleNumber: styleNumber,
                 color: color,
-                cacheKey: cacheKey
+                cacheKey: cacheKey,
+                forceRefresh: forceRefresh
             });
         }
         
-        // Check cache first
-        if (this.cache.has(cacheKey)) {
+        // Check cache first (unless force refresh)
+        if (!forceRefresh && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
             if (Date.now() - cached.timestamp < this.cacheTimeout) {
-                console.log('[DTGPricingService] Returning cached data for:', cacheKey);
-                return cached.data;
+                // Validate cached data before returning
+                if (cached.data && cached.data.sizes && cached.data.sizes.length > 0) {
+                    console.log('[DTGPricingService] Returning cached data for:', cacheKey);
+                    return cached.data;
+                } else {
+                    console.warn('[DTGPricingService] Invalid cached data detected, fetching fresh data for:', cacheKey);
+                    this.cache.delete(cacheKey); // Remove bad cache entry
+                }
             }
         }
 
@@ -62,10 +72,10 @@ class DTGPricingService {
             // Fetch all data in parallel for maximum performance
             const startTime = performance.now();
             
-            const [tiersRes, costsRes, inventoryRes, maxPricesRes] = await Promise.all([
+            // Removed inventory API call - using max-prices data instead for better reliability
+            const [tiersRes, costsRes, maxPricesRes] = await Promise.all([
                 fetch(`${this.apiBase}/pricing-tiers?method=DTG`),
                 fetch(`${this.apiBase}/dtg-costs`),
-                fetch(`${this.apiBase}/inventory?styleNumber=${styleNumber}${color ? `&color=${encodeURIComponent(color)}` : ''}`),
                 fetch(`${this.apiBase}/max-prices-by-style?styleNumber=${styleNumber}`)
             ]);
 
@@ -78,45 +88,52 @@ class DTGPricingService {
                 const errorText = await costsRes.text();
                 throw new Error(`Costs API failed (${costsRes.status}): ${errorText}`);
             }
-            if (!inventoryRes.ok) {
-                const errorText = await inventoryRes.text();
-                // Special handling for PC78ZH inventory issues
-                if (styleNumber === 'PC78ZH') {
-                    console.error('[DTGPricingService] PC78ZH inventory API error:', errorText);
-                }
-                throw new Error(`Inventory API failed (${inventoryRes.status}) for ${styleNumber}: ${errorText}`);
-            }
             if (!maxPricesRes.ok) {
                 const errorText = await maxPricesRes.text();
                 throw new Error(`Max Prices API failed (${maxPricesRes.status}) for ${styleNumber}: ${errorText}`);
             }
 
             // Parse responses
-            const [tiers, costs, inventory, maxPrices] = await Promise.all([
+            const [tiers, costs, maxPrices] = await Promise.all([
                 tiersRes.json(),
                 costsRes.json(),
-                inventoryRes.json(),
                 maxPricesRes.json()
             ]);
 
             const fetchTime = performance.now() - startTime;
             console.log(`[DTGPricingService] Data fetched in ${fetchTime.toFixed(0)}ms`);
+            
+            // Log max prices details for debugging
+            if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
+                console.log(`[DTGPricingService DEBUG] ${styleNumber} max prices:`, {
+                    sizesCount: maxPrices.sizes?.length || 0,
+                    firstSize: maxPrices.sizes?.[0],
+                    upcharges: maxPrices.sellingPriceDisplayAddOns,
+                    hasPrices: maxPrices.sizes?.length > 0
+                });
+            }
+            
+            // Validate max prices data
+            if (!maxPrices.sizes || maxPrices.sizes.length === 0) {
+                console.error(`[DTGPricingService] No pricing data found for ${styleNumber}`);
+                throw new Error(`No pricing data available for ${styleNumber}`);
+            }
 
             // Combine and structure the data
             const data = {
                 tiers,
                 costs,
-                inventory,
+                sizes: maxPrices.sizes || [],
                 upcharges: maxPrices.sellingPriceDisplayAddOns || {},
-                maxPrices: maxPrices.sizes || [],
                 styleNumber,
                 color,
                 locations: this.locations,
                 timestamp: Date.now()
             };
 
-            // Cache the result
+            // Cache valid results
             this.cache.set(cacheKey, { data, timestamp: Date.now() });
+            console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
             
             return data;
             
@@ -135,7 +152,7 @@ class DTGPricingService {
     calculateAllLocationPrices(data, quantity) {
         console.log('[DTGPricingService] Calculating prices for quantity:', quantity);
         
-        const { tiers, costs, inventory, upcharges } = data;
+        const { tiers, costs, sizes, upcharges } = data;
         const allLocationPrices = {};
         
         // Find the appropriate tier for the quantity
@@ -153,7 +170,7 @@ class DTGPricingService {
                 location.code,
                 tier,
                 costs,
-                inventory,
+                sizes,
                 upcharges
             );
         });
@@ -165,22 +182,11 @@ class DTGPricingService {
      * Calculate prices for a specific location
      * @private
      */
-    calculateLocationPrices(locationCode, tier, costs, inventory, upcharges) {
+    calculateLocationPrices(locationCode, tier, costs, sizes, upcharges) {
         const prices = {};
         
         // Handle combined locations (e.g., 'LC_FB')
         const locationCodes = locationCode.split('_');
-        
-        // Special debug for PC78ZH with left chest + full back
-        const isPC78ZH = inventory.some(item => item.STYLE === 'PC78ZH');
-        if (isPC78ZH && locationCode === 'LC_FB' && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] PC78ZH LC_FB calculation:', {
-                locationCode: locationCode,
-                locationCodes: locationCodes,
-                tier: tier.TierLabel,
-                costsAvailable: costs.length
-            });
-        }
         
         // Get print cost for this location and tier
         let totalPrintCost = 0;
@@ -191,31 +197,25 @@ class DTGPricingService {
             );
             if (costEntry) {
                 totalPrintCost += parseFloat(costEntry.PrintCost);
-                if (isPC78ZH && locationCode === 'LC_FB' && window.DTG_PERFORMANCE?.debug) {
-                    console.log(`[DTGPricingService DEBUG] PC78ZH print cost for ${code}:`, costEntry.PrintCost);
-                }
             }
         });
         
-        // Group inventory by size and calculate prices
-        const garmentsBySize = this.groupInventoryBySize(inventory);
+        // Find the base garment cost (lowest price)
+        const baseGarmentCost = Math.min(...sizes.map(s => s.maxCasePrice));
         
-        // Get standard garment cost (size S or first available)
-        const standardGarment = garmentsBySize['S'] || garmentsBySize['M'] || Object.values(garmentsBySize)[0];
-        if (!standardGarment) {
-            console.error('[DTGPricingService] No garments found in inventory');
+        if (isNaN(baseGarmentCost) || baseGarmentCost <= 0) {
+            console.error('[DTGPricingService] Invalid garment cost');
             return prices;
         }
         
-        const standardGarmentCost = this.getGarmentCost(standardGarment);
-        
         // Calculate base price (same for all sizes before upcharges)
-        const markedUpGarment = standardGarmentCost / tier.MarginDenominator;
+        const markedUpGarment = baseGarmentCost / tier.MarginDenominator;
         const basePrice = markedUpGarment + totalPrintCost;
         const roundedBasePrice = this.roundUpToHalfDollar(basePrice);
         
         // Apply size-specific upcharges
-        Object.keys(garmentsBySize).forEach(size => {
+        sizes.forEach(sizeInfo => {
+            const size = sizeInfo.size;
             const upcharge = upcharges[size] || 0;
             prices[size] = {};
             prices[size][tier.TierLabel] = parseFloat((roundedBasePrice + upcharge).toFixed(2));
@@ -274,28 +274,6 @@ class DTGPricingService {
         return tier;
     }
 
-    /**
-     * Group inventory items by size
-     * @private
-     */
-    groupInventoryBySize(inventory) {
-        const grouped = {};
-        inventory.forEach(item => {
-            if (item.SIZE) {
-                grouped[item.SIZE] = item;
-            }
-        });
-        return grouped;
-    }
-
-    /**
-     * Get garment cost from inventory item
-     * @private
-     */
-    getGarmentCost(garmentData) {
-        // Prefer CASE_PRICE, fall back to PIECE_PRICE
-        return parseFloat(garmentData.CASE_PRICE || garmentData.PIECE_PRICE || 0);
-    }
 
     /**
      * Round up to nearest half dollar
@@ -315,8 +293,29 @@ class DTGPricingService {
      */
     calculateSinglePrice(data, quantity, locationCode, size = 'M') {
         const allPrices = this.calculateAllLocationPrices(data, quantity);
-        if (!allPrices || !allPrices[locationCode] || !allPrices[locationCode][size]) {
+        if (!allPrices || !allPrices[locationCode]) {
             return 0;
+        }
+        
+        // If the requested size doesn't exist, try to find a fallback
+        if (!allPrices[locationCode][size]) {
+            // Try standard sizes in order
+            const fallbackSizes = ['M', 'L', 'S', 'XL'];
+            for (const fallback of fallbackSizes) {
+                if (allPrices[locationCode][fallback]) {
+                    size = fallback;
+                    break;
+                }
+            }
+            // If still not found, use first available size
+            if (!allPrices[locationCode][size]) {
+                const availableSizes = Object.keys(allPrices[locationCode]);
+                if (availableSizes.length > 0) {
+                    size = availableSizes[0];
+                } else {
+                    return 0;
+                }
+            }
         }
         
         const tier = this.getTierForQuantity(data.tiers, quantity);
@@ -352,15 +351,11 @@ class DTGPricingService {
             };
         });
         
-        // Get unique sizes from inventory or use standard sizes
-        let uniqueSizes = [...new Set(data.inventory.map(item => item.SIZE))].filter(Boolean);
+        // Get unique sizes from max prices data
+        let uniqueSizes = data.sizes.map(s => s.size);
         if (uniqueSizes.length === 0) {
             uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
         }
-        uniqueSizes.sort((a, b) => {
-            const sizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
-            return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
-        });
         
         // Build size-based prices for the selected location (for DP5-Helper compatibility)
         const prices = {};
