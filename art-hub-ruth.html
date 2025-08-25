@@ -382,8 +382,8 @@
         <!-- Tab Buttons -->
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('mockup')">Mockup Queue</button>
-            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
             <button class="tab-button" onclick="showTab('sendmockup')">Send Mockup to AE</button>
+            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
         </div>
         
         <!-- Tab Content -->
@@ -808,12 +808,12 @@
         if (tabName === 'mockup') {
             document.querySelectorAll('.tab-button')[0].classList.add('active');
             document.getElementById('mockup-tab').classList.add('active');
-        } else if (tabName === 'requirements') {
-            document.querySelectorAll('.tab-button')[1].classList.add('active');
-            document.getElementById('requirements-tab').classList.add('active');
         } else if (tabName === 'sendmockup') {
-            document.querySelectorAll('.tab-button')[2].classList.add('active');
+            document.querySelectorAll('.tab-button')[1].classList.add('active');
             document.getElementById('sendmockup-tab').classList.add('active');
+        } else if (tabName === 'requirements') {
+            document.querySelectorAll('.tab-button')[2].classList.add('active');
+            document.getElementById('requirements-tab').classList.add('active');
         }
         
         // Save preference
