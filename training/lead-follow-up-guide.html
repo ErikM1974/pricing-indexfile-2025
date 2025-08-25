@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Lead Follow-Up Guide - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --wsu-crimson: #981e32;
+            --wsu-crimson-dark: #7a182a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, var(--wsu-crimson) 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .executive-summary h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .content-section h2 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .content-section h3 {
+            color: var(--primary-color);
+            margin: 1.5rem 0 1rem;
+            font-size: 1.125rem;
+        }
+
+        .content-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            margin: 1rem 0 1rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timeline Table */
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .timeline-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .timeline-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timeline-table tr:hover {
+            background: var(--bg-color);
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .timeline-badge.immediate {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .timeline-badge.quick {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .timeline-badge.followup {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .timeline-badge.nurture {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* BANT Scoring */
+        .bant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .bant-card {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .bant-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .bant-score {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .score-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Template Examples */
+        .template-example {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .template-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .copy-btn {
+            padding: 0.375rem 0.75rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .template-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+        }
+
+        /* Best Practices */
+        .best-practice {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .best-practice-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .best-practice-content {
+            flex: 1;
+        }
+
+        .best-practice-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .best-practice-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-table th {
+            background: var(--wsu-crimson);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--bg-color);
+        }
+
+        /* Interactive Elements */
+        .interactive-timeline {
+            position: relative;
+            padding: 2rem 0;
+            margin: 2rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin: 0 2rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Accordion */
+        .accordion {
+            margin: 1.5rem 0;
+        }
+
+        .accordion-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: var(--border-color);
+        }
+
+        .accordion-header.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content.active {
+            padding: 1.5rem;
+            max-height: 1000px;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav-header {
+                display: none;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .content-section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .key-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .timeline-line {
+                left: 20px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                flex-direction: row;
+                padding-left: 50px;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Dashboard</span>
+                </a>
+                <h1 class="page-title">
+                    <i class="fas fa-book"></i>
+                    Lead Follow-Up Guide
+                </h1>
+            </div>
+            <div class="nav-right">
+                <a href="lead-email-templates.html" class="nav-btn">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email Templates</span>
+                </a>
+                <button class="nav-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span>Print Guide</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Executive Summary -->
+        <div class="executive-summary">
+            <h2>
+                <i class="fas fa-bullseye"></i>
+                Executive Summary
+            </h2>
+            <p>
+                In the custom apparel industry, where Northwest Custom Apparel specializes in embroidery and screen printing for businesses, effective lead management is crucial for growth. This comprehensive guide provides a systematic approach to nurturing leads from initial contact through conversion, leveraging industry best practices and data-driven strategies.
+            </p>
+            <div class="key-metrics">
+                <div class="metric-card">
+                    <div class="metric-value">12-24hrs</div>
+                    <div class="metric-label">Response Time Goal</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">6-8</div>
+                    <div class="metric-label">Touchpoints Over 2 Weeks</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">20-30%</div>
+                    <div class="metric-label">Target Conversion Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">47%</div>
+                    <div class="metric-label">Higher Order Value</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lead Capture Process -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-inbox"></i>
+                Lead Capture and CRM Integration
+            </h2>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Critical First Step:</strong> All leads must be entered into ShopWorks within 10-15 minutes of receipt. This ensures no opportunities are lost and enables automated follow-up reminders.
+                </div>
+            </div>
+
+            <h3>Immediate Actions Upon Lead Receipt</h3>
+            <ol>
+                <li><strong>Assign to Account Executive (AE)</strong> - Based on territory, industry, or availability</li>
+                <li><strong>Log in ShopWorks Marketing Database</strong> - Include all contact details and request specifics</li>
+                <li><strong>Attach Logo/Artwork</strong> - For quick mock-up generation</li>
+                <li><strong>Score Lead Using BANT Criteria</strong> - Prioritize high-value opportunities</li>
+                <li><strong>Set Follow-Up Reminder</strong> - Automated alert for 12-hour response</li>
+            </ol>
+
+            <h3>Custom Fields for Apparel-Specific Notes</h3>
+            <ul>
+                <li>Decoration Type (Embroidery vs. Screen Print vs. DTG)</li>
+                <li>Garment Preference (Carhartt, Polos, T-shirts, etc.)</li>
+                <li>Quantity Range (Small batch vs. Bulk order)</li>
+                <li>Timeline (Rush vs. Standard vs. Future planning)</li>
+                <li>Budget Indicator (Price-sensitive vs. Quality-focused)</li>
+            </ul>
+        </div>
+
+        <!-- BANT Scoring System -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-star"></i>
+                BANT Lead Scoring System
+            </h2>
+            <p>
+                Score each lead based on Budget, Authority, Need, and Timeline. Leads scoring 40-50 points should receive immediate priority attention.
+            </p>
+
+            <div class="bant-grid">
+                <div class="bant-card">
+                    <h4>Budget (0-15 points)</h4>
+                    <div class="bant-score">
+                        <span>Stated budget > $5,000</span>
+                        <span class="score-value">15 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Budget $1,000-$5,000</span>
+                        <span class="score-value">10 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Budget < $1,000</span>
+                        <span class="score-value">5 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>No budget mentioned</span>
+                        <span class="score-value">0 pts</span>
+                    </div>
+                </div>
+
+                <div class="bant-card">
+                    <h4>Authority (0-15 points)</h4>
+                    <div class="bant-score">
+                        <span>Owner/C-Level</span>
+                        <span class="score-value">15 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Manager/Director</span>
+                        <span class="score-value">10 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Influencer/Committee</span>
+                        <span class="score-value">5 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Unknown role</span>
+                        <span class="score-value">0 pts</span>
+                    </div>
+                </div>
+
+                <div class="bant-card">
+                    <h4>Need (0-10 points)</h4>
+                    <div class="bant-score">
+                        <span>Specific requirements</span>
+                        <span class="score-value">10 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>General inquiry</span>
+                        <span class="score-value">5 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Just browsing</span>
+                        <span class="score-value">2 pts</span>
+                    </div>
+                </div>
+
+                <div class="bant-card">
+                    <h4>Timeline (0-10 points)</h4>
+                    <div class="bant-score">
+                        <span>Immediate (< 2 weeks)</span>
+                        <span class="score-value">10 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>This month</span>
+                        <span class="score-value">7 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>This quarter</span>
+                        <span class="score-value">4 pts</span>
+                    </div>
+                    <div class="bant-score">
+                        <span>Future/Unknown</span>
+                        <span class="score-value">1 pt</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>Qualification Threshold:</strong> Leads scoring 30+ points (3 out of 4 BANT criteria) should be considered qualified and receive priority follow-up.
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline and Cadence -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-clock"></i>
+                Follow-Up Timeline and Cadence
+            </h2>
+            
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th>Timing</th>
+                        <th>Action</th>
+                        <th>Channel</th>
+                        <th>Example/Template</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="timeline-badge immediate">Immediate</span></td>
+                        <td>Log in ShopWorks</td>
+                        <td>CRM</td>
+                        <td>Enter all details, score lead, assign AE</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td><span class="timeline-badge quick">12-24 Hours</span></td>
+                        <td>Acknowledgment</td>
+                        <td>Email</td>
+                        <td>Thank you, recap order, offer mock-up</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><span class="timeline-badge quick">Day 1-2</span></td>
+                        <td>Rapport Building</td>
+                        <td>Phone</td>
+                        <td>Discuss needs, timeline, budget</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><span class="timeline-badge followup">Day 3-5</span></td>
+                        <td>Value Nurture</td>
+                        <td>Email/Social</td>
+                        <td>Branding tips, case studies, samples</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><span class="timeline-badge followup">Day 7-10</span></td>
+                        <td>Incentive Push</td>
+                        <td>SMS/Email</td>
+                        <td>Limited-time discount, free shipping</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><span class="timeline-badge nurture">After 2 Weeks</span></td>
+                        <td>Close/Archive</td>
+                        <td>Email</td>
+                        <td>Final nudge or move to drip campaign</td>
+                        <td>Low</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Speed Matters:</strong> 50% of B2B buyers choose the vendor that responds first. Aim for initial response within 12 hours maximum.
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Channel Strategy -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-share-alt"></i>
+                Multi-Channel Nurturing Strategy
+            </h2>
+
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>📧 Email Channel</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <h4>Email Best Practices</h4>
+                        <ul>
+                            <li>Personalize subject lines with company name or specific request</li>
+                            <li>Keep initial emails under 150 words</li>
+                            <li>Include visual mock-ups or samples in second email</li>
+                            <li>Use clear CTAs (Schedule Demo, Get Quote, View Samples)</li>
+                            <li>A/B test subject lines for 20% better open rates</li>
+                        </ul>
+                        <p><strong>Optimal Send Times:</strong> Tuesday-Thursday, 10-11 AM or 2-3 PM local time</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>📞 Phone Channel</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <h4>Phone Follow-Up Strategy</h4>
+                        <ul>
+                            <li>Call 1-2 days after initial email for warm handoff</li>
+                            <li>Best times: Tuesday-Thursday, 10-11 AM or 2-4 PM</li>
+                            <li>Leave voicemail with specific value proposition</li>
+                            <li>Reference their specific request/logo</li>
+                            <li>Maximum 3 call attempts before switching channels</li>
+                        </ul>
+                        <p><strong>Voicemail Script:</strong> "Hi [Name], this is [Your Name] from Northwest Custom Apparel. I received your request for [specific item] and have some great ideas for your [company/event]. I'll send you a mock-up by email, but I'd love to discuss your timeline and any specific requirements. You can reach me at 253-922-5793."</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>💬 SMS/Text Channel</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <h4>SMS Best Practices</h4>
+                        <ul>
+                            <li>Only use after permission granted or existing relationship</li>
+                            <li>Keep messages under 160 characters</li>
+                            <li>Include opt-out instructions</li>
+                            <li>Best for: Appointment reminders, shipping updates, urgent offers</li>
+                            <li>Response rate: 45% within 3 minutes</li>
+                        </ul>
+                        <p><strong>Example:</strong> "Hi [Name]! Your custom apparel mock-up is ready. Check your email or text YES for me to call with details. Reply STOP to opt out. -[Your Name], NWCA"</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>💼 LinkedIn/Social Channel</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <h4>Social Media Engagement</h4>
+                        <ul>
+                            <li>Connect on LinkedIn after first email</li>
+                            <li>Share relevant content (not sales pitches)</li>
+                            <li>Comment on their company updates</li>
+                            <li>Send InMail only if email bounces</li>
+                            <li>Use for relationship building, not hard selling</li>
+                        </ul>
+                        <p><strong>LinkedIn Message Template:</strong> "Hi [Name], I noticed your company [recent achievement/news]. Congrats! I sent over some ideas for your custom apparel request. Looking forward to working with [Company Name]. -[Your Name]"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Templates -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-envelope"></i>
+                Email Template Examples
+            </h2>
+
+            <div class="template-example">
+                <div class="template-header">
+                    <span class="template-title">Initial Response (12-24 hours)</span>
+                    <button class="copy-btn" onclick="copyTemplate('initial')">Copy Template</button>
+                </div>
+                <div class="template-content" id="template-initial">Subject: Re: Your Custom [Embroidery/Screen Print] Request - [Company Name]
+
+Hi [Name],
+
+Thank you for reaching out to Northwest Custom Apparel! I'm excited to help with your [specific request - e.g., embroidered polos for your team].
+
+I've reviewed your requirements for [quantity] [garment type] with [decoration type], and I have some great options that would work perfectly for [company/event].
+
+Next steps:
+✓ I'll prepare a digital mock-up using your logo
+✓ You'll receive pricing options within 24 hours
+✓ We can schedule a quick call to discuss any specific needs
+
+Quick question: Do you have a preferred garment brand (Carhartt, Nike, Port Authority), or would you like recommendations based on your use case?
+
+Best regards,
+[Your Name]
+[Your Title] | Northwest Custom Apparel
+📞 253-922-5793 | ✉️ [your email]</div>
+            </div>
+
+            <div class="template-example">
+                <div class="template-header">
+                    <span class="template-title">Mock-up Ready (Day 2-3)</span>
+                    <button class="copy-btn" onclick="copyTemplate('mockup')">Copy Template</button>
+                </div>
+                <div class="template-content" id="template-mockup">Subject: Your Custom Design is Ready! - [Company Name]
+
+Hi [Name],
+
+Great news! I've created a mock-up of your custom [product] – check it out!
+
+[Attach mock-up image]
+
+Here's what I've prepared for you:
+• [Garment description and color]
+• [Decoration method and location]
+• [Special features or notes]
+
+Pricing for [quantity] pieces:
+• Option 1: $[price] per piece - [Standard delivery]
+• Option 2: $[price] per piece - [Rush delivery]
+• Bulk discount available for 72+ pieces
+
+The mock-up can be adjusted – different colors, placement, or garment styles are no problem.
+
+Would you prefer to review this over a quick call, or should I send additional options?
+
+[Your Name]
+P.S. We're running a special this month: Free shipping on orders over $500!</div>
+            </div>
+
+            <div class="template-example">
+                <div class="template-header">
+                    <span class="template-title">Value Nurture (Day 3-5)</span>
+                    <button class="copy-btn" onclick="copyTemplate('nurture')">Copy Template</button>
+                </div>
+                <div class="template-content" id="template-nurture">Subject: 3 Tips for Perfect Company Apparel - [Company Name]
+
+Hi [Name],
+
+While you're considering your custom apparel options, I thought you might find these tips helpful:
+
+1. **Fabric Matters for Your Industry**
+   - Construction/Outdoor: Carhartt or similar durables last 3x longer
+   - Office/Sales: Moisture-wicking polos keep teams comfortable
+   - Events: Tri-blend tees offer the softest feel
+
+2. **Logo Placement Best Practices**
+   - Left chest: Professional, standard placement
+   - Full back: Maximum visibility for events
+   - Sleeve: Modern, subtle branding
+
+3. **Color Psychology in Branding**
+   - Did you know consistent brand colors increase recognition by 80%?
+
+By the way, here's how we helped [Similar Company] with their apparel needs:
+[Link to case study or testimonial]
+
+Still happy to discuss your [specific request] whenever you're ready!
+
+[Your Name]</div>
+            </div>
+
+            <div class="template-example">
+                <div class="template-header">
+                    <span class="template-title">Incentive Offer (Day 7-10)</span>
+                    <button class="copy-btn" onclick="copyTemplate('incentive')">Copy Template</button>
+                </div>
+                <div class="template-content" id="template-incentive">Subject: 🎁 Special Offer Expires Friday - [Company Name]
+
+Hi [Name],
+
+I wanted to make sure you saw the mock-up I sent for your [product request].
+
+To help with your decision, I've secured a special offer for you:
+
+**This Week Only:**
+• 10% off orders placed by Friday
+• FREE shipping (normally $50-75)
+• FREE digitizing of your logo ($75 value)
+• Total savings: Up to $200
+
+This brings your price down to just $[price] per piece for premium [product type].
+
+Plus, we can still meet your [timeline/event date] with time to spare.
+
+Want to lock in these savings? Just reply with "YES" and I'll send the official quote.
+
+[Your Name]
+P.S. This offer is exclusive to new customers and expires Friday at 5 PM.</div>
+            </div>
+
+            <div class="template-example">
+                <div class="template-header">
+                    <span class="template-title">Break-up Email (After 2 weeks)</span>
+                    <button class="copy-btn" onclick="copyTemplate('breakup')">Copy Template</button>
+                </div>
+                <div class="template-content" id="template-breakup">Subject: Should I close your file? - [Company Name]
+
+Hi [Name],
+
+I haven't heard back about your custom [product] request, so I wanted to check in one last time.
+
+I understand priorities change, and you might be:
+• Gathering approvals
+• Waiting on budget confirmation
+• Exploring other options
+• Just busy with other projects
+
+If you'd like me to:
+→ Check back in a month
+→ Send different options
+→ Adjust the pricing
+→ Close your file for now
+
+Just let me know with a quick reply.
+
+Otherwise, I'll archive your request but keep your mock-up and pricing on file for whenever you're ready.
+
+Thanks for considering Northwest Custom Apparel!
+
+[Your Name]
+P.S. Your mock-up and quote will remain valid for 30 days.</div>
+            </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-award"></i>
+                Industry Best Practices for 2025
+            </h2>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">⚡</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Speed-to-Lead</div>
+                    <div class="best-practice-desc">Respond within 12-24 hours maximum. Companies that respond within an hour are 7x more likely to qualify the lead. Set up auto-responders for immediate acknowledgment.</div>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">🎯</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Personalization at Scale</div>
+                    <div class="best-practice-desc">Reference specific details from their inquiry (logo, event, quantity). Use merge tags for names and companies, but personalize 20-30% of each message. Mention recent company news or achievements found on LinkedIn.</div>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">📊</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Data-Driven Decisions</div>
+                    <div class="best-practice-desc">Track response rates, conversion rates, and average deal size by lead source. A/B test subject lines, send times, and offers. Use ShopWorks reporting to identify patterns in successful conversions.</div>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">🎨</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Visual Selling</div>
+                    <div class="best-practice-desc">Include mock-ups in second touch point. Use before/after examples. Create video walk-throughs for complex orders. Show products in real-world settings.</div>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">🔄</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Persistent Follow-Up</div>
+                    <div class="best-practice-desc">Average of 6-8 touches needed for B2B conversion. Space follow-ups to avoid fatigue (3-3-4 day intervals). Vary channels and content types. Know when to stop (typically after 2-3 weeks of no response).</div>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <div class="best-practice-icon">🤝</div>
+                <div class="best-practice-content">
+                    <div class="best-practice-title">Relationship Building</div>
+                    <div class="best-practice-desc">Focus on being helpful, not pushy. Share industry insights and tips. Connect on LinkedIn for long-term nurturing. Remember: Today's "no" might be tomorrow's "yes".</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Monitoring -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-chart-line"></i>
+                Performance Monitoring & KPIs
+            </h2>
+
+            <h3>Key Metrics to Track</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Target</th>
+                        <th>How to Calculate</th>
+                        <th>Review Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Response Time</td>
+                        <td>< 12 hours</td>
+                        <td>Time from lead receipt to first response</td>
+                        <td>Daily</td>
+                    </tr>
+                    <tr>
+                        <td>Response Rate</td>
+                        <td>> 80%</td>
+                        <td>Leads contacted ÷ Total leads × 100</td>
+                        <td>Weekly</td>
+                    </tr>
+                    <tr>
+                        <td>Conversion Rate</td>
+                        <td>20-30%</td>
+                        <td>Closed deals ÷ Total leads × 100</td>
+                        <td>Monthly</td>
+                    </tr>
+                    <tr>
+                        <td>Average Deal Size</td>
+                        <td>Track trend</td>
+                        <td>Total revenue ÷ Number of deals</td>
+                        <td>Monthly</td>
+                    </tr>
+                    <tr>
+                        <td>Lead Velocity</td>
+                        <td>< 14 days</td>
+                        <td>Average time from lead to close</td>
+                        <td>Monthly</td>
+                    </tr>
+                    <tr>
+                        <td>Touch Points to Close</td>
+                        <td>6-8</td>
+                        <td>Count all interactions before conversion</td>
+                        <td>Quarterly</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Weekly Review Checklist</h3>
+            <ul>
+                <li>Review all open leads and their status</li>
+                <li>Identify stalled opportunities and re-engage</li>
+                <li>Update BANT scores based on new information</li>
+                <li>Analyze which templates/messages get best response</li>
+                <li>Celebrate wins and share successful strategies</li>
+                <li>Identify training needs or process improvements</li>
+            </ul>
+        </div>
+
+        <!-- Challenges and Solutions -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-exclamation-triangle"></i>
+                Common Challenges & Solutions
+            </h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Challenge</th>
+                        <th>Solution</th>
+                        <th>Prevention</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lead goes cold after initial interest</td>
+                        <td>Send value-add content, offer samples, provide social proof</td>
+                        <td>Respond faster, better qualify needs upfront</td>
+                    </tr>
+                    <tr>
+                        <td>Price objections</td>
+                        <td>Focus on value/ROI, offer payment terms, show comparisons</td>
+                        <td>Set expectations early, qualify budget in BANT</td>
+                    </tr>
+                    <tr>
+                        <td>Long decision cycles</td>
+                        <td>Create urgency with limited offers, engage multiple stakeholders</td>
+                        <td>Understand their process, set clear timelines</td>
+                    </tr>
+                    <tr>
+                        <td>Lost to competitor</td>
+                        <td>Follow up in 3 months, maintain relationship</td>
+                        <td>Differentiate better, showcase unique value</td>
+                    </tr>
+                    <tr>
+                        <td>Poor data quality</td>
+                        <td>Regular CRM audits, verify contact info early</td>
+                        <td>Standardize data entry, use required fields</td>
+                    </tr>
+                    <tr>
+                        <td>Inconsistent follow-up</td>
+                        <td>Use ShopWorks automation, set team standards</td>
+                        <td>Create SOPs, use templates, automate reminders</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="content-section">
+            <h2>
+                <i class="fas fa-list-check"></i>
+                Quick Reference Checklist
+            </h2>
+
+            <div class="alert alert-info">
+                <i class="fas fa-bookmark"></i>
+                <div>
+                    <strong>Print this section and keep it at your desk for quick reference!</strong>
+                </div>
+            </div>
+
+            <h3>✅ New Lead Checklist</h3>
+            <ul style="list-style: none;">
+                <li>☐ Enter into ShopWorks within 15 minutes</li>
+                <li>☐ Assign to appropriate AE</li>
+                <li>☐ Calculate BANT score</li>
+                <li>☐ Attach logo/artwork files</li>
+                <li>☐ Set 12-hour follow-up reminder</li>
+                <li>☐ Send acknowledgment email</li>
+                <li>☐ Research company on LinkedIn</li>
+                <li>☐ Prepare mock-up if applicable</li>
+            </ul>
+
+            <h3>📅 Daily Tasks</h3>
+            <ul style="list-style: none;">
+                <li>☐ Check for new leads (9 AM, 1 PM, 4 PM)</li>
+                <li>☐ Complete scheduled follow-ups</li>
+                <li>☐ Update lead statuses in CRM</li>
+                <li>☐ Send mock-ups for yesterday's leads</li>
+                <li>☐ Make phone calls (best: 10-11 AM, 2-4 PM)</li>
+            </ul>
+
+            <h3>📊 Weekly Tasks</h3>
+            <ul style="list-style: none;">
+                <li>☐ Review pipeline with team</li>
+                <li>☐ Update BANT scores</li>
+                <li>☐ Clean up stalled opportunities</li>
+                <li>☐ Analyze conversion metrics</li>
+                <li>☐ Prepare next week's follow-up schedule</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Copy template function
+        function copyTemplate(templateId) {
+            const template = document.getElementById('template-' + templateId);
+            const text = template.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Change button text temporarily
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Accordion toggle
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isActive = header.classList.contains('active');
+            
+            // Close all accordions
+            document.querySelectorAll('.accordion-header').forEach(h => {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            });
+            
+            // Open clicked accordion if it wasn't active
+            if (!isActive) {
+                header.classList.add('active');
+                content.classList.add('active');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

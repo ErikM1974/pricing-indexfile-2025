@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Lead Email Templates - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --wsu-crimson: #981e32;
+            --wsu-crimson-dark: #7a182a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, var(--wsu-crimson) 0%, #b82940 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: white;
+            border-color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-width: 250px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            flex: 1;
+            font-size: 0.875rem;
+        }
+
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Template Card */
+        .template-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
+        }
+
+        .template-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .template-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-category.initial {
+            color: var(--info);
+            background: #dbeafe;
+        }
+
+        .template-category.followup {
+            color: var(--warning);
+            background: #fef3c7;
+        }
+
+        .template-category.nurture {
+            color: var(--success);
+            background: #d1fae5;
+        }
+
+        .template-category.closing {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .template-category.industry {
+            color: var(--primary-color);
+            background: #dcfce7;
+        }
+
+        .template-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .template-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .template-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .template-subject {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: var(--bg-color);
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .template-content {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: var(--bg-color);
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .template-actions {
+            padding: 1rem 1.5rem;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .template-btn {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .template-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .template-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .template-btn.secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .template-btn.secondary:hover {
+            background: var(--bg-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Variables Helper */
+        .variables-helper {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .variables-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .variable-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .variable-chip {
+            padding: 0.375rem 0.75rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .variable-chip:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            z-index: 10000;
+        }
+
+        .success-message.active {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Dashboard</span>
+                </a>
+                <h1 class="page-title">
+                    <i class="fas fa-envelope"></i>
+                    Email Template Library
+                </h1>
+            </div>
+            <div class="nav-right">
+                <a href="lead-follow-up-guide.html" class="nav-btn">
+                    <i class="fas fa-book"></i>
+                    <span>Follow-Up Guide</span>
+                </a>
+                <button class="nav-btn" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Template</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="filterTemplates('all')">All Templates</button>
+                <button class="filter-btn" onclick="filterTemplates('initial')">Initial Contact</button>
+                <button class="filter-btn" onclick="filterTemplates('followup')">Follow-Up</button>
+                <button class="filter-btn" onclick="filterTemplates('nurture')">Nurturing</button>
+                <button class="filter-btn" onclick="filterTemplates('closing')">Closing</button>
+                <button class="filter-btn" onclick="filterTemplates('industry')">Industry-Specific</button>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search templates..." onkeyup="searchTemplates(this.value)">
+            </div>
+        </div>
+
+        <!-- Template Grid -->
+        <div class="template-grid" id="templateGrid">
+            <!-- Initial Response Template -->
+            <div class="template-card" data-category="initial">
+                <div class="template-header">
+                    <span class="template-category initial">Initial Contact</span>
+                    <h3 class="template-title">First Response (12-24 hours)</h3>
+                    <p class="template-desc">Acknowledge inquiry and set expectations</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Re: Your Custom Apparel Request - [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+Thank you for reaching out to Northwest Custom Apparel! I'm excited to help with your [specific request].
+
+I've reviewed your requirements for [quantity] [garment type] with [decoration type], and I have some great options for you.
+
+Next steps:
+✓ I'll prepare a digital mock-up using your logo
+✓ You'll receive pricing options within 24 hours
+✓ We can schedule a quick call to discuss specifics
+
+Quick question: Do you have a preferred garment brand, or would you like recommendations?
+
+Best regards,
+[Your Name]
+Northwest Custom Apparel
+253-922-5793</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mock-up Ready Template -->
+            <div class="template-card" data-category="followup">
+                <div class="template-header">
+                    <span class="template-category followup">Follow-Up</span>
+                    <h3 class="template-title">Mock-up Ready</h3>
+                    <p class="template-desc">Send when design proof is complete</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Your Custom Design is Ready! - [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+Great news! I've created a mock-up of your custom [product] – check it out!
+
+[Attach mock-up image]
+
+Here's what I've prepared:
+• [Garment description and color]
+• [Decoration method and location]
+• [Special features]
+
+Pricing for [quantity] pieces:
+• Option 1: $[price] per piece - Standard delivery
+• Option 2: $[price] per piece - Rush delivery
+• Bulk discount available for 72+ pieces
+
+The mock-up can be adjusted – different colors, placement, or styles are no problem.
+
+Would you prefer a quick call to review, or should I send additional options?
+
+[Your Name]
+P.S. Free shipping on orders over $500!</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Phone Follow-up Template -->
+            <div class="template-card" data-category="followup">
+                <div class="template-header">
+                    <span class="template-category followup">Follow-Up</span>
+                    <h3 class="template-title">After Phone Call</h3>
+                    <p class="template-desc">Summary email after phone discussion</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Great talking with you! Next steps for [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+Thanks for taking the time to discuss your custom apparel needs today!
+
+As we discussed:
+• [Quantity] [Product type] for your [event/team]
+• [Specific requirements mentioned]
+• Timeline: Delivery by [date]
+• Budget range: $[amount]
+
+Action items:
+□ I'll send revised mock-ups with [changes discussed]
+□ Price comparison for [options discussed]
+□ Sample availability for [product]
+
+I'll have everything to you by [day/time].
+
+Feel free to call me directly at 253-922-5793 with any questions!
+
+[Your Name]</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Educational Content Template -->
+            <div class="template-card" data-category="nurture">
+                <div class="template-header">
+                    <span class="template-category nurture">Nurturing</span>
+                    <h3 class="template-title">Educational Content</h3>
+                    <p class="template-desc">Share valuable tips and insights</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: 3 Tips for Perfect Company Apparel - [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+While you're considering your custom apparel options, here are some industry insights:
+
+1. **Fabric Matters for Your Industry**
+   - Construction: Carhartt durables last 3x longer
+   - Office: Moisture-wicking polos for comfort
+   - Events: Tri-blend tees for softness
+
+2. **Logo Placement Best Practices**
+   - Left chest: Professional standard
+   - Full back: Maximum visibility
+   - Sleeve: Modern, subtle branding
+
+3. **Color Psychology**
+   - Consistent brand colors increase recognition by 80%
+
+Here's how we helped [Similar Company]:
+[Link to case study]
+
+Still happy to discuss your [specific request] whenever you're ready!
+
+[Your Name]</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Limited Time Offer Template -->
+            <div class="template-card" data-category="closing">
+                <div class="template-header">
+                    <span class="template-category closing">Closing</span>
+                    <h3 class="template-title">Limited Time Offer</h3>
+                    <p class="template-desc">Create urgency with special pricing</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: 🎁 Special Offer Expires Friday - [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+I wanted to make sure you saw the mock-up for your [product request].
+
+To help with your decision, I've secured a special offer:
+
+**This Week Only:**
+• 10% off orders placed by Friday
+• FREE shipping (normally $50-75)
+• FREE logo digitizing ($75 value)
+• Total savings: Up to $200
+
+Your price: Just $[price] per piece
+
+Plus, we can still meet your [timeline/event date].
+
+Want to lock in these savings? Reply with "YES" and I'll send the official quote.
+
+[Your Name]
+P.S. This offer expires Friday at 5 PM.</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Break-up Email Template -->
+            <div class="template-card" data-category="closing">
+                <div class="template-header">
+                    <span class="template-category closing">Closing</span>
+                    <h3 class="template-title">Break-up Email</h3>
+                    <p class="template-desc">Final attempt before archiving lead</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Should I close your file? - [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+I haven't heard back about your custom [product] request, so checking in one last time.
+
+I understand priorities change. You might be:
+• Gathering approvals
+• Waiting on budget
+• Exploring options
+• Just busy
+
+If you'd like me to:
+→ Check back next month
+→ Send different options
+→ Adjust pricing
+→ Close your file
+
+Just let me know with a quick reply.
+
+Otherwise, I'll keep your mock-up on file for when you're ready.
+
+Thanks for considering Northwest Custom Apparel!
+
+[Your Name]
+P.S. Your quote remains valid for 30 days.</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Construction Industry Template -->
+            <div class="template-card" data-category="industry">
+                <div class="template-header">
+                    <span class="template-category industry">Industry-Specific</span>
+                    <h3 class="template-title">Construction Companies</h3>
+                    <p class="template-desc">Tailored for construction firms</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Durable Workwear for [Company Name] Crews</div>
+                    <div class="template-content">Hi [Name],
+
+I specialize in outfitting construction crews with durable, professional workwear.
+
+For companies like yours, I recommend:
+
+**Carhartt Options:**
+• Duck Canvas Jackets - withstand tough conditions
+• Moisture-wicking polos - summer comfort
+• Hi-vis safety options available
+
+**Why contractors choose us:**
+✓ Reinforced embroidery for durability
+✓ No minimum reorders for crew additions
+✓ 48-hour rush available for new hires
+✓ Volume discounts for 24+ pieces
+
+Recent project: Outfitted ABC Construction with 150 embroidered Carhartt jackets.
+
+Can I show you some options for your crew?
+
+[Your Name]
+Safety-compliant decoration specialist</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- School District Template -->
+            <div class="template-card" data-category="industry">
+                <div class="template-header">
+                    <span class="template-category industry">Industry-Specific</span>
+                    <h3 class="template-title">Schools & Education</h3>
+                    <p class="template-desc">For school districts and educators</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Spirit Wear Options for [School Name]</div>
+                    <div class="template-content">Hi [Name],
+
+Thank you for considering us for [School Name]'s apparel needs!
+
+We specialize in school orders with:
+
+**Popular Options:**
+• Spirit wear for students/parents
+• Staff polos with school logo
+• Team uniforms and warm-ups
+• Graduation/event shirts
+
+**School-Friendly Features:**
+✓ Online stores for easy parent ordering
+✓ Fundraising options (you keep 15-20%)
+✓ No setup fees for repeat orders
+✓ PO/Net 30 terms available
+
+We currently serve 12 local districts including [nearby schools].
+
+Would you like to see samples from other schools we've worked with?
+
+[Your Name]
+Education Partner Specialist</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Healthcare Template -->
+            <div class="template-card" data-category="industry">
+                <div class="template-header">
+                    <span class="template-category industry">Industry-Specific</span>
+                    <h3 class="template-title">Healthcare & Medical</h3>
+                    <p class="template-desc">For medical facilities and practices</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Professional Medical Apparel for [Facility Name]</div>
+                    <div class="template-content">Hi [Name],
+
+We understand the unique apparel needs of healthcare facilities.
+
+**Healthcare Solutions:**
+• Embroidered scrubs with name/title
+• Professional lab coats
+• Soft-touch patient comfort wear
+• Antimicrobial fabric options
+
+**Why medical facilities choose us:**
+✓ HIPAA-compliant ordering process
+✓ Individual personalization
+✓ Consistent colors across orders
+✓ Quick turnaround for new staff
+
+We proudly serve [Local Hospital] and several medical practices in the area.
+
+Can we discuss your facility's specific needs?
+
+[Your Name]
+Healthcare Apparel Specialist</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event/Trade Show Template -->
+            <div class="template-card" data-category="industry">
+                <div class="template-header">
+                    <span class="template-category industry">Industry-Specific</span>
+                    <h3 class="template-title">Events & Trade Shows</h3>
+                    <p class="template-desc">For event organizers and exhibitors</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Stand Out at [Event Name] - Custom Apparel</div>
+                    <div class="template-content">Hi [Name],
+
+With [Event Name] approaching, let's make sure your team looks professional and unified.
+
+**Event Apparel Solutions:**
+• Matching staff polos/shirts
+• Giveaway items for booth visitors
+• VIP/attendee gift options
+• Rush delivery available
+
+**Trade Show Success Package:**
+✓ 24 staff polos with logo
+✓ 200 giveaway t-shirts
+✓ Booth display banner
+Bundle price: $[amount] (save 15%)
+
+Timeline: 5-7 business days for production
+Rush: 48-hour turnaround available
+
+Previous events: Microsoft Summit, Construction Expo, Healthcare Conference
+
+Ready to make your booth memorable?
+
+[Your Name]
+Event Specialist</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Referral Request Template -->
+            <div class="template-card" data-category="nurture">
+                <div class="template-header">
+                    <span class="template-category nurture">Nurturing</span>
+                    <h3 class="template-title">Referral Request</h3>
+                    <p class="template-desc">Ask satisfied customers for referrals</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Thank you! Quick favor to ask...</div>
+                    <div class="template-content">Hi [Name],
+
+I hope your team is loving their new [product type]!
+
+I wanted to thank you again for choosing Northwest Custom Apparel. Working with [Company Name] has been fantastic.
+
+Quick favor: If you know other businesses that could use quality custom apparel, I'd be grateful for an introduction.
+
+As a thank you, you'll receive:
+• 15% off your next order
+• Same discount for anyone you refer
+
+No pressure at all – just thought I'd ask!
+
+Thanks again for your business.
+
+[Your Name]
+P.S. Need more items? Your reorder has no setup fees!</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sample Request Response -->
+            <div class="template-card" data-category="followup">
+                <div class="template-header">
+                    <span class="template-category followup">Follow-Up</span>
+                    <h3 class="template-title">Sample Request Response</h3>
+                    <p class="template-desc">When leads request physical samples</p>
+                </div>
+                <div class="template-body">
+                    <div class="template-subject">Subject: Sample Options for [Company Name]</div>
+                    <div class="template-content">Hi [Name],
+
+I'd be happy to help you see and feel our quality!
+
+**Sample Options:**
+
+Option 1: Virtual Sample Kit
+• High-res photos of actual products
+• Fabric swatches mailed to you
+• Video walkthrough of options
+• Available immediately
+
+Option 2: Physical Sample (with deposit)
+• Actual garment with your logo
+• $75 deposit (applied to order)
+• 5-7 day turnaround
+• Yours to keep
+
+Option 3: Showroom Visit
+• See our full range in person
+• Touch and feel all options
+• Same-day mock-ups possible
+• By appointment
+
+Which option works best for you?
+
+[Your Name]</div>
+                </div>
+                <div class="template-actions">
+                    <button class="template-btn primary" onclick="copyTemplate(this)">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    <button class="template-btn secondary" onclick="editTemplate(this)">
+                        <i class="fas fa-edit"></i>
+                        Customize
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Template Modal -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Custom Template</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="templateForm">
+                <div class="form-group">
+                    <label class="form-label">Template Name</label>
+                    <input type="text" class="form-input" id="templateName" placeholder="e.g., Welcome Email for Construction Companies">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" id="templateCategory">
+                        <option value="initial">Initial Contact</option>
+                        <option value="followup">Follow-Up</option>
+                        <option value="nurture">Nurturing</option>
+                        <option value="closing">Closing</option>
+                        <option value="industry">Industry-Specific</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subject Line</label>
+                    <input type="text" class="form-input" id="templateSubject" placeholder="e.g., Re: Your Custom Apparel Request">
+                </div>
+
+                <div class="variables-helper">
+                    <div class="variables-title">Click to insert variables:</div>
+                    <div class="variable-chips">
+                        <span class="variable-chip" onclick="insertVariable('[Name]')">[Name]</span>
+                        <span class="variable-chip" onclick="insertVariable('[Company Name]')">[Company Name]</span>
+                        <span class="variable-chip" onclick="insertVariable('[Product]')">[Product]</span>
+                        <span class="variable-chip" onclick="insertVariable('[Quantity]')">[Quantity]</span>
+                        <span class="variable-chip" onclick="insertVariable('[Date]')">[Date]</span>
+                        <span class="variable-chip" onclick="insertVariable('[Your Name]')">[Your Name]</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Body</label>
+                    <textarea class="form-textarea" id="templateBody" placeholder="Type your email template here..."></textarea>
+                </div>
+
+                <div class="template-actions">
+                    <button type="submit" class="template-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save Template
+                    </button>
+                    <button type="button" class="template-btn secondary" onclick="closeModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        <span>Template copied to clipboard!</span>
+    </div>
+
+    <script>
+        // Template Management
+        function copyTemplate(button) {
+            const card = button.closest('.template-card');
+            const content = card.querySelector('.template-content').textContent;
+            
+            navigator.clipboard.writeText(content).then(() => {
+                // Show success message
+                const successMsg = document.getElementById('successMessage');
+                successMsg.classList.add('active');
+                
+                // Update button temporarily
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = '';
+                    successMsg.classList.remove('active');
+                }, 2000);
+            });
+        }
+
+        function editTemplate(button) {
+            const card = button.closest('.template-card');
+            const title = card.querySelector('.template-title').textContent;
+            const subject = card.querySelector('.template-subject').textContent.replace('Subject: ', '');
+            const content = card.querySelector('.template-content').textContent;
+            
+            // Populate modal
+            document.getElementById('templateName').value = title;
+            document.getElementById('templateSubject').value = subject;
+            document.getElementById('templateBody').value = content;
+            
+            // Open modal
+            document.getElementById('templateModal').classList.add('active');
+        }
+
+        function filterTemplates(category) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter cards
+            const cards = document.querySelectorAll('.template-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function searchTemplates(query) {
+            const cards = document.querySelectorAll('.template-card');
+            const searchTerm = query.toLowerCase();
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.template-title').textContent.toLowerCase();
+                const desc = card.querySelector('.template-desc').textContent.toLowerCase();
+                const content = card.querySelector('.template-content').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || desc.includes(searchTerm) || content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function openCreateModal() {
+            // Clear form
+            document.getElementById('templateForm').reset();
+            document.getElementById('templateModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('templateModal').classList.remove('active');
+        }
+
+        function insertVariable(variable) {
+            const textarea = document.getElementById('templateBody');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            textarea.value = text.substring(0, start) + variable + text.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + variable.length, start + variable.length);
+        }
+
+        // Form submission
+        document.getElementById('templateForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Save template to localStorage
+            const template = {
+                name: document.getElementById('templateName').value,
+                category: document.getElementById('templateCategory').value,
+                subject: document.getElementById('templateSubject').value,
+                body: document.getElementById('templateBody').value,
+                created: new Date().toISOString()
+            };
+            
+            // Get existing templates
+            let templates = JSON.parse(localStorage.getItem('nwca_email_templates') || '[]');
+            templates.push(template);
+            localStorage.setItem('nwca_email_templates', JSON.stringify(templates));
+            
+            // Show success and close modal
+            alert('Template saved successfully!');
+            closeModal();
+            
+            // Optionally reload templates
+            location.reload();
+        });
+
+        // Load custom templates on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const customTemplates = JSON.parse(localStorage.getItem('nwca_email_templates') || '[]');
+            
+            // Add custom templates to the grid
+            customTemplates.forEach(template => {
+                // This would add the custom templates to the grid
+                // Implementation depends on your needs
+            });
+        });
+    </script>
+</body>
+</html>
