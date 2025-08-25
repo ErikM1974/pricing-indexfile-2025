@@ -275,10 +275,7 @@
             </div>
         </div>
         
-        <!-- Hidden Caspio Data Source -->
-        <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
-            <!-- Caspio datapage will be loaded dynamically to prevent multiple loads -->
-        </div>
+        <!-- Caspio Data Source Removed - Using Direct API Only -->
         
         <!-- Hidden elements for quote system compatibility -->
         <div id="size-quantity-grid-container" style="display: none;"></div>
@@ -300,10 +297,7 @@
     <!-- New Direct API Service (Phase 1 Migration) -->
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     
-    <!-- Legacy Master Bundle System (To be removed after migration) -->
-    <script src="/shared_components/js/base-adapter.js"></script>
-    <script src="/shared_components/js/dtg-adapter.js"></script>
-    <script src="/shared_components/js/pricing-fallback-adapter.js"></script>
+    <!-- Legacy Master Bundle System Removed - Direct API Only -->
     
     <!-- Universal Components -->
     <script src="/shared_components/js/universal-header-component.js"></script>
@@ -318,8 +312,8 @@
     <!-- DTG Integration Layer -->
     <script src="/shared_components/js/dtg-integration.js"></script>
     
-    <!-- DTG v4 Simplified Single-Page Experience -->
-    <script src="/shared_components/js/dtg-pricing-v4.js"></script>
+    <!-- DTG v4 Simplified Single-Page Experience (Cleaned Version - Direct API Only) -->
+    <script src="/shared_components/js/dtg-pricing-v4-cleaned.js"></script>
     
     <!-- DTG Product Recommendations Modal -->
     <script src="/shared_components/js/dtg-product-recommendations-modal.js"></script>
@@ -347,21 +341,24 @@
             return Promise.resolve();
         };
         
-        // FEATURE FLAG: Toggle between old master bundle and new direct API
-        // Set to true to use new system, false for old system
-        window.USE_DIRECT_API = true; // ENABLED: Both systems produce identical prices
+        // DIRECT API ONLY - Master Bundle System Removed
+        window.USE_DIRECT_API = true; // Permanent - old system removed
         
         // Performance tracking
         window.DTG_PERFORMANCE = {
-            systemUsed: window.USE_DIRECT_API ? 'Direct API' : 'Master Bundle',
+            systemUsed: 'Direct API',
             loadStartTime: performance.now(),
-            metrics: {}
+            metrics: {},
+            debug: new URLSearchParams(window.location.search).get('debug') === 'true'
         };
         
-        // Log which system is active
+        // Log system status
         console.log('===================================');
-        console.log(`🚀 DTG Pricing System: ${window.USE_DIRECT_API ? 'NEW Direct API (ACTIVE)' : 'OLD Master Bundle'}`);
-        console.log('To switch back: window.USE_DIRECT_API = false');
+        console.log('🚀 DTG Pricing System: Direct API Only');
+        console.log('Master Bundle/Caspio system has been removed');
+        if (window.DTG_PERFORMANCE.debug) {
+            console.log('🔍 DEBUG MODE ENABLED');
+        }
         console.log('===================================');
         
         // Initialize on DOM ready

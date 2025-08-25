@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC78ZH Test - Quantity 166 with Left Chest + Full Back</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #2e5827;
+            border-bottom: 2px solid #2e5827;
+            padding-bottom: 10px;
+        }
+        .test-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-controls h2 {
+            margin-top: 0;
+        }
+        .control-group {
+            margin: 15px 0;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        button {
+            background: #2e5827;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #409a47;
+        }
+        .results {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .warning {
+            color: orange;
+            font-weight: bold;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f9f9f9;
+            border-left: 3px solid #ddd;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .log-entry.error {
+            border-left-color: red;
+            background: #fff5f5;
+        }
+        .log-entry.success {
+            border-left-color: green;
+            background: #f5fff5;
+        }
+        .log-entry.warning {
+            border-left-color: orange;
+            background: #fffbf5;
+        }
+        .price-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e5827;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fcf9;
+            border: 2px solid #2e5827;
+            border-radius: 8px;
+            text-align: center;
+        }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 PC78ZH Pricing Test - Debug Mode</h1>
+    
+    <div class="test-controls">
+        <h2>Test Configuration</h2>
+        <div class="control-group">
+            <label>Style Number:</label>
+            <input type="text" id="style" value="PC78ZH" readonly>
+        </div>
+        <div class="control-group">
+            <label>Quantity:</label>
+            <input type="number" id="quantity" value="166" min="1">
+        </div>
+        <div class="control-group">
+            <label>Location:</label>
+            <select id="location">
+                <option value="LC">Left Chest (LC)</option>
+                <option value="FF">Full Front (FF)</option>
+                <option value="FB">Full Back (FB)</option>
+                <option value="LC_FB" selected>Left Chest + Full Back (LC_FB)</option>
+                <option value="FF_FB">Full Front + Full Back (FF_FB)</option>
+                <option value="JF">Jumbo Front (JF)</option>
+                <option value="JB">Jumbo Back (JB)</option>
+                <option value="JF_JB">Jumbo Front + Back (JF_JB)</option>
+                <option value="LC_JB">Left Chest + Jumbo Back (LC_JB)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Color (optional):</label>
+            <input type="text" id="color" placeholder="e.g., Black">
+        </div>
+        <div style="margin-top: 20px;">
+            <button onclick="testDirectAPI()">Test Direct API</button>
+            <button onclick="testFullPage()">Test Full Page</button>
+            <button onclick="clearCache()">Clear Cache</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <div class="results" id="results">
+        <h2>Test Results</h2>
+        <div id="price-display" class="price-display">
+            Press a test button to begin
+        </div>
+        <div id="log"></div>
+    </div>
+
+    <div class="results" style="margin-top: 20px;">
+        <h2>Full Page Test (iframe)</h2>
+        <iframe id="test-frame" style="display: none;"></iframe>
+    </div>
+
+    <script>
+        const log = (message, type = 'info') => {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            console.log(`[TEST ${type.toUpperCase()}]`, message);
+        };
+
+        const clearLog = () => {
+            document.getElementById('log').innerHTML = '';
+            console.clear();
+        };
+
+        const updatePriceDisplay = (price, message = '') => {
+            const display = document.getElementById('price-display');
+            if (price === null || price === undefined) {
+                display.innerHTML = `<span class="error">No price returned</span><br>${message}`;
+            } else if (price === 0) {
+                display.innerHTML = `<span class="warning">$0.00</span><br>${message}`;
+            } else {
+                display.innerHTML = `<span class="success">$${price.toFixed(2)}</span><br>${message}`;
+            }
+        };
+
+        async function testDirectAPI() {
+            clearLog();
+            log('Starting Direct API test...', 'info');
+            
+            const style = document.getElementById('style').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const location = document.getElementById('location').value;
+            const color = document.getElementById('color').value || null;
+            
+            log(`Testing: ${style}, Qty: ${quantity}, Location: ${location}, Color: ${color || 'None'}`, 'info');
+            
+            try {
+                // Load the DTG pricing service
+                const script = document.createElement('script');
+                script.src = '/shared_components/js/dtg-pricing-service.js';
+                document.head.appendChild(script);
+                
+                await new Promise(resolve => {
+                    script.onload = resolve;
+                    script.onerror = () => {
+                        log('Failed to load DTG pricing service', 'error');
+                        resolve();
+                    };
+                });
+                
+                if (!window.DTGPricingService) {
+                    log('DTGPricingService not available', 'error');
+                    return;
+                }
+                
+                log('DTGPricingService loaded successfully', 'success');
+                
+                // Create service instance
+                const service = new window.DTGPricingService();
+                log('Service instance created', 'info');
+                
+                // Enable debug mode
+                window.DTG_PERFORMANCE = { debug: true };
+                
+                // Fetch pricing data
+                log('Fetching pricing data...', 'info');
+                const startTime = performance.now();
+                
+                const data = await service.fetchPricingData(style, color);
+                
+                const fetchTime = performance.now() - startTime;
+                log(`Data fetched in ${fetchTime.toFixed(0)}ms`, 'success');
+                
+                // Log tier information
+                const tier = service.getTierForQuantity(data.tiers, quantity);
+                if (tier) {
+                    log(`Selected tier: ${tier.TierLabel} (${tier.MinQuantity}-${tier.MaxQuantity})`, 'info');
+                } else {
+                    log(`No tier found for quantity ${quantity}!`, 'error');
+                    return;
+                }
+                
+                // Calculate prices
+                log('Calculating prices...', 'info');
+                const allPrices = service.calculateAllLocationPrices(data, quantity);
+                
+                if (!allPrices) {
+                    log('No prices calculated!', 'error');
+                    return;
+                }
+                
+                // Get price for selected location
+                if (allPrices[location]) {
+                    const locationPrices = allPrices[location];
+                    const size = locationPrices['M'] || locationPrices['S'] || Object.keys(locationPrices)[0];
+                    
+                    if (locationPrices[size] && locationPrices[size][tier.TierLabel]) {
+                        const basePrice = locationPrices[size][tier.TierLabel];
+                        let finalPrice = basePrice;
+                        
+                        // Add LTM fee if under 24
+                        if (quantity < 24) {
+                            const ltmFee = 50 / quantity;
+                            finalPrice = basePrice + ltmFee;
+                            log(`LTM fee applied: $${ltmFee.toFixed(2)} per unit`, 'warning');
+                        }
+                        
+                        log(`Base price: $${basePrice.toFixed(2)}`, 'info');
+                        log(`Final price: $${finalPrice.toFixed(2)}`, 'success');
+                        log(`Total: $${(finalPrice * quantity).toFixed(2)}`, 'success');
+                        
+                        updatePriceDisplay(finalPrice, `Per shirt for ${location} at quantity ${quantity}`);
+                    } else {
+                        log(`No price found for size ${size} in tier ${tier.TierLabel}`, 'error');
+                        updatePriceDisplay(null, 'Price not found in data');
+                    }
+                } else {
+                    log(`No prices for location ${location}`, 'error');
+                    updatePriceDisplay(null, 'Location not found');
+                }
+                
+                // Log all available prices for debugging
+                log('All available location prices:', 'info');
+                Object.keys(allPrices).forEach(loc => {
+                    const prices = allPrices[loc];
+                    const size = prices['M'] || prices['S'] || Object.keys(prices)[0];
+                    if (prices[size] && prices[size][tier.TierLabel]) {
+                        log(`  ${loc}: $${prices[size][tier.TierLabel].toFixed(2)}`, 'info');
+                    }
+                });
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+                updatePriceDisplay(null, `Error: ${error.message}`);
+            }
+        }
+
+        async function testFullPage() {
+            clearLog();
+            log('Starting Full Page test...', 'info');
+            
+            const style = document.getElementById('style').value;
+            const quantity = document.getElementById('quantity').value;
+            const location = document.getElementById('location').value;
+            const color = document.getElementById('color').value || '';
+            
+            const url = `/dtg-pricing.html?StyleNumber=${style}&debug=true`;
+            
+            log(`Loading page: ${url}`, 'info');
+            
+            const iframe = document.getElementById('test-frame');
+            iframe.style.display = 'block';
+            iframe.src = url;
+            
+            iframe.onload = () => {
+                log('Page loaded in iframe', 'success');
+                log('Check the iframe below for the full page experience', 'info');
+                log(`Set quantity to ${quantity} and location to ${location} manually in the iframe`, 'warning');
+                
+                // Try to interact with the iframe (may be blocked by CORS)
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    if (iframeWindow.DTGPricingV4) {
+                        log('DTGPricingV4 detected in iframe', 'success');
+                        
+                        // Set quantity and location
+                        setTimeout(() => {
+                            iframeWindow.DTGPricingV4.setQuantity(parseInt(quantity));
+                            iframeWindow.DTGPricingV4.setLocation(location);
+                            log(`Set quantity to ${quantity} and location to ${location} in iframe`, 'success');
+                        }, 2000);
+                    }
+                } catch (e) {
+                    log('Cannot interact with iframe (CORS or different origin)', 'warning');
+                }
+            };
+            
+            iframe.onerror = () => {
+                log('Failed to load page in iframe', 'error');
+            };
+        }
+
+        function clearCache() {
+            if (window.DTGPricingService) {
+                const service = new window.DTGPricingService();
+                service.clearCache();
+                log('Cache cleared', 'success');
+            } else {
+                log('Service not loaded yet', 'warning');
+            }
+            
+            // Also clear sessionStorage and localStorage
+            sessionStorage.clear();
+            localStorage.clear();
+            log('Browser storage cleared', 'success');
+        }
+
+        // Auto-run test if coming from specific URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('autotest') === 'true') {
+            setTimeout(testDirectAPI, 1000);
+        }
+    </script>
+</body>
+</html>

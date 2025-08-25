@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Pricing Complete Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #2e5827;
+            border-bottom: 3px solid #2e5827;
+            padding-bottom: 10px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-card h2 {
+            margin-top: 0;
+            color: #2e5827;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .test-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .test-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .test-value {
+            color: #333;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        button {
+            background: #2e5827;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #409a47;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .log {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+        .log-entry.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .log-entry.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .log-entry.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 DTG Pricing Complete Fix Test Suite</h1>
+    
+    <div class="controls">
+        <h2>Test Controls</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="testLowQuantity()">Test Qty 1-23</button>
+        <button onclick="testNormalQuantity()">Test Qty 24-47</button>
+        <button onclick="testHighQuantity()">Test Qty 166 (72+)</button>
+        <button onclick="testPC78ZH()">Test PC78ZH Specific</button>
+        <button onclick="clearAllTests()">Clear Results</button>
+    </div>
+
+    <div class="test-grid">
+        <!-- Test 1: Quantities Under 24 -->
+        <div class="test-card">
+            <h2>Test 1: Quantities Under 24</h2>
+            <div class="test-row">
+                <span class="test-label">Quantity:</span>
+                <span class="test-value" id="test1-qty">20</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Expected Tier:</span>
+                <span class="test-value">24-47 (with LTM)</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Actual Tier:</span>
+                <span class="test-value" id="test1-tier">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Price per Shirt:</span>
+                <span class="test-value" id="test1-price">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">LTM Fee:</span>
+                <span class="test-value" id="test1-ltm">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test1-status">PENDING</span>
+            </div>
+            <div class="log" id="test1-log"></div>
+        </div>
+
+        <!-- Test 2: Normal Quantities -->
+        <div class="test-card">
+            <h2>Test 2: Normal Quantities (24-47)</h2>
+            <div class="test-row">
+                <span class="test-label">Quantity:</span>
+                <span class="test-value" id="test2-qty">36</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Expected Tier:</span>
+                <span class="test-value">24-47</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Actual Tier:</span>
+                <span class="test-value" id="test2-tier">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Price per Shirt:</span>
+                <span class="test-value" id="test2-price">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test2-status">PENDING</span>
+            </div>
+            <div class="log" id="test2-log"></div>
+        </div>
+
+        <!-- Test 3: High Quantities -->
+        <div class="test-card">
+            <h2>Test 3: High Quantities (166)</h2>
+            <div class="test-row">
+                <span class="test-label">Quantity:</span>
+                <span class="test-value" id="test3-qty">166</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Expected Tier:</span>
+                <span class="test-value">72+</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Actual Tier:</span>
+                <span class="test-value" id="test3-tier">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Price per Shirt:</span>
+                <span class="test-value" id="test3-price">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test3-status">PENDING</span>
+            </div>
+            <div class="log" id="test3-log"></div>
+        </div>
+
+        <!-- Test 4: PC78ZH Specific -->
+        <div class="test-card">
+            <h2>Test 4: PC78ZH with LC_FB</h2>
+            <div class="test-row">
+                <span class="test-label">Style:</span>
+                <span class="test-value">PC78ZH</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Quantity:</span>
+                <span class="test-value">166</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Location:</span>
+                <span class="test-value">Left Chest + Full Back</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Price per Shirt:</span>
+                <span class="test-value" id="test4-price">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Total:</span>
+                <span class="test-value" id="test4-total">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test4-status">PENDING</span>
+            </div>
+            <div class="log" id="test4-log"></div>
+        </div>
+
+        <!-- Test 5: Event Format Validation -->
+        <div class="test-card">
+            <h2>Test 5: Event Format Validation</h2>
+            <div class="test-row">
+                <span class="test-label">Has Headers:</span>
+                <span class="test-value" id="test5-headers">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Has Prices:</span>
+                <span class="test-value" id="test5-prices">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Has TierData:</span>
+                <span class="test-value" id="test5-tierdata">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">DP5-Helper Valid:</span>
+                <span class="test-value" id="test5-dp5">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test5-status">PENDING</span>
+            </div>
+            <div class="log" id="test5-log"></div>
+        </div>
+
+        <!-- Test 6: Live Page Test -->
+        <div class="test-card">
+            <h2>Test 6: Live Page Integration</h2>
+            <div class="test-row">
+                <span class="test-label">Page Loaded:</span>
+                <span class="test-value" id="test6-loaded">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">API Loaded:</span>
+                <span class="test-value" id="test6-api">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Pricing Shown:</span>
+                <span class="test-value" id="test6-pricing">-</span>
+            </div>
+            <div class="test-row">
+                <span class="test-label">Status:</span>
+                <span class="status pending" id="test6-status">PENDING</span>
+            </div>
+            <button onclick="loadLivePage()">Load Live Page</button>
+            <div class="log" id="test6-log"></div>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; background: white; padding: 20px; border-radius: 8px;">
+        <h2>Live Page Test</h2>
+        <iframe id="live-frame" style="display: none;"></iframe>
+    </div>
+
+    <script>
+        let service = null;
+        let lastEventData = null;
+
+        // Helper functions
+        function log(testId, message, type = 'info') {
+            const logEl = document.getElementById(`${testId}-log`);
+            if (logEl) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                logEl.appendChild(entry);
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+            console.log(`[${testId}] ${message}`);
+        }
+
+        function updateStatus(testId, status) {
+            const statusEl = document.getElementById(`${testId}-status`);
+            if (statusEl) {
+                statusEl.textContent = status;
+                statusEl.className = `status ${status.toLowerCase()}`;
+            }
+        }
+
+        function clearTest(testId) {
+            const logEl = document.getElementById(`${testId}-log`);
+            if (logEl) logEl.innerHTML = '';
+            updateStatus(testId, 'PENDING');
+        }
+
+        function clearAllTests() {
+            for (let i = 1; i <= 6; i++) {
+                clearTest(`test${i}`);
+            }
+        }
+
+        // Load DTG pricing service
+        async function loadService() {
+            if (service) return service;
+            
+            const script = document.createElement('script');
+            script.src = '/shared_components/js/dtg-pricing-service.js';
+            document.head.appendChild(script);
+            
+            await new Promise(resolve => {
+                script.onload = resolve;
+                script.onerror = () => {
+                    console.error('Failed to load service');
+                    resolve();
+                };
+            });
+            
+            if (window.DTGPricingService) {
+                service = new window.DTGPricingService();
+                window.DTG_PERFORMANCE = { debug: true };
+            }
+            return service;
+        }
+
+        // Test functions
+        async function testLowQuantity() {
+            clearTest('test1');
+            log('test1', 'Starting low quantity test...', 'info');
+            
+            try {
+                const svc = await loadService();
+                if (!svc) {
+                    log('test1', 'Service not available', 'error');
+                    updateStatus('test1', 'FAIL');
+                    return;
+                }
+                
+                const data = await svc.fetchPricingData('PC78ZH');
+                const quantity = 20;
+                
+                const tier = svc.getTierForQuantity(data.tiers, quantity);
+                document.getElementById('test1-tier').textContent = tier?.TierLabel || 'None';
+                
+                if (tier?.TierLabel !== '24-47') {
+                    log('test1', `Wrong tier: ${tier?.TierLabel}`, 'error');
+                    updateStatus('test1', 'FAIL');
+                    return;
+                }
+                
+                const prices = svc.calculateAllLocationPrices(data, quantity);
+                if (prices && prices['LC'] && prices['LC']['M']) {
+                    const price = prices['LC']['M']['24-47'];
+                    const ltmFee = 50 / quantity;
+                    const total = price + ltmFee;
+                    
+                    document.getElementById('test1-price').textContent = `$${total.toFixed(2)}`;
+                    document.getElementById('test1-ltm').textContent = `$${ltmFee.toFixed(2)}`;
+                    
+                    log('test1', `Price calculated: $${total.toFixed(2)}`, 'success');
+                    updateStatus('test1', 'PASS');
+                } else {
+                    log('test1', 'No price calculated', 'error');
+                    updateStatus('test1', 'FAIL');
+                }
+            } catch (error) {
+                log('test1', `Error: ${error.message}`, 'error');
+                updateStatus('test1', 'FAIL');
+            }
+        }
+
+        async function testNormalQuantity() {
+            clearTest('test2');
+            log('test2', 'Starting normal quantity test...', 'info');
+            
+            try {
+                const svc = await loadService();
+                if (!svc) {
+                    log('test2', 'Service not available', 'error');
+                    updateStatus('test2', 'FAIL');
+                    return;
+                }
+                
+                const data = await svc.fetchPricingData('PC78ZH');
+                const quantity = 36;
+                
+                const tier = svc.getTierForQuantity(data.tiers, quantity);
+                document.getElementById('test2-tier').textContent = tier?.TierLabel || 'None';
+                
+                if (tier?.TierLabel !== '24-47') {
+                    log('test2', `Wrong tier: ${tier?.TierLabel}`, 'error');
+                    updateStatus('test2', 'FAIL');
+                    return;
+                }
+                
+                const prices = svc.calculateAllLocationPrices(data, quantity);
+                if (prices && prices['LC'] && prices['LC']['M']) {
+                    const price = prices['LC']['M']['24-47'];
+                    document.getElementById('test2-price').textContent = `$${price.toFixed(2)}`;
+                    
+                    log('test2', `Price calculated: $${price.toFixed(2)}`, 'success');
+                    updateStatus('test2', 'PASS');
+                } else {
+                    log('test2', 'No price calculated', 'error');
+                    updateStatus('test2', 'FAIL');
+                }
+            } catch (error) {
+                log('test2', `Error: ${error.message}`, 'error');
+                updateStatus('test2', 'FAIL');
+            }
+        }
+
+        async function testHighQuantity() {
+            clearTest('test3');
+            log('test3', 'Starting high quantity test...', 'info');
+            
+            try {
+                const svc = await loadService();
+                if (!svc) {
+                    log('test3', 'Service not available', 'error');
+                    updateStatus('test3', 'FAIL');
+                    return;
+                }
+                
+                const data = await svc.fetchPricingData('PC78ZH');
+                const quantity = 166;
+                
+                const tier = svc.getTierForQuantity(data.tiers, quantity);
+                document.getElementById('test3-tier').textContent = tier?.TierLabel || 'None';
+                
+                if (tier?.TierLabel !== '72+') {
+                    log('test3', `Wrong tier: ${tier?.TierLabel}`, 'error');
+                    updateStatus('test3', 'FAIL');
+                    return;
+                }
+                
+                const prices = svc.calculateAllLocationPrices(data, quantity);
+                if (prices && prices['LC'] && prices['LC']['M']) {
+                    const price = prices['LC']['M']['72+'];
+                    document.getElementById('test3-price').textContent = `$${price.toFixed(2)}`;
+                    
+                    log('test3', `Price calculated: $${price.toFixed(2)}`, 'success');
+                    updateStatus('test3', 'PASS');
+                } else {
+                    log('test3', 'No price calculated', 'error');
+                    updateStatus('test3', 'FAIL');
+                }
+            } catch (error) {
+                log('test3', `Error: ${error.message}`, 'error');
+                updateStatus('test3', 'FAIL');
+            }
+        }
+
+        async function testPC78ZH() {
+            clearTest('test4');
+            log('test4', 'Starting PC78ZH specific test...', 'info');
+            
+            try {
+                const svc = await loadService();
+                if (!svc) {
+                    log('test4', 'Service not available', 'error');
+                    updateStatus('test4', 'FAIL');
+                    return;
+                }
+                
+                const data = await svc.fetchPricingData('PC78ZH', 'Red');
+                const quantity = 166;
+                const location = 'LC_FB';
+                
+                const prices = svc.calculateAllLocationPrices(data, quantity);
+                if (prices && prices[location] && prices[location]['M']) {
+                    const price = prices[location]['M']['72+'];
+                    const total = price * quantity;
+                    
+                    document.getElementById('test4-price').textContent = `$${price.toFixed(2)}`;
+                    document.getElementById('test4-total').textContent = `$${total.toFixed(2)}`;
+                    
+                    log('test4', `LC_FB price: $${price.toFixed(2)}`, 'success');
+                    log('test4', `Total for 166: $${total.toFixed(2)}`, 'success');
+                    updateStatus('test4', 'PASS');
+                } else {
+                    log('test4', 'No price calculated for LC_FB', 'error');
+                    updateStatus('test4', 'FAIL');
+                }
+            } catch (error) {
+                log('test4', `Error: ${error.message}`, 'error');
+                updateStatus('test4', 'FAIL');
+            }
+        }
+
+        async function testEventFormat() {
+            clearTest('test5');
+            log('test5', 'Testing event format...', 'info');
+            
+            try {
+                const svc = await loadService();
+                if (!svc) {
+                    log('test5', 'Service not available', 'error');
+                    updateStatus('test5', 'FAIL');
+                    return;
+                }
+                
+                const data = await svc.fetchPricingData('PC78ZH');
+                const bundle = svc.buildCompatibilityBundle(data, 24, 'LC');
+                
+                // Check required fields
+                const hasHeaders = !!bundle.headers && Array.isArray(bundle.headers);
+                const hasPrices = !!bundle.prices && typeof bundle.prices === 'object';
+                const hasTierData = !!bundle.tierData && typeof bundle.tierData === 'object';
+                
+                document.getElementById('test5-headers').textContent = hasHeaders ? 'Yes' : 'No';
+                document.getElementById('test5-prices').textContent = hasPrices ? 'Yes' : 'No';
+                document.getElementById('test5-tierdata').textContent = hasTierData ? 'Yes' : 'No';
+                
+                // Validate DP5-Helper format
+                const isDP5Valid = hasHeaders && hasPrices && hasTierData &&
+                    bundle.headers.length > 0 && 
+                    Object.keys(bundle.prices).length > 0;
+                
+                document.getElementById('test5-dp5').textContent = isDP5Valid ? 'Yes' : 'No';
+                
+                if (isDP5Valid) {
+                    log('test5', 'Event format is valid', 'success');
+                    log('test5', `Headers: ${bundle.headers.join(', ')}`, 'info');
+                    updateStatus('test5', 'PASS');
+                } else {
+                    log('test5', 'Event format invalid', 'error');
+                    updateStatus('test5', 'FAIL');
+                }
+                
+                lastEventData = bundle;
+            } catch (error) {
+                log('test5', `Error: ${error.message}`, 'error');
+                updateStatus('test5', 'FAIL');
+            }
+        }
+
+        function loadLivePage() {
+            clearTest('test6');
+            log('test6', 'Loading live page...', 'info');
+            
+            const iframe = document.getElementById('live-frame');
+            iframe.style.display = 'block';
+            iframe.src = '/dtg-pricing.html?StyleNumber=PC78ZH&debug=true';
+            
+            iframe.onload = () => {
+                log('test6', 'Page loaded', 'success');
+                document.getElementById('test6-loaded').textContent = 'Yes';
+                
+                // Try to check if components loaded
+                setTimeout(() => {
+                    try {
+                        const iframeWindow = iframe.contentWindow;
+                        
+                        if (iframeWindow.DTGPricingV4) {
+                            document.getElementById('test6-api').textContent = 'Yes';
+                            log('test6', 'DTGPricingV4 detected', 'success');
+                            
+                            // Set quantity to 166 and location to LC_FB
+                            iframeWindow.DTGPricingV4.setQuantity(166);
+                            iframeWindow.DTGPricingV4.setLocation('LC_FB');
+                            
+                            setTimeout(() => {
+                                const state = iframeWindow.DTGPricingV4.getState();
+                                if (state.pricingData) {
+                                    document.getElementById('test6-pricing').textContent = 'Yes';
+                                    log('test6', 'Pricing data loaded', 'success');
+                                    updateStatus('test6', 'PASS');
+                                } else {
+                                    document.getElementById('test6-pricing').textContent = 'No';
+                                    log('test6', 'No pricing data', 'error');
+                                    updateStatus('test6', 'FAIL');
+                                }
+                            }, 3000);
+                        } else {
+                            document.getElementById('test6-api').textContent = 'No';
+                            log('test6', 'DTGPricingV4 not found', 'error');
+                            updateStatus('test6', 'FAIL');
+                        }
+                    } catch (e) {
+                        log('test6', `Cannot access iframe: ${e.message}`, 'error');
+                        updateStatus('test6', 'FAIL');
+                    }
+                }, 2000);
+            };
+        }
+
+        async function runAllTests() {
+            console.log('Running all tests...');
+            await testLowQuantity();
+            await new Promise(r => setTimeout(r, 500));
+            await testNormalQuantity();
+            await new Promise(r => setTimeout(r, 500));
+            await testHighQuantity();
+            await new Promise(r => setTimeout(r, 500));
+            await testPC78ZH();
+            await new Promise(r => setTimeout(r, 500));
+            await testEventFormat();
+        }
+
+        // Auto-run if requested
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('autorun') === 'true') {
+            setTimeout(runAllTests, 1000);
+        }
+    </script>
+</body>
+</html>
