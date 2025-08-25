@@ -35,24 +35,34 @@ class DTGPricingService {
      * @param {string} color - Color name (optional, for inventory filtering)
      * @returns {Object} Combined pricing data
      */
-    async fetchPricingData(styleNumber, color = null) {
+    async fetchPricingData(styleNumber, color = null, forceRefresh = false) {
         const cacheKey = `${styleNumber}-${color || 'all'}`;
         
-        // Special debug logging for PC78ZH
-        if (styleNumber === 'PC78ZH' && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] PC78ZH pricing request:', {
+        // Special debug logging for problematic styles
+        const debugStyles = ['PC78ZH', 'PC78', 'S700'];
+        const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
+        
+        if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
+            console.log(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
                 styleNumber: styleNumber,
                 color: color,
-                cacheKey: cacheKey
+                cacheKey: cacheKey,
+                forceRefresh: forceRefresh
             });
         }
         
-        // Check cache first
-        if (this.cache.has(cacheKey)) {
+        // Check cache first (unless force refresh)
+        if (!forceRefresh && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
             if (Date.now() - cached.timestamp < this.cacheTimeout) {
-                console.log('[DTGPricingService] Returning cached data for:', cacheKey);
-                return cached.data;
+                // Validate cached data before returning
+                if (cached.data && cached.data.inventory && cached.data.inventory.length > 0) {
+                    console.log('[DTGPricingService] Returning cached data for:', cacheKey, 'Items:', cached.data.inventory.length);
+                    return cached.data;
+                } else {
+                    console.warn('[DTGPricingService] Invalid cached data detected, fetching fresh data for:', cacheKey);
+                    this.cache.delete(cacheKey); // Remove bad cache entry
+                }
             }
         }
 
@@ -101,6 +111,23 @@ class DTGPricingService {
 
             const fetchTime = performance.now() - startTime;
             console.log(`[DTGPricingService] Data fetched in ${fetchTime.toFixed(0)}ms`);
+            
+            // Log inventory details for debugging
+            if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
+                console.log(`[DTGPricingService DEBUG] ${styleNumber} inventory:`, {
+                    itemCount: inventory.length,
+                    firstItem: inventory[0],
+                    sizes: [...new Set(inventory.map(i => i.SIZE))].filter(Boolean),
+                    hasPrice: inventory.some(i => i.CASE_PRICE || i.PIECE_PRICE)
+                });
+            }
+            
+            // Validate inventory data
+            if (!inventory || inventory.length === 0) {
+                console.error(`[DTGPricingService] No inventory found for ${styleNumber}`);
+                // Don't cache empty inventory - might be temporary issue
+                throw new Error(`No inventory data available for ${styleNumber}`);
+            }
 
             // Combine and structure the data
             const data = {
@@ -115,8 +142,13 @@ class DTGPricingService {
                 timestamp: Date.now()
             };
 
-            // Cache the result
-            this.cache.set(cacheKey, { data, timestamp: Date.now() });
+            // Only cache valid results
+            if (inventory && inventory.length > 0) {
+                this.cache.set(cacheKey, { data, timestamp: Date.now() });
+                console.log(`[DTGPricingService] Cached ${inventory.length} items for:`, cacheKey);
+            } else {
+                console.warn('[DTGPricingService] Not caching empty inventory for:', cacheKey);
+            }
             
             return data;
             
@@ -171,14 +203,18 @@ class DTGPricingService {
         // Handle combined locations (e.g., 'LC_FB')
         const locationCodes = locationCode.split('_');
         
-        // Special debug for PC78ZH with left chest + full back
-        const isPC78ZH = inventory.some(item => item.STYLE === 'PC78ZH');
-        if (isPC78ZH && locationCode === 'LC_FB' && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] PC78ZH LC_FB calculation:', {
+        // Enhanced debug for problematic styles
+        const debugStyles = ['PC78ZH', 'PC78', 'S700'];
+        const styleNumber = inventory[0]?.STYLE || '';
+        const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
+        
+        if (isDebugStyle && window.DTG_PERFORMANCE?.debug) {
+            console.log(`[DTGPricingService DEBUG] ${styleNumber} ${locationCode} calculation:`, {
                 locationCode: locationCode,
                 locationCodes: locationCodes,
                 tier: tier.TierLabel,
-                costsAvailable: costs.length
+                costsAvailable: costs.length,
+                inventoryCount: inventory.length
             });
         }
         
@@ -200,10 +236,24 @@ class DTGPricingService {
         // Group inventory by size and calculate prices
         const garmentsBySize = this.groupInventoryBySize(inventory);
         
+        // Log grouping results for debug styles
+        if (isDebugStyle && window.DTG_PERFORMANCE?.debug) {
+            console.log(`[DTGPricingService DEBUG] ${styleNumber} grouped inventory:`, {
+                sizes: Object.keys(garmentsBySize),
+                count: Object.keys(garmentsBySize).length,
+                raw: garmentsBySize
+            });
+        }
+        
         // Get standard garment cost (size S or first available)
         const standardGarment = garmentsBySize['S'] || garmentsBySize['M'] || Object.values(garmentsBySize)[0];
         if (!standardGarment) {
-            console.error('[DTGPricingService] No garments found in inventory');
+            console.error('[DTGPricingService] No garments found after grouping:', {
+                styleNumber: styleNumber,
+                inventoryCount: inventory.length,
+                firstItem: inventory[0],
+                groupedSizes: Object.keys(garmentsBySize)
+            });
             return prices;
         }
         
@@ -280,11 +330,22 @@ class DTGPricingService {
      */
     groupInventoryBySize(inventory) {
         const grouped = {};
+        let skippedItems = 0;
+        
         inventory.forEach(item => {
-            if (item.SIZE) {
-                grouped[item.SIZE] = item;
+            // Check for SIZE field (case-insensitive as fallback)
+            const size = item.SIZE || item.Size || item.size;
+            if (size) {
+                grouped[size] = item;
+            } else {
+                skippedItems++;
             }
         });
+        
+        if (skippedItems > 0) {
+            console.warn(`[DTGPricingService] Skipped ${skippedItems} items without SIZE field`);
+        }
+        
         return grouped;
     }
 

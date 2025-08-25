@@ -237,7 +237,28 @@
             
         } catch (error) {
             console.error('[DTG-v4] Failed to load pricing after retries:', error);
-            showError(`Unable to load pricing data. ${error.message || 'Please try refreshing the page.'}`);
+            
+            // Special handling for problematic styles
+            const debugStyles = ['PC78', 'S700'];
+            const isDebugStyle = debugStyles.some(style => state.styleNumber && state.styleNumber.startsWith(style));
+            
+            if (isDebugStyle) {
+                console.error(`[DTG-v4] Debug info for ${state.styleNumber}:`, {
+                    color: state.color || 'Not selected',
+                    error: error.message
+                });
+                
+                // Clear cache for this style
+                if (directAPIService && directAPIService.cache) {
+                    const cacheKey = `${state.styleNumber}-${state.color || 'all'}`;
+                    directAPIService.cache.delete(cacheKey);
+                    console.log('[DTG-v4] Cleared cache for:', cacheKey);
+                }
+                
+                showError(`Unable to load pricing for ${state.styleNumber}. Cache cleared - please try selecting the product again.`);
+            } else {
+                showError(`Unable to load pricing data. ${error.message || 'Please try refreshing the page.'}`);
+            }
         } finally {
             state.isLoading = false;
         }
