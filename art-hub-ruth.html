@@ -314,6 +314,39 @@
         .purple-gradient {
             background: linear-gradient(135deg, #F3E5F5 0%, #EDE7F6 100%) !important;
         }
+        
+        /* CSS Isolation for Caspio forms */
+        .caspio-isolated {
+            all: initial;
+            display: block;
+            width: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .caspio-isolated * {
+            all: revert;
+        }
+        
+        .caspio-isolated table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .caspio-isolated th,
+        .caspio-isolated td {
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .caspio-isolated input,
+        .caspio-isolated select,
+        .caspio-isolated textarea {
+            font-family: inherit;
+            font-size: inherit;
+        }
     </style>
 </head>
 <body>
@@ -350,6 +383,7 @@
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('mockup')">Mockup Queue</button>
             <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
+            <button class="tab-button" onclick="showTab('sendmockup')">Send Mockup to AE</button>
         </div>
         
         <!-- Tab Content -->
@@ -357,8 +391,10 @@
             <!-- Mockup Queue Tab -->
             <div id="mockup-tab" class="tab-pane active">
                 <h2 class="tab-title">Production Mockup Queue</h2>
-                <!-- Caspio Mockup Queue DataPage Embed -->
-                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150003443c5364c5f49f89813/emb"></script>
+                <!-- Caspio Mockup Queue DataPage Embed with isolation -->
+                <div class="caspio-isolated">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150003443c5364c5f49f89813/emb"></script>
+                </div>
             </div>
             
             <!-- Art Requirements & Fees Tab -->
@@ -705,6 +741,15 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Send Mockup to AE Tab -->
+            <div id="sendmockup-tab" class="tab-pane">
+                <h2 class="tab-title">Send Mockup to AE</h2>
+                <!-- Caspio Form with isolation wrapper -->
+                <div class="caspio-isolated">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150006e58bf14e8e149e69a31/emb"></script>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -748,6 +793,8 @@
         const savedTab = localStorage.getItem('ruthDashboardTab');
         if (savedTab === 'requirements') {
             showTab('requirements');
+        } else if (savedTab === 'sendmockup') {
+            showTab('sendmockup');
         }
     });
     
@@ -764,6 +811,9 @@
         } else if (tabName === 'requirements') {
             document.querySelectorAll('.tab-button')[1].classList.add('active');
             document.getElementById('requirements-tab').classList.add('active');
+        } else if (tabName === 'sendmockup') {
+            document.querySelectorAll('.tab-button')[2].classList.add('active');
+            document.getElementById('sendmockup-tab').classList.add('active');
         }
         
         // Save preference

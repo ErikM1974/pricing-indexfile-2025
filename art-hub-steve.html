@@ -185,7 +185,7 @@
             padding: 0;
         }
         
-        /* Caspio isolation for Mockup Queue only */
+        /* Caspio isolation for forms */
         .caspio-isolated {
             /* Reset all inherited styles */
             all: initial;
@@ -201,13 +201,15 @@
             all: revert;
         }
         
-        /* Ensure the tab pane still displays correctly */
-        #mockup-tab.tab-pane.active {
+        /* Ensure the tab panes still display correctly */
+        #mockup-tab.tab-pane.active,
+        #sendmockup-tab.tab-pane.active {
             display: block !important;
         }
         
-        /* Keep the title styled but isolated from Caspio */
-        #mockup-tab .tab-title {
+        /* Keep the titles styled but isolated from Caspio */
+        #mockup-tab .tab-title,
+        #sendmockup-tab .tab-title {
             font-size: 24px;
             font-weight: 600;
             color: #333;
@@ -231,6 +233,7 @@
             <button class="tab-button active" onclick="showTab('gallery')">Gallery View</button>
             <button class="tab-button" onclick="showTab('table')">Table View</button>
             <button class="tab-button" onclick="showTab('mockup')">Mockup Queue</button>
+            <button class="tab-button" onclick="showTab('sendmockup')">Send Mockup to AE</button>
             <button class="tab-button" onclick="showTab('express')">Express Submit Form</button>
             <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
         </div>
@@ -257,6 +260,15 @@
                 <div class="caspio-isolated">
                     <!-- Caspio Artist Mockup Queue DataPage Embed -->
                     <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150003443c5364c5f49f89813/emb"></script>
+                </div>
+            </div>
+            
+            <!-- Send Mockup to AE Tab -->
+            <div id="sendmockup-tab" class="tab-pane">
+                <h2 class="tab-title">Send Completed Mockup to AE</h2>
+                <div class="caspio-isolated">
+                    <!-- Artist Mockup Form to send completed mockup back to AE -->
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000c1e3d4b560a1459bbe89/emb"></script>
                 </div>
             </div>
             
@@ -664,12 +676,16 @@
                 document.querySelectorAll('.tab-button')[2].classList.add('active');
                 document.getElementById('mockup-tab').classList.add('active');
                 break;
-            case 'express':
+            case 'sendmockup':
                 document.querySelectorAll('.tab-button')[3].classList.add('active');
+                document.getElementById('sendmockup-tab').classList.add('active');
+                break;
+            case 'express':
+                document.querySelectorAll('.tab-button')[4].classList.add('active');
                 document.getElementById('express-tab').classList.add('active');
                 break;
             case 'requirements':
-                document.querySelectorAll('.tab-button')[4].classList.add('active');
+                document.querySelectorAll('.tab-button')[5].classList.add('active');
                 document.getElementById('requirements-tab').classList.add('active');
                 break;
         }
@@ -681,7 +697,7 @@
     // Restore saved tab preference on load
     document.addEventListener('DOMContentLoaded', function() {
         const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && ['table', 'mockup', 'express', 'requirements'].includes(savedTab)) {
+        if (savedTab && ['table', 'mockup', 'sendmockup', 'express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
         }
     });
