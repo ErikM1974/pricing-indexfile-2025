@@ -129,6 +129,10 @@ app.get('/art-hub-steve.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-hub-steve.html'));
 });
 
+app.get('/art-hub-ruth.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'art-hub-ruth.html'));
+});
+
 app.get('/announcements-create.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'announcements-create.html'));
 });
