@@ -200,11 +200,20 @@ class DTGPricingService {
             }
         });
         
-        // Find the base garment cost (lowest price)
-        const baseGarmentCost = Math.min(...sizes.map(s => s.maxCasePrice));
+        // Find the base garment cost (lowest valid price, excluding zeros)
+        const validPrices = sizes
+            .map(s => parseFloat(s.maxCasePrice))
+            .filter(price => !isNaN(price) && price > 0);
+        
+        if (validPrices.length === 0) {
+            console.error('[DTGPricingService] No valid garment costs found for any size');
+            return prices;
+        }
+        
+        const baseGarmentCost = Math.min(...validPrices);
         
         if (isNaN(baseGarmentCost) || baseGarmentCost <= 0) {
-            console.error('[DTGPricingService] Invalid garment cost');
+            console.error('[DTGPricingService] Invalid base garment cost:', baseGarmentCost);
             return prices;
         }
         
@@ -216,9 +225,18 @@ class DTGPricingService {
         // Apply size-specific upcharges
         sizes.forEach(sizeInfo => {
             const size = sizeInfo.size;
-            const upcharge = upcharges[size] || 0;
-            prices[size] = {};
-            prices[size][tier.TierLabel] = parseFloat((roundedBasePrice + upcharge).toFixed(2));
+            const sizePrice = parseFloat(sizeInfo.maxCasePrice);
+            
+            // If this size has no valid price ($0), mark as unavailable
+            if (isNaN(sizePrice) || sizePrice <= 0) {
+                prices[size] = {};
+                prices[size][tier.TierLabel] = 'N/A';  // Mark as not available
+                console.warn(`[DTGPricingService] Size ${size} has invalid price, marking as N/A`);
+            } else {
+                const upcharge = upcharges[size] || 0;
+                prices[size] = {};
+                prices[size][tier.TierLabel] = parseFloat((roundedBasePrice + upcharge).toFixed(2));
+            }
         });
         
         return prices;
