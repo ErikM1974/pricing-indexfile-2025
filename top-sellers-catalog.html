@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Top Sellers 2025 - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --wsu-crimson: #981e32;
+            --wsu-grey: #5e6a71;
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--wsu-crimson);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 1;
+        }
+
+        /* Search and Filter Bar */
+        .controls-bar {
+            background: white;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 80px;
+            z-index: 90;
+        }
+
+        .controls-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--wsu-crimson);
+            box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.625rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--wsu-crimson);
+            color: var(--wsu-crimson);
+            background: rgba(152, 30, 50, 0.05);
+        }
+
+        .filter-btn.active {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+        }
+
+        /* Stats Summary */
+        .stats-bar {
+            background: linear-gradient(135deg, var(--wsu-crimson), var(--wsu-grey));
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Product Grid */
+        .content-area {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--wsu-crimson);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-revenue {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 20px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-bestseller {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+        }
+
+        .badge-top-revenue {
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: white;
+        }
+
+        .product-image {
+            position: relative;
+            height: 200px;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .product-image-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.3;
+        }
+
+        .product-content {
+            padding: 1.25rem;
+        }
+
+        .product-header {
+            margin-bottom: 0.75rem;
+        }
+
+        .product-style {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0.25rem 0;
+            line-height: 1.4;
+            min-height: 2.8em;
+        }
+
+        .product-description {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+            min-height: 2.5em;
+        }
+
+        .product-colors {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .color-count {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .product-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.6875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--wsu-crimson);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .controls-container {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .product-image {
+                height: 150px;
+            }
+
+            .product-content {
+                padding: 0.875rem;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>🔥 Top Sellers 2025</h1>
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a> / <span>Top Sellers Catalog</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <span style="font-size: 0.875rem; opacity: 0.9;">Quick Reference for Sales Staff</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search and Filter Controls -->
+    <div class="controls-bar">
+        <div class="controls-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by product name or style number...">
+            </div>
+            <div class="category-filters">
+                <button class="filter-btn active" data-category="all">All Products</button>
+                <button class="filter-btn" data-category="polos">Polos/Knits</button>
+                <button class="filter-btn" data-category="sweatshirts">Sweatshirts</button>
+                <button class="filter-btn" data-category="caps">Caps</button>
+                <button class="filter-btn" data-category="outerwear">Outerwear</button>
+                <button class="filter-btn" data-category="tshirts">T-Shirts</button>
+                <button class="filter-btn" data-category="ladies">Ladies</button>
+                <button class="filter-btn" data-category="accessories">Accessories</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Bar -->
+    <div class="stats-bar">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">$492,783</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">16,838</div>
+                <div class="stat-label">Total Units Sold</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1,112</div>
+                <div class="stat-label">Unique Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$29.28</div>
+                <div class="stat-label">Average Price</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area" id="contentArea">
+        <!-- Products will be loaded here dynamically -->
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalProductTitle">Product Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Product details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data from the PDF analysis
+        const topSellingProducts = {
+            'polos': [
+                {
+                    style: 'ST650',
+                    name: 'Sport-Tek Micropique Sport-Wick Polo',
+                    quantity: 333,
+                    revenue: 9514.00,
+                    avgPrice: 28.57,
+                    rank: 4,
+                    isBestseller: true,
+                    isTopRevenue: true
+                },
+                {
+                    style: 'K524',
+                    name: 'Port Authority Dry Zone Colorblock Ottoman Polo',
+                    quantity: 197,
+                    revenue: 6305.33,
+                    avgPrice: 32.01
+                },
+                {
+                    style: 'K682',
+                    name: 'Port Authority City Stretch Polo',
+                    quantity: 145,
+                    revenue: 4250.00,
+                    avgPrice: 29.31
+                },
+                {
+                    style: '267020',
+                    name: 'Nike Dri-Fit Classic Polo',
+                    quantity: 132,
+                    revenue: 7011.00,
+                    avgPrice: 53.11,
+                    isTopRevenue: true
+                }
+            ],
+            'sweatshirts': [
+                {
+                    style: 'ST850',
+                    name: 'Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover',
+                    quantity: 180,
+                    revenue: 5200.00,
+                    avgPrice: 28.89
+                },
+                {
+                    style: '1379757',
+                    name: 'Under Armour Men\'s Rival Fleece',
+                    quantity: 110,
+                    revenue: 7535.00,
+                    avgPrice: 68.50,
+                    isTopRevenue: true
+                },
+                {
+                    style: 'NF0A7V63',
+                    name: 'The North Face Skyline 1/2-Zip Fleece',
+                    quantity: 95,
+                    revenue: 6800.00,
+                    avgPrice: 71.58
+                }
+            ],
+            'caps': [
+                {
+                    style: 'CP90',
+                    name: 'Port Company Knit Cap',
+                    quantity: 561,
+                    revenue: 7165.00,
+                    avgPrice: 12.77,
+                    rank: 2,
+                    isBestseller: true,
+                    isTopRevenue: true
+                },
+                {
+                    style: 'C112',
+                    name: 'Port Authority Snapback Trucker Cap',
+                    quantity: 392,
+                    revenue: 5973.29,
+                    avgPrice: 15.24,
+                    rank: 3,
+                    isBestseller: true
+                },
+                {
+                    style: 'STC43',
+                    name: 'Sport-Tek YP Classics Curve Bill Snapback Cap',
+                    quantity: 201,
+                    revenue: 3400.00,
+                    avgPrice: 16.92,
+                    rank: 6
+                },
+                {
+                    style: '112',
+                    name: 'Richardson Trucker Cap with Mesh Snap Back',
+                    quantity: 670,
+                    revenue: 12705.55,
+                    avgPrice: 18.97,
+                    isTopRevenue: true
+                }
+            ],
+            'outerwear': [
+                {
+                    style: 'NKFQ4761',
+                    name: 'Nike Pro Hooded Jacket',
+                    quantity: 103,
+                    revenue: 10608.00,
+                    avgPrice: 103.00,
+                    isTopRevenue: true
+                },
+                {
+                    style: 'EB550',
+                    name: 'Eddie Bauer Rain Jacket',
+                    quantity: 62,
+                    revenue: 9718.00,
+                    avgPrice: 156.77,
+                    isTopRevenue: true
+                },
+                {
+                    style: 'EB532',
+                    name: 'Eddie Bauer Soft Shell Jacket',
+                    quantity: 91,
+                    revenue: 7105.00,
+                    avgPrice: 78.08,
+                    isTopRevenue: true
+                }
+            ],
+            'tshirts': [
+                {
+                    style: 'PC55',
+                    name: 'Port & Company Core Cotton Tee',
+                    quantity: 420,
+                    revenue: 3150.00,
+                    avgPrice: 7.50
+                },
+                {
+                    style: 'PC54',
+                    name: 'Port & Company Core Cotton Tee',
+                    quantity: 380,
+                    revenue: 2850.00,
+                    avgPrice: 7.50
+                },
+                {
+                    style: 'K468',
+                    name: 'Port Authority Dry Zone Short Sleeve Raglan Sport Shirt',
+                    quantity: 120,
+                    revenue: 3600.00,
+                    avgPrice: 30.00
+                },
+                {
+                    style: 'PC450',
+                    name: 'Port & Company Fan Favorite Tee',
+                    quantity: 280,
+                    revenue: 2520.00,
+                    avgPrice: 9.00
+                }
+            ],
+            'ladies': [
+                {
+                    style: 'L608',
+                    name: 'Port Authority Ladies Long Sleeve Easy Care Shirt',
+                    quantity: 145,
+                    revenue: 5800.00,
+                    avgPrice: 40.00
+                },
+                {
+                    style: 'L500',
+                    name: 'Port Authority Women\'s Silk Touch Polo',
+                    quantity: 120,
+                    revenue: 3600.00,
+                    avgPrice: 30.00
+                },
+                {
+                    style: 'BB18203',
+                    name: 'Brooks Brothers Women\'s Mid-Layer Stretch',
+                    quantity: 45,
+                    revenue: 3150.00,
+                    avgPrice: 70.00
+                }
+            ],
+            'accessories': [
+                {
+                    style: 'PT400',
+                    name: 'Port Authority Grommeted Hemmed Towel',
+                    quantity: 650,
+                    revenue: 6650.00,
+                    avgPrice: 10.23,
+                    rank: 1,
+                    isBestseller: true
+                },
+                {
+                    style: 'BP60',
+                    name: 'Port Authority Value Fleece Blanket',
+                    quantity: 45,
+                    revenue: 450.00,
+                    avgPrice: 10.00
+                },
+                {
+                    style: 'TB850',
+                    name: 'Port Authority Fleece & Polyester Travel Blanket',
+                    quantity: 44,
+                    revenue: 108.00,
+                    avgPrice: 2.45
+                },
+                {
+                    style: 'BG265',
+                    name: 'Port Authority Backpack',
+                    quantity: 85,
+                    revenue: 5525.00,
+                    avgPrice: 65.00
+                },
+                {
+                    style: 'BG300',
+                    name: 'Port Authority Cotton Canvas Tote',
+                    quantity: 60,
+                    revenue: 3600.00,
+                    avgPrice: 60.00
+                },
+                {
+                    style: 'BG505',
+                    name: 'Port Authority Small Duffel',
+                    quantity: 29,
+                    revenue: 1752.84,
+                    avgPrice: 60.44
+                }
+            ]
+        };
+
+        // Cache for API responses
+        const productCache = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllProducts();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                filterProducts(e.target.value);
+            });
+
+            // Category filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterByCategory(this.dataset.category);
+                });
+            });
+        }
+
+        async function loadAllProducts() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '<div class="loading-card"><div class="loading-spinner"></div><p>Loading top sellers...</p></div>';
+
+            let allProductsHTML = '';
+
+            for (const [category, products] of Object.entries(topSellingProducts)) {
+                const categoryTitle = getCategoryTitle(category);
+                const categoryRevenue = products.reduce((sum, p) => sum + p.revenue, 0);
+
+                let categoryHTML = `
+                    <div class="category-section" data-category="${category}">
+                        <div class="category-header">
+                            <h2 class="category-title">${categoryTitle}</h2>
+                            <span class="category-revenue">Total Revenue: $${categoryRevenue.toFixed(2).toLocaleString()}</span>
+                        </div>
+                        <div class="products-grid">
+                `;
+
+                // Sort products by revenue within category
+                products.sort((a, b) => b.revenue - a.revenue);
+
+                for (const product of products) {
+                    categoryHTML += await createProductCard(product, category);
+                }
+
+                categoryHTML += `
+                        </div>
+                    </div>
+                `;
+
+                allProductsHTML += categoryHTML;
+            }
+
+            contentArea.innerHTML = allProductsHTML;
+        }
+
+        async function createProductCard(product, category) {
+            let productData = productCache[product.style];
+
+            if (!productData) {
+                try {
+                    const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=${product.style}`);
+                    if (response.ok) {
+                        productData = await response.json();
+                        productCache[product.style] = productData;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching product ${product.style}:`, error);
+                }
+            }
+
+            const imageUrl = productData?.colors?.[0]?.MAIN_IMAGE_URL || '';
+            const description = productData?.PRODUCT_DESCRIPTION || '';
+            const colors = productData?.colors || [];
+
+            // Create badges
+            let badges = '';
+            if (product.rank) {
+                badges += `<span class="badge badge-bestseller">#${product.rank} Best Seller</span>`;
+            }
+            if (product.isTopRevenue) {
+                badges += `<span class="badge badge-top-revenue">Top Revenue</span>`;
+            }
+
+            // Create color swatches
+            let colorSwatches = '';
+            if (colors.length > 0) {
+                const displayColors = colors.slice(0, 5);
+                displayColors.forEach(color => {
+                    if (color.COLOR_SQUARE_IMAGE) {
+                        colorSwatches += `<div class="color-swatch" title="${color.COLOR_NAME}">
+                            <img src="${color.COLOR_SQUARE_IMAGE}" alt="${color.COLOR_NAME}">
+                        </div>`;
+                    }
+                });
+                if (colors.length > 5) {
+                    colorSwatches += `<div class="color-count">+${colors.length - 5} more</div>`;
+                }
+            }
+
+            return `
+                <div class="product-card" onclick="showProductDetails('${product.style}')" data-product="${product.style}" data-name="${product.name.toLowerCase()}" data-category="${category}">
+                    ${badges ? `<div class="product-badge">${badges}</div>` : ''}
+                    <div class="product-image">
+                        ${imageUrl ? 
+                            `<img src="${imageUrl}" alt="${product.name}" onerror="this.parentElement.innerHTML='<div class=\\'product-image-placeholder\\'><i class=\\'fas fa-tshirt\\'></i><span>Image not available</span></div>'">` : 
+                            `<div class="product-image-placeholder">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Image not available</span>
+                            </div>`
+                        }
+                    </div>
+                    <div class="product-content">
+                        <div class="product-header">
+                            <div class="product-style">STYLE #${product.style}</div>
+                            <h3 class="product-title">${product.name}</h3>
+                        </div>
+                        <p class="product-description">${cleanDescription(description)}</p>
+                        ${colorSwatches ? `<div class="product-colors">${colorSwatches}</div>` : ''}
+                        <div class="product-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Units Sold</div>
+                                <div class="stat-value">${product.quantity}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Revenue</div>
+                                <div class="stat-value">$${product.revenue.toFixed(0).toLocaleString()}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Avg Price</div>
+                                <div class="stat-value">$${product.avgPrice.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryTitle(category) {
+            const titles = {
+                'polos': 'Polos & Knits',
+                'sweatshirts': 'Sweatshirts & Fleece',
+                'caps': 'Caps & Headwear',
+                'outerwear': 'Outerwear & Jackets',
+                'tshirts': 'T-Shirts',
+                'ladies': 'Ladies Apparel',
+                'accessories': 'Accessories & Bags'
+            };
+            return titles[category] || category;
+        }
+
+        function cleanDescription(description) {
+            // Remove HTML entities and clean up description
+            const div = document.createElement('div');
+            div.innerHTML = description;
+            let text = div.textContent || div.innerText || '';
+            // Limit to first sentence or 100 characters
+            const firstSentence = text.split('.')[0];
+            return firstSentence.length > 100 ? firstSentence.substring(0, 100) + '...' : firstSentence + '.';
+        }
+
+        function filterProducts(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+
+            cards.forEach(card => {
+                const productName = card.dataset.name;
+                const productStyle = card.dataset.product.toLowerCase();
+                const matches = productName.includes(term) || productStyle.includes(term);
+                card.style.display = matches ? 'block' : 'none';
+            });
+
+            // Hide empty categories
+            document.querySelectorAll('.category-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.product-card:not([style*="display: none"])');
+                section.style.display = visibleCards.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        function filterByCategory(category) {
+            const sections = document.querySelectorAll('.category-section');
+
+            if (category === 'all') {
+                sections.forEach(section => section.style.display = 'block');
+                document.querySelectorAll('.product-card').forEach(card => card.style.display = 'block');
+            } else {
+                sections.forEach(section => {
+                    if (section.dataset.category === category) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        async function showProductDetails(styleNumber) {
+            const modal = document.getElementById('productModal');
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.getElementById('modalProductTitle');
+
+            let productData = productCache[styleNumber];
+            if (!productData) {
+                modalBody.innerHTML = '<div class="loading-spinner"></div> Loading product details...';
+                modal.classList.add('active');
+
+                try {
+                    const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=${styleNumber}`);
+                    if (response.ok) {
+                        productData = await response.json();
+                        productCache[styleNumber] = productData;
+                    }
+                } catch (error) {
+                    modalBody.innerHTML = '<p>Error loading product details. Please try again.</p>';
+                    return;
+                }
+            }
+
+            if (productData) {
+                modalTitle.textContent = productData.productTitle || `Style #${styleNumber}`;
+
+                let colorGallery = '';
+                if (productData.colors && productData.colors.length > 0) {
+                    colorGallery = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">';
+                    productData.colors.forEach(color => {
+                        colorGallery += `
+                            <div style="text-align: center;">
+                                <img src="${color.FRONT_MODEL || color.FRONT_FLAT}" alt="${color.COLOR_NAME}" 
+                                     style="width: 100%; border-radius: 8px; margin-bottom: 0.5rem;">
+                                <p style="font-size: 0.875rem; font-weight: 500;">${color.COLOR_NAME}</p>
+                            </div>
+                        `;
+                    });
+                    colorGallery += '</div>';
+                }
+
+                modalBody.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <img src="${productData.colors?.[0]?.MAIN_IMAGE_URL || ''}" alt="${productData.productTitle}" 
+                                 style="width: 100%; border-radius: 8px;">
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Product Details</h4>
+                            <p style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+                                ${productData.PRODUCT_DESCRIPTION || 'No description available'}
+                            </p>
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Available Colors (${productData.colors?.length || 0})</p>
+                        </div>
+                    </div>
+                    ${colorGallery}
+                `;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('productModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

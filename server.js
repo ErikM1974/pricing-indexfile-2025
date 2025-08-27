@@ -182,6 +182,11 @@ app.get('/policies-hub.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'policies-hub.html'));
 });
 
+// Top Sellers Catalog page
+app.get('/top-sellers-catalog.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'top-sellers-catalog.html'));
+});
+
 // Serve the policies directory as static files
 app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOptions));
 
