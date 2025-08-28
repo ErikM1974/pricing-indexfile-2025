@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Hitter Tips Archive - NWCA Training</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --wsu-crimson: #981e32;
+            --wsu-grey: #5e6a71;
+            --wsu-light-grey: #f0f0f0;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--wsu-crimson);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .intro-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--wsu-crimson);
+        }
+
+        .intro-section h2 {
+            color: var(--wsu-crimson);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .intro-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--wsu-crimson);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .tips-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .tip-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .tip-header {
+            background: linear-gradient(135deg, var(--wsu-crimson), #c4365f);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tip-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .tip-date {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .tip-body {
+            padding: 1.5rem;
+        }
+
+        .tip-content table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .new-badge {
+            background: #22c55e;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .no-tips {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .no-tips i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--wsu-crimson);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-lightbulb"></i>
+                Quick Hitter Tips Archive
+            </h1>
+            <a href="/staff-dashboard.html" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>Welcome to Quick Hitter Tips Archive</h2>
+            <p>This is your permanent archive of all quick hitter tips and training references. New tips appear on the dashboard for 14 days, then move here for permanent reference. Use the search bar to quickly find specific information.</p>
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTips">0</div>
+                <div class="stat-label">Total Tips</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="newTips">0</div>
+                <div class="stat-label">New This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="categoryCount">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search tips... (e.g., 'setup fees', 'GRT-50', 'digitizing')">
+        </div>
+
+        <div class="tips-grid" id="tipsContainer">
+            <!-- Tips will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        let allTips = [];
+
+        async function loadTips() {
+            try {
+                const response = await fetch('quick-tips-data.json');
+                const data = await response.json();
+                allTips = data.tips;
+                displayTips(allTips);
+                updateStats();
+            } catch (error) {
+                console.error('Error loading tips:', error);
+                document.getElementById('tipsContainer').innerHTML = `
+                    <div class="no-tips">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Unable to load tips. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayTips(tips) {
+            const container = document.getElementById('tipsContainer');
+            
+            if (tips.length === 0) {
+                container.innerHTML = `
+                    <div class="no-tips">
+                        <i class="fas fa-inbox"></i>
+                        <p>No tips found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = tips.map(tip => {
+                const isNew = isWithinDays(tip.addedDate, 7);
+                const formattedDate = new Date(tip.addedDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                return `
+                    <div class="tip-card">
+                        <div class="tip-header">
+                            <div class="tip-title">
+                                ${tip.title}
+                                ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                            </div>
+                            <div class="tip-date">Added: ${formattedDate}</div>
+                        </div>
+                        <div class="tip-body">
+                            ${tip.content}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function isWithinDays(dateStr, days) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays <= days;
+        }
+
+        function updateStats() {
+            // Total tips
+            document.getElementById('totalTips').textContent = allTips.length;
+            
+            // New tips (within 7 days)
+            const newTipsCount = allTips.filter(tip => isWithinDays(tip.addedDate, 7)).length;
+            document.getElementById('newTips').textContent = newTipsCount;
+            
+            // Categories
+            const categories = [...new Set(allTips.map(tip => tip.category || 'general'))];
+            document.getElementById('categoryCount').textContent = categories.length;
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayTips(allTips);
+                return;
+            }
+
+            const filteredTips = allTips.filter(tip => {
+                const searchContent = (tip.title + ' ' + tip.content).toLowerCase();
+                return searchContent.includes(searchTerm);
+            });
+
+            displayTips(filteredTips);
+        });
+
+        // Load tips on page load
+        loadTips();
+    </script>
+</body>
+</html>
