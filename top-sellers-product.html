@@ -133,13 +133,13 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Product Showcase */
+        /* Product Showcase - Enhanced Catalog Layout */
         .product-showcase {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 3rem auto;
             padding: 0 2rem;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 60% 40%;
             gap: 3rem;
         }
 
@@ -147,18 +147,95 @@
             position: relative;
         }
 
+        /* Main Image Container - Larger and Better */
         .main-image {
             width: 100%;
+            height: 650px;
             border-radius: 12px;
             overflow: hidden;
             background: white;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
         }
 
         .main-image img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: contain;
             display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Image Navigation Dots */
+        .image-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .image-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.4;
+        }
+
+        .image-dot.active {
+            background: var(--primary-color);
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Thumbnail Strip */
+        .thumbnail-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            box-shadow: var(--shadow);
+            opacity: 0.6;
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+            opacity: 1;
+            box-shadow: var(--shadow-md);
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .image-placeholder {
@@ -166,7 +243,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 500px;
+            height: 100%;
+            width: 100%;
             background: linear-gradient(135deg, #f5f7fa, #e5e7eb);
             color: var(--text-secondary);
         }
@@ -177,33 +255,71 @@
             opacity: 0.5;
         }
 
+        /* Color Selection - Enhanced and Larger */
+        .color-selection {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 12px;
+        }
+
+        .color-selection h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .color-swatches {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 1rem;
         }
 
         .color-swatch {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid transparent;
+            text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .color-swatch:hover,
-        .color-swatch.active {
-            border-color: var(--primary-color);
-            transform: scale(1.1);
+        .color-swatch-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+            margin: 0 auto;
         }
 
-        .color-swatch img {
+        .color-swatch.active .color-swatch-image {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.2);
+        }
+
+        .color-swatch:hover .color-swatch-image {
+            transform: scale(1.05);
+        }
+
+        .color-swatch-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .color-name {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .color-swatch.active .color-name {
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
         /* Product Information */
@@ -505,16 +621,22 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- Product Showcase -->
+    <!-- Product Showcase - Enhanced Catalog Style -->
     <div id="productShowcase" class="product-showcase" style="display: none;">
         <div class="product-images">
+            <!-- Main Image with Navigation -->
             <div class="main-image" id="mainImageContainer">
                 <div class="image-placeholder">
                     <i class="fas fa-tshirt"></i>
                     <p>Loading product image...</p>
                 </div>
+                <!-- Image dots will be added dynamically -->
             </div>
-            <div class="color-swatches" id="colorSwatches"></div>
+            
+            <!-- Thumbnail Strip for Different Views -->
+            <div class="thumbnail-strip" id="thumbnailStrip">
+                <!-- Thumbnails will be added dynamically -->
+            </div>
         </div>
 
         <div class="product-info">
@@ -523,6 +645,14 @@
             <div class="product-style" id="productStyle">Style #</div>
             <div class="product-description" id="productDescription">
                 This is one of our most popular products. Perfect for your custom apparel needs.
+            </div>
+
+            <!-- Color Selection Section -->
+            <div class="color-selection" id="colorSelection" style="display: none;">
+                <h3>Select Color</h3>
+                <div class="color-swatches" id="colorSwatches">
+                    <!-- Color swatches will be added dynamically -->
+                </div>
             </div>
 
             <div class="product-features">
@@ -589,6 +719,12 @@
     </footer>
 
     <script>
+        // Global variables for product state
+        let currentProducts = [];
+        let selectedColorIndex = 0;
+        let currentImageType = 'model-front';
+        let availableImages = {};
+        
         // Parse URL parameters
         function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
@@ -619,6 +755,7 @@
                 if (response.ok) {
                     const products = await response.json();
                     if (products && products.length > 0) {
+                        currentProducts = products;
                         displayProduct(products[0], params);
                         displayColors(products);
                         loadRelatedProducts(params.type);
@@ -662,13 +799,16 @@
             };
             document.getElementById('productBadge').textContent = badgeText[params.type] || 'Top Seller';
 
-            // Display main image
-            if (product.FRONT_MODEL || product.FRONT_FLAT) {
-                const imageUrl = product.FRONT_MODEL || product.FRONT_FLAT;
-                document.getElementById('mainImageContainer').innerHTML = `
-                    <img src="${imageUrl}" alt="${product.PRODUCT_TITLE}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-tshirt\\'></i><p>Image not available</p></div>'">
-                `;
-            }
+            // Collect all available images for this product color
+            availableImages = {};
+            if (product.FRONT_MODEL) availableImages['model-front'] = product.FRONT_MODEL;
+            if (product.BACK_MODEL) availableImages['model-back'] = product.BACK_MODEL;
+            if (product.FRONT_FLAT) availableImages['flat-front'] = product.FRONT_FLAT;
+            if (product.BACK_FLAT) availableImages['flat-back'] = product.BACK_FLAT;
+            
+            // Display main image and thumbnails
+            updateMainImage();
+            createThumbnails();
 
             // Update product details
             document.getElementById('categoryValue').textContent = product.CATEGORY_NAME || 'Apparel';
@@ -685,32 +825,186 @@
             }
         }
 
-        // Display color swatches
+        // Display color swatches with click functionality
         function displayColors(products) {
+            currentProducts = products; // Store for later use
             const swatchContainer = document.getElementById('colorSwatches');
-            const displayedColors = new Set();
+            const colorSection = document.getElementById('colorSelection');
+            swatchContainer.innerHTML = ''; // Clear existing
             
-            products.forEach(product => {
-                if (product.COLOR_SQUARE_IMAGE && !displayedColors.has(product.COLOR_NAME)) {
-                    displayedColors.add(product.COLOR_NAME);
-                    const swatch = document.createElement('div');
-                    swatch.className = 'color-swatch';
-                    swatch.title = product.COLOR_NAME;
-                    swatch.innerHTML = `<img src="${product.COLOR_SQUARE_IMAGE}" alt="${product.COLOR_NAME}">`;
-                    swatch.onclick = () => updateMainImage(product);
-                    swatchContainer.appendChild(swatch);
+            // Group products by color and create unique swatches
+            const colorMap = new Map();
+            products.forEach((product, index) => {
+                if (!colorMap.has(product.COLOR_NAME)) {
+                    colorMap.set(product.COLOR_NAME, index);
+                }
+            });
+            
+            // Create swatches for each unique color
+            colorMap.forEach((productIndex, colorName) => {
+                const product = products[productIndex];
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch' + (productIndex === selectedColorIndex ? ' active' : '');
+                swatch.dataset.colorIndex = productIndex;
+                
+                // Create swatch HTML - clicking the COLOR_SQUARE_IMAGE changes main image
+                swatch.innerHTML = `
+                    <div class="color-swatch-image">
+                        ${product.COLOR_SQUARE_IMAGE ? 
+                            `<img src="${product.COLOR_SQUARE_IMAGE}" alt="${colorName}">` : 
+                            `<div style="width:100%; height:100%; background:${getColorHex(colorName)}; border-radius:8px;"></div>`
+                        }
+                    </div>
+                    <div class="color-name">${colorName}</div>
+                `;
+                
+                // Add click handler to change color and update main image
+                swatch.onclick = () => selectColor(productIndex);
+                swatchContainer.appendChild(swatch);
+            });
+            
+            // Show color section if there are colors
+            if (colorMap.size > 0) {
+                colorSection.style.display = 'block';
+            }
+        }
+
+        // Select a color and update images - triggered by clicking color swatch
+        function selectColor(colorIndex) {
+            selectedColorIndex = colorIndex;
+            const product = currentProducts[colorIndex];
+            
+            // Update active swatch
+            document.querySelectorAll('.color-swatch').forEach((swatch, index) => {
+                if (parseInt(swatch.dataset.colorIndex) === colorIndex) {
+                    swatch.classList.add('active');
+                } else {
+                    swatch.classList.remove('active');
+                }
+            });
+            
+            // Collect available images for this color
+            availableImages = {};
+            if (product.FRONT_MODEL) availableImages['model-front'] = product.FRONT_MODEL;
+            if (product.BACK_MODEL) availableImages['model-back'] = product.BACK_MODEL;
+            if (product.FRONT_FLAT) availableImages['flat-front'] = product.FRONT_FLAT;
+            if (product.BACK_FLAT) availableImages['flat-back'] = product.BACK_FLAT;
+            
+            // Reset to front model view when changing colors
+            currentImageType = Object.keys(availableImages)[0] || 'model-front';
+            
+            // Update displays with new color's images
+            updateMainImage();
+            createThumbnails();
+        }
+        
+        // Update the main image display
+        function updateMainImage() {
+            const mainContainer = document.getElementById('mainImageContainer');
+            const imageUrl = availableImages[currentImageType];
+            
+            if (imageUrl) {
+                mainContainer.innerHTML = `
+                    <img src="${imageUrl}" alt="Product Image" 
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-tshirt\\'></i><p>Image not available</p></div>'">
+                `;
+            } else {
+                mainContainer.innerHTML = `
+                    <div class="image-placeholder">
+                        <i class="fas fa-tshirt"></i>
+                        <p>Image not available</p>
+                    </div>
+                `;
+            }
+            
+            // Add image dots if multiple views
+            if (Object.keys(availableImages).length > 1) {
+                addImageDots();
+            }
+        }
+        
+        // Create thumbnail strip for different views (model front/back, flat front/back)
+        function createThumbnails() {
+            const thumbnailStrip = document.getElementById('thumbnailStrip');
+            thumbnailStrip.innerHTML = '';
+            
+            // Define view labels
+            const viewLabels = {
+                'model-front': 'Model Front',
+                'model-back': 'Model Back',
+                'flat-front': 'Flat Front',
+                'flat-back': 'Flat Back'
+            };
+            
+            // Create thumbnails for each available view
+            ['model-front', 'model-back', 'flat-front', 'flat-back'].forEach(viewType => {
+                if (availableImages[viewType]) {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'thumbnail' + (viewType === currentImageType ? ' active' : '');
+                    thumb.dataset.viewType = viewType;
+                    thumb.innerHTML = `
+                        <img src="${availableImages[viewType]}" alt="${viewLabels[viewType]}" 
+                             title="${viewLabels[viewType]}">
+                    `;
+                    thumb.onclick = () => selectView(viewType);
+                    thumbnailStrip.appendChild(thumb);
                 }
             });
         }
-
-        // Update main image when color is clicked
-        function updateMainImage(product) {
-            const imageUrl = product.FRONT_MODEL || product.FRONT_FLAT;
-            if (imageUrl) {
-                document.getElementById('mainImageContainer').innerHTML = `
-                    <img src="${imageUrl}" alt="${product.PRODUCT_TITLE}">
-                `;
-            }
+        
+        // Select a different view (model/flat, front/back)
+        function selectView(viewType) {
+            currentImageType = viewType;
+            
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                if (thumb.dataset.viewType === viewType) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+            
+            // Update main image
+            updateMainImage();
+        }
+        
+        // Add navigation dots to main image
+        function addImageDots() {
+            const existingDots = document.querySelector('.image-dots');
+            if (existingDots) existingDots.remove();
+            
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'image-dots';
+            
+            const imageTypes = Object.keys(availableImages);
+            imageTypes.forEach((type, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'image-dot' + (type === currentImageType ? ' active' : '');
+                dot.onclick = () => selectView(type);
+                dotsContainer.appendChild(dot);
+            });
+            
+            document.getElementById('mainImageContainer').appendChild(dotsContainer);
+        }
+        
+        // Get color hex code for fallback
+        function getColorHex(colorName) {
+            const colors = {
+                'Black': '#000000',
+                'White': '#FFFFFF',
+                'Navy': '#001F3F',
+                'Red': '#FF0000',
+                'Royal': '#4169E1',
+                'Sport Grey': '#8C8C8C',
+                'Charcoal': '#36454F',
+                'Forest Green': '#228B22',
+                'Maroon': '#800000',
+                'Light Blue': '#ADD8E6',
+                'Gold': '#FFD700',
+                'Orange': '#FFA500'
+            };
+            return colors[colorName] || '#CCCCCC';
         }
 
         // Display fallback for non-Sanmar products
