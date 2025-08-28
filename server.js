@@ -75,6 +75,12 @@ app.get('/top-sellers-product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'top-sellers-product.html'));
 });
 
+// Serve top sellers public showcase page
+app.get('/top-sellers-showcase.html', (req, res) => {
+  console.log('Serving top-sellers-showcase.html page');
+  res.sendFile(path.join(__dirname, 'top-sellers-showcase.html'));
+});
+
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
 app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
