@@ -1047,6 +1047,334 @@
             gap: 0.5rem;
         }
 
+        /* Sales Goal Banner */
+        .sales-goal-banner {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: white;
+            padding: 0.75rem 2rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        
+        .sales-goal-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .sales-goal-banner .goal-icon {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .sales-goal-banner .goal-text {
+            display: inline-block;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .sales-goal-banner {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .sales-goal-banner .goal-text {
+                display: block;
+                margin-top: 0.25rem;
+            }
+        }
+
+        /* Quick Tips Widget - Dashboard Card Design */
+        .quick-tips-widget {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        /* Collapsed State - Compact card */
+        .quick-tips-widget.collapsed {
+            cursor: pointer;
+        }
+        
+        .quick-tips-widget.collapsed:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .quick-tips-widget.collapsed .collapsed-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+            padding: 1rem 1.25rem;
+        }
+        
+        .quick-tips-widget.collapsed .collapsed-bar .tip-icon {
+            font-size: 1.25rem;
+        }
+        
+        .quick-tips-widget.collapsed .collapsed-bar .tip-text {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .quick-tips-widget.collapsed .collapsed-bar .expand-icon {
+            color: var(--wsu-crimson);
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .quick-tips-widget.collapsed:hover .collapsed-bar .expand-icon {
+            transform: translateY(-2px);
+        }
+        
+        /* Expanded State - Full tip content */
+        .quick-tips-widget.expanded {
+            overflow-y: auto;
+        }
+        
+        .quick-tips-widget.expanded .collapsed-bar {
+            display: none;
+        }
+        
+        .quick-tips-widget.expanded .expanded-content {
+            display: block;
+        }
+        
+        .quick-tips-widget.collapsed .expanded-content {
+            display: none;
+        }
+
+        .quick-tip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--wsu-crimson);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .quick-tip-title-section {
+            flex: 1;
+        }
+
+        .quick-tip-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .quick-tip-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .quick-tip-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            color: white;
+        }
+
+        .quick-tip-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .quick-tip-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-tip-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .quick-tip-collapse-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-tip-collapse-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(180deg);
+        }
+
+        .quick-tip-content {
+            padding: 1.25rem;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .quick-tip-content table {
+            background: white;
+        }
+
+        .quick-tip-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .quick-tip-nav:hover:not(:disabled) {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .quick-tip-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quick-tip-nav.prev {
+            left: -10px;
+        }
+
+        .quick-tip-nav.next {
+            right: -10px;
+        }
+
+        .quick-tip-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-tip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quick-tip-dot.active {
+            background: rgba(255,255,255,0.8);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .quick-tip-dot:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .quick-tip-content {
+            background: rgba(255,255,255,0.95);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .quick-tip-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .quick-tip-content th,
+        .quick-tip-content td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .quick-tip-footer {
+            margin-top: 1rem;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 0 0 12px 12px;
+        }
+
+        .quick-tip-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-tip-link {
+            color: var(--wsu-crimson);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .quick-tip-link:hover {
+            background: var(--wsu-crimson);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .weather-widget {
                 flex-direction: column;
@@ -2989,6 +3317,12 @@
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
 
+    <!-- Sales Goal Banner -->
+    <div class="sales-goal-banner" id="salesGoalBanner">
+        <span class="goal-icon">🏆</span>
+        <span class="goal-text">Annual Sales Goal: Hit $2.85 million in total revenue by December 31st, 2025</span>
+    </div>
+
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
@@ -3113,6 +3447,12 @@
                             </a>
                             <a href="/training/get-to-know-erik.html" class="nav-link">
                                 <span>Get to Know Erik</span>
+                            </a>
+                            <div style="margin: 0.5rem 0; padding: 0.25rem 0.75rem; font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px;">Quick Reference</div>
+                            <a href="/training/quick-reference-tips.html" class="nav-link" style="background: rgba(255,255,255,0.05); border-left: 2px solid rgba(255,255,255,0.3);">
+                                <i class="fas fa-lightbulb" style="margin-right: 0.5rem; font-size: 0.875rem; color: #ffd700;"></i>
+                                <span>Quick Hitter Tips Archive</span>
+                                <span id="quickTipsCount" style="margin-left: auto; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;">1</span>
                             </a>
                         </div>
                     </div>
@@ -3430,6 +3770,13 @@
                             <i class="fas fa-fire" style="color: white !important;"></i>
                             <span style="color: white !important;">🔥 Top Sellers 2025</span>
                         </a>
+                    </div>
+                    
+                    <!-- Quick Hitter Tips Widget (Shows tips from last 14 days) -->
+                    <div class="quick-tips-widget collapsed" id="quickTipsWidget">
+                        <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">
+                            <i class="fas fa-spinner fa-spin"></i> Loading Quick Hitter Tips...
+                        </div>
                     </div>
                     
                     <!-- Quick Access Calculator Grid -->
@@ -6142,6 +6489,247 @@
             `;
         }
 
+        // Quick Tips Carousel Variables
+        let currentTipIndex = 0;
+        let quickTips = [];
+        let autoPlayInterval = null;
+        let autoPlayEnabled = false;
+
+        // Quick Tips Functions
+        async function loadQuickTips() {
+            console.log('[QuickTips] Starting to load tips...');
+            const widget = document.getElementById('quickTipsWidget');
+            
+            try {
+                // Try relative path
+                const response = await fetch('training/quick-tips-data.json');
+                console.log('[QuickTips] Fetch response:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch tips: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('[QuickTips] Loaded tips data:', data);
+                const tips = data.tips;
+                
+                // Update the count in sidebar
+                const countElement = document.getElementById('quickTipsCount');
+                if (countElement) {
+                    countElement.textContent = tips.length;
+                }
+                
+                // Filter for tips from last 14 days
+                const fourteenDaysAgo = new Date();
+                fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                
+                const recentTips = tips.filter(tip => {
+                    const tipDate = new Date(tip.addedDate);
+                    return tipDate >= fourteenDaysAgo && tip.active;
+                });
+                
+                console.log('[QuickTips] Recent tips found:', recentTips.length);
+                
+                if (recentTips.length > 0) {
+                    quickTips = recentTips; // Store all recent tips
+                    currentTipIndex = 0;
+                    displayQuickTipCarousel(); // Display widget with tip
+                } else {
+                    // No recent tips - hide widget
+                    widget.innerHTML = `
+                        <div style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.7);">
+                            <i class="fas fa-info-circle"></i> No recent tips. Check the 
+                            <a href="training/quick-reference-tips.html" style="color: white; text-decoration: underline;">archive</a> for all tips.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('[QuickTips] Error loading tips:', error);
+                
+                // Show error message in widget
+                if (widget) {
+                    widget.innerHTML = `
+                        <div style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.9);">
+                            <i class="fas fa-exclamation-triangle"></i> Unable to load tips. 
+                            <a href="training/quick-reference-tips.html" style="color: white; text-decoration: underline;">View archive</a>
+                        </div>
+                    `;
+                }
+                
+                // Try fallback - display hardcoded setup fees tip
+                displayFallbackTip();
+            }
+        }
+        
+        // Fallback function with hardcoded tip
+        function displayFallbackTip() {
+            const widget = document.getElementById('quickTipsWidget');
+            if (!widget) return;
+            
+            const fallbackTip = {
+                id: "setup-fees",
+                title: "Setup Fees & Part Numbers",
+                addedDate: "2025-08-28",
+                content: `<div class='tip-content'><h4 style='color: var(--wsu-crimson); margin-bottom: 1rem;'>Standardized Setup Fees</h4><table class='setup-fees-table' style='width: 100%; border-collapse: collapse;'><thead><tr style='background: var(--wsu-grey); color: white;'><th style='padding: 0.75rem; text-align: left; border: 1px solid #ddd;'>Part Number</th><th style='padding: 0.75rem; text-align: left; border: 1px solid #ddd;'>Description</th><th style='padding: 0.75rem; text-align: right; border: 1px solid #ddd;'>Fee</th></tr></thead><tbody><tr><td style='padding: 0.75rem; border: 1px solid #ddd; font-weight: bold;'>GRT-50</td><td style='padding: 0.75rem; border: 1px solid #ddd;'>Logo Mockup & Print Review</td><td style='padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: bold; color: var(--wsu-crimson);'>$50.00</td></tr><tr style='background: #f9f9f9;'><td style='padding: 0.75rem; border: 1px solid #ddd; font-weight: bold;'>GRT-75</td><td style='padding: 0.75rem; border: 1px solid #ddd;'>Graphic Design Services<br><em style='font-size: 0.875rem; color: #666;'>(Billed Hourly)</em></td><td style='padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: bold; color: var(--wsu-crimson);'>$75.00</td></tr><tr><td style='padding: 0.75rem; border: 1px solid #ddd; font-weight: bold;'>SPSU</td><td style='padding: 0.75rem; border: 1px solid #ddd;'>New Screen Set Up Charge</td><td style='padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: bold; color: var(--wsu-crimson);'>$30.00</td></tr><tr style='background: #f9f9f9;'><td style='padding: 0.75rem; border: 1px solid #ddd; font-weight: bold;'>SPRESET</td><td style='padding: 0.75rem; border: 1px solid #ddd;'>Screen Reset Charge</td><td style='padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: bold; color: var(--wsu-crimson);'>$25.00</td></tr><tr><td style='padding: 0.75rem; border: 1px solid #ddd; font-weight: bold;'>DD</td><td style='padding: 0.75rem; border: 1px solid #ddd;'>Digitizing Setup Fee<br><em style='font-size: 0.875rem; color: #666;'>(Embroidery)</em></td><td style='padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: bold; color: var(--wsu-crimson);'>$100.00</td></tr></tbody></table><div style='margin-top: 1rem; padding: 0.75rem; background: #f0f9ff; border-left: 3px solid var(--wsu-crimson); border-radius: 4px;'><h5 style='margin: 0 0 0.5rem 0; color: var(--wsu-crimson);'>Quick Reference:</h5><div style='display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.875rem;'><div><strong>Design Services:</strong> GRT-50 ($50), GRT-75 ($75/hr)</div><div><strong>Screen Printing:</strong> SPSU ($30), SPRESET ($25)</div><div style='grid-column: 1 / -1;'><strong>Embroidery:</strong> DD - Digitizing ($100)</div></div></div></div>`
+            };
+            
+            console.log('[QuickTips] Using fallback tip');
+            quickTips = [fallbackTip]; // Set as array for carousel
+            currentTipIndex = 0;
+            displayQuickTipCarousel();
+        }
+        
+        // Display Quick Tip with collapsed/expanded states
+        function displayQuickTipCarousel() {
+            const widget = document.getElementById('quickTipsWidget');
+            if (!widget || !quickTips || quickTips.length === 0) return;
+            
+            // Get current tip (we only have one now)
+            const tip = quickTips[0];
+            const tipDate = new Date(tip.addedDate);
+            const daysAgo = Math.floor((new Date() - tipDate) / (1000 * 60 * 60 * 24));
+            const isNew = daysAgo <= 7;
+            
+            const formattedDate = tipDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            // Check if widget should be expanded (from localStorage)
+            const isExpanded = localStorage.getItem('quickTipExpanded') === 'true';
+            
+            // Check if tip was dismissed this session
+            const permanentlyDismissed = sessionStorage.getItem('quickTipDismissed') === 'true';
+            if (permanentlyDismissed) {
+                widget.style.display = 'none';
+                return;
+            }
+            
+            // Build widget HTML with both collapsed and expanded content
+            widget.innerHTML = `
+                <!-- Collapsed State Bar -->
+                <div class="collapsed-bar" onclick="toggleQuickTip()">
+                    <span class="tip-icon">💡</span>
+                    <span class="tip-text">Quick Tip: ${tip.title}</span>
+                    <span class="expand-icon">
+                        <i class="fas fa-chevron-up"></i>
+                    </span>
+                </div>
+                
+                <!-- Expanded Content -->
+                <div class="expanded-content">
+                    <div class="quick-tip-header">
+                        <div class="quick-tip-title-section">
+                            <div class="quick-tip-label">
+                                💡 Quick Hitter Tip
+                                ${isNew ? '<span class="quick-tip-badge">NEW</span>' : ''}
+                            </div>
+                            <div class="quick-tip-title">${tip.title}</div>
+                        </div>
+                        <div class="quick-tip-actions">
+                            <button class="quick-tip-collapse-btn" onclick="toggleQuickTip()" title="Collapse">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <button class="quick-tip-btn" onclick="dismissQuickTip()" title="Close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-tip-content" id="quickTipContent">
+                        ${tip.content}
+                    </div>
+                    
+                    <div class="quick-tip-footer">
+                        <span class="quick-tip-date">Added ${formattedDate}</span>
+                        <a href="/training/quick-reference-tips.html" class="quick-tip-link">
+                            View All Tips
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            // Set initial state (collapsed by default, unless user previously expanded)
+            if (isExpanded) {
+                widget.classList.remove('collapsed');
+                widget.classList.add('expanded');
+            } else {
+                widget.classList.add('collapsed');
+                widget.classList.remove('expanded');
+            }
+        }
+        
+        // Toggle between collapsed and expanded states
+        function toggleQuickTip() {
+            const widget = document.getElementById('quickTipsWidget');
+            if (!widget) return;
+            
+            if (widget.classList.contains('collapsed')) {
+                // Expand
+                widget.classList.remove('collapsed');
+                widget.classList.add('expanded');
+                localStorage.setItem('quickTipExpanded', 'true');
+            } else {
+                // Collapse
+                widget.classList.remove('expanded');
+                widget.classList.add('collapsed');
+                localStorage.setItem('quickTipExpanded', 'false');
+            }
+        }
+        
+        
+        // Dismiss the Quick Tip (hides it permanently until page refresh)
+        function dismissQuickTip() {
+            const widget = document.getElementById('quickTipsWidget');
+            if (widget) {
+                // Hide widget
+                widget.style.display = 'none';
+                
+                // Store dismissal in localStorage (won't show again)
+                localStorage.setItem('quickTipDismissed', 'true');
+            }
+        }
+        
+        // Show the Quick Tip again (for testing)
+        function showQuickTip() {
+            const widget = document.getElementById('quickTipsWidget');
+            if (widget) {
+                widget.style.display = 'block';
+                localStorage.removeItem('quickTipDismissed');
+                displayQuickTipCarousel();
+            }
+        }
+
+        // Sales Goal Banner Functions
+        function initializeSalesGoalBanner() {
+            const banner = document.getElementById('salesGoalBanner');
+            if (!banner) return;
+            
+            // Check if we're past December 31st, 2025
+            const currentDate = new Date();
+            const endDate = new Date('2026-01-01'); // January 1st, 2026
+            
+            if (currentDate >= endDate) {
+                // Hide banner after December 31st, 2025
+                banner.style.display = 'none';
+                console.log('[SalesGoalBanner] Hidden - past end date');
+                return;
+            }
+            
+            // Calculate days remaining
+            const daysRemaining = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+            
+            // Update banner text with days remaining (optional enhancement)
+            const goalText = banner.querySelector('.goal-text');
+            if (daysRemaining <= 30 && goalText) {
+                // Add urgency for last 30 days
+                goalText.innerHTML = `Annual Sales Goal: Hit $2.85 million in total revenue by December 31st, 2025 <span style="margin-left: 0.5rem; padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.2); border-radius: 12px; font-size: 0.85em;">${daysRemaining} days left!</span>`;
+            }
+            
+            console.log(`[SalesGoalBanner] Active - ${daysRemaining} days remaining`);
+        }
+
         function getWeatherIcon(condition) {
             const icons = {
                 'Clear': '☀️',
@@ -6171,6 +6759,12 @@
             loadWeatherData();
             // Refresh weather every 10 minutes
             setInterval(loadWeatherData, 600000);
+            
+            // Load Quick Tips
+            loadQuickTips();
+            
+            // Initialize Sales Goal Banner
+            initializeSalesGoalBanner();
             
             // Load all dashboard data
             await Promise.all([
