@@ -627,6 +627,271 @@
             color: var(--text-primary);
         }
 
+        /* Product Actions (Share Buttons) */
+        .product-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.share-btn:hover {
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .action-btn.email-btn:hover {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .action-btn.link-btn:hover {
+            background: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        /* Share Modal */
+        .share-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .share-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        .share-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .share-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        .share-modal-body {
+            padding: 1.5rem;
+        }
+
+        .share-product-info {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-product-info p {
+            margin: 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .share-options {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .share-option-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .share-option-btn i {
+            font-size: 1.125rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .share-link-preview {
+            margin-top: 1.5rem;
+        }
+
+        .share-link-preview label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .link-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .link-input-group input {
+            flex: 1;
+            padding: 0.625rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: var(--bg-color);
+        }
+
+        .copy-btn {
+            padding: 0.625rem 1.25rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 400px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 10001;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 1.25rem;
+        }
+
+        .notification-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-success i {
+            color: var(--success);
+        }
+
+        .notification-error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .notification-error i {
+            color: var(--danger);
+        }
+
+        .notification-info {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-info i {
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         /* Loading State */
         .loading-spinner {
             display: inline-block;
@@ -748,10 +1013,16 @@
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-                <h1>🔥 Top Sellers 2025</h1>
                 <nav class="breadcrumb">
-                    <a href="/staff-dashboard.html">Dashboard</a> / <span>Top Sellers Catalog</span>
+                    <a href="/staff-dashboard.html" style="color: white; text-decoration: none; opacity: 0.9; font-size: 0.875rem;">
+                        <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>Dashboard
+                    </a> 
+                    <span style="margin: 0 0.5rem; opacity: 0.6;">/</span>
+                    <span style="font-size: 0.875rem;">Top Sellers Catalog</span>
                 </nav>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">🔥 Top Sellers 2025</h1>
             </div>
             <div class="header-right">
                 <span style="font-size: 0.875rem; opacity: 0.9;">Quick Reference for Sales Staff</span>
@@ -1176,6 +1447,155 @@
         let currentCategoryFilter = 'all';
 
         // Initialize page
+        // ========== SHARING FUNCTIONS ==========
+        
+        // Generate a shareable public link for a product
+        function generateShareLink(styleNumber, productName, embellishmentType) {
+            const baseUrl = window.location.origin;
+            const params = new URLSearchParams({
+                style: styleNumber,
+                name: productName,
+                type: embellishmentType,
+                ref: 'top-sellers-2025'
+            });
+            return `${baseUrl}/top-sellers-product.html?${params}`;
+        }
+
+        // Share product with modal options
+        function shareProduct(styleNumber, productName, embellishmentType) {
+            const shareUrl = generateShareLink(styleNumber, productName, embellishmentType);
+            
+            // Create and show share modal
+            const modal = document.createElement('div');
+            modal.className = 'share-modal-overlay';
+            modal.innerHTML = `
+                <div class="share-modal">
+                    <div class="share-modal-header">
+                        <h3>Share Product</h3>
+                        <button onclick="closeShareModal()" class="close-btn">&times;</button>
+                    </div>
+                    <div class="share-modal-body">
+                        <div class="share-product-info">
+                            <p><strong>Style:</strong> #${styleNumber}</p>
+                            <p><strong>Product:</strong> ${productName}</p>
+                            <p><strong>Category:</strong> ${embellishmentType.charAt(0).toUpperCase() + embellishmentType.slice(1)}</p>
+                        </div>
+                        <div class="share-options">
+                            <button class="share-option-btn" onclick="copyToClipboard('${shareUrl}'); closeShareModal();">
+                                <i class="fas fa-link"></i>
+                                Copy Share Link
+                            </button>
+                            <button class="share-option-btn" onclick="emailProductToCustomer('${styleNumber}', '${productName.replace(/'/g, "\\'")}', '${embellishmentType}')">
+                                <i class="fas fa-envelope"></i>
+                                Email to Customer
+                            </button>
+                            <button class="share-option-btn" onclick="generateProductPDF('${styleNumber}', '${productName.replace(/'/g, "\\'")}', '${embellishmentType}')">
+                                <i class="fas fa-file-pdf"></i>
+                                Download PDF
+                            </button>
+                        </div>
+                        <div class="share-link-preview">
+                            <label>Share Link:</label>
+                            <div class="link-input-group">
+                                <input type="text" value="${shareUrl}" readonly id="shareUrlInput">
+                                <button onclick="copyToClipboard('${shareUrl}')" class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Close share modal
+        function closeShareModal() {
+            const modal = document.querySelector('.share-modal-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Copy link to clipboard
+        function copyProductLink(styleNumber, productName, embellishmentType) {
+            const shareUrl = generateShareLink(styleNumber, productName, embellishmentType);
+            copyToClipboard(shareUrl);
+            showNotification('Share link copied to clipboard!', 'success');
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        // Fallback for older browsers
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showNotification('Copied to clipboard!', 'success');
+            } catch (err) {
+                showNotification('Failed to copy', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Email product to customer
+        function emailProduct(styleNumber, productName, embellishmentType) {
+            // For now, open email client with pre-filled content
+            const shareUrl = generateShareLink(styleNumber, productName, embellishmentType);
+            const subject = `Product Recommendation: ${productName} (Style #${styleNumber})`;
+            const body = `Hi,\n\nI wanted to share this popular product with you:\n\n${productName}\nStyle: #${styleNumber}\nCategory: ${embellishmentType.charAt(0).toUpperCase() + embellishmentType.slice(1)}\n\nView product details: ${shareUrl}\n\nPlease let me know if you'd like a custom quote for this item.\n\nBest regards,\nNorthwest Custom Apparel`;
+            
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        // Email product to customer using modal
+        function emailProductToCustomer(styleNumber, productName, embellishmentType) {
+            // TODO: Implement EmailJS integration in next phase
+            emailProduct(styleNumber, productName, embellishmentType);
+        }
+
+        // Generate PDF (placeholder for now)
+        function generateProductPDF(styleNumber, productName, embellishmentType) {
+            showNotification('PDF generation coming soon!', 'info');
+            // TODO: Implement PDF generation in future phase
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadProductsByEmbellishment('all');
             setupEventListeners();
@@ -1539,6 +1959,17 @@
                                 <div class="stat-label">Orders</div>
                                 <div class="stat-value">${product.orderCount}</div>
                             </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn share-btn" onclick="event.stopPropagation(); shareProduct('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${embellishmentType}')" title="Share with Customer">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <button class="action-btn email-btn" onclick="event.stopPropagation(); emailProduct('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${embellishmentType}')" title="Email to Customer">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                            <button class="action-btn link-btn" onclick="event.stopPropagation(); copyProductLink('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${embellishmentType}')" title="Copy Share Link">
+                                <i class="fas fa-link"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
