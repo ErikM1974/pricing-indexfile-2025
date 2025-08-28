@@ -1451,14 +1451,14 @@
         
         // Generate a shareable public link for a product
         function generateShareLink(styleNumber, productName, embellishmentType) {
-            const baseUrl = window.location.origin;
+            // Use relative path that works with the dev server
             const params = new URLSearchParams({
                 style: styleNumber,
                 name: productName,
                 type: embellishmentType,
                 ref: 'top-sellers-2025'
             });
-            return `${baseUrl}/top-sellers-product.html?${params}`;
+            return `/top-sellers-product.html?${params}`;
         }
 
         // Share product with modal options
