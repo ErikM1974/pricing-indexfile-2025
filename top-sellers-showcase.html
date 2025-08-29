@@ -391,12 +391,40 @@
                         .toISOString()
                         .replace(/\.\d{3}Z$/, '');
                     
-                    // Use the simplified notes
-                    const notes = formData.notes || 'Sample request';
+                    // Build simple notes without newlines (Caspio doesn't like special characters)
+                    let notesContent = formData.notes || 'Sample request';
+                    
+                    // Add project details with pipe separators instead of newlines
+                    if (formData.projectType) {
+                        notesContent += ` | Project: ${formData.projectType}`;
+                    }
+                    if (formData.estimatedQuantity) {
+                        notesContent += ` | Qty: ${formData.estimatedQuantity}`;
+                    }
+                    if (formData.timeline) {
+                        notesContent += ` | Timeline: ${formData.timeline}`;
+                    }
+                    
+                    // Add delivery info
+                    if (formData.deliveryMethod === 'ship') {
+                        notesContent += ` | Ship to: ${formData.shippingCity || 'TBD'}, ${formData.shippingState || 'TBD'}`;
+                    } else {
+                        notesContent += ' | Pickup at NWCA';
+                    }
+                    
+                    // Add sample count and total
+                    if (samples && samples.length > 0) {
+                        notesContent += ` | ${samples.length} samples`;
+                    }
                     
                     // Get totals with proper defaults
                     const samplesCost = parseFloat((formData.samplesCost || 0).toFixed(2));
                     const totalAmount = parseFloat((formData.totalAmount || 0).toFixed(2));
+                    
+                    // Add total if there's a cost
+                    if (totalAmount > 0) {
+                        notesContent += ` | Total: $${totalAmount.toFixed(2)}`;
+                    }
                     
                     const sessionData = {
                         QuoteID: quoteID,
@@ -411,7 +439,9 @@
                         TotalAmount: totalAmount,
                         Status: 'Sample Request',
                         ExpiresAt: expiresAt,
-                        Notes: notes
+                        Notes: notesContent,
+                        // ProjectName field - leave empty to avoid database type issues
+                        ProjectName: ''
                     };
                     
                     // Validate data before sending
@@ -425,6 +455,8 @@
                         notesLength: sessionData.Notes.length
                     });
                     
+                    console.log('Sending session data to API:', JSON.stringify(sessionData, null, 2));
+                    
                     const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                         method: 'POST',
                         headers: {
@@ -436,6 +468,7 @@
                     if (!sessionResponse.ok) {
                         const errorText = await sessionResponse.text();
                         console.error('Session save failed:', errorText);
+                        console.error('Failed session data:', sessionData);
                         throw new Error(`Failed to save session: ${errorText}`);
                     }
                     
@@ -447,23 +480,13 @@
                         // Use the sample price if it's a paid sample, ensure it's a number
                         const itemPrice = parseFloat((sample.price || 0).toFixed(2));
                         
-                        // For the first item, include complete order details
+                        // Simple size/color data for each item
                         let sizeBreakdownData = {
                             size: sample.size || 'L',
                             color: sample.color || 'TBD'
                         };
                         
-                        // Add complete order details to first item
-                        if (index === 0 && formData.orderDetails) {
-                            sizeBreakdownData.orderInfo = {
-                                delivery: formData.deliveryMethod || 'pickup',
-                                shipping: formData.orderDetails.shipping,
-                                totals: formData.orderDetails.totals,
-                                projectType: formData.projectType || 'Not specified',
-                                estimatedQuantity: formData.estimatedQuantity || 'Not specified',
-                                timeline: formData.timeline || 'Not specified'
-                            };
-                        }
+                        // Order details now stored in session record, not in individual items
                         
                         const itemData = {
                             QuoteID: quoteID,
@@ -498,14 +521,29 @@
                         });
                         
                         if (!itemResponse.ok) {
-                            console.error(`Failed to save item ${index + 1}:`, await itemResponse.text());
+                            const errorText = await itemResponse.text();
+                            console.error(`Failed to save item ${index + 1} (LineNumber ${index + 1}):`, errorText);
+                            console.error('Failed item data:', itemData);
+                            // Return false but don't throw to allow other items to save
+                            return false;
                         }
                         
-                        return itemResponse.ok;
+                        console.log(`Successfully saved item ${index + 1} (LineNumber ${index + 1})`);
+                        return true;
                     });
                     
-                    await Promise.all(itemPromises);
-                    console.log('All items saved successfully');
+                    const itemResults = await Promise.all(itemPromises);
+                    const successCount = itemResults.filter(result => result === true).length;
+                    const failCount = itemResults.filter(result => result === false).length;
+                    
+                    console.log(`Items saved: ${successCount} successful, ${failCount} failed out of ${samples.length} total`);
+                    
+                    // Log which items failed
+                    itemResults.forEach((success, index) => {
+                        if (!success) {
+                            console.error(`Item ${index + 1} (LineNumber ${index + 1}) failed to save`);
+                        }
+                    });
                     
                     return {
                         success: true,
@@ -3250,45 +3288,30 @@
                 formData.salesTax = salesTax;
                 formData.totalAmount = finalTotal;
                 
-                // Create simple notes for Caspio (avoiding special characters that might cause issues)
-                let simpleNotes = formData.notes || 'Sample request';
-                
-                // Add basic delivery info
-                if (deliveryMethod === 'ship') {
-                    simpleNotes += ` - Ship to ${formData.shippingCity}, ${formData.shippingState}`;
-                } else {
-                    simpleNotes += ' - Pickup at NWCA';
-                }
-                
-                // Add sample count and total
-                simpleNotes += ` - ${cartSummary.items.length} samples`;
-                if (finalTotal > 0) {
-                    simpleNotes += ` - Total: $${finalTotal.toFixed(2)}`;
-                }
-                
-                formData.notes = simpleNotes;
+                // Store original notes - comprehensive notes will be built in saveSampleRequest
+                // Don't override formData.notes here
                 
                 // Store detailed order info for the AE
                 formData.orderDetails = {
                     samples: cartSummary.items.map(item => ({
-                        style: item.style,
-                        name: item.name,
+                        style: item.style || '',
+                        name: item.name || '',
                         color: item.color || 'TBD',
                         size: item.size || 'TBD',
                         price: item.price || 0
                     })),
                     delivery: deliveryMethod,
                     shipping: deliveryMethod === 'ship' ? {
-                        address: formData.shippingAddress,
-                        city: formData.shippingCity,
-                        state: formData.shippingState,
-                        zip: formData.shippingZip
+                        address: formData.shippingAddress || '',
+                        city: formData.shippingCity || '',
+                        state: formData.shippingState || '',
+                        zip: formData.shippingZip || ''
                     } : null,
                     totals: {
-                        samples: samplesCost,
-                        shipping: formData.shippingCost,
-                        tax: salesTax,
-                        total: finalTotal
+                        samples: samplesCost || 0,
+                        shipping: formData.shippingCost || 0,
+                        tax: salesTax || 0,
+                        total: finalTotal || 0
                     }
                 };
                 

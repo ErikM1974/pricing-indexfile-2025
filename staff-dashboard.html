@@ -7055,21 +7055,84 @@
                 const request = currentSampleRequests.find(r => r.QuoteID === quoteID);
                 if (!request) throw new Error('Request not found');
                 
-                // Fetch the items using SessionID to ensure we get the correct items for this specific request
-                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?sessionID=${encodeURIComponent(request.SessionID)}`);
+                // Fetch the items using QuoteID (now unique with timestamp+random generation)
+                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
                 const items = await itemsResponse.json();
                 
-                // Parse the order details from the first item's SizeBreakdown if available
+                // Parse the order details from the session's ProjectName field
                 let orderDetails = {};
-                if (items.length > 0 && items[0].SizeBreakdown) {
+                if (request.ProjectName) {
                     try {
-                        const sizeData = JSON.parse(items[0].SizeBreakdown);
-                        if (sizeData.orderInfo) {
-                            orderDetails = sizeData.orderInfo;
+                        const sessionOrderData = JSON.parse(request.ProjectName);
+                        if (sessionOrderData.orderDetails) {
+                            orderDetails = sessionOrderData.orderDetails;
+                        }
+                        // Also get project info if available
+                        if (sessionOrderData.projectInfo) {
+                            orderDetails.projectType = sessionOrderData.projectInfo.projectType;
+                            orderDetails.estimatedQuantity = sessionOrderData.projectInfo.estimatedQuantity;
+                            orderDetails.timeline = sessionOrderData.projectInfo.timeline;
+                        }
+                        // Get delivery method
+                        if (sessionOrderData.deliveryMethod) {
+                            orderDetails.delivery = sessionOrderData.deliveryMethod;
                         }
                     } catch (e) {
-                        console.error('Error parsing order details:', e);
+                        console.error('Error parsing session order details:', e);
                     }
+                }
+                
+                // Extract shipping info from notes as fallback if session data not available
+                const isShipping = (orderDetails.delivery === 'ship') || 
+                                 (request.Notes && request.Notes.toLowerCase().includes('ship'));
+                
+                // Parse shipping address from notes as fallback (format: "Ship to city, state")  
+                let shippingAddress = null;
+                if (!orderDetails.shipping && isShipping && request.Notes) {
+                    const shipMatch = request.Notes.match(/ship to ([^-]+)/i);
+                    if (shipMatch) {
+                        const addressText = shipMatch[1].trim();
+                        // Split "puyallupe, wa" into city and state
+                        const parts = addressText.split(',').map(p => p.trim());
+                        if (parts.length >= 2) {
+                            shippingAddress = {
+                                city: parts[0],
+                                state: parts[1],
+                                full: addressText
+                            };
+                        } else {
+                            shippingAddress = { full: addressText };
+                        }
+                    }
+                }
+                
+                // Calculate missing totals from available data
+                const subtotalAmount = request.SubtotalAmount || 0;
+                const totalAmount = request.TotalAmount || 0;
+                const itemsTotal = items.reduce((sum, item) => sum + (item.FinalUnitPrice || 0), 0);
+                
+                // Calculate shipping and tax if missing from orderDetails
+                let shippingAmount = 0;
+                let taxAmount = 0;
+                
+                if (isShipping && totalAmount > subtotalAmount) {
+                    // If shipping, assume $10 shipping and calculate tax
+                    shippingAmount = 10.00;
+                    const taxableAmount = subtotalAmount + shippingAmount;
+                    taxAmount = totalAmount - taxableAmount;
+                } else if (totalAmount > subtotalAmount) {
+                    // Just tax, no shipping
+                    taxAmount = totalAmount - subtotalAmount;
+                }
+                
+                // Populate orderDetails if missing
+                if (!orderDetails.totals && (shippingAmount > 0 || taxAmount > 0)) {
+                    orderDetails.delivery = isShipping ? 'ship' : 'pickup';
+                    orderDetails.totals = {
+                        samples: itemsTotal,
+                        shipping: shippingAmount,
+                        tax: taxAmount
+                    };
                 }
                 
                 // Build the details HTML
@@ -7104,19 +7167,34 @@
                         </div>
                         
                         <!-- Shipping Address (if applicable) -->
-                        ${orderDetails.shipping ? `
+                        ${(orderDetails.shipping || shippingAddress) ? `
                             <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                                <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">Shipping Address</h4>
+                                <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">
+                                    <i class="fas fa-shipping-fast"></i> Shipping Information
+                                </h4>
                                 <div>
-                                    ${orderDetails.shipping.address || ''}<br>
-                                    ${orderDetails.shipping.city || ''}, ${orderDetails.shipping.state || ''} ${orderDetails.shipping.zip || ''}
+                                    ${orderDetails.shipping ? `
+                                        <div><strong>Address:</strong> ${orderDetails.shipping.address || ''}</div>
+                                        <div><strong>City:</strong> ${orderDetails.shipping.city || ''}</div>
+                                        <div><strong>State:</strong> ${orderDetails.shipping.state || ''}</div>
+                                        <div><strong>ZIP:</strong> ${orderDetails.shipping.zip || ''}</div>
+                                    ` : shippingAddress ? `
+                                        <div><strong>Destination:</strong> ${shippingAddress.full}</div>
+                                        ${shippingAddress.city ? `<div><strong>City:</strong> ${shippingAddress.city}</div>` : ''}
+                                        ${shippingAddress.state ? `<div><strong>State:</strong> ${shippingAddress.state}</div>` : ''}
+                                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
+                                            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Complete shipping address needed for processing
+                                        </div>
+                                    ` : ''}
                                 </div>
                             </div>
                         ` : ''}
                         
                         <!-- Sample Items -->
                         <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
-                            <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">Sample Items (${items.length})</h4>
+                            <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">
+                                Sample Items (${items.length}${request.TotalQuantity > items.length ? ` of ${request.TotalQuantity} requested` : ''})
+                            </h4>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead>
                                     <tr style="border-bottom: 2px solid #e5e7eb;">
@@ -7149,7 +7227,48 @@
                                     }).join('')}
                                 </tbody>
                             </table>
+                            
+                            <!-- Order Totals Breakdown -->
+                            ${(orderDetails.totals || shippingAmount > 0 || taxAmount > 0) ? `
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: #374151; font-size: 0.875rem; font-weight: 600;">Order Totals</h5>
+                                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; font-size: 0.875rem;">
+                                        <div>Samples Subtotal:</div><div style="text-align: right;">$${(orderDetails.totals?.samples || itemsTotal).toFixed(2)}</div>
+                                        ${shippingAmount > 0 ? `
+                                            <div>Shipping:</div><div style="text-align: right;">$${shippingAmount.toFixed(2)}</div>
+                                        ` : ''}
+                                        ${taxAmount > 0 ? `
+                                            <div>Tax (10.1%):</div><div style="text-align: right;">$${taxAmount.toFixed(2)}</div>
+                                        ` : ''}
+                                        <div style="border-top: 1px solid #d1d5db; padding-top: 0.5rem; font-weight: 600;">Total:</div>
+                                        <div style="border-top: 1px solid #d1d5db; padding-top: 0.5rem; text-align: right; font-weight: 600;">$${totalAmount.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
+                        
+                        <!-- Missing Items Alert -->
+                        ${request.TotalQuantity > items.length ? `
+                            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; color: #dc2626; font-size: 1rem;">
+                                    <i class="fas fa-exclamation-triangle"></i> Missing Items Alert
+                                </h4>
+                                <p style="margin: 0 0 0.5rem 0; color: #7f1d1d; font-size: 0.875rem;">
+                                    Customer requested <strong>${request.TotalQuantity} samples</strong> but only <strong>${items.length} items</strong> are shown in the database.
+                                </p>
+                                <div style="background: #fee2e2; padding: 0.5rem; border-radius: 4px; font-size: 0.875rem; color: #7f1d1d;">
+                                    <strong>Technical Details:</strong> 
+                                    ${(() => {
+                                        const lineNumbers = items.map(item => item.LineNumber).sort((a,b) => a-b);
+                                        const missing = [];
+                                        for(let i = 1; i <= request.TotalQuantity; i++) {
+                                            if (!lineNumbers.includes(i)) missing.push(i);
+                                        }
+                                        return missing.length > 0 ? `Missing LineNumber(s): ${missing.join(', ')}` : 'Items may have failed to save during submission';
+                                    })()}
+                                </div>
+                            </div>
+                        ` : ''}
                         
                         <!-- Project Information -->
                         ${orderDetails.projectType || request.Notes ? `
