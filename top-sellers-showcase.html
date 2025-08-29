@@ -358,6 +358,13 @@
             constructor() {
                 this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
                 this.quotePrefix = 'SR';
+                
+                // Initialize EmailJS
+                emailjs.init('4qSbDO-SQs19TbP80');
+                this.emailConfig = {
+                    serviceId: 'service_1c4k67j',
+                    templateId: 'template_sample_request' // TODO: Replace with actual template ID from EmailJS
+                };
             }
 
             generateSampleRequestID() {
@@ -551,6 +558,15 @@
                         }
                     });
                     
+                    // Send confirmation email
+                    try {
+                        await this.sendConfirmationEmail(formData, samples, quoteID);
+                        console.log('Confirmation email sent successfully');
+                    } catch (emailError) {
+                        // Don't block the request if email fails
+                        console.error('Email send error (non-blocking):', emailError);
+                    }
+                    
                     return {
                         success: true,
                         requestID: quoteID
@@ -563,6 +579,122 @@
                         error: error.message
                     };
                 }
+            }
+            
+            async sendConfirmationEmail(formData, samples, quoteID) {
+                // Build samples HTML table for email
+                const samplesHtml = this.buildSamplesHtmlTable(samples);
+                
+                // Extract shipping info
+                const isShipping = formData.deliveryMethod === 'ship';
+                
+                // Calculate cost breakdown
+                const samplesCost = formData.samplesCost || 0;
+                const shippingCost = formData.shippingCost || 0;
+                const salesTax = formData.salesTax || 0;
+                const totalAmount = formData.totalAmount || 0;
+                
+                // Build email data with all required variables
+                const emailData = {
+                    // System fields
+                    to_email: formData.email,
+                    from_name: 'Northwest Custom Apparel',
+                    reply_to: 'sales@nwcustomapparel.com',
+                    
+                    // Customer information
+                    customer_name: formData.name || 'Valued Customer',
+                    customer_email: formData.email || '',
+                    customer_phone: formData.phone || 'Not provided',
+                    company_name: formData.company || 'Not provided',
+                    
+                    // Order details
+                    request_id: quoteID,
+                    request_date: new Date().toLocaleDateString(),
+                    sample_count: samples.length.toString(),
+                    delivery_method: isShipping ? 'Ship' : 'Pickup',
+                    
+                    // Sample items (HTML table)
+                    samples_html: samplesHtml,
+                    
+                    // Shipping information
+                    shipping_address: formData.shippingAddress || '',
+                    shipping_city: formData.shippingCity || '',
+                    shipping_state: formData.shippingState || '',
+                    shipping_zip: formData.shippingZip || '',
+                    shipping_info: isShipping ? 
+                        `${formData.shippingAddress || ''} ${formData.shippingCity || ''}, ${formData.shippingState || ''} ${formData.shippingZip || ''}`.trim() : 
+                        'Pickup at NWCA',
+                    
+                    // Cost breakdown
+                    samples_cost: `$${samplesCost.toFixed(2)}`,
+                    shipping_cost: isShipping ? `$${shippingCost.toFixed(2)}` : '$0.00',
+                    tax_amount: `$${salesTax.toFixed(2)}`,
+                    total_amount: `$${totalAmount.toFixed(2)}`,
+                    
+                    // Project details
+                    project_type: formData.projectType || 'Not specified',
+                    estimated_quantity: formData.estimatedQuantity || 'Not specified',
+                    timeline: formData.timeline || 'Not specified',
+                    notes: formData.notes || 'No additional notes',
+                    
+                    // Company info
+                    company_year: '1977',
+                    company_phone: '253-922-5793',
+                    
+                    // Next steps message
+                    next_steps: totalAmount > 0 ? 
+                        'An account executive will contact you to process payment for your sample order.' : 
+                        'Your free samples will be processed within 2 business days.',
+                    
+                    // Delivery timeline
+                    delivery_timeline: isShipping ? 
+                        'Your samples will be shipped within 2 business days.' : 
+                        'Your samples will be ready for pickup within 2 business days.'
+                };
+                
+                // Send email via EmailJS
+                await emailjs.send(
+                    this.emailConfig.serviceId,
+                    this.emailConfig.templateId,
+                    emailData
+                );
+                
+                return true;
+            }
+            
+            buildSamplesHtmlTable(samples) {
+                if (!samples || samples.length === 0) {
+                    return '<p>No samples in this request</p>';
+                }
+                
+                const tableRows = samples.map(sample => `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px; text-align: left;">${sample.style || 'N/A'}</td>
+                        <td style="padding: 12px; text-align: left;">${sample.name || 'N/A'}</td>
+                        <td style="padding: 12px; text-align: left;">${sample.color || 'TBD'}</td>
+                        <td style="padding: 12px; text-align: center;">${sample.size || 'TBD'}</td>
+                        <td style="padding: 12px; text-align: right;">
+                            ${sample.price > 0 ? `$${sample.price.toFixed(2)}` : 'FREE'}
+                        </td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <thead>
+                            <tr style="background: #4cb354; color: white;">
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Style #</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Product</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Color</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 600;">Size</th>
+                                <th style="padding: 12px; text-align: right; font-weight: 600;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                `;
             }
         }
 
