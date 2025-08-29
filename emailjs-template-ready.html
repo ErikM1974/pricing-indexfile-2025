@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Request Confirmation</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5;">
+    
+    <!-- Main Container -->
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                
+                <!-- Email Content Container -->
+                <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #4cb354 0%, #409a47 100%); padding: 30px 20px; text-align: center;">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                                 alt="Northwest Custom Apparel" 
+                                 style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
+                            <h1 style="color: #ffffff; margin: 20px 0 10px 0; font-size: 24px; font-weight: bold;">
+                                Sample Request Confirmation
+                            </h1>
+                            <p style="color: #ffffff; margin: 0; font-size: 16px;">
+                                Request ID: {{request_id}}
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Welcome Message -->
+                    <tr>
+                        <td style="padding: 30px 20px 20px 20px;">
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+                                Dear {{customer_name}},
+                            </p>
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0;">
+                                Thank you for your sample request! We've received your order and will process it promptly.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Order Summary -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f9fafb; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <h2 style="color: #4cb354; font-size: 18px; margin: 0 0 15px 0; font-weight: bold;">
+                                            Order Summary
+                                        </h2>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Request ID:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; font-weight: bold; text-align: right;">{{request_id}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Date:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{request_date}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Number of Samples:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{sample_count}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Delivery Method:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{delivery_method}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Sample Items -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <h2 style="color: #4cb354; font-size: 18px; margin: 0 0 15px 0; font-weight: bold;">
+                                Sample Items
+                            </h2>
+                            {{{samples_html}}}
+                        </td>
+                    </tr>
+                    
+                    <!-- Shipping Information -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #fff3cd; border-left: 4px solid #f59e0b;">
+                                <tr>
+                                    <td style="padding: 15px;">
+                                        <h3 style="color: #92400e; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+                                            Delivery Information
+                                        </h3>
+                                        <p style="color: #78350f; font-size: 14px; line-height: 1.6; margin: 0;">
+                                            <strong>Method:</strong> {{delivery_method}}<br>
+                                            <strong>Address:</strong> {{shipping_info}}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Cost Breakdown -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f9fafb; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <h3 style="color: #4cb354; font-size: 16px; margin: 0 0 15px 0; font-weight: bold;">
+                                            Cost Breakdown
+                                        </h3>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Samples:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{samples_cost}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Shipping:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{shipping_cost}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px;">Tax (10.1%):</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{tax_amount}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-top: 8px; border-top: 2px solid #e5e7eb;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 16px; font-weight: bold;">Total:</td>
+                                                <td style="padding: 8px 0; color: #4cb354; font-size: 16px; font-weight: bold; text-align: right;">{{total_amount}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Project Information -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f9fafb; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <h3 style="color: #4cb354; font-size: 16px; margin: 0 0 15px 0; font-weight: bold;">
+                                            Project Information
+                                        </h3>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px; vertical-align: top; width: 40%;">Project Type:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{project_type}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px; vertical-align: top;">Estimated Quantity:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{estimated_quantity}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px; vertical-align: top;">Timeline:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{timeline}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #666666; font-size: 14px; vertical-align: top;">Notes:</td>
+                                                <td style="padding: 8px 0; color: #333333; font-size: 14px; text-align: right;">{{notes}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Next Steps -->
+                    <tr>
+                        <td style="padding: 0 20px 20px 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #e6f7ff; border-left: 4px solid #1890ff;">
+                                <tr>
+                                    <td style="padding: 15px;">
+                                        <h3 style="color: #0050b3; font-size: 16px; margin: 0 0 10px 0; font-weight: bold;">
+                                            What Happens Next?
+                                        </h3>
+                                        <p style="color: #003a8c; font-size: 14px; line-height: 1.6; margin: 0 0 10px 0;">
+                                            {{delivery_timeline}}
+                                        </p>
+                                        <p style="color: #003a8c; font-size: 14px; line-height: 1.6; margin: 0;">
+                                            {{next_steps}}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Contact Information -->
+                    <tr>
+                        <td style="padding: 20px; border-top: 1px solid #e5e7eb;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <h3 style="color: #333333; font-size: 16px; margin: 0 0 15px 0; font-weight: bold;">
+                                            Questions? We're Here to Help!
+                                        </h3>
+                                        <p style="color: #666666; font-size: 14px; line-height: 1.8; margin: 0;">
+                                            <strong>Phone:</strong> {{company_phone}}<br>
+                                            <strong>Email:</strong> sales@nwcustomapparel.com<br>
+                                            <strong>Hours:</strong> Monday - Friday, 9:00 AM - 5:00 PM PST
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #333333; padding: 20px; text-align: center;">
+                            <p style="color: #999999; font-size: 12px; margin: 0 0 5px 0;">
+                                Northwest Custom Apparel - Family Owned Since {{company_year}}
+                            </p>
+                            <p style="color: #999999; font-size: 12px; margin: 0;">
+                                2025 Freeman Road East, Milton, WA 98354
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+                <!-- End Email Content Container -->
+                
+            </td>
+        </tr>
+    </table>
+    <!-- End Main Container -->
+    
+</body>
+</html>
