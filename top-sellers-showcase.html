@@ -468,8 +468,8 @@
                             LineNumber: index + 1,
                             StyleNumber: sample.style || 'UNKNOWN',
                             ProductName: sample.name || sample.description || 'Sample Item',
-                            Color: sample.color || 'Customer Choice',
-                            ColorCode: '',
+                            Color: sample.color || '',  // Use actual selected color, never "Customer Choice"
+                            ColorCode: sample.colorCode || '',
                             EmbellishmentType: 'sample',
                             PrintLocation: '',
                             PrintLocationName: '',
@@ -2897,6 +2897,19 @@
         
         // Show modal for color/size selection
         function showSampleSelectionModal(styleNumber, productName, imageUrl, price, type, eligibilityData) {
+            // Validate we have colors and sizes
+            if (!eligibilityData.colors || eligibilityData.colors.length === 0) {
+                console.error('No colors available for', styleNumber);
+                alert('Unable to load color options for this product. Please try again or contact customer service.');
+                return;
+            }
+            
+            if (!eligibilityData.sizes || eligibilityData.sizes.length === 0) {
+                console.error('No sizes available for', styleNumber);
+                alert('Unable to load size options for this product. Please try again or contact customer service.');
+                return;
+            }
+            
             // Create a simple selection modal
             const modal = document.createElement('div');
             modal.className = 'sample-selection-modal';
@@ -2904,19 +2917,20 @@
                 <div class="sample-selection-content">
                     <h3>Select Options for ${productName}</h3>
                     <p>Style #${styleNumber}</p>
+                    ${price > 0 ? `<p style="color: #dc2626; font-weight: 500;">Sample Price: $${price.toFixed(2)}</p>` : '<p style="color: #10b981; font-weight: 500;">FREE Sample</p>'}
                     
                     <div class="selection-group">
-                        <label>Color:</label>
+                        <label>Color: <span style="color: red;">*</span></label>
                         <select id="sampleColorSelect" required>
                             <option value="">Choose color...</option>
                             ${eligibilityData.colors.map(c => 
-                                `<option value="${c.code}">${c.name}</option>`
+                                `<option value="${c.code || c.name}">${c.name}</option>`
                             ).join('')}
                         </select>
                     </div>
                     
                     <div class="selection-group">
-                        <label>Size:</label>
+                        <label>Size: <span style="color: red;">*</span></label>
                         <select id="sampleSizeSelect" required>
                             <option value="">Choose size...</option>
                             ${eligibilityData.sizes.map(s => 
@@ -3009,8 +3023,8 @@
                         <div class="sample-item-name">${sample.name}</div>
                         <div class="sample-item-style">Style #${sample.style}</div>
                         <div class="sample-item-details">
-                            ${sample.color ? `Color: ${sample.color}` : ''} 
-                            ${sample.size ? `| Size: ${sample.size}` : ''}
+                            ${sample.color ? `Color: ${sample.color}` : '<span style="color: #dc2626;">⚠️ No color selected</span>'} 
+                            ${sample.size ? `| Size: ${sample.size}` : '| <span style="color: #dc2626;">⚠️ No size selected</span>'}
                             ${sample.price > 0 ? `| $${sample.price.toFixed(2)}` : '| FREE'}
                         </div>
                     </div>
