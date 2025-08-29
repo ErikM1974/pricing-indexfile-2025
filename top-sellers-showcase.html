@@ -95,15 +95,40 @@
                         return result;
                     }
                     
+                    // Extract available colors and sizes from all items
+                    const colors = [];
+                    const sizesSet = new Set();
+                    
+                    data.forEach(item => {
+                        if (item.color) {
+                            colors.push({
+                                name: item.color,
+                                code: item.color.toUpperCase().replace(/\s+/g, '_')
+                            });
+                        }
+                        // Get sizes from basePrices keys
+                        Object.keys(item.basePrices || {}).forEach(size => {
+                            sizesSet.add(size);
+                        });
+                    });
+                    
+                    const sizes = Array.from(sizesSet).sort((a, b) => {
+                        // Sort sizes logically
+                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                        return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+                    });
+                    
                     const minPrice = Math.min(...priceValues);
-                    console.log(`Style ${styleNumber}: Min price $${minPrice.toFixed(2)}`);
+                    console.log(`Style ${styleNumber}: Min price $${minPrice.toFixed(2)}, ${colors.length} colors, ${sizes.length} sizes`);
                     
                     if (minPrice < 10) {
                         const result = { 
                             eligible: true, 
                             type: 'free', 
                             price: 0,
-                            minCost: minPrice
+                            minCost: minPrice,
+                            colors: colors,
+                            sizes: sizes
                         };
                         this.eligibilityCache[styleNumber] = result;
                         console.log(`  → FREE sample`);
@@ -115,7 +140,9 @@
                             eligible: true, 
                             type: 'paid', 
                             price: samplePrice,
-                            minCost: minPrice
+                            minCost: minPrice,
+                            colors: colors,
+                            sizes: sizes
                         };
                         this.eligibilityCache[styleNumber] = result;
                         console.log(`  → PAID sample at $${samplePrice}`);
@@ -362,12 +389,13 @@
                         .toISOString()
                         .replace(/\.\d{3}Z$/, '');
                     
-                    const notes = [
-                        `Project Type: ${formData.projectType || 'Not specified'}`,
-                        `Quantity Needed: ${formData.estimatedQuantity || 'Not specified'}`,
-                        `Timeline: ${formData.timeline || 'Not specified'}`,
-                        formData.notes || ''
-                    ].filter(n => n).join('\n');
+                    // Use the enhanced notes passed from the form handler
+                    const notes = formData.notes || '';
+                    
+                    // Calculate totals
+                    const samplesCost = formData.samplesCost || 0;
+                    const shippingCost = formData.shippingCost || 0;
+                    const totalAmount = formData.totalAmount || 0;
                     
                     const sessionData = {
                         QuoteID: quoteID,
@@ -377,9 +405,9 @@
                         CompanyName: formData.company || '',
                         Phone: formData.phone || '',
                         TotalQuantity: samples.length,
-                        SubtotalAmount: 0,
-                        LTMFeeTotal: 0,
-                        TotalAmount: 0,
+                        SubtotalAmount: parseFloat(samplesCost.toFixed(2)),
+                        LTMFeeTotal: parseFloat(shippingCost.toFixed(2)), // Using LTM field for shipping
+                        TotalAmount: parseFloat(totalAmount.toFixed(2)),
                         Status: 'Sample Request',
                         ExpiresAt: expiresAt,
                         Notes: notes
@@ -403,24 +431,30 @@
                     // Save individual sample items
                     console.log(`Saving ${samples.length} sample items...`);
                     const itemPromises = samples.map(async (sample, index) => {
+                        // Use the sample price if it's a paid sample
+                        const itemPrice = sample.price || 0;
+                        
                         const itemData = {
                             QuoteID: quoteID,
                             LineNumber: index + 1,
                             StyleNumber: sample.style,
                             ProductName: sample.name || sample.description,
-                            Color: sample.selectedColor || 'Customer Choice',
+                            Color: sample.color || 'Customer Choice',
                             ColorCode: '',
                             EmbellishmentType: 'sample',
                             PrintLocation: '',
                             PrintLocationName: '',
                             Quantity: 1,
                             HasLTM: 'No',
-                            BaseUnitPrice: 0,
+                            BaseUnitPrice: parseFloat(itemPrice.toFixed(2)),
                             LTMPerUnit: 0,
-                            FinalUnitPrice: 0,
-                            LineTotal: 0,
-                            SizeBreakdown: JSON.stringify({ size: sample.selectedSize || 'L' }),
-                            PricingTier: 'Sample',
+                            FinalUnitPrice: parseFloat(itemPrice.toFixed(2)),
+                            LineTotal: parseFloat(itemPrice.toFixed(2)),
+                            SizeBreakdown: JSON.stringify({ 
+                                size: sample.size || 'L',
+                                color: sample.color || ''
+                            }),
+                            PricingTier: itemPrice > 0 ? 'Paid Sample' : 'Free Sample',
                             ImageURL: sample.imageUrl || '',
                             AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
                         };
@@ -1443,6 +1477,94 @@
             }
         }
         
+        /* Sample Selection Modal */
+        .sample-selection-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sample-selection-modal.active {
+            opacity: 1;
+        }
+        
+        .sample-selection-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sample-selection-content h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+        
+        .sample-selection-content p {
+            color: var(--text-secondary);
+            margin: 0 0 1.5rem 0;
+        }
+        
+        .selection-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .selection-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .selection-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .selection-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .selection-actions button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-cancel {
+            background: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        .btn-confirm {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+        }
+        
+        .btn-confirm:hover {
+            background: var(--primary-dark);
+        }
+        
         /* Toast Notifications */
         .sample-toast {
             position: fixed;
@@ -1645,6 +1767,84 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
+        }
+        
+        .delivery-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(76, 179, 84, 0.05);
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        .radio-option input[type="radio"]:checked + .radio-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .radio-label {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .radio-label i {
+            margin-right: 0.5rem;
+        }
+        
+        .radio-label small {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-weight: normal;
+        }
+        
+        .order-total-display {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .order-total-display h4 {
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
+        }
+        
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .total-line.total-final {
+            border-top: 2px solid var(--border-color);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
         }
         
         .form-submit {
@@ -1943,8 +2143,60 @@
                         <textarea id="sampleNotes" name="notes" rows="3" placeholder="Tell us about your project or any specific requirements..."></textarea>
                     </div>
                     
+                    <!-- Delivery Method -->
+                    <div class="form-group">
+                        <label>How would you like to receive your samples? *</label>
+                        <div class="delivery-options">
+                            <label class="radio-option">
+                                <input type="radio" name="deliveryMethod" value="pickup" checked onchange="toggleShippingFields()">
+                                <span class="radio-label">
+                                    <i class="fas fa-store"></i> Pickup at NWCA (FREE)
+                                    <small>2025 Freeman Road East, Milton, WA | Mon-Fri 9AM-5PM</small>
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="deliveryMethod" value="ship" onchange="toggleShippingFields()">
+                                <span class="radio-label">
+                                    <i class="fas fa-shipping-fast"></i> Ship to me (+$10.00)
+                                    <small>2-3 business days via USPS/UPS</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Address (hidden by default) -->
+                    <div id="shippingFields" style="display: none;">
+                        <h4 style="margin: 1.5rem 0 1rem 0;">Shipping Address</h4>
+                        <div class="form-group">
+                            <label for="shippingAddress">Street Address *</label>
+                            <input type="text" id="shippingAddress" name="shippingAddress" placeholder="123 Main Street">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="shippingCity">City *</label>
+                                <input type="text" id="shippingCity" name="shippingCity" placeholder="Seattle">
+                            </div>
+                            <div class="form-group" style="width: 30%;">
+                                <label for="shippingState">State *</label>
+                                <input type="text" id="shippingState" name="shippingState" placeholder="WA" maxlength="2">
+                            </div>
+                            <div class="form-group" style="width: 30%;">
+                                <label for="shippingZip">ZIP *</label>
+                                <input type="text" id="shippingZip" name="shippingZip" placeholder="98101" pattern="[0-9]{5}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Total Display -->
+                    <div class="order-total-display" id="orderTotalDisplay" style="display: none;">
+                        <h4>Order Summary</h4>
+                        <div class="total-line"><span>Samples:</span> <span id="samplesSubtotal">$0.00</span></div>
+                        <div class="total-line" id="shippingLine" style="display: none;"><span>Shipping:</span> <span>$10.00</span></div>
+                        <div class="total-line total-final"><span>Total to Collect:</span> <span id="finalTotal">$0.00</span></div>
+                    </div>
+                    
                     <button type="submit" class="form-submit" id="submitSampleRequest">
-                        <i class="fas fa-paper-plane"></i> Request Free Samples
+                        <i class="fas fa-paper-plane"></i> <span id="submitButtonText">Request Free Samples</span>
                     </button>
                 </form>
             </div>
@@ -2593,17 +2845,110 @@
             if (existingItem) {
                 // Remove from cart
                 window.sampleCart.removeSample(styleNumber);
-            } else {
-                // Add to cart with pricing info
+                return;
+            }
+            
+            // Get cached eligibility data with colors/sizes
+            const eligibilityData = window.sampleCart.eligibilityCache[styleNumber];
+            if (!eligibilityData || !eligibilityData.colors || !eligibilityData.sizes) {
+                // Fallback - add without color/size
                 window.sampleCart.addSample({
                     style: styleNumber,
                     name: productName,
                     description: productName,
                     imageUrl: imageUrl,
                     price: samplePrice,
-                    type: sampleType
+                    type: sampleType,
+                    color: 'Default',
+                    size: 'L'
                 });
+                return;
             }
+            
+            // Show color/size selection modal
+            showSampleSelectionModal(styleNumber, productName, imageUrl, samplePrice, sampleType, eligibilityData);
+        }
+        
+        // Show modal for color/size selection
+        function showSampleSelectionModal(styleNumber, productName, imageUrl, price, type, eligibilityData) {
+            // Create a simple selection modal
+            const modal = document.createElement('div');
+            modal.className = 'sample-selection-modal';
+            modal.innerHTML = `
+                <div class="sample-selection-content">
+                    <h3>Select Options for ${productName}</h3>
+                    <p>Style #${styleNumber}</p>
+                    
+                    <div class="selection-group">
+                        <label>Color:</label>
+                        <select id="sampleColorSelect" required>
+                            <option value="">Choose color...</option>
+                            ${eligibilityData.colors.map(c => 
+                                `<option value="${c.code}">${c.name}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="selection-group">
+                        <label>Size:</label>
+                        <select id="sampleSizeSelect" required>
+                            <option value="">Choose size...</option>
+                            ${eligibilityData.sizes.map(s => 
+                                `<option value="${s}">${s}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="selection-actions">
+                        <button onclick="cancelSampleSelection()" class="btn-cancel">Cancel</button>
+                        <button onclick="confirmSampleSelection('${styleNumber}', '${productName.replace(/'/g, "\\'")}', '${imageUrl}', ${price}, '${type}')" class="btn-confirm">
+                            Add to Samples
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+        
+        // Cancel selection
+        function cancelSampleSelection() {
+            const modal = document.querySelector('.sample-selection-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        // Confirm selection and add to cart
+        function confirmSampleSelection(styleNumber, productName, imageUrl, price, type) {
+            const colorSelect = document.getElementById('sampleColorSelect');
+            const sizeSelect = document.getElementById('sampleSizeSelect');
+            
+            if (!colorSelect.value || !sizeSelect.value) {
+                alert('Please select both color and size');
+                return;
+            }
+            
+            const selectedColor = colorSelect.options[colorSelect.selectedIndex].text;
+            const selectedSize = sizeSelect.value;
+            
+            // Add to cart with selections
+            window.sampleCart.addSample({
+                style: styleNumber,
+                name: productName,
+                description: productName,
+                imageUrl: imageUrl,
+                price: price,
+                type: type,
+                color: selectedColor,
+                colorCode: colorSelect.value,
+                size: selectedSize
+            });
+            
+            // Close modal
+            cancelSampleSelection();
         }
         
         // Open sample modal
@@ -2617,7 +2962,14 @@
             
             // Clear and populate samples list
             samplesList.innerHTML = '';
+            let totalSamplesCost = 0;
+            
             samples.forEach(sample => {
+                // Add to total if it's a paid sample
+                if (sample.price > 0) {
+                    totalSamplesCost += sample.price;
+                }
+                
                 const sampleItem = document.createElement('div');
                 sampleItem.className = 'sample-item';
                 sampleItem.innerHTML = `
@@ -2630,6 +2982,11 @@
                     <div class="sample-item-info">
                         <div class="sample-item-name">${sample.name}</div>
                         <div class="sample-item-style">Style #${sample.style}</div>
+                        <div class="sample-item-details">
+                            ${sample.color ? `Color: ${sample.color}` : ''} 
+                            ${sample.size ? `| Size: ${sample.size}` : ''}
+                            ${sample.price > 0 ? `| $${sample.price.toFixed(2)}` : '| FREE'}
+                        </div>
                     </div>
                     <button class="sample-item-remove" onclick="removeSampleFromModal('${sample.style}')" title="Remove">
                         <i class="fas fa-times"></i>
@@ -2638,6 +2995,9 @@
                 samplesList.appendChild(sampleItem);
             });
             
+            // Update order total display
+            updateOrderTotal(totalSamplesCost);
+            
             // Show modal
             modal.classList.add('active');
         }
@@ -2645,6 +3005,69 @@
         // Close sample modal
         function closeSampleModal() {
             document.getElementById('sampleRequestModal').classList.remove('active');
+        }
+        
+        // Toggle shipping fields based on delivery method
+        function toggleShippingFields() {
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const shippingFields = document.getElementById('shippingFields');
+            const shippingLine = document.getElementById('shippingLine');
+            
+            if (deliveryMethod === 'ship') {
+                shippingFields.style.display = 'block';
+                shippingLine.style.display = 'flex';
+                // Make shipping fields required
+                document.getElementById('shippingAddress').required = true;
+                document.getElementById('shippingCity').required = true;
+                document.getElementById('shippingState').required = true;
+                document.getElementById('shippingZip').required = true;
+            } else {
+                shippingFields.style.display = 'none';
+                shippingLine.style.display = 'none';
+                // Remove required from shipping fields
+                document.getElementById('shippingAddress').required = false;
+                document.getElementById('shippingCity').required = false;
+                document.getElementById('shippingState').required = false;
+                document.getElementById('shippingZip').required = false;
+            }
+            
+            // Recalculate total
+            const currentSamplesTotal = parseFloat(document.getElementById('samplesSubtotal').textContent.replace('$', '')) || 0;
+            updateOrderTotal(currentSamplesTotal);
+        }
+        
+        // Update order total display
+        function updateOrderTotal(samplesCost) {
+            const orderTotalDisplay = document.getElementById('orderTotalDisplay');
+            const samplesSubtotal = document.getElementById('samplesSubtotal');
+            const finalTotal = document.getElementById('finalTotal');
+            const submitButtonText = document.getElementById('submitButtonText');
+            
+            // Get delivery method
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const shippingCost = deliveryMethod === 'ship' ? 10.00 : 0;
+            
+            // Calculate total
+            const total = samplesCost + shippingCost;
+            
+            // Update display
+            samplesSubtotal.textContent = `$${samplesCost.toFixed(2)}`;
+            finalTotal.textContent = `$${total.toFixed(2)}`;
+            
+            // Show/hide order total display and update button text
+            if (total > 0) {
+                orderTotalDisplay.style.display = 'block';
+                submitButtonText.textContent = `Submit Sample Order ($${total.toFixed(2)})`;
+            } else {
+                if (window.sampleCart && window.sampleCart.samples.length > 0) {
+                    // Has free samples
+                    orderTotalDisplay.style.display = 'none';
+                    submitButtonText.textContent = 'Request Free Samples';
+                } else {
+                    orderTotalDisplay.style.display = 'none';
+                    submitButtonText.textContent = 'Request Samples';
+                }
+            }
         }
         
         // Remove sample from modal
@@ -2666,10 +3089,14 @@
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitSampleRequest');
+            const originalButtonText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
             
             try {
+                // Get delivery method
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+                
                 // Get form data
                 const formData = {
                     name: document.getElementById('sampleName').value,
@@ -2679,27 +3106,77 @@
                     projectType: document.getElementById('projectType').value,
                     estimatedQuantity: document.getElementById('estimatedQuantity').value,
                     timeline: document.getElementById('timeline').value,
-                    notes: document.getElementById('sampleNotes').value
+                    notes: document.getElementById('sampleNotes').value,
+                    deliveryMethod: deliveryMethod
                 };
+                
+                // Add shipping address if needed
+                if (deliveryMethod === 'ship') {
+                    formData.shippingAddress = document.getElementById('shippingAddress').value;
+                    formData.shippingCity = document.getElementById('shippingCity').value;
+                    formData.shippingState = document.getElementById('shippingState').value;
+                    formData.shippingZip = document.getElementById('shippingZip').value;
+                    formData.shippingCost = 10.00;
+                } else {
+                    formData.shippingCost = 0;
+                }
                 
                 // Get samples from cart
                 const cartSummary = window.sampleCart.getCartSummary();
+                
+                // Calculate totals
+                let samplesCost = 0;
+                cartSummary.items.forEach(item => {
+                    if (item.price > 0) {
+                        samplesCost += item.price;
+                    }
+                });
+                formData.samplesCost = samplesCost;
+                formData.totalAmount = samplesCost + formData.shippingCost;
                 
                 // Check for duplicate requests
                 const isDuplicate = await sampleRequestService.checkDuplicateRequest(formData.email);
                 if (isDuplicate) {
                     alert('You have already requested samples within the last 30 days. Please contact us directly if you need additional samples.');
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Free Samples';
+                    submitBtn.innerHTML = originalButtonText;
                     return;
                 }
+                
+                // Save to database with enhanced notes
+                const enhancedNotes = [
+                    formData.notes,
+                    '',
+                    '=== ORDER DETAILS ===',
+                    `Delivery Method: ${deliveryMethod === 'ship' ? 'Ship' : 'Pickup at NWCA'}`,
+                    deliveryMethod === 'ship' ? `Shipping Address: ${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingState} ${formData.shippingZip}` : '',
+                    '',
+                    '=== SAMPLES REQUESTED ===',
+                    ...cartSummary.items.map(item => 
+                        `${item.name} (${item.style})` +
+                        `${item.color ? ` - Color: ${item.color}` : ''}` +
+                        `${item.size ? `, Size: ${item.size}` : ''}` +
+                        `${item.price > 0 ? ` - $${item.price.toFixed(2)}` : ' - FREE'}`
+                    ),
+                    '',
+                    '=== TOTALS ===',
+                    `Samples: $${samplesCost.toFixed(2)}`,
+                    deliveryMethod === 'ship' ? `Shipping: $10.00` : '',
+                    `Total to Collect: $${formData.totalAmount.toFixed(2)}`
+                ].filter(line => line !== '').join('\n');
+                
+                formData.notes = enhancedNotes;
                 
                 // Save to database
                 const result = await sampleRequestService.saveSampleRequest(formData, cartSummary.items);
                 
                 if (result.success) {
                     // Show success message
-                    alert(`Success! Your sample request ${result.requestID} has been submitted. We'll ship your samples within 2 business days.`);
+                    const message = formData.totalAmount > 0 
+                        ? `Success! Your sample request ${result.requestID} has been submitted.\n\nTotal to collect: $${formData.totalAmount.toFixed(2)}\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nAn account executive will contact you to process payment.`
+                        : `Success! Your free sample request ${result.requestID} has been submitted.\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}`;
+                    
+                    alert(message);
                     
                     // Clear cart
                     window.sampleCart.clearCart();
@@ -2718,7 +3195,7 @@
                 alert('There was an error submitting your request. Please try again or contact us directly.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Free Samples';
+                submitBtn.innerHTML = originalButtonText;
             }
         }
         
