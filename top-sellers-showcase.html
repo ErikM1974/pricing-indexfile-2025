@@ -405,9 +405,9 @@
                         notesContent += ` | Timeline: ${formData.timeline}`;
                     }
                     
-                    // Add delivery info
+                    // Add delivery info including street address
                     if (formData.deliveryMethod === 'ship') {
-                        notesContent += ` | Ship to: ${formData.shippingCity || 'TBD'}, ${formData.shippingState || 'TBD'}`;
+                        notesContent += ` | Ship to: ${formData.shippingAddress || 'TBD'}, ${formData.shippingCity || 'TBD'}, ${formData.shippingState || 'TBD'} ${formData.shippingZip || ''}`;
                     } else {
                         notesContent += ' | Pickup at NWCA';
                     }
@@ -441,7 +441,13 @@
                         ExpiresAt: expiresAt,
                         Notes: notesContent,
                         // ProjectName field - leave empty to avoid database type issues
-                        ProjectName: ''
+                        ProjectName: '',
+                        // New shipping fields
+                        ShippingAddress: formData.shippingAddress || '',
+                        ShippingCity: formData.shippingCity || '',
+                        ShippingState: formData.shippingState || '',
+                        ShippingZip: formData.shippingZip || '',
+                        DeliveryMethod: formData.deliveryMethod || 'pickup'
                     };
                     
                     // Validate data before sending

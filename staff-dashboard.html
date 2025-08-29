@@ -7003,7 +7003,7 @@
             
             tbody.innerHTML = requests.map(request => {
                 const date = new Date(request.CreatedAt).toLocaleDateString();
-                const delivery = extractDeliveryMethod(request.Notes);
+                const delivery = request.DeliveryMethod || 'pickup';
                 const statusBadge = getStatusBadge(request.Status);
                 
                 return `
@@ -7018,7 +7018,12 @@
                             </span>
                         </td>
                         <td style="padding: 0.75rem; font-weight: 500;">$${(request.TotalAmount || 0).toFixed(2)}</td>
-                        <td style="padding: 0.75rem;">${delivery}</td>
+                        <td style="padding: 0.75rem;">
+                            <span class="badge ${delivery === 'ship' ? 'badge-warning' : 'badge-info'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; text-transform: capitalize;">
+                                <i class="fas ${delivery === 'ship' ? 'fa-truck' : 'fa-store'}" style="margin-right: 0.25rem;"></i>
+                                ${delivery === 'ship' ? 'Ship' : 'Pickup'}
+                            </span>
+                        </td>
                         <td style="padding: 0.75rem;">${statusBadge}</td>
                         <td style="padding: 0.75rem;">
                             <button onclick="viewSampleDetails('${request.QuoteID}')" class="quick-btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
@@ -7157,23 +7162,33 @@
                                 <div><strong>Date:</strong> ${new Date(request.CreatedAt).toLocaleString()}</div>
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
                                 <div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>
-                                ${orderDetails.delivery ? `<div><strong>Delivery:</strong> ${orderDetails.delivery === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
-                                ${orderDetails.totals ? `
-                                    <div><strong>Samples Cost:</strong> $${orderDetails.totals.samples?.toFixed(2) || '0.00'}</div>
-                                    <div><strong>Shipping:</strong> $${orderDetails.totals.shipping?.toFixed(2) || '0.00'}</div>
-                                    <div><strong>Tax:</strong> $${orderDetails.totals.tax?.toFixed(2) || '0.00'}</div>
+                                ${request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${request.DeliveryMethod === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
+                                ${orderDetails.totals || request.SubtotalAmount ? `
+                                    <div><strong>Samples Cost:</strong> $${(orderDetails.totals?.samples || request.SubtotalAmount || 0).toFixed(2)}</div>
+                                    ${request.DeliveryMethod === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
+                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - (request.DeliveryMethod === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
                                 ` : ''}
                             </div>
                         </div>
                         
                         <!-- Shipping Address (if applicable) -->
-                        ${(orderDetails.shipping || shippingAddress) ? `
+                        ${request.DeliveryMethod === 'ship' ? `
                             <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
                                 <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">
                                     <i class="fas fa-shipping-fast"></i> Shipping Information
                                 </h4>
                                 <div>
-                                    ${orderDetails.shipping ? `
+                                    ${request.ShippingAddress || request.ShippingCity || request.ShippingState || request.ShippingZip ? `
+                                        ${request.ShippingAddress ? `<div><strong>Street Address:</strong> ${request.ShippingAddress}</div>` : ''}
+                                        ${request.ShippingCity ? `<div><strong>City:</strong> ${request.ShippingCity}</div>` : ''}
+                                        ${request.ShippingState ? `<div><strong>State:</strong> ${request.ShippingState}</div>` : ''}
+                                        ${request.ShippingZip ? `<div><strong>ZIP:</strong> ${request.ShippingZip}</div>` : ''}
+                                        ${!request.ShippingAddress ? `
+                                            <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
+                                                <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Street address missing - please contact customer
+                                            </div>
+                                        ` : ''}
+                                    ` : orderDetails.shipping ? `
                                         <div><strong>Address:</strong> ${orderDetails.shipping.address || ''}</div>
                                         <div><strong>City:</strong> ${orderDetails.shipping.city || ''}</div>
                                         <div><strong>State:</strong> ${orderDetails.shipping.state || ''}</div>
@@ -7185,7 +7200,11 @@
                                         <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
                                             <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Complete shipping address needed for processing
                                         </div>
-                                    ` : ''}
+                                    ` : `
+                                        <div style="padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
+                                            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> No shipping information available
+                                        </div>
+                                    `}
                                 </div>
                             </div>
                         ` : ''}
