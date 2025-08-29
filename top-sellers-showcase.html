@@ -389,12 +389,13 @@
                         .toISOString()
                         .replace(/\.\d{3}Z$/, '');
                     
-                    // Use the enhanced notes passed from the form handler
-                    const notes = formData.notes || '';
+                    // Use the simplified notes
+                    const notes = formData.notes || 'Sample request';
                     
                     // Calculate totals
                     const samplesCost = formData.samplesCost || 0;
                     const shippingCost = formData.shippingCost || 0;
+                    const salesTax = formData.salesTax || 0;
                     const totalAmount = formData.totalAmount || 0;
                     
                     const sessionData = {
@@ -406,7 +407,7 @@
                         Phone: formData.phone || '',
                         TotalQuantity: samples.length,
                         SubtotalAmount: parseFloat(samplesCost.toFixed(2)),
-                        LTMFeeTotal: parseFloat(shippingCost.toFixed(2)), // Using LTM field for shipping
+                        LTMFeeTotal: parseFloat((shippingCost + salesTax).toFixed(2)), // Using LTM field for shipping + tax
                         TotalAmount: parseFloat(totalAmount.toFixed(2)),
                         Status: 'Sample Request',
                         ExpiresAt: expiresAt,
@@ -434,6 +435,24 @@
                         // Use the sample price if it's a paid sample
                         const itemPrice = sample.price || 0;
                         
+                        // For the first item, include complete order details
+                        let sizeBreakdownData = {
+                            size: sample.size || 'L',
+                            color: sample.color || ''
+                        };
+                        
+                        // Add complete order details to first item
+                        if (index === 0 && formData.orderDetails) {
+                            sizeBreakdownData.orderInfo = {
+                                delivery: formData.deliveryMethod,
+                                shipping: formData.orderDetails.shipping,
+                                totals: formData.orderDetails.totals,
+                                projectType: formData.projectType,
+                                estimatedQuantity: formData.estimatedQuantity,
+                                timeline: formData.timeline
+                            };
+                        }
+                        
                         const itemData = {
                             QuoteID: quoteID,
                             LineNumber: index + 1,
@@ -450,10 +469,7 @@
                             LTMPerUnit: 0,
                             FinalUnitPrice: parseFloat(itemPrice.toFixed(2)),
                             LineTotal: parseFloat(itemPrice.toFixed(2)),
-                            SizeBreakdown: JSON.stringify({ 
-                                size: sample.size || 'L',
-                                color: sample.color || ''
-                            }),
+                            SizeBreakdown: JSON.stringify(sizeBreakdownData),
                             PricingTier: itemPrice > 0 ? 'Paid Sample' : 'Free Sample',
                             ImageURL: sample.imageUrl || '',
                             AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
@@ -3177,26 +3193,47 @@
                 formData.salesTax = salesTax;
                 formData.totalAmount = finalTotal;
                 
-                // Save to database with enhanced notes (single line with pipe separators to avoid Caspio issues)
-                const samplesList = cartSummary.items.map(item => 
-                    `${item.name} (${item.style})` +
-                    `${item.color ? ` - Color: ${item.color}` : ''}` +
-                    `${item.size ? `, Size: ${item.size}` : ''}` +
-                    `${item.price > 0 ? ` - $${item.price.toFixed(2)}` : ' - FREE'}`
-                ).join(' | ');
+                // Create simple notes for Caspio (avoiding special characters that might cause issues)
+                let simpleNotes = formData.notes || 'Sample request';
                 
-                const enhancedNotes = [
-                    formData.notes ? `Notes: ${formData.notes}` : '',
-                    `Delivery: ${deliveryMethod === 'ship' ? 'Ship' : 'Pickup'}`,
-                    deliveryMethod === 'ship' ? `Ship To: ${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingState} ${formData.shippingZip}` : '',
-                    `Samples: ${samplesList}`,
-                    `Subtotal: $${samplesCost.toFixed(2)}`,
-                    deliveryMethod === 'ship' ? `Shipping: $10.00` : '',
-                    taxableAmount > 0 ? `Tax (10.1%): $${salesTax.toFixed(2)}` : '',
-                    `Total: $${finalTotal.toFixed(2)}`
-                ].filter(line => line !== '').join(' | ');
+                // Add basic delivery info
+                if (deliveryMethod === 'ship') {
+                    simpleNotes += ` - Ship to ${formData.shippingCity}, ${formData.shippingState}`;
+                } else {
+                    simpleNotes += ' - Pickup at NWCA';
+                }
                 
-                formData.notes = enhancedNotes;
+                // Add sample count and total
+                simpleNotes += ` - ${cartSummary.items.length} samples`;
+                if (finalTotal > 0) {
+                    simpleNotes += ` - Total: $${finalTotal.toFixed(2)}`;
+                }
+                
+                formData.notes = simpleNotes;
+                
+                // Store detailed order info for the AE
+                formData.orderDetails = {
+                    samples: cartSummary.items.map(item => ({
+                        style: item.style,
+                        name: item.name,
+                        color: item.color || 'TBD',
+                        size: item.size || 'TBD',
+                        price: item.price || 0
+                    })),
+                    delivery: deliveryMethod,
+                    shipping: deliveryMethod === 'ship' ? {
+                        address: formData.shippingAddress,
+                        city: formData.shippingCity,
+                        state: formData.shippingState,
+                        zip: formData.shippingZip
+                    } : null,
+                    totals: {
+                        samples: samplesCost,
+                        shipping: formData.shippingCost,
+                        tax: salesTax,
+                        total: finalTotal
+                    }
+                };
                 
                 // Save to database
                 const result = await sampleRequestService.saveSampleRequest(formData, cartSummary.items);
