@@ -1,54 +1,102 @@
 # Sample Request System Implementation
 
 ## Overview
-Implementing a free sample request system for the top sellers showcase page that allows customers to request 2-3 physical samples without calling. Uses existing quote API infrastructure and size-pricing endpoint for eligibility.
+Implementing a sample request system for the top sellers showcase page that allows customers to request up to 3 physical samples. Uses existing quote API infrastructure and size-pricing endpoint for eligibility.
+
+### Sample Types:
+- **FREE Samples**: Products under $10 minimum price (from Sanmar)
+- **PAID Samples**: Products $10+ at cost + 40% margin (rounded up)
+- **No Samples**: Non-Sanmar products (Richardson, etc.)
 
 ## Progress Status
 
 ### ✅ Completed
-1. **sample-cart.js** - Sample cart management system
+1. **Sample Cart System** 
    - Eligibility checking via size-pricing API
+   - Three-tier pricing: FREE (<$10), PAID ($10+), NO SAMPLES (non-Sanmar)
    - Max 3 samples limit enforcement
    - Session storage persistence
    - Floating cart widget UI
-   - Toast notifications
-   - Cache for API calls
+   - Color/size selection for each sample
 
-2. **sample-request-service.js** - Database integration service
-   - Uses existing quote API infrastructure
-   - Sample Request prefix "SR"
+2. **Database Integration**
+   - Uses existing quote_sessions and quote_items tables
+   - Sample Request prefix "SR" (e.g., SR0829-1)
+   - Simplified Notes field to avoid Caspio errors
+   - Detailed order info stored in SizeBreakdown JSON field
    - Duplicate request prevention (30-day check)
-   - EmailJS integration ready
-   - CRUD operations for sample requests
 
-3. **Modified top-sellers-showcase.html**
-   - Added sample request buttons to product cards
-   - Integrated floating sample cart widget
-   - Added sample request modal with form
-   - Integrated all JavaScript functions
-   - CSS styling for all sample components
+3. **Order Processing Features**
+   - Delivery method selection (Pickup FREE vs Ship $10)
+   - Conditional shipping address fields
+   - 10.1% Milton sales tax calculation
+   - Complete order total with tax breakdown
+   - All details captured for manual Shopworks entry
+
+4. **User Interface**
+   - Sample request buttons on eligible products
+   - Floating sample cart widget
+   - Complete order form with project details
+   - Success messages with order breakdown
+   - Mobile responsive design
 
 ### 📋 To Do
-4. **Create sample-requests-dashboard.html**
+5. **Create sample-requests-dashboard.html**
    - Staff view for managing requests
    - Fulfillment tracking
    - Export functionality
 
-5. **Update staff-dashboard.html**
+6. **Update staff-dashboard.html**
    - Add link to sample requests
 
 ## Key Implementation Details
 
 ### Eligibility Rules
-- Products with average price < $10 are eligible for free samples
+- Products with MINIMUM price < $10 = FREE samples
+- Products with MINIMUM price ≥ $10 = PAID samples at Math.ceil(minPrice / 0.60)
+- Non-Sanmar products (no API data) = NO samples available
 - Using endpoint: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=XXX`
-- Caching results to minimize API calls
+- Results cached to minimize API calls
 
 ### Database Structure
-- Using existing quote_sessions and quote_items tables
-- Sample requests use prefix "SR" (e.g., SR1230-1)
-- Status field set to "Sample Request"
-- Price fields set to 0.00 (free samples)
+**quote_sessions table:**
+- QuoteID: "SR[MMDD]-[sequence]" format
+- Status: "Sample Request"
+- Notes: Simplified format (e.g., "Sample request - Ship to Seattle, WA - 3 samples - Total: $33.03")
+- SubtotalAmount: Sample costs
+- LTMFeeTotal: Shipping + Tax combined
+- TotalAmount: Final total including tax
+
+**quote_items table:**
+- Each sample as separate line item
+- FinalUnitPrice: Sample price (0 for free, actual price for paid)
+- SizeBreakdown field contains:
+  - Sample's selected size and color
+  - First item also includes complete order details JSON:
+    ```json
+    {
+      "size": "L",
+      "color": "Black",
+      "orderInfo": {
+        "delivery": "ship",
+        "shipping": {
+          "address": "123 Main St",
+          "city": "Seattle",
+          "state": "WA",
+          "zip": "98101"
+        },
+        "totals": {
+          "samples": 20.00,
+          "shipping": 10.00,
+          "tax": 3.03,
+          "total": 33.03
+        },
+        "projectType": "Screen Printing",
+        "estimatedQuantity": "100-249",
+        "timeline": "Within 2 weeks"
+      }
+    }
+    ```
 
 ### Sample Cart Features
 - Maximum 3 samples per request
