@@ -172,7 +172,9 @@
                     name: product.name,
                     description: product.description,
                     imageUrl: product.imageUrl || '',
-                    selectedColor: product.selectedColor || '',
+                    color: product.color || '',  // Store actual color name
+                    colorCode: product.colorCode || '',  // Store color code
+                    size: product.size || '',  // Store selected size
                     price: product.price || 0,
                     type: product.type || 'free',
                     addedAt: new Date().toISOString()
