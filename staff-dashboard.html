@@ -7042,6 +7042,41 @@
             return 'Unknown';
         }
         
+        // Helper functions to extract shipping info from notes as fallback
+        function extractCityFromNotes(notes) {
+            if (!notes) return '';
+            const match = notes.match(/Ship to: ([^,]+),/i);
+            if (match) {
+                // Extract just the city part (might have street address before it)
+                const parts = match[1].trim().split(' ');
+                // If it starts with numbers, it's likely street address, skip it
+                if (/^\d/.test(parts[0])) {
+                    return parts.slice(-1)[0]; // Return last part as city
+                }
+                return match[1].trim();
+            }
+            return '';
+        }
+        
+        function extractStateFromNotes(notes) {
+            if (!notes) return '';
+            const match = notes.match(/Ship to: [^,]+, ([A-Z]{2})/i);
+            return match ? match[1].trim() : '';
+        }
+        
+        function extractZipFromNotes(notes) {
+            if (!notes) return '';
+            const match = notes.match(/Ship to: [^,]+, [A-Z]{2} (\d{5})/i);
+            return match ? match[1].trim() : '';
+        }
+        
+        // Clean shipping info from notes for display
+        function cleanNotesDisplay(notes) {
+            if (!notes) return '';
+            // Remove the shipping line from notes
+            return notes.replace(/\| Ship to: [^|]*/gi, '').replace(/Ship to: [^|]*/gi, '').trim();
+        }
+        
         function getStatusBadge(status) {
             const badges = {
                 'Sample Request': '<span style="background: #fbbf24; color: #78350f; padding: 2px 8px; border-radius: 4px; font-size: 0.875rem;">Pending</span>',
@@ -7173,39 +7208,61 @@
                         
                         <!-- Shipping Address (if applicable) -->
                         ${request.DeliveryMethod === 'ship' ? `
-                            <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                                <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">
-                                    <i class="fas fa-shipping-fast"></i> Shipping Information
+                            <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border: 2px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h4 style="margin: 0 0 1.25rem 0; color: #92400e; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-shipping-fast" style="color: #f59e0b;"></i> 
+                                    Shipping Information - For ShopWorks Entry
                                 </h4>
-                                <div>
-                                    ${request.ShippingAddress || request.ShippingCity || request.ShippingState || request.ShippingZip ? `
-                                        ${request.ShippingAddress ? `<div><strong>Street Address:</strong> ${request.ShippingAddress}</div>` : ''}
-                                        ${request.ShippingCity ? `<div><strong>City:</strong> ${request.ShippingCity}</div>` : ''}
-                                        ${request.ShippingState ? `<div><strong>State:</strong> ${request.ShippingState}</div>` : ''}
-                                        ${request.ShippingZip ? `<div><strong>ZIP:</strong> ${request.ShippingZip}</div>` : ''}
-                                        ${!request.ShippingAddress ? `
-                                            <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
-                                                <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Street address missing - please contact customer
-                                            </div>
-                                        ` : ''}
-                                    ` : orderDetails.shipping ? `
-                                        <div><strong>Address:</strong> ${orderDetails.shipping.address || ''}</div>
-                                        <div><strong>City:</strong> ${orderDetails.shipping.city || ''}</div>
-                                        <div><strong>State:</strong> ${orderDetails.shipping.state || ''}</div>
-                                        <div><strong>ZIP:</strong> ${orderDetails.shipping.zip || ''}</div>
-                                    ` : shippingAddress ? `
-                                        <div><strong>Destination:</strong> ${shippingAddress.full}</div>
-                                        ${shippingAddress.city ? `<div><strong>City:</strong> ${shippingAddress.city}</div>` : ''}
-                                        ${shippingAddress.state ? `<div><strong>State:</strong> ${shippingAddress.state}</div>` : ''}
-                                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
-                                            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Complete shipping address needed for processing
+                                <div style="display: grid; gap: 0.875rem; background: white; padding: 1rem; border-radius: 6px; border: 1px solid #fed7aa;">
+                                    <!-- Street Address Field -->
+                                    <div style="display: flex; align-items: start; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">Street Address:</label>
+                                        <div style="flex: 1;">
+                                            ${request.ShippingAddress ? 
+                                                `<span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">${request.ShippingAddress}</span>` : 
+                                                `<span style="color: #dc2626; font-style: italic; font-size: 0.875rem;">
+                                                    <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem;"></i>
+                                                    Missing - Contact customer for street address
+                                                </span>`
+                                            }
                                         </div>
-                                    ` : `
-                                        <div style="padding: 0.5rem; background: #fbbf24; border-radius: 4px; font-size: 0.875rem;">
-                                            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> No shipping information available
-                                        </div>
-                                    `}
+                                    </div>
+                                    
+                                    <!-- City Field -->
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">City:</label>
+                                        <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
+                                            ${request.ShippingCity || extractCityFromNotes(request.Notes) || 'Not provided'}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- State Field -->
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                                        <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">State:</label>
+                                        <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
+                                            ${request.ShippingState || extractStateFromNotes(request.Notes) || 'Not provided'}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- ZIP Code Field -->
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">ZIP Code:</label>
+                                        <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
+                                            ${request.ShippingZip || extractZipFromNotes(request.Notes) || 'Not provided'}
+                                        </span>
+                                    </div>
                                 </div>
+                                
+                                ${!request.ShippingAddress ? `
+                                    <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+                                        <div style="font-size: 0.875rem; color: #92400e; font-weight: 600; margin-bottom: 0.25rem;">
+                                            <i class="fas fa-info-circle"></i> Action Required
+                                        </div>
+                                        <div style="font-size: 0.875rem; color: #78350f;">
+                                            Please contact customer to obtain complete street address before processing in ShopWorks.
+                                        </div>
+                                    </div>
+                                ` : ''}
                             </div>
                         ` : ''}
                         
@@ -7296,7 +7353,7 @@
                                 ${orderDetails.projectType ? `<div><strong>Project Type:</strong> ${orderDetails.projectType}</div>` : ''}
                                 ${orderDetails.estimatedQuantity ? `<div><strong>Estimated Quantity:</strong> ${orderDetails.estimatedQuantity}</div>` : ''}
                                 ${orderDetails.timeline ? `<div><strong>Timeline:</strong> ${orderDetails.timeline}</div>` : ''}
-                                ${request.Notes ? `<div style="margin-top: 0.5rem;"><strong>Notes:</strong><br>${request.Notes.replace(/\|/g, '<br>')}</div>` : ''}
+                                ${request.Notes ? `<div style="margin-top: 0.5rem;"><strong>Notes:</strong><br>${cleanNotesDisplay(request.Notes).replace(/\|/g, '<br>')}</div>` : ''}
                             </div>
                         ` : ''}
                     </div>
