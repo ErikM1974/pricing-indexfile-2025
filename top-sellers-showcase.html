@@ -366,11 +366,11 @@
                 const day = now.getDate().toString().padStart(2, '0');
                 const dateKey = `${month}${day}`;
                 
-                const storageKey = `sample_request_sequence_${dateKey}`;
-                let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-                sessionStorage.setItem(storageKey, sequence.toString());
+                // Use timestamp + random to ensure uniqueness across all users/sessions
+                const timestamp = now.getTime().toString();
+                const uniqueId = timestamp.slice(-6) + Math.random().toString(36).substr(2, 3);
                 
-                return `${this.quotePrefix}${dateKey}-${sequence}`;
+                return `${this.quotePrefix}${dateKey}-${uniqueId}`;
             }
 
             generateSessionID() {
