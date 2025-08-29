@@ -64,9 +64,69 @@
             }
 
             async checkEligibility(styleNumber) {
-                // For testing, make all products eligible
-                console.log(`Checking eligibility for ${styleNumber} - returning true for testing`);
-                return true;
+                // Check cache first
+                if (this.eligibilityCache[styleNumber] !== undefined) {
+                    return this.eligibilityCache[styleNumber];
+                }
+
+                try {
+                    const response = await fetch(`${this.apiBase}/api/size-pricing?styleNumber=${styleNumber}`);
+                    const data = await response.json();
+                    
+                    // Check if product is in Sanmar (has pricing data)
+                    if (!data || data.error || data.length === 0) {
+                        console.log(`Style ${styleNumber}: Not in Sanmar - no samples available`);
+                        const result = { 
+                            eligible: false, 
+                            reason: 'not_sanmar'
+                        };
+                        this.eligibilityCache[styleNumber] = result;
+                        return result;
+                    }
+                    
+                    // Find MINIMUM price (not average)
+                    const firstItem = data[0];
+                    const prices = firstItem.basePrices || {};
+                    const priceValues = Object.values(prices).filter(p => p > 0);
+                    
+                    if (priceValues.length === 0) {
+                        const result = { eligible: false, reason: 'no_pricing' };
+                        this.eligibilityCache[styleNumber] = result;
+                        return result;
+                    }
+                    
+                    const minPrice = Math.min(...priceValues);
+                    console.log(`Style ${styleNumber}: Min price $${minPrice.toFixed(2)}`);
+                    
+                    if (minPrice < 10) {
+                        const result = { 
+                            eligible: true, 
+                            type: 'free', 
+                            price: 0,
+                            minCost: minPrice
+                        };
+                        this.eligibilityCache[styleNumber] = result;
+                        console.log(`  → FREE sample`);
+                        return result;
+                    } else {
+                        // Calculate markup: cost / 0.60, round up
+                        const samplePrice = Math.ceil(minPrice / 0.60);
+                        const result = { 
+                            eligible: true, 
+                            type: 'paid', 
+                            price: samplePrice,
+                            minCost: minPrice
+                        };
+                        this.eligibilityCache[styleNumber] = result;
+                        console.log(`  → PAID sample at $${samplePrice}`);
+                        return result;
+                    }
+                } catch (error) {
+                    console.error(`Error checking eligibility for ${styleNumber}:`, error);
+                    const result = { eligible: false, reason: 'api_error' };
+                    this.eligibilityCache[styleNumber] = result;
+                    return result;
+                }
             }
 
             addSample(product) {
@@ -86,12 +146,21 @@
                     description: product.description,
                     imageUrl: product.imageUrl || '',
                     selectedColor: product.selectedColor || '',
+                    price: product.price || 0,
+                    type: product.type || 'free',
                     addedAt: new Date().toISOString()
                 });
 
                 this.save();
                 this.updateUI();
-                this.showNotification(`${product.name} added to samples`, 'success');
+                
+                // Custom message based on sample type
+                if (product.type === 'paid') {
+                    this.showNotification(`${product.name} added - $${product.price} sample`, 'success');
+                } else {
+                    this.showNotification(`${product.name} added - FREE sample`, 'success');
+                }
+                
                 this.showWidget();
                 
                 return true;
@@ -210,12 +279,48 @@
             }
 
             async checkAllProductEligibility() {
-                // For testing, show all sample buttons
-                console.log('Showing all sample buttons for testing');
-                document.querySelectorAll('.btn-sample').forEach(btn => {
-                    btn.style.display = 'inline-flex';
-                    btn.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
+                console.log('Checking product eligibility for samples...');
+                const buttons = document.querySelectorAll('.btn-sample[data-style]');
+                const checks = [];
+                
+                buttons.forEach(btn => {
+                    const style = btn.dataset.style;
+                    if (style) {
+                        checks.push(this.checkAndUpdateButton(btn, style));
+                    }
                 });
+                
+                await Promise.all(checks);
+                console.log('Eligibility check complete');
+            }
+            
+            async checkAndUpdateButton(button, styleNumber) {
+                const result = await this.checkEligibility(styleNumber);
+                
+                if (!result.eligible) {
+                    // Hide button for non-Sanmar products
+                    button.style.display = 'none';
+                    return;
+                }
+                
+                button.style.display = 'inline-flex';
+                button.style.width = '100%';
+                
+                // Store pricing data
+                button.dataset.samplePrice = result.price;
+                button.dataset.sampleType = result.type;
+                
+                // Check if already in cart
+                if (this.samples.find(s => s.style === styleNumber)) {
+                    button.innerHTML = '<i class="fas fa-check"></i> In Sample Cart';
+                    button.classList.add('in-cart');
+                } else if (result.type === 'free') {
+                    button.innerHTML = '<i class="fas fa-box-open"></i> Request Free Sample';
+                    button.className = 'btn-sample btn-sample-free';
+                } else {
+                    button.innerHTML = `<i class="fas fa-shopping-cart"></i> Order Sample - $${result.price}`;
+                    button.className = 'btn-sample btn-sample-paid';
+                }
             }
         }
 
@@ -295,6 +400,51 @@
                         throw new Error(`Failed to save session: ${errorText}`);
                     }
                     
+                    // Save individual sample items
+                    console.log(`Saving ${samples.length} sample items...`);
+                    const itemPromises = samples.map(async (sample, index) => {
+                        const itemData = {
+                            QuoteID: quoteID,
+                            LineNumber: index + 1,
+                            StyleNumber: sample.style,
+                            ProductName: sample.name || sample.description,
+                            Color: sample.selectedColor || 'Customer Choice',
+                            ColorCode: '',
+                            EmbellishmentType: 'sample',
+                            PrintLocation: '',
+                            PrintLocationName: '',
+                            Quantity: 1,
+                            HasLTM: 'No',
+                            BaseUnitPrice: 0,
+                            LTMPerUnit: 0,
+                            FinalUnitPrice: 0,
+                            LineTotal: 0,
+                            SizeBreakdown: JSON.stringify({ size: sample.selectedSize || 'L' }),
+                            PricingTier: 'Sample',
+                            ImageURL: sample.imageUrl || '',
+                            AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                        };
+                        
+                        console.log(`Saving item ${index + 1}:`, itemData);
+                        
+                        const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(itemData)
+                        });
+                        
+                        if (!itemResponse.ok) {
+                            console.error(`Failed to save item ${index + 1}:`, await itemResponse.text());
+                        }
+                        
+                        return itemResponse.ok;
+                    });
+                    
+                    await Promise.all(itemPromises);
+                    console.log('All items saved successfully');
+                    
                     return {
                         success: true,
                         requestID: quoteID
@@ -310,9 +460,17 @@
             }
         }
 
-        // Initialize immediately
-        window.sampleCart = new SampleCart();
-        window.sampleRequestService = new SampleRequestService();
+        // Initialize when DOM is ready to avoid document.body being null
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                window.sampleCart = new SampleCart();
+                window.sampleRequestService = new SampleRequestService();
+            });
+        } else {
+            // DOM already loaded (shouldn't happen in head, but just in case)
+            window.sampleCart = new SampleCart();
+            window.sampleRequestService = new SampleRequestService();
+        }
     </script>
     
     <style>
@@ -1154,20 +1312,31 @@
         
         /* Sample Request Styles */
         .btn-sample {
-            background: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
             padding: 0.625rem 1rem;
             border-radius: 8px;
             font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: inline-flex; /* Show by default for testing */
+            display: none; /* Hidden until eligibility checked */
             align-items: center;
             gap: 0.5rem;
             margin-top: 0.5rem;
             width: 100%;
+            justify-content: center;
+            border: 2px solid;
+        }
+        
+        .btn-sample-free {
+            background: white;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-sample-paid {
+            background: white;
+            color: #2563eb;
+            border-color: #2563eb;
         }
         
         .btn-sample:hover:not(:disabled) {
@@ -2244,20 +2413,18 @@
                 }
             });
             
-            // Show sample buttons after products are displayed
+            // Check eligibility and update buttons after products are displayed
             setTimeout(() => {
-                console.log('Showing sample buttons after products loaded');
-                document.querySelectorAll('.btn-sample').forEach(btn => {
-                    btn.style.display = 'inline-flex';
-                    btn.style.width = '100%';
-                    if (!btn.innerHTML.includes('Sample')) {
-                        btn.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
-                    }
-                });
-                
-                // Update buttons if sample cart is available
-                if (window.sampleCart) {
-                    window.sampleCart.updateSampleButtons();
+                if (window.sampleCart && typeof window.sampleCart.checkAllProductEligibility === 'function') {
+                    console.log('Checking sample eligibility for all products...');
+                    window.sampleCart.checkAllProductEligibility();
+                } else {
+                    console.log('Sample cart not ready, retrying...');
+                    setTimeout(() => {
+                        if (window.sampleCart) {
+                            window.sampleCart.checkAllProductEligibility();
+                        }
+                    }, 500);
                 }
             }, 100);
         }
@@ -2414,6 +2581,11 @@
         function handleSampleRequest(styleNumber, productName, imageUrl) {
             if (!window.sampleCart) return;
             
+            // Get the button to retrieve pricing info
+            const button = event.target.closest('.btn-sample');
+            const samplePrice = parseFloat(button.dataset.samplePrice) || 0;
+            const sampleType = button.dataset.sampleType || 'free';
+            
             // Check if already in cart
             const cartSummary = window.sampleCart.getCartSummary();
             const existingItem = cartSummary.items.find(item => item.style === styleNumber);
@@ -2422,12 +2594,14 @@
                 // Remove from cart
                 window.sampleCart.removeSample(styleNumber);
             } else {
-                // Add to cart
+                // Add to cart with pricing info
                 window.sampleCart.addSample({
                     style: styleNumber,
                     name: productName,
                     description: productName,
-                    imageUrl: imageUrl
+                    imageUrl: imageUrl,
+                    price: samplePrice,
+                    type: sampleType
                 });
             }
         }
