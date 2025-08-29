@@ -392,11 +392,9 @@
                     // Use the simplified notes
                     const notes = formData.notes || 'Sample request';
                     
-                    // Calculate totals
-                    const samplesCost = formData.samplesCost || 0;
-                    const shippingCost = formData.shippingCost || 0;
-                    const salesTax = formData.salesTax || 0;
-                    const totalAmount = formData.totalAmount || 0;
+                    // Get totals with proper defaults
+                    const samplesCost = parseFloat((formData.samplesCost || 0).toFixed(2));
+                    const totalAmount = parseFloat((formData.totalAmount || 0).toFixed(2));
                     
                     const sessionData = {
                         QuoteID: quoteID,
@@ -406,15 +404,24 @@
                         CompanyName: formData.company || '',
                         Phone: formData.phone || '',
                         TotalQuantity: samples.length,
-                        SubtotalAmount: parseFloat(samplesCost.toFixed(2)),
-                        LTMFeeTotal: parseFloat((shippingCost + salesTax).toFixed(2)), // Using LTM field for shipping + tax
-                        TotalAmount: parseFloat(totalAmount.toFixed(2)),
+                        SubtotalAmount: samplesCost,
+                        LTMFeeTotal: 0, // No LTM fees for sample requests - this field is for Less Than Minimum fees only
+                        TotalAmount: totalAmount,
                         Status: 'Sample Request',
                         ExpiresAt: expiresAt,
                         Notes: notes
                     };
                     
+                    // Validate data before sending
                     console.log('Saving sample request session:', sessionData);
+                    console.log('Session data validation:', {
+                        hasQuoteID: !!sessionData.QuoteID,
+                        hasEmail: !!sessionData.CustomerEmail,
+                        subtotalIsNumber: !isNaN(sessionData.SubtotalAmount),
+                        ltmIsZero: sessionData.LTMFeeTotal === 0,
+                        totalIsNumber: !isNaN(sessionData.TotalAmount),
+                        notesLength: sessionData.Notes.length
+                    });
                     
                     const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                         method: 'POST',
@@ -426,38 +433,41 @@
                     
                     if (!sessionResponse.ok) {
                         const errorText = await sessionResponse.text();
+                        console.error('Session save failed:', errorText);
                         throw new Error(`Failed to save session: ${errorText}`);
                     }
+                    
+                    console.log('Session saved successfully');
                     
                     // Save individual sample items
                     console.log(`Saving ${samples.length} sample items...`);
                     const itemPromises = samples.map(async (sample, index) => {
-                        // Use the sample price if it's a paid sample
-                        const itemPrice = sample.price || 0;
+                        // Use the sample price if it's a paid sample, ensure it's a number
+                        const itemPrice = parseFloat((sample.price || 0).toFixed(2));
                         
                         // For the first item, include complete order details
                         let sizeBreakdownData = {
                             size: sample.size || 'L',
-                            color: sample.color || ''
+                            color: sample.color || 'TBD'
                         };
                         
                         // Add complete order details to first item
                         if (index === 0 && formData.orderDetails) {
                             sizeBreakdownData.orderInfo = {
-                                delivery: formData.deliveryMethod,
+                                delivery: formData.deliveryMethod || 'pickup',
                                 shipping: formData.orderDetails.shipping,
                                 totals: formData.orderDetails.totals,
-                                projectType: formData.projectType,
-                                estimatedQuantity: formData.estimatedQuantity,
-                                timeline: formData.timeline
+                                projectType: formData.projectType || 'Not specified',
+                                estimatedQuantity: formData.estimatedQuantity || 'Not specified',
+                                timeline: formData.timeline || 'Not specified'
                             };
                         }
                         
                         const itemData = {
                             QuoteID: quoteID,
                             LineNumber: index + 1,
-                            StyleNumber: sample.style,
-                            ProductName: sample.name || sample.description,
+                            StyleNumber: sample.style || 'UNKNOWN',
+                            ProductName: sample.name || sample.description || 'Sample Item',
                             Color: sample.color || 'Customer Choice',
                             ColorCode: '',
                             EmbellishmentType: 'sample',
@@ -465,10 +475,10 @@
                             PrintLocationName: '',
                             Quantity: 1,
                             HasLTM: 'No',
-                            BaseUnitPrice: parseFloat(itemPrice.toFixed(2)),
+                            BaseUnitPrice: itemPrice,
                             LTMPerUnit: 0,
-                            FinalUnitPrice: parseFloat(itemPrice.toFixed(2)),
-                            LineTotal: parseFloat(itemPrice.toFixed(2)),
+                            FinalUnitPrice: itemPrice,
+                            LineTotal: itemPrice,
                             SizeBreakdown: JSON.stringify(sizeBreakdownData),
                             PricingTier: itemPrice > 0 ? 'Paid Sample' : 'Free Sample',
                             ImageURL: sample.imageUrl || '',
