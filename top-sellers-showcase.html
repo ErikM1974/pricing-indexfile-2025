@@ -18,6 +18,303 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
+    <!-- EmailJS for sample request notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Embed Sample Request functionality directly to avoid path issues -->
+    <script>
+        // Embedded sample cart functionality  
+        class SampleCart {
+            constructor() {
+                this.maxSamples = 3;
+                this.samples = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+                this.eligibilityCache = {};
+                this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                this.initializeUI();
+                this.bindEvents();
+            }
+
+            initializeUI() {
+                if (!document.getElementById('sampleCartWidget')) {
+                    const widget = document.createElement('div');
+                    widget.id = 'sampleCartWidget';
+                    widget.className = 'sample-cart-widget';
+                    widget.innerHTML = `
+                        <div class="sample-cart-inner">
+                            <div class="sample-cart-icon">
+                                <i class="fas fa-box-open"></i>
+                                <span class="sample-count-badge">${this.samples.length}</span>
+                            </div>
+                            <div class="sample-cart-text">
+                                <span class="sample-cart-label">Samples</span>
+                                <span class="sample-cart-status">${this.samples.length}/${this.maxSamples}</span>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(widget);
+                }
+                this.updateUI();
+            }
+
+            bindEvents() {
+                const widget = document.getElementById('sampleCartWidget');
+                if (widget) {
+                    widget.addEventListener('click', () => this.openSampleModal());
+                }
+            }
+
+            async checkEligibility(styleNumber) {
+                // For testing, make all products eligible
+                console.log(`Checking eligibility for ${styleNumber} - returning true for testing`);
+                return true;
+            }
+
+            addSample(product) {
+                if (this.samples.length >= this.maxSamples) {
+                    this.showNotification(`Maximum ${this.maxSamples} samples per request`, 'warning');
+                    return false;
+                }
+
+                if (this.samples.find(s => s.style === product.style)) {
+                    this.showNotification('This item is already in your sample cart', 'info');
+                    return false;
+                }
+
+                this.samples.push({
+                    style: product.style,
+                    name: product.name,
+                    description: product.description,
+                    imageUrl: product.imageUrl || '',
+                    selectedColor: product.selectedColor || '',
+                    addedAt: new Date().toISOString()
+                });
+
+                this.save();
+                this.updateUI();
+                this.showNotification(`${product.name} added to samples`, 'success');
+                this.showWidget();
+                
+                return true;
+            }
+
+            removeSample(styleNumber) {
+                const index = this.samples.findIndex(s => s.style === styleNumber);
+                if (index !== -1) {
+                    const removed = this.samples.splice(index, 1)[0];
+                    this.save();
+                    this.updateUI();
+                    this.showNotification(`${removed.name} removed from samples`, 'info');
+                    
+                    if (this.samples.length === 0) {
+                        this.hideWidget();
+                    }
+                }
+            }
+
+            clearCart() {
+                this.samples = [];
+                this.save();
+                this.updateUI();
+                this.hideWidget();
+            }
+
+            save() {
+                sessionStorage.setItem('sampleCart', JSON.stringify(this.samples));
+            }
+
+            updateUI() {
+                const badge = document.querySelector('.sample-count-badge');
+                if (badge) {
+                    badge.textContent = this.samples.length;
+                    badge.style.display = this.samples.length > 0 ? 'flex' : 'none';
+                }
+
+                const status = document.querySelector('.sample-cart-status');
+                if (status) {
+                    status.textContent = `${this.samples.length}/${this.maxSamples}`;
+                }
+
+                const widget = document.getElementById('sampleCartWidget');
+                if (widget) {
+                    if (this.samples.length > 0) {
+                        widget.style.display = 'block';
+                        widget.classList.add('sample-cart-bounce');
+                        setTimeout(() => widget.classList.remove('sample-cart-bounce'), 600);
+                    }
+                }
+
+                this.updateSampleButtons();
+            }
+
+            updateSampleButtons() {
+                document.querySelectorAll('.btn-sample').forEach(btn => {
+                    const style = btn.dataset.style;
+                    if (style && this.samples.find(s => s.style === style)) {
+                        btn.innerHTML = '<i class="fas fa-check"></i> In Sample Cart';
+                        btn.classList.add('in-cart');
+                        btn.disabled = false;
+                    }
+                });
+            }
+
+            showWidget() {
+                const widget = document.getElementById('sampleCartWidget');
+                if (widget && this.samples.length > 0) {
+                    widget.style.display = 'block';
+                    widget.classList.add('sample-cart-show');
+                }
+            }
+
+            hideWidget() {
+                const widget = document.getElementById('sampleCartWidget');
+                if (widget) {
+                    widget.classList.remove('sample-cart-show');
+                    setTimeout(() => {
+                        if (this.samples.length === 0) {
+                            widget.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            }
+
+            openSampleModal() {
+                window.dispatchEvent(new CustomEvent('openSampleModal', {
+                    detail: { samples: this.samples }
+                }));
+            }
+
+            showNotification(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `sample-toast sample-toast-${type}`;
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(toast);
+                setTimeout(() => toast.classList.add('sample-toast-show'), 10);
+                
+                setTimeout(() => {
+                    toast.classList.remove('sample-toast-show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            getCartSummary() {
+                return {
+                    items: this.samples,
+                    count: this.samples.length,
+                    remaining: this.maxSamples - this.samples.length,
+                    isFull: this.samples.length >= this.maxSamples
+                };
+            }
+
+            async checkAllProductEligibility() {
+                // For testing, show all sample buttons
+                console.log('Showing all sample buttons for testing');
+                document.querySelectorAll('.btn-sample').forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
+                });
+            }
+        }
+
+        // Embedded sample request service
+        class SampleRequestService {
+            constructor() {
+                this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                this.quotePrefix = 'SR';
+            }
+
+            generateSampleRequestID() {
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const dateKey = `${month}${day}`;
+                
+                const storageKey = `sample_request_sequence_${dateKey}`;
+                let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+                sessionStorage.setItem(storageKey, sequence.toString());
+                
+                return `${this.quotePrefix}${dateKey}-${sequence}`;
+            }
+
+            generateSessionID() {
+                return `sample_sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            }
+
+            async checkDuplicateRequest(email) {
+                // Simplified for testing
+                return false;
+            }
+
+            async saveSampleRequest(formData, samples) {
+                try {
+                    const quoteID = this.generateSampleRequestID();
+                    const sessionID = this.generateSessionID();
+                    
+                    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                        .toISOString()
+                        .replace(/\.\d{3}Z$/, '');
+                    
+                    const notes = [
+                        `Project Type: ${formData.projectType || 'Not specified'}`,
+                        `Quantity Needed: ${formData.estimatedQuantity || 'Not specified'}`,
+                        `Timeline: ${formData.timeline || 'Not specified'}`,
+                        formData.notes || ''
+                    ].filter(n => n).join('\n');
+                    
+                    const sessionData = {
+                        QuoteID: quoteID,
+                        SessionID: sessionID,
+                        CustomerEmail: formData.email,
+                        CustomerName: formData.name,
+                        CompanyName: formData.company || '',
+                        Phone: formData.phone || '',
+                        TotalQuantity: samples.length,
+                        SubtotalAmount: 0,
+                        LTMFeeTotal: 0,
+                        TotalAmount: 0,
+                        Status: 'Sample Request',
+                        ExpiresAt: expiresAt,
+                        Notes: notes
+                    };
+                    
+                    console.log('Saving sample request session:', sessionData);
+                    
+                    const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(sessionData)
+                    });
+                    
+                    if (!sessionResponse.ok) {
+                        const errorText = await sessionResponse.text();
+                        throw new Error(`Failed to save session: ${errorText}`);
+                    }
+                    
+                    return {
+                        success: true,
+                        requestID: quoteID
+                    };
+                    
+                } catch (error) {
+                    console.error('Error saving sample request:', error);
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            }
+        }
+
+        // Initialize immediately
+        window.sampleCart = new SampleCart();
+        window.sampleRequestService = new SampleRequestService();
+    </script>
+    
     <style>
         :root {
             --primary-color: #4cb354;
@@ -854,6 +1151,375 @@
             margin-bottom: 0.5rem;
             color: var(--text-primary);
         }
+        
+        /* Sample Request Styles */
+        .btn-sample {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex; /* Show by default for testing */
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+        
+        .btn-sample:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-sample.in-cart {
+            background: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+        }
+        
+        .btn-sample:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Sample Cart Widget */
+        .sample-cart-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 60px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(76, 179, 84, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sample-cart-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(76, 179, 84, 0.4);
+        }
+        
+        .sample-cart-inner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sample-cart-icon {
+            position: relative;
+            font-size: 1.5rem;
+        }
+        
+        .sample-count-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .sample-cart-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sample-cart-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .sample-cart-status {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        /* Animation for widget */
+        @keyframes sampleCartBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .sample-cart-bounce {
+            animation: sampleCartBounce 0.6s ease;
+        }
+        
+        .sample-cart-show {
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Toast Notifications */
+        .sample-toast {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1100;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .sample-toast-show {
+            transform: translateX(0);
+        }
+        
+        .sample-toast-success {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .sample-toast-warning {
+            border-left: 4px solid #ff9800;
+        }
+        
+        .sample-toast-info {
+            border-left: 4px solid #2196f3;
+        }
+        
+        /* Sample Request Modal */
+        .sample-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .sample-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 3rem;
+        }
+        
+        .sample-modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .sample-modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .sample-modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .sample-modal-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .sample-modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .sample-modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .sample-modal-body {
+            padding: 2rem;
+        }
+        
+        .selected-samples {
+            margin-bottom: 2rem;
+        }
+        
+        .selected-samples h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .sample-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sample-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .sample-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .sample-item-info {
+            flex: 1;
+        }
+        
+        .sample-item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .sample-item-style {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .sample-item-remove {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: color 0.2s ease;
+        }
+        
+        .sample-item-remove:hover {
+            color: #c82333;
+        }
+        
+        /* Sample Request Form */
+        .sample-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-submit {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+        
+        .form-submit:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+        
+        .form-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Sample eligibility badge */
+        .sample-eligible-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 5;
+        }
+        
+        /* Product card actions */
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -1023,6 +1689,98 @@
             <p>2025 Freeman Road East, Milton, WA 98354 | 253-922-5793</p>
         </div>
     </footer>
+
+    <!-- Sample Request Modal -->
+    <div id="sampleRequestModal" class="sample-modal">
+        <div class="sample-modal-content">
+            <div class="sample-modal-header">
+                <h2 class="sample-modal-title">Complete Your Sample Request</h2>
+                <p class="sample-modal-subtitle">We'll send these samples to you for FREE!</p>
+                <button class="sample-modal-close" onclick="closeSampleModal()">&times;</button>
+            </div>
+            <div class="sample-modal-body">
+                <!-- Selected samples -->
+                <div class="selected-samples">
+                    <h3>Selected Samples (<span id="sampleCount">0</span>/3)</h3>
+                    <div id="selectedSamplesList">
+                        <!-- Samples will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <!-- Contact form -->
+                <form id="sampleRequestForm" class="sample-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sampleName">Your Name *</label>
+                            <input type="text" id="sampleName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sampleEmail">Email Address *</label>
+                            <input type="email" id="sampleEmail" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="samplePhone">Phone Number</label>
+                            <input type="tel" id="samplePhone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="sampleCompany">Company Name</label>
+                            <input type="text" id="sampleCompany" name="company">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectType">What type of decoration are you interested in? *</label>
+                        <select id="projectType" name="projectType" required>
+                            <option value="">Select decoration type...</option>
+                            <option value="Screen Printing">Screen Printing</option>
+                            <option value="DTG Printing">DTG (Direct to Garment) Printing</option>
+                            <option value="Embroidery">Embroidery</option>
+                            <option value="Heat Transfer">Heat Transfer</option>
+                            <option value="Not Sure Yet">Not Sure Yet</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estimatedQuantity">Estimated Quantity Needed</label>
+                            <select id="estimatedQuantity" name="estimatedQuantity">
+                                <option value="">Select quantity...</option>
+                                <option value="1-24">1-24 pieces</option>
+                                <option value="25-49">25-49 pieces</option>
+                                <option value="50-99">50-99 pieces</option>
+                                <option value="100-249">100-249 pieces</option>
+                                <option value="250-499">250-499 pieces</option>
+                                <option value="500+">500+ pieces</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeline">When do you need these?</label>
+                            <select id="timeline" name="timeline">
+                                <option value="">Select timeline...</option>
+                                <option value="ASAP">ASAP</option>
+                                <option value="Within 1 week">Within 1 week</option>
+                                <option value="Within 2 weeks">Within 2 weeks</option>
+                                <option value="Within 1 month">Within 1 month</option>
+                                <option value="Just researching">Just researching</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sampleNotes">Additional Notes (optional)</label>
+                        <textarea id="sampleNotes" name="notes" rows="3" placeholder="Tell us about your project or any specific requirements..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit" id="submitSampleRequest">
+                        <i class="fas fa-paper-plane"></i> Request Free Samples
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Complete top sellers data - ALL 60 products
@@ -1435,9 +2193,11 @@
                                     <div class="more-colors">+${uniqueColors.length - 5}</div>
                                 ` : ''}
                             </div>
-                            <button class="product-cta" onclick="event.stopPropagation(); requestQuote('${product.style}', '${product.description.replace(/'/g, "\\'")}')">
-                                Request Quote
-                            </button>
+                            <div class="product-actions">
+                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending" onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
+                                    <i class="fas fa-box-open"></i> Request Sample
+                                </button>
+                            </div>
                         </div>
                     `;
                 } else {
@@ -1460,9 +2220,11 @@
                                 <i class="fas fa-award" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
                                 Premium ${product.brand} Product
                             </div>
-                            <button class="product-cta" onclick="event.stopPropagation(); requestQuote('${product.style}', '${product.description.replace(/'/g, "\\'")}')">
-                                Request Quote
-                            </button>
+                            <div class="product-actions">
+                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending" onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '')">
+                                    <i class="fas fa-box-open"></i> Request Sample
+                                </button>
+                            </div>
                         </div>
                     `;
             }
@@ -1481,6 +2243,23 @@
                     grid.appendChild(card);
                 }
             });
+            
+            // Show sample buttons after products are displayed
+            setTimeout(() => {
+                console.log('Showing sample buttons after products loaded');
+                document.querySelectorAll('.btn-sample').forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                    btn.style.width = '100%';
+                    if (!btn.innerHTML.includes('Sample')) {
+                        btn.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
+                    }
+                });
+                
+                // Update buttons if sample cart is available
+                if (window.sampleCart) {
+                    window.sampleCart.updateSampleButtons();
+                }
+            }, 100);
         }
         
         // Detect brand from product name
@@ -1611,6 +2390,170 @@
             
             window.location.href = `mailto:sales@nwcustomapparel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
+        
+        // Sample Request System Integration
+        let sampleRequestService = null;
+        
+        // Initialize sample request system
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize service if available
+            if (typeof SampleRequestService !== 'undefined') {
+                sampleRequestService = new SampleRequestService();
+            }
+            
+            // Listen for sample modal events
+            window.addEventListener('openSampleModal', (e) => {
+                openSampleModal(e.detail.samples);
+            });
+            
+            // Handle form submission
+            document.getElementById('sampleRequestForm').addEventListener('submit', handleSampleFormSubmit);
+        });
+        
+        // Handle sample request button click
+        function handleSampleRequest(styleNumber, productName, imageUrl) {
+            if (!window.sampleCart) return;
+            
+            // Check if already in cart
+            const cartSummary = window.sampleCart.getCartSummary();
+            const existingItem = cartSummary.items.find(item => item.style === styleNumber);
+            
+            if (existingItem) {
+                // Remove from cart
+                window.sampleCart.removeSample(styleNumber);
+            } else {
+                // Add to cart
+                window.sampleCart.addSample({
+                    style: styleNumber,
+                    name: productName,
+                    description: productName,
+                    imageUrl: imageUrl
+                });
+            }
+        }
+        
+        // Open sample modal
+        function openSampleModal(samples) {
+            const modal = document.getElementById('sampleRequestModal');
+            const samplesList = document.getElementById('selectedSamplesList');
+            const sampleCount = document.getElementById('sampleCount');
+            
+            // Update sample count
+            sampleCount.textContent = samples.length;
+            
+            // Clear and populate samples list
+            samplesList.innerHTML = '';
+            samples.forEach(sample => {
+                const sampleItem = document.createElement('div');
+                sampleItem.className = 'sample-item';
+                sampleItem.innerHTML = `
+                    <div class="sample-item-image">
+                        ${sample.imageUrl ? 
+                            `<img src="${sample.imageUrl}" alt="${sample.name}">` :
+                            `<i class="fas fa-tshirt" style="font-size: 2rem; color: var(--text-secondary);"></i>`
+                        }
+                    </div>
+                    <div class="sample-item-info">
+                        <div class="sample-item-name">${sample.name}</div>
+                        <div class="sample-item-style">Style #${sample.style}</div>
+                    </div>
+                    <button class="sample-item-remove" onclick="removeSampleFromModal('${sample.style}')" title="Remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                samplesList.appendChild(sampleItem);
+            });
+            
+            // Show modal
+            modal.classList.add('active');
+        }
+        
+        // Close sample modal
+        function closeSampleModal() {
+            document.getElementById('sampleRequestModal').classList.remove('active');
+        }
+        
+        // Remove sample from modal
+        function removeSampleFromModal(styleNumber) {
+            if (window.sampleCart) {
+                window.sampleCart.removeSample(styleNumber);
+                // Refresh modal
+                const cartSummary = window.sampleCart.getCartSummary();
+                if (cartSummary.items.length > 0) {
+                    openSampleModal(cartSummary.items);
+                } else {
+                    closeSampleModal();
+                }
+            }
+        }
+        
+        // Handle sample form submission
+        async function handleSampleFormSubmit(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitSampleRequest');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            try {
+                // Get form data
+                const formData = {
+                    name: document.getElementById('sampleName').value,
+                    email: document.getElementById('sampleEmail').value,
+                    phone: document.getElementById('samplePhone').value,
+                    company: document.getElementById('sampleCompany').value,
+                    projectType: document.getElementById('projectType').value,
+                    estimatedQuantity: document.getElementById('estimatedQuantity').value,
+                    timeline: document.getElementById('timeline').value,
+                    notes: document.getElementById('sampleNotes').value
+                };
+                
+                // Get samples from cart
+                const cartSummary = window.sampleCart.getCartSummary();
+                
+                // Check for duplicate requests
+                const isDuplicate = await sampleRequestService.checkDuplicateRequest(formData.email);
+                if (isDuplicate) {
+                    alert('You have already requested samples within the last 30 days. Please contact us directly if you need additional samples.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Free Samples';
+                    return;
+                }
+                
+                // Save to database
+                const result = await sampleRequestService.saveSampleRequest(formData, cartSummary.items);
+                
+                if (result.success) {
+                    // Show success message
+                    alert(`Success! Your sample request ${result.requestID} has been submitted. We'll ship your samples within 2 business days.`);
+                    
+                    // Clear cart
+                    window.sampleCart.clearCart();
+                    
+                    // Close modal
+                    closeSampleModal();
+                    
+                    // Reset form
+                    document.getElementById('sampleRequestForm').reset();
+                } else {
+                    throw new Error(result.error || 'Failed to submit request');
+                }
+                
+            } catch (error) {
+                console.error('Sample request error:', error);
+                alert('There was an error submitting your request. Please try again or contact us directly.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Free Samples';
+            }
+        }
+        
+        // Modal close on outside click
+        document.getElementById('sampleRequestModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSampleModal();
+            }
+        });
     </script>
 </body>
 </html>
