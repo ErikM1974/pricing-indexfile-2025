@@ -3042,16 +3042,40 @@
             const samplesSubtotal = document.getElementById('samplesSubtotal');
             const finalTotal = document.getElementById('finalTotal');
             const submitButtonText = document.getElementById('submitButtonText');
+            const shippingLine = document.getElementById('shippingLine');
             
             // Get delivery method
             const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
             const shippingCost = deliveryMethod === 'ship' ? 10.00 : 0;
             
-            // Calculate total
-            const total = samplesCost + shippingCost;
+            // Calculate tax (10.1% Milton sales tax on taxable items)
+            const taxRate = 0.101;
+            const taxableAmount = samplesCost + shippingCost;
+            const salesTax = taxableAmount > 0 ? taxableAmount * taxRate : 0;
+            const total = taxableAmount + salesTax;
             
             // Update display
             samplesSubtotal.textContent = `$${samplesCost.toFixed(2)}`;
+            
+            // Add or update tax line if needed
+            let taxLine = document.getElementById('taxLine');
+            if (salesTax > 0) {
+                if (!taxLine) {
+                    taxLine = document.createElement('div');
+                    taxLine.id = 'taxLine';
+                    taxLine.className = 'total-line';
+                    taxLine.innerHTML = `<span>Tax (10.1%):</span> <span id="taxAmount">$${salesTax.toFixed(2)}</span>`;
+                    // Insert before final total
+                    const finalTotalLine = document.querySelector('.total-line.total-final');
+                    finalTotalLine.parentNode.insertBefore(taxLine, finalTotalLine);
+                } else {
+                    document.getElementById('taxAmount').textContent = `$${salesTax.toFixed(2)}`;
+                }
+                taxLine.style.display = 'flex';
+            } else if (taxLine) {
+                taxLine.style.display = 'none';
+            }
+            
             finalTotal.textContent = `$${total.toFixed(2)}`;
             
             // Show/hide order total display and update button text
@@ -3143,27 +3167,34 @@
                     return;
                 }
                 
-                // Save to database with enhanced notes
+                // Calculate tax (10.1% Milton sales tax on taxable items)
+                const taxRate = 0.101;
+                const taxableAmount = samplesCost + formData.shippingCost;
+                const salesTax = taxableAmount > 0 ? taxableAmount * taxRate : 0;
+                const finalTotal = taxableAmount + salesTax;
+                
+                // Update form data with tax
+                formData.salesTax = salesTax;
+                formData.totalAmount = finalTotal;
+                
+                // Save to database with enhanced notes (single line with pipe separators to avoid Caspio issues)
+                const samplesList = cartSummary.items.map(item => 
+                    `${item.name} (${item.style})` +
+                    `${item.color ? ` - Color: ${item.color}` : ''}` +
+                    `${item.size ? `, Size: ${item.size}` : ''}` +
+                    `${item.price > 0 ? ` - $${item.price.toFixed(2)}` : ' - FREE'}`
+                ).join(' | ');
+                
                 const enhancedNotes = [
-                    formData.notes,
-                    '',
-                    '=== ORDER DETAILS ===',
-                    `Delivery Method: ${deliveryMethod === 'ship' ? 'Ship' : 'Pickup at NWCA'}`,
-                    deliveryMethod === 'ship' ? `Shipping Address: ${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingState} ${formData.shippingZip}` : '',
-                    '',
-                    '=== SAMPLES REQUESTED ===',
-                    ...cartSummary.items.map(item => 
-                        `${item.name} (${item.style})` +
-                        `${item.color ? ` - Color: ${item.color}` : ''}` +
-                        `${item.size ? `, Size: ${item.size}` : ''}` +
-                        `${item.price > 0 ? ` - $${item.price.toFixed(2)}` : ' - FREE'}`
-                    ),
-                    '',
-                    '=== TOTALS ===',
-                    `Samples: $${samplesCost.toFixed(2)}`,
+                    formData.notes ? `Notes: ${formData.notes}` : '',
+                    `Delivery: ${deliveryMethod === 'ship' ? 'Ship' : 'Pickup'}`,
+                    deliveryMethod === 'ship' ? `Ship To: ${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingState} ${formData.shippingZip}` : '',
+                    `Samples: ${samplesList}`,
+                    `Subtotal: $${samplesCost.toFixed(2)}`,
                     deliveryMethod === 'ship' ? `Shipping: $10.00` : '',
-                    `Total to Collect: $${formData.totalAmount.toFixed(2)}`
-                ].filter(line => line !== '').join('\n');
+                    taxableAmount > 0 ? `Tax (10.1%): $${salesTax.toFixed(2)}` : '',
+                    `Total: $${finalTotal.toFixed(2)}`
+                ].filter(line => line !== '').join(' | ');
                 
                 formData.notes = enhancedNotes;
                 
@@ -3172,9 +3203,22 @@
                 
                 if (result.success) {
                     // Show success message
-                    const message = formData.totalAmount > 0 
-                        ? `Success! Your sample request ${result.requestID} has been submitted.\n\nTotal to collect: $${formData.totalAmount.toFixed(2)}\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nAn account executive will contact you to process payment.`
-                        : `Success! Your free sample request ${result.requestID} has been submitted.\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}`;
+                    let message;
+                    if (formData.totalAmount > 0) {
+                        let breakdown = `Samples: $${samplesCost.toFixed(2)}`;
+                        if (formData.shippingCost > 0) {
+                            breakdown += `\nShipping: $${formData.shippingCost.toFixed(2)}`;
+                        }
+                        if (formData.salesTax > 0) {
+                            breakdown += `\nTax (10.1%): $${formData.salesTax.toFixed(2)}`;
+                        }
+                        breakdown += `\n────────────────`;
+                        breakdown += `\nTotal: $${formData.totalAmount.toFixed(2)}`;
+                        
+                        message = `Success! Your sample request ${result.requestID} has been submitted.\n\n${breakdown}\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nAn account executive will contact you to process payment.`;
+                    } else {
+                        message = `Success! Your free sample request ${result.requestID} has been submitted.\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}`;
+                    }
                     
                     alert(message);
                     
