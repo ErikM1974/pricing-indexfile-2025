@@ -57,6 +57,68 @@ The system uses a "Master Bundle" approach where Caspio sends comprehensive pric
    - Handles all Caspio database operations
    - Modular route structure in `/src/routes/`
 
+## API Documentation - Single Source of Truth with Inter-Claude Communication
+
+### Caspio Pricing Proxy API
+@memory/CASPIO_API_TEMPLATE.md
+- **SHARED DOCUMENTATION** between this app and caspio-pricing-proxy server
+- Complete documentation for all 53 active API endpoints
+- **INTER-CLAUDE COMMUNICATION LOG** for coordination with API Provider
+- Enhanced product search with faceted filtering
+- Cart management (sessions, items, sizes)
+- Pricing calculations for all decoration methods
+- Order processing and dashboard metrics with CSR performance
+- Art requests and invoicing with full CRUD
+- Quote system (critical for calculators)
+- Transfer pricing and inventory management
+- Production schedules
+
+**API Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
+
+### 🔔 Session Start Protocol
+**IMPORTANT: At the start of each session, you MUST:**
+1. Read @memory/CASPIO_API_TEMPLATE.md
+2. Check the "Active Conversations" section for pending messages from Provider Claude
+3. Review "Recent Updates Requiring Acknowledgment" and check off completed items
+4. Update your "Last Checked by Consumer" timestamp
+5. Respond to any questions or acknowledge updates
+
+### 💬 Communicating with API Provider Claude
+
+**When you need to communicate with the API Provider:**
+1. Add messages to the Communication Log in CASPIO_API_TEMPLATE.md
+2. Use appropriate message prefixes:
+   - ❓ **QUESTION** when you need information about the API
+   - 🐛 **BUG** when you find an API issue
+   - 💡 **SUGGESTION** for improvement ideas
+   - 🤝 **ACKNOWLEDGED** when you've implemented a change
+   - ✅ **ANSWER** when responding to Provider's questions
+
+**Example message format:**
+```
+**2025-01-30 16:30** - ❓ **QUESTION** from API Consumer:
+The /api/products/search endpoint returns duplicates when filtering by multiple colors.
+Is this intentional or should results be unique by style?
+```
+
+### 📝 Your Responsibilities as API Consumer
+- Report bugs and unexpected behavior
+- Document integration patterns you discover
+- Request missing functionality
+- Provide UI/UX feedback on API responses
+- Update "Implementation Notes from Consumer" section with important findings
+- Acknowledge breaking changes and update your code accordingly
+
+### 🚨 When Provider Reports Breaking Changes
+1. Check the 🚨 **BREAKING** messages immediately
+2. Review migration guide if provided
+3. Update affected code in the application
+4. Test thoroughly
+5. Acknowledge the change with 🤝 **ACKNOWLEDGED** message
+6. Report any issues encountered during migration
+
+**Important**: This shared documentation enables asynchronous communication between you and the API Provider Claude, ensuring both applications stay synchronized without human intervention.
+
 ## Claude Development Guidelines
 
 1. First understand the existing patterns by reading relevant files
@@ -169,12 +231,6 @@ Service ID: service_1c4k67j
 - CRUD operations with complete examples
 - Field requirements and data types
 
-### API Documentation
-@memory/API_DOCUMENTATION.md
-- Compact Caspio Pricing Proxy API reference
-- All endpoints organized by module (cart, pricing, products, orders, quotes)
-- Standard CRUD patterns and critical schemas
-- Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api
 
 ### Troubleshooting
 @memory/TROUBLESHOOTING.md
