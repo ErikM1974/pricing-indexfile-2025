@@ -2,6 +2,9 @@
   "permissions": {
     "allow": [
       "Read(/mnt/c/Users/erik/OneDrive/**)",
+      "Bash(cd:*)",
+      "Read(/mnt/c/Users/erik/OneDrive/**)",
+      "Read(/mnt/c/Users/erik/OneDrive/**)",
       "Bash(cd:*)"
     ],
     "deny": [],

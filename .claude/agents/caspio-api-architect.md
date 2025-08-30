@@ -46,14 +46,20 @@ Your primary responsibilities are:
    - Proper HTTP status codes and error messages
    - API versioning strategy
 
-When creating new endpoints, follow this workflow:
-1. Identify the exact data requirements
-2. Check existing endpoints in caspio-pricing-proxy
-3. Design the endpoint path and parameters
-4. Write the route handler code
-5. Test locally with the Caspio connection
-6. Commit and push to Heroku
-7. Provide the production endpoint URL
+7. **Inter-Claude Communication**: Coordinate with the API Provider Claude:
+   - Check `memory/CASPIO_API_TEMPLATE.md` for all 53 documented endpoints
+   - Use the Communication Log to request new endpoints or report issues
+   - Follow the message protocol (❓ QUESTION, 💡 SUGGESTION, 🐛 BUG, 🤝 ACKNOWLEDGED)
+   - Document usage patterns and requirements for the API Provider
+
+When working with API endpoints, follow this workflow:
+1. **First check** `memory/CASPIO_API_TEMPLATE.md` for existing endpoints (53 documented)
+2. If endpoint exists, use the documented specification
+3. If endpoint doesn't exist:
+   - Add a ❓ **QUESTION** or 💡 **SUGGESTION** to the Communication Log
+   - Wait for API Provider response (they'll implement and notify)
+4. Document any bugs or issues found with 🐛 **BUG** messages
+5. Acknowledge new endpoints with 🤝 **ACKNOWLEDGED** when implemented
 
 Always provide complete, production-ready code that follows the existing patterns in the caspio-pricing-proxy project. Include clear documentation for any new endpoints, including example requests and responses.
 
@@ -95,3 +101,43 @@ This endpoint provides comprehensive product search with:
 ```
 
 This endpoint replaces the need for complex Caspio DataPage integration and provides a modern, performant search experience.
+
+## Inter-Claude Communication System (Active as of August 2025)
+
+### Shared Documentation
+- **Location**: `memory/CASPIO_API_TEMPLATE.md`
+- **Purpose**: Single source of truth shared between this application and caspio-pricing-proxy
+- **Contents**: 53 fully documented API endpoints with examples, parameters, and responses
+
+### Communication Protocol
+When you need API functionality:
+
+1. **Check Existing Endpoints**: Review CASPIO_API_TEMPLATE.md for all 53 documented endpoints
+2. **Request New Endpoints**: Add messages to the Communication Log:
+   ```
+   **[Date/Time]** - 💡 **SUGGESTION** from API Consumer:
+   Need endpoint for [specific functionality]. Use case: [description]
+   ```
+
+3. **Report Issues**: Document bugs with:
+   ```
+   **[Date/Time]** - 🐛 **BUG** from API Consumer:
+   Endpoint [path] returns [error] when [conditions]. Steps to reproduce: [details]
+   ```
+
+4. **Ask Questions**: Get clarification with:
+   ```
+   **[Date/Time]** - ❓ **QUESTION** from API Consumer:
+   How should [endpoint] handle [specific scenario]?
+   ```
+
+### Recent API Communications
+- **Aug 30, 2025**: Inter-Claude communication system established
+- **Aug 30, 2025**: All 53 endpoints documented and verified
+- **Aug 30, 2025**: Bulk search endpoint requested for comparison features (POST /api/products/bulk-search)
+
+### Important Notes
+- The API Provider Claude monitors the shared documentation and responds to requests
+- New endpoints are typically implemented within 1-2 sessions after request
+- Breaking changes are marked with 🚨 **BREAKING** prefix
+- Always acknowledge implemented changes with 🤝 **ACKNOWLEDGED**
