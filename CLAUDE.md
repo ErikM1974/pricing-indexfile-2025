@@ -251,6 +251,13 @@ Service ID: service_1c4k67j
 - Key findings about API behavior and best practices
 - Test commands and examples for reference
 
+### DTG Bundle Optimization
+@memory/DTG_BUNDLE_OPTIMIZATION.md
+- DTG pricing page API optimization strategy
+- Bundle endpoint specification and implementation
+- Testing utilities and performance metrics
+- Automatic fallback system documentation
+
 ## Key Takeaways
 
 1. **Follow Established Patterns**: All calculators use the same architecture - HTML page, quote service, EmailJS integration

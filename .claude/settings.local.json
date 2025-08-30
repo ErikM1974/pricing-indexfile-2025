@@ -5,7 +5,8 @@
       "Bash(cd:*)",
       "Read(/mnt/c/Users/erik/OneDrive/**)",
       "Read(/mnt/c/Users/erik/OneDrive/**)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": [],

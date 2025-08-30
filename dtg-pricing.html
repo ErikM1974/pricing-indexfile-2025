@@ -346,16 +346,56 @@
         
         // Performance tracking
         window.DTG_PERFORMANCE = {
-            systemUsed: 'Direct API',
+            systemUsed: 'Direct API with Bundle Support',
             loadStartTime: performance.now(),
             metrics: {},
             debug: new URLSearchParams(window.location.search).get('debug') === 'true'
         };
         
+        // Bundle endpoint testing utilities
+        window.DTG_BUNDLE_TEST = {
+            // Test the bundle endpoint
+            testBundle: async function(styleNumber) {
+                const service = new window.DTGPricingService();
+                console.log('🧪 Testing bundle endpoint for:', styleNumber);
+                const result = await service.fetchBundledData(styleNumber || 'PC54');
+                if (result) {
+                    console.log('✅ Bundle endpoint available!', result);
+                } else {
+                    console.log('❌ Bundle endpoint not available yet');
+                }
+                return result;
+            },
+            
+            // Check service status
+            checkStatus: function() {
+                const service = new window.DTGPricingService();
+                const status = service.getServiceStatus();
+                console.log('📊 DTG Service Status:', status);
+                return status;
+            },
+            
+            // Force retry of bundle endpoint
+            resetAndRetry: function() {
+                const service = new window.DTGPricingService();
+                service.resetBundleEndpointStatus();
+                console.log('🔄 Bundle endpoint status reset - will retry on next request');
+            },
+            
+            // Toggle bundle usage
+            toggleBundle: function(enable) {
+                const service = new window.DTGPricingService();
+                service.setBundleEndpointUsage(enable);
+                console.log(`📌 Bundle endpoint ${enable ? 'enabled' : 'disabled'}`);
+            }
+        };
+        
         // Log system status
         console.log('===================================');
-        console.log('🚀 DTG Pricing System: Direct API Only');
-        console.log('Master Bundle/Caspio system has been removed');
+        console.log('🚀 DTG Pricing System: Direct API with Bundle Endpoint Support');
+        console.log('📦 Bundle endpoint will be used when available (with automatic fallback)');
+        console.log('🧪 Test bundle: DTG_BUNDLE_TEST.testBundle()');
+        console.log('📊 Check status: DTG_BUNDLE_TEST.checkStatus()');
         if (window.DTG_PERFORMANCE.debug) {
             console.log('🔍 DEBUG MODE ENABLED');
         }
