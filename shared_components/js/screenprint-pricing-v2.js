@@ -52,6 +52,10 @@ class ScreenPrintPricing {
         // DOM elements cache
         this.elements = {};
         
+        // Initialize pricing service
+        this.pricingService = null;
+        // Direct API mode only - Caspio removed
+        
         // Initialize when DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -62,6 +66,15 @@ class ScreenPrintPricing {
 
     init() {
         console.log('[ScreenPrintV2] Initializing...');
+        
+        // Initialize pricing service
+        if (typeof ScreenPrintPricingService !== 'undefined') {
+            this.pricingService = new ScreenPrintPricingService();
+            console.log('[ScreenPrintV2] API service initialized');
+        } else {
+            console.error('[ScreenPrintV2] ScreenPrintPricingService not found!');
+        }
+        
         this.cacheElements();
         this.createUI();
         this.bindEvents();
@@ -244,14 +257,14 @@ class ScreenPrintPricing {
             const rawValue = e.target.value;
             const parsedValue = rawValue === "" ? 0 : parseInt(rawValue); 
             const quantityToUpdate = isNaN(parsedValue) ? 0 : parsedValue;
-            console.log(`[ScreenPrintV2_Debug] Quantity input event. Raw: "${rawValue}", Parsed: ${parsedValue}, To Update: ${quantityToUpdate}`);
+            // Debug logging removed - was causing console noise
             this.state.quantity = quantityToUpdate; 
             this.updateDisplay(); 
         });
         
         this.elements.quantityInput?.addEventListener('blur', (e) => {
             let currentVal = parseInt(e.target.value);
-            console.log(`[ScreenPrintV2_Debug] Quantity blur event. CurrentVal: ${currentVal}`);
+            // Debug logging removed - was causing console noise
 
             if (isNaN(currentVal) || (currentVal < this.config.minimumQuantity && currentVal !== 0) || currentVal === 0 ) {
                  if (currentVal !== 0 || isNaN(currentVal)) { // Avoid alert if user just typed 0 and intends to type more
@@ -311,10 +324,7 @@ class ScreenPrintPricing {
             }
         });
 
-        // Listen for pricing data from adapter
-        document.addEventListener('screenPrintMasterBundleReady', (e) => {
-            this.handleMasterBundle(e.detail);
-        });
+        // Caspio event listener removed - using direct API only
 
         // Listen for color changes from product display
         document.addEventListener('productColorChanged', (e) => {
@@ -324,11 +334,35 @@ class ScreenPrintPricing {
         });
     }
 
-    checkUrlParams() {
+    async checkUrlParams() {
         const params = new URLSearchParams(window.location.search);
         const color = params.get('COLOR') || params.get('color');
+        const styleNumber = params.get('StyleNumber') || params.get('styleNumber');
+        
         if (color) {
             this.updateGarmentColor(color);
+        }
+        
+        if (styleNumber) {
+            this.state.styleNumber = styleNumber;
+            
+            // Load pricing data via API if in API mode
+            if (this.pricingService) {
+                try {
+                    console.log(`[ScreenPrintV2] Loading pricing data via API for ${styleNumber}`);
+                    const data = await this.pricingService.fetchPricingData(styleNumber);
+                    
+                    if (data) {
+                        this.handleMasterBundle(data);
+                    } else {
+                        console.error('[ScreenPrintV2] API returned null - no pricing data available');
+                    }
+                } catch (error) {
+                    console.error('[ScreenPrintV2] Error loading pricing data:', error);
+                }
+            } else {
+                console.error('[ScreenPrintV2] Pricing service not initialized');
+            }
         }
     }
 
@@ -482,7 +516,7 @@ class ScreenPrintPricing {
     }
 
     updateLocations() {
-        console.log('[ScreenPrintV2_Debug] updateLocations() called.');
+        // Debug logging removed - was causing console noise
         const locationRows = this.elements.locationsContainer.querySelectorAll('.sp-location-row');
         this.state.additionalLocations = Array.from(locationRows).map(row => {
             const locationSelect = row.querySelector('.sp-location-select');
@@ -764,7 +798,6 @@ class ScreenPrintPricing {
         
         // Prevent dp5-helper interference
         window.directFixApplied = true;
-        console.log('[ScreenPrintV2] Set directFixApplied = true to prevent dp5-helper interference');
     }
 
     updateOrderSummary(pricing) {
@@ -1169,7 +1202,9 @@ class ScreenPrintPricing {
     }
 
     handleMasterBundle(data) {
-        console.log('[ScreenPrintV2] Received master bundle:', data);
+        // Log the pricing data
+        console.log('[ScreenPrintV2] Received pricing data from API:', data);
+        
         this.state.masterBundle = data;
         this.state.pricingData = data;
         
