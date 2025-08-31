@@ -1442,8 +1442,8 @@
     <!-- Product URL handler -->
     <script src="/product-url-handler.js"></script>
     
-    <!-- Cap Master Bundle Integration -->
-    <script src="/shared_components/js/cap-master-bundle-integration.js"></script>
+    <!-- Cap Embroidery Pricing Service (API) -->
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
     
     <!-- V3 Enhanced pricing implementation -->
     <script src="/shared_components/js/cap-embroidery-pricing-v3.js"></script>
@@ -1541,14 +1541,111 @@
             const styleNumber = urlParams.get('StyleNumber') || 'C112';
             const color = urlParams.get('COLOR') || 'Black';
             
-            // Create and inject Caspio script
-            const caspioScript = document.createElement('script');
-            caspioScript.src = `https://c3eku948.caspio.com/dp/a0e150004ecd0739f853449c8d7f/emb?StyleNumber=${styleNumber}&COLOR=${encodeURIComponent(color)}`;
-            caspioScript.async = true;
-            document.body.appendChild(caspioScript);
+            console.log('[CapEmbroideryEnhanced] Using direct API for pricing data:', styleNumber, color);
             
-            console.log('[CapEmbroideryEnhanced] Loading Caspio master bundle for:', styleNumber, color);
+            // Initialize cap embroidery pricing system
+            if (typeof CapEmbroideryPricingService !== 'undefined') {
+                window.capPricingService = new CapEmbroideryPricingService();
+                console.log('===================================');
+                console.log('🚀 Cap Embroidery Pricing System: Direct API Mode');
+                console.log('📦 API endpoint: /api/pricing-bundle?method=CAP');
+                console.log('🧪 Test API: CAP_EMBROIDERY_API_TEST.testAPI()');
+                console.log('📊 Check status: CAP_EMBROIDERY_API_TEST.checkStatus()');
+                console.log('🗑️ Clear cache: CAP_EMBROIDERY_API_TEST.clearCache()');
+                console.log('===================================');
+            }
         });
+    </script>
+    
+    <!-- Cap Embroidery API Testing Utilities -->
+    <script>
+        window.CAP_EMBROIDERY_API_TEST = {
+            // Test API endpoint
+            testAPI: async function(styleNumber = 'C112') {
+                console.log('🧪 Testing Cap Embroidery API for:', styleNumber);
+                try {
+                    const service = new CapEmbroideryPricingService();
+                    const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                    console.log('✅ API Response:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ API Error:', error);
+                    return null;
+                }
+            },
+            
+            // Check service status
+            checkStatus: function() {
+                const service = window.capPricingService;
+                if (service) {
+                    const status = service.getStatus();
+                    console.log('📊 Service Status:', status);
+                    console.log('API Mode: ✅ Enabled (Direct API Only)');
+                    console.log('8000 Stitch Pricing: ✅ Active');
+                } else {
+                    console.log('❌ Service not initialized');
+                }
+            },
+            
+            // Clear cache
+            clearCache: function() {
+                const service = window.capPricingService;
+                if (service) {
+                    service.clearCache();
+                    console.log('🗑️ Cache cleared');
+                } else {
+                    console.log('❌ Service not available');
+                }
+            },
+            
+            // Reload pricing data
+            reload: async function() {
+                const params = new URLSearchParams(window.location.search);
+                const styleNumber = params.get('StyleNumber') || 'C112';
+                const service = window.capPricingService;
+                
+                if (service) {
+                    try {
+                        const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                        // Trigger the cap pricing system to update
+                        if (typeof handleMasterBundle === 'function') {
+                            handleMasterBundle({ detail: data });
+                        }
+                        console.log('🔄 Pricing data reloaded');
+                    } catch (error) {
+                        console.error('❌ Reload failed:', error);
+                    }
+                } else {
+                    console.log('❌ Service not available');
+                }
+            },
+            
+            // Compare pricing calculations
+            compareCalculations: async function(qty = 24, stitches = 8000) {
+                const params = new URLSearchParams(window.location.search);
+                const styleNumber = params.get('StyleNumber') || 'C112';
+                
+                console.log(`📊 Comparing prices for ${styleNumber}, Qty: ${qty}, Stitches: ${stitches}`);
+                
+                const data = await this.testAPI(styleNumber);
+                if (data && data.pricing) {
+                    console.log('Pricing tiers:', data.tierData);
+                    console.log('Available sizes:', data.uniqueSizes);
+                    
+                    // Find the appropriate tier for the quantity
+                    const tier = data.tierData.find(t => 
+                        qty >= t.MinQuantity && qty <= t.MaxQuantity
+                    );
+                    
+                    if (tier && data.pricing[tier.TierLabel]) {
+                        const prices = data.pricing[tier.TierLabel];
+                        console.log(`Prices for ${tier.TierLabel} tier:`, prices);
+                    }
+                }
+                
+                return data;
+            }
+        };
     </script>
 </body>
 </html>
