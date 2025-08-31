@@ -258,6 +258,13 @@ Service ID: service_1c4k67j
 - Testing utilities and performance metrics
 - Automatic fallback system documentation
 
+### Screen Print API Optimization
+@memory/SCREENPRINT_API_OPTIMIZATION.md
+- Screen print pricing converted from Caspio to API
+- Exact pricing calculation implementation
+- Testing utilities and console commands
+- Performance improvements and fallback system
+
 ## Key Takeaways
 
 1. **Follow Established Patterns**: All calculators use the same architecture - HTML page, quote service, EmailJS integration

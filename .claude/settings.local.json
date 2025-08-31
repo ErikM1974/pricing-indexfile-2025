@@ -7,7 +7,14 @@
       "Read(/mnt/c/Users/erik/OneDrive/**)",
       "Bash(cd:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "WebFetch(domain:caspio-pricing-proxy-ab30a049961a.herokuapp.com)",
+      "Bash(grep:*)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)"
     ],
     "deny": [],
     "ask": [],

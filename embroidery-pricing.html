@@ -1496,12 +1496,7 @@
     
     <!-- Hidden containers for compatibility -->
     <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
-        <!-- Caspio Master Bundle iframe -->
-        <iframe id="embroidery-master-bundle-iframe" 
-                src="https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01?StyleNumber=5190&COLOR=Black"
-                style="width: 1px; height: 1px; border: none; position: absolute; left: -9999px;"
-                title="Embroidery Pricing Data">
-        </iframe>
+        <!-- Caspio iframe removed - using direct API -->
     </div>
     
     <!-- Add loading elements for embroidery-enhanced-loading.js -->
@@ -1565,7 +1560,8 @@
     <script src="/shared_components/js/embroidery-pricing-v3.js"></script>
     
     <!-- Master Bundle Integration -->
-    <script src="/shared_components/js/embroidery-master-bundle-integration.js"></script>
+    <!-- Embroidery Pricing Service - Direct API implementation -->
+    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
     
     <script>
         // Set API URL globally
@@ -1595,26 +1591,39 @@
             }
         });
         
-        // Function to update master bundle iframe URL
-        function updateMasterBundleIframe(styleNumber, color) {
-            const iframe = document.getElementById('embroidery-master-bundle-iframe');
-            if (iframe && styleNumber) {
-                const baseUrl = 'https://c3eku948.caspio.com/dp/a0e150001c7143d027a54c439c01';
-                const params = new URLSearchParams({
-                    StyleNumber: styleNumber,
-                    COLOR: color || 'Black'
-                });
-                iframe.src = `${baseUrl}?${params.toString()}`;
-                console.log('[EMBROIDERY] Updated master bundle iframe:', iframe.src);
-            }
+        // API-based pricing data loading (no iframe needed)
+        const embroideryService = new EmbroideryPricingService();
+        
+        // Function to load pricing data via API
+        function loadEmbroideryPricingData(styleNumber, color) {
+            if (!styleNumber) return;
+            
+            embroideryService.fetchPricingData(styleNumber).then(data => {
+                console.log('[EMBROIDERY] Pricing data loaded:', data);
+                // Dispatch event for embroidery-pricing-v3.js
+                document.dispatchEvent(new CustomEvent('embroideryPricingDataLoaded', {
+                    detail: data
+                }));
+            }).catch(error => {
+                console.error('[EMBROIDERY] Failed to load pricing:', error);
+            });
         }
         
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[EMBROIDERY] Page initialized');
             
-            // Set flag to indicate we're using master bundle mode for embroidery
-            window.EMBROIDERY_MASTER_BUNDLE_MODE = true;
+            // Set flag to indicate we're using API mode for embroidery
+            window.EMBROIDERY_API_MODE = true;
+            
+            // Status display for API mode
+            console.log('===================================');
+            console.log('🚀 Embroidery Pricing System: Direct API Mode');
+            console.log('📦 API endpoint: /api/pricing-bundle?method=EMB');
+            console.log('🧪 Test API: EMBROIDERY_API_TEST.testAPI()');
+            console.log('📊 Check status: EMBROIDERY_API_TEST.checkStatus()');
+            console.log('🗑️ Clear cache: EMBROIDERY_API_TEST.clearCache()');
+            console.log('===================================');
             
             // Initialize product context from URL parameters
             if (window.initializeProductFromURL) {
@@ -1626,7 +1635,7 @@
                 const color = urlParams.get('color') || urlParams.get('COLOR');
                 
                 if (styleNumber) {
-                    updateMasterBundleIframe(styleNumber, color);
+                    loadEmbroideryPricingData(styleNumber, color);
                 }
             }
             
@@ -1670,7 +1679,7 @@
                     const colorName = event.detail.COLOR_NAME || event.detail.color;
                     
                     if (styleNumber && colorName) {
-                        updateMasterBundleIframe(styleNumber, colorName);
+                        loadEmbroideryPricingData(styleNumber, colorName);
                     }
                 }
             });
@@ -1689,6 +1698,67 @@
             
             // Header will auto-initialize from the component script
         });
+        
+        // Testing utilities for embroidery pricing API
+        window.EMBROIDERY_API_TEST = {
+            async testAPI(styleNumber = 'PC54') {
+                console.log(`🧪 Testing embroidery API for style: ${styleNumber}`);
+                try {
+                    const data = await embroideryService.fetchPricingData(styleNumber, {forceRefresh: true});
+                    console.log('✅ API test successful!', data);
+                    return data;
+                } catch(error) {
+                    console.error('❌ API test failed:', error);
+                    return null;
+                }
+            },
+            
+            checkStatus() {
+                const status = embroideryService.getStatus();
+                console.log('📊 Service Status:', status);
+                return status;
+            },
+            
+            clearCache() {
+                embroideryService.clearCache();
+                console.log('🗑️ Cache cleared');
+            },
+            
+            async reload() {
+                const params = new URLSearchParams(window.location.search);
+                const styleNumber = params.get('StyleNumber');
+                if (styleNumber) {
+                    console.log(`🔄 Reloading pricing for ${styleNumber}...`);
+                    await loadEmbroideryPricingData(styleNumber);
+                } else {
+                    console.log('⚠️ No StyleNumber in URL');
+                }
+            },
+            
+            async compareCalculations(quantity = 24) {
+                const params = new URLSearchParams(window.location.search);
+                const styleNumber = params.get('StyleNumber') || 'PC54';
+                console.log(`🔬 Comparing calculations for ${styleNumber}, qty: ${quantity}`);
+                
+                try {
+                    const data = await embroideryService.fetchPricingData(styleNumber);
+                    const tierData = data.tierData.find(t => 
+                        quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+                    );
+                    
+                    if (tierData) {
+                        console.log('Tier:', tierData.TierLabel);
+                        console.log('Margin:', tierData.MarginDenominator);
+                        console.log('Standard Garment Cost:', data.standardGarmentBaseCostUsed);
+                        console.log('Pricing:', data.pricing[tierData.TierLabel]);
+                    }
+                    
+                    return data;
+                } catch(error) {
+                    console.error('Comparison failed:', error);
+                }
+            }
+        };
     </script>
     
 </body>
