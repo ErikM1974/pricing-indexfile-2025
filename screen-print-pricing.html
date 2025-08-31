@@ -973,10 +973,113 @@
     <script src="/shared_components/js/universal-image-gallery.js"></script>
 
     <!-- Screen Print V2 Scripts -->
-    <script src="/shared_components/js/screenprint-caspio-adapter-v2.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
     
-    <!-- Caspio Loader -->
-    <script src="/screenprint-caspio-loader.js"></script>
+    <!-- API Testing Utilities -->
+    <script>
+        // Screen Print API Testing Utilities
+        window.SCREENPRINT_API_TEST = {
+            // Test API endpoint
+            testAPI: async function(styleNumber = 'PC61') {
+                console.log('🧪 Testing Screen Print API for:', styleNumber);
+                try {
+                    const service = new ScreenPrintPricingService();
+                    const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                    console.log('✅ API Response:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ API Error:', error);
+                    return null;
+                }
+            },
+            
+            // Compare API vs Caspio prices
+            compareCalculations: async function(qty = 48, colors = 2) {
+                const calculator = window.screenPrintCalculator;
+                if (!calculator) {
+                    console.error('Calculator not initialized');
+                    return;
+                }
+                
+                const styleNumber = calculator.state.styleNumber || 'PC61';
+                console.log(`📊 Comparing prices for ${styleNumber}, Qty: ${qty}, Colors: ${colors}`);
+                
+                // Get API pricing
+                const apiData = await this.testAPI(styleNumber);
+                if (apiData && apiData.primaryLocationPricing) {
+                    const apiPricing = apiData.primaryLocationPricing[colors.toString()];
+                    if (apiPricing && apiPricing.tiers) {
+                        const tier = apiPricing.tiers.find(t => qty >= t.minQty && (!t.maxQty || qty <= t.maxQty));
+                        if (tier) {
+                            const apiPrice = tier.prices['M'] || tier.prices[Object.keys(tier.prices)[0]];
+                            console.log(`API Price: $${apiPrice}`);
+                        }
+                    }
+                }
+                
+                // Get current calculator price
+                calculator.state.quantity = qty;
+                calculator.state.frontColors = colors;
+                const pricing = calculator.calculatePricing();
+                console.log(`Calculator Price: $${pricing.perShirtTotal.toFixed(2)}`);
+                
+                return { api: apiData, calculated: pricing };
+            },
+            
+            // Check service status
+            checkStatus: function() {
+                const calculator = window.screenPrintCalculator;
+                const service = calculator?.pricingService;
+                
+                if (service) {
+                    const status = service.getStatus();
+                    console.log('📊 Service Status:', status);
+                    console.log('API Mode: ✅ Enabled (Direct API Only)');
+                    console.log('Pricing Data Loaded:', calculator.state.pricingData ? '✅ Yes' : '❌ No');
+                } else {
+                    console.log('❌ Service not initialized');
+                }
+            },
+            
+            // Clear cache
+            clearCache: function() {
+                const calculator = window.screenPrintCalculator;
+                if (calculator?.pricingService) {
+                    calculator.pricingService.clearCache();
+                    console.log('🗑️ Cache cleared');
+                } else {
+                    console.log('❌ Service not available');
+                }
+            },
+            
+            // Reload pricing data
+            reload: async function() {
+                const calculator = window.screenPrintCalculator;
+                if (calculator && calculator.state.styleNumber) {
+                    await calculator.checkUrlParams();
+                    console.log('🔄 Pricing data reloaded');
+                } else {
+                    console.log('❌ No style number to reload');
+                }
+            }
+        };
+        
+        // Store calculator reference when initialized
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (typeof ScreenPrintPricing !== 'undefined') {
+                    window.screenPrintCalculator = new ScreenPrintPricing();
+                    console.log('===================================');
+                    console.log('🚀 Screen Print Pricing System: Direct API Mode');
+                    console.log('📦 API endpoint: /api/pricing-bundle?method=ScreenPrint');
+                    console.log('🧪 Test API: SCREENPRINT_API_TEST.testAPI()');
+                    console.log('📊 Check status: SCREENPRINT_API_TEST.checkStatus()');
+                    console.log('🗑️ Clear cache: SCREENPRINT_API_TEST.clearCache()');
+                    console.log('===================================');
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>

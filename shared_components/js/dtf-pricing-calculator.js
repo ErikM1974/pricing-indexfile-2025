@@ -5,6 +5,8 @@
 class DTFPricingCalculator {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        this.pricingService = new DTFPricingService();
+        this.apiDataLoaded = false;
         this.currentData = {
             garmentCost: 0,
             quantity: DTFConfig.settings.defaultQuantity,
@@ -16,11 +18,81 @@ class DTFPricingCalculator {
         this.init();
     }
 
-    init() {
+    async init() {
+        // Show loading state initially
+        this.showLoadingState();
+        
+        try {
+            // Load API data
+            await this.loadApiData();
+            this.apiDataLoaded = true;
+            console.log('[DTF Calculator] API data loaded successfully');
+        } catch (error) {
+            console.error('[DTF Calculator] Failed to load API data:', error);
+            // Will fall back to hardcoded values in DTFConfig
+        }
+        
         this.render();
         this.attachEventListeners();
         this.checkStaffViewStatus();
         this.addTransferLocation(); // Start with one location
+    }
+
+    async loadApiData() {
+        const apiData = await this.pricingService.fetchPricingData();
+        
+        // Update DTFConfig with API data if available
+        if (apiData && apiData.transferSizes) {
+            // Merge API data into existing config while keeping UI elements
+            this.mergeApiDataIntoConfig(apiData);
+        }
+        
+        return apiData;
+    }
+
+    mergeApiDataIntoConfig(apiData) {
+        // Update transfer pricing from API
+        if (apiData.transferSizes) {
+            Object.keys(apiData.transferSizes).forEach(sizeKey => {
+                if (DTFConfig.transferSizes[sizeKey]) {
+                    DTFConfig.transferSizes[sizeKey].pricingTiers = apiData.transferSizes[sizeKey].pricingTiers;
+                }
+            });
+        }
+        
+        // Update freight costs from API
+        if (apiData.freightTiers) {
+            DTFConfig.freightCost.tiers = apiData.freightTiers;
+        }
+        
+        // Update labor cost from API
+        if (apiData.laborCostPerLocation) {
+            DTFConfig.laborCost.costPerLocation = apiData.laborCostPerLocation;
+        }
+        
+        // Update LTM fee from API
+        if (apiData.pricingTiers && apiData.pricingTiers.length > 0) {
+            const ltmTier = apiData.pricingTiers.find(t => t.ltmFee > 0);
+            if (ltmTier) {
+                DTFConfig.settings.ltmFeeAmount = ltmTier.ltmFee;
+                DTFConfig.settings.ltmFeeThreshold = ltmTier.maxQuantity + 1;
+            }
+        }
+        
+        console.log('[DTF Calculator] Config updated with API data');
+    }
+
+    showLoadingState() {
+        if (this.container) {
+            this.container.innerHTML = `
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading pricing data...</span>
+                    </div>
+                    <p class="mt-3">Loading pricing data...</p>
+                </div>
+            `;
+        }
     }
 
     render() {
@@ -290,7 +362,13 @@ class DTFPricingCalculator {
 
     calculatePricing() {
         const quantity = this.currentData.quantity;
-        const garmentCost = this.currentData.garmentCost / DTFConfig.settings.garmentMargin; // 40% margin
+        
+        // Get margin denominator from API if available, otherwise use default
+        const marginDenominator = this.apiDataLoaded && this.pricingService.apiData 
+            ? this.pricingService.getMarginDenominator(quantity)
+            : DTFConfig.settings.garmentMargin;
+        
+        const garmentCost = this.currentData.garmentCost / marginDenominator; // Apply margin
         
         // Calculate transfer costs
         let totalTransferCost = 0;
@@ -298,7 +376,11 @@ class DTFPricingCalculator {
 
         this.currentData.transfers.forEach(transfer => {
             if (transfer.location && transfer.size) {
-                const price = DTFConfig.helpers.getTransferPrice(transfer.size, quantity);
+                // Use API service if available, otherwise fall back to config
+                const price = this.apiDataLoaded && this.pricingService.apiData
+                    ? this.pricingService.getTransferPrice(transfer.size, quantity)
+                    : DTFConfig.helpers.getTransferPrice(transfer.size, quantity);
+                    
                 totalTransferCost += price;
                 
                 const location = DTFConfig.transferLocations.find(l => l.value === transfer.location);
@@ -313,14 +395,21 @@ class DTFPricingCalculator {
             }
         });
 
-        // Calculate labor cost ($2 per location)
+        // Calculate labor cost from API if available
         const locationCount = this.currentData.transfers.filter(t => t.location && t.size).length;
-        const laborCost = locationCount > 0 ? DTFConfig.laborCost.getTotalLaborCost(locationCount) : 0;
+        const laborCostPerLocation = this.apiDataLoaded && this.pricingService.apiData
+            ? this.pricingService.getLaborCostPerLocation()
+            : DTFConfig.laborCost.costPerLocation;
+        const laborCost = locationCount > 0 ? laborCostPerLocation * locationCount : 0;
 
         // Calculate freight based on quantity and number of transfers
         let freightCost = 0;
         if (DTFConfig.settings.includeFreightInTransfers && locationCount > 0) {
-            freightCost = DTFConfig.freightCost.getTotalFreight(quantity, locationCount);
+            // Use API service for freight if available
+            const freightPerTransfer = this.apiDataLoaded && this.pricingService.apiData
+                ? this.pricingService.getFreightPerTransfer(quantity)
+                : DTFConfig.freightCost.getFreightPerTransfer(quantity);
+            freightCost = freightPerTransfer * locationCount;
         } else {
             freightCost = this.currentData.freight;
         }
@@ -328,7 +417,10 @@ class DTFPricingCalculator {
         // Calculate LTM fee if auto-calculate is on
         let ltmFee = this.currentData.ltmFee;
         if (this.currentData.autoCalculateLTM && DTFConfig.settings.showLTMFee) {
-            ltmFee = quantity < DTFConfig.settings.ltmFeeThreshold ? DTFConfig.settings.ltmFeeAmount : 0;
+            // Use API service for LTM if available
+            ltmFee = this.apiDataLoaded && this.pricingService.apiData
+                ? this.pricingService.getLTMFee(quantity)
+                : (quantity < DTFConfig.settings.ltmFeeThreshold ? DTFConfig.settings.ltmFeeAmount : 0);
         }
 
         // Total per shirt
@@ -343,7 +435,11 @@ class DTFPricingCalculator {
             laborCost,
             locationCount,
             freight: freightCost,
-            freightPerTransfer: locationCount > 0 ? DTFConfig.freightCost.getFreightPerTransfer(quantity) : 0,
+            freightPerTransfer: locationCount > 0 
+                ? (this.apiDataLoaded && this.pricingService.apiData
+                    ? this.pricingService.getFreightPerTransfer(quantity)
+                    : DTFConfig.freightCost.getFreightPerTransfer(quantity))
+                : 0,
             ltmFee: ltmFee,
             ltmFeePerShirt: ltmFee / quantity,
             totalPerShirt,

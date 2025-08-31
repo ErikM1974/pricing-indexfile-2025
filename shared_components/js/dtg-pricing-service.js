@@ -26,11 +26,57 @@ class DTGPricingService {
             { code: 'LC_JB', name: 'Left Chest & Jumbo Back' }
         ];
         
-        console.log('[DTGPricingService] Service initialized');
+        console.log('[DTGPricingService] Service initialized - API bundle endpoint only (no fallback)');
     }
 
     /**
-     * Fetch all pricing data from APIs
+     * Fetch bundled DTG data from new optimized endpoint
+     * @param {string} styleNumber - Product style number
+     * @param {string} color - Optional color filter
+     * @returns {Object|null} Bundle data or null if endpoint not available
+     */
+    async fetchBundledData(styleNumber, color = null) {
+        const bundleUrl = `${this.apiBase}/dtg/product-bundle?styleNumber=${encodeURIComponent(styleNumber)}${color ? `&color=${encodeURIComponent(color)}` : ''}`;
+        
+        try {
+            console.log('[DTGPricingService] Attempting to fetch from bundle endpoint:', bundleUrl);
+            const response = await fetch(bundleUrl);
+            
+            if (response.status === 404) {
+                console.error('[DTGPricingService] Bundle endpoint not available (404) - no fallback available');
+                throw new Error('DTG pricing bundle endpoint not found. Please contact support.');
+            }
+            
+            if (!response.ok) {
+                console.warn('[DTGPricingService] Bundle endpoint error:', response.status);
+                return null;
+            }
+            
+            const data = await response.json();
+            console.log('[DTGPricingService] Bundle data received successfully');
+            
+            // Transform bundle data to match existing format
+            return {
+                tiers: data.pricing?.tiers || [],
+                costs: data.pricing?.costs || [],
+                sizes: data.pricing?.sizes || [],
+                upcharges: data.pricing?.upcharges || {},
+                styleNumber: data.product?.styleNumber || styleNumber,
+                color: color,
+                locations: data.pricing?.locations || this.locations,
+                productInfo: data.product || {},
+                timestamp: Date.now(),
+                source: 'bundle'
+            };
+            
+        } catch (error) {
+            console.warn('[DTGPricingService] Bundle endpoint failed:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch all pricing data from APIs (with bundle endpoint support)
      * @param {string} styleNumber - Product style number (e.g., 'PC61')
      * @param {string} color - Color name (optional, for inventory filtering)
      * @returns {Object} Combined pricing data
@@ -66,79 +112,29 @@ class DTGPricingService {
             }
         }
 
-        console.log('[DTGPricingService] Fetching fresh data for:', styleNumber, color);
+        // Use bundle endpoint only - no fallback to individual endpoints
+        console.log('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
         
         try {
-            // Fetch all data in parallel for maximum performance
-            const startTime = performance.now();
+            const bundleData = await this.fetchBundledData(styleNumber, color);
             
-            // Removed inventory API call - using max-prices data instead for better reliability
-            const [tiersRes, costsRes, maxPricesRes] = await Promise.all([
-                fetch(`${this.apiBase}/pricing-tiers?method=DTG`),
-                fetch(`${this.apiBase}/dtg-costs`),
-                fetch(`${this.apiBase}/max-prices-by-style?styleNumber=${styleNumber}`)
-            ]);
-
-            // Check for errors with detailed messages
-            if (!tiersRes.ok) {
-                const errorText = await tiersRes.text();
-                throw new Error(`Tiers API failed (${tiersRes.status}): ${errorText}`);
-            }
-            if (!costsRes.ok) {
-                const errorText = await costsRes.text();
-                throw new Error(`Costs API failed (${costsRes.status}): ${errorText}`);
-            }
-            if (!maxPricesRes.ok) {
-                const errorText = await maxPricesRes.text();
-                throw new Error(`Max Prices API failed (${maxPricesRes.status}) for ${styleNumber}: ${errorText}`);
-            }
-
-            // Parse responses
-            const [tiers, costs, maxPrices] = await Promise.all([
-                tiersRes.json(),
-                costsRes.json(),
-                maxPricesRes.json()
-            ]);
-
-            const fetchTime = performance.now() - startTime;
-            console.log(`[DTGPricingService] Data fetched in ${fetchTime.toFixed(0)}ms`);
-            
-            // Log max prices details for debugging
-            if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
-                console.log(`[DTGPricingService DEBUG] ${styleNumber} max prices:`, {
-                    sizesCount: maxPrices.sizes?.length || 0,
-                    firstSize: maxPrices.sizes?.[0],
-                    upcharges: maxPrices.sellingPriceDisplayAddOns,
-                    hasPrices: maxPrices.sizes?.length > 0
-                });
+            // Bundle endpoint is required - no fallback
+            if (!bundleData) {
+                throw new Error(`Failed to fetch DTG pricing data for ${styleNumber}. API bundle endpoint is required.`);
             }
             
-            // Validate max prices data
-            if (!maxPrices.sizes || maxPrices.sizes.length === 0) {
-                console.error(`[DTGPricingService] No pricing data found for ${styleNumber}`);
-                throw new Error(`No pricing data available for ${styleNumber}`);
-            }
-
-            // Combine and structure the data
-            const data = {
-                tiers,
-                costs,
-                sizes: maxPrices.sizes || [],
-                upcharges: maxPrices.sellingPriceDisplayAddOns || {},
-                styleNumber,
-                color,
-                locations: this.locations,
-                timestamp: Date.now()
-            };
-
-            // Cache valid results
-            this.cache.set(cacheKey, { data, timestamp: Date.now() });
+            console.log('[DTGPricingService] Bundle endpoint data received successfully');
+            
+            // Cache the bundled data
+            this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
             console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
             
-            return data;
+            return bundleData;
             
         } catch (error) {
-            console.error('[DTGPricingService] Error fetching data:', error);
+            console.error('[DTGPricingService] Error fetching bundle data:', error);
+            // Clear cache on error to prevent stale data
+            this.cache.delete(cacheKey);
             throw error;
         }
     }
@@ -440,9 +436,20 @@ class DTGPricingService {
             timeout: this.cacheTimeout
         };
     }
+
+    /**
+     * Get service status and configuration
+     */
+    getServiceStatus() {
+        return {
+            bundleEndpointEnabled: true,
+            cacheEntries: this.cache.size,
+            apiBase: this.apiBase
+        };
+    }
 }
 
 // Make available globally
 window.DTGPricingService = DTGPricingService;
 
-console.log('[DTGPricingService] Service loaded and ready');
+console.log('[DTGPricingService] Service loaded with API bundle endpoint (required for operation)');

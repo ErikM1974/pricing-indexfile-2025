@@ -346,16 +346,49 @@
         
         // Performance tracking
         window.DTG_PERFORMANCE = {
-            systemUsed: 'Direct API',
+            systemUsed: 'Direct API with Bundle Support',
             loadStartTime: performance.now(),
             metrics: {},
             debug: new URLSearchParams(window.location.search).get('debug') === 'true'
         };
         
+        // API testing utilities  
+        window.DTG_API_TEST = {
+            // Test the API endpoint
+            testAPI: async function(styleNumber) {
+                const service = new window.DTGPricingService();
+                console.log('🧪 Testing DTG API for:', styleNumber);
+                const result = await service.fetchBundledData(styleNumber || 'PC54');
+                if (result) {
+                    console.log('✅ API endpoint working!', result);
+                } else {
+                    console.log('❌ API endpoint error');
+                }
+                return result;
+            },
+            
+            // Check service status
+            checkStatus: function() {
+                const service = new window.DTGPricingService();
+                const status = service.getServiceStatus();
+                console.log('📊 DTG Service Status:', status);
+                return status;
+            },
+            
+            // Clear cache
+            clearCache: function() {
+                const service = new window.DTGPricingService();
+                service.clearCache();
+                console.log('🔄 Cache cleared successfully');
+            }
+        };
+        
         // Log system status
         console.log('===================================');
-        console.log('🚀 DTG Pricing System: Direct API Only');
-        console.log('Master Bundle/Caspio system has been removed');
+        console.log('🚀 DTG Pricing System: Direct API Implementation');
+        console.log('📦 Using optimized bundle endpoint for all pricing data');
+        console.log('🧪 Test API: DTG_API_TEST.testAPI()');
+        console.log('📊 Check status: DTG_API_TEST.checkStatus()');
         if (window.DTG_PERFORMANCE.debug) {
             console.log('🔍 DEBUG MODE ENABLED');
         }

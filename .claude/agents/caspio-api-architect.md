@@ -102,6 +102,51 @@ This endpoint provides comprehensive product search with:
 
 This endpoint replaces the need for complex Caspio DataPage integration and provides a modern, performant search experience.
 
+### `/api/dtg/product-bundle` - DTG Product Bundle Endpoint 
+**Status**: LIVE as of August 30, 2025
+**Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/dtg/product-bundle`
+**Method**: GET
+**Purpose**: Consolidate DTG pricing data retrieval from multiple API calls into one optimized request
+
+This endpoint provides complete DTG (Direct to Garment) data in a single request:
+- **Product Details**: Style info, title, description, all color variants with images
+- **Pricing Tiers**: DTG pricing tiers with quantity breaks (24-47, 48-71, 72+)
+- **Print Costs**: DTG costs by print location and tier (LC, FF, FB, etc.)
+- **Size Pricing**: Base item costs for all sizes with max case prices
+- **Upcharges**: Size-based upcharges (2XL, 3XL, etc.)
+- **Performance**: ~2-3x faster than individual API calls, 5-minute cache
+
+**Parameters**:
+- `styleNumber` (required) - Product style number (e.g., "PC54")
+- `color` (optional) - Focus on specific color variant
+
+**Response Structure**:
+```json
+{
+  "product": {
+    "styleNumber": "PC54",
+    "title": "Port & Co Core Cotton Tee",
+    "colors": [...],
+    "selectedColor": {...}  // When color parameter used
+  },
+  "pricing": {
+    "tiers": [...],         // DTG pricing tiers
+    "costs": [...],         // Print costs by location
+    "sizes": [...],         // Size-based pricing
+    "upcharges": {...},     // Size upcharges
+    "locations": [...]      // Print location codes/names
+  },
+  "metadata": {
+    "cachedAt": "2025-08-30T17:00:00",
+    "ttl": 300,
+    "source": "dtg-bundle-v1"
+  }
+}
+```
+
+**Use Cases**: DTG pricing calculators, quote generation, product configuration
+**Breaking Changes**: None - parameter removed in v1.1.1 but gracefully ignored
+
 ## Inter-Claude Communication System (Active as of August 2025)
 
 ### Shared Documentation
@@ -131,9 +176,31 @@ When you need API functionality:
    How should [endpoint] handle [specific scenario]?
    ```
 
+### `/api/pricing-bundle?method=DTF` - DTF (Direct-to-Film) Support
+**Status**: LIVE as of August 31, 2025 16:00 UTC
+**Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF`
+**Method**: GET
+**Purpose**: Complete DTF pricing data for calculator integration
+
+**DTF Implementation Details**:
+- **Data Sources**: DTF_Pricing table (12 records), Transfer_Freight table (4 tiers), Pricing_Tiers (4 DTF tiers), Pricing_Rules
+- **Response Structure**: `{tiersR: [], allDtfCostsR: [], freightR: [], rulesR: {}, locations: [], sizes: [], sellingPriceDisplayAddOns: {}}`
+- **Key Features**: 
+  - 4 pricing tiers with MarginDenominator=0.6
+  - 10-23 tier includes $50 LTM_Fee
+  - 12 DTF cost records by size (Small/Medium/Large) and quantity ranges
+  - 4 freight cost tiers (10-49: $0.50, 50-99: $0.35, 100-199: $0.25, 200+: $0.15)
+  - HalfDollarCeil_Final rounding method
+- **Performance**: <2 second response time, production tested ✅
+
 ### Recent API Communications
+- **Aug 31, 2025**: 🚀 DTF DEPLOYED - DTF support added to pricing-bundle endpoint, LIVE on production
+- **Aug 31, 2025**: DTF pricing calculator can now replace hardcoded values with live API data
 - **Aug 30, 2025**: Inter-Claude communication system established
 - **Aug 30, 2025**: All 53 endpoints documented and verified
+- **Aug 30, 2025**: DTG Product Bundle endpoint implemented (`/api/dtg/product-bundle`)
+- **Aug 30, 2025**: DTG endpoint optimized - removed `includeInventory` parameter (v1.1.1)
+- **Aug 30, 2025**: DTG endpoint DEPLOYED and TESTED on Heroku - Ready for production use
 - **Aug 30, 2025**: Bulk search endpoint requested for comparison features (POST /api/products/bulk-search)
 
 ### Important Notes

@@ -32,8 +32,8 @@
     const elements = {};
 
     // Initialize on DOM ready
-    document.addEventListener('DOMContentLoaded', function() {
-        // console.log('[CAP-PRICING-V3] Initializing...');
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('[CAP-PRICING-V3] Initializing with API service...');
         
         // Make updateHeaderPricing globally available
         window.updateHeaderPricing = function(quantity, unitPrice) {
@@ -44,27 +44,65 @@
             if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
         };
         
-        // Listen for master bundle data
-        document.addEventListener('capMasterBundleLoaded', handleMasterBundle);
-        
         // Initialize UI
         initializeUI();
         
         // Load product data for gallery and swatches
         loadProductData();
+        
+        // Load pricing data via API service
+        await loadPricingDataViaAPI();
     });
 
-    // Handle master bundle data
+    // Load pricing data via API service
+    async function loadPricingDataViaAPI() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const styleNumber = params.get('StyleNumber') || 'C112';
+            
+            // Check if service is available
+            if (!window.capPricingService && typeof CapEmbroideryPricingService !== 'undefined') {
+                window.capPricingService = new CapEmbroideryPricingService();
+            }
+            
+            if (!window.capPricingService) {
+                console.error('[CAP-PRICING-V3] Pricing service not available');
+                displayPricingError();
+                return;
+            }
+            
+            console.log(`[CAP-PRICING-V3] Loading pricing data via API for ${styleNumber}`);
+            const data = await window.capPricingService.fetchPricingData(styleNumber);
+            
+            if (data) {
+                console.log('[CAP-PRICING-V3] API data received:', data);
+                processMasterBundleData(data);
+            } else {
+                console.error('[CAP-PRICING-V3] No data received from API');
+                displayPricingError();
+            }
+        } catch (error) {
+            console.error('[CAP-PRICING-V3] Error loading pricing data:', error);
+            displayPricingError();
+        }
+    }
+
+    // Handle master bundle data (kept for compatibility but not used with API)
     function handleMasterBundle(event) {
-        // console.log('[CAP-PRICING-V3] Received master bundle event:', event.detail);
+        console.log('[CAP-PRICING-V3] Processing bundle data:', event.detail);
         
-        if (!event.detail || !event.detail.raw) {
+        if (!event.detail) {
             displayPricingError();
             return;
         }
 
-        processMasterBundleData(event.detail.raw);
+        // Handle both API format and legacy format
+        const data = event.detail.raw || event.detail;
+        processMasterBundleData(data);
     }
+    
+    // Make handleMasterBundle globally available for testing
+    window.handleMasterBundle = handleMasterBundle;
 
     // Process master bundle data
     function processMasterBundleData(masterBundle) {
