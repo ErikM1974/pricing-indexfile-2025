@@ -436,7 +436,7 @@
                     }
                     console.log("[DP5-HELPER] Inventory data processed:", sizes);
                 } else {
-                    console.warn("[DP5-HELPER] No inventory data found for style/color.");
+                    // console.warn("[DP5-HELPER] No inventory data found for style/color.");
                     window.inventoryData = { styleNumber, color: colorCode, sizes: [], sizeTotals: [], timestamp: new Date().toISOString(), noData: true }; // Mark as no data
                      if (window.nwcaPricingData) { // Refresh grid to remove old indicators if any
                         console.log("[DP5-HELPER] No inventory data, refreshing pricing grid to clear indicators.");
