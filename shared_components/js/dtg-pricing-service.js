@@ -13,11 +13,6 @@ class DTGPricingService {
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         
-        // Feature flags for bundle endpoint
-        this.useBundleEndpoint = true; // Try bundle first, fallback if fails
-        this.bundleEndpointAttempted = false; // Track if we've tried the bundle endpoint
-        this.bundleEndpointAvailable = null; // null=unknown, true=available, false=not available
-        
         // Location definitions (matching current system)
         this.locations = [
             { code: 'LC', name: 'Left Chest' },
@@ -31,7 +26,7 @@ class DTGPricingService {
             { code: 'LC_JB', name: 'Left Chest & Jumbo Back' }
         ];
         
-        console.log('[DTGPricingService] Service initialized with bundle endpoint support');
+        console.log('[DTGPricingService] Service initialized - API bundle endpoint only (no fallback)');
     }
 
     /**
@@ -48,9 +43,8 @@ class DTGPricingService {
             const response = await fetch(bundleUrl);
             
             if (response.status === 404) {
-                console.log('[DTGPricingService] Bundle endpoint not available (404), will use fallback');
-                this.bundleEndpointAvailable = false;
-                return null;
+                console.error('[DTGPricingService] Bundle endpoint not available (404) - no fallback available');
+                throw new Error('DTG pricing bundle endpoint not found. Please contact support.');
             }
             
             if (!response.ok) {
@@ -60,7 +54,6 @@ class DTGPricingService {
             
             const data = await response.json();
             console.log('[DTGPricingService] Bundle data received successfully');
-            this.bundleEndpointAvailable = true;
             
             // Transform bundle data to match existing format
             return {
@@ -119,92 +112,29 @@ class DTGPricingService {
             }
         }
 
-        // Try bundle endpoint first if enabled and not known to be unavailable
-        if (this.useBundleEndpoint && this.bundleEndpointAvailable !== false) {
-            const bundleData = await this.fetchBundledData(styleNumber, color);
-            if (bundleData) {
-                console.log('[DTGPricingService] Using bundle endpoint data');
-                // Cache the bundled data
-                this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
-                return bundleData;
-            }
-            // If bundle failed, fall through to existing implementation
-            console.log('[DTGPricingService] Bundle endpoint failed or unavailable, using fallback');
-        }
-
-        console.log('[DTGPricingService] Fetching fresh data from individual endpoints for:', styleNumber, color);
+        // Use bundle endpoint only - no fallback to individual endpoints
+        console.log('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
         
         try {
-            // Fetch all data in parallel for maximum performance
-            const startTime = performance.now();
+            const bundleData = await this.fetchBundledData(styleNumber, color);
             
-            // Removed inventory API call - using max-prices data instead for better reliability
-            const [tiersRes, costsRes, maxPricesRes] = await Promise.all([
-                fetch(`${this.apiBase}/pricing-tiers?method=DTG`),
-                fetch(`${this.apiBase}/dtg-costs`),
-                fetch(`${this.apiBase}/max-prices-by-style?styleNumber=${styleNumber}`)
-            ]);
-
-            // Check for errors with detailed messages
-            if (!tiersRes.ok) {
-                const errorText = await tiersRes.text();
-                throw new Error(`Tiers API failed (${tiersRes.status}): ${errorText}`);
-            }
-            if (!costsRes.ok) {
-                const errorText = await costsRes.text();
-                throw new Error(`Costs API failed (${costsRes.status}): ${errorText}`);
-            }
-            if (!maxPricesRes.ok) {
-                const errorText = await maxPricesRes.text();
-                throw new Error(`Max Prices API failed (${maxPricesRes.status}) for ${styleNumber}: ${errorText}`);
-            }
-
-            // Parse responses
-            const [tiers, costs, maxPrices] = await Promise.all([
-                tiersRes.json(),
-                costsRes.json(),
-                maxPricesRes.json()
-            ]);
-
-            const fetchTime = performance.now() - startTime;
-            console.log(`[DTGPricingService] Data fetched in ${fetchTime.toFixed(0)}ms`);
-            
-            // Log max prices details for debugging
-            if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
-                console.log(`[DTGPricingService DEBUG] ${styleNumber} max prices:`, {
-                    sizesCount: maxPrices.sizes?.length || 0,
-                    firstSize: maxPrices.sizes?.[0],
-                    upcharges: maxPrices.sellingPriceDisplayAddOns,
-                    hasPrices: maxPrices.sizes?.length > 0
-                });
+            // Bundle endpoint is required - no fallback
+            if (!bundleData) {
+                throw new Error(`Failed to fetch DTG pricing data for ${styleNumber}. API bundle endpoint is required.`);
             }
             
-            // Validate max prices data
-            if (!maxPrices.sizes || maxPrices.sizes.length === 0) {
-                console.error(`[DTGPricingService] No pricing data found for ${styleNumber}`);
-                throw new Error(`No pricing data available for ${styleNumber}`);
-            }
-
-            // Combine and structure the data
-            const data = {
-                tiers,
-                costs,
-                sizes: maxPrices.sizes || [],
-                upcharges: maxPrices.sellingPriceDisplayAddOns || {},
-                styleNumber,
-                color,
-                locations: this.locations,
-                timestamp: Date.now()
-            };
-
-            // Cache valid results
-            this.cache.set(cacheKey, { data, timestamp: Date.now() });
+            console.log('[DTGPricingService] Bundle endpoint data received successfully');
+            
+            // Cache the bundled data
+            this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
             console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
             
-            return data;
+            return bundleData;
             
         } catch (error) {
-            console.error('[DTGPricingService] Error fetching data:', error);
+            console.error('[DTGPricingService] Error fetching bundle data:', error);
+            // Clear cache on error to prevent stale data
+            this.cache.delete(cacheKey);
             throw error;
         }
     }
@@ -508,45 +438,18 @@ class DTGPricingService {
     }
 
     /**
-     * Check if bundle endpoint is available
-     * @returns {boolean|null} true if available, false if not, null if unknown
-     */
-    isBundleEndpointAvailable() {
-        return this.bundleEndpointAvailable;
-    }
-
-    /**
-     * Enable or disable bundle endpoint usage
-     * @param {boolean} enable - Whether to use bundle endpoint
-     */
-    setBundleEndpointUsage(enable) {
-        this.useBundleEndpoint = enable;
-        console.log(`[DTGPricingService] Bundle endpoint usage ${enable ? 'enabled' : 'disabled'}`);
-    }
-
-    /**
      * Get service status and configuration
      */
     getServiceStatus() {
         return {
-            bundleEndpointEnabled: this.useBundleEndpoint,
-            bundleEndpointAvailable: this.bundleEndpointAvailable,
+            bundleEndpointEnabled: true,
             cacheEntries: this.cache.size,
             apiBase: this.apiBase
         };
-    }
-
-    /**
-     * Force a retry of the bundle endpoint (useful after API updates)
-     */
-    resetBundleEndpointStatus() {
-        this.bundleEndpointAvailable = null;
-        this.bundleEndpointAttempted = false;
-        console.log('[DTGPricingService] Bundle endpoint status reset - will retry on next request');
     }
 }
 
 // Make available globally
 window.DTGPricingService = DTGPricingService;
 
-console.log('[DTGPricingService] Service loaded with bundle endpoint support (will fallback if unavailable)');
+console.log('[DTGPricingService] Service loaded with API bundle endpoint (required for operation)');
