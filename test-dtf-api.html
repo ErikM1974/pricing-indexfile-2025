@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTF API Test - Price Verification</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #333; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        .match { background: #d4edda; }
+        .mismatch { background: #f8d7da; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .loading { opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DTF API Test - Price Verification</h1>
+        <div id="status"></div>
+        <button onclick="runTest()">Run Price Comparison Test</button>
+        <button onclick="clearResults()">Clear Results</button>
+        <div id="results"></div>
+    </div>
+
+    <script src="/shared_components/js/dtf-config.js"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js"></script>
+    
+    <script>
+        async function runTest() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="status info loading">Loading API data...</div>';
+            resultsDiv.innerHTML = '';
+            
+            try {
+                // Initialize service and fetch data
+                const service = new DTFPricingService();
+                const apiData = await service.fetchPricingData();
+                
+                statusDiv.innerHTML = '<div class="status success">✅ API data loaded successfully</div>';
+                
+                // Compare prices
+                let html = '<h2>Price Comparison Results</h2>';
+                
+                // Test transfer prices
+                html += '<h3>Transfer Prices</h3>';
+                html += '<table>';
+                html += '<tr><th>Size</th><th>Quantity Range</th><th>Hardcoded Price</th><th>API Price</th><th>Match</th></tr>';
+                
+                const testCases = [
+                    { size: 'small', qty: 15, expectedPrice: 6.00, range: '10-23' },
+                    { size: 'small', qty: 30, expectedPrice: 5.25, range: '24-47' },
+                    { size: 'small', qty: 60, expectedPrice: 4.00, range: '48-71' },
+                    { size: 'small', qty: 100, expectedPrice: 3.25, range: '72+' },
+                    { size: 'medium', qty: 15, expectedPrice: 9.50, range: '10-23' },
+                    { size: 'medium', qty: 30, expectedPrice: 8.25, range: '24-47' },
+                    { size: 'medium', qty: 60, expectedPrice: 6.50, range: '48-71' },
+                    { size: 'medium', qty: 100, expectedPrice: 5.00, range: '72+' },
+                    { size: 'large', qty: 15, expectedPrice: 14.50, range: '10-23' },
+                    { size: 'large', qty: 30, expectedPrice: 12.50, range: '24-47' },
+                    { size: 'large', qty: 60, expectedPrice: 10.00, range: '48-71' },
+                    { size: 'large', qty: 100, expectedPrice: 8.00, range: '72+' }
+                ];
+                
+                for (const test of testCases) {
+                    const hardcodedPrice = DTFConfig.helpers.getTransferPrice(test.size, test.qty);
+                    const apiPrice = service.getTransferPrice(test.size, test.qty);
+                    const match = hardcodedPrice === apiPrice;
+                    
+                    html += `<tr class="${match ? 'match' : 'mismatch'}">`;
+                    html += `<td>${test.size}</td>`;
+                    html += `<td>${test.range}</td>`;
+                    html += `<td>$${hardcodedPrice.toFixed(2)}</td>`;
+                    html += `<td>$${apiPrice.toFixed(2)}</td>`;
+                    html += `<td>${match ? '✅' : '❌'}</td>`;
+                    html += '</tr>';
+                }
+                
+                html += '</table>';
+                
+                // Test freight costs
+                html += '<h3>Freight Costs</h3>';
+                html += '<table>';
+                html += '<tr><th>Quantity</th><th>Hardcoded Cost</th><th>API Cost</th><th>Match</th></tr>';
+                
+                const freightTests = [
+                    { qty: 25, expectedCost: 0.50 },
+                    { qty: 75, expectedCost: 0.35 },
+                    { qty: 150, expectedCost: 0.25 },
+                    { qty: 250, expectedCost: 0.15 }
+                ];
+                
+                for (const test of freightTests) {
+                    const hardcodedCost = DTFConfig.freightCost.getFreightPerTransfer(test.qty);
+                    const apiCost = service.getFreightPerTransfer(test.qty);
+                    const match = hardcodedCost === apiCost;
+                    
+                    html += `<tr class="${match ? 'match' : 'mismatch'}">`;
+                    html += `<td>${test.qty}</td>`;
+                    html += `<td>$${hardcodedCost.toFixed(2)}</td>`;
+                    html += `<td>$${apiCost.toFixed(2)}</td>`;
+                    html += `<td>${match ? '✅' : '❌'}</td>`;
+                    html += '</tr>';
+                }
+                
+                html += '</table>';
+                
+                // Test other values
+                html += '<h3>Other Configuration</h3>';
+                html += '<table>';
+                html += '<tr><th>Setting</th><th>Hardcoded Value</th><th>API Value</th><th>Match</th></tr>';
+                
+                // Labor cost
+                const hardcodedLabor = DTFConfig.laborCost.costPerLocation;
+                const apiLabor = service.getLaborCostPerLocation();
+                html += `<tr class="${hardcodedLabor === apiLabor ? 'match' : 'mismatch'}">`;
+                html += `<td>Labor Cost per Location</td>`;
+                html += `<td>$${hardcodedLabor.toFixed(2)}</td>`;
+                html += `<td>$${apiLabor.toFixed(2)}</td>`;
+                html += `<td>${hardcodedLabor === apiLabor ? '✅' : '❌'}</td>`;
+                html += '</tr>';
+                
+                // LTM Fee
+                const hardcodedLTM = DTFConfig.settings.ltmFeeAmount;
+                const apiLTM = service.getLTMFee(15); // Quantity under 24
+                html += `<tr class="${hardcodedLTM === apiLTM ? 'match' : 'mismatch'}">`;
+                html += `<td>LTM Fee (orders under 24)</td>`;
+                html += `<td>$${hardcodedLTM.toFixed(2)}</td>`;
+                html += `<td>$${apiLTM.toFixed(2)}</td>`;
+                html += `<td>${hardcodedLTM === apiLTM ? '✅' : '❌'}</td>`;
+                html += '</tr>';
+                
+                // Margin
+                const hardcodedMargin = DTFConfig.settings.garmentMargin;
+                const apiMargin = service.getMarginDenominator(24);
+                html += `<tr class="${hardcodedMargin === apiMargin ? 'match' : 'mismatch'}">`;
+                html += `<td>Margin Denominator (40% margin)</td>`;
+                html += `<td>${hardcodedMargin}</td>`;
+                html += `<td>${apiMargin}</td>`;
+                html += `<td>${hardcodedMargin === apiMargin ? '✅' : '❌'}</td>`;
+                html += '</tr>';
+                
+                html += '</table>';
+                
+                // Show raw API data
+                html += '<h3>Raw API Data</h3>';
+                html += '<details>';
+                html += '<summary>Click to expand API response</summary>';
+                html += '<pre>' + JSON.stringify(apiData, null, 2) + '</pre>';
+                html += '</details>';
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+                console.error('Test failed:', error);
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('status').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Auto-run on load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DTF API Test Page Ready');
+            console.log('Click "Run Price Comparison Test" to verify API prices match hardcoded values');
+        });
+    </script>
+</body>
+</html>

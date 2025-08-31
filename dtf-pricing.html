@@ -432,6 +432,7 @@
     
     <!-- DTF Calculator V2 Scripts -->
     <script src="/shared_components/js/dtf-config.js"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js"></script>
     <script src="/shared_components/js/dtf-pricing-calculator.js"></script>
     <script src="/shared_components/js/dtf-adapter.js"></script>
     <script src="/shared_components/js/dtf-integration.js"></script>
@@ -446,6 +447,12 @@
         // Initialize DTF page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[DTF] Page initialized with V2 calculator');
+            console.log('===================================');
+            console.log('🚀 DTF Pricing System: API-Powered Calculator');
+            console.log('📡 API endpoint: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF');
+            console.log('📊 Using live pricing data from Caspio tables');
+            console.log('✅ Labor cost, freight, and transfer prices from API');
+            console.log('===================================');
             
             // Initialize product context from URL parameters
             if (window.initializeProductFromURL) {
