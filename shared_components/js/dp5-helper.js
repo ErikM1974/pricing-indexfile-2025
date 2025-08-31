@@ -136,6 +136,12 @@
                 return;
             }
             
+            // Skip fallback check for DTF pages (they use their own calculator)
+            if (window.location.pathname.includes('dtf')) {
+                console.log("[DP5-HELPER] DTF page detected, skipping pricing grid check.");
+                return;
+            }
+            
             const customGridTbody = document.getElementById('custom-pricing-grid')?.querySelector('tbody');
             
             if (!window.directFixApplied && (!customGridTbody || !customGridTbody.hasChildNodes())) {

@@ -19,6 +19,8 @@
                 ltmFee: 0,
                 productInfo: null
             };
+            this.initialDataDispatched = false;  // Track if we've dispatched initial data
+            this.dispatchDebounceTimer = null;   // Debounce timer for events
             this.init();
         }
 
@@ -209,21 +211,26 @@
                 hasData = true;
             }
 
-            if (hasData) {
-                this.log('DTF Adapter: Found initial URL data', data);
-                this.updatePricingData(data);
-            }
-
-            // Check for data in sessionStorage
+            // Check for data in sessionStorage and merge with URL data
             const storedData = sessionStorage.getItem('dtfPricingData');
             if (storedData) {
                 try {
                     const parsedData = JSON.parse(storedData);
                     this.log('DTF Adapter: Found stored data', parsedData);
-                    this.updatePricingData(parsedData);
+                    
+                    // Merge stored data with URL data (URL data takes precedence)
+                    Object.assign(data, parsedData, data);
+                    hasData = true;
                 } catch (e) {
                     this.log('DTF Adapter: Error parsing stored data', e);
                 }
+            }
+            
+            // Dispatch consolidated initial data only once
+            if (hasData && !this.initialDataDispatched) {
+                this.log('DTF Adapter: Dispatching consolidated initial data', data);
+                this.initialDataDispatched = true;
+                this.updatePricingData(data, true); // true = skip debounce for initial data
             }
         }
 
@@ -340,7 +347,7 @@
             }
         }
 
-        updatePricingData(data) {
+        updatePricingData(data, skipDebounce = false) {
             // Update current data
             if (data.garmentCost !== undefined) {
                 this.currentData.garmentCost = data.garmentCost;
@@ -364,8 +371,24 @@
             // Store in sessionStorage for persistence
             sessionStorage.setItem('dtfPricingData', JSON.stringify(this.currentData));
 
-            // Dispatch event for DTF integration
-            this.dispatchDataEvent();
+            // Dispatch event with debouncing (unless skipDebounce is true)
+            if (skipDebounce) {
+                this.dispatchDataEvent();
+            } else {
+                this.dispatchDataEventDebounced();
+            }
+        }
+        
+        dispatchDataEventDebounced() {
+            // Clear existing timer
+            if (this.dispatchDebounceTimer) {
+                clearTimeout(this.dispatchDebounceTimer);
+            }
+            
+            // Set new timer
+            this.dispatchDebounceTimer = setTimeout(() => {
+                this.dispatchDataEvent();
+            }, 100); // 100ms debounce
         }
 
         dispatchDataEvent() {
