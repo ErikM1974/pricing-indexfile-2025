@@ -383,6 +383,61 @@ Pricing calculations for various decoration methods including DTG, embroidery, a
 - `GET /api/base-item-costs?styleNumber=PC54` - Base garment costs
 - `GET /api/size-pricing?styleNumber=PC54&size=2XL` - Size-based pricing
 - `GET /api/max-prices-by-style?styleNumber=PC54` - Maximum prices
+- `GET /api/pricing-bundle?method=DTF` - DTF transfer pricing bundle (pending implementation)
+
+### 🆕 PENDING: DTF Pricing Bundle
+
+#### Get DTF Transfer Pricing Data
+**Endpoint**: `GET /api/pricing-bundle?method=DTF`  
+**Purpose**: Get complete DTF (Direct-to-Film) transfer pricing data  
+**Status**: ⏳ Pending implementation by API Provider
+
+**Query Parameters**:
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| method | string | Yes | Must be "DTF" | DTF |
+| styleNumber | string | No | Product style (optional) | PC54 |
+
+**Expected Response**:
+```json
+{
+  "tiersR": [
+    {
+      "TierLabel": "10-23",
+      "MinQuantity": 10,
+      "MaxQuantity": 23,
+      "MarginDenominator": 0.6,
+      "LTM_Fee": 50
+    },
+    // ... more tiers
+  ],
+  "allDtfCostsR": [
+    {
+      "size": "Up to 5\" x 5\"",
+      "price_type": "Small",
+      "quantity_range": "10-23",
+      "min_quantity": 10,
+      "max_quantity": 23,
+      "unit_price": 6.00,
+      "PressingLaborCost": 2
+    },
+    // ... more costs
+  ],
+  "freightR": [
+    {
+      "min_quantity": 10,
+      "max_quantity": 49,
+      "cost_per_transfer": 0.50
+    },
+    // ... more freight tiers
+  ],
+  "rulesR": {
+    "RoundingMethod": "HalfDollarCeil_Final"
+  },
+  "sizes": [],  // Empty for DTF
+  "sellingPriceDisplayAddOns": {}  // Empty for DTF
+}
+```
 
 ### 🚀 OPTIMIZED ENDPOINT: DTG Product Bundle
 
@@ -1154,6 +1209,36 @@ Use these prefixes for clear communication:
 
 #### Active Conversations
 *[Messages requiring response or acknowledgment - move to History when resolved]*
+
+**2025-08-31 10:00** - ❓ **QUESTION** from API Consumer:
+Need to add DTF (Direct-to-Film) support to the pricing-bundle endpoint. 
+
+DTF data is ready in Caspio tables:
+- **DTF_Pricing**: 12 records with transfer costs by size and quantity
+- **Pricing_Tiers**: 4 DTF entries (10-23, 24-47, 48-71, 72+) with MarginDenominator=0.6
+- **Transfer_Freight**: 4 freight tiers (10-49: $0.50, 50-99: $0.35, 100-199: $0.25, 200+: $0.15)
+- **Pricing_Rules**: DTF rounding method "HalfDollarCeil_Final"
+
+**Request**: Add support for `/api/pricing-bundle?method=DTF&styleNumber={optional}`
+
+**Required response structure**:
+```json
+{
+  "tiersR": [...],  // DTF tiers from Pricing_Tiers where DecorationMethod='DTF'
+  "allDtfCostsR": [...],  // All records from DTF_Pricing table
+  "freightR": [...],  // All records from Transfer_Freight table
+  "rulesR": { "RoundingMethod": "HalfDollarCeil_Final" },  // DTF rules
+  "sizes": [],  // Empty for DTF (sizes are in the costs)
+  "sellingPriceDisplayAddOns": {}  // Empty for DTF
+}
+```
+
+**Caspio table endpoints**:
+- `DTF_Pricing`: `/integrations/rest/v3/tables/DTF_Pricing/records`
+- `Transfer_Freight`: `/integrations/rest/v3/tables/Transfer_Freight/records`
+- Existing tables: `Pricing_Tiers`, `Pricing_Rules` (filter by DecorationMethod='DTF')
+
+This follows the same pattern as ScreenPrint, Embroidery, and CAP methods. The DTF calculator uses hardcoded values that need to be replaced with API data.
 
 **2025-08-30 16:30** - 💡 **SUGGESTION** from API Consumer:
 Based on DTG pricing page analysis, I recommend implementing a comprehensive `/api/dtg/product-bundle` endpoint that combines all required data for DTG pricing in a single request. Current page makes 3-4 API calls that could be consolidated into one optimized endpoint.
