@@ -7,6 +7,8 @@ class DTFPricingCalculator {
         this.container = document.getElementById(containerId);
         this.pricingService = new DTFPricingService();
         this.apiDataLoaded = false;
+        this.isRendered = false;  // Track if render() has completed
+        this.pendingUpdates = [];  // Queue for updates that arrive before render
         this.currentData = {
             garmentCost: 0,
             quantity: DTFConfig.settings.defaultQuantity,
@@ -36,6 +38,22 @@ class DTFPricingCalculator {
         this.attachEventListeners();
         this.checkStaffViewStatus();
         this.addTransferLocation(); // Start with one location
+        
+        // Mark as rendered and process any pending updates
+        this.isRendered = true;
+        this.processPendingUpdates();
+        
+        // Dispatch ready event
+        window.dispatchEvent(new CustomEvent('dtfCalculatorReady', { 
+            detail: { calculator: this } 
+        }));
+    }
+    
+    processPendingUpdates() {
+        while (this.pendingUpdates.length > 0) {
+            const update = this.pendingUpdates.shift();
+            update();
+        }
     }
 
     async loadApiData() {
@@ -465,8 +483,20 @@ class DTFPricingCalculator {
     }
 
     updateSummary() {
+        // If not rendered yet, queue this update for later
+        if (!this.isRendered) {
+            this.pendingUpdates.push(() => this.updateSummary());
+            return;
+        }
+        
         const pricing = this.calculatePricing();
         const summaryContainer = document.getElementById('order-summary-content');
+        
+        // Safety check - element might not exist yet
+        if (!summaryContainer) {
+            console.warn('[DTF Calculator] order-summary-content element not found, skipping update');
+            return;
+        }
 
         // Check if garment cost is missing or zero
         if (!this.currentData.garmentCost || this.currentData.garmentCost === 0) {
@@ -672,22 +702,55 @@ class DTFPricingCalculator {
     // Public methods for external data updates
     updateGarmentCost(cost) {
         this.currentData.garmentCost = parseFloat(cost) || 0;
+        
+        // Queue update if not rendered yet
+        if (!this.isRendered) {
+            this.pendingUpdates.push(() => this.updateSummary());
+            return;
+        }
+        
         this.updateSummary();
     }
 
     updateFreight(freight) {
         this.currentData.freight = parseFloat(freight) || 0;
+        
+        // Queue update if not rendered yet
+        if (!this.isRendered) {
+            this.pendingUpdates.push(() => this.updateSummary());
+            return;
+        }
+        
         this.updateSummary();
     }
 
     updateLTMFee(fee) {
         this.currentData.ltmFee = parseFloat(fee) || 0;
+        
+        // Queue update if not rendered yet
+        if (!this.isRendered) {
+            this.pendingUpdates.push(() => this.updateSummary());
+            return;
+        }
+        
         this.updateSummary();
     }
 
     updateQuantity(qty) {
         this.currentData.quantity = Math.max(parseInt(qty) || DTFConfig.settings.minQuantity, DTFConfig.settings.minQuantity);
-        document.getElementById('dtf-quantity').value = this.currentData.quantity;
+        
+        // Only update DOM element if it exists
+        const quantityInput = document.getElementById('dtf-quantity');
+        if (quantityInput) {
+            quantityInput.value = this.currentData.quantity;
+        }
+        
+        // Queue update if not rendered yet
+        if (!this.isRendered) {
+            this.pendingUpdates.push(() => this.updateSummary());
+            return;
+        }
+        
         this.updateSummary();
     }
     
