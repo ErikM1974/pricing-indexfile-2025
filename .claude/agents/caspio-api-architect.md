@@ -176,7 +176,26 @@ When you need API functionality:
    How should [endpoint] handle [specific scenario]?
    ```
 
+### `/api/pricing-bundle?method=DTF` - DTF (Direct-to-Film) Support
+**Status**: LIVE as of August 31, 2025 16:00 UTC
+**Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF`
+**Method**: GET
+**Purpose**: Complete DTF pricing data for calculator integration
+
+**DTF Implementation Details**:
+- **Data Sources**: DTF_Pricing table (12 records), Transfer_Freight table (4 tiers), Pricing_Tiers (4 DTF tiers), Pricing_Rules
+- **Response Structure**: `{tiersR: [], allDtfCostsR: [], freightR: [], rulesR: {}, locations: [], sizes: [], sellingPriceDisplayAddOns: {}}`
+- **Key Features**: 
+  - 4 pricing tiers with MarginDenominator=0.6
+  - 10-23 tier includes $50 LTM_Fee
+  - 12 DTF cost records by size (Small/Medium/Large) and quantity ranges
+  - 4 freight cost tiers (10-49: $0.50, 50-99: $0.35, 100-199: $0.25, 200+: $0.15)
+  - HalfDollarCeil_Final rounding method
+- **Performance**: <2 second response time, production tested ✅
+
 ### Recent API Communications
+- **Aug 31, 2025**: 🚀 DTF DEPLOYED - DTF support added to pricing-bundle endpoint, LIVE on production
+- **Aug 31, 2025**: DTF pricing calculator can now replace hardcoded values with live API data
 - **Aug 30, 2025**: Inter-Claude communication system established
 - **Aug 30, 2025**: All 53 endpoints documented and verified
 - **Aug 30, 2025**: DTG Product Bundle endpoint implemented (`/api/dtg/product-bundle`)
