@@ -66,7 +66,13 @@ class LogoManager {
             }
         } catch (error) {
             console.error('[LogoManager] Error fetching configuration:', error);
-            console.log('[LogoManager] Using fallback positions');
+            console.log('[LogoManager] Using fallback positions - CONFIGURATION MAY BE INCORRECT!');
+            
+            // Show warning about configuration failure
+            this.showConfigWarning(
+                'Logo configuration could not be loaded from server. ' +
+                'Setup fees and positions may be incorrect.'
+            );
         }
     }
     
@@ -276,6 +282,42 @@ class LogoManager {
             needsDigitizing: logo.needsDigitizing,
             extraStitchCost: Math.max(0, logo.stitchCount - this.baseStitchCount) / 1000 * this.additionalStitchRate
         }));
+    }
+    
+    /**
+     * Show configuration warning
+     */
+    showConfigWarning(message) {
+        // Check if pricing calculator already showed main warning
+        if (document.getElementById('pricing-api-warning')) {
+            // Main warning already shown, just log this one
+            console.warn('[LogoManager]', message);
+            return;
+        }
+        
+        // Create warning element for logo section
+        const logoSection = document.getElementById('logo-setup-section');
+        if (logoSection) {
+            const warning = document.createElement('div');
+            warning.className = 'config-warning';
+            warning.style.cssText = `
+                background: #fef2f2;
+                border: 2px solid #dc2626;
+                color: #991b1b;
+                padding: 12px;
+                margin-bottom: 15px;
+                border-radius: 6px;
+                font-weight: bold;
+            `;
+            warning.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> 
+                ${message}
+                <br><small>Contact IT support before proceeding.</small>
+            `;
+            
+            // Insert at top of logo section
+            logoSection.insertBefore(warning, logoSection.firstChild);
+        }
     }
     
     /**

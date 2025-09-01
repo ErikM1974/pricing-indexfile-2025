@@ -240,9 +240,73 @@
     
     <script>
         // Initialize the quote builder when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check API status before initializing
+            const apiStatus = await checkAPIStatus();
+            
+            if (!apiStatus) {
+                console.error('[EmbroideryQuoteBuilder] API check failed - system may not work correctly');
+            }
+            
+            // Initialize anyway but warnings will be shown if API failed
             window.embroideryQuoteBuilder = new EmbroideryQuoteBuilder();
         });
+        
+        // Check if critical APIs are available
+        async function checkAPIStatus() {
+            const baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const criticalEndpoints = [
+                '/api/pricing-bundle?method=EMB&styleNumber=PC54',
+                '/api/pricing-rules?method=EmbroideryShirts'
+            ];
+            
+            try {
+                const checks = criticalEndpoints.map(endpoint => 
+                    fetch(baseURL + endpoint)
+                        .then(r => r.ok)
+                        .catch(() => false)
+                );
+                
+                const results = await Promise.all(checks);
+                const allOk = results.every(r => r === true);
+                
+                if (!allOk) {
+                    console.error('[API Check] One or more critical endpoints are unavailable');
+                    showStartupWarning();
+                    return false;
+                }
+                
+                console.log('[API Check] All critical endpoints are available');
+                return true;
+                
+            } catch (error) {
+                console.error('[API Check] Failed to check API status:', error);
+                showStartupWarning();
+                return false;
+            }
+        }
+        
+        // Show startup warning if APIs are down
+        function showStartupWarning() {
+            const banner = document.createElement('div');
+            banner.style.cssText = `
+                background: linear-gradient(135deg, #dc2626, #991b1b);
+                color: white;
+                padding: 15px;
+                text-align: center;
+                font-weight: bold;
+                position: sticky;
+                top: 0;
+                z-index: 10000;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            `;
+            banner.innerHTML = `
+                ⚠️ SYSTEM ERROR: Unable to connect to pricing server. 
+                DO NOT create quotes until this is resolved. 
+                <a href="javascript:location.reload()" style="color: white; text-decoration: underline; margin-left: 10px;">Retry</a>
+            `;
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
     </script>
 </body>
 </html>

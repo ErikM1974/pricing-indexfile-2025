@@ -28,6 +28,9 @@ class EmbroideryPricingCalculator {
         // Rounding method - will be fetched from API
         this.roundingMethod = null;
         
+        // Track API status
+        this.apiError = false;
+        
         // Fetch configuration from API
         this.initialized = false;
         this.initializeConfig();
@@ -102,7 +105,19 @@ class EmbroideryPricingCalculator {
             
         } catch (error) {
             console.error('[EmbroideryPricingCalculator] Error fetching configuration:', error);
-            console.log('[EmbroideryPricingCalculator] Using fallback values');
+            console.log('[EmbroideryPricingCalculator] Using fallback values - PRICES MAY BE INCORRECT!');
+            
+            // Mark API as failed
+            this.apiError = true;
+            
+            // Show prominent warning to user
+            this.showAPIWarning(
+                'Unable to load current pricing configuration from server. ' +
+                'DO NOT send quotes to customers until this is resolved. ' +
+                'Please contact IT support immediately.'
+            );
+            
+            // Still initialize with fallback but user is warned
             this.roundingMethod = 'CeilDollar';
             this.initialized = true;
         }
@@ -308,6 +323,11 @@ class EmbroideryPricingCalculator {
             await this.initializeConfig();
         }
         
+        // Warn if using fallback values
+        if (this.apiError) {
+            console.warn('[EmbroideryPricingCalculator] WARNING: Calculating with fallback values - prices may be incorrect!');
+        }
+        
         const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
         const tier = this.getTier(totalQuantity);
         
@@ -365,6 +385,91 @@ class EmbroideryPricingCalculator {
             grandTotal: grandTotal,
             logos: logos
         };
+    }
+    
+    /**
+     * Show API warning to user
+     */
+    showAPIWarning(message) {
+        // Create warning banner
+        const warningBanner = document.createElement('div');
+        warningBanner.id = 'pricing-api-warning';
+        warningBanner.className = 'api-warning-banner';
+        warningBanner.style.cssText = `
+            background: #dc2626;
+            color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        `;
+        
+        warningBanner.innerHTML = `
+            <div style="font-size: 24px; margin-bottom: 10px;">
+                ⚠️ CRITICAL ERROR ⚠️
+            </div>
+            <div style="font-size: 16px; line-height: 1.5;">
+                ${message}
+            </div>
+            <div style="margin-top: 15px;">
+                <button onclick="location.reload()" style="
+                    background: white;
+                    color: #dc2626;
+                    border: none;
+                    padding: 10px 20px;
+                    margin: 0 5px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                ">Try Again</button>
+                <button onclick="alert('Please email IT support or call the help desk immediately.')" style="
+                    background: white;
+                    color: #dc2626;
+                    border: none;
+                    padding: 10px 20px;
+                    margin: 0 5px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                ">Report Issue</button>
+            </div>
+        `;
+        
+        // Add CSS animation if not already present
+        if (!document.getElementById('api-warning-styles')) {
+            const style = document.createElement('style');
+            style.id = 'api-warning-styles';
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.85; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Add to page
+        document.body.appendChild(warningBanner);
+        
+        // Also disable quote submission if possible
+        const submitButtons = document.querySelectorAll('[id*="submit"], [id*="save"], [id*="send"]');
+        submitButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.title = 'Cannot submit quotes while pricing configuration is unavailable';
+        });
+        
+        // Log for debugging
+        console.error('[CRITICAL] API configuration failed - fallback prices in use!');
     }
     
     /**
