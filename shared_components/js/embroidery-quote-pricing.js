@@ -213,20 +213,15 @@ class EmbroideryPricingCalculator {
         // Fetch size pricing for this style
         const sizePricingData = await this.fetchSizePricing(product.style);
         
-        console.log(`[DEBUG] Size pricing data for ${product.style}:`, sizePricingData);
-        
         if (!sizePricingData || sizePricingData.length === 0) {
-            console.error('[DEBUG] CRITICAL: No size pricing data for', product.style);
-            console.error('[DEBUG] CRITICAL: This means API call failed - system will likely use hardcoded fallback values!');
-            console.error('[DEBUG] CRITICAL: Check if /api/size-pricing endpoint is working');
+            console.error('[CRITICAL] No size pricing data for', product.style);
+            console.error('[CRITICAL] API call failed - system will likely use hardcoded fallback values!');
+            console.error('[CRITICAL] Check if /api/size-pricing endpoint is working');
             return null;
         }
         
         // Use first color's data (or find specific color if needed)
         const priceData = sizePricingData.find(d => d.color === product.color) || sizePricingData[0];
-        
-        console.log(`[DEBUG] Selected price data for color "${product.color}":`, priceData);
-        console.log(`[DEBUG] Available sizeUpcharges:`, priceData.sizeUpcharges);
         
         const lineItems = [];
         let lineSubtotal = 0;
@@ -241,16 +236,12 @@ class EmbroideryPricingCalculator {
             }
         }
         
-        console.log(`[DEBUG] Using standard base price: ${standardBasePrice} (from standard sizes)`);
-        
         // Group sizes by upcharge amount from API
         const standardSizeGroup = [];
         const upchargeSizeGroups = {};
         
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
             const apiUpcharge = priceData.sizeUpcharges[size] || 0; // Use API upcharge values directly
-            
-            console.log(`[DEBUG] Size ${size}: qty=${qty}, API upcharge=${apiUpcharge}`);
             
             if (apiUpcharge === 0) {
                 // Standard sizes (S, M, L, XL)
@@ -279,12 +270,6 @@ class EmbroideryPricingCalculator {
             const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
             const finalPrice = this.roundPrice(decoratedPrice);
             
-            console.log(`[DEBUG] Standard sizes calculation:`);
-            console.log(`  - standardBasePrice: ${standardBasePrice}`);
-            console.log(`  - garmentPrice (standardBasePrice / ${this.marginDenominator}): ${garmentPrice}`);
-            console.log(`  - decoratedPrice (garmentPrice + embCost + additionalStitchCost): ${decoratedPrice}`);
-            console.log(`  - finalPrice (no upcharge): ${finalPrice}`);
-            
             lineItems.push({
                 description: sizeList.join(' '),
                 quantity: standardQty,
@@ -310,13 +295,6 @@ class EmbroideryPricingCalculator {
             const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
             const upchargeAmount = parseFloat(apiUpcharge); // Use API upcharge value directly
             const finalPrice = this.roundPrice(decoratedPrice + upchargeAmount);
-            
-            console.log(`[DEBUG] Upcharge calculation for ${sizeList.join(' ')}:`);
-            console.log(`  - standardBasePrice: ${standardBasePrice} (same as standard sizes)`);
-            console.log(`  - garmentPrice (standardBasePrice / ${this.marginDenominator}): ${garmentPrice}`);
-            console.log(`  - decoratedPrice (garmentPrice + embCost + additionalStitchCost): ${decoratedPrice}`);
-            console.log(`  - API upchargeAmount: ${upchargeAmount} (from sizeUpcharges)`);
-            console.log(`  - finalPrice (decoratedPrice + API upcharge): ${finalPrice}`);
             
             lineItems.push({
                 description: sizeList.join(' '),
