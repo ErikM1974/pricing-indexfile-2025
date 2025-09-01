@@ -116,6 +116,17 @@ class ProductLineManager {
                         </div>
                     `).join('');
                     suggestionsDiv.style.display = 'block';
+                    
+                    // Bind click events to filtered suggestions
+                    suggestionsDiv.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const style = item.dataset.style;
+                            console.log('[ProductLineManager] Autocomplete selection:', style);
+                            document.getElementById('style-search').value = style;
+                            suggestionsDiv.style.display = 'none';
+                            this.loadProductDetails(style);
+                        });
+                    });
                 } else {
                     suggestionsDiv.innerHTML = '<div class="no-results">No apparel products found (caps use separate calculator)</div>';
                     suggestionsDiv.style.display = 'block';
