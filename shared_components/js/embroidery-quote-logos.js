@@ -92,7 +92,9 @@ class LogoManager {
             id: this.nextId++,
             position: 'Left Chest',
             stitchCount: 8000,
-            needsDigitizing: false
+            needsDigitizing: false,
+            isPrimary: this.logos.length === 0,  // First logo is primary
+            shopWorksCode: null  // Will be set for additional logos
         };
         
         this.logos.push(logo);
@@ -120,6 +122,11 @@ class LogoManager {
      * Delete a logo
      */
     deleteLogo(logoId) {
+        const logo = this.logos.find(l => l.id === logoId);
+        if (logo && logo.isPrimary) {
+            alert('Cannot delete the primary logo. All products must have at least one logo.');
+            return;
+        }
         this.logos = this.logos.filter(l => l.id !== logoId);
         this.renderLogos();
         this.updateContinueButton();
@@ -190,12 +197,15 @@ class LogoManager {
         const extraCost = extraStitches > 0 ? ` (+$${(extraStitches / 1000 * this.additionalStitchRate).toFixed(2)}/pc)` : '';
         
         return `
-            <div class="logo-card" data-logo-id="${logo.id}">
+            <div class="logo-card ${logo.isPrimary ? 'primary-logo' : 'additional-logo'}" data-logo-id="${logo.id}">
                 <div class="logo-header">
-                    <h3>Logo ${logo.id}</h3>
-                    <button class="btn-delete" id="delete-logo-${logo.id}" title="Delete Logo">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <h3>Logo ${logo.id} ${logo.isPrimary ? '<span class="badge badge-primary">PRIMARY</span>' : '<span class="badge badge-additional">ADDITIONAL</span>'}</h3>
+                    ${logo.isPrimary ? 
+                        '<span class="primary-note">Required on all products</span>' :
+                        `<button class="btn-delete" id="delete-logo-${logo.id}" title="Delete Logo">
+                            <i class="fas fa-trash"></i>
+                        </button>`
+                    }
                 </div>
                 
                 <div class="logo-body">
@@ -238,6 +248,8 @@ class LogoManager {
                     <span class="position-tag">${logo.position}</span>
                     <span class="stitch-tag">${logo.stitchCount.toLocaleString()} stitches</span>
                     ${logo.needsDigitizing ? '<span class="digitizing-tag">+Digitizing</span>' : ''}
+                    ${!logo.isPrimary && logo.stitchCount !== 8000 ? `<span class="part-number-tag">AL-${logo.stitchCount}</span>` : ''}
+                    ${!logo.isPrimary && logo.stitchCount === 8000 ? '<span class="part-number-tag">AL</span>' : ''}
                 </div>
             </div>
         `;

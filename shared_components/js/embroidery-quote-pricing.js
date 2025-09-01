@@ -335,20 +335,25 @@ class EmbroideryPricingCalculator {
         
         const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
         const tier = this.getTier(totalQuantity);
+        const tierEmbCost = this.getEmbroideryCost(tier);
         
-        // Calculate additional stitch cost per piece
-        let additionalStitchCost = 0;
-        logos.forEach(logo => {
+        // Separate primary and additional logos
+        const primaryLogos = logos.filter(l => l.isPrimary);
+        const additionalLogos = logos.filter(l => !l.isPrimary);
+        
+        // Calculate additional stitch cost for PRIMARY logos only (included in base price)
+        let primaryAdditionalStitchCost = 0;
+        primaryLogos.forEach(logo => {
             const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
-            additionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
+            primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
         });
         
-        // Calculate each product's pricing
+        // Calculate each product's pricing (with primary logo)
         const productPricing = [];
         let subtotal = 0;
         
         for (const product of products) {
-            const pricing = await this.calculateProductPrice(product, totalQuantity, additionalStitchCost);
+            const pricing = await this.calculateProductPrice(product, totalQuantity, primaryAdditionalStitchCost);
             if (pricing) {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
@@ -371,22 +376,91 @@ class EmbroideryPricingCalculator {
             });
         }
         
+        // Calculate additional logos pricing
+        const additionalServices = [];
+        let additionalServicesTotal = 0;
+        
+        // Process additional logos for each product
+        for (const product of products) {
+            if (product.logoAssignments?.additional) {
+                for (const assignment of product.logoAssignments.additional) {
+                    const logo = additionalLogos.find(l => l.id === assignment.logoId);
+                    if (logo) {
+                        const quantity = assignment.quantity || 0;
+                        if (quantity > 0) {
+                            // Calculate additional logo price (NO margin division)
+                            const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
+                            const stitchCost = (extraStitches / 1000) * this.additionalStitchRate;
+                            const isSubset = quantity < totalQuantity;
+                            const subsetUpcharge = isSubset ? 3.00 : 0;
+                            
+                            // Direct tier cost + stitch cost + subset upcharge
+                            const unitPrice = this.roundPrice(tierEmbCost + stitchCost + subsetUpcharge);
+                            const total = unitPrice * quantity;
+                            
+                            // Generate part number
+                            const partNumber = logo.stitchCount === 8000 ? 'AL' : `AL-${logo.stitchCount}`;
+                            
+                            additionalServices.push({
+                                type: 'additional_logo',
+                                description: `${partNumber} ${logo.position}`,
+                                partNumber: partNumber,
+                                quantity: quantity,
+                                unitPrice: unitPrice,
+                                total: total,
+                                productStyle: product.style,
+                                hasSubsetUpcharge: isSubset,
+                                logoPosition: logo.position,
+                                stitchCount: logo.stitchCount
+                            });
+                            
+                            additionalServicesTotal += total;
+                        }
+                    }
+                }
+            }
+            
+            // Process monograms
+            if (product.logoAssignments?.monogram) {
+                const monogram = product.logoAssignments.monogram;
+                if (monogram.quantity > 0) {
+                    const total = monogram.quantity * 12.50;
+                    
+                    additionalServices.push({
+                        type: 'monogram',
+                        description: 'Monogram',
+                        partNumber: 'Monogram',
+                        quantity: monogram.quantity,
+                        unitPrice: 12.50,
+                        total: total,
+                        productStyle: product.style,
+                        mode: monogram.mode,
+                        names: monogram.names || []
+                    });
+                    
+                    additionalServicesTotal += total;
+                }
+            }
+        }
+        
         // Calculate setup fees
         const setupFees = logos.filter(l => l.needsDigitizing).length * this.digitizingFee;
         
         // Final totals
-        const grandTotal = subtotal + ltmTotal + setupFees;
+        const grandTotal = subtotal + ltmTotal + setupFees + additionalServicesTotal;
         
         return {
             products: productPricing,
             totalQuantity: totalQuantity,
             tier: tier,
-            embroideryRate: this.getEmbroideryCost(tier),
-            additionalStitchCost: additionalStitchCost,
+            embroideryRate: tierEmbCost,
+            additionalStitchCost: primaryAdditionalStitchCost,
             subtotal: subtotal,
             ltmFee: ltmTotal,
             ltmPerUnit: ltmPerUnit,
             setupFees: setupFees,
+            additionalServices: additionalServices,
+            additionalServicesTotal: additionalServicesTotal,
             grandTotal: grandTotal,
             logos: logos
         };

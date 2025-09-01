@@ -228,11 +228,13 @@ class EmbroideryQuoteBuilder {
         html += '<div class="summary-section">';
         html += '<h4><i class="fas fa-thread"></i> Embroidery Specifications</h4>';
         this.currentPricing.logos.forEach((logo, idx) => {
+            const isPrimary = idx === 0; // First logo is always primary
             html += `
                 <div class="logo-spec">
                     <span class="logo-number">${idx + 1}.</span>
                     <span class="logo-details">
                         ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
+                        ${isPrimary ? '<span class="badge badge-primary">PRIMARY</span>' : '<span class="badge badge-additional">ADDITIONAL</span>'}
                         ${logo.needsDigitizing ? '<span class="digitizing-badge">+Digitizing $100</span>' : ''}
                     </span>
                 </div>
@@ -287,16 +289,50 @@ class EmbroideryQuoteBuilder {
         
         html += '</div>';
         
+        // Additional Services section (if any)
+        if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
+            html += '<div class="summary-section additional-services-section">';
+            html += '<h4><i class="fas fa-plus-circle"></i> Additional Services</h4>';
+            
+            this.currentPricing.additionalServices.forEach(service => {
+                html += `
+                    <div class="additional-service-item">
+                        <div class="service-header">
+                            <span class="service-name">${service.description}</span>
+                            <span class="service-part-number">${service.partNumber}</span>
+                        </div>
+                        <div class="service-details">
+                            <span>${service.quantity} pieces</span>
+                            <span>@ $${service.unitPrice.toFixed(2)} each</span>
+                            <span class="service-total">$${service.total.toFixed(2)}</span>
+                        </div>
+                        ${service.hasSubsetUpcharge ? '<span class="subset-note">*Includes $3.00 subset upcharge</span>' : ''}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+        }
+        
         // Totals section
         html += `
             <div class="summary-section totals-section">
                 <h4><i class="fas fa-calculator"></i> Quote Totals</h4>
                 <div class="totals-breakdown">
                     <div class="total-line">
-                        <span>Products & Embroidery:</span>
+                        <span>Products & Primary Embroidery:</span>
                         <span>$${this.currentPricing.subtotal.toFixed(2)}</span>
                     </div>
         `;
+        
+        if (this.currentPricing.additionalServicesTotal && this.currentPricing.additionalServicesTotal > 0) {
+            html += `
+                <div class="total-line">
+                    <span>Additional Services:</span>
+                    <span>$${this.currentPricing.additionalServicesTotal.toFixed(2)}</span>
+                </div>
+            `;
+        }
         
         if (this.currentPricing.setupFees > 0) {
             html += `
@@ -490,10 +526,21 @@ class EmbroideryQuoteBuilder {
             html += `<p><strong>Subtotal: $${pp.subtotal.toFixed(2)}</strong></p></div>`;
         });
         
+        // Additional Services
+        if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
+            html += '<h3>Additional Services:</h3>';
+            this.currentPricing.additionalServices.forEach(service => {
+                html += `<p>${service.description} (${service.quantity} pieces) @ $${service.unitPrice.toFixed(2)} = $${service.total.toFixed(2)}</p>`;
+            });
+        }
+        
         // Totals
         html += '<div class="totals">';
         html += `<p>Total Quantity: ${this.currentPricing.totalQuantity} pieces</p>`;
-        html += `<p>Products & Embroidery: $${this.currentPricing.subtotal.toFixed(2)}</p>`;
+        html += `<p>Products & Primary Embroidery: $${this.currentPricing.subtotal.toFixed(2)}</p>`;
+        if (this.currentPricing.additionalServicesTotal > 0) {
+            html += `<p>Additional Services: $${this.currentPricing.additionalServicesTotal.toFixed(2)}</p>`;
+        }
         if (this.currentPricing.setupFees > 0) {
             html += `<p>Setup Fees: $${this.currentPricing.setupFees.toFixed(2)}</p>`;
         }

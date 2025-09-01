@@ -92,12 +92,7 @@ class EmbroideryQuoteService {
                 TotalAmount: parseFloat(pricingResults.grandTotal.toFixed(2)),
                 Status: 'Open',
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify({
-                    logos: pricingResults.logos,
-                    specialNotes: customerData.notes || '',
-                    tier: pricingResults.tier,
-                    setupFees: pricingResults.setupFees
-                })
+                Notes: customerData.notes || ''
             };
             
             // Save session
@@ -112,10 +107,41 @@ class EmbroideryQuoteService {
                 throw new Error(`Session save failed: ${errorText}`);
             }
             
-            // Save line items
+            // Save line items for products
             let lineNumber = 1;
+            let isFirstItem = true;
             for (const productPricing of pricingResults.products) {
                 for (const lineItem of productPricing.lineItems) {
+                    // Prepare logo specs for the first item only - keep it simple and short
+                    let logoSpecsData = '';
+                    if (isFirstItem) {
+                        try {
+                            const specs = {
+                                logos: pricingResults.logos.map(l => ({
+                                    pos: l.position,
+                                    stitch: l.stitchCount,
+                                    digit: l.needsDigitizing ? 1 : 0,
+                                    primary: l.isPrimary ? 1 : 0
+                                })),
+                                tier: pricingResults.tier,
+                                setup: pricingResults.setupFees
+                            };
+                            logoSpecsData = JSON.stringify(specs);
+                            // Ensure it's not too long for the field
+                            if (logoSpecsData.length > 250) {
+                                // If too long, just store basic info
+                                logoSpecsData = JSON.stringify({
+                                    logoCount: pricingResults.logos.length,
+                                    tier: pricingResults.tier,
+                                    setup: pricingResults.setupFees
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error stringifying logo specs:', e);
+                            logoSpecsData = '';
+                        }
+                    }
+                    
                     const itemData = {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
@@ -125,17 +151,18 @@ class EmbroideryQuoteService {
                         ColorCode: '',
                         EmbellishmentType: 'embroidery',
                         PrintLocation: 'Multiple Logos',
-                        PrintLocationName: pricingResults.logos.map(l => l.position).join(', '),
+                        PrintLocationName: pricingResults.logos.filter(l => l.isPrimary !== false).map(l => l.position).join(', '),
                         Quantity: lineItem.quantity,
                         HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
                         BaseUnitPrice: parseFloat(lineItem.unitPrice.toFixed(2)),
                         LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
                         LineTotal: parseFloat(lineItem.total.toFixed(2)),
-                        SizeBreakdown: JSON.stringify(productPricing.product.sizeBreakdown),
+                        SizeBreakdown: JSON.stringify(productPricing.product.sizeBreakdown || {}),  // Ensure it's always a valid JSON string
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
-                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: logoSpecsData  // Already a string or empty
                     };
                     
                     const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
@@ -145,7 +172,52 @@ class EmbroideryQuoteService {
                     });
                     
                     if (!itemResponse.ok) {
-                        console.error('Item save failed for line', lineNumber - 1);
+                        const errorText = await itemResponse.text();
+                        console.error('Item save failed for line', lineNumber - 1, 'Error:', errorText);
+                        console.error('Failed item data:', itemData);
+                        // Don't throw - allow partial success
+                    }
+                    
+                    isFirstItem = false;  // Only store logo specs in the first item
+                }
+            }
+            
+            // Save additional services as line items
+            if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+                for (const service of pricingResults.additionalServices) {
+                    const itemData = {
+                        QuoteID: quoteID,
+                        LineNumber: lineNumber++,
+                        StyleNumber: service.partNumber,  // Use ShopWorks part number
+                        ProductName: service.description,
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: service.type === 'monogram' ? 'monogram' : 'embroidery-additional',
+                        PrintLocation: service.location || '',
+                        PrintLocationName: service.location || '',
+                        Quantity: service.quantity,
+                        HasLTM: 'No',  // Additional services don't have LTM
+                        BaseUnitPrice: parseFloat(service.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(service.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(service.total.toFixed(2)),
+                        SizeBreakdown: JSON.stringify(service.metadata || {}),
+                        PricingTier: service.hasSubsetUpcharge ? 'Subset' : pricingResults.tier,
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''  // Additional services don't need logo specs
+                    };
+                    
+                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+                    
+                    if (!itemResponse.ok) {
+                        const errorText = await itemResponse.text();
+                        console.error('Additional service save failed for line', lineNumber - 1, 'Error:', errorText);
+                        console.error('Failed service data:', itemData);
                         // Don't throw - allow partial success
                     }
                 }
@@ -260,10 +332,27 @@ class EmbroideryQuoteService {
             html += `</div>`;
         });
         
+        // Additional Services section
+        if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+            html += '<h3>Additional Services:</h3>';
+            pricingResults.additionalServices.forEach(service => {
+                html += `<div style="margin-bottom: 10px;">`;
+                html += `<p><strong>${service.description}</strong> (${service.partNumber})</p>`;
+                html += `<p>${service.quantity} pieces @ $${service.unitPrice.toFixed(2)} each = $${service.total.toFixed(2)}</p>`;
+                if (service.hasSubsetUpcharge) {
+                    html += `<p style="font-size: 12px; color: #666;"><em>*Includes $3.00 subset upcharge</em></p>`;
+                }
+                html += `</div>`;
+            });
+        }
+        
         // Totals
         html += '<hr>';
         html += `<p><strong>Total Quantity: ${pricingResults.totalQuantity} pieces</strong></p>`;
-        html += `<p>Products & Embroidery: $${pricingResults.subtotal.toFixed(2)}</p>`;
+        html += `<p>Products & Primary Embroidery: $${pricingResults.subtotal.toFixed(2)}</p>`;
+        if (pricingResults.additionalServicesTotal && pricingResults.additionalServicesTotal > 0) {
+            html += `<p>Additional Services: $${pricingResults.additionalServicesTotal.toFixed(2)}</p>`;
+        }
         if (pricingResults.setupFees > 0) {
             html += `<p>Setup Fees: $${pricingResults.setupFees.toFixed(2)}</p>`;
         }
