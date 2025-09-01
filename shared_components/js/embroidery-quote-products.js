@@ -14,6 +14,37 @@ class ProductLineManager {
         this.initializeEvents();
     }
     
+    /**
+     * Check if product is allowed (exclude caps, include beanies)
+     */
+    isAllowedProduct(product) {
+        const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
+        const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
+        
+        // Explicitly ALLOW beanies (flat embroidery)
+        if (title.includes('beanie') || description.includes('beanie')) {
+            return true;
+        }
+        
+        // EXCLUDE structured caps (these go on cap machines)
+        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 
+                            'flexfit', 'visor', 'mesh back', 'dad hat',
+                            'baseball', '5-panel', '6-panel'];
+        
+        const isStructuredCap = capKeywords.some(keyword => 
+            title.includes(keyword) || 
+            description.includes(keyword)
+        );
+        
+        if (isStructuredCap) {
+            console.log('[ProductLineManager] Filtered out cap product:', title);
+            return false;
+        }
+        
+        // Allow everything else (shirts, polos, jackets, etc.)
+        return true;
+    }
+    
     initializeEvents() {
         // Style search
         const styleSearch = document.getElementById('style-search');
@@ -66,6 +97,31 @@ class ProductLineManager {
             const suggestions = await response.json();
             
             if (suggestions && suggestions.length > 0) {
+                // Filter out caps but keep beanies
+                const filteredSuggestions = suggestions.filter(item => this.isAllowedProduct(item));
+                
+                if (filteredSuggestions.length > 0) {
+                    // Add note about beanies if any are present
+                    const hasBeanies = filteredSuggestions.some(item => 
+                        (item.label || '').toLowerCase().includes('beanie')
+                    );
+                    
+                    const noteHtml = hasBeanies 
+                        ? '<div class="autocomplete-note" style="padding: 8px; background: #f0f9ff; color: #0369a1; font-size: 12px; border-bottom: 1px solid #e0e7ff;">Note: Beanies use flat embroidery pricing</div>' 
+                        : '';
+                    
+                    suggestionsDiv.innerHTML = noteHtml + filteredSuggestions.map(item => `
+                        <div class="suggestion-item" data-style="${item.value}">
+                            <strong>${item.value}</strong> - ${item.label.split(' - ')[1] || item.label}
+                        </div>
+                    `).join('');
+                    suggestionsDiv.style.display = 'block';
+                } else {
+                    suggestionsDiv.innerHTML = '<div class="no-results">No apparel products found (caps use separate calculator)</div>';
+                    suggestionsDiv.style.display = 'block';
+                }
+            } else if (suggestions && suggestions.length > 0) {
+                // Original code path as fallback
                 suggestionsDiv.innerHTML = suggestions.map(item => `
                     <div class="suggestion-item" data-style="${item.value}">
                         <strong>${item.value}</strong> - ${item.label.split(' - ')[1] || item.label}
@@ -98,6 +154,10 @@ class ProductLineManager {
      * Load product details
      */
     async loadProductDetails(styleNumber) {
+        // Quick check if this might be a cap product
+        if (styleNumber.toLowerCase().includes('cap') || styleNumber.toLowerCase().includes('hat')) {
+            console.warn('[ProductLineManager] Warning: This might be a cap product. Verifying...');
+        }
         console.log('[ProductLineManager] Loading product details for:', styleNumber);
         
         try {

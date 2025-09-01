@@ -7,7 +7,7 @@ class EmbroideryPricingCalculator {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
-        // Tier structure from API verification
+        // Default fallback values (will be replaced by API data)
         this.tiers = {
             '1-23': { embCost: 12.00, hasLTM: true },
             '24-47': { embCost: 12.00, hasLTM: false },
@@ -19,17 +19,97 @@ class EmbroideryPricingCalculator {
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
         this.additionalStitchRate = 1.25; // per 1000 stitches over 8000
+        this.baseStitchCount = 8000; // base included stitches
+        this.stitchIncrement = 1000; // rounding increment
         
         // Cache for size pricing data
         this.sizePricingCache = {};
         
         // Rounding method - will be fetched from API
         this.roundingMethod = null;
-        this.fetchRoundingRules();
+        
+        // Fetch configuration from API
+        this.initialized = false;
+        this.initializeConfig();
     }
     
     /**
-     * Fetch rounding rules from API
+     * Initialize configuration from API
+     */
+    async initializeConfig() {
+        try {
+            console.log('[EmbroideryPricingCalculator] Fetching configuration from API...');
+            
+            // Fetch embroidery pricing bundle (includes all config)
+            const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
+            const data = await response.json();
+            
+            if (data) {
+                // Extract configuration from tiersR
+                if (data.tiersR && data.tiersR.length > 0) {
+                    this.marginDenominator = data.tiersR[0].MarginDenominator || 0.6;
+                    
+                    // Build tiers object from API data
+                    this.tiers = {};
+                    data.tiersR.forEach(tier => {
+                        this.tiers[tier.TierLabel] = {
+                            embCost: 0, // Will be set from allEmbroideryCostsR
+                            hasLTM: tier.LTM_Fee > 0
+                        };
+                        if (tier.LTM_Fee > 0) {
+                            this.ltmFee = tier.LTM_Fee;
+                        }
+                    });
+                }
+                
+                // Extract configuration from allEmbroideryCostsR
+                if (data.allEmbroideryCostsR && data.allEmbroideryCostsR.length > 0) {
+                    // Use first shirt record for configuration
+                    const shirtConfig = data.allEmbroideryCostsR.find(c => c.ItemType === 'Shirt') || data.allEmbroideryCostsR[0];
+                    
+                    // Apply configuration values
+                    this.digitizingFee = shirtConfig.DigitizingFee || 100;
+                    this.additionalStitchRate = shirtConfig.AdditionalStitchRate || 1.25;
+                    this.baseStitchCount = shirtConfig.BaseStitchCount || shirtConfig.StitchCount || 8000;
+                    this.stitchIncrement = shirtConfig.StitchIncrement || 1000;
+                    
+                    // Update tier embroidery costs
+                    data.allEmbroideryCostsR.forEach(cost => {
+                        if (cost.ItemType === 'Shirt' && this.tiers[cost.TierLabel]) {
+                            this.tiers[cost.TierLabel].embCost = cost.EmbroideryCost;
+                        }
+                    });
+                    
+                    console.log('[EmbroideryPricingCalculator] Configuration loaded from API:');
+                    console.log('- Digitizing Fee:', this.digitizingFee);
+                    console.log('- Additional Stitch Rate:', this.additionalStitchRate);
+                    console.log('- Base Stitch Count:', this.baseStitchCount);
+                    console.log('- Tiers:', this.tiers);
+                }
+                
+                // Extract rounding method
+                if (data.rulesR && data.rulesR.RoundingMethod) {
+                    this.roundingMethod = data.rulesR.RoundingMethod;
+                    console.log('[EmbroideryPricingCalculator] Rounding method:', this.roundingMethod);
+                } else {
+                    // Fallback: fetch from pricing-rules endpoint
+                    await this.fetchRoundingRules();
+                }
+            }
+            
+            this.initialized = true;
+            console.log('[EmbroideryPricingCalculator] Initialization complete');
+            
+        } catch (error) {
+            console.error('[EmbroideryPricingCalculator] Error fetching configuration:', error);
+            console.log('[EmbroideryPricingCalculator] Using fallback values');
+            this.roundingMethod = 'CeilDollar';
+            this.initialized = true;
+        }
+    }
+    
+    /**
+     * Fetch rounding rules from API (fallback method)
      */
     async fetchRoundingRules() {
         try {
@@ -40,7 +120,7 @@ class EmbroideryPricingCalculator {
                 const roundingRule = data.find(rule => rule.RuleName === 'RoundingMethod');
                 if (roundingRule) {
                     this.roundingMethod = roundingRule.RuleValue;
-                    console.log('[EmbroideryPricingCalculator] Rounding method:', this.roundingMethod);
+                    console.log('[EmbroideryPricingCalculator] Rounding method from pricing-rules:', this.roundingMethod);
                 }
             }
         } catch (error) {
@@ -223,13 +303,18 @@ class EmbroideryPricingCalculator {
             return null;
         }
         
+        // Ensure configuration is loaded
+        if (!this.initialized) {
+            await this.initializeConfig();
+        }
+        
         const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
         const tier = this.getTier(totalQuantity);
         
         // Calculate additional stitch cost per piece
         let additionalStitchCost = 0;
         logos.forEach(logo => {
-            const extraStitches = Math.max(0, logo.stitchCount - 8000);
+            const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
             additionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
         });
         
@@ -280,6 +365,13 @@ class EmbroideryPricingCalculator {
             grandTotal: grandTotal,
             logos: logos
         };
+    }
+    
+    /**
+     * Round stitch count to increment
+     */
+    roundStitchCount(stitches) {
+        return Math.round(stitches / this.stitchIncrement) * this.stitchIncrement;
     }
     
     /**

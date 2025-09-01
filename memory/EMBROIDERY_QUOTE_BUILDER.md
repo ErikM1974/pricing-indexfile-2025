@@ -1,7 +1,9 @@
 # Embroidery Quote Builder Documentation
 
 ## Overview
-A comprehensive quote builder tool for sales representatives to quickly create professional embroidery quotes with multiple product styles, dynamic sizing, and automatic pricing calculations. This tool streamlines the complex process of quoting embroidery orders that combine different garment styles with shared logo designs.
+A comprehensive quote builder tool for sales representatives to quickly create professional **flat embroidery** quotes with multiple product styles, dynamic sizing, and automatic pricing calculations. This tool streamlines the complex process of quoting embroidery orders that combine different garment styles with shared logo designs.
+
+**Important**: This calculator is for **flat embroidery** on shirts, apparel, and beanies. Beanies are embroidered flat before assembly and can be combined with other garments for quantity pricing discounts. For structured caps (baseball caps, trucker hats, etc.), use the separate Cap Embroidery Calculator.
 
 ## Purpose & Benefits
 
@@ -41,9 +43,9 @@ EMBROIDERY SETUP
 ```
 
 **Fields per Logo**:
-- Position dropdown (Left Chest, Right Chest, Full Front, Full Back, Left Sleeve, Right Sleeve)
-- Stitch count input (minimum 8,000, increment by 1,000)
-- Digitizing checkbox ($100 per logo if needed)
+- Position dropdown (dynamically loaded from API - shirts only, no cap positions)
+- Stitch count input (minimum 1,000, increment by 1,000)
+- Digitizing checkbox ($100 per logo if needed - configurable via API)
 
 ### 2. Product Addition Phase
 **Purpose**: Build line items with style-specific sizing
@@ -99,7 +101,7 @@ QUOTE SUMMARY
 
 ## Pricing Logic
 
-### Embroidery Tier Pricing (8,000 Stitches)
+### Embroidery Tier Pricing (Flat Embroidery - Shirts & Beanies)
 Based on TOTAL quantity across ALL styles and sizes:
 
 | Quantity Range | Embroidery Cost | Notes |
@@ -109,12 +111,13 @@ Based on TOTAL quantity across ALL styles and sizes:
 | 48-71 pieces | $11.00 | Volume discount |
 | 72+ pieces | $10.00 | Best pricing |
 
-**Note**: All tiers use 0.6 margin denominator (60% margin)
+**Note**: These prices are fetched dynamically from the API (Embroidery_Costs table) and may be updated in Caspio without code changes. All tiers use 0.6 margin denominator.
 
 ### Additional Stitch Pricing
-- First 8,000 stitches: Included in base price
-- Additional stitches: $1.25 per 1,000 stitches
+- Base included stitches: 8,000 (configurable via API)
+- Additional stitches: $1.25 per 1,000 stitches for shirts/beanies
 - Each logo priced separately, then summed
+- Minimum stitch count: 1,000 (rounded to nearest 1,000)
 
 ### Size Upcharges
 Applied to final decorated price (style-specific from API):

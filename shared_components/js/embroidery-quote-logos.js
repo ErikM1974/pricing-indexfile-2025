@@ -7,19 +7,67 @@ class LogoManager {
     constructor() {
         this.logos = [];
         this.nextId = 1;
+        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        
+        // Default fallback positions (shirts only - no caps)
         this.positions = [
             'Left Chest',
             'Right Chest',
             'Full Front',
             'Full Back',
             'Left Sleeve',
-            'Right Sleeve',
-            'Hat Front',
-            'Hat Back',
-            'Hat Side'
+            'Right Sleeve'
         ];
         
+        // Configuration from API
+        this.digitizingFee = 100;
+        this.additionalStitchRate = 1.25;
+        this.baseStitchCount = 8000;
+        this.minStitchCount = 1000;
+        this.stitchIncrement = 1000;
+        
+        // Fetch configuration from API
+        this.fetchConfiguration();
         this.initializeEvents();
+    }
+    
+    /**
+     * Fetch configuration from API including logo positions
+     */
+    async fetchConfiguration() {
+        try {
+            console.log('[LogoManager] Fetching configuration from API...');
+            
+            // Fetch embroidery configuration
+            const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
+            const data = await response.json();
+            
+            if (data && data.allEmbroideryCostsR && data.allEmbroideryCostsR.length > 0) {
+                // Use first shirt record for configuration
+                const shirtConfig = data.allEmbroideryCostsR.find(c => c.ItemType === 'Shirt') || data.allEmbroideryCostsR[0];
+                
+                // Parse logo positions from API (shirts only, no caps)
+                if (shirtConfig.LogoPositions) {
+                    this.positions = shirtConfig.LogoPositions.split(',').map(p => p.trim());
+                    console.log('[LogoManager] Logo positions from API:', this.positions);
+                }
+                
+                // Apply other configuration values
+                this.digitizingFee = shirtConfig.DigitizingFee || 100;
+                this.additionalStitchRate = shirtConfig.AdditionalStitchRate || 1.25;
+                this.baseStitchCount = shirtConfig.BaseStitchCount || shirtConfig.StitchCount || 8000;
+                this.minStitchCount = this.stitchIncrement; // Minimum is 1000
+                this.stitchIncrement = shirtConfig.StitchIncrement || 1000;
+                
+                console.log('[LogoManager] Configuration loaded:');
+                console.log('- Positions:', this.positions.length, 'options');
+                console.log('- Digitizing Fee:', this.digitizingFee);
+                console.log('- Min Stitch Count:', this.minStitchCount);
+            }
+        } catch (error) {
+            console.error('[LogoManager] Error fetching configuration:', error);
+            console.log('[LogoManager] Using fallback positions');
+        }
     }
     
     initializeEvents() {
@@ -53,9 +101,9 @@ class LogoManager {
         const logo = this.logos.find(l => l.id === logoId);
         if (logo) {
             if (field === 'stitchCount') {
-                value = Math.max(1000, parseInt(value) || 8000);
-                // Round to nearest 1000
-                value = Math.round(value / 1000) * 1000;
+                value = Math.max(this.minStitchCount, parseInt(value) || this.baseStitchCount);
+                // Round to nearest increment
+                value = Math.round(value / this.stitchIncrement) * this.stitchIncrement;
             }
             logo[field] = value;
             this.renderLogos();
@@ -132,8 +180,8 @@ class LogoManager {
      * Render a single logo card
      */
     renderLogo(logo) {
-        const extraStitches = Math.max(0, logo.stitchCount - 8000);
-        const extraCost = extraStitches > 0 ? ` (+$${(extraStitches / 1000 * 1.25).toFixed(2)}/pc)` : '';
+        const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
+        const extraCost = extraStitches > 0 ? ` (+$${(extraStitches / 1000 * this.additionalStitchRate).toFixed(2)}/pc)` : '';
         
         return `
             <div class="logo-card" data-logo-id="${logo.id}">
@@ -163,10 +211,10 @@ class LogoManager {
                                    id="logo-stitches-${logo.id}" 
                                    class="logo-stitches"
                                    value="${logo.stitchCount}"
-                                   min="1000"
-                                   step="1000"
-                                   placeholder="8000">
-                            <small class="help-text">Min: 1,000 | Increment: 1,000${extraCost}</small>
+                                   min="${this.minStitchCount}"
+                                   step="${this.stitchIncrement}"
+                                   placeholder="${this.baseStitchCount}">
+                            <small class="help-text">Min: ${this.minStitchCount.toLocaleString()} | Increment: ${this.stitchIncrement.toLocaleString()}${extraCost}</small>
                         </div>
                     </div>
                     
@@ -175,7 +223,7 @@ class LogoManager {
                             <input type="checkbox" 
                                    id="logo-digitizing-${logo.id}"
                                    ${logo.needsDigitizing ? 'checked' : ''}>
-                            <span>Needs digitizing ($100 setup fee)</span>
+                            <span>Needs digitizing ($${this.digitizingFee} setup fee)</span>
                         </label>
                     </div>
                 </div>
@@ -203,7 +251,7 @@ class LogoManager {
      * Calculate total setup fees
      */
     getTotalSetupFees() {
-        return this.logos.filter(l => l.needsDigitizing).length * 100;
+        return this.logos.filter(l => l.needsDigitizing).length * this.digitizingFee;
     }
     
     /**
@@ -212,10 +260,10 @@ class LogoManager {
     getAdditionalStitchCost() {
         let totalExtraStitches = 0;
         this.logos.forEach(logo => {
-            const extra = Math.max(0, logo.stitchCount - 8000);
+            const extra = Math.max(0, logo.stitchCount - this.baseStitchCount);
             totalExtraStitches += extra;
         });
-        return (totalExtraStitches / 1000) * 1.25;
+        return (totalExtraStitches / 1000) * this.additionalStitchRate;
     }
     
     /**
@@ -226,7 +274,7 @@ class LogoManager {
             position: logo.position,
             stitchCount: logo.stitchCount,
             needsDigitizing: logo.needsDigitizing,
-            extraStitchCost: Math.max(0, logo.stitchCount - 8000) / 1000 * 1.25
+            extraStitchCost: Math.max(0, logo.stitchCount - this.baseStitchCount) / 1000 * this.additionalStitchRate
         }));
     }
     
