@@ -253,7 +253,9 @@ class EmbroideryQuoteBuilder {
             html += `
                 <div class="product-summary">
                     <div class="product-header">
-                        <img src="${pp.product.imageUrl || '/images/placeholder.png'}" alt="${pp.product.style}">
+                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(pp.product.style)}" 
+                             alt="${pp.product.style} - ${pp.product.color}"
+                             onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${pp.product.style}')">
                         <div class="product-info">
                             <strong>${pp.product.style} - ${pp.product.color}</strong>
                             <span>${pp.product.title}</span>

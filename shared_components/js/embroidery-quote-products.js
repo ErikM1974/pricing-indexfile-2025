@@ -287,21 +287,21 @@ class ProductLineManager {
         try {
             this.showLoading(true);
             
-            console.log('[ProductLineManager] Fetching sizes and swatches...');
+            console.log('[ProductLineManager] Fetching sizes and product colors...');
             
-            // Get available sizes and swatches (use catalog color for sizes API)
+            // Get available sizes and product colors with images (use catalog color for sizes API)
             const sizesUrl = `${this.baseURL}/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(catalogColor)}`;
-            const swatchesUrl = `${this.baseURL}/api/color-swatches?styleNumber=${styleNumber}`;
+            const colorsUrl = `${this.baseURL}/api/product-colors?styleNumber=${styleNumber}`;
             
             console.log('[ProductLineManager] Sizes URL:', sizesUrl);
-            console.log('[ProductLineManager] Swatches URL:', swatchesUrl);
+            console.log('[ProductLineManager] Colors URL:', colorsUrl);
             
-            const [sizesResponse, swatchesResponse] = await Promise.all([
+            const [sizesResponse, colorsResponse] = await Promise.all([
                 fetch(sizesUrl),
-                fetch(swatchesUrl)
+                fetch(colorsUrl)
             ]);
             
-            console.log('[ProductLineManager] API responses:', sizesResponse.status, swatchesResponse.status);
+            console.log('[ProductLineManager] API responses:', sizesResponse.status, colorsResponse.status);
             
             if (!sizesResponse.ok) {
                 console.warn(`[ProductLineManager] Sizes API failed: ${sizesResponse.status} ${sizesResponse.statusText}`);
@@ -316,21 +316,23 @@ class ProductLineManager {
                     if (fallbackResponse.ok) {
                         console.log('[ProductLineManager] Fallback successful with display color');
                         const fallbackSizes = await fallbackResponse.json();
-                        return this.handleSizesResponse(fallbackSizes, swatches, color, styleNumber);
+                        const colors = await colorsResponse.json();
+                        return this.handleSizesResponse(fallbackSizes, colors, color, styleNumber);
                     }
                 }
                 
                 // If both attempts failed, provide graceful fallback
                 console.error(`[ProductLineManager] Both sizes API attempts failed. Using default sizes.`);
                 const defaultSizes = { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] };
+                const colors = await colorsResponse.json();
                 alert(`Size information not available for ${styleNumber} in ${color}. Using standard sizes - please verify with customer.`);
-                return this.handleSizesResponse(defaultSizes, swatches, color, styleNumber);
+                return this.handleSizesResponse(defaultSizes, colors, color, styleNumber);
             }
             
             const sizes = await sizesResponse.json();
-            const swatches = await swatchesResponse.json();
+            const colors = await colorsResponse.json();
             
-            return this.handleSizesResponse(sizes, swatches, color, styleNumber);
+            return this.handleSizesResponse(sizes, colors, color, styleNumber);
         } catch (error) {
             console.error('[ProductLineManager] Load product error:', error);
             alert('Failed to load product sizes: ' + error.message);
@@ -342,9 +344,9 @@ class ProductLineManager {
     /**
      * Handle sizes response and display product
      */
-    handleSizesResponse(sizes, swatches, color, styleNumber) {
+    handleSizesResponse(sizes, colors, color, styleNumber) {
         console.log('[ProductLineManager] Raw sizes response:', sizes);
-        console.log('[ProductLineManager] Raw swatches response:', swatches);
+        console.log('[ProductLineManager] Raw colors response:', colors);
         
         // Handle multiple possible response formats: {data: [...]} or {sizes: [...]} or direct array
         let sizesArray = sizes.data || sizes.sizes || sizes;
@@ -354,17 +356,32 @@ class ProductLineManager {
             
             console.log('[ProductLineManager] Available sizes:', this.availableSizes);
             
-            // Find image from swatches
-            let colorSwatch = null;
-            if (swatches.data && Array.isArray(swatches.data)) {
-                colorSwatch = swatches.data.find(s => s.color === color || s.COLOR_NAME === color);
-            } else if (Array.isArray(swatches)) {
-                colorSwatch = swatches.find(s => s.color === color || s.COLOR_NAME === color);
+            // Find image from colors data (product-colors API returns colors array)
+            let colorData = null;
+            if (colors.colors && Array.isArray(colors.colors)) {
+                colorData = colors.colors.find(c => c.COLOR_NAME === color);
+                console.log('[ProductLineManager] Found color data by COLOR_NAME:', color, colorData);
             }
             
-            this.currentProduct.imageUrl = colorSwatch?.swatchUrl || colorSwatch?.COLOR_SQUARE_IMAGE || '';
+            // If not found by exact match, try fuzzy matching
+            if (!colorData && colors.colors && Array.isArray(colors.colors)) {
+                colorData = colors.colors.find(c => 
+                    c.COLOR_NAME?.toLowerCase() === color.toLowerCase() ||
+                    c.CATALOG_COLOR?.toLowerCase() === color.toLowerCase()
+                );
+                console.log('[ProductLineManager] Found color data by fuzzy match:', color, colorData);
+            }
             
-            console.log('[ProductLineManager] Color swatch found:', colorSwatch);
+            // Extract the model image URL (prioritize MAIN_IMAGE_URL or FRONT_MODEL)
+            if (colorData) {
+                this.currentProduct.imageUrl = colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL || colorData.FRONT_FLAT || '';
+                console.log('[ProductLineManager] Using product model image:', this.currentProduct.imageUrl);
+            } else {
+                console.warn('[ProductLineManager] No color data found for:', color);
+                this.currentProduct.imageUrl = '';
+            }
+            
+            console.log('[ProductLineManager] Color data found:', colorData);
             console.log('[ProductLineManager] Product image URL:', this.currentProduct.imageUrl);
             
             this.displayProduct();
@@ -395,7 +412,12 @@ class ProductLineManager {
         const productDescription = document.getElementById('product-description');
         
         if (productImage) {
-            productImage.src = this.currentProduct.imageUrl || '/images/placeholder.png';
+            // Use actual product image or generate a placeholder with style number
+            productImage.src = this.currentProduct.imageUrl || 
+                `https://via.placeholder.com/150x150/f0f0f0/666?text=${encodeURIComponent(this.currentProduct.style)}`;
+            productImage.onerror = () => {
+                productImage.src = `https://via.placeholder.com/150x150/f0f0f0/666?text=${encodeURIComponent(this.currentProduct.style)}`;
+            };
             console.log('[ProductLineManager] Set product image:', productImage.src);
         }
         
@@ -514,8 +536,10 @@ class ProductLineManager {
             return `
                 <div class="product-item" data-product-id="${product.id}">
                     <div class="product-item-header">
-                        <img src="${product.imageUrl || '/images/placeholder.png'}" alt="${product.style}" 
-                             onerror="this.src='/images/placeholder.png'" class="product-item-image">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
+                             alt="${product.style} - ${product.color}" 
+                             onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
+                             class="product-item-image">
                         <div class="product-item-info">
                             <strong>${product.style} - ${product.title}</strong>
                             <span>${product.color} | ${product.totalQuantity} pieces</span>
@@ -575,8 +599,10 @@ class ProductLineManager {
                     </div>
                     <div class="modal-body">
                         <div class="product-edit-info">
-                            <img src="${product.imageUrl || '/images/placeholder.png'}" 
-                                 alt="${product.style}" class="product-edit-image">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
+                                 alt="${product.style} - ${product.color}" 
+                                 onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
+                                 class="product-edit-image">
                             <div>
                                 <strong>${product.style} - ${product.title}</strong>
                                 <p>${product.color}</p>

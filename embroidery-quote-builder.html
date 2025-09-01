@@ -20,16 +20,69 @@
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="breadcrumb">
-            <a href="/staff-dashboard.html">Dashboard</a> / 
-            <span>Embroidery Quote Builder</span>
-        </nav>
-        <div class="header-actions">
-            <button class="btn-secondary" onclick="window.location.href='/staff-dashboard.html'">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </button>
+    <!-- Professional Header with Logo and Navigation -->
+    <header class="embroidery-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <a href="/staff-dashboard.html" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+                
+                <!-- Navigation Actions -->
+                <div class="nav-actions">
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context Bar -->
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Embroidery Quote Builder</span>
+                    </div>
+                </div>
+                
+                <!-- Live Status -->
+                <div class="header-status">
+                    <div class="status-item">
+                        <span class="status-label">Quote Type:</span>
+                        <span class="status-value">Multi-Product Embroidery</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -178,30 +231,30 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="customer-name">Customer Name *</label>
-                        <input type="text" id="customer-name" required>
+                        <input type="text" id="customer-name" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="customer-email">Email *</label>
-                        <input type="email" id="customer-email" required>
+                        <input type="email" id="customer-email" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="customer-phone">Phone</label>
-                        <input type="tel" id="customer-phone">
+                        <input type="tel" id="customer-phone" class="form-control">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="company-name">Company Name</label>
-                        <input type="text" id="company-name">
+                        <input type="text" id="company-name" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name">
+                        <input type="text" id="project-name" class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="special-notes">Special Notes</label>
-                    <textarea id="special-notes" rows="3"></textarea>
+                    <textarea id="special-notes" rows="3" class="form-textarea"></textarea>
                 </div>
             </div>
             

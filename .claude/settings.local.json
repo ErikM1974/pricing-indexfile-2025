@@ -17,7 +17,12 @@
       "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/OneDrive/**)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": [],
