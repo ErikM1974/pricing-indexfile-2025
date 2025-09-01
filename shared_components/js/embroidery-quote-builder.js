@@ -83,13 +83,18 @@ class EmbroideryQuoteBuilder {
         // Hide all phases
         document.querySelectorAll('.phase-section').forEach(section => {
             section.style.display = 'none';
+            section.classList.remove('active');
         });
         
         // Show selected phase
         const phaseElement = document.getElementById(`${phase}-phase`);
         if (phaseElement) {
             phaseElement.style.display = 'block';
+            phaseElement.classList.add('active');
         }
+        
+        // Update navigation indicators
+        this.updatePhaseNavigation(phase);
         
         this.currentPhase = phase;
         
@@ -97,6 +102,39 @@ class EmbroideryQuoteBuilder {
         if (phase === 'summary') {
             this.updatePricing();
         }
+    }
+    
+    /**
+     * Update phase navigation indicators
+     */
+    updatePhaseNavigation(currentPhase) {
+        const phases = ['logo', 'product', 'summary'];
+        const currentIndex = phases.indexOf(currentPhase);
+        
+        phases.forEach((phase, index) => {
+            const navItem = document.getElementById(`phase-${index + 1}-nav`);
+            const connector = document.getElementById(`connector-${index + 1}`);
+            
+            if (navItem) {
+                navItem.classList.remove('active', 'completed');
+                
+                if (index < currentIndex) {
+                    navItem.classList.add('completed');
+                } else if (index === currentIndex) {
+                    navItem.classList.add('active');
+                }
+            }
+            
+            if (connector) {
+                connector.classList.remove('active', 'completed');
+                
+                if (index < currentIndex) {
+                    connector.classList.add('completed');
+                } else if (index === currentIndex) {
+                    connector.classList.add('active');
+                }
+            }
+        });
     }
     
     /**

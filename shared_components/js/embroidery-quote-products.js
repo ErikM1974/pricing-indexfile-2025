@@ -514,15 +514,21 @@ class ProductLineManager {
             return `
                 <div class="product-item" data-product-id="${product.id}">
                     <div class="product-item-header">
-                        <img src="${product.imageUrl || '/images/placeholder.png'}" alt="${product.style}">
+                        <img src="${product.imageUrl || '/images/placeholder.png'}" alt="${product.style}" 
+                             onerror="this.src='/images/placeholder.png'" class="product-item-image">
                         <div class="product-item-info">
                             <strong>${product.style} - ${product.title}</strong>
                             <span>${product.color} | ${product.totalQuantity} pieces</span>
                             <small>${sizesList}</small>
                         </div>
-                        <button class="btn-delete" onclick="window.productLineManager.removeProduct(${product.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="product-item-actions">
+                            <button class="btn-edit" onclick="window.productLineManager.editProduct(${product.id})" title="Edit quantities">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove product">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -548,6 +554,142 @@ class ProductLineManager {
         else tier = '72+';
         
         indicator.textContent = `Tier: ${tier}`;
+    }
+    
+    /**
+     * Edit product quantities
+     */
+    editProduct(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
+        // Create edit modal HTML
+        const modalHtml = `
+            <div id="edit-product-modal" class="modal active">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Product Quantities</h3>
+                        <button class="modal-close" onclick="window.productLineManager.closeEditModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="product-edit-info">
+                            <img src="${product.imageUrl || '/images/placeholder.png'}" 
+                                 alt="${product.style}" class="product-edit-image">
+                            <div>
+                                <strong>${product.style} - ${product.title}</strong>
+                                <p>${product.color}</p>
+                            </div>
+                        </div>
+                        <div class="size-inputs edit-size-inputs">
+                            ${Object.entries(product.sizeBreakdown).map(([size, qty]) => `
+                                <div class="size-input-group">
+                                    <label>${size}</label>
+                                    <input type="number" 
+                                           class="edit-size-qty" 
+                                           data-size="${size}" 
+                                           min="0" 
+                                           value="${qty}">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="edit-total">
+                            Total: <span id="edit-total-qty">0</span> pieces
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="window.productLineManager.closeEditModal()">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary" onclick="window.productLineManager.saveProductEdit(${productId})">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add modal to DOM
+        const existingModal = document.getElementById('edit-product-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Add event listeners for quantity changes
+        document.querySelectorAll('.edit-size-qty').forEach(input => {
+            input.addEventListener('input', () => this.updateEditTotal());
+        });
+        
+        // Calculate initial total
+        this.updateEditTotal();
+    }
+    
+    /**
+     * Update edit modal total
+     */
+    updateEditTotal() {
+        const inputs = document.querySelectorAll('.edit-size-qty');
+        let total = 0;
+        inputs.forEach(input => {
+            total += parseInt(input.value) || 0;
+        });
+        const totalElement = document.getElementById('edit-total-qty');
+        if (totalElement) {
+            totalElement.textContent = total;
+        }
+    }
+    
+    /**
+     * Save product edit
+     */
+    saveProductEdit(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
+        const newSizeBreakdown = {};
+        let totalQty = 0;
+        
+        document.querySelectorAll('.edit-size-qty').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                newSizeBreakdown[input.dataset.size] = qty;
+                totalQty += qty;
+            }
+        });
+        
+        if (totalQty === 0) {
+            if (confirm('All quantities are 0. Remove this product?')) {
+                this.removeProduct(productId);
+                this.closeEditModal();
+            }
+            return;
+        }
+        
+        // Update product
+        product.sizeBreakdown = newSizeBreakdown;
+        product.totalQuantity = totalQty;
+        
+        // Re-render and update pricing
+        this.renderProductsList();
+        this.updateContinueButton();
+        
+        if (window.embroideryQuoteBuilder) {
+            window.embroideryQuoteBuilder.updatePricing();
+        }
+        
+        this.closeEditModal();
+    }
+    
+    /**
+     * Close edit modal
+     */
+    closeEditModal() {
+        const modal = document.getElementById('edit-product-modal');
+        if (modal) {
+            modal.remove();
+        }
     }
     
     /**

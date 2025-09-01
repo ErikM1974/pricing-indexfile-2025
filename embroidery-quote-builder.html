@@ -41,6 +41,24 @@
         <p class="page-description">
             Create professional embroidery quotes with multiple products and automatic tier pricing
         </p>
+        
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" id="phase-1-nav">
+                <div class="phase-step-number">1</div>
+                <div class="phase-step-label">Define Logos</div>
+            </div>
+            <div class="phase-connector" id="connector-1"></div>
+            <div class="phase-step" id="phase-2-nav">
+                <div class="phase-step-number">2</div>
+                <div class="phase-step-label">Add Products</div>
+            </div>
+            <div class="phase-connector" id="connector-2"></div>
+            <div class="phase-step" id="phase-3-nav">
+                <div class="phase-step-number">3</div>
+                <div class="phase-step-label">Review & Save</div>
+            </div>
+        </div>
 
         <!-- Phase 1: Logo Definition -->
         <section id="logo-phase" class="phase-section active">
@@ -53,12 +71,12 @@
                 <!-- Logos will be added here dynamically -->
             </div>
             
-            <button id="add-logo-btn" class="btn-secondary">
-                <i class="fas fa-plus"></i> Add Logo
+            <button id="add-logo-btn" class="btn btn-secondary">
+                <i class="fas fa-plus-circle"></i> Add Another Logo
             </button>
             
             <div class="phase-actions">
-                <button id="continue-to-products" class="btn-primary" disabled>
+                <button id="continue-to-products" class="btn btn-primary" disabled>
                     Continue to Products <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -134,10 +152,10 @@
             </div>
             
             <div class="phase-actions">
-                <button id="back-to-logos" class="btn-secondary">
+                <button id="back-to-logos" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Logos
                 </button>
-                <button id="continue-to-summary" class="btn-primary" disabled>
+                <button id="continue-to-summary" class="btn btn-primary" disabled>
                     Continue to Summary <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -188,16 +206,16 @@
             </div>
             
             <div class="phase-actions">
-                <button id="back-to-products" class="btn-secondary">
+                <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </button>
-                <button id="save-quote-btn" class="btn-primary">
+                <button id="save-quote-btn" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Quote
                 </button>
-                <button id="email-quote-btn" class="btn-primary">
+                <button id="email-quote-btn" class="btn btn-primary">
                     <i class="fas fa-envelope"></i> Email Quote
                 </button>
-                <button id="print-quote-btn" class="btn-secondary">
+                <button id="print-quote-btn" class="btn btn-secondary">
                     <i class="fas fa-print"></i> Print
                 </button>
             </div>
