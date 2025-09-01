@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Quote Builder | Northwest Custom Apparel</title>
+    
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="breadcrumb">
+            <a href="/staff-dashboard.html">Dashboard</a> / 
+            <span>Embroidery Quote Builder</span>
+        </nav>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="window.location.href='/staff-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">
+            <i class="fas fa-thread"></i> Embroidery Quote Builder
+        </h1>
+        <p class="page-description">
+            Create professional embroidery quotes with multiple products and automatic tier pricing
+        </p>
+
+        <!-- Phase 1: Logo Definition -->
+        <section id="logo-phase" class="phase-section active">
+            <div class="phase-header">
+                <h2><span class="phase-number">1</span> Define Embroidery Logos</h2>
+                <p>These logos will apply to all products in the quote</p>
+            </div>
+            
+            <div id="logos-container" class="logos-container">
+                <!-- Logos will be added here dynamically -->
+            </div>
+            
+            <button id="add-logo-btn" class="btn-secondary">
+                <i class="fas fa-plus"></i> Add Logo
+            </button>
+            
+            <div class="phase-actions">
+                <button id="continue-to-products" class="btn-primary" disabled>
+                    Continue to Products <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 2: Product Addition -->
+        <section id="product-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">2</span> Add Products</h2>
+                <p>Add garments with quantities by size</p>
+            </div>
+            
+            <!-- Product Search -->
+            <div class="product-search-container">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label for="style-search">Style Number</label>
+                        <input type="text" id="style-search" placeholder="Enter style (e.g., PC54)" autocomplete="off">
+                        <div id="style-suggestions" class="suggestions-dropdown"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color-select">Color</label>
+                        <select id="color-select" disabled>
+                            <option value="">Select style first</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-product-btn" class="btn-primary" disabled>
+                        <i class="fas fa-search"></i> Load Product
+                    </button>
+                </div>
+                
+                <!-- Product Display -->
+                <div id="product-display" class="product-display" style="display: none;">
+                    <div class="product-info">
+                        <img id="product-image" src="" alt="Product">
+                        <div class="product-details">
+                            <h3 id="product-name"></h3>
+                            <p id="product-description"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Matrix -->
+                    <div class="size-matrix">
+                        <h4>Enter Quantities by Size</h4>
+                        <div id="size-inputs" class="size-inputs-grid">
+                            <!-- Size inputs will be added dynamically -->
+                        </div>
+                        <div class="total-row">
+                            <strong>Total Quantity:</strong> 
+                            <span id="product-total-qty">0</span>
+                        </div>
+                    </div>
+                    
+                    <button id="add-to-quote-btn" class="btn-primary" disabled>
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Products List -->
+            <div id="products-list" class="products-list">
+                <h3>Products in Quote</h3>
+                <div id="products-container">
+                    <p class="empty-message">No products added yet</p>
+                </div>
+                <div class="aggregate-total">
+                    <strong>Total Pieces Across All Products:</strong> 
+                    <span id="aggregate-total">0</span>
+                    <span id="tier-indicator" class="tier-indicator"></span>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-logos" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Logos
+                </button>
+                <button id="continue-to-summary" class="btn-primary" disabled>
+                    Continue to Summary <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 3: Quote Summary -->
+        <section id="summary-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">3</span> Quote Summary</h2>
+                <p>Review and finalize your quote</p>
+            </div>
+            
+            <div id="quote-summary" class="quote-summary">
+                <!-- Summary will be generated here -->
+            </div>
+            
+            <!-- Customer Information -->
+            <div class="customer-info-section">
+                <h3>Customer Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name *</label>
+                        <input type="text" id="customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email *</label>
+                        <input type="email" id="customer-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone</label>
+                        <input type="tel" id="customer-phone">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="special-notes">Special Notes</label>
+                    <textarea id="special-notes" rows="3"></textarea>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-products" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Products
+                </button>
+                <button id="save-quote-btn" class="btn-primary">
+                    <i class="fas fa-save"></i> Save Quote
+                </button>
+                <button id="email-quote-btn" class="btn-primary">
+                    <i class="fas fa-envelope"></i> Email Quote
+                </button>
+                <button id="print-quote-btn" class="btn-secondary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <i class="fas fa-check-circle"></i>
+                <h2>Quote Saved Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <p>Quote ID: <strong id="modal-quote-id"></strong></p>
+                <p>Customer: <span id="modal-customer"></span></p>
+                <p>Total: <span id="modal-total"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeSuccessModal()" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/embroidery-quote-logos.js"></script>
+    <script src="/shared_components/js/embroidery-quote-products.js"></script>
+    <script src="/shared_components/js/embroidery-quote-pricing.js"></script>
+    <script src="/shared_components/js/embroidery-quote-service.js"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js"></script>
+    
+    <script>
+        // Initialize the quote builder when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            window.embroideryQuoteBuilder = new EmbroideryQuoteBuilder();
+        });
+    </script>
+</body>
+</html>
