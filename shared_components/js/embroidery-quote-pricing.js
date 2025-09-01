@@ -22,6 +22,48 @@ class EmbroideryPricingCalculator {
         
         // Cache for size pricing data
         this.sizePricingCache = {};
+        
+        // Rounding method - will be fetched from API
+        this.roundingMethod = null;
+        this.fetchRoundingRules();
+    }
+    
+    /**
+     * Fetch rounding rules from API
+     */
+    async fetchRoundingRules() {
+        try {
+            const response = await fetch(`${this.baseURL}/api/pricing-rules?method=EmbroideryShirts`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const roundingRule = data.find(rule => rule.RuleName === 'RoundingMethod');
+                if (roundingRule) {
+                    this.roundingMethod = roundingRule.RuleValue;
+                    console.log('[EmbroideryPricingCalculator] Rounding method:', this.roundingMethod);
+                }
+            }
+        } catch (error) {
+            console.warn('[EmbroideryPricingCalculator] Could not fetch rounding rules, using default CeilDollar');
+            this.roundingMethod = 'CeilDollar'; // Default for embroidery
+        }
+    }
+    
+    /**
+     * Round price based on API rules
+     */
+    roundPrice(price) {
+        if (isNaN(price)) return null;
+        
+        // Use API-specified rounding method
+        if (this.roundingMethod === 'CeilDollar') {
+            // Round up to nearest dollar
+            return Math.ceil(price);
+        }
+        
+        // Fallback to half-dollar rounding if different method specified
+        if (price % 0.5 === 0) return price;
+        return Math.ceil(price * 2) / 2;
     }
     
     /**
@@ -122,7 +164,7 @@ class EmbroideryPricingCalculator {
             // Calculate decorated price
             const garmentPrice = avgBasePrice / this.marginDenominator;
             const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
-            const finalPrice = Math.ceil(decoratedPrice * 2) / 2; // Round UP to $0.50
+            const finalPrice = this.roundPrice(decoratedPrice); // Use API-based rounding (CeilDollar)
             
             lineItems.push({
                 description: sizeList.join(' '),
@@ -152,7 +194,7 @@ class EmbroideryPricingCalculator {
             const garmentPrice = avgBasePrice / this.marginDenominator;
             const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
             const upchargeAmount = parseFloat(upcharge);
-            const finalPrice = Math.ceil((decoratedPrice + upchargeAmount) * 2) / 2;
+            const finalPrice = this.roundPrice(decoratedPrice + upchargeAmount); // Use API-based rounding
             
             lineItems.push({
                 description: sizeList.join(' '),
@@ -248,7 +290,7 @@ class EmbroideryPricingCalculator {
     }
     
     /**
-     * Round price up to nearest $0.50
+     * @deprecated Use roundPrice() instead which uses API-based rounding rules
      */
     roundUpToHalf(price) {
         return Math.ceil(price * 2) / 2;
