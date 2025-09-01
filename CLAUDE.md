@@ -265,6 +265,14 @@ Service ID: service_1c4k67j
 - Testing utilities and console commands
 - Performance improvements and fallback system
 
+### Embroidery Quote Builder
+@memory/EMBROIDERY_QUOTE_BUILDER.md
+- Comprehensive sales tool for multi-style embroidery quotes
+- Logo definition with multiple positions and stitch counts
+- Dynamic size matrix with API integration
+- Aggregate tier pricing across all styles
+- Professional quote output with database persistence
+
 ## Key Takeaways
 
 1. **Follow Established Patterns**: All calculators use the same architecture - HTML page, quote service, EmailJS integration

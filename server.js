@@ -157,6 +157,21 @@ app.get('/design-name-generator.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'design-name-generator.html'));
 });
 
+// Serve the standardized embroidery pricing page
+app.get('/embroidery-pricing-standardized.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embroidery-pricing-standardized.html'));
+});
+
+// Serve the professional embroidery pricing page
+app.get('/embroidery-pricing-professional.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embroidery-pricing-professional.html'));
+});
+
+// Serve the embroidery quote builder
+app.get('/embroidery-quote-builder.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embroidery-quote-builder.html'));
+});
+
 app.get('/ae-art-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
 });
