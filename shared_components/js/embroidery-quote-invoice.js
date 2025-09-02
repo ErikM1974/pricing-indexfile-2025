@@ -45,6 +45,7 @@ class EmbroideryInvoiceGenerator {
                 <div class="invoice-container">
                     ${this.generateHeader(pricingData.quoteId, today, expiryDate)}
                     ${this.generateCustomerSection(customerData, salesRepName)}
+                    ${this.generateEmbroiderySpecs(pricingData)}
                     ${this.generateProductsTable(pricingData)}
                     ${this.generateTotalsSection(pricingData, taxAmount, totalWithTax)}
                     ${this.generateFooter(customerData)}
@@ -357,6 +358,68 @@ class EmbroideryInvoiceGenerator {
     }
     
     /**
+     * Generate embroidery specifications section
+     */
+    generateEmbroiderySpecs(pricingData) {
+        if (!pricingData.logos || pricingData.logos.length === 0) {
+            return '';
+        }
+        
+        let specsHTML = `
+            <div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 3px;">
+                <div style="font-size: 11px; font-weight: bold; color: #4cb354; margin-bottom: 5px;">EMBROIDERY SPECIFICATIONS:</div>
+        `;
+        
+        // List all logos
+        pricingData.logos.forEach((logo, index) => {
+            if (logo.isPrimary !== false) {
+                specsHTML += `
+                    <div style="font-size: 10px; color: #333; margin: 2px 0;">
+                        • <strong>Primary Logo:</strong> ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
+                        ${logo.needsDigitizing ? ' <span style="color: #4cb354;">✓ Digitizing included</span>' : ''}
+                    </div>
+                `;
+            }
+        });
+        
+        // Add additional logos if any
+        const additionalLogos = pricingData.logos.filter(l => l.isPrimary === false);
+        additionalLogos.forEach((logo, index) => {
+            specsHTML += `
+                <div style="font-size: 10px; color: #333; margin: 2px 0;">
+                    • <strong>Additional Logo ${index + 2}:</strong> ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
+                    ${logo.needsDigitizing ? ' <span style="color: #4cb354;">✓ Digitizing included</span>' : ''}
+                </div>
+            `;
+        });
+        
+        // Add setup fees if present
+        if (pricingData.setupFees > 0) {
+            const digitizingCount = pricingData.logos.filter(l => l.needsDigitizing).length;
+            if (digitizingCount > 0) {
+                specsHTML += `
+                    <div style="font-size: 10px; color: #666; margin-top: 5px;">
+                        <strong>Setup Fees:</strong> ${digitizingCount} logo${digitizingCount > 1 ? 's' : ''} × $100 digitizing = $${pricingData.setupFees.toFixed(2)}
+                    </div>
+                `;
+            }
+        }
+        
+        // Add LTM notice if applicable
+        if (pricingData.ltmFee > 0) {
+            specsHTML += `
+                <div style="font-size: 9px; color: #dc3545; margin-top: 5px; font-style: italic;">
+                    *Includes small batch pricing for orders under 24 pieces
+                </div>
+            `;
+        }
+        
+        specsHTML += `</div>`;
+        
+        return specsHTML;
+    }
+    
+    /**
      * Generate products table
      */
     generateProductsTable(pricingData) {
@@ -377,54 +440,130 @@ class EmbroideryInvoiceGenerator {
                 <tbody>
         `;
         
-        // Add product rows
+        // Add product rows - consolidate by product/color
         pricingData.products.forEach(pp => {
-            const primaryLogo = pricingData.logos.find(l => l.isPrimary !== false);
-            const hasExtraStitches = primaryLogo && primaryLogo.stitchCount > 8000;
+            const imageUrl = pp.product.imageUrl || '';
             
-            pp.lineItems.forEach(item => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                const imageUrl = pp.product.imageUrl || '';
+            // Group line items - regular sizes first
+            const regularSizes = pp.lineItems.filter(item => {
+                const desc = item.description || '';
+                return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
+                       !desc.includes('5XL') && !desc.includes('6XL') && !desc.includes('XXL');
+            });
+            
+            const extendedSizes = pp.lineItems.filter(item => {
+                const desc = item.description || '';
+                return desc.includes('2XL') || desc.includes('3XL') || desc.includes('4XL') || 
+                       desc.includes('5XL') || desc.includes('6XL') || desc.includes('XXL');
+            });
+            
+            // Add regular sizes row if exists
+            if (regularSizes.length > 0) {
+                const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
+                const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
+                const unitPrice = regularSizes[0].unitPriceWithLTM || regularSizes[0].unitPrice;
                 
-                // Parse size breakdown
-                let sizeDisplay = this.parseSizeDisplay(item);
+                // Combine size descriptions
+                const sizeDesc = regularSizes.map(item => this.parseSizeDisplay(item)).join(' ');
                 
                 tableHTML += `
                     <tr>
-                        <td>${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
-                        <td>${pp.product.style}</td>
-                        <td>${pp.product.color}</td>
+                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
+                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${pp.product.style}</td>
+                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${pp.product.color}</td>
                         <td class="description-cell">
                             <div class="logo-position">${pp.product.title}</div>
-                            <div>Primary: ${primaryLogo ? primaryLogo.position : 'Left Chest'}${hasExtraStitches ? ` <span class="stitch-count">(${primaryLogo.stitchCount.toLocaleString()} stitches)</span>` : ''}</div>
                         </td>
-                        <td class="size-breakdown">${sizeDisplay}</td>
-                        <td>${item.quantity}</td>
-                        <td>$${displayPrice.toFixed(2)}</td>
-                        <td>$${item.total.toFixed(2)}</td>
+                        <td class="size-breakdown">${sizeDesc}</td>
+                        <td>${totalQty}</td>
+                        <td>$${unitPrice.toFixed(2)}</td>
+                        <td>$${totalAmount.toFixed(2)}</td>
                     </tr>
                 `;
-            });
+            }
+            
+            // Add extended sizes row if exists
+            if (extendedSizes.length > 0) {
+                const totalQty = extendedSizes.reduce((sum, item) => sum + item.quantity, 0);
+                const totalAmount = extendedSizes.reduce((sum, item) => sum + item.total, 0);
+                const unitPrice = extendedSizes[0].unitPriceWithLTM || extendedSizes[0].unitPrice;
+                
+                // Combine size descriptions
+                const sizeDesc = extendedSizes.map(item => this.parseSizeDisplay(item)).join(' ');
+                
+                // Don't repeat image/style/color if we already showed regular sizes
+                if (regularSizes.length === 0) {
+                    tableHTML += `
+                        <tr>
+                            <td>${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
+                            <td>${pp.product.style}</td>
+                            <td>${pp.product.color}</td>
+                            <td class="description-cell">
+                                <div class="logo-position">${pp.product.title}</div>
+                            </td>
+                            <td class="size-breakdown">${sizeDesc}</td>
+                            <td>${totalQty}</td>
+                            <td>$${unitPrice.toFixed(2)}</td>
+                            <td>$${totalAmount.toFixed(2)}</td>
+                        </tr>
+                    `;
+                } else {
+                    tableHTML += `
+                        <tr>
+                            <td class="description-cell">
+                                <div style="font-size: 9px; color: #666;">Extended Sizes</div>
+                            </td>
+                            <td class="size-breakdown">${sizeDesc}</td>
+                            <td>${totalQty}</td>
+                            <td>$${unitPrice.toFixed(2)}</td>
+                            <td>$${totalAmount.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            }
         });
         
-        // Add additional services
+        // Add additional services with better formatting
         if (pricingData.additionalServices && pricingData.additionalServices.length > 0) {
+            // Group services by logo
+            const servicesByLogo = {};
             pricingData.additionalServices.forEach(service => {
-                tableHTML += `
-                    <tr class="additional-service-row">
-                        <td></td>
-                        <td>${service.partNumber}</td>
-                        <td>N/A</td>
-                        <td class="description-cell">
-                            <div class="logo-position">${service.type === 'monogram' ? 'Personalized Names' : `Additional Logo #${service.logoNumber || ''}`}</div>
-                            <div>${service.description}</div>
-                        </td>
-                        <td>${service.type === 'monogram' ? `${service.quantity} names` : `Applied to ${service.quantity} items`}</td>
-                        <td>${service.quantity}</td>
-                        <td>$${service.unitPrice.toFixed(2)}</td>
-                        <td>$${service.total.toFixed(2)}</td>
-                    </tr>
-                `;
+                const key = service.logoNumber || 'monogram';
+                if (!servicesByLogo[key]) {
+                    servicesByLogo[key] = [];
+                }
+                servicesByLogo[key].push(service);
+            });
+            
+            // Add each service group
+            Object.entries(servicesByLogo).forEach(([logoKey, services]) => {
+                services.forEach(service => {
+                    const description = service.type === 'monogram' 
+                        ? 'Personalized Names/Monogramming'
+                        : `Additional Logo: ${service.location || service.description}`;
+                    
+                    const appliedTo = service.type === 'monogram'
+                        ? `${service.quantity} names`
+                        : service.products 
+                            ? `${service.products.join(', ')}`
+                            : `${service.quantity} pieces`;
+                    
+                    tableHTML += `
+                        <tr class="additional-service-row">
+                            <td></td>
+                            <td></td>
+                            <td>Service</td>
+                            <td class="description-cell">
+                                <div class="logo-position">${description}</div>
+                                <div style="font-size: 9px; color: #666;">${appliedTo}</div>
+                            </td>
+                            <td></td>
+                            <td>${service.quantity}</td>
+                            <td>$${service.unitPrice.toFixed(2)}</td>
+                            <td>$${service.total.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
             });
         }
         
