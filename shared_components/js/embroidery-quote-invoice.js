@@ -74,7 +74,7 @@ class EmbroideryInvoiceGenerator {
             .invoice-container {
                 max-width: 8.5in;
                 margin: 0 auto;
-                padding: 0.5in;
+                padding: 0.25in;
                 background: white;
             }
             
@@ -83,9 +83,9 @@ class EmbroideryInvoiceGenerator {
                 display: flex;
                 justify-content: space-between;
                 align-items: start;
-                padding-bottom: 20px;
-                border-bottom: 3px solid #4cb354;
-                margin-bottom: 30px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #4cb354;
+                margin-bottom: 15px;
             }
             
             .company-info {
@@ -93,31 +93,31 @@ class EmbroideryInvoiceGenerator {
             }
             
             .company-logo {
-                width: 200px;
+                width: 150px;
                 height: auto;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
             }
             
             .company-details {
-                font-size: 12px;
+                font-size: 10px;
                 color: #666;
-                line-height: 1.4;
+                line-height: 1.2;
             }
             
             .quote-info {
                 text-align: right;
-                flex: 0 0 250px;
+                flex: 0 0 200px;
             }
             
             .quote-title {
-                font-size: 24px;
+                font-size: 18px;
                 font-weight: bold;
                 color: #4cb354;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
             }
             
             .quote-details {
-                font-size: 12px;
+                font-size: 10px;
                 color: #666;
             }
             
@@ -129,10 +129,10 @@ class EmbroideryInvoiceGenerator {
             .customer-section {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 30px;
-                padding: 15px;
+                margin-bottom: 10px;
+                padding: 8px;
                 background: #f8f9fa;
-                border-radius: 5px;
+                border-radius: 3px;
             }
             
             .customer-info, .sales-rep-info {
@@ -140,23 +140,23 @@ class EmbroideryInvoiceGenerator {
             }
             
             .section-title {
-                font-size: 14px;
+                font-size: 11px;
                 font-weight: bold;
                 color: #4cb354;
-                margin-bottom: 5px;
+                margin-bottom: 3px;
             }
             
             .info-line {
-                font-size: 12px;
+                font-size: 10px;
                 color: #666;
-                margin: 2px 0;
+                margin: 1px 0;
             }
             
             /* Products Table */
             .products-table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-bottom: 30px;
+                margin-bottom: 15px;
             }
             
             .products-table thead {
@@ -165,9 +165,9 @@ class EmbroideryInvoiceGenerator {
             }
             
             .products-table th {
-                padding: 10px 8px;
+                padding: 5px 4px;
                 text-align: left;
-                font-size: 12px;
+                font-size: 10px;
                 font-weight: 600;
                 border-right: 1px solid rgba(255,255,255,0.2);
             }
@@ -186,14 +186,14 @@ class EmbroideryInvoiceGenerator {
             }
             
             .products-table td {
-                padding: 8px;
+                padding: 4px;
                 border-bottom: 1px solid #e0e0e0;
-                font-size: 11px;
+                font-size: 9px;
             }
             
             .product-image {
-                width: 40px;
-                height: 40px;
+                width: 30px;
+                height: 30px;
                 object-fit: contain;
                 display: block;
             }
@@ -208,15 +208,15 @@ class EmbroideryInvoiceGenerator {
             }
             
             .stitch-count {
-                font-size: 10px;
+                font-size: 8px;
                 color: #666;
-                display: block;
-                margin-top: 2px;
+                display: inline;
+                margin-left: 3px;
             }
             
             .size-breakdown {
                 font-family: 'Courier New', monospace;
-                font-size: 11px;
+                font-size: 9px;
             }
             
             /* Additional Services */
@@ -396,8 +396,7 @@ class EmbroideryInvoiceGenerator {
                         <td>${pp.product.color}</td>
                         <td class="description-cell">
                             <div class="logo-position">${pp.product.title}</div>
-                            <div>Primary Logo: ${primaryLogo ? primaryLogo.position : 'Left Chest'}</div>
-                            ${hasExtraStitches ? `<span class="stitch-count">${primaryLogo.stitchCount.toLocaleString()} stitches</span>` : ''}
+                            <div>Primary: ${primaryLogo ? primaryLogo.position : 'Left Chest'}${hasExtraStitches ? ` <span class="stitch-count">(${primaryLogo.stitchCount.toLocaleString()} stitches)</span>` : ''}</div>
                         </td>
                         <td class="size-breakdown">${sizeDisplay}</td>
                         <td>${item.quantity}</td>

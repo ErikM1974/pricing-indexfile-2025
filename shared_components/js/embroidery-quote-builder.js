@@ -405,6 +405,10 @@ class EmbroideryQuoteBuilder {
             );
             
             if (result.success) {
+                // Store the quote ID in currentPricing for print
+                if (this.currentPricing) {
+                    this.currentPricing.quoteId = result.quoteID;
+                }
                 this.showSuccessModal(result.quoteID, customerData, this.currentPricing);
             } else {
                 alert('Failed to save quote: ' + result.error);
@@ -431,6 +435,11 @@ class EmbroideryQuoteBuilder {
             
             // Generate quote ID for email
             const quoteId = this.quoteService.generateQuoteID();
+            
+            // Store the quote ID in currentPricing for print
+            if (this.currentPricing) {
+                this.currentPricing.quoteId = quoteId;
+            }
             
             // Send email
             const result = await this.quoteService.sendQuoteEmail(
