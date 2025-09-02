@@ -405,6 +405,10 @@ class EmbroideryQuoteBuilder {
             );
             
             if (result.success) {
+                // Store the quote ID in currentPricing for print
+                if (this.currentPricing) {
+                    this.currentPricing.quoteId = result.quoteID;
+                }
                 this.showSuccessModal(result.quoteID, customerData, this.currentPricing);
             } else {
                 alert('Failed to save quote: ' + result.error);
@@ -431,6 +435,11 @@ class EmbroideryQuoteBuilder {
             
             // Generate quote ID for email
             const quoteId = this.quoteService.generateQuoteID();
+            
+            // Store the quote ID in currentPricing for print
+            if (this.currentPricing) {
+                this.currentPricing.quoteId = quoteId;
+            }
             
             // Send email
             const result = await this.quoteService.sendQuoteEmail(
@@ -466,34 +475,24 @@ class EmbroideryQuoteBuilder {
     handlePrintQuote() {
         if (!this.currentPricing) return;
         
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Embroidery Quote</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; }
-                    .header { text-align: center; margin-bottom: 30px; }
-                    .logo-spec, .product-summary { margin-bottom: 20px; }
-                    .totals { border-top: 2px solid #333; padding-top: 20px; }
-                    .grand-total { font-size: 18px; font-weight: bold; }
-                    @media print { body { margin: 0; } }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>Northwest Custom Apparel</h1>
-                    <h2>Embroidery Quote</h2>
-                    <p>Valid for 30 days</p>
-                </div>
-                ${this.generatePrintHTML()}
-            </body>
-            </html>
-        `);
+        // Get customer data
+        const customerData = this.getCustomerData();
         
+        // Create invoice generator
+        const invoiceGenerator = new EmbroideryInvoiceGenerator();
+        
+        // Generate professional invoice HTML
+        const invoiceHTML = invoiceGenerator.generateInvoiceHTML(this.currentPricing, customerData);
+        
+        // Open print window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(invoiceHTML);
         printWindow.document.close();
-        printWindow.print();
+        
+        // Auto-print after a short delay
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
     }
     
     /**
@@ -557,6 +556,7 @@ class EmbroideryQuoteBuilder {
     validateCustomerInfo() {
         const name = document.getElementById('customer-name')?.value.trim();
         const email = document.getElementById('customer-email')?.value.trim();
+        const salesRep = document.getElementById('sales-rep')?.value;
         
         if (!name) {
             alert('Customer name is required');
@@ -565,6 +565,11 @@ class EmbroideryQuoteBuilder {
         
         if (!email || !email.includes('@')) {
             alert('Valid email address is required');
+            return false;
+        }
+        
+        if (!salesRep) {
+            alert('Please select a sales representative');
             return false;
         }
         
@@ -581,7 +586,8 @@ class EmbroideryQuoteBuilder {
             phone: document.getElementById('customer-phone')?.value.trim(),
             company: document.getElementById('company-name')?.value.trim(),
             project: document.getElementById('project-name')?.value.trim(),
-            notes: document.getElementById('special-notes')?.value.trim()
+            notes: document.getElementById('special-notes')?.value.trim(),
+            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
         };
     }
     
