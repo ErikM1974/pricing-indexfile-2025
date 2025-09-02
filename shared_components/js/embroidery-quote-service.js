@@ -86,6 +86,7 @@ class EmbroideryQuoteService {
                 CustomerName: customerData.name || 'Guest',
                 CompanyName: customerData.company || 'Not Provided',
                 Phone: customerData.phone || '',
+                SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 TotalQuantity: pricingResults.totalQuantity,
                 SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
