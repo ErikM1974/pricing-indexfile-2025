@@ -177,12 +177,12 @@ class EmbroideryInvoiceGenerator {
                 border-right: none;
             }
             
-            .products-table th:nth-child(6),
+            .products-table th:nth-child(6) {
+                text-align: center;
+            }
+            
             .products-table th:nth-child(7),
-            .products-table th:nth-child(8),
-            .products-table td:nth-child(6),
-            .products-table td:nth-child(7),
-            .products-table td:nth-child(8) {
+            .products-table th:nth-child(8) {
                 text-align: right;
             }
             
@@ -218,6 +218,8 @@ class EmbroideryInvoiceGenerator {
             .size-breakdown {
                 font-family: 'Courier New', monospace;
                 font-size: 9px;
+                word-break: break-word;
+                line-height: 1.2;
             }
             
             /* Additional Services */
@@ -431,7 +433,7 @@ class EmbroideryInvoiceGenerator {
                         <th style="width: 60px;">Style #</th>
                         <th style="width: 80px;">Color</th>
                         <th>Description</th>
-                        <th style="width: 120px;">Size</th>
+                        <th style="width: 150px;">Size</th>
                         <th style="width: 40px;">Qty</th>
                         <th style="width: 70px;">Unit Price</th>
                         <th style="width: 80px;">Line Total</th>
@@ -475,9 +477,9 @@ class EmbroideryInvoiceGenerator {
                             <div class="logo-position">${pp.product.title}</div>
                         </td>
                         <td class="size-breakdown">${sizeDesc}</td>
-                        <td>${totalQty}</td>
-                        <td>$${unitPrice.toFixed(2)}</td>
-                        <td>$${totalAmount.toFixed(2)}</td>
+                        <td style="text-align: center;">${totalQty}</td>
+                        <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                        <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
                     </tr>
                 `;
             }
@@ -502,21 +504,20 @@ class EmbroideryInvoiceGenerator {
                                 <div class="logo-position">${pp.product.title}</div>
                             </td>
                             <td class="size-breakdown">${sizeDesc}</td>
-                            <td>${totalQty}</td>
-                            <td>$${unitPrice.toFixed(2)}</td>
-                            <td>$${totalAmount.toFixed(2)}</td>
+                            <td style="text-align: center;">${totalQty}</td>
+                            <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
                         </tr>
                     `;
                 } else {
+                    // When using rowspan, skip the first 3 columns (they're already covered)
                     tableHTML += `
                         <tr>
-                            <td class="description-cell">
-                                <div style="font-size: 9px; color: #666;">Extended Sizes</div>
-                            </td>
+                            <td class="description-cell" style="font-size: 9px; color: #666;">Extended Sizes</td>
                             <td class="size-breakdown">${sizeDesc}</td>
-                            <td>${totalQty}</td>
-                            <td>$${unitPrice.toFixed(2)}</td>
-                            <td>$${totalAmount.toFixed(2)}</td>
+                            <td style="text-align: center;">${totalQty}</td>
+                            <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
                         </tr>
                     `;
                 }
@@ -538,9 +539,14 @@ class EmbroideryInvoiceGenerator {
             // Add each service group
             Object.entries(servicesByLogo).forEach(([logoKey, services]) => {
                 services.forEach(service => {
+                    // Extract clean description without part numbers
+                    let cleanDescription = service.description || service.location || '';
+                    // Remove AL-10000 or similar part numbers from description
+                    cleanDescription = cleanDescription.replace(/AL-\d+\s*/g, '').trim();
+                    
                     const description = service.type === 'monogram' 
                         ? 'Personalized Names/Monogramming'
-                        : `Additional Logo: ${service.location || service.description}`;
+                        : `Additional Logo: ${cleanDescription}`;
                     
                     const appliedTo = service.type === 'monogram'
                         ? `${service.quantity} names`
@@ -558,9 +564,9 @@ class EmbroideryInvoiceGenerator {
                                 <div style="font-size: 9px; color: #666;">${appliedTo}</div>
                             </td>
                             <td></td>
-                            <td>${service.quantity}</td>
-                            <td>$${service.unitPrice.toFixed(2)}</td>
-                            <td>$${service.total.toFixed(2)}</td>
+                            <td style="text-align: center;">${service.quantity}</td>
+                            <td style="text-align: right;">$${service.unitPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${service.total.toFixed(2)}</td>
                         </tr>
                     `;
                 });

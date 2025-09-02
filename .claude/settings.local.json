@@ -26,6 +26,7 @@
       "Read(/mnt/c/Users/erik/OneDrive/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)",
+      "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)"
     ],
     "deny": [],
