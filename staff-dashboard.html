@@ -308,6 +308,24 @@
             cursor: not-allowed;
         }
         
+        /* Disabled button without "Soon" badge - cleaner look */
+        .quick-btn.disabled-no-badge {
+            opacity: 0.4;
+            background: var(--light-bg);
+            border-color: var(--border-color);
+            cursor: not-allowed;
+            pointer-events: none;
+            color: var(--gray-500);
+        }
+        
+        .quick-btn.disabled-no-badge:hover {
+            transform: none;
+            box-shadow: none;
+            background: var(--light-bg);
+            color: var(--gray-500);
+            border-color: var(--border-color);
+        }
+        
         /* Unified Professional Styling - All Calculator Types */
         /* No more rainbow gradients - just clean, professional design */
         
@@ -3791,7 +3809,7 @@
                             <div class="row-label" title="Comprehensive quote tools for multi-style orders">QUOTE BUILDER</div>
                             <div class="button-group">
                                 <a href="/embroidery-quote-builder.html" class="quick-btn" title="Professional quote builder for multi-style embroidery orders">Embroidery Quote</a>
-                                <a href="#" class="quick-btn coming-soon" title="Coming Soon - Cap embroidery quote builder">Cap Embroidery Quote</a>
+                                <a href="#" class="quick-btn disabled-no-badge" title="Coming Soon - Cap embroidery quote builder">Cap Embroidery Quote</a>
                             </div>
                         </div>
                         
