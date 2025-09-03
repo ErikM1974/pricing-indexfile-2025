@@ -86,8 +86,6 @@
         .tab-pane {
             display: none;
             max-width: 100%;
-            overflow-x: auto;
-            overflow-y: visible;
         }
         
         .tab-pane.active {
@@ -185,22 +183,6 @@
             padding: 0;
         }
         
-        /* Caspio isolation for forms */
-        .caspio-isolated {
-            /* Reset all inherited styles */
-            all: initial;
-            /* Restore basic display properties */
-            display: block;
-            width: 100%;
-            /* Let Caspio use its own font stack */
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        
-        .caspio-isolated * {
-            /* Let Caspio styles take precedence */
-            all: revert;
-        }
-        
         /* Ensure the tab panes still display correctly */
         #mockup-tab.tab-pane.active,
         #sendmockup-tab.tab-pane.active {
@@ -217,6 +199,49 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #009900;
         }
+        
+        /* Removed CSS isolation rules that were interfering with Caspio forms */
+        
+        /* Ensure the title stays styled correctly */
+        #mockup-tab > .tab-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #009900;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        
+        /* Ensure Caspio forms and buttons are clickable */
+        #caspioform {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Fix for Caspio inline edit/delete buttons */
+        #mockup-tab .cbResultSetTable,
+        #mockup-tab table,
+        #mockup-tab form {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Ensure Caspio modals and popups appear above everything */
+        .cbFormModal,
+        .cbModalBackground,
+        [id*="cbModal"],
+        [class*="cbModal"] {
+            z-index: 9999 !important;
+        }
+        
+        /* Style for Caspio iframe */
+        #mockup-iframe {
+            width: 100%;
+            min-height: 600px;
+            height: auto;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -230,12 +255,12 @@
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="showTab('gallery')">Gallery View</button>
-            <button class="tab-button" onclick="showTab('table')">Table View</button>
-            <button class="tab-button" onclick="showTab('mockup')">Mockup Queue</button>
-            <button class="tab-button" onclick="showTab('sendmockup')">Send Mockup to AE</button>
-            <button class="tab-button" onclick="showTab('express')">Express Submit Form</button>
-            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
+            <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
+            <button class="tab-button" onclick="showTab('table', event)">Table View</button>
+            <button class="tab-button" onclick="showTab('mockup', event)">Mockup Queue</button>
+            <button class="tab-button" onclick="showTab('sendmockup', event)">Send Mockup to AE</button>
+            <button class="tab-button" onclick="showTab('express', event)">Express Submit Form</button>
+            <button class="tab-button" onclick="showTab('requirements', event)">Art Requirements & Fees</button>
         </div>
         
         <!-- Tab Content -->
@@ -257,19 +282,16 @@
             <!-- Mockup Queue Tab -->
             <div id="mockup-tab" class="tab-pane">
                 <h2 class="tab-title">Artist Mockup Queue</h2>
-                <div style="display: flex; justify-content: center; align-items: center; min-height: 400px;">
-                    <div style="background: linear-gradient(135deg, #009900 0%, #00cc00 100%); border-radius: 12px; padding: 40px 60px; box-shadow: 0 8px 24px rgba(0, 153, 0, 0.3); text-align: center; max-width: 600px;">
-                        <div style="background: white; width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#009900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                        </div>
-                        <h3 style="color: white; font-size: 28px; margin: 0 0 15px 0; font-weight: 600;">Form Coming Soon</h3>
-                        <p style="color: rgba(255, 255, 255, 0.95); font-size: 18px; margin: 0 0 10px 0;">from Erik as of 8-25-2025</p>
-                        <p style="color: rgba(255, 255, 255, 0.85); font-size: 14px; margin: 0;">We're actively working on this feature to improve your workflow.</p>
-                    </div>
-                </div>
+                <!-- Caspio Mockup Queue DataPage Embed in iframe for isolation -->
+                <iframe 
+                    name="Mockup Queue Steve-Ruthie" 
+                    title="Mockup Queue Steve-Ruthie" 
+                    src="https://c3eku948.caspio.com/dp/a0e150003443c5364c5f49f89813"
+                    style="width: 100%; height: 1200px; border: none;"
+                    frameborder="0"
+                    id="mockup-iframe">
+                    Sorry, but your browser does not support frames.
+                </iframe>
             </div>
             
             <!-- Send Mockup to AE Tab -->
@@ -674,8 +696,29 @@
     // Track if a note was successfully submitted
     let noteWasSubmitted = false;
     
-    // Tab switching functionality
-    function showTab(tabName) {
+    // Tab switching functionality with protection against Caspio conflicts
+    function showTab(tabName, event) {
+        // If this was triggered by an event, check if it came from a Caspio element
+        if (event) {
+            // Stop the event from bubbling up
+            event.stopPropagation();
+            
+            // Check if the click originated from within a Caspio form
+            let target = event.target;
+            while (target && target !== document.body) {
+                if (target.id && (target.id.includes('caspio') || target.id.includes('cb'))) {
+                    // This click is from within Caspio, don't switch tabs
+                    return;
+                }
+                if (target.className && typeof target.className === 'string' && 
+                    (target.className.includes('cbResultSet') || target.className.includes('cbForm'))) {
+                    // This click is from within Caspio, don't switch tabs
+                    return;
+                }
+                target = target.parentElement;
+            }
+        }
+        
         // Remove active class from all buttons and panes
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
@@ -717,6 +760,26 @@
         const savedTab = localStorage.getItem('artistDashboardTab');
         if (savedTab && ['table', 'mockup', 'sendmockup', 'express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
+        }
+        
+        // Prevent Caspio clicks from bubbling up and triggering tab switches
+        const mockupTab = document.getElementById('mockup-tab');
+        if (mockupTab) {
+            mockupTab.addEventListener('click', function(e) {
+                // Check if the click is on a Caspio element
+                let target = e.target;
+                while (target && target !== this) {
+                    // Check for Caspio-specific classes or IDs
+                    if ((target.tagName === 'A' && (target.href && target.href.includes('InlineEdit') || target.href && target.href.includes('InlineDelete'))) ||
+                        (target.id && target.id.includes('cb')) ||
+                        (target.className && typeof target.className === 'string' && target.className.includes('cb'))) {
+                        // Stop this event from bubbling further
+                        e.stopPropagation();
+                        break;
+                    }
+                    target = target.parentElement;
+                }
+            }, true); // Use capture phase to catch events early
         }
     });
 
