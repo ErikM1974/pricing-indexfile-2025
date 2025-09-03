@@ -442,11 +442,11 @@ class EmbroideryInvoiceGenerator {
                 <tbody>
         `;
         
-        // Add product rows - consolidate by product/color
+        // Add product rows - consolidate regular sizes, show extended sizes separately
         pricingData.products.forEach(pp => {
             const imageUrl = pp.product.imageUrl || '';
             
-            // Group line items - regular sizes first
+            // Group line items - regular sizes vs extended sizes
             const regularSizes = pp.lineItems.filter(item => {
                 const desc = item.description || '';
                 return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
@@ -459,7 +459,11 @@ class EmbroideryInvoiceGenerator {
                        desc.includes('5XL') || desc.includes('6XL') || desc.includes('XXL');
             });
             
-            // Add regular sizes row if exists
+            // Calculate rowspan for image/style/color columns
+            const totalRows = (regularSizes.length > 0 ? 1 : 0) + extendedSizes.length;
+            let isFirstRow = true;
+            
+            // Add regular sizes row if exists (grouped)
             if (regularSizes.length > 0) {
                 const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
                 const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
@@ -470,9 +474,9 @@ class EmbroideryInvoiceGenerator {
                 
                 tableHTML += `
                     <tr>
-                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
-                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${pp.product.style}</td>
-                        <td rowspan="${extendedSizes.length > 0 ? 2 : 1}">${pp.product.color}</td>
+                        <td rowspan="${totalRows}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
+                        <td rowspan="${totalRows}">${pp.product.style}</td>
+                        <td rowspan="${totalRows}">${pp.product.color}</td>
                         <td class="description-cell">
                             <div class="logo-position">${pp.product.title}</div>
                         </td>
@@ -482,46 +486,45 @@ class EmbroideryInvoiceGenerator {
                         <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
                     </tr>
                 `;
+                isFirstRow = false;
             }
             
-            // Add extended sizes row if exists
-            if (extendedSizes.length > 0) {
-                const totalQty = extendedSizes.reduce((sum, item) => sum + item.quantity, 0);
-                const totalAmount = extendedSizes.reduce((sum, item) => sum + item.total, 0);
-                const unitPrice = extendedSizes[0].unitPriceWithLTM || extendedSizes[0].unitPrice;
+            // Add each extended size on its own row with its own price
+            extendedSizes.forEach((item, index) => {
+                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                const sizeDesc = this.parseSizeDisplay(item);
                 
-                // Combine size descriptions
-                const sizeDesc = extendedSizes.map(item => this.parseSizeDisplay(item)).join(' ');
-                
-                // Don't repeat image/style/color if we already showed regular sizes
-                if (regularSizes.length === 0) {
+                if (isFirstRow) {
+                    // First row includes image/style/color
                     tableHTML += `
                         <tr>
-                            <td>${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
-                            <td>${pp.product.style}</td>
-                            <td>${pp.product.color}</td>
+                            <td rowspan="${totalRows}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
+                            <td rowspan="${totalRows}">${pp.product.style}</td>
+                            <td rowspan="${totalRows}">${pp.product.color}</td>
                             <td class="description-cell">
                                 <div class="logo-position">${pp.product.title}</div>
+                                <div style="font-size: 8px; color: #666;">${sizeDesc}</div>
                             </td>
                             <td class="size-breakdown">${sizeDesc}</td>
-                            <td style="text-align: center;">${totalQty}</td>
-                            <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
+                            <td style="text-align: center;">${item.quantity}</td>
+                            <td style="text-align: right;">$${displayPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${item.total.toFixed(2)}</td>
                         </tr>
                     `;
+                    isFirstRow = false;
                 } else {
-                    // When using rowspan, skip the first 3 columns (they're already covered)
+                    // Subsequent rows skip the first 3 columns (covered by rowspan)
                     tableHTML += `
                         <tr>
-                            <td class="description-cell" style="font-size: 9px; color: #666;">Extended Sizes</td>
+                            <td class="description-cell" style="font-size: 9px; color: #666;">${sizeDesc}</td>
                             <td class="size-breakdown">${sizeDesc}</td>
-                            <td style="text-align: center;">${totalQty}</td>
-                            <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
+                            <td style="text-align: center;">${item.quantity}</td>
+                            <td style="text-align: right;">$${displayPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${item.total.toFixed(2)}</td>
                         </tr>
                     `;
                 }
-            }
+            });
         });
         
         // Add additional services with better formatting

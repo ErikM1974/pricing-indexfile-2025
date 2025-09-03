@@ -63,6 +63,10 @@ class EmbroideryQuoteBuilder {
             this.handleEmailQuote();
         });
         
+        document.getElementById('copy-quote-btn')?.addEventListener('click', () => {
+            this.handleCopyQuote();
+        });
+        
         document.getElementById('print-quote-btn')?.addEventListener('click', () => {
             this.handlePrintQuote();
         });
@@ -428,8 +432,6 @@ class EmbroideryQuoteBuilder {
         if (!this.validateCustomerInfo()) return;
         
         try {
-            this.showLoading(true);
-            
             const customerData = this.getCustomerData();
             const salesRepEmail = document.getElementById('sales-rep-select')?.value || 'sales@nwcustomapparel.com';
             
@@ -441,31 +443,224 @@ class EmbroideryQuoteBuilder {
                 this.currentPricing.quoteId = quoteId;
             }
             
-            // Send email
-            const result = await this.quoteService.sendQuoteEmail(
-                { quoteId },
-                customerData,
-                this.currentPricing,
-                salesRepEmail
-            );
+            // Generate plain text quote
+            const quoteText = this.generatePlainTextQuote(quoteId, customerData, this.currentPricing);
             
-            if (result.success) {
-                // Also save to database
+            // Create mailto link
+            const subject = `Embroidery Quote #${quoteId} - Northwest Custom Apparel`;
+            const to = customerData.email;
+            const cc = salesRepEmail;
+            
+            // URL encode the components
+            const mailtoUrl = `mailto:${encodeURIComponent(to)}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(quoteText)}`;
+            
+            // Open email client
+            window.location.href = mailtoUrl;
+            
+            // Also save to database
+            try {
                 await this.quoteService.saveQuote(
                     { quoteId },
                     customerData,
                     this.currentPricing
                 );
                 
-                this.showSuccessModal(quoteId, customerData, this.currentPricing);
-            } else {
-                alert('Failed to send email: ' + result.error);
+                // Show simple success message after a delay (to allow email client to open)
+                setTimeout(() => {
+                    alert(`Quote #${quoteId} has been prepared in your email client.\n\nPlease review and send the email.`);
+                }, 500);
+            } catch (error) {
+                console.error('Database save error:', error);
+                // Don't block the email from opening if database save fails
             }
         } catch (error) {
             console.error('Email error:', error);
-            alert('Failed to send quote');
-        } finally {
-            this.showLoading(false);
+            alert('Failed to open email client');
+        }
+    }
+    
+    /**
+     * Generate plain text version of quote for email
+     */
+    generatePlainTextQuote(quoteId, customerData, pricingData) {
+        let text = '';
+        
+        // Header
+        text += `EMBROIDERY QUOTE #${quoteId}\n`;
+        text += `Northwest Custom Apparel\n`;
+        text += `${'='.repeat(40)}\n\n`;
+        
+        // Customer info
+        text += `CUSTOMER: ${customerData.name || 'N/A'}\n`;
+        if (customerData.company) text += `COMPANY: ${customerData.company}\n`;
+        text += `EMAIL: ${customerData.email}\n`;
+        if (customerData.phone) text += `PHONE: ${customerData.phone}\n`;
+        text += '\n';
+        
+        // Embroidery specifications
+        text += `EMBROIDERY SPECIFICATIONS:\n`;
+        text += `${'-'.repeat(40)}\n`;
+        pricingData.logos.forEach((logo, idx) => {
+            const isPrimary = logo.isPrimary !== false;
+            const logoType = isPrimary ? 'Primary Logo' : `Additional Logo ${idx}`;
+            text += `${logoType}: ${logo.position}\n`;
+            text += `  ${logo.stitchCount.toLocaleString()} stitches`;
+            if (logo.needsDigitizing) text += ' (Digitizing: $100)';
+            text += '\n';
+        });
+        text += '\n';
+        
+        // Products
+        text += `PRODUCTS:\n`;
+        text += `${'-'.repeat(40)}\n`;
+        pricingData.products.forEach(pp => {
+            text += `${pp.product.style} - ${pp.product.color}\n`;
+            text += `${pp.product.title}\n`;
+            
+            // Group regular sizes
+            const regularSizes = pp.lineItems.filter(item => {
+                const desc = item.description || '';
+                return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
+                       !desc.includes('5XL') && !desc.includes('6XL');
+            });
+            
+            if (regularSizes.length > 0) {
+                const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
+                const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
+                const unitPrice = regularSizes[0].unitPriceWithLTM || regularSizes[0].unitPrice;
+                text += `- Regular sizes (${totalQty} pcs) @ $${unitPrice.toFixed(2)} = $${totalAmount.toFixed(2)}\n`;
+            }
+            
+            // Show each extended size separately
+            const extendedSizes = pp.lineItems.filter(item => {
+                const desc = item.description || '';
+                return desc.includes('2XL') || desc.includes('3XL') || desc.includes('4XL') || 
+                       desc.includes('5XL') || desc.includes('6XL');
+            });
+            
+            extendedSizes.forEach(item => {
+                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                text += `- ${item.description} @ $${displayPrice.toFixed(2)} = $${item.total.toFixed(2)}\n`;
+            });
+            
+            text += '\n';
+        });
+        
+        // Additional services
+        if (pricingData.additionalServices && pricingData.additionalServices.length > 0) {
+            text += `ADDITIONAL SERVICES:\n`;
+            text += `${'-'.repeat(40)}\n`;
+            pricingData.additionalServices.forEach(service => {
+                const desc = service.type === 'monogram' 
+                    ? 'Personalized Names/Monogramming'
+                    : service.description.replace(/AL-\d+\s*/g, '');
+                text += `${desc}\n`;
+                text += `${service.quantity} pieces @ $${service.unitPrice.toFixed(2)} = $${service.total.toFixed(2)}\n`;
+            });
+            text += '\n';
+        }
+        
+        // Totals
+        text += `${'-'.repeat(40)}\n`;
+        text += `Subtotal: $${pricingData.subtotal.toFixed(2)}\n`;
+        if (pricingData.additionalServicesTotal > 0) {
+            text += `Additional Services: $${pricingData.additionalServicesTotal.toFixed(2)}\n`;
+        }
+        if (pricingData.setupFees > 0) {
+            text += `Setup Fees: $${pricingData.setupFees.toFixed(2)}\n`;
+        }
+        text += '\n';
+        text += `Subtotal: $${pricingData.grandTotal.toFixed(2)}\n`;
+        
+        // Tax calculation
+        const taxAmount = pricingData.grandTotal * 0.101;
+        text += `WA Sales Tax (10.1%): $${taxAmount.toFixed(2)}\n`;
+        text += `${'='.repeat(40)}\n`;
+        text += `GRAND TOTAL: $${(pricingData.grandTotal + taxAmount).toFixed(2)}\n`;
+        text += `${'='.repeat(40)}\n\n`;
+        
+        // Footer
+        const today = new Date();
+        const expiryDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+        text += `Valid Until: ${expiryDate.toLocaleDateString()}\n`;
+        text += `\nPayment Terms: 50% deposit required\n`;
+        text += `\n${customerData.notes ? `Notes: ${customerData.notes}\n` : ''}`;
+        text += `\nThank you for your business!\n`;
+        text += `Northwest Custom Apparel\n`;
+        text += `(253) 922-5793\n`;
+        text += `www.nwcustomapparel.com\n`;
+        
+        return text;
+    }
+    
+    /**
+     * Handle copy quote to clipboard
+     */
+    async handleCopyQuote() {
+        if (!this.validateCustomerInfo()) return;
+        
+        try {
+            const customerData = this.getCustomerData();
+            
+            // Generate quote ID
+            const quoteId = this.quoteService.generateQuoteID();
+            
+            // Store the quote ID in currentPricing for consistency
+            if (this.currentPricing) {
+                this.currentPricing.quoteId = quoteId;
+            }
+            
+            // Generate plain text quote
+            const quoteText = this.generatePlainTextQuote(quoteId, customerData, this.currentPricing);
+            
+            // Copy to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                // Modern API
+                await navigator.clipboard.writeText(quoteText);
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = quoteText;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+            
+            // Save to database
+            try {
+                await this.quoteService.saveQuote(
+                    { quoteId },
+                    customerData,
+                    this.currentPricing
+                );
+            } catch (error) {
+                console.error('Database save error:', error);
+            }
+            
+            // Show success message
+            const copyBtn = document.getElementById('copy-quote-btn');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.classList.add('btn-success');
+            copyBtn.classList.remove('btn-secondary');
+            
+            // Revert button after 2 seconds
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.classList.remove('btn-success');
+                copyBtn.classList.add('btn-secondary');
+            }, 2000);
+            
+            // Also show alert
+            alert(`Quote #${quoteId} has been copied to your clipboard.\n\nYou can now paste it into any email client or document.`);
+            
+        } catch (error) {
+            console.error('Copy error:', error);
+            alert('Failed to copy quote to clipboard');
         }
     }
     
