@@ -2185,6 +2185,10 @@
                     <i class="fas fa-hat-cowboy"></i>
                     <span>Caps & Hats</span>
                 </button>
+                <button class="filter-btn" data-type="freshPicks">
+                    <i class="fas fa-sparkles"></i>
+                    <span>Brinton's Fresh Picks 2025</span>
+                </button>
             </div>
         </div>
     </div>
@@ -2470,6 +2474,43 @@
                 { rank: 12, style: '5180', description: 'Hanes Beefy-T - 100 Cotton T-Shirt', brand: 'Hanes' },
                 { rank: 13, style: 'DT6100', description: 'District V.I.T. Fleece Hoodie', brand: 'District' },
                 { rank: 14, style: 'SPRESET', description: 'Screen Reset Charge', brand: 'Service' }
+            ],
+            freshPicks: [
+                // Essential Value Tees
+                { rank: 1, style: 'PC43', description: 'Port & Company Essential Pigment-Dyed Tee', brand: 'Port & Company' },
+                { rank: 2, style: 'PC340', description: 'Port & Company CVC Tee', brand: 'Port & Company' },
+                { rank: 3, style: 'PC330', description: 'Port & Company Tri-Blend Tee', brand: 'Port & Company' },
+                
+                // District Premium Collection
+                { rank: 4, style: 'DT6000', description: 'District Perfect Weight Tee', brand: 'District' },
+                { rank: 5, style: 'DT6200', description: 'District Very Important Tee', brand: 'District' },
+                { rank: 6, style: 'DT106', description: 'District Re-Tee', brand: 'District' },
+                { rank: 7, style: 'DM108', description: 'District Perfect Blend CVC Tee', brand: 'District' },
+                { rank: 8, style: 'DT184', description: 'District Women\'s Perfect Blend CVC Tee', brand: 'District' },
+                { rank: 9, style: 'DT8000', description: 'District Re-Fleece Full-Zip Hoodie', brand: 'District' },
+                { rank: 10, style: 'DM130', description: 'District Perfect Tri Tee', brand: 'District' },
+                { rank: 11, style: 'DT2101', description: 'District Flannel Shirt', brand: 'District' },
+                { rank: 12, style: 'DT6065', description: 'District V.I.T. Heavyweight Tee', brand: 'District' },
+                
+                // Performance Collection
+                { rank: 13, style: 'PC380', description: 'Port & Company Performance Blend Tee', brand: 'Port & Company' },
+                { rank: 14, style: 'ST350', description: 'Sport-Tek PosiCharge Competitor Tee', brand: 'Sport-Tek' },
+                { rank: 15, style: 'ST490', description: 'Sport-Tek Dry Zone Colorblock Raglan Polo', brand: 'Sport-Tek' },
+                
+                // Professional Polos
+                { rank: 16, style: 'K200', description: 'Port Authority Pima Cotton Polo', brand: 'Port Authority' },
+                { rank: 17, style: 'K500', description: 'Port Authority Silk Touch Polo', brand: 'Port Authority' },
+                { rank: 18, style: 'K240', description: 'Port Authority Wearever Performance Pique Polo', brand: 'Port Authority' },
+                { rank: 19, style: 'CS450', description: 'CornerStone Select Lightweight Snag-Proof Tactical Polo', brand: 'CornerStone' },
+                { rank: 20, style: 'MM1014', description: 'Mercer+Mettle Stretch Jersey Polo', brand: 'Mercer+Mettle' },
+                
+                // Comfort Fleece
+                { rank: 21, style: 'DT6150', description: 'District Featherweight French Terry Hoodie', brand: 'District' },
+                { rank: 22, style: 'DT7800', description: 'District Cloud Fleece Hoodie', brand: 'District' },
+                
+                // Headwear Additions
+                { rank: 23, style: 'STC39', description: 'Sport-Tek PosiCharge Competitor Cap', brand: 'Sport-Tek' },
+                { rank: 24, style: 'STC54', description: 'Sport-Tek PosiCharge Competitor Mesh Back Cap', brand: 'Sport-Tek' }
             ]
         };
 
@@ -3033,7 +3074,8 @@
                 'dtg': 'Best for DTG',
                 'screenprint': 'Best for Screen Print',
                 'embroidery': 'Best for Embroidery',
-                'caps': 'Top Selling Cap'
+                'caps': 'Top Selling Cap',
+                'freshPicks': "Brinton's Pick"
             };
             return types[type] || 'Top Seller';
         }
