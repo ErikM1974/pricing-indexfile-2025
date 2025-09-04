@@ -81,6 +81,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            position: relative;
         }
 
         .search-input {
@@ -112,6 +113,79 @@
 
         .search-btn:hover {
             background: var(--primary-dark);
+        }
+        
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-result-item {
+            display: block;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-result-item:hover {
+            background: var(--primary-light);
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #f5f5f5;
+        }
+        
+        .search-result-info {
+            flex: 1;
+        }
+        
+        .search-result-style {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .search-result-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .search-no-results {
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .search-loading {
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
         }
 
         /* Main Container */
@@ -239,10 +313,11 @@
             object-fit: contain;
             border-radius: 12px;
             transition: transform 0.3s ease;
+            cursor: zoom-in;
         }
 
         .product-image:hover {
-            transform: scale(1.05);
+            transform: scale(1.2);
         }
 
         .image-placeholder {
@@ -611,8 +686,8 @@
     <header class="header">
         <div class="header-content">
             <nav class="breadcrumb">
-                <a href="/index.html">Home</a> / 
-                <a href="/products.html">Products</a> / 
+                <a href="/">Home</a> / 
+                <a href="/product.html" id="products-breadcrumb">Products</a> / 
                 <span>Embroidery Pricing</span>
             </nav>
             
@@ -621,7 +696,8 @@
                     type="text" 
                     class="search-input" 
                     id="styleSearch" 
-                    placeholder="Search by style number..."
+                    placeholder="Search by style number or name..."
+                    autocomplete="off"
                 >
                 <button class="search-btn" id="searchBtn">
                     <i class="fas fa-search"></i>
@@ -805,26 +881,122 @@
             setupSearch();
         });
         
-        // Setup search functionality
+        // Setup search functionality with API integration
         function setupSearch() {
             const searchInput = document.getElementById('styleSearch');
             const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
             
-            function performSearch() {
-                const value = searchInput.value.trim();
-                if (value) {
-                    // Reload page with new style
-                    window.location.href = `?StyleNumber=${value}`;
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+            
+            let searchTimeout = null;
+            
+            // Perform API search
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+                
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.classList.add('active');
+                
+                try {
+                    // Search using the same API endpoint as the product page
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+                    
+                    const results = await response.json();
+                    
+                    if (!results || results.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                    } else {
+                        // Build results HTML - results come as {value: "style", label: "name"}
+                        const resultsHTML = results.map(result => {
+                            return `
+                                <div class="search-result-item" data-style="${result.value}">
+                                    <div class="search-result-info">
+                                        <div class="search-result-style">Style #${result.value}</div>
+                                        <div class="search-result-name">${result.label}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        resultsContainer.innerHTML = resultsHTML;
+                        
+                        // Add click handlers to results
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
                 }
             }
             
+            // Handle search input
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+                
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(query);
+                }, 300);
+            });
+            
+            // Handle enter key for direct navigation
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    performSearch();
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        // Try direct style number navigation
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
                 }
             });
             
-            searchBtn.addEventListener('click', performSearch);
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+            
+            // Handle escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    resultsContainer.classList.remove('active');
+                    searchInput.blur();
+                }
+            });
         }
         
         // Load product data
@@ -867,6 +1039,13 @@
                 const pricingData = await embroideryService.fetchPricingData(styleNumber);
                 updatePricing(pricingData);
                 
+                // Update breadcrumb to pass style back to product page
+                const productsBreadcrumb = document.getElementById('products-breadcrumb');
+                if (productsBreadcrumb) {
+                    productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                    console.log('✅ Updated products breadcrumb with style:', styleNumber);
+                }
+                
                 // Show all sections
                 showProduct();
                 
@@ -894,6 +1073,21 @@
             console.log('✅ Product info updated:', { title, description, brand });
         }
         
+        // Helper function to detect generic catalog images
+        function isGenericProductImage(url) {
+            if (!url) return true;
+            
+            // Check for generic catalog image patterns
+            // These are typically: /catalog/images/[STYLE].jpg or similar
+            const genericPatterns = [
+                /\/catalog\/images\/[A-Z0-9]+\.jpg$/i,  // Matches /catalog/images/PC61.jpg
+                /\/catalog\/[A-Z0-9]+\.jpg$/i,          // Matches /catalog/PC61.jpg
+                /\/imglib\/mft\/[A-Z0-9]+\.jpg$/i       // Matches other generic patterns
+            ];
+            
+            return genericPatterns.some(pattern => pattern.test(url));
+        }
+        
         // Set main product image and create thumbnails
         function setMainProductImage(product, colorSpecific = false) {
             console.log('🖼️ Setting main product image with:', product);
@@ -909,10 +1103,11 @@
                 images.push({ url: product.FRONT_FLAT, label: 'Flat', field: 'FRONT_FLAT' });
             }
             
-            // Only add PRODUCT_IMAGE if it's different from other images and exists on this variant
+            // Only add PRODUCT_IMAGE if it's different, not generic, and exists on this variant
             if (product.PRODUCT_IMAGE && 
                 product.PRODUCT_IMAGE !== product.FRONT_MODEL && 
-                product.PRODUCT_IMAGE !== product.FRONT_FLAT) {
+                product.PRODUCT_IMAGE !== product.FRONT_FLAT &&
+                !isGenericProductImage(product.PRODUCT_IMAGE)) {
                 images.push({ url: product.PRODUCT_IMAGE, label: 'Product', field: 'PRODUCT_IMAGE' });
             }
             
@@ -1153,12 +1348,51 @@
             const tier2 = tiers.find(t => t.TierLabel === '48-71');
             const tier3 = tiers.find(t => t.TierLabel === '72+');
             
-            // Get base prices (use fallback if no tier data)
-            const basePrices = {
-                tier1: tier1?.prices?.base || tier1?.prices?.S || 18.00,
-                tier2: tier2?.prices?.base || tier2?.prices?.S || 17.00,
-                tier3: tier3?.prices?.base || tier3?.prices?.S || 16.00
+            // Get base prices from the calculated pricing data
+            // The service returns prices in two formats:
+            // pricingData.pricing['24-47']['S'] or pricingData.prices['S']['24-47']
+            let basePrices = {
+                tier1: 18.00, // Default fallback
+                tier2: 17.00, // Default fallback
+                tier3: 16.00  // Default fallback
             };
+            
+            // Try to get calculated prices from the service
+            if (pricingData.pricing) {
+                // Format: pricingData.pricing['24-47']['S']
+                if (pricingData.pricing['24-47']) {
+                    // Use S size, or first available size
+                    const tier1Prices = pricingData.pricing['24-47'];
+                    basePrices.tier1 = tier1Prices['S'] || tier1Prices['SM'] || Object.values(tier1Prices).find(p => typeof p === 'number') || 18.00;
+                }
+                if (pricingData.pricing['48-71']) {
+                    const tier2Prices = pricingData.pricing['48-71'];
+                    basePrices.tier2 = tier2Prices['S'] || tier2Prices['SM'] || Object.values(tier2Prices).find(p => typeof p === 'number') || 17.00;
+                }
+                if (pricingData.pricing['72+']) {
+                    const tier3Prices = pricingData.pricing['72+'];
+                    basePrices.tier3 = tier3Prices['S'] || tier3Prices['SM'] || Object.values(tier3Prices).find(p => typeof p === 'number') || 16.00;
+                }
+            } else if (pricingData.prices) {
+                // Alternative format: pricingData.prices['S']['24-47']
+                // Find the first available size (S, SM, or any)
+                const availableSizes = Object.keys(pricingData.prices);
+                const baseSize = availableSizes.find(s => s === 'S') || availableSizes.find(s => s === 'SM') || availableSizes[0];
+                
+                if (baseSize && pricingData.prices[baseSize]) {
+                    if (pricingData.prices[baseSize]['24-47']) {
+                        basePrices.tier1 = pricingData.prices[baseSize]['24-47'];
+                    }
+                    if (pricingData.prices[baseSize]['48-71']) {
+                        basePrices.tier2 = pricingData.prices[baseSize]['48-71'];
+                    }
+                    if (pricingData.prices[baseSize]['72+']) {
+                        basePrices.tier3 = pricingData.prices[baseSize]['72+'];
+                    }
+                }
+            }
+            
+            console.log('💰 Calculated base prices:', basePrices);
             
             // Get size upcharges from API data
             const sizeUpcharges = window.currentSizePricing?.sizeUpcharges || {
@@ -1191,11 +1425,27 @@
             // Add extended size rows if we have upcharges
             Object.entries(sizeUpcharges).forEach(([size, upcharge]) => {
                 if (upcharge > 0) {
-                    const extendedRow = document.createElement('tr');
-                    const price1 = basePrices.tier1 + upcharge;
-                    const price2 = basePrices.tier2 + upcharge;
-                    const price3 = basePrices.tier3 + upcharge;
+                    let price1, price2, price3;
                     
+                    // Try to get calculated prices for this specific size first
+                    if (pricingData.pricing) {
+                        // Format: pricingData.pricing['24-47']['2XL']
+                        price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + upcharge);
+                        price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + upcharge);
+                        price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + upcharge);
+                    } else if (pricingData.prices && pricingData.prices[size]) {
+                        // Alternative format: pricingData.prices['2XL']['24-47']
+                        price1 = pricingData.prices[size]?.['24-47'] || (basePrices.tier1 + upcharge);
+                        price2 = pricingData.prices[size]?.['48-71'] || (basePrices.tier2 + upcharge);
+                        price3 = pricingData.prices[size]?.['72+'] || (basePrices.tier3 + upcharge);
+                    } else {
+                        // Fall back to base price + upcharge
+                        price1 = basePrices.tier1 + upcharge;
+                        price2 = basePrices.tier2 + upcharge;
+                        price3 = basePrices.tier3 + upcharge;
+                    }
+                    
+                    const extendedRow = document.createElement('tr');
                     extendedRow.innerHTML = `
                         <td class="size-cell">${size}</td>
                         <td class="price-cell">$${price1.toFixed(2)}</td>
