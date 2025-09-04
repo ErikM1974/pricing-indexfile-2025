@@ -4,1762 +4,1240 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     
-    <!-- Universal Header CSS -->
-    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
-    
-    <!-- Universal Pricing CSS -->
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
-    
-    <!-- Force green theme for consistency -->
-    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
-    
-    <!-- Modern pricing table design -->
-    <link rel="stylesheet" href="/shared_components/css/modern-pricing-table.css">
-    
-    <!-- Layout fixes for embroidery page -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-layout-fix.css">
-    
-    <!-- Legacy styles for compatibility -->
-    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
-    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
-    <link rel="stylesheet" href="/shared_components/css/enhanced-loading-animations.css">
-    <link rel="stylesheet" href="/shared_components/css/embroidery-customization-cool.css">
     <style>
-        /* Override blue theme with green */
         :root {
-            --primary: #3a7c52 !important;
-            --primary-dark: #2d5f3f !important;
-            --primary-color: #3a7c52 !important;
-            --primary-light: #e8f5e9 !important;
-            --secondary: #f5f5f5;
-            --border-color: #e0e0e0;
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --warning-bg: #fef3c7;
+            --warning-border: #fbbf24;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        
-        /* Page-specific overrides */
-        body {
-            background-color: #f9f9f9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+
+        * {
             margin: 0;
             padding: 0;
-            /* padding-top handled by embroidery-layout-fix.css */
+            box-sizing: border-box;
         }
-        
-        /* Enhanced Header Styles */
-        .enhanced-pricing-header {
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
             background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 20px 0;
+            margin-bottom: 40px;
         }
-        
-        /* Top contact bar */
-        .header-contact-bar {
-            background: #2d5f3f;
-            color: white;
-            padding: 10px 0;
-            font-size: 14px;
-        }
-        
-        .contact-bar-content {
-            max-width: 1400px;
+
+        .header-content {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .contact-info {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .contact-item i {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        .business-hours {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        /* Main navigation header */
-        .header-nav {
-            padding: 15px 0;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .nav-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        /* Logo section */
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-        }
-        
-        .logo-link {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        
-        .logo-image {
-            height: 50px;
-            width: auto;
-            max-width: 200px;
-        }
-        
-        /* Pricing context bar */
-        .pricing-context-bar {
-            background: #f8f9fa;
-            padding: 15px 0;
-            border-bottom: 2px solid #3a7c52;
-        }
-        
-        .context-bar-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        /* Breadcrumb */
-        .context-left {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-        
+
         .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             font-size: 14px;
-            color: #666;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        /* Live pricing in header */
-        .header-live-pricing {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 16px;
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
         }
-        
-        .header-price-item {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-        
-        .header-price-label {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .header-price-value {
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: 600;
-            color: #333;
+            transition: background-color 0.3s ease;
         }
-        
-        .header-price-value.highlight {
-            color: #3a7c52;
-            font-size: 18px;
+
+        .search-btn:hover {
+            background: var(--primary-dark);
         }
-        
-        /* Container styling */
-        .universal-pricing-container {
-            max-width: 1400px;
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 0 20px;
         }
-        
-        .universal-pricing-columns {
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
+            gap: 0;
+            min-height: 400px;
         }
-        
-        /* Calculator card styling */
-        .universal-calculator-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            padding: 0;
-        }
-        
-        /* Progress bar */
-        .progress-bar {
-            height: 4px;
-            background: #e0e0e0;
-            position: relative;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #3a7c52;
-            width: 33%;
-            transition: width 0.3s;
-        }
-        
-        /* Product header - Enhanced with shared styles */
-        .product-header {
-            /* Inherits enhanced styles from modern-enhancements.css */
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: var(--space-md) var(--space-lg);
-            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
-            border: 1px solid var(--neutral-200);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: var(--space-md);
-            transition: box-shadow var(--transition-base);
+            padding: 30px;
+            position: relative;
         }
-        
-        .product-header:hover {
-            box-shadow: var(--shadow-md);
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
-        .product-title-area {
-            flex: 1;
-        }
-        
-        .product-title-area h2 {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 1.5em;
-        }
-        
-        .navigation-area {
-            margin-left: 20px;
-        }
-        
-        .product-content {
-            display: flex;
-            padding: 20px;
-            justify-content: space-between;
-        }
-        
-        .product-image-column {
-            flex: 0 0 380px;
-            margin-right: 40px;
-        }
-        
-        .product-image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .color-swatches-column {
-            flex: 1;
-            min-width: 650px;
-            padding: 10px;
-        }
-        
-        /* This is a duplicate rule - the main one is defined below */
-        
-        /* Product Image Gallery - Enhanced with shared styles */
-        .product-image-gallery {
+
+        .product-image-container {
             position: relative;
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Multiple Image Gallery */
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 450px;
         }
         
         .main-image-container {
-            /* Inherits enhanced styles from modern-enhancements.css */
             position: relative;
             width: 100%;
-            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
-            border-radius: var(--radius-lg);
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            margin-bottom: var(--space-md);
-            transition: all var(--transition-base);
-        }
-        
-        .main-image-container:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-        
-        .main-image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            min-height: 400px;
-            object-fit: contain;
-            background-color: white;
-        }
-        
-        .image-loading-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-        
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        .main-image-container.loading .image-loading-spinner {
-            display: block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .image-thumbnails {
             display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) var(--primary-light);
+            gap: 8px;
+            justify-content: center;
         }
         
-        .image-thumbnails::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .image-thumbnails::-webkit-scrollbar-track {
-            background: var(--primary-light);
-            border-radius: 3px;
-        }
-        
-        .image-thumbnails::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
-            border-radius: 3px;
-        }
-        
-        .thumbnail-item {
-            /* Enhanced with shared styles */
-            flex: 0 0 80px;
-            height: 80px;
-            background: white;
-            border: 2px solid var(--neutral-200);
-            border-radius: var(--radius-md);
+        .image-thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid transparent;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
-            transition: all var(--transition-base);
-            position: relative;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
-        .thumbnail-item:hover {
-            border-color: var(--primary-light);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .thumbnail-item.active {
+        .image-thumbnail:hover {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+            transform: scale(1.05);
         }
         
-        .thumbnail-item img {
+        .image-thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+        
+        .image-thumbnail img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
-        .thumbnail-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 0.7em;
-            padding: 2px 4px;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .image-zoom-overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .main-image-container:hover .image-zoom-overlay {
-            opacity: 1;
-        }
-        
-        .zoom-icon {
-            font-size: 20px;
-        }
-        
-        .selected-color-display {
-            margin-top: 10px;
-            text-align: center;
-            padding: 10px;
-            background-color: var(--primary-light);
-            border-radius: var(--radius-sm);
-            font-size: 0.9em;
-            border-left: 3px solid var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .selected-color-display strong {
-            font-weight: bold;
-            color: var(--primary-color);
-            display: inline-block;
-            margin-left: 5px;
-        }
-        
-        .color-swatches-container.compact {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: var(--background-light);
-            border-radius: var(--radius-sm);
-            border-top: 1px solid var(--border-light);
-        }
-        
-        .color-swatches-container.compact .section-title {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--border-light);
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        .color-swatches-container.compact .color-swatches {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-height: 350px;
-            overflow-y: auto;
-            padding: 10px 15px;
-            gap: 15px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) var(--primary-light);
-        }
-        
-        .color-swatches-container.compact .color-swatches::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-track {
-            background: var(--primary-light);
-            border-radius: 10px;
-        }
-        
-        .color-swatches-container.compact .color-swatches::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
-            border-radius: 10px;
-        }
-        
-        /* Simplified Swatch Styles */
-        .swatch-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 70px; /* Adjust as needed */
-            min-height: 75px; /* Ensure enough space for swatch + name */
-            margin: 5px;
-            cursor: pointer;
-            justify-content: flex-start; /* Align items to the top */
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
         }
 
-        .color-swatch {
-            /* Enhanced with shared styles from modern-enhancements.css */
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid var(--neutral-200);
-            margin-bottom: 4px;
-            background-size: cover;
-            background-position: center;
-            transition: all var(--transition-base);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .color-swatch:hover {
-            border-color: var(--primary-color);
-            transform: scale(1.1);
-            box-shadow: var(--shadow-md);
-        }
-
-        .color-swatch.active {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(47, 102, 30, 0.2);
+        .product-image:hover {
             transform: scale(1.05);
         }
 
-        .color-name {
-            font-size: 0.75em;
-            text-align: center;
-            color: var(--text-color);
-            width: 100%; /* Take full width of wrapper */
-            line-height: normal; /* Use default line height */
-            /* margin-top: 2px; */ /* Remove margin-top, rely on swatch margin-bottom */
-            padding: 0 2px;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            display: block; /* Ensure it's a block element */
-        }
-
-        /* Pulse animation for highlighting a swatch */
-        @keyframes pulse-highlight {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
-            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
-        }
-
-        .color-swatch.pulse-highlight {
-            animation: pulse-highlight 1s ease; /* Run once */
-            border-color: var(--primary-color);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .product-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .navigation-area {
-                margin-left: 0;
-                margin-top: 10px;
-                align-self: flex-start;
-            }
-            
-            .product-content {
-                flex-direction: column;
-            }
-            
-            .product-image-column {
-                flex: 0 0 auto;
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 20px;
-            }
-            
-            .color-swatches-column {
-                width: 100%;
-            }
-            
-            .color-swatches-container.compact {
-                margin-top: 10px;
-            }
-            
-            .color-swatches-container.compact .color-swatches {
-                grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
-                max-height: 200px;
-            }
-            
-            /* Make the product image sticky on mobile */
-            .product-image-container {
-                position: sticky;
-                top: 0;
-                background-color: var(--white);
-                z-index: 10;
-                padding: 10px;
-                border-radius: var(--radius-sm);
-                box-shadow: var(--shadow-sm);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .color-swatches-container.compact .color-swatches {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-                gap: 5px;
-            }
-            
-            .color-swatch {
-                width: 35px !important;
-                height: 35px !important;
-                /* Maintain aspect ratio for smaller screens too */
-                aspect-ratio: 1 / 1 !important;
-                min-width: 35px !important;
-                min-height: 35px !important;
-                max-width: 35px !important;
-                max-height: 35px !important;
-            }
-            
-            .color-name {
-                font-size: 0.65em;
-            }
-            
-            .selected-color-display {
-                padding: 8px;
-                font-size: 0.8em;
-            }
-            
-            /* Add a "Show More Colors" button for mobile */
-            .show-more-colors {
-                display: block;
-                margin-top: 10px;
-                text-align: center;
-                padding: 8px;
-                background-color: var(--primary-light);
-                color: var(--primary-color);
-                border: none;
-                border-radius: var(--radius-sm);
-                font-weight: bold;
-                cursor: pointer;
-            }
-            
-            /* Initially limit the height on mobile */
-            .color-swatches-container.compact .color-swatches.collapsed {
-                max-height: 120px;
-                overflow-y: hidden;
-            }
-        }
-    </style>
-    
-    <!-- Add to Cart Simplified UI Styles -->
-    <style>
-        /* Single row quantity layout */
-        .single-row-quantity-container {
-            margin-bottom: var(--spacing-md);
-            overflow-x: auto;
+        .image-placeholder {
             width: 100%;
-        }
-        
-        /* Quantity matrix table styling */
-        .quantity-matrix {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        
-        .quantity-matrix th,
-        .quantity-matrix td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        
-        .quantity-matrix th {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        .quantity-matrix th:first-child,
-        .quantity-matrix td:first-child {
-            text-align: left;
-            font-weight: bold;
-            width: 100px;
-        }
-        
-        /* Price display row styling */
-        #price-display-row td {
-            font-weight: bold;
-            color: var(--primary-color);
-            border-top: 1px solid var(--primary-light);
-            vertical-align: top;
-            padding: 8px;
-            text-align: center;
-        }
-        
-        /* Ensure price displays are properly contained */
-        .size-price-display {
-            display: inline-block;
-            width: 100%;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Quantity input styling - Inherits from modern-enhancements.css */
-        .quantity-input {
-            /* Inherits base styles from shared CSS */
-            width: 40px;
-            padding: 4px;
-        }
-        
-        .quantity-btn {
-            /* Inherits base styles from shared CSS */
-            width: 24px;
-            height: 24px;
-            padding: 0;
-            font-size: 14px;
-        }
-        
-        .quantity-input-container {
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
         }
-        
-        /* Pricing tier info - Now inherits from modern-enhancements.css */
-        .pricing-tier-info {
-            /* Inherits styles from shared CSS - info box styles */
-        }
-        
-        .tier-explanation h4,
-        .ltm-explanation h4 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.1em;
-        }
-        
-        .tier-progress {
-            margin-top: var(--spacing-sm);
-            background-color: var(--white);
-            border-radius: var(--radius-sm);
-            padding: var(--spacing-sm);
-        }
-        
-        .tier-progress-bar {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .tier-point {
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            z-index: 1;
-            position: relative;
+            justify-content: center;
         }
-        
-        .tier-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
-            border: 2px solid var(--primary-color);
-        }
-        
-        .tier-dot.active {
-            background-color: var(--primary-color);
-        }
-        
-        .tier-label {
-            margin-top: 5px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        
-        .tier-line {
-            position: absolute;
-            top: 8px;
-            height: 2px;
-            width: 100%;
-            background-color: var(--primary-light);
-            z-index: 0;
-        }
-        
-        .tier-progress-fill {
-            position: absolute;
-            top: 8px;
-            height: 2px;
-            background-color: var(--primary-color);
-            z-index: 0;
-        }
-        
-        .tier-progress-text {
-            text-align: center;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        .ltm-explanation {
-            margin-top: var(--spacing-md);
-            padding-top: var(--spacing-md);
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
-        
-        .ltm-applied {
-            font-weight: bold;
-            color: #856404;
-        }
-        
-        .ltm-per-item {
-            color: #dc3545;
-        }
-        
-        /* Responsive adjustments for the new UI */
-        @media (max-width: 768px) {
-            .pricing-tier-info {
-                padding: var(--spacing-sm);
-            }
-            
-            .tier-explanation h4,
-            .ltm-explanation h4 {
-                font-size: 1em;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .tier-explanation h4,
-            .ltm-explanation h4 {
-                font-size: 0.9em;
-            }
-            
-            .tier-progress-bar {
-                margin-top: 10px;
-            }
-            
-            .tier-dot {
-                width: 12px;
-                height: 12px;
-            }
-            
-            .tier-label {
-                font-size: 0.7em;
-            }
-            
-            .tier-line {
-                top: 6px;
-            }
-        }
-        
-        
-        /* Header integration adjustments */
-        .container {
-            padding-top: 20px;
-        }
-        
-        /* Hide the old navigation area since we have it in the header now */
-        .product-header .navigation-area {
-            display: none;
-        }
-        
-        /* Main Content Sections - Enhanced */
-        .main-content {
-            padding: var(--space-2xl) 0;
-        }
-        
-        .content-section {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            transition: box-shadow var(--transition-base);
-        }
-        
-        .content-section:hover {
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .content-section h2 {
-            font-size: var(--text-xl);
-            font-weight: var(--font-semibold);
-            margin: 0 0 var(--space-lg) 0;
-            color: var(--primary-dark);
-        }
-        
-        /* CTA Section - Enhanced with gradient background */
-        .cta-section {
-            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
-            border-radius: var(--radius-lg);
-            padding: 40px;
-            text-align: center;
-            margin-top: 40px;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .cta-section h2 {
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
             font-size: 28px;
-            margin: 0 0 10px 0;
-        }
-        
-        .cta-section p {
-            color: var(--gray-700);
-            margin: 0 0 30px 0;
-            font-size: 18px;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        /* Buttons - Now inherit from modern-enhancements.css */
-        .btn {
-            /* Base styles inherited from shared CSS */
-        }
-        
-        .btn-primary {
-            /* Uses add-to-cart-button styles from shared CSS */
-        }
-        
-        .btn-secondary {
-            /* Inherits from shared CSS */
-        }
-        
-        /* Features */
-        .features {
-            margin-top: 30px;
-            line-height: 1.8;
-        }
-        
-        .features p {
-            margin: 5px 0;
-            color: var(--gray-700);
-        }
-        
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .universal-pricing-columns {
-                grid-template-columns: 1fr;
-            }
-            
-            body {
-                padding-top: 250px; /* More space for wrapped header on mobile */
-            }
-            
-            .contact-bar-content,
-            .nav-content,
-            .context-bar-content {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-        }
-        
-        /* Step sections for V3 layout */
-        .step-section {
-            padding: 25px;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 20px;
-        }
-        
-        .step-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        
-        /* Ensure proper spacing between sections */
-        #customization-options-container .step-section {
-            margin-bottom: 0;
-        }
-        
-        #pricing-grid-container .step-section {
-            border-bottom: none;
-        }
-        
-        .step-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .step-number {
-            background: #3a7c52;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 12px;
-        }
-        
-        .step-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        /* Control groups */
-        .control-group {
-            margin-bottom: 25px;
-        }
-        
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .control-label {
-            display: block;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--text-primary);
             margin-bottom: 8px;
-            color: #333;
-        }
-        
-        /* Slider enhancements */
-        .slider-container {
-            background: #f8f8f8;
-            padding: 15px;
-            border-radius: 6px;
-            position: relative;
-        }
-        
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .price-display {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .price-display.positive { color: #d32f2f; }
-        .price-display.negative { color: #2e7d32; }
-        .price-display.neutral { color: #666; }
-        
-        .slider-wrapper {
-            position: relative;
-            margin: 20px 0;
-        }
-        
-        .slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3a7c52;
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3a7c52;
-            cursor: pointer;
-        }
-        
-        /* Slider tooltip */
-        .slider-tooltip {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .slider-tooltip.dual-line {
-            top: -50px;
-            padding: 4px 10px;
             line-height: 1.3;
         }
-        
-        .slider-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 4px solid transparent;
-            border-top-color: #333;
-        }
-        
-        .slider-wrapper:hover .slider-tooltip,
-        .slider:active ~ .slider-tooltip {
-            opacity: 1;
-        }
-        
-        /* Checkbox styling */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        
-        .checkbox-group label {
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        /* Additional logos section */
-        .additional-logos {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .expand-link {
-            color: #3a7c52;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        
-        .expand-link:hover {
-            text-decoration: underline;
-        }
-        
-        .expand-link i {
-            font-size: 12px;
-            transition: transform 0.2s;
-        }
-        
-        .additional-logo-options {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        
-        .additional-logo-options.expanded {
-            max-height: 1000px;
-        }
-        
-        .pricing-info {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .slider-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        /* Quote box styles */
-        .quote-box {
-            background: #f8f8f8;
-            padding: 20px;
-            border-radius: 6px;
-        }
-        
-        .quote-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 15px;
-        }
-        
-        .quote-line.indent {
-            padding-left: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .quote-line.conditional {
-            display: none;
-        }
-        
-        .quote-line.conditional.show {
-            display: flex;
-        }
-        
-        .quote-line.subtotal {
-            border-top: 1px solid #ddd;
-            margin-top: 10px;
-            padding-top: 15px;
-            font-weight: 600;
-        }
-        
-        .quote-line.total {
-            font-size: 18px;
-            font-weight: 700;
-            color: #3a7c52;
-            margin-top: 10px;
-        }
-        
-        .quote-separator {
-            height: 1px;
-            background: #ddd;
-            margin: 15px 0;
-        }
-        
-        .loading-price {
-            color: #999;
-            font-style: italic;
-        }
-        
-        /* Quantity input styling */
-        .quantity-input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
+
+        .product-description {
             font-size: 16px;
-            text-align: center;
-            transition: border-color 0.3s;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
         }
-        
-        .quantity-input:focus {
-            outline: none;
-            border-color: #3a7c52;
-            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
-        }
-        
-        /* Step 3 Pricing Table - Clean Modern Design */
-        .pricing-content {
-            margin-top: 20px;
-        }
-        
-        .pricing-header {
+
+        .product-details {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            background: transparent !important;
-            padding: 0;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
         }
-        
-        .pricing-subtitle {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-            background: transparent !important;
-            padding: 0;
-            display: inline-block;
-        }
-        
-        /* Override any universal grid styles that add green background */
-        #pricing-grid-container .section-title {
-            background: transparent !important;
-            color: #333 !important;
-            padding: 0 !important;
-        }
-        
-        #pricing-grid-container h3 {
-            background: transparent !important;
-        }
-        
-        /* Hide the universal grid's default header since we're using our custom one */
-        #pricing-grid-container .pricing-header:first-child {
-            display: none !important;
-        }
-        
-        /* Ensure our custom pricing header is visible */
-        .step-section .pricing-header {
-            display: flex !important;
-        }
-        
-        .selected-color-indicator {
+
+        .product-detail-item {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
         }
-        
-        .mini-color-swatch {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid #e0e0e0;
-            background-size: cover;
-            background-position: center;
-            background-color: #f5f5f5;
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Info Boxes */
+        .info-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-box.primary {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+
+        .info-box.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+        }
+
+        .info-box i {
+            margin-right: 8px;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .pricing-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .pricing-table th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-table td {
+            padding: 24px 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-table tbody tr:hover {
+            background: rgba(76, 179, 84, 0.05);
+        }
+
+        .pricing-table .size-cell {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pricing-table .price-cell {
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Order Information Section */
+        .order-info-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .order-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .order-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 24px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .order-info-item:hover {
+            background: rgba(76, 179, 84, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .order-info-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             flex-shrink: 0;
         }
-        
-        .selected-color-indicator strong {
-            color: #333;
-            font-weight: 600;
+
+        .order-info-content {
+            flex: 1;
         }
-        
-        /* Pricing table styles moved to modern-pricing-table.css */
-        
-        /* Make the universal pricing grid inherit these styles */
-        #pricing-grid-container .universal-pricing-grid {
-            margin-top: 0;
+
+        .order-info-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
-        
-        #pricing-grid-container .pricing-header {
-            display: none; /* Hide the duplicate header from UniversalPricingGrid */
+
+        .order-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
-        
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .pricing-header {
+            .header-content {
                 flex-direction: column;
-                align-items: flex-start;
+                gap: 20px;
             }
-            
-            .selected-color-indicator {
+
+            .search-wrapper {
                 width: 100%;
             }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image-section {
+                min-height: 300px;
+            }
+
+            .pricing-table th,
+            .pricing-table td {
+                padding: 16px 12px;
+                font-size: 14px;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
         }
-        
+
+        @media (max-width: 480px) {
+            .product-title {
+                font-size: 24px;
+            }
+
+            .pricing-title {
+                font-size: 28px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 24px;
+            }
+
+            .pricing-section,
+            .order-info-section {
+                padding: 24px;
+            }
+        }
     </style>
 </head>
-<body class="universal-theme">
-    <!-- Enhanced Pricing Header -->
-    <header class="enhanced-pricing-header">
-        <!-- Contact Bar -->
-        <div class="header-contact-bar">
-            <div class="contact-bar-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <span>(253) 922-5793</span>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>sales@nwcustomapparel.com</span>
-                    </div>
-                </div>
-                <div class="business-hours">
-                    <i class="fas fa-clock"></i>
-                    Monday - Friday: 8:30 AM - 5:00 PM PST
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main Navigation -->
-        <div class="header-nav">
-            <div class="nav-content">
-                <!-- Logo and Navigation -->
-                <div class="logo-section">
-                    <a href="/" class="logo-link">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                             alt="Northwest Custom Apparel" 
-                             class="logo-image">
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Pricing Context Bar -->
-        <div class="pricing-context-bar">
-            <div class="context-bar-content">
-                <div class="context-left">
-                    <!-- Breadcrumb -->
-                    <div class="breadcrumb">
-                        <span>Embroidery Pricing Calculator</span>
-                    </div>
-                </div>
-                
-                <!-- Live Pricing -->
-                <div class="header-live-pricing">
-                    <div class="header-price-item">
-                        <span class="header-price-label">Qty:</span>
-                        <span id="header-quantity" class="header-price-value">24</span>
-                    </div>
-                    <div class="header-price-item">
-                        <span class="header-price-label">Per Unit:</span>
-                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
-                    </div>
-                </div>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <nav class="breadcrumb">
+                <a href="/index.html">Home</a> / 
+                <a href="/products.html">Products</a> / 
+                <span>Embroidery Pricing</span>
+            </nav>
+            
+            <div class="search-wrapper">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="styleSearch" 
+                    placeholder="Search by style number..."
+                >
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Universal Header Container - Disabled to prevent duplicate header -->
-    <!-- <div id="universal-header-container"></div> -->
-
-    <!-- Main Content -->
-    <div class="universal-pricing-container">
-        
-        <!-- Hidden elements for compatibility with legacy scripts -->
-        <div style="display: none;">
-            <div id="custom-pricing-grid">
-                <table>
-                    <thead>
-                        <tr id="pricing-header-row"></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <h2 id="product-title-context">Product Title</h2>
-            <img id="product-image-main-hidden" src="" alt="">
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
         </div>
 
-        <div class="universal-pricing-columns">
-            <!-- Left Column: Product Display -->
-            <div class="universal-product-column">
-                <!-- Universal Product Display Component will render here -->
-                <div id="product-display"></div>
-            </div>
-            
-            <!-- Right Column: Calculator -->
-            <div class="universal-calculator-column">
-                <div class="universal-calculator-card">
-                    <!-- Progress Bar -->
-                    <div class="progress-bar">
-                        <div id="progress-fill" class="progress-fill"></div>
-                    </div>
-                    
-                    <!-- Step 1: Customization Options -->
-                    <div id="customization-options-container" style="display: block;">
-                        <!-- Customization options will be initialized here -->
-                    </div>
-                    
-                    <!-- Step 2: Quick Quote Calculator -->
-                    <div id="quick-quote-container" style="display: block;"></div>
-                    
-                    <!-- Step 3: Pricing Grid -->
-                    <div id="pricing-grid-container" style="display: block;">
-                        <div class="step-section">
-                            <div class="step-header">
-                                <div class="step-number">3</div>
-                                <h2 class="step-title">Pricing Grid</h2>
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-badge">Embroidery</div>
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
                             </div>
-                            <!-- Pricing table container for embroidery-pricing-v3.js -->
-                            <div id="embroidery-pricing-table-container"></div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+                    
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+
+                    <!-- Info Boxes -->
+                    <div class="info-boxes">
+                        <div class="info-box primary">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Includes a Left Chest Embroidered Logo.</strong> Minimum order 24 pieces.
+                        </div>
+                        
+                        <div class="info-box warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Headwear Note:</strong> Beanies are included in flat embroidery pricing.
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Hidden containers for compatibility -->
-    <div id="pricing-calculator" style="display:none !important; position: absolute; left: -9999px;">
-        <!-- Caspio iframe removed - using direct API -->
-    </div>
-    
-    <!-- Add loading elements for embroidery-enhanced-loading.js -->
-    <div id="pricing-initial-state" style="display:none;"></div>
-    <div id="pricing-table-loading" style="display:none;">
-        <div class="enhanced-loading-container">
-            <div class="loading-spinner"></div>
-            <div id="loading-status">Loading your custom pricing...</div>
-            <div id="loading-step">Connecting to pricing database...</div>
-            <div id="loading-progress-bar" style="width: 0%;"></div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-section" id="pricingSection" style="display: none;">
+            <div class="pricing-header">
+                <h2 class="pricing-title">Embroidery Pricing</h2>
+                <p class="pricing-subtitle">Includes one left chest logo at 8,000 stitches</p>
+            </div>
+            
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Size Range</th>
+                        <th>24-47 pieces</th>
+                        <th>48-71 pieces</th>
+                        <th>72+ pieces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Pricing rows will be dynamically generated -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Information -->
+        <div class="order-info-section" id="orderInfoSection" style="display: none;">
+            <h3 class="order-info-title">Order Information</h3>
+            
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Minimum Order</div>
+                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Orders Under 24</div>
+                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Mix & Match</div>
+                        <div class="order-info-text">Combine different styles and colors to meet quantity tiers for best pricing</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Custom Quotes</div>
+                        <div class="order-info-text">For additional logos or complex designs, please contact our customer service team at 253-922-5793 for a personalized quote.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="custom-pricing-grid" style="display:none;">
-        <table>
-            <thead>
-                <tr id="pricing-header-row"></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    
-    <!-- Hidden elements for UniversalProductDisplay compatibility -->
-    <div style="display: none;">
-        <h2 id="product-title-context">Product Title</h2>
-        <img id="product-image-main-hidden" src="" alt="">
-    </div>
-    
-    <!-- Scripts -->
-    <!-- Core utilities and constants -->
-    <script src="/shared_components/js/nwca-namespace.js"></script>
-    <script src="/shared_components/js/app-config.js"></script>
-    <script src="/shared_components/js/utils.js"></script>
-    <script src="/shared_components/js/constants.js"></script>
-    
-    <!-- Universal Header -->
-    <script src="/shared_components/js/universal-header.js"></script>
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    
-    <!-- Visual components -->
-    <script src="/shared_components/js/universal-image-gallery.js"></script>
-    <script src="/shared_components/js/universal-product-display.js"></script>
-    
-    <!-- Pricing components -->
-    <script src="/shared_components/js/universal-quick-quote.js"></script>
-    <!-- Commented out - embroidery-pricing-v3.js handles the pricing grid -->
-    <!-- <script src="/shared_components/js/universal-pricing-grid.js"></script> -->
-    
-    <!-- Color swatches helper -->
-    <script src="/shared_components/js/dp5-helper.js"></script>
-    
-    <!-- Product URL handler -->
-    <script src="/product-url-handler.js"></script>
-    
-    <!-- Embroidery specific -->
-    <script src="/shared_components/js/pricing-pages.js"></script>
-    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
-    <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/embroidery-enhanced-loading.js"></script>
-    
-    <!-- V3 Enhanced pricing implementation -->
-    <script src="/shared_components/js/embroidery-pricing-v3.js"></script>
-    
-    <!-- Master Bundle Integration -->
-    <!-- Embroidery Pricing Service - Direct API implementation -->
+
+    <!-- JavaScript -->
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
-    
     <script>
-        // Set API URL globally
-        window.API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-        
-        // Enhanced product display functions
-        function updateHeaderPricing(quantity, unitPrice) {
-            const headerQty = document.getElementById('header-quantity');
-            const headerPrice = document.getElementById('header-unit-price');
-            
-            if (headerQty) headerQty.textContent = quantity;
-            if (headerPrice) headerPrice.textContent = typeof unitPrice === 'number' ? `$${unitPrice.toFixed(2)}` : unitPrice;
-        }
-        
-        function updateProgressBar(step) {
-            const progressFill = document.getElementById('progress-fill');
-            if (progressFill) {
-                const percentage = (step / 3) * 100;
-                progressFill.style.width = percentage + '%';
-            }
-        }
-        
-        // Listen for pricing updates
-        document.addEventListener('pricingUpdated', function(event) {
-            if (event.detail) {
-                updateHeaderPricing(event.detail.quantity, event.detail.unitPrice);
-            }
-        });
-        
-        // API-based pricing data loading (no iframe needed)
+        // Initialize embroidery pricing service
         const embroideryService = new EmbroideryPricingService();
         
-        // Function to load pricing data via API
-        function loadEmbroideryPricingData(styleNumber, color) {
-            if (!styleNumber) return;
-            
-            embroideryService.fetchPricingData(styleNumber).then(data => {
-                console.log('[EMBROIDERY] Pricing data loaded:', data);
-                // Dispatch event for embroidery-pricing-v3.js
-                document.dispatchEvent(new CustomEvent('embroideryPricingDataLoaded', {
-                    detail: data
-                }));
-            }).catch(error => {
-                console.error('[EMBROIDERY] Failed to load pricing:', error);
-            });
-        }
+        // State
+        let currentProduct = null;
+        let currentColors = [];
+        let selectedColor = null;
         
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('[EMBROIDERY] Page initialized');
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const productHero = document.getElementById('productHero');
+        const pricingSection = document.getElementById('pricingSection');
+        const orderInfoSection = document.getElementById('orderInfoSection');
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎨 Embroidery Pricing Page - Professional Layout');
             
-            // Set flag to indicate we're using API mode for embroidery
-            window.EMBROIDERY_API_MODE = true;
+            // Get style from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('StyleNumber') || urlParams.get('STYLE_No') || urlParams.get('style');
             
-            // Status display for API mode
-            console.log('===================================');
-            console.log('🚀 Embroidery Pricing System: Direct API Mode');
-            console.log('📦 API endpoint: /api/pricing-bundle?method=EMB');
-            console.log('🧪 Test API: EMBROIDERY_API_TEST.testAPI()');
-            console.log('📊 Check status: EMBROIDERY_API_TEST.checkStatus()');
-            console.log('🗑️ Clear cache: EMBROIDERY_API_TEST.clearCache()');
-            console.log('===================================');
-            
-            // Initialize product context from URL parameters
-            if (window.initializeProductFromURL) {
-                window.initializeProductFromURL();
-                
-                // Update iframe with URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const styleNumber = urlParams.get('style') || urlParams.get('styleNumber');
-                const color = urlParams.get('color') || urlParams.get('COLOR');
-                
-                if (styleNumber) {
-                    loadEmbroideryPricingData(styleNumber, color);
-                }
+            if (styleNumber) {
+                loadProduct(styleNumber);
+            } else {
+                showNoProduct();
             }
             
-            // Set initial progress
-            updateProgressBar(1);
-            
-            // Initialize with default values
-            updateHeaderPricing(24, '$0.00');
-            
-            // Initialize Universal Product Display
-            const productDisplay = new UniversalProductDisplay({
-                containerId: 'product-display',
-                pageType: 'embroidery',
-                showBackButton: true,
-                showInfoBox: true,
-                infoBoxContent: '<strong>Base pricing includes:</strong> 8,000 stitch embroidered logo.<br><small>Additional logo locations available in configuration.</small>',
-                showSelectedColor: true,
-                enableGallery: true,
-                enableSwatches: true,
-                mobileColorLimit: 8,
-                sticky: false
-            });
-            
-            // Comment out Universal Pricing Grid - embroidery-pricing-v3.js handles the pricing table
-            // const pricingGrid = new UniversalPricingGrid({
-            //     containerId: 'pricing-grid-container',
-            //     showInventory: true,
-            //     inventoryThreshold: 10,
-            //     loadingAnimation: true,
-            //     showColorIndicator: true
-            // });
-            
-            // Update color when changed
-            window.addEventListener('colorChanged', (event) => {
-                if (event.detail) {
-                    // pricingGrid.updateSelectedColor(event.detail.COLOR_NAME, event.detail);
-                    
-                    // Update master bundle iframe with new color
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const styleNumber = urlParams.get('style') || urlParams.get('styleNumber') || window.selectedStyleNumber;
-                    const colorName = event.detail.COLOR_NAME || event.detail.color;
-                    
-                    if (styleNumber && colorName) {
-                        loadEmbroideryPricingData(styleNumber, colorName);
-                    }
-                }
-            });
-            
-            // Highlight active tier when quantity changes
-            window.addEventListener('quantityChanged', (event) => {
-                if (event.detail && event.detail.totalQuantity) {
-                    // pricingGrid.highlightActiveTier(event.detail.totalQuantity);
-                    // Trigger a re-render of the pricing table to update active tier
-                    if (window.nwcaMasterBundleData) {
-                        const renderEvent = new Event('renderPricingTable');
-                        document.dispatchEvent(renderEvent);
-                    }
-                }
-            });
-            
-            // Header will auto-initialize from the component script
+            // Setup search
+            setupSearch();
         });
         
-        // Testing utilities for embroidery pricing API
-        window.EMBROIDERY_API_TEST = {
-            async testAPI(styleNumber = 'PC54') {
-                console.log(`🧪 Testing embroidery API for style: ${styleNumber}`);
-                try {
-                    const data = await embroideryService.fetchPricingData(styleNumber, {forceRefresh: true});
-                    console.log('✅ API test successful!', data);
-                    return data;
-                } catch(error) {
-                    console.error('❌ API test failed:', error);
-                    return null;
-                }
-            },
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
             
-            checkStatus() {
-                const status = embroideryService.getStatus();
-                console.log('📊 Service Status:', status);
-                return status;
-            },
-            
-            clearCache() {
-                embroideryService.clearCache();
-                console.log('🗑️ Cache cleared');
-            },
-            
-            async reload() {
-                const params = new URLSearchParams(window.location.search);
-                const styleNumber = params.get('StyleNumber');
-                if (styleNumber) {
-                    console.log(`🔄 Reloading pricing for ${styleNumber}...`);
-                    await loadEmbroideryPricingData(styleNumber);
-                } else {
-                    console.log('⚠️ No StyleNumber in URL');
-                }
-            },
-            
-            async compareCalculations(quantity = 24) {
-                const params = new URLSearchParams(window.location.search);
-                const styleNumber = params.get('StyleNumber') || 'PC54';
-                console.log(`🔬 Comparing calculations for ${styleNumber}, qty: ${quantity}`);
-                
-                try {
-                    const data = await embroideryService.fetchPricingData(styleNumber);
-                    const tierData = data.tierData.find(t => 
-                        quantity >= t.MinQuantity && quantity <= t.MaxQuantity
-                    );
-                    
-                    if (tierData) {
-                        console.log('Tier:', tierData.TierLabel);
-                        console.log('Margin:', tierData.MarginDenominator);
-                        console.log('Standard Garment Cost:', data.standardGarmentBaseCostUsed);
-                        console.log('Pricing:', data.pricing[tierData.TierLabel]);
-                    }
-                    
-                    return data;
-                } catch(error) {
-                    console.error('Comparison failed:', error);
+            function performSearch() {
+                const value = searchInput.value.trim();
+                if (value) {
+                    // Reload page with new style
+                    window.location.href = `?StyleNumber=${value}`;
                 }
             }
-        };
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            searchBtn.addEventListener('click', performSearch);
+        }
+        
+        // Load product data
+        async function loadProduct(styleNumber) {
+            console.log(`🎨 Loading product: ${styleNumber}`);
+            
+            try {
+                showLoading();
+                
+                // Fetch product details - API returns array
+                console.log('📡 Fetching product details...');
+                const productResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
+                if (!productResponse.ok) {
+                    throw new Error(`Product details API error: ${productResponse.status}`);
+                }
+                
+                const productArray = await productResponse.json();
+                console.log('📦 Product details response:', productArray);
+                
+                // API returns array - use first item or find by color
+                if (!productArray || productArray.length === 0) {
+                    throw new Error('No product data found');
+                }
+                
+                currentProduct = productArray[0]; // Use first item as base product info
+                
+                // Update product info
+                updateProductInfo(currentProduct, styleNumber);
+                
+                // Set initial main product image from product data
+                setMainProductImage(currentProduct);
+                
+                // Load colors and images
+                await loadColors(styleNumber);
+                
+                // Load size pricing for upcharges
+                await loadSizePricing(styleNumber);
+                
+                // Load pricing data
+                const pricingData = await embroideryService.fetchPricingData(styleNumber);
+                updatePricing(pricingData);
+                
+                // Show all sections
+                showProduct();
+                
+            } catch (error) {
+                console.error('❌ Error loading product:', error);
+                showNoProduct();
+            }
+        }
+        
+        // Update product information
+        function updateProductInfo(product, styleNumber) {
+            console.log('📝 Updating product info with:', product);
+            
+            // Extract product info from API response
+            const title = product.PRODUCT_TITLE || product.ProductTitle || product.STYLE || styleNumber.toUpperCase();
+            const description = product.PRODUCT_DESCRIPTION || product.Description || product.PRODUCT_TITLE || '';
+            const brand = product.BRAND_NAME || product.BRAND || product.Brand || 'Unknown Brand';
+            
+            // Update UI elements
+            document.getElementById('productTitle').textContent = title;
+            document.getElementById('productDescription').textContent = description;
+            document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+            document.getElementById('currentBrand').textContent = brand;
+            
+            console.log('✅ Product info updated:', { title, description, brand });
+        }
+        
+        // Set main product image and create thumbnails
+        function setMainProductImage(product, colorSpecific = false) {
+            console.log('🖼️ Setting main product image with:', product);
+            
+            // Collect all available images ONLY from this specific product/color variant
+            const images = [];
+            
+            // Add images in priority order, but only if they exist on THIS product variant
+            if (product.FRONT_MODEL) {
+                images.push({ url: product.FRONT_MODEL, label: 'Model', field: 'FRONT_MODEL' });
+            }
+            if (product.FRONT_FLAT) {
+                images.push({ url: product.FRONT_FLAT, label: 'Flat', field: 'FRONT_FLAT' });
+            }
+            
+            // Only add PRODUCT_IMAGE if it's different from other images and exists on this variant
+            if (product.PRODUCT_IMAGE && 
+                product.PRODUCT_IMAGE !== product.FRONT_MODEL && 
+                product.PRODUCT_IMAGE !== product.FRONT_FLAT) {
+                images.push({ url: product.PRODUCT_IMAGE, label: 'Product', field: 'PRODUCT_IMAGE' });
+            }
+            
+            // Only add back/side images if they exist on THIS color variant
+            // Skip these if we're loading color-specific images to avoid mixing colors
+            if (!colorSpecific || (product.BACK_FLAT && product.COLOR_NAME === selectedColor?.COLOR_NAME)) {
+                if (product.BACK_FLAT) {
+                    images.push({ url: product.BACK_FLAT, label: 'Back', field: 'BACK_FLAT' });
+                }
+            }
+            
+            if (!colorSpecific || (product.SIDE_MODEL && product.COLOR_NAME === selectedColor?.COLOR_NAME)) {
+                if (product.SIDE_MODEL) {
+                    images.push({ url: product.SIDE_MODEL, label: 'Side', field: 'SIDE_MODEL' });
+                }
+            }
+            
+            console.log('🖼️ Found images for color:', product.COLOR_NAME || 'default', images);
+            
+            // Set main image
+            const mainImageUrl = images[0]?.url || null;
+            if (mainImageUrl) {
+                const img = document.getElementById('productImage');
+                const placeholder = document.getElementById('imagePlaceholder');
+                
+                img.src = mainImageUrl;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                // Handle image load error
+                img.onerror = () => {
+                    console.log('❌ Main image failed to load:', mainImageUrl);
+                    img.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                };
+                
+                img.onload = () => {
+                    console.log('✅ Main image loaded successfully:', mainImageUrl);
+                };
+                
+                // Create thumbnails if we have multiple images
+                if (images.length > 1) {
+                    createImageThumbnails(images);
+                }
+            } else {
+                console.log('⚠️ No images found in product data');
+            }
+        }
+        
+        // Create image thumbnails for multiple views
+        function createImageThumbnails(images) {
+            const thumbnailsContainer = document.getElementById('imageThumbnails');
+            thumbnailsContainer.innerHTML = '';
+            
+            images.forEach((image, index) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'image-thumbnail';
+                if (index === 0) thumbnail.classList.add('active');
+                
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.alt = image.label;
+                img.title = image.label;
+                
+                thumbnail.appendChild(img);
+                
+                // Add click handler
+                thumbnail.addEventListener('click', () => {
+                    // Update main image
+                    const mainImg = document.getElementById('productImage');
+                    mainImg.src = image.url;
+                    
+                    // Update active thumbnail
+                    document.querySelectorAll('.image-thumbnail').forEach(t => t.classList.remove('active'));
+                    thumbnail.classList.add('active');
+                    
+                    console.log('🖼️ Switched to image:', image.label);
+                });
+                
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+            
+            thumbnailsContainer.style.display = 'flex';
+            console.log('✅ Created', images.length, 'thumbnails');
+        }
+        
+        // Load colors and images
+        async function loadColors(styleNumber) {
+            try {
+                console.log('🎨 Fetching color swatches...');
+                const colorsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
+                if (colorsResponse.ok) {
+                    const colorsArray = await colorsResponse.json();
+                    console.log('🎨 Color swatches response:', colorsArray);
+                    
+                    // API returns array directly
+                    const colors = Array.isArray(colorsArray) ? colorsArray : [];
+                    currentColors = colors;
+                    
+                    if (colors.length > 0) {
+                        // Set first color as selected
+                        selectedColor = colors[0];
+                        updateSelectedColor(selectedColor);
+                        
+                        // Show color swatches if we have more than one
+                        if (colors.length > 1) {
+                            displayColorSwatches(colors);
+                        }
+                        
+                        console.log(`✅ Loaded ${colors.length} colors, selected:`, selectedColor.COLOR_NAME || selectedColor.color);
+                    } else {
+                        console.log('⚠️ No colors found, using placeholder');
+                    }
+                } else {
+                    console.log(`⚠️ Colors API returned ${colorsResponse.status}`);
+                }
+            } catch (error) {
+                console.log('❌ Could not load colors:', error);
+                // Use default image placeholder
+            }
+        }
+        
+        // Display color swatches
+        function displayColorSwatches(colors) {
+            const swatchesContainer = document.getElementById('colorSwatches');
+            const swatchesSection = document.getElementById('colorSwatchesSection');
+            
+            swatchesContainer.innerHTML = '';
+            
+            colors.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                if (index === 0) swatch.classList.add('active');
+                
+                swatch.innerHTML = `<img src="${color.COLOR_SQUARE_IMAGE || color.swatchUrl}" alt="${color.COLOR_NAME || color.color}">`;
+                swatch.title = color.COLOR_NAME || color.color;
+                
+                swatch.addEventListener('click', () => {
+                    // Remove active class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    
+                    // Update selected color
+                    selectedColor = color;
+                    updateSelectedColor(color);
+                });
+                
+                swatchesContainer.appendChild(swatch);
+            });
+            
+            swatchesSection.style.display = 'block';
+        }
+        
+        // Load size pricing for upcharges
+        async function loadSizePricing(styleNumber) {
+            try {
+                console.log('📏 Fetching size pricing...');
+                const sizePricingResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                if (sizePricingResponse.ok) {
+                    const sizePricingArray = await sizePricingResponse.json();
+                    console.log('📏 Size pricing response:', sizePricingArray);
+                    
+                    // API returns array - use first item or find by color
+                    if (sizePricingArray && sizePricingArray.length > 0) {
+                        const sizePricingData = sizePricingArray[0]; // Use first item
+                        console.log('📏 Using size pricing data:', sizePricingData);
+                        
+                        // Store for use in pricing table
+                        window.currentSizePricing = sizePricingData;
+                    }
+                } else {
+                    console.log(`⚠️ Size pricing API returned ${sizePricingResponse.status}`);
+                }
+            } catch (error) {
+                console.log('❌ Could not load size pricing:', error);
+            }
+        }
+
+        // Update selected color
+        function updateSelectedColor(color) {
+            console.log('🎨 Updating selected color:', color);
+            
+            const colorName = color.COLOR_NAME || color.color || 'Natural';
+            document.getElementById('currentColor').textContent = colorName;
+            
+            // Find matching product image from product-details data based on color
+            updateMainImageForColor(colorName);
+        }
+        
+        // Update main product image for selected color
+        function updateMainImageForColor(colorName) {
+            console.log('🖼️ Finding image for color:', colorName);
+            
+            // Find matching product from original product data that has the same color and has image
+            const productResponse = fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${currentProduct.STYLE}`)
+                .then(response => response.json())
+                .then(productArray => {
+                    // Find ALL product entries that match this specific color
+                    const matchingProducts = productArray.filter(p => p.COLOR_NAME === colorName);
+                    
+                    if (matchingProducts.length > 0) {
+                        // Merge all image fields from products with this color
+                        const mergedProduct = { ...matchingProducts[0] };
+                        
+                        // Collect all unique image URLs from this color's variants
+                        matchingProducts.forEach(p => {
+                            if (p.FRONT_MODEL && !mergedProduct.FRONT_MODEL) mergedProduct.FRONT_MODEL = p.FRONT_MODEL;
+                            if (p.FRONT_FLAT && !mergedProduct.FRONT_FLAT) mergedProduct.FRONT_FLAT = p.FRONT_FLAT;
+                            if (p.PRODUCT_IMAGE && !mergedProduct.PRODUCT_IMAGE) mergedProduct.PRODUCT_IMAGE = p.PRODUCT_IMAGE;
+                            if (p.BACK_FLAT && !mergedProduct.BACK_FLAT) mergedProduct.BACK_FLAT = p.BACK_FLAT;
+                            if (p.SIDE_MODEL && !mergedProduct.SIDE_MODEL) mergedProduct.SIDE_MODEL = p.SIDE_MODEL;
+                        });
+                        
+                        // Update with all images for this specific color only
+                        setMainProductImage(mergedProduct, true);
+                        console.log('✅ Updated images for color:', colorName, 'with', matchingProducts.length, 'variants');
+                    } else {
+                        console.log('⚠️ No matching product found for color:', colorName);
+                        // Use the original default image
+                        setMainProductImage(currentProduct, false);
+                    }
+                })
+                .catch(error => {
+                    console.log('❌ Error fetching color-specific image:', error);
+                    // Fall back to original image
+                    setMainProductImage(currentProduct, false);
+                });
+        }
+        
+        // Update pricing table with multiple size rows
+        function updatePricing(pricingData) {
+            console.log('💰 Updating pricing table with:', pricingData);
+            
+            const tiers = pricingData.tierData || [];
+            
+            // Get pricing tiers
+            const tier1 = tiers.find(t => t.TierLabel === '24-47');
+            const tier2 = tiers.find(t => t.TierLabel === '48-71');
+            const tier3 = tiers.find(t => t.TierLabel === '72+');
+            
+            // Get base prices (use fallback if no tier data)
+            const basePrices = {
+                tier1: tier1?.prices?.base || tier1?.prices?.S || 18.00,
+                tier2: tier2?.prices?.base || tier2?.prices?.S || 17.00,
+                tier3: tier3?.prices?.base || tier3?.prices?.S || 16.00
+            };
+            
+            // Get size upcharges from API data
+            const sizeUpcharges = window.currentSizePricing?.sizeUpcharges || {
+                '2XL': 2.00,
+                '3XL': 3.00,  
+                '4XL': 4.00,
+                '5XL': 6.00
+            };
+            
+            console.log('💰 Base prices:', basePrices);
+            console.log('💰 Size upcharges:', sizeUpcharges);
+            
+            // Build pricing table HTML with multiple rows
+            const pricingTable = document.querySelector('.pricing-table');
+            const tbody = pricingTable.querySelector('tbody');
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Add base sizes row
+            const baseRow = document.createElement('tr');
+            baseRow.innerHTML = `
+                <td class="size-cell">S, M, L, XL</td>
+                <td class="price-cell">$${basePrices.tier1.toFixed(2)}</td>
+                <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
+                <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
+            `;
+            tbody.appendChild(baseRow);
+            
+            // Add extended size rows if we have upcharges
+            Object.entries(sizeUpcharges).forEach(([size, upcharge]) => {
+                if (upcharge > 0) {
+                    const extendedRow = document.createElement('tr');
+                    const price1 = basePrices.tier1 + upcharge;
+                    const price2 = basePrices.tier2 + upcharge;
+                    const price3 = basePrices.tier3 + upcharge;
+                    
+                    extendedRow.innerHTML = `
+                        <td class="size-cell">${size}</td>
+                        <td class="price-cell">$${price1.toFixed(2)}</td>
+                        <td class="price-cell">$${price2.toFixed(2)}</td>
+                        <td class="price-cell">$${price3.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(extendedRow);
+                }
+            });
+            
+            console.log('✅ Pricing table updated with multiple size tiers');
+        }
+        
+        // Show loading state
+        function showLoading() {
+            loadingState.style.display = 'flex';
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
+        
+        // Show product sections
+        function showProduct() {
+            loadingState.style.display = 'none';
+            productHero.style.display = 'block';
+            pricingSection.style.display = 'block';
+            orderInfoSection.style.display = 'block';
+        }
+        
+        // Show no product state
+        function showNoProduct() {
+            loadingState.style.display = 'none';
+            
+            // Update loading text to show no product
+            document.querySelector('.loading p').textContent = 'No product selected. Please search for a product style number above.';
+            document.querySelector('.loading i').className = 'fas fa-search';
+            loadingState.style.display = 'flex';
+            
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
     </script>
-    
 </body>
 </html>
