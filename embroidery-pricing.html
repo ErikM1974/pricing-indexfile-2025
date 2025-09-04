@@ -764,7 +764,7 @@
                     <div class="info-boxes">
                         <div class="info-box primary">
                             <i class="fas fa-check-circle"></i>
-                            <strong>Includes a Left Chest Embroidered Logo.</strong> Minimum order 24 pieces.
+                            <strong>Includes a Left Chest Embroidered Logo.</strong> Minimum order 24 pieces. Orders under 24 pieces incur a $50.00 LTM (Less Than Minimum) fee.
                         </div>
                         
                         <div class="info-box warning">
@@ -1394,16 +1394,16 @@
             
             console.log('💰 Calculated base prices:', basePrices);
             
-            // Get size upcharges from API data
-            const sizeUpcharges = window.currentSizePricing?.sizeUpcharges || {
-                '2XL': 2.00,
-                '3XL': 3.00,  
-                '4XL': 4.00,
-                '5XL': 6.00
-            };
+            // Get sizes with sortOrder from API data
+            const sizesWithOrder = pricingData.apiData?.sizes || [];
+            const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
+            
+            // Sort by sortOrder
+            const sortedSizes = [...sizesWithOrder].sort((a, b) => a.sortOrder - b.sortOrder);
             
             console.log('💰 Base prices:', basePrices);
-            console.log('💰 Size upcharges:', sizeUpcharges);
+            console.log('📏 Sorted sizes:', sortedSizes);
+            console.log('💰 Display add-ons:', displayAddOns);
             
             // Build pricing table HTML with multiple rows
             const pricingTable = document.querySelector('.pricing-table');
@@ -1422,14 +1422,23 @@
             `;
             tbody.appendChild(baseRow);
             
-            // Add extended size rows if we have upcharges
-            Object.entries(sizeUpcharges).forEach(([size, upcharge]) => {
+            // Filter for extended sizes that have upcharges
+            const baseSizeNames = ['S', 'M', 'L', 'XL'];
+            const extendedSizes = sortedSizes.filter(s => 
+                !baseSizeNames.includes(s.size) && displayAddOns[s.size] > 0
+            );
+            
+            // Add extended size rows in sorted order
+            extendedSizes.forEach(sizeData => {
+                const size = sizeData.size;
+                const upcharge = displayAddOns[size] || 0;
+                
                 if (upcharge > 0) {
                     let price1, price2, price3;
                     
                     // Try to get calculated prices for this specific size first
                     if (pricingData.pricing) {
-                        // Format: pricingData.pricing['24-47']['2XL']
+                        // Format: pricingData.pricing['24-47']['2XL'] or ['XXL']
                         price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + upcharge);
                         price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + upcharge);
                         price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + upcharge);
@@ -1456,7 +1465,7 @@
                 }
             });
             
-            console.log('✅ Pricing table updated with multiple size tiers');
+            console.log('✅ Pricing table updated with multiple size tiers in correct sort order');
         }
         
         // Show loading state
