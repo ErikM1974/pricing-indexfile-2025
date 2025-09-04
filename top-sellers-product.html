@@ -618,9 +618,40 @@
         </div>
     </header>
 
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav" style="background: white; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                <a href="/top-sellers-showcase.html" 
+                   style="color: var(--primary-color); text-decoration: none; font-weight: 500; transition: opacity 0.2s;"
+                   onmouseover="this.style.opacity='0.7'"
+                   onmouseout="this.style.opacity='1'">
+                    <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+                    Best Sellers
+                </a>
+                <span style="color: var(--text-secondary);">/</span>
+                <span id="breadcrumbProductName" style="color: var(--text-primary);">Product Details</span>
+            </nav>
+        </div>
+    </div>
+
     <!-- Loading State -->
     <div id="loadingContainer" class="loading-container">
         <div class="spinner"></div>
+    </div>
+
+    <!-- Back to Best Sellers Button Section -->
+    <div class="back-button-section" style="background: white; padding: 1.5rem 0; display: none;" id="backButtonSection">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <a href="/top-sellers-showcase.html" 
+               class="back-button"
+               style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--primary-color); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; box-shadow: var(--shadow-md);"
+               onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='translateX(-2px)'"
+               onmouseout="this.style.background='var(--primary-color)'; this.style.transform='translateX(0)'">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Best Sellers</span>
+            </a>
+        </div>
     </div>
 
     <!-- Product Showcase - Enhanced Catalog Style -->
@@ -778,6 +809,7 @@
 
             // Hide loading, show content
             document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('backButtonSection').style.display = 'block';
             document.getElementById('productShowcase').style.display = 'grid';
             document.getElementById('relatedSection').style.display = 'block';
         }
@@ -785,8 +817,12 @@
         // Display product from API data
         function displayProduct(product, params) {
             // Update product info
-            document.getElementById('productTitle').textContent = params.name || product.PRODUCT_TITLE || 'Product Details';
+            const productName = params.name || product.PRODUCT_TITLE || 'Product Details';
+            document.getElementById('productTitle').textContent = productName;
             document.getElementById('productStyle').textContent = `Style #${product.STYLE}`;
+            
+            // Update breadcrumb with product name
+            document.getElementById('breadcrumbProductName').textContent = productName;
             
             if (product.PRODUCT_DESCRIPTION) {
                 document.getElementById('productDescription').textContent = product.PRODUCT_DESCRIPTION;
@@ -1011,8 +1047,12 @@
 
         // Display fallback for non-Sanmar products
         function displayFallbackProduct(params) {
-            document.getElementById('productTitle').textContent = params.name || 'Premium Product';
+            const productName = params.name || 'Premium Product';
+            document.getElementById('productTitle').textContent = productName;
             document.getElementById('productStyle').textContent = `Style #${params.style}`;
+            
+            // Update breadcrumb with product name
+            document.getElementById('breadcrumbProductName').textContent = productName;
             
             // Set decoration-specific description
             const descriptions = {
