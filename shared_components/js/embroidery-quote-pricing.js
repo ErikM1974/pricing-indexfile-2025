@@ -34,6 +34,15 @@ class EmbroideryPricingCalculator {
         // Track API status
         this.apiError = false;
         
+        // Detailed API status tracking
+        this.apiStatus = {
+            mainPricing: false,      // Main embroidery pricing loaded
+            alPricing: false,        // AL pricing loaded
+            configuration: false,    // Config values loaded
+            criticalFailures: [],    // List of critical failures
+            warnings: []             // List of non-critical warnings
+        };
+        
         // Fetch configuration from API
         this.initialized = false;
         this.initializeConfig();
@@ -91,6 +100,10 @@ class EmbroideryPricingCalculator {
                     console.log('- Additional Stitch Rate:', this.additionalStitchRate);
                     console.log('- Base Stitch Count:', this.baseStitchCount);
                     console.log('- Tiers:', this.tiers);
+                    
+                    // Mark main pricing as successfully loaded
+                    this.apiStatus.mainPricing = true;
+                    this.apiStatus.configuration = true;
                 }
                 
                 // Extract rounding method
@@ -120,42 +133,55 @@ class EmbroideryPricingCalculator {
                         }
                     });
                     console.log('[EmbroideryPricingCalculator] AL pricing loaded from API:', this.alTiers);
+                    this.apiStatus.alPricing = true;
                 } else {
                     throw new Error('No AL data in response');
                 }
             } catch (alError) {
-                console.warn('[EmbroideryPricingCalculator] Failed to load AL pricing from API, using fallback values');
-                console.warn('[EmbroideryPricingCalculator] Error:', alError);
-                // Fallback AL values based on Caspio data
-                this.alTiers = {
-                    '1-23': { embCost: 12.50, hasLTM: true },
-                    '24-47': { embCost: 11.50, hasLTM: false },
-                    '48-71': { embCost: 9.50, hasLTM: false },
-                    '72+': { embCost: 8.50, hasLTM: false }
-                };
-                console.log('[EmbroideryPricingCalculator] Using fallback AL pricing:', this.alTiers);
+                console.error('[EmbroideryPricingCalculator] CRITICAL: Failed to load AL pricing from API');
+                console.error('[EmbroideryPricingCalculator] Error:', alError);
+                
+                // NO SILENT FALLBACK - Show error and track failure
+                this.alTiers = {};
+                this.apiStatus.alPricing = false;
+                this.apiStatus.criticalFailures.push('Additional Logo (AL) pricing unavailable - API connection failed');
+                
+                // Show warning to user
+                this.showAPIWarning(
+                    'Additional Logo pricing is unavailable. ' +
+                    'AL quotes cannot be calculated at this time. ' +
+                    'Please contact IT support immediately.',
+                    'al-pricing'
+                );
             }
             
             this.initialized = true;
             console.log('[EmbroideryPricingCalculator] Initialization complete');
             
         } catch (error) {
-            console.error('[EmbroideryPricingCalculator] Error fetching configuration:', error);
-            console.log('[EmbroideryPricingCalculator] Using fallback values - PRICES MAY BE INCORRECT!');
+            console.error('[EmbroideryPricingCalculator] CRITICAL ERROR: Failed to load pricing configuration');
+            console.error('[EmbroideryPricingCalculator] Error:', error);
             
             // Mark API as failed
             this.apiError = true;
+            this.apiStatus.mainPricing = false;
+            this.apiStatus.configuration = false;
+            this.apiStatus.criticalFailures.push('Main embroidery pricing configuration unavailable');
             
-            // Show prominent warning to user
+            // Show prominent warning to user - NO FALLBACK VALUES
             this.showAPIWarning(
-                'Unable to load current pricing configuration from server. ' +
-                'DO NOT send quotes to customers until this is resolved. ' +
-                'Please contact IT support immediately.'
+                'CRITICAL ERROR: Unable to load pricing configuration from server. ' +
+                'The quote calculator cannot function without pricing data. ' +
+                'DO NOT attempt to create quotes. ' +
+                'Please contact IT support immediately.',
+                'main-pricing'
             );
             
-            // Still initialize with fallback but user is warned
-            this.roundingMethod = 'CeilDollar';
-            this.initialized = true;
+            // DO NOT initialize with fallback values - system should not work without valid pricing
+            this.initialized = false;
+            
+            // Disable quote functionality
+            this.disableQuoteCreation();
         }
     }
     
@@ -364,9 +390,27 @@ class EmbroideryPricingCalculator {
             await this.initializeConfig();
         }
         
-        // Warn if using fallback values
+        // Prevent calculation if API has critical errors
         if (this.apiError) {
-            console.warn('[EmbroideryPricingCalculator] WARNING: Calculating with fallback values - prices may be incorrect!');
+            console.error('[EmbroideryPricingCalculator] CRITICAL: Cannot calculate prices - API configuration unavailable');
+            
+            // Return error result instead of incorrect prices
+            return {
+                success: false,
+                error: 'Pricing configuration unavailable',
+                message: 'Cannot calculate prices due to API connection failure. Please refresh the page or contact support.',
+                products: [],
+                logos: [],
+                additionalServices: [],
+                setupFees: [],
+                subtotal: 0,
+                grandTotal: 0,
+                tier: 'ERROR',
+                totalQuantity: 0,
+                hasLTM: false,
+                ltmFeeTotal: 0,
+                setupFeesTotal: 0
+            };
         }
         
         const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
@@ -428,8 +472,36 @@ class EmbroideryPricingCalculator {
                             const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
                             const stitchCost = (extraStitches / 1000) * this.additionalStitchRate;
                             
-                            // Use AL tier cost from API (or fallback to regular tier if AL not available)
-                            const alTierCost = this.alTiers[tier]?.embCost || tierEmbCost;
+                            // Use AL tier cost from API - ERROR if not available
+                            if (!this.alTiers[tier] || !this.alTiers[tier].embCost) {
+                                console.error('[EmbroideryPricingCalculator] AL pricing not available for tier:', tier);
+                                // Show error to user if not already shown
+                                if (!document.getElementById('pricing-api-warning')) {
+                                    this.showAPIWarning(
+                                        'Cannot calculate Additional Logo pricing. AL pricing data is unavailable. ' +
+                                        'Please contact IT support immediately.',
+                                        'al-pricing'
+                                    );
+                                }
+                                // Return zero price to prevent incorrect quotes
+                                const unitPrice = 0;
+                                const total = 0;
+                                
+                                additionalServices.push({
+                                    type: 'additional_logo',
+                                    description: `⚠️ ERROR: ${logo.position} - PRICING UNAVAILABLE`,
+                                    partNumber: 'ERROR',
+                                    quantity: quantity,
+                                    unitPrice: unitPrice,
+                                    total: total,
+                                    productStyle: product.style,
+                                    logoId: logo.id,
+                                    error: true
+                                });
+                                continue; // Skip to next logo
+                            }
+                            
+                            const alTierCost = this.alTiers[tier].embCost;
                             
                             // Direct tier cost + stitch cost (NO subset upcharge - simplified pricing)
                             const unitPrice = this.roundPrice(alTierCost + stitchCost);
@@ -503,15 +575,34 @@ class EmbroideryPricingCalculator {
     }
     
     /**
-     * Show API warning to user
+     * Show API warning to user with different severity levels
      */
-    showAPIWarning(message) {
+    showAPIWarning(message, failureType = 'general') {
+        // Determine severity based on failure type
+        let severity = 'error';
+        if (failureType === 'main-pricing') {
+            severity = 'critical';
+        } else if (failureType === 'al-pricing' || failureType === 'partial') {
+            severity = 'warning';
+        }
+        
+        // Remove any existing warning
+        const existingWarning = document.getElementById('pricing-api-warning');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+        
         // Create warning banner
         const warningBanner = document.createElement('div');
         warningBanner.id = 'pricing-api-warning';
         warningBanner.className = 'api-warning-banner';
+        
+        // Color based on severity
+        const bgColor = severity === 'critical' ? '#dc2626' : 
+                       severity === 'warning' ? '#f59e0b' : '#ef4444';
+        
         warningBanner.style.cssText = `
-            background: #dc2626;
+            background: ${bgColor};
             color: white;
             padding: 20px;
             margin: 20px;
@@ -528,9 +619,13 @@ class EmbroideryPricingCalculator {
             animation: pulse 2s infinite;
         `;
         
+        const icon = severity === 'critical' ? '🚫' : '⚠️';
+        const title = severity === 'critical' ? 'CRITICAL ERROR' :
+                     severity === 'warning' ? 'WARNING' : 'ERROR';
+        
         warningBanner.innerHTML = `
             <div style="font-size: 24px; margin-bottom: 10px;">
-                ⚠️ CRITICAL ERROR ⚠️
+                ${icon} ${title} ${icon}
             </div>
             <div style="font-size: 16px; line-height: 1.5;">
                 ${message}
@@ -538,7 +633,7 @@ class EmbroideryPricingCalculator {
             <div style="margin-top: 15px;">
                 <button onclick="location.reload()" style="
                     background: white;
-                    color: #dc2626;
+                    color: ${bgColor};
                     border: none;
                     padding: 10px 20px;
                     margin: 0 5px;
@@ -546,9 +641,9 @@ class EmbroideryPricingCalculator {
                     font-weight: bold;
                     cursor: pointer;
                 ">Try Again</button>
-                <button onclick="alert('Please email IT support or call the help desk immediately.')" style="
+                <button onclick="alert('Please contact IT support at erik@nwcustomapparel.com or call 253-922-5793.')" style="
                     background: white;
-                    color: #dc2626;
+                    color: ${bgColor};
                     border: none;
                     padding: 10px 20px;
                     margin: 0 5px;
@@ -575,16 +670,77 @@ class EmbroideryPricingCalculator {
         // Add to page
         document.body.appendChild(warningBanner);
         
-        // Also disable quote submission if possible
-        const submitButtons = document.querySelectorAll('[id*="submit"], [id*="save"], [id*="send"]');
+        // Handle quote creation based on severity
+        if (severity === 'critical' || (severity === 'warning' && failureType === 'al-pricing')) {
+            this.disableQuoteCreation(failureType);
+        }
+        
+        // Log for debugging
+        console.error(`[${severity.toUpperCase()}] API failure - Type: ${failureType}`, message);
+    }
+    
+    /**
+     * Disable quote creation when critical data is missing
+     */
+    disableQuoteCreation(reason = 'general') {
+        // Disable all submit/save buttons
+        const submitButtons = document.querySelectorAll(
+            'button[type="submit"], ' +
+            'button[id*="submit"], ' +
+            'button[id*="save"], ' + 
+            'button[id*="send"], ' +
+            'button[id*="quote"], ' +
+            '.btn-primary, ' +
+            '.create-quote-btn'
+        );
+        
         submitButtons.forEach(btn => {
             btn.disabled = true;
             btn.style.opacity = '0.5';
-            btn.title = 'Cannot submit quotes while pricing configuration is unavailable';
+            btn.style.cursor = 'not-allowed';
+            
+            // Set specific tooltip based on reason
+            if (reason === 'al-pricing') {
+                btn.title = 'Cannot create quotes with Additional Logos while AL pricing is unavailable';
+                // Only disable if AL is being used
+                if (window.embQuoteBuilder && window.embQuoteBuilder.hasAdditionalLogos && window.embQuoteBuilder.hasAdditionalLogos()) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false; // Allow quotes without AL
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.title = '';
+                }
+            } else if (reason === 'main-pricing') {
+                btn.title = 'Cannot create quotes while main pricing configuration is unavailable';
+            } else {
+                btn.title = 'Cannot submit quotes while pricing data is unavailable';
+            }
+            
+            // Add visual indicator for disabled buttons
+            if (btn.disabled) {
+                const originalText = btn.textContent;
+                if (!btn.dataset.originalText) {
+                    btn.dataset.originalText = originalText;
+                    btn.textContent = '⚠️ ' + originalText + ' (Disabled)';
+                }
+            }
         });
         
-        // Log for debugging
-        console.error('[CRITICAL] API configuration failed - fallback prices in use!');
+        // Also disable form submission
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            if (!form.dataset.apiErrorHandler) {
+                form.dataset.apiErrorHandler = 'true';
+                form.addEventListener('submit', (e) => {
+                    if (this.apiStatus && !this.apiStatus.isHealthy) {
+                        e.preventDefault();
+                        alert('Quote creation is disabled due to pricing data issues. Please refresh the page or contact support.');
+                        return false;
+                    }
+                });
+            }
+        });
     }
     
     /**
