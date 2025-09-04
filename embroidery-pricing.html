@@ -965,11 +965,34 @@
                     
                     const results = await response.json();
                     
-                    if (!results || results.length === 0) {
+                    // Filter out caps (but allow beanies) and track if any were found
+                    const capsFound = results.some(item => {
+                        const label = item.label.toLowerCase();
+                        return label.includes('cap') && !label.includes('beanie');
+                    });
+                    const filteredResults = results.filter(item => {
+                        const label = item.label.toLowerCase();
+                        // Keep if it's a beanie, or if it doesn't have 'cap'
+                        return label.includes('beanie') || !label.includes('cap');
+                    });
+                    
+                    if (capsFound && filteredResults.length === 0) {
+                        // Only caps were found
+                        resultsContainer.innerHTML = '<div class="search-no-results" style="padding: 15px; color: #92400e;"><i class="fas fa-info-circle" style="margin-right: 8px;"></i>For cap embroidery pricing, please use the Cap Pricing Calculator</div>';
+                    } else if (filteredResults.length === 0) {
+                        // No results found at all
                         resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
                     } else {
-                        // Build results HTML - results come as {value: "style", label: "name"}
-                        const resultsHTML = results.map(result => {
+                        // Build results HTML with filtered results
+                        let resultsHTML = '';
+                        
+                        // Add a note if caps were filtered out
+                        if (capsFound) {
+                            resultsHTML = '<div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;"><i class="fas fa-info-circle" style="margin-right: 5px;"></i>Cap results excluded. Use Cap Pricing Calculator for caps.</div>';
+                        }
+                        
+                        // Add the filtered results
+                        resultsHTML += filteredResults.map(result => {
                             return `
                                 <div class="search-result-item" data-style="${result.value}">
                                     <div class="search-result-info">
@@ -1415,27 +1438,43 @@
                 tier3: null
             };
             
+            // Get sizes with sortOrder from API data for determining base size
+            const sizesWithOrder = pricingData.apiData?.sizes || [];
+            const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
+            
+            // Find the first base size (no upcharge) to use for base pricing
+            const firstBaseSize = sizesWithOrder.find(s => 
+                !displayAddOns[s.size] || displayAddOns[s.size] === 0
+            );
+            const baseSizeToUse = firstBaseSize ? firstBaseSize.size : 'S'; // Fallback to 'S' if no base size found
+            
+            console.log('🎯 Using base size for pricing:', baseSizeToUse);
+            
             // Try to get calculated prices from the service
             if (pricingData.pricing) {
                 // Format: pricingData.pricing['24-47']['S']
                 if (pricingData.pricing['24-47']) {
-                    // Use S size, or first available size
+                    // Use the first base size (could be OSFA, S, SM, etc.)
                     const tier1Prices = pricingData.pricing['24-47'];
-                    basePrices.tier1 = tier1Prices['S'] || tier1Prices['SM'] || Object.values(tier1Prices).find(p => typeof p === 'number');
+                    basePrices.tier1 = tier1Prices[baseSizeToUse] || tier1Prices['S'] || tier1Prices['SM'] || tier1Prices['OSFA'] || Object.values(tier1Prices).find(p => typeof p === 'number');
                 }
                 if (pricingData.pricing['48-71']) {
                     const tier2Prices = pricingData.pricing['48-71'];
-                    basePrices.tier2 = tier2Prices['S'] || tier2Prices['SM'] || Object.values(tier2Prices).find(p => typeof p === 'number');
+                    basePrices.tier2 = tier2Prices[baseSizeToUse] || tier2Prices['S'] || tier2Prices['SM'] || tier2Prices['OSFA'] || Object.values(tier2Prices).find(p => typeof p === 'number');
                 }
                 if (pricingData.pricing['72+']) {
                     const tier3Prices = pricingData.pricing['72+'];
-                    basePrices.tier3 = tier3Prices['S'] || tier3Prices['SM'] || Object.values(tier3Prices).find(p => typeof p === 'number');
+                    basePrices.tier3 = tier3Prices[baseSizeToUse] || tier3Prices['S'] || tier3Prices['SM'] || tier3Prices['OSFA'] || Object.values(tier3Prices).find(p => typeof p === 'number');
                 }
             } else if (pricingData.prices) {
                 // Alternative format: pricingData.prices['S']['24-47']
-                // Find the first available size (S, SM, or any)
+                // Find the first available size (use base size from API, or fallback to S, SM, OSFA, or any)
                 const availableSizes = Object.keys(pricingData.prices);
-                const baseSize = availableSizes.find(s => s === 'S') || availableSizes.find(s => s === 'SM') || availableSizes[0];
+                const baseSize = availableSizes.find(s => s === baseSizeToUse) || 
+                                availableSizes.find(s => s === 'S') || 
+                                availableSizes.find(s => s === 'SM') || 
+                                availableSizes.find(s => s === 'OSFA') || 
+                                availableSizes[0];
                 
                 if (baseSize && pricingData.prices[baseSize]) {
                     if (pricingData.prices[baseSize]['24-47']) {
@@ -1471,11 +1510,7 @@
                 return;
             }
             
-            // Get sizes with sortOrder from API data
-            const sizesWithOrder = pricingData.apiData?.sizes || [];
-            const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
-            
-            // Sort by sortOrder
+            // Sort by sortOrder (we already have sizesWithOrder and displayAddOns from above)
             const sortedSizes = [...sizesWithOrder].sort((a, b) => a.sortOrder - b.sortOrder);
             
             console.log('💰 Base prices:', basePrices);
@@ -1489,10 +1524,22 @@
             // Clear existing rows
             tbody.innerHTML = '';
             
+            // Determine base sizes dynamically from API data
+            // Base sizes are those with no upcharge (displayAddOns value of 0 or undefined)
+            const baseSizes = sortedSizes.filter(s => 
+                !displayAddOns[s.size] || displayAddOns[s.size] === 0
+            );
+            
+            // Get the base size names for display
+            const baseSizeNames = baseSizes.map(s => s.size);
+            const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : 'S, M, L, XL'; // Fallback if no base sizes found
+            
+            console.log('📏 Base sizes from API:', baseSizeNames);
+            
             // Add base sizes row
             const baseRow = document.createElement('tr');
             baseRow.innerHTML = `
-                <td class="size-cell">S, M, L, XL</td>
+                <td class="size-cell">${baseSizeDisplay}</td>
                 <td class="price-cell">$${basePrices.tier1.toFixed(2)}</td>
                 <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
                 <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
@@ -1500,9 +1547,8 @@
             tbody.appendChild(baseRow);
             
             // Filter for extended sizes that have upcharges
-            const baseSizeNames = ['S', 'M', 'L', 'XL'];
             const extendedSizes = sortedSizes.filter(s => 
-                !baseSizeNames.includes(s.size) && displayAddOns[s.size] > 0
+                displayAddOns[s.size] > 0
             );
             
             // Add extended size rows in sorted order
