@@ -25,6 +25,9 @@ class EmbroideryPricingCalculator {
         // Cache for size pricing data
         this.sizePricingCache = {};
         
+        // Additional Logo (AL) tiers - will be fetched from API
+        this.alTiers = {};
+        
         // Rounding method - will be fetched from API
         this.roundingMethod = null;
         
@@ -98,6 +101,39 @@ class EmbroideryPricingCalculator {
                     // Fallback: fetch from pricing-rules endpoint
                     await this.fetchRoundingRules();
                 }
+            }
+            
+            // Fetch Additional Logo (AL) pricing from EMB-AL endpoint
+            try {
+                console.log('[EmbroideryPricingCalculator] Fetching AL pricing from EMB-AL endpoint...');
+                const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB-AL`);
+                const alData = await alResponse.json();
+                
+                if (alData && alData.allEmbroideryCostsR && alData.allEmbroideryCostsR.length > 0) {
+                    this.alTiers = {};
+                    alData.allEmbroideryCostsR.forEach(cost => {
+                        if (cost.ItemType === 'AL') {
+                            this.alTiers[cost.TierLabel] = {
+                                embCost: cost.EmbroideryCost,
+                                hasLTM: cost.TierLabel === '1-23'
+                            };
+                        }
+                    });
+                    console.log('[EmbroideryPricingCalculator] AL pricing loaded from API:', this.alTiers);
+                } else {
+                    throw new Error('No AL data in response');
+                }
+            } catch (alError) {
+                console.warn('[EmbroideryPricingCalculator] Failed to load AL pricing from API, using fallback values');
+                console.warn('[EmbroideryPricingCalculator] Error:', alError);
+                // Fallback AL values based on Caspio data
+                this.alTiers = {
+                    '1-23': { embCost: 12.50, hasLTM: true },
+                    '24-47': { embCost: 11.50, hasLTM: false },
+                    '48-71': { embCost: 9.50, hasLTM: false },
+                    '72+': { embCost: 8.50, hasLTM: false }
+                };
+                console.log('[EmbroideryPricingCalculator] Using fallback AL pricing:', this.alTiers);
             }
             
             this.initialized = true;
@@ -391,11 +427,12 @@ class EmbroideryPricingCalculator {
                             // Calculate additional logo price (NO margin division)
                             const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
                             const stitchCost = (extraStitches / 1000) * this.additionalStitchRate;
-                            const isSubset = quantity < totalQuantity;
-                            const subsetUpcharge = isSubset ? 3.00 : 0;
                             
-                            // Direct tier cost + stitch cost + subset upcharge
-                            const unitPrice = this.roundPrice(tierEmbCost + stitchCost + subsetUpcharge);
+                            // Use AL tier cost from API (or fallback to regular tier if AL not available)
+                            const alTierCost = this.alTiers[tier]?.embCost || tierEmbCost;
+                            
+                            // Direct tier cost + stitch cost (NO subset upcharge - simplified pricing)
+                            const unitPrice = this.roundPrice(alTierCost + stitchCost);
                             const total = unitPrice * quantity;
                             
                             // Generate part number
@@ -409,7 +446,6 @@ class EmbroideryPricingCalculator {
                                 unitPrice: unitPrice,
                                 total: total,
                                 productStyle: product.style,
-                                hasSubsetUpcharge: isSubset,
                                 logoPosition: logo.position,
                                 stitchCount: logo.stitchCount
                             });
