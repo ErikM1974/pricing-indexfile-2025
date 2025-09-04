@@ -965,15 +965,15 @@
                     
                     const results = await response.json();
                     
-                    // Filter out caps (but allow beanies) and track if any were found
+                    // Filter out caps (but allow beanies and knit caps) and track if any were found
                     const capsFound = results.some(item => {
                         const label = item.label.toLowerCase();
-                        return label.includes('cap') && !label.includes('beanie');
+                        return label.includes('cap') && !label.includes('beanie') && !label.includes('knit');
                     });
                     const filteredResults = results.filter(item => {
                         const label = item.label.toLowerCase();
-                        // Keep if it's a beanie, or if it doesn't have 'cap'
-                        return label.includes('beanie') || !label.includes('cap');
+                        // Keep if it's a beanie or knit cap, or if it doesn't have 'cap'
+                        return label.includes('beanie') || label.includes('knit') || !label.includes('cap');
                     });
                     
                     if (capsFound && filteredResults.length === 0) {
