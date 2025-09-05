@@ -325,6 +325,11 @@ app.get('/inventory-details.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'inventory-details.html'));
 });
 
+// Serve AI Designer iframe page
+app.get('/ai-designer.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ai-designer.html'));
+});
+
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {
   res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
