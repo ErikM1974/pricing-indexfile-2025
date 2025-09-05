@@ -22,8 +22,9 @@ class ProductLineManager {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
         
-        // Explicitly ALLOW beanies (flat embroidery)
-        if (title.includes('beanie') || description.includes('beanie')) {
+        // Explicitly ALLOW beanies and knit caps (flat embroidery)
+        if (title.includes('beanie') || description.includes('beanie') ||
+            title.includes('knit') || description.includes('knit')) {
             return true;
         }
         
