@@ -59,6 +59,34 @@
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/richardson-sports-logo-vector.png?ver=1" alt="Richardson Headwear" class="richardson-logo">
         </div>
 
+        <!-- Compact Richardson 112 Hero Strip -->
+        <div class="compact-showcase" id="productShowcase">
+            <div class="showcase-strip">
+                <div class="strip-content">
+                    <div class="strip-text">
+                        <i class="fas fa-star" style="color: #fbbf24;"></i>
+                        <span class="strip-title">Featured: Richardson 112</span>
+                        <span class="strip-subtitle">#1 Best Seller</span>
+                    </div>
+                    <div class="strip-images">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122" 
+                             alt="Front" class="strip-thumb" title="Front View">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123" 
+                             alt="Side" class="strip-thumb" title="Side View">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124" 
+                             alt="Back" class="strip-thumb" title="Back View">
+                    </div>
+                    <div class="strip-features">
+                        <span class="mini-badge">Mid-Profile</span>
+                        <span class="mini-badge">Pre-Curved</span>
+                        <span class="mini-badge">Snapback</span>
+                        <span class="mini-badge">60/40 Blend</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2-Column Grid Layout -->
         <div class="calculator-grid">
             <!-- Input Section -->
             <div class="input-section">
@@ -133,46 +161,51 @@
                         </button>
                     </div>
 
-                    <!-- Setup Fees Section -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-dollar-sign"></i>
-                            Setup Fees (Optional)
-                        </label>
-                        <div class="setup-fees-container" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
-                            <!-- Digitizing Fee -->
-                            <div class="checkbox-group" style="margin-bottom: 1rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                    <input type="checkbox" id="digitizingFee" value="100">
-                                    <span>Digitizing Fee - $100.00</span>
-                                </label>
+                    <!-- Setup Fees Section (Collapsible) -->
+                    <div class="form-group setup-fees-accordion">
+                        <button type="button" class="setup-accordion-toggle" id="setupFeesToggle">
+                            <div class="toggle-header">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Setup Fees (Optional)</span>
                             </div>
-                            
-                            <!-- Graphic Design Fee -->
-                            <div class="form-group" style="margin-bottom: 1rem;">
-                                <label class="form-label" style="font-size: 0.875rem;">Graphic Design Fee</label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <select id="graphicDesignFee" class="form-select" style="flex: 1;">
-                                        <option value="0">None</option>
-                                        <option value="50">$50.00</option>
-                                        <option value="75">$75.00</option>
-                                        <option value="custom">Custom Amount</option>
-                                    </select>
-                                    <input type="number" id="graphicDesignCustom" class="form-input" placeholder="Amount" 
-                                           style="display: none; width: 120px;" min="0" step="0.01">
+                            <i class="fas fa-chevron-down setup-accordion-icon"></i>
+                        </button>
+                        <div class="setup-accordion-content" id="setupFeesContent">
+                            <div class="setup-fees-inner">
+                                <!-- Digitizing Fee -->
+                                <div class="checkbox-group" style="margin-bottom: 1rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                        <input type="checkbox" id="digitizingFee" value="100">
+                                        <span>Digitizing Fee - $100.00</span>
+                                    </label>
                                 </div>
-                            </div>
-                            
-                            <!-- Additional Fees -->
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" style="font-size: 0.875rem;">Additional Fees</label>
-                                <div id="additionalFeesContainer">
-                                    <!-- Dynamic fees will be added here -->
+                                
+                                <!-- Graphic Design Fee -->
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label class="form-label" style="font-size: 0.875rem;">Graphic Design Fee</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <select id="graphicDesignFee" class="form-select" style="flex: 1;">
+                                            <option value="0">None</option>
+                                            <option value="50">$50.00</option>
+                                            <option value="75">$75.00</option>
+                                            <option value="custom">Custom Amount</option>
+                                        </select>
+                                        <input type="number" id="graphicDesignCustom" class="form-input" placeholder="Amount" 
+                                               style="display: none; width: 120px;" min="0" step="0.01">
+                                    </div>
                                 </div>
-                                <button type="button" id="addFeeBtn" class="btn btn-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">
-                                    <i class="fas fa-plus"></i>
-                                    Add Fee
-                                </button>
+                                
+                                <!-- Additional Fees -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" style="font-size: 0.875rem;">Additional Fees</label>
+                                    <div id="additionalFeesContainer">
+                                        <!-- Dynamic fees will be added here -->
+                                    </div>
+                                    <button type="button" id="addFeeBtn" class="btn btn-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                                        <i class="fas fa-plus"></i>
+                                        Add Fee
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,92 +241,6 @@
                 <div id="resultsDisplay" class="hidden">
                     <!-- Quote results will be displayed here -->
                 </div>
-            </div>
-        </div>
-        <!-- Pricing Reference Table -->
-        <div class="pricing-reference">
-            <div class="reference-header">
-                <h3 class="reference-title">Embellishment Pricing Reference</h3>
-                <p class="reference-note">Base decoration costs only - cap price additional</p>
-            </div>
-            
-            <div class="reference-grid">
-                <!-- Embroidery Table -->
-                <div class="reference-table">
-                    <h4><i class="fas fa-thread"></i> Embroidery (8,000 stitches)</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1-23</td>
-                                <td>$12.00</td>
-                            </tr>
-                            <tr>
-                                <td>24-47</td>
-                                <td>$11.00</td>
-                            </tr>
-                            <tr>
-                                <td>48-71</td>
-                                <td>$10.00</td>
-                            </tr>
-                            <tr>
-                                <td>72+</td>
-                                <td>$8.50</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Leatherette Table -->
-                <div class="reference-table">
-                    <h4><i class="fas fa-tag"></i> Leatherette Patch</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Quantity</th>
-                                <th>Patch</th>
-                                <th>Labor</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1-23</td>
-                                <td class="text-right">$8.40</td>
-                                <td class="text-right">$4.00</td>
-                                <td>$12.40</td>
-                            </tr>
-                            <tr>
-                                <td>24-47</td>
-                                <td class="text-right">$7.34</td>
-                                <td class="text-right">$4.00</td>
-                                <td>$11.34</td>
-                            </tr>
-                            <tr>
-                                <td>48-71</td>
-                                <td class="text-right">$7.34</td>
-                                <td class="text-right">$3.00</td>
-                                <td>$10.34</td>
-                            </tr>
-                            <tr>
-                                <td>72+</td>
-                                <td class="text-right">$6.03</td>
-                                <td class="text-right">$2.75</td>
-                                <td>$8.78</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="reference-footer">
-                <p><i class="fas fa-info-circle"></i> Orders under 24 pieces incur a $50 Less Than Minimum fee</p>
-                <p><i class="fas fa-calculator"></i> Final price = (Cap Price ÷ 0.6) + Embellishment + Round Up</p>
             </div>
         </div>
     </main>
@@ -378,6 +325,48 @@
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.richardsonCalculator = new RichardsonCalculator();
+            
+            // Compact Showcase Image Click Handler
+            const stripThumbs = document.querySelectorAll('.strip-thumb');
+            stripThumbs.forEach(img => {
+                img.addEventListener('click', function() {
+                    // Open image in new tab for larger view
+                    window.open(this.src, '_blank');
+                });
+            });
+            
+            // Setup Fees Accordion Toggle
+            const setupToggle = document.getElementById('setupFeesToggle');
+            const setupContent = document.getElementById('setupFeesContent');
+            
+            if (setupToggle && setupContent) {
+                setupToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Toggle active classes
+                    this.classList.toggle('active');
+                    setupContent.classList.toggle('active');
+                    
+                    // Update aria-expanded for accessibility
+                    const isExpanded = this.classList.contains('active');
+                    this.setAttribute('aria-expanded', isExpanded);
+                });
+                
+                // Handle graphic design custom amount field
+                const graphicDesignFee = document.getElementById('graphicDesignFee');
+                const graphicDesignCustom = document.getElementById('graphicDesignCustom');
+                
+                if (graphicDesignFee && graphicDesignCustom) {
+                    graphicDesignFee.addEventListener('change', function() {
+                        if (this.value === 'custom') {
+                            graphicDesignCustom.style.display = 'block';
+                        } else {
+                            graphicDesignCustom.style.display = 'none';
+                            graphicDesignCustom.value = '';
+                        }
+                    });
+                }
+            }
         });
     </script>
 </body>
