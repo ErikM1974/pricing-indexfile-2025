@@ -86,8 +86,8 @@
             </div>
         </div>
 
-        <!-- 2-Column Grid Layout -->
-        <div class="calculator-grid">
+        <!-- Main Calculator Container -->
+        <div class="calculator-container">
             <!-- Input Section -->
             <div class="input-section">
                 <h2 class="section-title">
@@ -230,15 +230,27 @@
                 </form>
             </div>
 
-            <!-- Results Section -->
-            <div class="results-section">
-                <div id="emptyState" class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h3>Your quote will appear here</h3>
-                    <p>Add cap styles and quantities to get started</p>
+            <!-- Results Section - Below Form -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Quote Details
+                    </h2>
+                    <div class="quote-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.richardsonCalculator.printQuote();">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.richardsonCalculator.emailQuote();">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="window.richardsonCalculator.newQuote();">
+                            <i class="fas fa-plus"></i> New Quote
+                        </button>
+                    </div>
                 </div>
 
-                <div id="resultsDisplay" class="hidden">
+                <div id="resultsDisplay">
                     <!-- Quote results will be displayed here -->
                 </div>
             </div>

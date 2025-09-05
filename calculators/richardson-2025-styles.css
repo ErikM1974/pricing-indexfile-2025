@@ -1918,7 +1918,7 @@
 /* Compact Form Groups */
 .form-group {
     position: relative;
-    margin-bottom: 0.875rem;
+    margin-bottom: 1rem; /* Consistent spacing */
 }
 
 /* Enhanced form inputs with :has() selector */
@@ -2235,13 +2235,11 @@ textarea {
 /* 2-COLUMN GRID LAYOUT                        */
 /* ============================================ */
 
-.calculator-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    max-width: 1400px;
+/* Main Calculator Container - Single Column Vertical Layout */
+.calculator-container {
+    max-width: 900px;
     margin: 0 auto;
-    align-items: start;
+    padding: 0 1rem;
 }
 
 /* Input Section Styling */
@@ -2261,12 +2259,45 @@ textarea {
 }
 
 /* Results Section Styling */
+/* Results Section - Shows Below Form After Generation */
 .results-section {
-    background: #f8f9fa;
-    border: 1px solid rgba(229, 231, 235, 0.3);
-    border-radius: 10px;
-    padding: 1.25rem;
-    min-height: 400px;
+    background: white;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f4f8;
+}
+
+.quote-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.quote-actions .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
     display: flex;
     flex-direction: column;
 }
@@ -2396,18 +2427,38 @@ textarea {
     font-size: 0.75rem;
 }
 
-/* Responsive Design for 2-Column Layout */
+/* Responsive Design for Vertical Layout */
 @media (max-width: 1024px) {
-    .calculator-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+    .calculator-container {
+        max-width: 100%;
+        padding: 0 0.75rem;
     }
 }
 
 @media (max-width: 768px) {
-    .calculator-grid {
-        grid-template-columns: 1fr;
+    .calculator-container {
+        padding: 0 0.5rem;
+    }
+    
+    .input-section,
+    .results-section {
+        padding: 1rem;
+    }
+    
+    .results-header {
+        flex-direction: column;
         gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .quote-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .quote-actions .btn {
+        flex: 1;
+        min-width: 100px;
     }
     
     .compact-showcase .strip-content {
