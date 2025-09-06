@@ -332,6 +332,38 @@
         </div>
     </div>
 
+    <!-- Quote Generation Loading Animation -->
+    <div id="quoteLoadingOverlay" class="quote-loading-overlay">
+        <div class="loading-content">
+            <div class="stitch-animation">
+                <svg class="needle-svg" width="300" height="100" viewBox="0 0 300 100">
+                    <!-- Needle -->
+                    <g id="needle" transform="translate(0, 50)">
+                        <line x1="0" y1="0" x2="15" y2="0" stroke="#6b7280" stroke-width="2"/>
+                        <circle cx="15" cy="0" r="2" fill="#6b7280"/>
+                        <path d="M 15 0 Q 20 -3, 25 0" stroke="#4cb354" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <!-- Thread path will be drawn by animation -->
+                    <path id="threadPath" d="M 0 50" stroke="#4cb354" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+                <div class="stitch-dots">
+                    <span class="stitch-dot"></span>
+                    <span class="stitch-dot"></span>
+                    <span class="stitch-dot"></span>
+                    <span class="stitch-dot"></span>
+                    <span class="stitch-dot"></span>
+                </div>
+            </div>
+            <div class="loading-text">
+                <h3>Stitching together your perfect quote<span class="loading-dots">...</span></h3>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="progress-text">Calculating best pricing... <span id="progressPercent">0</span>%</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {

@@ -486,6 +486,9 @@
             handleCalculate(e) {
                 e.preventDefault();
                 
+                // Show loading animation
+                this.showLoadingAnimation();
+                
                 // Clear previous results
                 this.currentQuote = null;
                 
@@ -539,6 +542,7 @@
                 
                 if (hasErrors || lineItems.length === 0) {
                     alert('Please add at least one valid style with quantity.');
+                    this.hideLoadingAnimation(); // Hide loading on error
                     return;
                 }
                 
@@ -611,6 +615,54 @@
                 
                 // Save quote to database immediately
                 this.saveQuoteToDatabase();
+            }
+
+            showLoadingAnimation() {
+                console.log('[Richardson] Showing loading animation');
+                const overlay = document.getElementById('quoteLoadingOverlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    
+                    // Start progress animation
+                    const progressFill = overlay.querySelector('.progress-fill');
+                    if (progressFill) {
+                        progressFill.style.width = '0%';
+                        
+                        // Simulate progress over 2.5 seconds
+                        let progress = 0;
+                        const interval = setInterval(() => {
+                            progress += 4; // Increase by 4% every 100ms
+                            if (progress >= 100) {
+                                progress = 100;
+                                clearInterval(interval);
+                                // Hide after reaching 100%
+                                setTimeout(() => {
+                                    this.hideLoadingAnimation();
+                                }, 300);
+                            }
+                            progressFill.style.width = progress + '%';
+                        }, 100);
+                        
+                        // Store interval so we can clear it if needed
+                        this.loadingInterval = interval;
+                    }
+                } else {
+                    console.warn('[Richardson] Loading overlay element not found');
+                }
+            }
+
+            hideLoadingAnimation() {
+                console.log('[Richardson] Hiding loading animation');
+                const overlay = document.getElementById('quoteLoadingOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+                
+                // Clear any running interval
+                if (this.loadingInterval) {
+                    clearInterval(this.loadingInterval);
+                    this.loadingInterval = null;
+                }
             }
 
             displayResults() {
