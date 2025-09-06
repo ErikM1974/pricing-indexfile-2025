@@ -205,6 +205,11 @@
                 this.addStyleBtn = document.getElementById('addStyleBtn');
                 this.embellishmentRadios = document.querySelectorAll('input[name="embellishment"]');
                 
+                // Real-time counter elements
+                this.quoteCounter = document.getElementById('quotePreviewCounter');
+                this.totalCapsCount = document.getElementById('totalCapsCount');
+                this.estimatedTotal = document.getElementById('estimatedTotal');
+                
                 // Setup fee elements
                 this.digitizingFeeCheckbox = document.getElementById('digitizingFee');
                 this.graphicDesignFeeSelect = document.getElementById('graphicDesignFee');
@@ -364,6 +369,7 @@
                                    placeholder="Type style number..." 
                                    autocomplete="off">
                             <div class="autocomplete-list hidden"></div>
+                            <span class="validation-indicator"></span>
                         </div>
                     </div>
                     <div class="quantity-input-group">
@@ -384,16 +390,33 @@
                 // Bind autocomplete
                 const styleInput = lineItem.querySelector('.style-input');
                 const autocompleteList = lineItem.querySelector('.autocomplete-list');
+                const quantityInput = lineItem.querySelector('.quantity-input');
+                const validationIndicator = lineItem.querySelector('.validation-indicator');
+                
                 this.setupAutocomplete(styleInput, autocompleteList);
+                this.setupStyleValidation(styleInput, validationIndicator);
+                
+                // Bind real-time counter updates
+                quantityInput.addEventListener('input', () => {
+                    this.updateQuoteCounter();
+                });
+                
+                quantityInput.addEventListener('change', () => {
+                    this.updateQuoteCounter();
+                });
                 
                 // Bind remove button
                 const removeBtn = lineItem.querySelector('.remove-btn');
                 removeBtn.addEventListener('click', () => {
                     lineItem.remove();
+                    this.updateQuoteCounter(); // Update counter when item removed
                 });
                 
                 // Focus on new input
                 styleInput.focus();
+                
+                // Update counter when new line added
+                this.updateQuoteCounter();
             }
 
             setupAutocomplete(input, list) {
@@ -642,9 +665,11 @@
                             if (progress >= 100) {
                                 progress = 100;
                                 clearInterval(interval);
-                                // Hide after reaching 100%
+                                // Show success animations before hiding
                                 setTimeout(() => {
                                     this.hideLoadingAnimation();
+                                    this.showSuccessButtonState();
+                                    this.showSuccessConfetti();
                                 }, 300);
                             }
                             
@@ -674,6 +699,175 @@
                 if (this.loadingInterval) {
                     clearInterval(this.loadingInterval);
                     this.loadingInterval = null;
+                }
+            }
+
+            updateQuoteCounter() {
+                if (!this.totalCapsCount || !this.estimatedTotal || !this.quoteCounter) return;
+                
+                // Calculate total quantity from all line items
+                let totalQuantity = 0;
+                const lineItemElements = this.lineItemsContainer.querySelectorAll('.line-item');
+                
+                lineItemElements.forEach(element => {
+                    const quantityInput = element.querySelector('.quantity-input');
+                    if (quantityInput && quantityInput.value) {
+                        totalQuantity += parseInt(quantityInput.value) || 0;
+                    }
+                });
+                
+                // Animate counter change
+                const currentCount = parseInt(this.totalCapsCount.textContent) || 0;
+                if (currentCount !== totalQuantity) {
+                    this.animateCounterValue(this.totalCapsCount, currentCount, totalQuantity);
+                }
+                
+                // Update tier styling based on quantity
+                this.quoteCounter.classList.remove('tier-warning', 'tier-good');
+                if (totalQuantity > 0 && totalQuantity < 24) {
+                    this.quoteCounter.classList.add('tier-warning');
+                } else if (totalQuantity >= 24) {
+                    this.quoteCounter.classList.add('tier-good');
+                }
+                
+                // Update estimated total
+                if (totalQuantity === 0) {
+                    this.estimatedTotal.textContent = 'Add caps to see pricing';
+                    this.estimatedTotal.classList.remove('has-estimate');
+                } else {
+                    // Quick estimate calculation
+                    const embellishmentType = this.getSelectedEmbellishment();
+                    const embellishmentCost = this.getEmbellishmentCost(totalQuantity);
+                    const avgCapPrice = 12; // Rough average
+                    const estimated = (avgCapPrice + embellishmentCost) * totalQuantity;
+                    
+                    this.estimatedTotal.textContent = `Est. Total: $${estimated.toFixed(0)}`;
+                    this.estimatedTotal.classList.add('has-estimate');
+                }
+            }
+
+            animateCounterValue(element, fromValue, toValue) {
+                element.classList.add('animate-count');
+                
+                // Animate the number change
+                const duration = 300;
+                const steps = 10;
+                const stepValue = (toValue - fromValue) / steps;
+                let currentStep = 0;
+                
+                const interval = setInterval(() => {
+                    currentStep++;
+                    const newValue = Math.round(fromValue + (stepValue * currentStep));
+                    element.textContent = Math.min(Math.max(newValue, 0), toValue);
+                    
+                    if (currentStep >= steps) {
+                        clearInterval(interval);
+                        element.textContent = toValue;
+                        setTimeout(() => {
+                            element.classList.remove('animate-count');
+                        }, 100);
+                    }
+                }, duration / steps);
+            }
+
+            showSuccessConfetti() {
+                console.log('[Richardson] Showing success confetti');
+                
+                // Create confetti container
+                const confettiContainer = document.createElement('div');
+                confettiContainer.className = 'confetti-container';
+                document.body.appendChild(confettiContainer);
+                
+                // Generate confetti pieces
+                const colors = ['#4cb354', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#f97316'];
+                const pieceCount = 50;
+                
+                for (let i = 0; i < pieceCount; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    
+                    // Random positioning and properties
+                    piece.style.left = Math.random() * 100 + '%';
+                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.animationDelay = Math.random() * 0.5 + 's';
+                    
+                    // Random shape variations
+                    if (Math.random() > 0.7) {
+                        piece.style.borderRadius = '50%';
+                    }
+                    
+                    confettiContainer.appendChild(piece);
+                }
+                
+                // Remove confetti container after animation
+                setTimeout(() => {
+                    if (confettiContainer.parentNode) {
+                        confettiContainer.parentNode.removeChild(confettiContainer);
+                    }
+                }, 4000);
+            }
+
+            showSuccessButtonState() {
+                const generateBtn = document.querySelector('.btn-generate-quote');
+                if (generateBtn) {
+                    // Add success state
+                    generateBtn.classList.add('success-state');
+                    
+                    // Change icon temporarily
+                    const icon = generateBtn.querySelector('i');
+                    if (icon) {
+                        const originalClass = icon.className;
+                        icon.className = 'fas fa-check';
+                        
+                        // Revert after animation
+                        setTimeout(() => {
+                            icon.className = originalClass;
+                            generateBtn.classList.remove('success-state');
+                        }, 1500);
+                    }
+                }
+            }
+
+            setupStyleValidation(input, indicator) {
+                input.addEventListener('input', () => {
+                    this.validateStyleNumber(input, indicator);
+                });
+                
+                input.addEventListener('blur', () => {
+                    this.validateStyleNumber(input, indicator);
+                });
+            }
+
+            validateStyleNumber(input, indicator) {
+                const value = input.value.trim().toUpperCase();
+                
+                // Clear previous states
+                input.classList.remove('valid', 'invalid');
+                indicator.classList.remove('valid', 'invalid');
+                indicator.innerHTML = '';
+                
+                if (!value) {
+                    return; // No validation for empty input
+                }
+                
+                // Check if it's a valid Richardson style
+                const capData = window.nwcaMasterBundleData?.caps || [];
+                const isValid = capData.some(cap => cap.style === value);
+                
+                if (isValid) {
+                    // Valid style
+                    input.classList.add('valid');
+                    indicator.classList.add('valid');
+                    indicator.innerHTML = '<i class="fas fa-check"></i>';
+                    
+                    console.log('[Richardson] Valid style detected:', value);
+                } else {
+                    // Invalid or unknown style
+                    input.classList.add('invalid');
+                    indicator.classList.add('invalid');
+                    indicator.innerHTML = '<i class="fas fa-times"></i>';
+                    
+                    console.log('[Richardson] Invalid style detected:', value);
                 }
             }
 
