@@ -330,6 +330,15 @@ app.get('/ai-designer.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ai-designer.html'));
 });
 
+// Serve AI Mockup Generator iframe page
+app.get('/ai-mockup-generator.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
+});
+
+app.get('/ai-mockup-generator', (req, res) => {
+  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
+});
+
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {
   res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));

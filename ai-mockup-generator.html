@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mockup Generator | Northwest Custom Apparel</title>
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .header {
+            height: 60px;
+            background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+        
+        .title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 400;
+            margin-left: 10px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .info-bar {
+            background: #f3f4f6;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .info-text {
+            color: #4b5563;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .info-text strong {
+            color: #1f2937;
+        }
+        
+        .mockup-frame {
+            width: 100%;
+            height: calc(100vh - 60px - 49px); /* Subtract header and info bar */
+            border: none;
+            display: block;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .title {
+                font-size: 16px;
+            }
+            
+            .description {
+                display: none;
+            }
+            
+            .nav {
+                gap: 15px;
+            }
+            
+            .nav a {
+                font-size: 14px;
+            }
+            
+            .info-bar {
+                padding: 10px 15px;
+            }
+            
+            .info-text {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                     alt="Northwest Custom Apparel" 
+                     class="logo">
+                <span class="title">AI Mockup Generator</span>
+            </div>
+            <nav class="nav">
+                <a href="/staff-dashboard.html">Dashboard</a>
+                <a href="/top-sellers-showcase.html">Top Sellers</a>
+                <a href="/ai-designer.html">AI Designer</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="info-bar">
+        <div class="info-text">
+            <strong>How to use:</strong> Upload your product image and then your logo and create an AI prompt to place the logo on the item. Feel free to ask Erik for help creating prompts.
+        </div>
+    </div>
+    
+    <iframe id="mockup-frame" 
+            class="mockup-frame"
+            src="https://ai-mockup-generator-189795467756.us-west1.run.app/"
+            allow="clipboard-write">
+    </iframe>
+    
+    <script>
+        // Pass URL parameters to the iframe
+        const params = new URLSearchParams(window.location.search);
+        
+        // If we have parameters, pass them to the iframe
+        if (params.toString()) {
+            const iframe = document.getElementById('mockup-frame');
+            const iframeSrc = new URL(iframe.src);
+            
+            // Add all parameters to the iframe URL
+            params.forEach((value, key) => {
+                iframeSrc.searchParams.set(key, value);
+            });
+            
+            // Add source identifier
+            iframeSrc.searchParams.set('source', 'nwca');
+            
+            iframe.src = iframeSrc.toString();
+        }
+        
+        // Optional: Handle messages from iframe if needed
+        window.addEventListener('message', function(event) {
+            // Only accept messages from the AI mockup generator domain
+            if (event.origin !== 'https://ai-mockup-generator-189795467756.us-west1.run.app') {
+                return;
+            }
+            
+            // Handle messages (e.g., mockup saved, etc.)
+            if (event.data && event.data.type === 'mockup-saved') {
+                console.log('Mockup saved:', event.data);
+                // Could redirect back to dashboard or show notification
+            }
+        });
+    </script>
+</body>
+</html>
