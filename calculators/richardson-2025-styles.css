@@ -2713,31 +2713,35 @@ textarea {
     gap: 1rem;
 }
 
-/* Clean close button */
+/* Clean close button - MORE VISIBLE */
 .gallery-close {
-    position: absolute;
+    position: fixed;  /* Changed from absolute to fixed */
     top: 20px;
     right: 20px;
     width: 48px;
     height: 48px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.7);  /* Darker background for visibility */
+    border: 2px solid rgba(255, 255, 255, 0.5);  /* More visible border */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 10;
+    z-index: 10001;  /* Higher z-index */
+    outline: none;  /* Remove focus outline */
+    padding: 0;  /* Reset padding */
 }
 
 .gallery-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 0, 0, 0.5);  /* Red on hover for clarity */
     transform: rotate(90deg);
+    border-color: white;
 }
 
 .gallery-close svg {
     color: white;
+    pointer-events: none;  /* Ensure SVG doesn't block clicks */
 }
 
 /* Main gallery container */

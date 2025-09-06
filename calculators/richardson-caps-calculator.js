@@ -1801,8 +1801,10 @@
                 document.addEventListener('keydown', (e) => {
                     if (!this.imageModal || !this.imageModal.classList.contains('active')) return;
                     
+                    console.log('[Gallery] Key pressed:', e.key);
                     switch(e.key) {
                         case 'Escape':
+                            console.log('[Gallery] ESC key pressed - closing');
                             this.closeGallery();
                             break;
                         case 'ArrowLeft':
@@ -1816,7 +1818,11 @@
             }
             
             openGallery(index) {
-                if (!this.imageModal || !this.galleryImages.length) return;
+                console.log('[Gallery] Opening gallery at index:', index);
+                if (!this.imageModal || !this.galleryImages.length) {
+                    console.log('[Gallery] Cannot open - missing modal or images');
+                    return;
+                }
                 
                 this.currentImageIndex = index;
                 this.updateGalleryDisplay();
@@ -1824,16 +1830,22 @@
                 // Show modal with animation
                 this.imageModal.classList.add('active');
                 document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                console.log('[Gallery] Modal opened');
                 
                 // Preload adjacent images for smooth navigation
                 this.preloadAdjacentImages();
             }
             
             closeGallery() {
-                if (!this.imageModal) return;
+                console.log('[Gallery] closeGallery called');
+                if (!this.imageModal) {
+                    console.log('[Gallery] No imageModal found');
+                    return;
+                }
                 
                 this.imageModal.classList.remove('active');
                 document.body.style.overflow = ''; // Restore scrolling
+                console.log('[Gallery] Modal closed');
             }
             
             navigateGallery(direction) {
@@ -1856,15 +1868,12 @@
                 
                 // Clean, simple modal content - JUST THE IMAGE
                 this.modalGalleryContent.innerHTML = `
-                    <button class="gallery-close" onclick="window.richardsonCalculator.closeGallery()" aria-label="Close">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                    <button type="button" class="gallery-close" id="galleryCloseBtn" aria-label="Close" title="Close (ESC)">
+                        <span style="font-size: 28px; line-height: 1; display: block; font-weight: normal;">×</span>
                     </button>
                     
                     <div class="gallery-main">
-                        <button class="gallery-arrow gallery-prev" onclick="window.richardsonCalculator.navigateGallery('prev')" aria-label="Previous">
+                        <button type="button" class="gallery-arrow gallery-prev" id="galleryPrevBtn" aria-label="Previous">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="15 18 9 12 15 6"></polyline>
                             </svg>
@@ -1872,7 +1881,7 @@
                         
                         <img src="${currentImage.src}" alt="${currentImage.alt}" class="gallery-image">
                         
-                        <button class="gallery-arrow gallery-next" onclick="window.richardsonCalculator.navigateGallery('next')" aria-label="Next">
+                        <button type="button" class="gallery-arrow gallery-next" id="galleryNextBtn" aria-label="Next">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>
@@ -1883,17 +1892,55 @@
                     
                     <div class="gallery-dots">
                         ${this.galleryImages.map((_, index) => `
-                            <button class="gallery-dot ${index === this.currentImageIndex ? 'active' : ''}" 
-                                    onclick="window.richardsonCalculator.openGallery(${index})"
+                            <button type="button" class="gallery-dot ${index === this.currentImageIndex ? 'active' : ''}" 
+                                    data-index="${index}"
                                     aria-label="View image ${index + 1}"></button>
                         `).join('')}
                     </div>
                 `;
                 
+                // Add event listeners using getElementById for better reliability
+                const closeBtn = document.getElementById('galleryCloseBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        console.log('[Gallery] Close button clicked');
+                        this.closeGallery();
+                    });
+                }
+                
+                const prevBtn = document.getElementById('galleryPrevBtn');
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        this.navigateGallery('prev');
+                    });
+                }
+                
+                const nextBtn = document.getElementById('galleryNextBtn');
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        this.navigateGallery('next');
+                    });
+                }
+                
+                // Add click handlers to dots
+                const dots = this.modalGalleryContent.querySelectorAll('.gallery-dot');
+                dots.forEach(dot => {
+                    dot.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        this.openGallery(index);
+                    });
+                });
+                
                 // Add click handler to overlay for closing
                 const overlay = this.imageModal.querySelector('.modal-overlay');
                 if (overlay) {
-                    overlay.onclick = () => this.closeGallery();
+                    // Remove any existing handlers first
+                    overlay.onclick = null;
+                    // Add new handler
+                    overlay.addEventListener('click', () => {
+                        console.log('[Gallery] Overlay clicked');
+                        this.closeGallery();
+                    });
                 }
             }
             
