@@ -186,12 +186,18 @@
                 this.currentQuote = null;
                 this.quoteService = new RichardsonQuoteService();
                 
+                // Drag state
+                this.isDragging = false;
+                this.dragOffset = { x: 0, y: 0 };
+                this.originalPosition = null;
+                
                 // Initialize EmailJS
                 emailjs.init('4qSbDO-SQs19TbP80');
                 
                 this.initializeElements();
                 this.bindEvents();
                 this.addInitialLineItem();
+                this.initializeDragAndDrop();
             }
 
             initializeElements() {
@@ -868,6 +874,133 @@
                     indicator.innerHTML = '<i class="fas fa-times"></i>';
                     
                     console.log('[Richardson] Invalid style detected:', value);
+                }
+            }
+
+            initializeDragAndDrop() {
+                if (!this.quoteCounter) return;
+                
+                // Check if mobile device (disable drag on mobile)
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) return;
+                
+                const dragHandle = this.quoteCounter.querySelector('.drag-handle');
+                if (!dragHandle) return;
+                
+                // Load saved position
+                this.loadCounterPosition();
+                
+                // Mouse events
+                dragHandle.addEventListener('mousedown', (e) => this.startDrag(e));
+                document.addEventListener('mousemove', (e) => this.dragMove(e));
+                document.addEventListener('mouseup', (e) => this.endDrag(e));
+                
+                // Touch events for tablets
+                dragHandle.addEventListener('touchstart', (e) => this.startDrag(e), { passive: false });
+                document.addEventListener('touchmove', (e) => this.dragMove(e), { passive: false });
+                document.addEventListener('touchend', (e) => this.endDrag(e));
+                
+                console.log('[Richardson] Drag and drop initialized');
+            }
+
+            startDrag(e) {
+                e.preventDefault();
+                this.isDragging = true;
+                
+                // Store original position for potential restoration
+                const rect = this.quoteCounter.getBoundingClientRect();
+                this.originalPosition = {
+                    top: rect.top,
+                    left: rect.left
+                };
+                
+                // Calculate offset from mouse to element
+                const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                
+                this.dragOffset = {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+                
+                // Add dragging class for visual feedback
+                this.quoteCounter.classList.add('dragging');
+                
+                console.log('[Richardson] Started dragging counter');
+            }
+
+            dragMove(e) {
+                if (!this.isDragging) return;
+                
+                e.preventDefault();
+                
+                const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                
+                // Calculate new position
+                const newLeft = clientX - this.dragOffset.x;
+                const newTop = clientY - this.dragOffset.y;
+                
+                // Constrain to viewport bounds
+                const maxLeft = window.innerWidth - this.quoteCounter.offsetWidth;
+                const maxTop = window.innerHeight - this.quoteCounter.offsetHeight;
+                
+                const constrainedLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
+                
+                // Apply position
+                this.quoteCounter.style.left = constrainedLeft + 'px';
+                this.quoteCounter.style.top = constrainedTop + 'px';
+            }
+
+            endDrag(e) {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                this.quoteCounter.classList.remove('dragging');
+                
+                // Save position to localStorage
+                this.saveCounterPosition();
+                
+                console.log('[Richardson] Finished dragging counter');
+            }
+
+            saveCounterPosition() {
+                if (!this.quoteCounter.style.left || !this.quoteCounter.style.top) return;
+                
+                const position = {
+                    left: this.quoteCounter.style.left,
+                    top: this.quoteCounter.style.top,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('richardson_counter_position', JSON.stringify(position));
+                console.log('[Richardson] Counter position saved:', position);
+            }
+
+            loadCounterPosition() {
+                try {
+                    const saved = localStorage.getItem('richardson_counter_position');
+                    if (!saved) return;
+                    
+                    const position = JSON.parse(saved);
+                    
+                    // Don't use positions older than 7 days
+                    if (Date.now() - position.timestamp > 7 * 24 * 60 * 60 * 1000) {
+                        localStorage.removeItem('richardson_counter_position');
+                        return;
+                    }
+                    
+                    // Apply saved position
+                    this.quoteCounter.style.position = 'fixed';
+                    this.quoteCounter.style.left = position.left;
+                    this.quoteCounter.style.top = position.top;
+                    this.quoteCounter.style.zIndex = '1000';
+                    
+                    console.log('[Richardson] Counter position loaded:', position);
+                } catch (error) {
+                    console.warn('[Richardson] Error loading counter position:', error);
+                    localStorage.removeItem('richardson_counter_position');
                 }
             }
 

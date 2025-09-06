@@ -93,19 +93,6 @@
             </div>
         </div>
 
-        <!-- Real-Time Quote Preview Counter -->
-        <div id="quotePreviewCounter" class="quote-preview-counter">
-            <div class="counter-content">
-                <div class="counter-main">
-                    <span class="counter-label">Total Caps:</span>
-                    <span class="counter-value" id="totalCapsCount">0</span>
-                </div>
-                <div class="counter-estimate">
-                    <span id="estimatedTotal">Add caps to see pricing</span>
-                </div>
-            </div>
-        </div>
-
         <!-- Main Calculator Container -->
         <div class="calculator-container">
             <!-- Input Section -->
@@ -159,7 +146,26 @@
 
                     <!-- Line Items -->
                     <div class="form-group">
-                        <label class="form-label">Cap Styles</label>
+                        <div class="cap-styles-header">
+                            <label class="form-label">Cap Styles</label>
+                            
+                            <!-- Real-Time Quote Preview Counter -->
+                            <div id="quotePreviewCounter" class="quote-preview-counter">
+                                <div class="drag-handle" title="Drag to reposition">
+                                    <i class="fas fa-grip-vertical"></i>
+                                </div>
+                                <div class="counter-content">
+                                    <div class="counter-main">
+                                        <span class="counter-label">Total Caps:</span>
+                                        <span class="counter-value" id="totalCapsCount">0</span>
+                                    </div>
+                                    <div class="counter-estimate">
+                                        <span id="estimatedTotal">Add caps to see pricing</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div id="lineItemsContainer" class="line-items-container">
                             <!-- Dynamic line items will be added here -->
                         </div>
