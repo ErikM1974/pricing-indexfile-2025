@@ -70,11 +70,18 @@
                     </div>
                     <div class="strip-images">
                         <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122" 
-                             alt="Front" class="strip-thumb" title="Front View">
+                             alt="Front" class="strip-thumb modal-trigger" title="Front View - Click to enlarge"
+                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122"
+                             data-caption="Richardson 112 - Front View">
                         <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123" 
-                             alt="Side" class="strip-thumb" title="Side View">
+                             alt="Side" class="strip-thumb modal-trigger" title="Side View - Click to enlarge"
+                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123"
+                             data-caption="Richardson 112 - Side View">
                         <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124" 
-                             alt="Back" class="strip-thumb" title="Back View">
+                             alt="Back" class="strip-thumb modal-trigger" title="Back View - Click to enlarge"
+                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124"
+                             data-caption="Richardson 112 - Back View">
+                        <span class="view-hint"><i class="fas fa-search-plus"></i> Click to view</span>
                     </div>
                     <div class="strip-features">
                         <span class="mini-badge">Mid-Profile</span>
@@ -317,6 +324,53 @@
         </div>
     </div>
 
+    <!-- Image Gallery Modal -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-gallery-content">
+            <button class="modal-close" aria-label="Close gallery">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-gallery-container">
+                <!-- Main Image Display -->
+                <div class="modal-image-wrapper">
+                    <button class="modal-nav modal-prev" aria-label="Previous image">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <img id="modalImage" src="" alt="" class="modal-main-image">
+                    <button class="modal-nav modal-next" aria-label="Next image">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Image Caption and Info -->
+                <div class="modal-image-info">
+                    <h3 id="modalCaption" class="modal-caption"></h3>
+                    <div class="modal-product-info">
+                        <h4>Richardson 112 - Trucker Mesh Back</h4>
+                        <p class="modal-product-subtitle">#1 Best Selling Cap</p>
+                        <div class="modal-features">
+                            <span class="modal-badge">Mid-Profile</span>
+                            <span class="modal-badge">Pre-Curved Visor</span>
+                            <span class="modal-badge">Snapback Closure</span>
+                            <span class="modal-badge">60/40 Cotton/Poly Blend</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thumbnail Navigation -->
+                <div class="modal-thumbnails">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122" 
+                         alt="Front" class="modal-thumb active" data-index="0">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123" 
+                         alt="Side" class="modal-thumb" data-index="1">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124" 
+                         alt="Back" class="modal-thumb" data-index="2">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Initialize calculator when DOM is ready

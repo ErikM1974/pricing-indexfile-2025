@@ -235,6 +235,12 @@
                 this.successMessage = document.getElementById('successMessage');
                 this.errorMessage = document.getElementById('errorMessage');
                 this.errorText = document.getElementById('errorText');
+                
+                // Image gallery modal elements
+                this.imageModal = document.getElementById('imageModal');
+                this.modalGalleryContent = document.querySelector('.modal-gallery-content');
+                this.galleryImages = [];
+                this.currentImageIndex = 0;
             }
 
             bindEvents() {
@@ -269,6 +275,9 @@
                 
                 // Handle add fee button
                 this.addFeeBtn.addEventListener('click', () => this.addAdditionalFee());
+                
+                // Initialize image gallery
+                this.initializeImageGallery();
             }
 
             addInitialLineItem() {
@@ -1763,5 +1772,145 @@
                         statusIcon.className = status === 'emailed' ? 'fas fa-envelope' : 'fas fa-check-circle';
                     }
                 }
+            }
+
+            // Image Gallery Methods
+            initializeImageGallery() {
+                // Get all cap thumbnails
+                const thumbnails = document.querySelectorAll('.strip-thumb');
+                
+                // Collect image data
+                this.galleryImages = Array.from(thumbnails).map((thumb, index) => {
+                    // For strip-thumb, the image IS the thumb element
+                    return {
+                        src: thumb.dataset.full || thumb.src,
+                        alt: thumb.alt,
+                        style: 'Richardson 112',
+                        description: thumb.dataset.caption || thumb.title || 'Trucker Mesh Back',
+                        price: '$6.50',
+                        index: index
+                    };
+                });
+                
+                // Add click handlers to thumbnails
+                thumbnails.forEach((thumb, index) => {
+                    thumb.addEventListener('click', () => {
+                        this.openGallery(index);
+                    });
+                });
+                
+                // Add keyboard support
+                document.addEventListener('keydown', (e) => {
+                    if (!this.imageModal || !this.imageModal.classList.contains('active')) return;
+                    
+                    switch(e.key) {
+                        case 'Escape':
+                            this.closeGallery();
+                            break;
+                        case 'ArrowLeft':
+                            this.navigateGallery('prev');
+                            break;
+                        case 'ArrowRight':
+                            this.navigateGallery('next');
+                            break;
+                    }
+                });
+            }
+            
+            openGallery(index) {
+                if (!this.imageModal || !this.galleryImages.length) return;
+                
+                this.currentImageIndex = index;
+                this.updateGalleryDisplay();
+                
+                // Show modal with animation
+                this.imageModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                
+                // Preload adjacent images for smooth navigation
+                this.preloadAdjacentImages();
+            }
+            
+            closeGallery() {
+                if (!this.imageModal) return;
+                
+                this.imageModal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+            
+            navigateGallery(direction) {
+                const totalImages = this.galleryImages.length;
+                
+                if (direction === 'prev') {
+                    this.currentImageIndex = (this.currentImageIndex - 1 + totalImages) % totalImages;
+                } else {
+                    this.currentImageIndex = (this.currentImageIndex + 1) % totalImages;
+                }
+                
+                this.updateGalleryDisplay();
+                this.preloadAdjacentImages();
+            }
+            
+            updateGalleryDisplay() {
+                if (!this.modalGalleryContent || !this.galleryImages[this.currentImageIndex]) return;
+                
+                const currentImage = this.galleryImages[this.currentImageIndex];
+                
+                // Update modal content
+                this.modalGalleryContent.innerHTML = `
+                    <button class="gallery-close" onclick="window.richardsonCalculator.closeGallery()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="gallery-navigation">
+                        <button class="gallery-nav gallery-prev" onclick="window.richardsonCalculator.navigateGallery('prev')">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="gallery-main-content">
+                            <div class="gallery-image-container">
+                                <img src="${currentImage.src}" alt="${currentImage.alt}" class="gallery-main-image">
+                            </div>
+                            
+                            <div class="gallery-info">
+                                <h3 class="gallery-title">${currentImage.style}</h3>
+                                <p class="gallery-description">${currentImage.description}</p>
+                                <div class="gallery-price">${currentImage.price}</div>
+                                <div class="gallery-counter">${this.currentImageIndex + 1} of ${this.galleryImages.length}</div>
+                            </div>
+                        </div>
+                        
+                        <button class="gallery-nav gallery-next" onclick="window.richardsonCalculator.navigateGallery('next')">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="gallery-thumbnails">
+                        ${this.galleryImages.map((img, index) => `
+                            <div class="gallery-thumb ${index === this.currentImageIndex ? 'active' : ''}" 
+                                 onclick="window.richardsonCalculator.openGallery(${index})">
+                                <img src="${img.src}" alt="${img.alt}">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Add click handler to overlay for closing
+                const overlay = this.imageModal.querySelector('.modal-overlay');
+                if (overlay) {
+                    overlay.onclick = () => this.closeGallery();
+                }
+            }
+            
+            preloadAdjacentImages() {
+                const totalImages = this.galleryImages.length;
+                const prevIndex = (this.currentImageIndex - 1 + totalImages) % totalImages;
+                const nextIndex = (this.currentImageIndex + 1) % totalImages;
+                
+                // Preload previous and next images
+                [prevIndex, nextIndex].forEach(index => {
+                    const img = new Image();
+                    img.src = this.galleryImages[index].src;
+                });
             }
         }
