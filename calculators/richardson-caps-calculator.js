@@ -625,8 +625,15 @@
                     
                     // Start progress animation
                     const progressFill = overlay.querySelector('.progress-fill');
+                    const progressPercent = overlay.querySelector('#progressPercent');
+                    
                     if (progressFill) {
                         progressFill.style.width = '0%';
+                        
+                        // Initialize percentage display
+                        if (progressPercent) {
+                            progressPercent.textContent = '0';
+                        }
                         
                         // Simulate progress over 2.5 seconds
                         let progress = 0;
@@ -640,7 +647,12 @@
                                     this.hideLoadingAnimation();
                                 }, 300);
                             }
+                            
+                            // Update both progress bar and percentage text
                             progressFill.style.width = progress + '%';
+                            if (progressPercent) {
+                                progressPercent.textContent = progress;
+                            }
                         }, 100);
                         
                         // Store interval so we can clear it if needed
