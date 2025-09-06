@@ -128,6 +128,60 @@ Is this intentional or should results be unique by style?
 5. Always verify security - no sensitive data in frontend, validate all inputs
 6. Test changes incrementally using browser console
 
+## ⚠️ IMPORTANT: Routing Requirements for New Pages
+
+**REMINDER: When Claude creates a new page, the following MUST be done to avoid white screen/page not loading errors:**
+
+1. **Add the new page to the route configuration** - The page must be registered in the routing system or it will not load
+2. **Ask Erik to restart the local server (port 3000)** - After adding a new page, Erik must restart the server using Roocode for the changes to take effect
+
+**Failure to do these steps will result in:**
+- White screen when trying to access the new page
+- Page not loading error
+- Routes not being recognized
+
+**Always remember:** New page → Add to routes → Restart server with Erik's help
+
+## 🚫 API Error Handling Policy - NO Silent Failures
+
+**ERIK'S REQUIREMENT: Never use fallback/cached data when API connections fail!**
+
+**Why this matters:**
+- Using incorrect pricing data is WORSE than showing an error
+- Silent failures hide problems that need to be fixed
+- Customers could receive wrong quotes if fallback data is outdated
+
+**Implementation Requirements:**
+
+1. **When API calls fail, you MUST:**
+   - Display a visible warning/error message on the page
+   - Prevent the calculator/tool from proceeding with potentially wrong data
+   - Log the error details to the console for debugging
+
+2. **Never do this:**
+   ```javascript
+   // ❌ WRONG - Silent fallback
+   try {
+     const data = await fetchAPI();
+   } catch (error) {
+     const data = getCachedData(); // NO! Don't silently use fallback
+   }
+   ```
+
+3. **Always do this:**
+   ```javascript
+   // ✅ CORRECT - Visible failure
+   try {
+     const data = await fetchAPI();
+   } catch (error) {
+     showErrorBanner('Unable to load current pricing. Please refresh or contact support.');
+     console.error('API failed:', error);
+     throw error; // Stop execution
+   }
+   ```
+
+**Remember:** It's better to show "Service temporarily unavailable" than to quietly use wrong pricing data!
+
 ## Adding New Documentation
 
 **IMPORTANT**: Claude does NOT automatically scan the memory/ directory. You MUST update this file when adding new documentation.
