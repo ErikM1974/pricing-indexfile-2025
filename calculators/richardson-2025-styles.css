@@ -2715,9 +2715,9 @@ textarea {
 
 /* Clean close button - MORE VISIBLE */
 .gallery-close {
-    position: fixed;  /* Changed from absolute to fixed */
-    top: 20px;
-    right: 20px;
+    position: absolute;  /* Position relative to modal content */
+    top: -60px;  /* Position above the content */
+    right: 0;
     width: 48px;
     height: 48px;
     background: rgba(0, 0, 0, 0.7);  /* Darker background for visibility */
@@ -2728,7 +2728,7 @@ textarea {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 10001;  /* Higher z-index */
+    z-index: 10;
     outline: none;  /* Remove focus outline */
     padding: 0;  /* Reset padding */
 }
