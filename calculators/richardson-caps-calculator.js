@@ -198,7 +198,6 @@
                 // Form elements
                 this.form = document.getElementById('pricingForm');
                 this.customerNameInput = document.getElementById('customerName');
-                this.projectNameInput = document.getElementById('projectName');
                 this.mainSalesRep = document.getElementById('mainSalesRep');
                 this.stitchCountSelect = document.getElementById('stitchCount');
                 this.stitchCountGroup = document.getElementById('stitchCountGroup');
@@ -218,6 +217,9 @@
                 // Results elements
                 this.emptyState = document.getElementById('emptyState');
                 this.resultsDisplay = document.getElementById('resultsDisplay');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.errorDisplay = document.getElementById('errorDisplay');
+                this.errorMessage = document.getElementById('errorMessage');
                 
                 // Modal elements
                 this.modal = document.getElementById('quoteModal');
@@ -252,8 +254,7 @@
                 // Handle embellishment type change
                 this.embellishmentRadios.forEach(radio => {
                     radio.addEventListener('change', () => {
-                        const isEmbroidery = this.getSelectedEmbellishment() === 'embroidery';
-                        this.stitchCountGroup.style.display = isEmbroidery ? 'block' : 'none';
+                        console.log('[Richardson] Embellishment changed to:', this.getSelectedEmbellishment());
                     });
                 });
                 
@@ -481,9 +482,14 @@
                 
                 // Get form values
                 const customerName = this.customerNameInput.value.trim();
-                const projectName = this.projectNameInput.value.trim();
-                const stitchCount = this.stitchCountSelect.value;
-                const stitchCountText = this.stitchCountSelect.options[this.stitchCountSelect.selectedIndex].text;
+                const stitchCount = '8000'; // Always 8000
+                const stitchCountText = 'Up to 8,000 stitches';
+                
+                console.log('[Richardson] Starting calculation with:', {
+                    customer: customerName,
+                    embellishment: this.getSelectedEmbellishment(),
+                    stitchCount: stitchCount
+                });
                 
                 // Collect line items
                 const lineItems = [];
@@ -562,6 +568,14 @@
                 const setupFees = this.calculateSetupFees();
                 const grandTotal = subtotal + setupFees.total;
                 
+                console.log('[Richardson] Calculation complete:', {
+                    totalQuantity,
+                    ltmFee: ltmFeeTotal,
+                    subtotal,
+                    setupFees: setupFees.total,
+                    grandTotal
+                });
+                
                 // Get sales rep information
                 const salesRepEmail = this.mainSalesRep.value;
                 const salesRepName = this.mainSalesRep.options[this.mainSalesRep.selectedIndex].text.split(':')[0].trim();
@@ -572,7 +586,6 @@
                 // Store quote data
                 this.currentQuote = {
                     customerName,
-                    projectName,
                     stitchCount,
                     stitchCountText,
                     embellishmentType,
@@ -594,7 +607,15 @@
             displayResults() {
                 if (!this.currentQuote) return;
                 
-                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, projectName } = this.currentQuote;
+                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, quoteId } = this.currentQuote;
+                
+                // Use the better display method if we have a quote ID
+                if (quoteId) {
+                    this.displayResultsWithQuoteId();
+                    return;
+                }
+                
+                console.log('[Richardson] Displaying results (no quote ID yet)');
                 
                 // Build items table
                 let itemsHtml = '';
@@ -635,14 +656,12 @@
                             </div>
                             <div class="overview-item">
                                 <span class="overview-label">Embellishment Type</span>
-                                <span class="overview-value">${embellishmentDisplay}</span>
+                                <span class="overview-value" style="font-weight: 600; color: #4cb354; text-transform: uppercase;">
+                                    ${embellishmentType === 'embroidery' ? 
+                                        `EMBROIDERY - ${stitchCountText}` : 
+                                        'LEATHERETTE PATCH - 4" x 2.5"'}
+                                </span>
                             </div>
-                            ${projectName ? `
-                                <div class="overview-item">
-                                    <span class="overview-label">Project Name</span>
-                                    <span class="overview-value">${projectName}</span>
-                                </div>
-                            ` : ''}
                         </div>
                         ${ltmFeeTotal > 0 ? `
                             <div class="ltm-warning" style="margin-top: 1rem;">
@@ -751,29 +770,21 @@
                             <div class="grand-total-label">Your Total Quote Amount</div>
                             <div class="grand-total-amount">$${grandTotal.toFixed(2)}</div>
                         </div>
-                        
-                        <div class="button-container">
-                            <button type="button" class="btn btn-secondary" onclick="if(window.richardsonCalculator && window.richardsonCalculator.currentQuote) { window.richardsonCalculator.printQuote(); } else { alert('Please generate a quote first'); }">
-                                <i class="fas fa-print"></i>
-                                Print Quote
-                            </button>
-                            <button type="button" class="btn btn-success" id="sendQuoteBtn">
-                                <i class="fas fa-paper-plane"></i>
-                                Send Quote
-                            </button>
-                        </div>
                     </div>
                 `;
                 
                 // Update display
                 this.resultsDisplay.innerHTML = resultsHtml;
                 this.resultsDisplay.classList.remove('hidden');
-                this.emptyState.classList.add('hidden');
+                if (this.emptyState) {
+                    this.emptyState.classList.add('hidden');
+                }
+                this.hideError();
                 
-                // Bind send quote button
-                document.getElementById('sendQuoteBtn').addEventListener('click', () => {
-                    this.openModal();
-                });
+                // Show the results section
+                if (this.resultsSection) {
+                    this.resultsSection.style.display = 'block';
+                }
             }
 
             async saveQuoteToDatabase() {
@@ -789,7 +800,6 @@
                         customerEmail: this.customerNameInput.value, // Will be filled from form
                         companyName: '', // Will be filled from form
                         customerPhone: '', // Will be filled from form
-                        projectName: this.currentQuote.projectName,
                         items: this.currentQuote.items,
                         totalQuantity: this.currentQuote.totalQuantity,
                         subtotal: this.currentQuote.subtotal,
@@ -811,18 +821,23 @@
                         this.currentQuote.quoteId = saveResult.quoteID;
                         
                         // Update display with quote ID
-                        this.displayResultsWithQuoteId();
+                        this.displayResults();
                         
                         // Update button states
                         this.enableQuoteActions();
                         
-                        console.log('Quote saved successfully with ID:', saveResult.quoteID);
+                        console.log('[Richardson] Quote saved successfully with ID:', saveResult.quoteID);
+                        console.log('[Richardson] Quote details:', {
+                            id: saveResult.quoteID,
+                            items: this.currentQuote.items.length,
+                            total: this.currentQuote.grandTotal
+                        });
                     } else {
-                        console.error('Failed to save quote:', saveResult.error);
+                        console.error('[Richardson] Failed to save quote:', saveResult.error);
                         this.showError('Failed to save quote. Please try again.');
                     }
                 } catch (error) {
-                    console.error('Error saving quote:', error);
+                    console.error('[Richardson] Error saving quote:', error);
                     this.showError('Error saving quote. Please try again.');
                 }
             }
@@ -837,13 +852,20 @@
                     </div>
                 `;
                 this.resultsDisplay.classList.remove('hidden');
-                this.emptyState.classList.add('hidden');
+                if (this.emptyState) {
+                    if (this.emptyState) {
+                        this.emptyState.classList.add('hidden');
+                    }
+                }
+                this.hideError();
             }
 
             displayResultsWithQuoteId() {
                 if (!this.currentQuote) return;
                 
-                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, projectName, quoteId } = this.currentQuote;
+                const { items, totalQuantity, stitchCountText, embellishmentType, ltmFeeTotal, subtotal, setupFees, grandTotal, notes, quoteId } = this.currentQuote;
+                
+                console.log('[Richardson] Displaying results with Quote ID:', quoteId);
                 
                 // Build items table with clean structure
                 let itemsHtml = '';
@@ -931,22 +953,6 @@
 
                 // Build complete results HTML with modern layout
                 const resultsHtml = `
-                    <!-- Quote Success Header -->
-                    <div class="quote-success-header">
-                        <div class="success-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="success-content">
-                            <h2 class="success-title">QUOTE GENERATED</h2>
-                            <div class="quote-id-display">
-                                <span class="quote-id-large">${quoteId}</span>
-                            </div>
-                        </div>
-                        <div class="status-badge">
-                            <span class="badge-success">Saved to Database</span>
-                        </div>
-                    </div>
-
                     <!-- Quote Overview Card -->
                     <div class="quote-card customer-info-card">
                         <div class="card-header">
@@ -958,15 +964,13 @@
                                 <span class="info-value">${totalQuantity} pieces</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Embellishment</span>
-                                <span class="info-value">${embellishmentType === 'embroidery' ? `Up to ${stitchCountText.toLowerCase()}` : 'Leatherette Patch'}</span>
+                                <span class="info-label">Embellishment Type</span>
+                                <span class="info-value" style="font-weight: 600; color: var(--primary-green); text-transform: uppercase;">
+                                    ${embellishmentType === 'embroidery' ? 
+                                        `EMBROIDERY - ${stitchCountText}` : 
+                                        'LEATHERETTE PATCH - 4" x 2.5"'}
+                                </span>
                             </div>
-                            ${projectName ? `
-                            <div class="info-item">
-                                <span class="info-label">Project</span>
-                                <span class="info-value">${projectName}</span>
-                            </div>
-                            ` : ''}
                         </div>
                     </div>
 
@@ -1009,37 +1013,44 @@
                     </div>
 
                     ${setupFeesHtml}
-                    ${notesHtml}
-
-                    <!-- Price Per Cap Display Section -->
-                    <div class="total-display-section">
-                        <div class="per-cap-section">
-                            <div class="per-cap-label">PRICE PER CAP</div>
-                            <div class="per-cap-amount">
-                                <span class="currency-symbol">$</span>
-                                <span class="amount-value">${(grandTotal / totalQuantity).toFixed(2)}</span>
-                            </div>
-                            <div class="per-cap-detail">for ${totalQuantity} caps</div>
+                    
+                    <!-- Compact Price Summary Bar -->
+                    <div class="quote-summary-bar">
+                        <div class="summary-item">
+                            <span class="summary-label">Type:</span>
+                            <span class="summary-value" style="font-weight: 600;">
+                                ${embellishmentType === 'embroidery' ? 'EMBROIDERY' : 'LEATHERETTE'}
+                            </span>
                         </div>
-                        <div class="total-section-small">
-                            <span class="total-label-small">Total Order:</span>
-                            <span class="total-amount-small">$${grandTotal.toFixed(2)}</span>
+                        <div class="summary-item">
+                            <span class="summary-label">Quantity:</span>
+                            <span class="summary-value">${totalQuantity} caps</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Price per cap:</span>
+                            <span class="summary-value">$${(grandTotal/totalQuantity).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-total">
+                            <span class="total-label">Total:</span>
+                            <span class="total-value">$${grandTotal.toFixed(2)}</span>
                         </div>
                     </div>
                     
+                    ${notesHtml}
+                    
                     <!-- Action Buttons -->
                     <div class="action-buttons">
-                        <button type="button" class="btn btn-print" id="printQuoteBtn" disabled>
+                        <button type="button" class="btn btn-print" id="printQuoteBtn">
                             <i class="fas fa-print"></i>
                             <span>Print Quote</span>
                             <span class="quote-ref">${quoteId}</span>
                         </button>
-                        <button type="button" class="btn btn-send" id="sendQuoteBtn" disabled>
+                        <button type="button" class="btn btn-send" id="sendQuoteBtn">
                             <i class="fas fa-paper-plane"></i>
                             <span>Send Quote</span>
                             <span class="quote-ref">${quoteId}</span>
                         </button>
-                        <button type="button" class="btn btn-new" id="newQuoteBtn" disabled>
+                        <button type="button" class="btn btn-new" id="newQuoteBtn">
                             <i class="fas fa-plus"></i>
                             <span>New Quote</span>
                         </button>
@@ -1049,40 +1060,50 @@
                 // Update display
                 this.resultsDisplay.innerHTML = resultsHtml;
                 this.resultsDisplay.classList.remove('hidden');
-                this.emptyState.classList.add('hidden');
+                if (this.emptyState) {
+                    this.emptyState.classList.add('hidden');
+                }
+                this.hideError();
                 
-                // Bind quote action buttons (will be enabled after quote is generated)
-                document.getElementById('printQuoteBtn').addEventListener('click', () => {
-                    this.printQuote();
-                });
-                document.getElementById('sendQuoteBtn').addEventListener('click', () => {
-                    this.openModal();
-                });
-                document.getElementById('newQuoteBtn').addEventListener('click', () => {
-                    this.startNewQuote();
-                });
-            }
-
-            enableQuoteActions() {
-                // Enable the print, send, and new quote buttons
+                // Show the results section
+                if (this.resultsSection) {
+                    this.resultsSection.style.display = 'block';
+                }
+                
+                // Bind quote action buttons with proper checks to avoid duplicates
                 const printBtn = document.getElementById('printQuoteBtn');
                 const sendBtn = document.getElementById('sendQuoteBtn');
                 const newBtn = document.getElementById('newQuoteBtn');
                 
-                if (printBtn) {
-                    printBtn.disabled = false;
-                    printBtn.classList.remove('btn-disabled');
+                if (printBtn && !printBtn.hasAttribute('data-listener-added')) {
+                    printBtn.setAttribute('data-listener-added', 'true');
+                    printBtn.addEventListener('click', () => {
+                        console.log('[Richardson] Print button clicked');
+                        this.printQuote();
+                    });
                 }
                 
-                if (sendBtn) {
-                    sendBtn.disabled = false;
-                    sendBtn.classList.remove('btn-disabled');
+                if (sendBtn && !sendBtn.hasAttribute('data-listener-added')) {
+                    sendBtn.setAttribute('data-listener-added', 'true');
+                    sendBtn.addEventListener('click', () => {
+                        console.log('[Richardson] Send button clicked');
+                        this.openModal();
+                    });
                 }
                 
-                if (newBtn) {
-                    newBtn.disabled = false;
-                    newBtn.classList.remove('btn-disabled');
+                if (newBtn && !newBtn.hasAttribute('data-listener-added')) {
+                    newBtn.setAttribute('data-listener-added', 'true');
+                    newBtn.addEventListener('click', () => {
+                        console.log('[Richardson] New Quote button clicked');
+                        this.startNewQuote();
+                    });
                 }
+            }
+
+            enableQuoteActions() {
+                // This function is no longer needed since buttons are enabled by default
+                // Kept for backward compatibility but does nothing
+                console.log('[Richardson] Quote actions are already enabled');
             }
 
             printQuote() {
@@ -1336,12 +1357,16 @@
                                 ${quote.customerEmail ? `<p>${quote.customerEmail}</p>` : ''}
                                 ${quote.customerPhone ? `<p>${quote.customerPhone}</p>` : ''}
                             </div>
-                            ${quote.projectName ? `
-                            <div class="info-box">
-                                <h3>Project</h3>
-                                <p>${quote.projectName}</p>
-                            </div>
-                            ` : ''}
+                        </div>
+                        
+                        <!-- Embellishment Type Section -->
+                        <div style="background: #f0f7f1; border: 2px solid #4cb354; border-radius: 6px; padding: 10px; margin: 15px 0;">
+                            <h3 style="margin: 0 0 5px 0; color: #4cb354; font-size: 14px;">EMBELLISHMENT TYPE</h3>
+                            <p style="margin: 0; font-size: 16px; font-weight: bold; color: #1f2937;">
+                                ${quote.embellishmentType === 'embroidery' ? 
+                                    `EMBROIDERY - ${quote.stitchCountText || 'Up to 8,000 stitches'}` : 
+                                    'LEATHERETTE PATCH - 4" x 2.5" Premium Patch'}
+                            </p>
                         </div>
                         
                         <!-- Compact pricing table -->
@@ -1397,7 +1422,20 @@
             }
 
             showError(message) {
-                alert(message); // Simple error handling for now
+                // Use error display div if available, otherwise fallback to alert
+                if (this.errorDisplay && this.errorMessage) {
+                    this.errorMessage.textContent = message;
+                    this.errorDisplay.classList.remove('hidden');
+                    console.error('[Richardson] Error displayed:', message);
+                } else {
+                    alert(message);
+                }
+            }
+            
+            hideError() {
+                if (this.errorDisplay) {
+                    this.errorDisplay.classList.add('hidden');
+                }
             }
 
             openModal() {
@@ -1434,13 +1472,9 @@
             updateQuotePreview() {
                 if (!this.currentQuote) return;
                 
-                const { totalQuantity, grandTotal, projectName } = this.currentQuote;
+                const { totalQuantity, grandTotal } = this.currentQuote;
                 
                 this.quotePreview.innerHTML = `
-                    <div class="summary-row">
-                        <span class="summary-label">Project:</span>
-                        <span class="summary-value">${projectName || 'Richardson Cap Quote'}</span>
-                    </div>
                     <div class="summary-row">
                         <span class="summary-label">Items:</span>
                         <span class="summary-value">${this.currentQuote.items.length} styles</span>
@@ -1601,7 +1635,7 @@
                         company_name: this.companyName.value || '',
                         customer_email: this.customerEmail.value,
                         customer_phone: this.customerPhone.value || '',
-                        project_name: this.currentQuote.projectName || 'Richardson Cap Quote',
+                        project_name: 'Richardson Cap Quote',
                         quote_id: this.currentQuote.quoteId, // Use existing quote ID
                         quote_date: new Date().toLocaleDateString(),
                         quote_type: 'Richardson Caps',
@@ -1676,7 +1710,9 @@
                     // Clear the results display
                     this.resultsDisplay.innerHTML = '';
                     this.resultsDisplay.classList.add('hidden');
-                    this.emptyState.classList.remove('hidden');
+                    if (this.emptyState) {
+                        this.emptyState.classList.remove('hidden');
+                    }
                     
                     // Reset line items to just one
                     this.lineItems = [];
@@ -1684,9 +1720,6 @@
                     
                     // Reset customer name
                     this.customerNameInput.value = '';
-                    
-                    // Reset project name
-                    this.projectName.value = '';
                     
                     // Reset sales rep
                     this.mainSalesRep.value = '';

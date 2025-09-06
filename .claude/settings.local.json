@@ -45,7 +45,9 @@
       "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)",
       "Read(/mnt/c/Users/erik/Downloads/**)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Read(//mnt/c/Users/erik/Downloads/**)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": [],
