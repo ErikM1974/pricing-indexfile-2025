@@ -1779,22 +1779,20 @@
                 // Get all cap thumbnails
                 const thumbnails = document.querySelectorAll('.strip-thumb');
                 
-                // Collect image data
+                // Collect ONLY image data - no pricing or extra info
                 this.galleryImages = Array.from(thumbnails).map((thumb, index) => {
-                    // For strip-thumb, the image IS the thumb element
                     return {
                         src: thumb.dataset.full || thumb.src,
                         alt: thumb.alt,
-                        style: 'Richardson 112',
-                        description: thumb.dataset.caption || thumb.title || 'Trucker Mesh Back',
-                        price: '$6.50',
-                        index: index
+                        caption: thumb.dataset.caption || thumb.alt || `View ${index + 1}`
                     };
                 });
                 
                 // Add click handlers to thumbnails
                 thumbnails.forEach((thumb, index) => {
-                    thumb.addEventListener('click', () => {
+                    thumb.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         this.openGallery(index);
                     });
                 });
@@ -1856,41 +1854,38 @@
                 
                 const currentImage = this.galleryImages[this.currentImageIndex];
                 
-                // Update modal content
+                // Clean, simple modal content - JUST THE IMAGE
                 this.modalGalleryContent.innerHTML = `
-                    <button class="gallery-close" onclick="window.richardsonCalculator.closeGallery()">
-                        <i class="fas fa-times"></i>
+                    <button class="gallery-close" onclick="window.richardsonCalculator.closeGallery()" aria-label="Close">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
                     </button>
                     
-                    <div class="gallery-navigation">
-                        <button class="gallery-nav gallery-prev" onclick="window.richardsonCalculator.navigateGallery('prev')">
-                            <i class="fas fa-chevron-left"></i>
+                    <div class="gallery-main">
+                        <button class="gallery-arrow gallery-prev" onclick="window.richardsonCalculator.navigateGallery('prev')" aria-label="Previous">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
                         </button>
                         
-                        <div class="gallery-main-content">
-                            <div class="gallery-image-container">
-                                <img src="${currentImage.src}" alt="${currentImage.alt}" class="gallery-main-image">
-                            </div>
-                            
-                            <div class="gallery-info">
-                                <h3 class="gallery-title">${currentImage.style}</h3>
-                                <p class="gallery-description">${currentImage.description}</p>
-                                <div class="gallery-price">${currentImage.price}</div>
-                                <div class="gallery-counter">${this.currentImageIndex + 1} of ${this.galleryImages.length}</div>
-                            </div>
-                        </div>
+                        <img src="${currentImage.src}" alt="${currentImage.alt}" class="gallery-image">
                         
-                        <button class="gallery-nav gallery-next" onclick="window.richardsonCalculator.navigateGallery('next')">
-                            <i class="fas fa-chevron-right"></i>
+                        <button class="gallery-arrow gallery-next" onclick="window.richardsonCalculator.navigateGallery('next')" aria-label="Next">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
                         </button>
                     </div>
                     
-                    <div class="gallery-thumbnails">
-                        ${this.galleryImages.map((img, index) => `
-                            <div class="gallery-thumb ${index === this.currentImageIndex ? 'active' : ''}" 
-                                 onclick="window.richardsonCalculator.openGallery(${index})">
-                                <img src="${img.src}" alt="${img.alt}">
-                            </div>
+                    <div class="gallery-caption">${currentImage.caption}</div>
+                    
+                    <div class="gallery-dots">
+                        ${this.galleryImages.map((_, index) => `
+                            <button class="gallery-dot ${index === this.currentImageIndex ? 'active' : ''}" 
+                                    onclick="window.richardsonCalculator.openGallery(${index})"
+                                    aria-label="View image ${index + 1}"></button>
                         `).join('')}
                     </div>
                 `;
