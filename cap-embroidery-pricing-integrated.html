@@ -1063,7 +1063,7 @@
                             resultsHTML += `
                                 <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
                                     <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
-                                    Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="embroidery-pricing.html" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
+                                    Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/pricing/embroidery" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
                                 </div>
                             `;
                         }
@@ -1746,7 +1746,7 @@
                 Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.
             `;
             
-            document.getElementById('redirectButton').href = `embroidery-pricing.html?StyleNumber=${styleNumber}`;
+            document.getElementById('redirectButton').href = `/pricing/embroidery?StyleNumber=${styleNumber}`;
             
             // Show the overlay
             overlay.style.display = 'flex';
