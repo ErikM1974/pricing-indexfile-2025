@@ -1293,6 +1293,21 @@
             console.log('✅ Product info updated:', { title, description, brand });
         }
         
+        // Helper function to detect generic catalog images
+        function isGenericProductImage(url) {
+            if (!url) return true;
+            
+            // Check for generic catalog image patterns
+            // These are typically: /catalog/images/[STYLE].jpg or similar
+            const genericPatterns = [
+                /\/catalog\/images\/[A-Z0-9]+\.jpg$/i,  // Matches /catalog/images/C112.jpg
+                /\/catalog\/[A-Z0-9]+\.jpg$/i,          // Matches /catalog/C112.jpg
+                /\/imglib\/mft\/[A-Z0-9]+\.jpg$/i       // Matches other generic patterns
+            ];
+            
+            return genericPatterns.some(pattern => pattern.test(url));
+        }
+        
         // Set main product image and create thumbnails
         function setMainProductImage(product, colorSpecific = false) {
             console.log('🖼️ Setting main product image with:', product, 'Color-specific:', colorSpecific);
@@ -1306,7 +1321,12 @@
             if (product.FRONT_FLAT) {
                 images.push({ url: product.FRONT_FLAT, label: 'Flat', field: 'FRONT_FLAT' });
             }
-            if (product.PRODUCT_IMAGE && product.PRODUCT_IMAGE !== product.FRONT_MODEL && product.PRODUCT_IMAGE !== product.FRONT_FLAT) {
+            
+            // Only add PRODUCT_IMAGE if it's different, not generic, and exists on this variant
+            if (product.PRODUCT_IMAGE && 
+                product.PRODUCT_IMAGE !== product.FRONT_MODEL && 
+                product.PRODUCT_IMAGE !== product.FRONT_FLAT &&
+                !isGenericProductImage(product.PRODUCT_IMAGE)) {
                 images.push({ url: product.PRODUCT_IMAGE, label: 'Product', field: 'PRODUCT_IMAGE' });
             }
             
