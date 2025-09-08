@@ -187,6 +187,92 @@
             text-align: center;
             color: var(--text-secondary);
         }
+        
+        /* Product type mismatch overlay */
+        .product-mismatch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .product-mismatch-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-icon {
+            font-size: 48px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .product-mismatch-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .product-mismatch-message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .product-mismatch-message strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .product-mismatch-button {
+            background: #4cb354;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-mismatch-button:hover {
+            background: #409a47;
+            color: white;
+            text-decoration: none;
+        }
 
         /* Main Container */
         .main-container {
@@ -964,21 +1050,36 @@
                     
                     const results = await response.json();
                     
-                    // Filter out caps (but allow beanies and knit caps) and track if any were found
-                    const capsFound = results.some(item => {
-                        const label = item.label.toLowerCase();
-                        return label.includes('cap') && !label.includes('beanie') && !label.includes('knit');
-                    });
-                    const filteredResults = results.filter(item => {
-                        const label = item.label.toLowerCase();
-                        // Keep if it's a beanie or knit cap, or if it doesn't have 'cap'
-                        return label.includes('beanie') || label.includes('knit') || !label.includes('cap');
+                    // Separate caps and non-caps
+                    const capResults = [];
+                    const flatResults = [];
+                    
+                    results.forEach(result => {
+                        const label = result.label.toLowerCase();
+                        const isCapProduct = (
+                            (label.includes('cap') || label.includes('trucker') || label.includes('snapback') || label.includes('fitted')) &&
+                            !label.includes('beanie') && 
+                            !label.includes('knit')
+                        );
+                        
+                        if (isCapProduct) {
+                            capResults.push(result);
+                        } else {
+                            flatResults.push(result);
+                        }
                     });
                     
-                    if (capsFound && filteredResults.length === 0) {
+                    if (capResults.length > 0 && flatResults.length === 0) {
                         // Only caps were found
-                        resultsContainer.innerHTML = '<div class="search-no-results" style="padding: 15px; color: #92400e;"><i class="fas fa-info-circle" style="margin-right: 8px;"></i>For cap embroidery pricing, please use the Cap Pricing Calculator</div>';
-                    } else if (filteredResults.length === 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="search-no-results" style="padding: 15px; color: #92400e;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                Found ${capResults.length} cap item(s). Please use the 
+                                <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                                page for structured caps.
+                            </div>
+                        `;
+                    } else if (flatResults.length === 0) {
                         // No results found at all
                         resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
                     } else {
@@ -986,12 +1087,19 @@
                         let resultsHTML = '';
                         
                         // Add a note if caps were filtered out
-                        if (capsFound) {
-                            resultsHTML = '<div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;"><i class="fas fa-info-circle" style="margin-right: 5px;"></i>Cap results excluded. Use Cap Pricing Calculator for caps.</div>';
+                        if (capResults.length > 0) {
+                            resultsHTML = `
+                                <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
+                                    <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                                    Found ${capResults.length} cap item(s). Please use the 
+                                    <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                                    page for structured caps.
+                                </div>
+                            `;
                         }
                         
-                        // Add the filtered results
-                        resultsHTML += filteredResults.map(result => {
+                        // Add the flat embroidery results
+                        resultsHTML += flatResults.map(result => {
                             return `
                                 <div class="search-result-item" data-style="${result.value}">
                                     <div class="search-result-info">
@@ -1096,6 +1204,12 @@
                 
                 currentProduct = productArray[0]; // Use first item as base product info
                 
+                // Validate product type - stop if it's a cap
+                if (!validateProductType(currentProduct, styleNumber)) {
+                    hideLoading();
+                    return; // Stop loading if wrong product type
+                }
+                
                 // Update product info
                 updateProductInfo(currentProduct, styleNumber);
                 
@@ -1151,6 +1265,97 @@
             document.getElementById('currentBrand').textContent = brand;
             
             console.log('✅ Product info updated:', { title, description, brand });
+        }
+        
+        // Validate if product is a cap and should use cap pricing
+        function validateProductType(product, styleNumber) {
+            // Get product title and description for validation
+            const productTitle = (product.PRODUCT_TITLE || product.ProductTitle || '').toLowerCase();
+            const description = (product.PRODUCT_DESCRIPTION || product.Description || '').toLowerCase();
+            const category = (product.CATEGORY || product.Category || '').toLowerCase();
+            
+            console.log('🔍 Validating product type:', {
+                title: productTitle,
+                description: description,
+                category: category
+            });
+            
+            // Check if this is a cap product
+            const isCapProduct = (
+                productTitle.includes('cap') ||
+                description.includes('cap') ||
+                category.includes('cap') ||
+                productTitle.includes('trucker') ||
+                productTitle.includes('snapback') ||
+                productTitle.includes('fitted') ||
+                productTitle.includes('flexfit')
+            );
+            
+            // Exclude beanies and knit caps (they use flat embroidery)
+            const isBeanie = (
+                productTitle.includes('beanie') ||
+                productTitle.includes('knit') ||
+                description.includes('beanie') ||
+                description.includes('knit cap')
+            );
+            
+            if (isCapProduct && !isBeanie) {
+                console.log('⚠️ Cap product detected - should use cap embroidery pricing');
+                const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;
+                const reason = 'This product is a structured cap and requires cap embroidery pricing.';
+                showProductMismatchOverlay(styleNumber, productName, reason);
+                return false; // Invalid for flat embroidery
+            }
+            
+            return true; // Valid for flat embroidery
+        }
+        
+        // Show overlay for product type mismatch
+        function showProductMismatchOverlay(styleNumber, productName, reason) {
+            console.log('🚫 Showing product mismatch overlay');
+            
+            // Check if overlay already exists
+            let overlay = document.getElementById('productMismatchOverlay');
+            
+            if (!overlay) {
+                // Create the overlay HTML dynamically
+                const overlayHTML = `
+                    <div id="productMismatchOverlay" class="product-mismatch-overlay">
+                        <div class="product-mismatch-modal">
+                            <div class="product-mismatch-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
+                            <p class="product-mismatch-message" id="mismatchMessage"></p>
+                            <a id="redirectButton" href="#" class="product-mismatch-button">
+                                Go to Cap Embroidery Pricing →
+                            </a>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', overlayHTML);
+                overlay = document.getElementById('productMismatchOverlay');
+            }
+            
+            // Update the message
+            document.getElementById('mismatchMessage').innerHTML = `
+                <strong>${productName}</strong><br><br>
+                ${reason}<br><br>
+                Flat embroidery pricing is for shirts, polos, jackets, and beanies.
+            `;
+            
+            document.getElementById('redirectButton').href = `/pricing/cap-embroidery?StyleNumber=${styleNumber}`;
+            
+            // Show the overlay
+            overlay.style.display = 'flex';
+            
+            // Gray out the background content
+            if (document.getElementById('productHero')) {
+                document.getElementById('productHero').style.opacity = '0.3';
+            }
+            if (document.getElementById('pricingSection')) {
+                document.getElementById('pricingSection').style.opacity = '0.3';
+            }
         }
         
         // Helper function to detect generic catalog images
