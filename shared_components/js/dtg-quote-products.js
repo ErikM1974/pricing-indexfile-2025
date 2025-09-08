@@ -39,7 +39,30 @@ class DTGQuoteProducts {
                 productName: item.label.split(' - ')[1] || item.label
             }));
             
-            console.log('[DTGQuoteProducts] Search results:', products.length);
+            // Sort suggestions by relevance - exact matches first, then "starts with", then contains
+            const queryUpper = query.toUpperCase();
+            products.sort((a, b) => {
+                const aUpper = a.value.toUpperCase();
+                const bUpper = b.value.toUpperCase();
+                
+                // Exact match gets highest priority (PC54 when searching for PC54)
+                const aExact = aUpper === queryUpper;
+                const bExact = bUpper === queryUpper;
+                if (aExact && !bExact) return -1;
+                if (!aExact && bExact) return 1;
+                
+                // "Starts with" gets second priority (PC54LS when searching for PC54)
+                const aStarts = aUpper.startsWith(queryUpper);
+                const bStarts = bUpper.startsWith(queryUpper);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                
+                // Otherwise alphabetical order
+                return aUpper.localeCompare(bUpper);
+            });
+            
+            console.log('[DTGQuoteProducts] Search results:', products.length, 
+                        products.length > 0 ? `First result: ${products[0].value}` : '');
             return products;
             
         } catch (error) {
