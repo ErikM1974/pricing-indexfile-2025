@@ -682,6 +682,114 @@
                 padding: 24px;
             }
         }
+        
+        /* Product type mismatch overlay */
+        .product-mismatch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-icon {
+            font-size: 48px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .product-mismatch-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .product-mismatch-message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .product-mismatch-message strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .product-mismatch-button {
+            background: #4cb354;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-mismatch-button:hover {
+            background: #409a47;
+            color: white;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 480px) {
+            .product-mismatch-modal {
+                padding: 30px 20px;
+            }
+            
+            .product-mismatch-icon {
+                font-size: 40px;
+            }
+            
+            .product-mismatch-title {
+                font-size: 20px;
+            }
+            
+            .product-mismatch-message {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1054,6 +1162,36 @@
                 }
                 
                 currentProduct = productArray[0];
+                
+                // Validate that this is actually a cap product
+                const productTitle = (currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || '').toLowerCase();
+                const productDescription = (currentProduct.PRODUCT_DESCRIPTION || currentProduct.Description || '').toLowerCase();
+                const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
+                const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
+                
+                // Check if it's a beanie/knit item
+                if (productTitle.includes('beanie') || productTitle.includes('knit') || 
+                    productDescription.includes('beanie') || productDescription.includes('knit')) {
+                    showProductMismatchOverlay(
+                        styleNumber,
+                        `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
+                        'This is a beanie/knit item that requires flat embroidery.'
+                    );
+                    return; // Stop loading the rest of the page
+                }
+                
+                // Check if it's actually a cap
+                if (!productTitle.includes('cap') && !category.includes('cap') && 
+                    !productTitle.includes('trucker') && !productTitle.includes('snapback') &&
+                    !productTitle.includes('flexfit') && !productTitle.includes('fitted')) {
+                    // This is not a cap - likely a shirt or other item
+                    showProductMismatchOverlay(
+                        styleNumber,
+                        `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
+                        'This product requires flat embroidery pricing, not cap embroidery.'
+                    );
+                    return; // Stop loading the rest of the page
+                }
                 
                 // Update product info
                 updateProductInfo(currentProduct, styleNumber);
@@ -1569,6 +1707,59 @@
             } catch (error) {
                 console.log('❌ Error fetching color-specific image:', error);
                 // Keep the current images
+            }
+        }
+        
+        // Show product mismatch overlay
+        function showProductMismatchOverlay(styleNumber, productName, reason) {
+            console.log('⚠️ Product mismatch detected:', productName);
+            
+            // Hide loading state
+            document.getElementById('loadingState').style.display = 'none';
+            
+            // Create or get overlay
+            let overlay = document.getElementById('productMismatchOverlay');
+            if (!overlay) {
+                // Create the overlay HTML dynamically
+                const overlayHTML = `
+                    <div id="productMismatchOverlay" class="product-mismatch-overlay">
+                        <div class="product-mismatch-modal">
+                            <div class="product-mismatch-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
+                            <p class="product-mismatch-message" id="mismatchMessage"></p>
+                            <a id="redirectButton" href="#" class="product-mismatch-button">
+                                Go to Flat Embroidery Pricing →
+                            </a>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', overlayHTML);
+                overlay = document.getElementById('productMismatchOverlay');
+            }
+            
+            // Update message and button
+            document.getElementById('mismatchMessage').innerHTML = `
+                <strong>${productName}</strong><br><br>
+                ${reason}<br><br>
+                Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.
+            `;
+            
+            document.getElementById('redirectButton').href = `/embroidery-pricing.html?StyleNumber=${styleNumber}`;
+            
+            // Show the overlay
+            overlay.style.display = 'flex';
+            
+            // Gray out the background content (they might be partially visible)
+            if (document.getElementById('productHero')) {
+                document.getElementById('productHero').style.opacity = '0.3';
+            }
+            if (document.getElementById('pricingSection')) {
+                document.getElementById('pricingSection').style.opacity = '0.3';
+            }
+            if (document.getElementById('orderInfoSection')) {
+                document.getElementById('orderInfoSection').style.opacity = '0.3';
             }
         }
         
