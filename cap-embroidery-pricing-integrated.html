@@ -927,40 +927,59 @@
                     
                     const results = await response.json();
                     
-                    // Filter to show only cap styles
-                    const capResults = results.filter(item => {
+                    // Filter results into caps vs beanies/knit items
+                    const capResults = [];
+                    const beanieResults = [];
+                    
+                    results.forEach(item => {
                         const label = item.label.toLowerCase();
-                        const style = item.value.toLowerCase();
-                        // Include items that have 'cap' in the name or common cap style numbers
-                        return label.includes('cap') || 
-                               label.includes('trucker') || 
-                               label.includes('snapback') ||
-                               label.includes('flexfit') ||
-                               style.startsWith('c1') || 
-                               style.startsWith('c9') ||
-                               style.startsWith('c8') ||
-                               style.startsWith('ztc') ||
-                               style.startsWith('ytc');
+                        
+                        // Check if it's a beanie or knit item
+                        if (label.includes('beanie') || label.includes('knit')) {
+                            beanieResults.push(item);
+                        }
+                        // Only include items that explicitly have 'cap' in the description
+                        else if (label.includes('cap')) {
+                            capResults.push(item);
+                        }
                     });
                     
-                    if (capResults.length === 0) {
+                    // Build the results display
+                    if (capResults.length === 0 && beanieResults.length === 0) {
                         resultsContainer.innerHTML = '<div class="search-no-results">No cap styles found</div>';
                     } else {
-                        // Build results HTML
-                        let resultsHTML = capResults.map(result => {
-                            return `
-                                <div class="search-result-item" data-style="${result.value}">
-                                    <div class="search-result-info">
-                                        <div class="search-result-style">Style #${result.value}</div>
-                                        <div class="search-result-name">${result.label}</div>
-                                    </div>
+                        let resultsHTML = '';
+                        
+                        // Add message about beanies if any were found
+                        if (beanieResults.length > 0) {
+                            resultsHTML += `
+                                <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
+                                    <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                                    Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/embroidery-pricing.html" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
                                 </div>
                             `;
-                        }).join('');
+                        }
+                        
+                        // Add cap results
+                        if (capResults.length > 0) {
+                            resultsHTML += capResults.map(result => {
+                                return `
+                                    <div class="search-result-item" data-style="${result.value}">
+                                        <div class="search-result-info">
+                                            <div class="search-result-style">Style #${result.value}</div>
+                                            <div class="search-result-name">${result.label}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        } else if (beanieResults.length > 0) {
+                            // Only beanies were found, no caps
+                            resultsHTML += '<div class="search-no-results">No cap styles found. See message above for beanie/knit options.</div>';
+                        }
                         
                         resultsContainer.innerHTML = resultsHTML;
                         
-                        // Add click handlers to results
+                        // Add click handlers to cap results only
                         resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
                             item.addEventListener('click', () => {
                                 const style = item.dataset.style;
