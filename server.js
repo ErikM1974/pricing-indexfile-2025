@@ -172,6 +172,12 @@ app.get('/embroidery-quote-builder.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'embroidery-quote-builder.html'));
 });
 
+// Serve the cap embroidery quote builder
+app.get('/cap-embroidery-quote-builder.html', (req, res) => {
+  console.log('Serving cap-embroidery-quote-builder.html page');
+  res.sendFile(path.join(__dirname, 'cap-embroidery-quote-builder.html'));
+});
+
 app.get('/ae-art-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
 });
