@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Quote Builder | Northwest Custom Apparel</title>
+    
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css">
+</head>
+<body>
+    <!-- Professional Header with Logo and Navigation -->
+    <header class="embroidery-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <a href="/staff-dashboard.html" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+                
+                <!-- Navigation Actions -->
+                <div class="nav-actions">
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context Bar -->
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>DTG Quote Builder</span>
+                    </div>
+                </div>
+                
+                <!-- Live Status -->
+                <div class="header-status">
+                    <div class="status-item">
+                        <span class="status-label">Quote Type:</span>
+                        <span class="status-value">Direct-to-Garment Printing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">
+            <i class="fas fa-print"></i> DTG Quote Builder
+        </h1>
+        <p class="page-description">
+            Create professional DTG printing quotes with multiple products and automatic tier pricing
+        </p>
+        
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" id="phase-1-nav">
+                <div class="phase-step-number">1</div>
+                <div class="phase-step-label">Select Location</div>
+            </div>
+            <div class="phase-connector" id="connector-1"></div>
+            <div class="phase-step" id="phase-2-nav">
+                <div class="phase-step-number">2</div>
+                <div class="phase-step-label">Add Products</div>
+            </div>
+            <div class="phase-connector" id="connector-2"></div>
+            <div class="phase-step" id="phase-3-nav">
+                <div class="phase-step-number">3</div>
+                <div class="phase-step-label">Review & Save</div>
+            </div>
+        </div>
+
+        <!-- Phase 1: Location Selection -->
+        <section id="location-phase" class="phase-section active">
+            <div class="phase-header">
+                <h2><span class="phase-number">1</span> Select Print Location</h2>
+                <p>Choose one print location that will apply to all products in the quote</p>
+            </div>
+            
+            <div class="location-selection">
+                <div class="location-group">
+                    <h3>Single Locations</h3>
+                    <div class="location-options">
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="LC" id="loc-LC">
+                            <div class="location-card">
+                                <i class="fas fa-tshirt"></i>
+                                <span class="location-name">Left Chest</span>
+                                <span class="location-code">LC</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="FF" id="loc-FF">
+                            <div class="location-card">
+                                <i class="fas fa-tshirt"></i>
+                                <span class="location-name">Full Front</span>
+                                <span class="location-code">FF</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="FB" id="loc-FB">
+                            <div class="location-card">
+                                <i class="fas fa-tshirt"></i>
+                                <span class="location-name">Full Back</span>
+                                <span class="location-code">FB</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="JF" id="loc-JF">
+                            <div class="location-card">
+                                <i class="fas fa-tshirt"></i>
+                                <span class="location-name">Jumbo Front</span>
+                                <span class="location-code">JF</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="JB" id="loc-JB">
+                            <div class="location-card">
+                                <i class="fas fa-tshirt"></i>
+                                <span class="location-name">Jumbo Back</span>
+                                <span class="location-code">JB</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="location-group">
+                    <h3>Combination Locations</h3>
+                    <div class="location-options">
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="LC_FB" id="loc-LC_FB">
+                            <div class="location-card combo">
+                                <i class="fas fa-layer-group"></i>
+                                <span class="location-name">LC & FB</span>
+                                <span class="location-code">Left Chest + Full Back</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="FF_FB" id="loc-FF_FB">
+                            <div class="location-card combo">
+                                <i class="fas fa-layer-group"></i>
+                                <span class="location-name">FF & FB</span>
+                                <span class="location-code">Full Front + Full Back</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="JF_JB" id="loc-JF_JB">
+                            <div class="location-card combo">
+                                <i class="fas fa-layer-group"></i>
+                                <span class="location-name">JF & JB</span>
+                                <span class="location-code">Jumbo Front + Jumbo Back</span>
+                            </div>
+                        </label>
+                        <label class="location-option">
+                            <input type="radio" name="print-location" value="LC_JB" id="loc-LC_JB">
+                            <div class="location-card combo">
+                                <i class="fas fa-layer-group"></i>
+                                <span class="location-name">LC & JB</span>
+                                <span class="location-code">Left Chest + Jumbo Back</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="selected-location-display" id="selected-location-display" style="display: none;">
+                    <h3>Selected Location:</h3>
+                    <div class="selected-location-info">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="selected-location-text"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="continue-to-products" class="btn btn-primary" disabled>
+                    Continue to Products <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 2: Product Addition -->
+        <section id="product-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">2</span> Add Products</h2>
+                <p>Add garments with quantities by size. Print location: <strong id="phase2-location"></strong></p>
+            </div>
+            
+            <!-- Product Search -->
+            <div class="product-search-container">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label for="style-search">Style Number</label>
+                        <input type="text" id="style-search" placeholder="Enter style (e.g., PC54)" autocomplete="off">
+                        <div id="style-suggestions" class="suggestions-dropdown"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color-select">Color</label>
+                        <select id="color-select" disabled>
+                            <option value="">Select style first</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-product-btn" class="btn-primary" disabled>
+                        <i class="fas fa-search"></i> Load Product
+                    </button>
+                </div>
+                
+                <!-- Product Display -->
+                <div id="product-display" class="product-display" style="display: none;">
+                    <div class="product-info">
+                        <img id="product-image" src="" alt="Product">
+                        <div class="product-details">
+                            <h3 id="product-name"></h3>
+                            <p id="product-description"></p>
+                            <p class="product-meta">
+                                <span id="product-style"></span> | 
+                                <span id="product-color"></span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Matrix -->
+                    <div class="size-matrix">
+                        <h4>Enter Quantities by Size</h4>
+                        <div id="size-inputs" class="size-inputs">
+                            <!-- Size inputs will be added dynamically -->
+                        </div>
+                        <div class="total-row">
+                            <strong>Total Quantity:</strong> 
+                            <span id="product-total-qty">0</span>
+                        </div>
+                    </div>
+                    
+                    <button id="add-to-quote-btn" class="btn-primary" disabled>
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Products List -->
+            <div id="products-list" class="products-list">
+                <h3>Products in Quote</h3>
+                <div id="products-container">
+                    <p class="empty-message">No products added yet</p>
+                </div>
+                <div class="aggregate-total">
+                    <strong>Total Quantity Across All Products:</strong> 
+                    <span id="aggregate-quantity">0</span> pieces
+                    <div id="tier-display" class="tier-info" style="display: none;">
+                        Pricing Tier: <span id="current-tier"></span>
+                    </div>
+                    <div id="ltm-warning" class="ltm-warning" style="display: none;">
+                        <i class="fas fa-info-circle"></i>
+                        *Note: Orders under 24 pieces include a small batch fee
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-location" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button id="continue-to-review" class="btn btn-primary" disabled>
+                    Continue to Review <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 3: Review & Save -->
+        <section id="review-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">3</span> Review & Save Quote</h2>
+                <p>Review your quote and enter customer information</p>
+            </div>
+            
+            <!-- Customer Information -->
+            <div class="customer-info-section">
+                <h3>Customer Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name *</label>
+                        <input type="text" id="customer-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email Address *</label>
+                        <input type="email" id="customer-email" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone Number</label>
+                        <input type="tel" id="customer-phone" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="sales-rep">Sales Representative *</label>
+                        <select id="sales-rep" class="form-control" required>
+                            <option value="">Select a sales rep...</option>
+                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="special-notes">Special Notes</label>
+                        <textarea id="special-notes" class="form-control" rows="3" 
+                                  placeholder="Any special instructions or requirements..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quote Summary -->
+            <div class="quote-summary-section">
+                <h3>Quote Summary</h3>
+                <div class="quote-header-info">
+                    <div class="quote-id-display">
+                        Quote ID: <span id="preview-quote-id">DTG0000-0</span>
+                    </div>
+                    <div class="quote-validity">
+                        Valid for 30 days (Expires: <span id="expiry-date"></span>)
+                    </div>
+                </div>
+                
+                <div class="location-summary">
+                    <strong>Print Location:</strong> <span id="summary-location"></span>
+                </div>
+                
+                <div id="quote-items-summary" class="quote-items-summary">
+                    <!-- Product summaries will be added here -->
+                </div>
+                
+                <div class="quote-totals">
+                    <div class="total-row">
+                        <span>Total Quantity:</span>
+                        <span id="summary-quantity">0 pieces</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Pricing Tier:</span>
+                        <span id="summary-tier">-</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Grand Total:</span>
+                        <span id="summary-total">$0.00</span>
+                    </div>
+                </div>
+                
+                <div id="summary-ltm-note" class="ltm-note" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    *Orders under 24 pieces include a small batch fee
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button id="save-quote-btn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Quote
+                </button>
+                <button id="print-quote-btn" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal" style="display: none;">
+        <div class="modal-content success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Quote Saved Successfully!</h2>
+            <div class="quote-id-display-modal">
+                <strong>Quote ID:</strong> <span id="modal-quote-id"></span>
+                <button class="copy-btn" onclick="copyQuoteId()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            <div class="modal-details">
+                <p><strong>Customer:</strong> <span id="modal-customer"></span></p>
+                <p><strong>Total:</strong> <span id="modal-total"></span></p>
+                <p class="validity-note">This quote is valid for 30 days</p>
+            </div>
+            <div class="modal-actions">
+                <button onclick="printQuote()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button onclick="createNewQuote()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Quote
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/shared_components/js/dtg-pricing-service.js"></script>
+    <script src="/shared_components/js/dtg-quote-service.js"></script>
+    <script src="/shared_components/js/dtg-quote-pricing.js"></script>
+    <script src="/shared_components/js/dtg-quote-products.js"></script>
+    <script src="/shared_components/js/dtg-quote-builder.js"></script>
+</body>
+</html>

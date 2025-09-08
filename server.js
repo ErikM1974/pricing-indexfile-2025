@@ -178,6 +178,12 @@ app.get('/cap-embroidery-quote-builder.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'cap-embroidery-quote-builder.html'));
 });
 
+// Serve the DTG quote builder
+app.get('/dtg-quote-builder.html', (req, res) => {
+  console.log('Serving dtg-quote-builder.html page');
+  res.sendFile(path.join(__dirname, 'dtg-quote-builder.html'));
+});
+
 app.get('/ae-art-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
 });
