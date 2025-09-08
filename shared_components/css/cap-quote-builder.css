@@ -911,6 +911,10 @@ body {
     color: white !important;
 }
 
+.totals-section p {
+    color: white !important;
+}
+
 .totals-breakdown {
     space-y: 0.5rem;
 }
@@ -938,6 +942,14 @@ body {
     border-top: 2px solid rgba(255, 255, 255, 0.3);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
+    color: white !important;
+}
+
+.grand-total span {
+    color: white !important;
+}
+
+.grand-total strong {
     color: white !important;
 }
 

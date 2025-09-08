@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Quote Builder | Northwest Custom Apparel</title>
+    
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
+    <link rel="stylesheet" href="/shared_components/css/cap-quote-builder.css">
+</head>
+<body>
+    <!-- Professional Header with Logo and Navigation -->
+    <header class="embroidery-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <a href="/staff-dashboard.html" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+                
+                <!-- Navigation Actions -->
+                <div class="nav-actions">
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context Bar -->
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Cap Embroidery Quote Builder</span>
+                    </div>
+                </div>
+                
+                <!-- Live Status -->
+                <div class="header-status">
+                    <div class="status-item">
+                        <span class="status-label">Quote Type:</span>
+                        <span class="status-value">Multi-Style Cap Embroidery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">
+            <i class="fas fa-hat-cowboy"></i> Cap Embroidery Quote Builder
+        </h1>
+        <p class="page-description">
+            Create professional cap embroidery quotes with multiple products and logo positions
+        </p>
+        
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" id="phase-1-nav">
+                <div class="phase-step-number">1</div>
+                <div class="phase-step-label">Define Logos</div>
+            </div>
+            <div class="phase-connector" id="connector-1"></div>
+            <div class="phase-step" id="phase-2-nav">
+                <div class="phase-step-number">2</div>
+                <div class="phase-step-label">Add Caps</div>
+            </div>
+            <div class="phase-connector" id="connector-2"></div>
+            <div class="phase-step" id="phase-3-nav">
+                <div class="phase-step-number">3</div>
+                <div class="phase-step-label">Review & Save</div>
+            </div>
+        </div>
+
+        <!-- Phase 1: Logo Definition -->
+        <section id="logo-phase" class="phase-section active">
+            <div class="phase-header">
+                <h2><span class="phase-number">1</span> Define Embroidery Logos</h2>
+                <p>Front logo required, additional positions optional</p>
+            </div>
+            
+            <!-- Front Logo (Required) -->
+            <div class="logo-section front-logo-section">
+                <div class="logo-header">
+                    <h3><i class="fas fa-star text-primary"></i> Front Logo (Required)</h3>
+                    <p class="logo-description">Every cap includes embroidery on the front</p>
+                </div>
+                
+                <div class="logo-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="front-position">Position</label>
+                            <select id="front-position" class="form-select" disabled>
+                                <option value="CF">Cap Front</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="front-stitches">Stitch Count *</label>
+                            <input type="number" id="front-stitches" class="form-control" 
+                                   value="8000" min="1000" step="1000" required>
+                            <small class="form-text">First 8,000 stitches included</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="front-digitizing">
+                                <span class="checkmark"></span>
+                                Needs Digitizing ($100)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Logos Container -->
+            <div id="additional-logos-container" class="additional-logos-container">
+                <div class="additional-logos-header">
+                    <h3>Additional Logo Positions</h3>
+                    <p>Add logos to back or sides (optional)</p>
+                </div>
+                <div id="additional-logos-list">
+                    <!-- Additional logos will be added here -->
+                </div>
+            </div>
+            
+            <button id="add-additional-logo-btn" class="btn btn-secondary">
+                <i class="fas fa-plus-circle"></i> Add Additional Position
+            </button>
+            
+            <div class="phase-actions">
+                <button id="continue-to-products" class="btn btn-primary">
+                    Continue to Caps <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 2: Cap Addition -->
+        <section id="product-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">2</span> Add Caps</h2>
+                <p>Add cap styles with quantities by size</p>
+            </div>
+            
+            <!-- Product Search -->
+            <div class="product-search-container">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label for="style-search">Style Number</label>
+                        <input type="text" id="style-search" placeholder="Enter style (e.g., C112)" autocomplete="off">
+                        <div id="style-suggestions" class="suggestions-dropdown"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color-select">Color</label>
+                        <select id="color-select" disabled>
+                            <option value="">Select style first</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-product-btn" class="btn-primary" disabled>
+                        <i class="fas fa-search"></i> Load Cap
+                    </button>
+                </div>
+                
+                <!-- Product Display -->
+                <div id="product-display" class="product-display" style="display: none;">
+                    <div class="product-info">
+                        <img id="product-image" src="" alt="Product">
+                        <div class="product-details">
+                            <h3 id="product-name"></h3>
+                            <p id="product-description"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Matrix -->
+                    <div class="size-matrix">
+                        <h4>Enter Quantities by Size</h4>
+                        <div id="size-inputs" class="size-inputs">
+                            <!-- Size inputs will be added dynamically -->
+                        </div>
+                        <div class="total-row">
+                            <strong>Total Quantity:</strong> 
+                            <span id="product-total-qty">0</span>
+                        </div>
+                    </div>
+                    
+                    <button id="add-to-quote-btn" class="btn-primary" disabled>
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Products List -->
+            <div id="products-list" class="products-list">
+                <h3>Caps in Quote</h3>
+                <div id="products-container">
+                    <p class="empty-message">No caps added yet</p>
+                </div>
+                <div class="aggregate-total">
+                    <strong>Total Pieces Across All Caps:</strong> 
+                    <span id="aggregate-total">0</span>
+                    <span id="tier-indicator" class="tier-indicator"></span>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-logos" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Logos
+                </button>
+                <button id="continue-to-summary" class="btn btn-primary" disabled>
+                    Continue to Summary <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 3: Quote Summary -->
+        <section id="summary-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">3</span> Quote Summary</h2>
+                <p>Review and finalize your cap quote</p>
+            </div>
+            
+            <div id="quote-summary" class="quote-summary">
+                <!-- Summary will be generated here -->
+            </div>
+            
+            <!-- Customer Information -->
+            <div class="customer-info-section">
+                <h3>Customer Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name *</label>
+                        <input type="text" id="customer-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email *</label>
+                        <input type="email" id="customer-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone</label>
+                        <input type="tel" id="customer-phone" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="sales-rep">Sales Representative *</label>
+                        <select id="sales-rep" class="form-control" required>
+                            <option value="">Select Sales Rep...</option>
+                            <option value="sales@nwcustomapparel.com">General Sales</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="special-notes">Special Notes</label>
+                    <textarea id="special-notes" rows="3" class="form-textarea"></textarea>
+                </div>
+                
+                <!-- Database Save Option -->
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="save-to-database" checked>
+                        <span class="checkmark"></span>
+                        Save quote to database
+                    </label>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="back-to-products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Caps
+                </button>
+                <button id="save-quote-btn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Quote
+                </button>
+                <button id="email-quote-btn" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Email Quote
+                </button>
+                <button id="copy-quote-btn" class="btn btn-secondary">
+                    <i class="fas fa-copy"></i> Copy Text
+                </button>
+                <button id="print-quote-btn" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <i class="fas fa-check-circle"></i>
+                <h2>Quote Saved Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <p>Quote ID: <strong id="modal-quote-id"></strong></p>
+                <p>Customer: <span id="modal-customer"></span></p>
+                <p>Total: <span id="modal-total"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeSuccessModal()" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading cap data...</p>
+        </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner" style="display: none;">
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="error-message">System Error</span>
+            <button id="error-close" class="error-close">&times;</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/shared_components/js/cap-quote-service.js"></script>
+    <script src="/shared_components/js/cap-quote-logos.js"></script>
+    <script src="/shared_components/js/cap-quote-products.js"></script>
+    <script src="/shared_components/js/cap-quote-pricing.js"></script>
+    <script src="/shared_components/js/cap-quote-builder.js"></script>
+    
+    <script>
+        // Initialize the cap quote builder when DOM is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('='.repeat(50));
+            console.log('🧢 CAP EMBROIDERY QUOTE BUILDER');
+            console.log('📦 API-driven pricing with visible error handling');
+            console.log('🔧 Debug tools: window.CAP_DEBUG');
+            console.log('='.repeat(50));
+            
+            // Check API status before initializing
+            const apiStatus = await checkAPIStatus();
+            
+            if (!apiStatus) {
+                console.error('[CapQuoteBuilder] API check failed - STOPPING INITIALIZATION');
+                showErrorBanner('CAP PRICING SYSTEM UNAVAILABLE - Cannot create quotes until this is resolved.');
+                return;
+            }
+            
+            // Initialize the quote builder
+            try {
+                window.capQuoteBuilder = new CapQuoteBuilder();
+                console.log('✅ Cap Quote Builder initialized successfully');
+            } catch (error) {
+                console.error('[CapQuoteBuilder] Initialization failed:', error);
+                showErrorBanner('QUOTE BUILDER FAILED TO INITIALIZE - Please refresh the page');
+            }
+        });
+        
+        // Check if critical APIs are available - NO FALLBACKS
+        async function checkAPIStatus() {
+            const baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const criticalEndpoints = [
+                '/api/pricing-bundle?method=CAP',
+                '/api/pricing-bundle?method=CAP-AL',
+                '/api/stylesearch?term=C112'
+            ];
+            
+            try {
+                console.log('[API Check] Testing critical cap endpoints...');
+                
+                const checks = criticalEndpoints.map(async endpoint => {
+                    const response = await fetch(baseURL + endpoint);
+                    const success = response.ok;
+                    console.log(`[API Check] ${endpoint}: ${success ? '✅' : '❌'} (${response.status})`);
+                    return success;
+                });
+                
+                const results = await Promise.all(checks);
+                const allOk = results.every(r => r === true);
+                
+                if (!allOk) {
+                    console.error('[API Check] ❌ One or more critical endpoints FAILED');
+                    return false;
+                }
+                
+                console.log('[API Check] ✅ All critical endpoints available');
+                return true;
+                
+            } catch (error) {
+                console.error('[API Check] ❌ Network error during API check:', error);
+                return false;
+            }
+        }
+        
+        // Show error banner - NO silent failures
+        function showErrorBanner(message) {
+            const banner = document.getElementById('error-banner');
+            const messageSpan = document.getElementById('error-message');
+            
+            if (banner && messageSpan) {
+                messageSpan.textContent = message;
+                banner.style.display = 'flex';
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 10000);
+            }
+        }
+        
+        // Error banner close button
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeBtn = document.getElementById('error-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    document.getElementById('error-banner').style.display = 'none';
+                });
+            }
+        });
+        
+        // Success modal functions
+        function closeSuccessModal() {
+            document.getElementById('success-modal').style.display = 'none';
+        }
+        
+        // Debugging tools will be added by cap-quote-builder.js
+        console.log('💡 Debug tools will be available at: window.CAP_DEBUG');
+    </script>
+</body>
+</html>
