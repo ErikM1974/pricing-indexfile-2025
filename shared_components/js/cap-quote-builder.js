@@ -319,16 +319,72 @@ class CapQuoteBuilder {
                     <div class="product-lines">
             `;
             
-            // Show size breakdown with upcharges
+            // Show size breakdown with upcharges and detailed cap/embroidery/extra stitches breakdown
             product.sizePricedItems.forEach(item => {
                 const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                html += `
-                    <div class="line-item">
-                        <span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>
-                        <span>@ $${item.unitPrice.toFixed(2)} each</span>
-                        <span class="line-total">$${item.total.toFixed(2)}</span>
-                    </div>
-                `;
+                
+                // Calculate LTM breakdown for display (item.unitPrice already includes LTM)
+                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
+                const totalPerPiece = item.unitPrice; // Already includes LTM from pricing calculation
+                const adjustedTotal = item.total; // Use the correct calculated total
+                
+                // Get cap price and embroidery breakdown from product pricingBreakdown
+                const capPrice = product.pricingBreakdown?.capPrice || 0;
+                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
+                
+                // Get front logo breakdown for extra stitch display
+                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
+                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
+                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
+                
+                // Calculate base price (cap + base embroidery, rounded)
+                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
+                const basePrice = Math.ceil(capPrice + baseEmbroideryPrice);
+                
+                if (this.currentQuote.hasLTM && ltmPerPiece > 0) {
+                    // Show simplified breakdown when LTM applies
+                    let breakdownText = '';
+                    
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        breakdownText = `Base: $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    } else {
+                        breakdownText = `Base: $${basePrice.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    }
+                    
+                    html += `
+                        <div class="line-item">
+                            <span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>
+                            <span class="ltm-breakdown">
+                                ${breakdownText}
+                            </span>
+                            <span class="line-total">$${adjustedTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                } else {
+                    // Show breakdown for 24+ pieces (no LTM) with extra stitches if applicable
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        const breakdownText = `Base: $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} = $${item.unitPrice.toFixed(2)} each`;
+                        
+                        html += `
+                            <div class="line-item">
+                                <span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>
+                                <span class="ltm-breakdown">
+                                    ${breakdownText}
+                                </span>
+                                <span class="line-total">$${item.total.toFixed(2)}</span>
+                            </div>
+                        `;
+                    } else {
+                        // Standard display for 24+ pieces with no extra stitches
+                        html += `
+                            <div class="line-item">
+                                <span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>
+                                <span>@ $${item.unitPrice.toFixed(2)} each</span>
+                                <span class="line-total">$${item.total.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                }
             });
             
             html += `
@@ -353,8 +409,15 @@ class CapQuoteBuilder {
             );
             
             if (additionalLogos.length > 0) {
-                additionalLogos.forEach(logo => {
-                    const additionalCostPerPiece = this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0;
+                // Get individual logo pricing from the first product's breakdown
+                const individualLogoPrices = this.currentQuote.products[0]?.pricingBreakdown?.additionalLogoPrices || [];
+                
+                additionalLogos.forEach((logo, index) => {
+                    // Find the matching individual logo price or fallback to equal division
+                    const logoData = individualLogoPrices.find(lp => lp.position === logo.position) || 
+                                   { pricePerPiece: (this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0) / additionalLogos.length };
+                    
+                    const additionalCostPerPiece = logoData.pricePerPiece;
                     html += `
                         <div class="additional-service-item">
                             <div class="service-header">
@@ -369,6 +432,13 @@ class CapQuoteBuilder {
                         </div>
                     `;
                 });
+                
+                // Add subtotal for additional logo embroidery
+                html += `
+                    <div style="text-align: right; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                        <strong>Additional Logo Subtotal: $${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</strong>
+                    </div>
+                `;
             }
             
             html += '</div>';
@@ -380,8 +450,8 @@ class CapQuoteBuilder {
                 <h4><i class="fas fa-calculator"></i> Quote Totals</h4>
                 <div class="totals-breakdown">
                     <div class="total-line">
-                        <span>Caps & Front Embroidery:</span>
-                        <span>$${(this.currentQuote.capTotal + this.currentQuote.frontEmbroideryTotal).toFixed(2)}</span>
+                        <span>Caps & Front Embroidery${this.currentQuote.hasLTM ? ' (includes small batch)' : ''}:</span>
+                        <span>$${this.currentQuote.subtotal.toFixed(2)}</span>
                     </div>
         `;
         
@@ -405,14 +475,7 @@ class CapQuoteBuilder {
             `;
         }
         
-        if (this.currentQuote.ltmFeeTotal > 0) {
-            html += `
-                <div class="total-line ltm-line">
-                    <span>Small Batch Fee:</span>
-                    <span>$${this.currentQuote.ltmFeeTotal.toFixed(2)}</span>
-                </div>
-            `;
-        }
+        // Small Batch Fee is now included in the per-piece pricing above, so no separate line needed
         
         html += `
                     <div class="total-line grand-total">
@@ -701,7 +764,43 @@ class CapQuoteBuilder {
             
             product.sizePricedItems.forEach(item => {
                 const upcharge = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)})` : '';
-                text += `${item.size}${upcharge}(${item.quantity}) @ $${item.unitPrice.toFixed(2)} = $${item.total.toFixed(2)}\n`;
+                
+                // Calculate LTM breakdown for display (item.unitPrice already includes LTM)
+                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
+                
+                // Get front logo breakdown for extra stitch display
+                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
+                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
+                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
+                
+                // Get cap price and embroidery breakdown from product pricingBreakdown
+                const capPrice = product.pricingBreakdown?.capPrice || 0;
+                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
+                
+                // Calculate base price (cap + base embroidery, rounded) - declare once
+                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
+                const basePrice = Math.ceil(capPrice + baseEmbroideryPrice);
+                
+                if (this.currentQuote.hasLTM && ltmPerPiece > 0) {
+                    const totalPerPiece = item.unitPrice; // Already includes LTM
+                    const adjustedTotal = item.total; // Use the correct calculated total
+                    text += `${item.size}${upcharge}(${item.quantity})\n`;
+                    
+                    // Show simplified breakdown with Base + extra stitches + LTM
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        text += `  Base: $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each = $${adjustedTotal.toFixed(2)}\n`;
+                    } else {
+                        text += `  Base: $${basePrice.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each = $${adjustedTotal.toFixed(2)}\n`;
+                    }
+                } else {
+                    // Show breakdown with extra stitches if applicable (no LTM)
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        text += `${item.size}${upcharge}(${item.quantity})\n`;
+                        text += `  Base: $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} = $${item.unitPrice.toFixed(2)} each = $${item.total.toFixed(2)}\n`;
+                    } else {
+                        text += `${item.size}${upcharge}(${item.quantity}) @ $${item.unitPrice.toFixed(2)} = $${item.total.toFixed(2)}\n`;
+                    }
+                }
             });
             
             text += `Subtotal: $${product.lineTotal.toFixed(2)}\n\n`;
@@ -719,18 +818,38 @@ class CapQuoteBuilder {
             );
             
             if (additionalLogos.length > 0) {
+                // Get individual logo pricing from the first product's breakdown
+                const individualLogoPrices = this.currentQuote.products[0]?.pricingBreakdown?.additionalLogoPrices || [];
+                
                 additionalLogos.forEach(logo => {
-                    const additionalCostPerPiece = this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0;
+                    // Find the matching individual logo price or fallback to equal division
+                    const logoData = individualLogoPrices.find(lp => lp.position === logo.position) || 
+                                   { pricePerPiece: (this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0) / additionalLogos.length };
+                    
+                    const additionalCostPerPiece = logoData.pricePerPiece;
+                    const breakdown = logoData.breakdown;
+                    
                     text += `${logo.position} - ${logo.stitchCount.toLocaleString()} stitches [ADDITIONAL]\n`;
+                    
+                    // Show extra stitch breakdown for additional logos if applicable
+                    if (breakdown?.hasExtraStitches && breakdown?.extraStitchCost > 0) {
+                        const basePrice = breakdown.basePrice;
+                        const extraStitchCost = breakdown.extraStitchCost;
+                        text += `  Base: $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} = $${additionalCostPerPiece.toFixed(2)} each\n`;
+                    }
+                    
                     text += `${this.currentQuote.totalQuantity} pieces @ $${additionalCostPerPiece.toFixed(2)} each = $${(additionalCostPerPiece * this.currentQuote.totalQuantity).toFixed(2)}\n\n`;
                 });
+                
+                // Add subtotal for additional logo embroidery
+                text += `Additional Logo Subtotal: $${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}\n\n`;
             }
         }
         
         // Totals
         text += `${'='.repeat(50)}\n\n`;
         text += `Total Quantity: ${this.currentQuote.totalQuantity} caps\n`;
-        text += `Caps & Front Embroidery: $${(this.currentQuote.capTotal + this.currentQuote.frontEmbroideryTotal).toFixed(2)}\n`;
+        text += `Caps & Front Embroidery${this.currentQuote.hasLTM ? ' (includes small batch)' : ''}: $${this.currentQuote.subtotal.toFixed(2)}\n`;
         
         if (this.currentQuote.additionalEmbroideryTotal && this.currentQuote.additionalEmbroideryTotal > 0) {
             text += `Additional Logo Embroidery: $${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}\n`;
@@ -740,9 +859,7 @@ class CapQuoteBuilder {
             text += `Setup Fees: $${this.currentQuote.setupFees.toFixed(2)}\n`;
         }
         
-        if (this.currentQuote.ltmFeeTotal > 0) {
-            text += `Small Batch Fee: $${this.currentQuote.ltmFeeTotal.toFixed(2)}\n`;
-        }
+        // Small Batch Fee is now included in the per-piece pricing above
         
         text += `\nGRAND TOTAL: $${this.currentQuote.grandTotal.toFixed(2)}\n\n`;
         
@@ -801,10 +918,60 @@ class CapQuoteBuilder {
             
             product.sizePricedItems.forEach(item => {
                 const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                html += `<div style="display: flex; justify-content: space-between; margin: 5px 0; padding: 2px 0;">`;
-                html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
-                html += `<span>@ $${item.unitPrice.toFixed(2)} each = $${item.total.toFixed(2)}</span>`;
-                html += `</div>`;
+                
+                // Get front logo breakdown for extra stitch display
+                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
+                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
+                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
+                
+                // Get cap price and embroidery breakdown from product pricingBreakdown - declare once
+                const capPrice = product.pricingBreakdown?.capPrice || 0;
+                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
+                
+                // Calculate base price (cap + base embroidery, rounded) - declare once
+                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
+                const combinedBasePrice = Math.ceil(capPrice + baseEmbroideryPrice);
+                
+                // Check if this is an LTM order and show breakdown
+                if (this.currentQuote.hasLTM) {
+                    const ltmPerPiece = this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity;
+                    const totalPerPiece = item.unitPrice;
+                    
+                    html += `<div style="margin: 5px 0; padding: 2px 0;">`;
+                    html += `<div style="display: flex; justify-content: space-between;">`;
+                    html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                    html += `<span>$${item.total.toFixed(2)}</span>`;
+                    html += `</div>`;
+                    html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px;">`;
+                    
+                    // Show simplified breakdown with Base + extra stitches + LTM
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    } else {
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    }
+                    
+                    html += `</div>`;
+                    html += `</div>`;
+                } else {
+                    // Show breakdown with extra stitches if applicable (no LTM)
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        html += `<div style="margin: 5px 0; padding: 2px 0;">`;
+                        html += `<div style="display: flex; justify-content: space-between;">`;
+                        html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                        html += `<span>$${item.total.toFixed(2)}</span>`;
+                        html += `</div>`;
+                        html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px;">`;
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} = $${item.unitPrice.toFixed(2)} each`;
+                        html += `</div>`;
+                        html += `</div>`;
+                    } else {
+                        html += `<div style="display: flex; justify-content: space-between; margin: 5px 0; padding: 2px 0;">`;
+                        html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                        html += `<span>@ $${item.unitPrice.toFixed(2)} each = $${item.total.toFixed(2)}</span>`;
+                        html += `</div>`;
+                    }
+                }
             });
             
             html += `<p style="font-weight: bold; text-align: right; margin: 10px 0 0 0;">Subtotal: $${product.lineTotal.toFixed(2)}</p>`;
@@ -823,8 +990,15 @@ class CapQuoteBuilder {
             );
             
             if (additionalLogos.length > 0) {
+                // Get individual logo pricing from the first product's breakdown
+                const individualLogoPrices = this.currentQuote.products[0]?.pricingBreakdown?.additionalLogoPrices || [];
+                
                 additionalLogos.forEach(logo => {
-                    const additionalCostPerPiece = this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0;
+                    // Find the matching individual logo price or fallback to equal division
+                    const logoData = individualLogoPrices.find(lp => lp.position === logo.position) || 
+                                   { pricePerPiece: (this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0) / additionalLogos.length };
+                    
+                    const additionalCostPerPiece = logoData.pricePerPiece;
                     html += `<div style="border: 1px solid #eee; padding: 10px; margin: 5px 0; border-radius: 5px;">`;
                     html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">`;
                     html += `<span style="font-weight: bold;">${logo.position} - ${logo.stitchCount.toLocaleString()} stitches</span>`;
@@ -836,6 +1010,11 @@ class CapQuoteBuilder {
                     html += `</div>`;
                     html += `</div>`;
                 });
+                
+                // Add subtotal for additional logo embroidery
+                html += `<div style="text-align: right; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">`;
+                html += `<strong>Additional Logo Subtotal: $${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</strong>`;
+                html += `</div>`;
             }
             
             html += '</div>';
@@ -846,7 +1025,12 @@ class CapQuoteBuilder {
         html += '<h3 style="color: #4cb354; margin-bottom: 15px;">Quote Totals:</h3>';
         
         html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Total Quantity:</span><span>${this.currentQuote.totalQuantity} pieces</span></div>`;
-        html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Caps & Front Embroidery:</span><span>$${(this.currentQuote.capTotal + this.currentQuote.frontEmbroideryTotal).toFixed(2)}</span></div>`;
+        
+        // Show caps & front embroidery with LTM indicator if applicable
+        const capsLabel = this.currentQuote.hasLTM ? 
+            "Caps & Front Embroidery (includes small batch):" : 
+            "Caps & Front Embroidery:";
+        html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>${capsLabel}</span><span>$${this.currentQuote.subtotal.toFixed(2)}</span></div>`;
         
         if (this.currentQuote.additionalEmbroideryTotal && this.currentQuote.additionalEmbroideryTotal > 0) {
             html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Additional Logo Embroidery:</span><span>$${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</span></div>`;
@@ -855,10 +1039,6 @@ class CapQuoteBuilder {
         if (this.currentQuote.setupFees > 0) {
             const digitizingLogos = this.currentQuote.logos.filter(l => l.needsDigitizing).length;
             html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Setup Fees (${digitizingLogos} logos):</span><span>$${this.currentQuote.setupFees.toFixed(2)}</span></div>`;
-        }
-        
-        if (this.currentQuote.ltmFeeTotal > 0) {
-            html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Small Batch Fee:</span><span>$${this.currentQuote.ltmFeeTotal.toFixed(2)}</span></div>`;
         }
         
         html += `<div style="display: flex; justify-content: space-between; margin: 10px 0; padding-top: 10px; border-top: 1px solid #ccc; font-weight: bold; font-size: 1.1em;"><span>GRAND TOTAL:</span><span>$${this.currentQuote.grandTotal.toFixed(2)}</span></div>`;
@@ -994,10 +1174,56 @@ class CapQuoteBuilder {
             
             product.sizePricedItems.forEach(item => {
                 const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                html += `<div class="line-item">`;
-                html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
-                html += `<span>@ $${item.unitPrice.toFixed(2)} each = $${item.total.toFixed(2)}</span>`;
-                html += `</div>`;
+                
+                // Get front logo breakdown for extra stitch display
+                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
+                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
+                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
+                
+                // Get cap price and embroidery breakdown from product pricingBreakdown - declare once
+                const capPrice = product.pricingBreakdown?.capPrice || 0;
+                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
+                
+                // Calculate base price (cap + base embroidery, rounded) - declare once
+                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
+                const combinedBasePrice = Math.ceil(capPrice + baseEmbroideryPrice);
+                
+                // Check if this is an LTM order and show breakdown
+                if (this.currentQuote.hasLTM) {
+                    const ltmPerPiece = this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity;
+                    const totalPerPiece = item.unitPrice;
+                    
+                    html += `<div class="line-item">`;
+                    html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                    html += `<span>$${item.total.toFixed(2)}</span>`;
+                    html += `</div>`;
+                    html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px; margin-bottom: 5px;">`;
+                    
+                    // Show simplified breakdown with Base + extra stitches + LTM
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    } else {
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Small batch: $${ltmPerPiece.toFixed(2)} = $${totalPerPiece.toFixed(2)} each`;
+                    }
+                    
+                    html += `</div>`;
+                } else {
+                    // Show breakdown with extra stitches if applicable (no LTM)
+                    if (hasExtraStitches && extraStitchCost > 0) {
+                        html += `<div class="line-item">`;
+                        html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                        html += `<span>$${item.total.toFixed(2)}</span>`;
+                        html += `</div>`;
+                        html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px; margin-bottom: 5px;">`;
+                        html += `Base: $${combinedBasePrice.toFixed(2)} + Extra stitches: $${extraStitchCost.toFixed(2)} = $${item.unitPrice.toFixed(2)} each`;
+                        html += `</div>`;
+                    } else {
+                        html += `<div class="line-item">`;
+                        html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
+                        html += `<span>@ $${item.unitPrice.toFixed(2)} each = $${item.total.toFixed(2)}</span>`;
+                        html += `</div>`;
+                    }
+                }
             });
             
             html += `<p><strong>Subtotal: $${product.lineTotal.toFixed(2)}</strong></p>`;
@@ -1008,15 +1234,20 @@ class CapQuoteBuilder {
         // Totals
         html += '<div class="totals">';
         html += `<div class="total-line"><span>Total Quantity:</span><span>${this.currentQuote.totalQuantity} pieces</span></div>`;
-        html += `<div class="total-line"><span>Caps & Embroidery:</span><span>$${this.currentQuote.subtotal.toFixed(2)}</span></div>`;
+        
+        // Show caps & embroidery with LTM indicator if applicable
+        const capsLabel = this.currentQuote.hasLTM ? 
+            "Caps & Embroidery (includes small batch):" : 
+            "Caps & Embroidery:";
+        html += `<div class="total-line"><span>${capsLabel}</span><span>$${this.currentQuote.subtotal.toFixed(2)}</span></div>`;
+        
+        if (this.currentQuote.additionalEmbroideryTotal && this.currentQuote.additionalEmbroideryTotal > 0) {
+            html += `<div class="total-line"><span>Additional Logo Embroidery:</span><span>$${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</span></div>`;
+        }
         
         if (this.currentQuote.setupFees > 0) {
             const digitizingLogos = this.currentQuote.logos.filter(l => l.needsDigitizing).length;
             html += `<div class="total-line"><span>Setup Fees (${digitizingLogos} logos):</span><span>$${this.currentQuote.setupFees.toFixed(2)}</span></div>`;
-        }
-        
-        if (this.currentQuote.ltmFeeTotal > 0) {
-            html += `<div class="total-line"><span>Small Batch Fee:</span><span>$${this.currentQuote.ltmFeeTotal.toFixed(2)}</span></div>`;
         }
         
         html += `<div class="total-line grand-total"><span>GRAND TOTAL:</span><span>$${this.currentQuote.grandTotal.toFixed(2)}</span></div>`;

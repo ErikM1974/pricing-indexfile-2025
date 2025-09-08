@@ -128,7 +128,8 @@ class CapQuotePricingCalculator {
             // Calculate fees
             const ltmFeeTotal = totalQuantity < 24 ? 50.00 : 0;
             const setupFees = logos.reduce((sum, logo) => sum + (logo.needsDigitizing ? 100 : 0), 0);
-            const grandTotal = subtotal + ltmFeeTotal + setupFees;
+            // Don't add ltmFeeTotal to grandTotal since it's already included in subtotal per-piece pricing
+            const grandTotal = subtotal + additionalEmbroideryTotal + setupFees;
             
             const pricingResult = {
                 products: pricedProducts,
@@ -165,14 +166,23 @@ class CapQuotePricingCalculator {
         console.log('[CapQuotePricingCalculator] Pricing product:', product.styleNumber);
         
         try {
-            // Get base cap price
-            const baseCapPrice = await this.getBaseCapPrice(product.styleNumber);
+            // Get base cap price for the specific color
+            const baseCapPrice = await this.getBaseCapPrice(product.styleNumber, product.color);
             
             // Calculate decorated price per cap (returns detailed breakdown)
             const pricingBreakdown = this.calculateDecoratedPrice(baseCapPrice, logos, totalQuantity);
             
-            // Apply size-based pricing using total price
-            const sizePricedItems = this.applySizePricing(product, pricingBreakdown.totalPrice);
+            // Add LTM fee to base price if applicable (orders under 24 pieces)
+            let adjustedPrice = pricingBreakdown.totalPrice;
+            if (totalQuantity < 24) {
+                const ltmPerPiece = 50 / totalQuantity;
+                adjustedPrice += ltmPerPiece;
+                console.log('[CapQuotePricingCalculator] 🔍 Adding LTM per piece:', '$' + ltmPerPiece.toFixed(2));
+                console.log('[CapQuotePricingCalculator] 🔍 Adjusted price with LTM:', '$' + adjustedPrice.toFixed(2));
+            }
+            
+            // Apply size-based pricing using LTM-adjusted price
+            const sizePricedItems = this.applySizePricing(product, adjustedPrice);
             
             const lineTotal = sizePricedItems.reduce((sum, item) => sum + item.total, 0);
             
@@ -197,9 +207,9 @@ class CapQuotePricingCalculator {
     /**
      * Get base cap price from API
      */
-    async getBaseCapPrice(styleNumber) {
+    async getBaseCapPrice(styleNumber, color) {
         try {
-            console.log('[CapQuotePricingCalculator] Getting base price for:', styleNumber);
+            console.log('[CapQuotePricingCalculator] Getting base price for:', styleNumber, color);
             
             const response = await fetch(`${this.baseURL}/api/size-pricing?styleNumber=${styleNumber}`);
             
@@ -208,17 +218,47 @@ class CapQuotePricingCalculator {
             }
             
             const data = await response.json();
+            console.log('[CapQuotePricingCalculator] 🔍 API Response for', styleNumber, ':', data.length, 'colors');
             
-            // Get the base price (typically from Small size or first available)
-            const sizes = data.basePrices || {};
-            const basePrice = sizes['S'] || sizes['One Size'] || Object.values(sizes)[0];
+            // First, try to find the specific color
+            let targetPrice = null;
+            let fallbackPrice = null;
             
-            if (!basePrice) {
-                throw new Error(`No base price found for ${styleNumber}`);
+            for (const colorData of Array.isArray(data) ? data : [data]) {
+                const colorName = colorData.color || 'Unknown';
+                const sizes = colorData.basePrices || {};
+                const prices = Object.values(sizes).filter(p => p && p > 0); // Remove zero/null prices
+                
+                if (prices.length > 0) {
+                    const colorPrice = Math.max(...prices);
+                    
+                    // If this is our target color, use it
+                    if (colorName === color) {
+                        targetPrice = colorPrice;
+                        console.log('[CapQuotePricingCalculator] 🔍 Found exact color match:', color, '$' + colorPrice.toFixed(2));
+                        break;
+                    }
+                    
+                    // Keep the first valid price as fallback
+                    if (fallbackPrice === null) {
+                        fallbackPrice = colorPrice;
+                    }
+                }
             }
             
-            console.log('[CapQuotePricingCalculator] Base cap price:', basePrice);
-            return parseFloat(basePrice);
+            const finalPrice = targetPrice || fallbackPrice;
+            
+            if (!finalPrice) {
+                throw new Error(`No valid (non-zero) prices found for ${styleNumber}`);
+            }
+            
+            if (targetPrice) {
+                console.log('[CapQuotePricingCalculator] 🔍 Using exact color price:', color, '$' + finalPrice.toFixed(2));
+            } else {
+                console.log('[CapQuotePricingCalculator] 🔍 Color not found, using fallback price: $' + finalPrice.toFixed(2));
+            }
+            
+            return parseFloat(finalPrice);
             
         } catch (error) {
             console.warn('[CapQuotePricingCalculator] Base price lookup failed, using default:', error.message);
@@ -231,49 +271,82 @@ class CapQuotePricingCalculator {
      * Calculate decorated price (cap + all embroidery)
      */
     calculateDecoratedPrice(baseCapPrice, logos, totalQuantity) {
-        console.log('[CapQuotePricingCalculator] Calculating decorated price...');
+        console.log('[CapQuotePricingCalculator] 🔍 Calculating decorated price...');
+        console.log('[CapQuotePricingCalculator] 🔍 Input baseCapPrice:', baseCapPrice);
+        console.log('[CapQuotePricingCalculator] 🔍 Input totalQuantity:', totalQuantity);
+        console.log('[CapQuotePricingCalculator] 🔍 Input logos:', logos.length);
         
         // Apply margin to cap price
         const marginDenominator = this.pricingData.primary.tiersR[0]?.MarginDenominator || 0.6;
         const capSellingPrice = baseCapPrice / marginDenominator;
+        console.log('[CapQuotePricingCalculator] 🔍 Margin denominator:', marginDenominator);
+        console.log('[CapQuotePricingCalculator] 🔍 Cap selling price:', capSellingPrice);
         
         // Get front logo pricing (from CAP endpoint)
         const frontLogo = logos.find(logo => logo.isRequired) || logos[0];
-        const frontEmbroideryPrice = this.calculateLogoPrice(frontLogo, totalQuantity, 'primary');
+        console.log('[CapQuotePricingCalculator] 🔍 Front logo:', frontLogo?.position, frontLogo?.stitchCount);
+        const frontLogoPricing = this.calculateLogoPrice(frontLogo, totalQuantity, 'primary');
+        const frontEmbroideryPrice = frontLogoPricing.totalPrice;
+        console.log('[CapQuotePricingCalculator] 🔍 Front embroidery price:', frontEmbroideryPrice);
         
         // Get additional logos pricing (from CAP-AL endpoint)
         const additionalLogos = logos.filter(logo => !logo.isRequired);
-        const additionalEmbroideryPrice = additionalLogos.reduce((sum, logo) => {
-            return sum + this.calculateLogoPrice(logo, totalQuantity, 'additional');
-        }, 0);
+        console.log('[CapQuotePricingCalculator] 🔍 Additional logos count:', additionalLogos.length);
         
-        const totalEmbroideryPrice = frontEmbroideryPrice + additionalEmbroideryPrice;
-        const decoratedPrice = capSellingPrice + totalEmbroideryPrice;
+        // Calculate individual logo prices and store details
+        const additionalLogoPrices = [];
+        const additionalEmbroideryPrice = additionalLogos.reduce((sum, logo) => {
+            const logoPricing = this.calculateLogoPrice(logo, totalQuantity, 'additional');
+            const logoPrice = logoPricing.totalPrice;
+            console.log('[CapQuotePricingCalculator] 🔍 Additional logo price:', logo.position, logoPrice);
+            
+            // Store individual logo pricing details
+            additionalLogoPrices.push({
+                position: logo.position,
+                stitchCount: logo.stitchCount,
+                pricePerPiece: logoPrice,
+                needsDigitizing: logo.needsDigitizing,
+                breakdown: logoPricing.breakdown
+            });
+            
+            return sum + logoPrice;
+        }, 0);
+        console.log('[CapQuotePricingCalculator] 🔍 Total additional embroidery price:', additionalEmbroideryPrice);
+        
+        // ONLY include front embroidery in the base decorated price
+        // Additional embroidery is tracked separately and not added to base price
+        const decoratedPrice = capSellingPrice + frontEmbroideryPrice;
         
         // Round UP to nearest dollar (CeilDollar)
         const roundedPrice = Math.ceil(decoratedPrice);
         
-        console.log('[CapQuotePricingCalculator] Price breakdown:');
-        console.log('  Cap selling price:', capSellingPrice.toFixed(2));
-        console.log('  Front embroidery:', frontEmbroideryPrice.toFixed(2));
-        console.log('  Additional embroidery:', additionalEmbroideryPrice.toFixed(2));
-        console.log('  Total decorated:', decoratedPrice.toFixed(2));
-        console.log('  Rounded final:', roundedPrice.toFixed(2));
+        console.log('[CapQuotePricingCalculator] 🔍 DETAILED BREAKDOWN:');
+        console.log('  🔍 Base cap cost: $' + baseCapPrice.toFixed(2));
+        console.log('  🔍 Cap selling price (÷0.6): $' + capSellingPrice.toFixed(2));
+        console.log('  🔍 Front embroidery: $' + frontEmbroideryPrice.toFixed(2));
+        console.log('  🔍 Additional embroidery: $' + additionalEmbroideryPrice.toFixed(2) + ' (NOT included in base price)');
+        console.log('  🔍 Base decorated price (cap + front only): $' + decoratedPrice.toFixed(2));
+        console.log('  🔍 Final rounded base price: $' + roundedPrice.toFixed(2));
         
         // Return detailed breakdown for separate display
         return {
             totalPrice: roundedPrice,
             capPrice: capSellingPrice,
             frontEmbroideryPrice: frontEmbroideryPrice,
-            additionalEmbroideryPrice: additionalEmbroideryPrice
+            frontLogoBreakdown: frontLogoPricing.breakdown,
+            additionalEmbroideryPrice: additionalEmbroideryPrice,
+            additionalLogoPrices: additionalLogoPrices // Individual logo pricing details with breakdown
         };
     }
     
     /**
-     * Calculate price for a single logo
+     * Calculate price for a single logo with detailed breakdown
      */
     calculateLogoPrice(logo, totalQuantity, pricingType) {
-        if (!logo) return 0;
+        if (!logo) return { totalPrice: 0, breakdown: null };
+        
+        console.log(`[CapQuotePricingCalculator] 🔍 Calculating ${pricingType} logo price for:`, logo.position);
+        console.log(`[CapQuotePricingCalculator] 🔍 Logo stitches:`, logo.stitchCount);
         
         const pricingSource = this.pricingData[pricingType];
         if (!pricingSource) {
@@ -284,40 +357,56 @@ class CapQuotePricingCalculator {
         const tierData = this.getTierData(totalQuantity, pricingSource);
         const embroideryData = this.getEmbroideryData(totalQuantity, pricingSource);
         
+        console.log(`[CapQuotePricingCalculator] 🔍 Tier data:`, tierData);
+        console.log(`[CapQuotePricingCalculator] 🔍 Embroidery data:`, embroideryData);
+        
         if (!tierData || !embroideryData) {
             throw new Error(`Pricing data not found for quantity ${totalQuantity} in ${pricingType}`);
         }
         
-        // Base embroidery cost
-        let logoPrice = embroideryData.EmbroideryCost;
+        // Base embroidery cost (this is already a selling price)
+        const baseEmbroideryPrice = embroideryData.EmbroideryCost;
+        console.log(`[CapQuotePricingCalculator] 🔍 Base embroidery cost (selling price):`, baseEmbroideryPrice);
         
-        // Add cost for additional stitches
+        // Calculate cost for additional stitches
         const baseStitchCount = embroideryData.BaseStitchCount || (pricingType === 'primary' ? 8000 : 5000);
         const additionalStitchRate = embroideryData.AdditionalStitchRate || 1.0;
         
+        console.log(`[CapQuotePricingCalculator] 🔍 Base stitch count:`, baseStitchCount);
+        console.log(`[CapQuotePricingCalculator] 🔍 Additional stitch rate:`, additionalStitchRate);
+        
+        let additionalStitchCost = 0;
+        let extraStitches = 0;
+        
         if (logo.stitchCount > baseStitchCount) {
-            const additionalStitches = logo.stitchCount - baseStitchCount;
-            const additionalStitchCost = Math.ceil(additionalStitches / 1000) * additionalStitchRate;
-            logoPrice += additionalStitchCost;
+            extraStitches = logo.stitchCount - baseStitchCount;
+            additionalStitchCost = Math.ceil(extraStitches / 1000) * additionalStitchRate;
             
-            console.log(`[CapQuotePricingCalculator] ${logo.position} extra stitches:`, 
-                       additionalStitches, '@ $' + additionalStitchRate, '= $' + additionalStitchCost.toFixed(2));
+            console.log(`[CapQuotePricingCalculator] 🔍 ${logo.position} extra stitches:`, 
+                       extraStitches, '@ $' + additionalStitchRate, '= $' + additionalStitchCost.toFixed(2));
         }
         
-        // Add LTM fee if applicable (from embroidery data, not tier data)
-        const ltmFee = embroideryData.LTM || 0;
-        if (totalQuantity < 24 && ltmFee > 0) {
-            const ltmPerUnit = ltmFee / totalQuantity;
-            logoPrice += ltmPerUnit;
-            
-            console.log(`[CapQuotePricingCalculator] ${logo.position} LTM:`, 
-                       '$' + ltmFee, '÷', totalQuantity, '= $' + ltmPerUnit.toFixed(2));
-        }
+        const logoPrice = baseEmbroideryPrice + additionalStitchCost;
         
-        console.log(`[CapQuotePricingCalculator] ${logo.position} (${pricingType}):`, 
+        // Note: LTM fee is handled separately as a line item, not per logo
+        // This prevents double-charging the $50 LTM fee
+        
+        console.log(`[CapQuotePricingCalculator] 🔍 FINAL ${logo.position} (${pricingType}) price:`, 
                    '$' + logoPrice.toFixed(2));
         
-        return logoPrice;
+        // Return detailed breakdown
+        const breakdown = {
+            basePrice: baseEmbroideryPrice,
+            extraStitchCost: additionalStitchCost,
+            extraStitches: extraStitches,
+            baseStitchCount: baseStitchCount,
+            hasExtraStitches: extraStitches > 0
+        };
+        
+        return {
+            totalPrice: logoPrice,
+            breakdown: breakdown
+        };
     }
     
     /**
@@ -357,9 +446,24 @@ class CapQuotePricingCalculator {
      * Get tier data for quantity
      */
     getTierData(quantity, pricingSource) {
-        return pricingSource.tiersR.find(tier => 
+        const tier = pricingSource.tiersR.find(tier => 
             quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity
         );
+        
+        // Handle missing 1-23 tier by creating synthetic tier data
+        if (!tier && quantity < 24) {
+            console.log('[CapQuotePricingCalculator] Creating synthetic 1-23 tier (API missing this tier)');
+            return {
+                TierLabel: '1-23',
+                MinQuantity: 1,
+                MaxQuantity: 23,
+                MarginDenominator: 0.6, // Standard margin
+                TargetMargin: 0,
+                LTM_Fee: 50 // $50 LTM fee for orders under 24
+            };
+        }
+        
+        return tier;
     }
     
     /**
