@@ -8,7 +8,7 @@ class ScreenPrintPricingCalculator {
         this.pricingService = null;
         this.cachedPricingData = null;
         this.currentStyleNumber = null;
-        this.SAFETY_STRIPE_COST = 2.00; // $2.00 per unit for safety stripes
+        this.SAFETY_STRIPE_COST = 2.00; // $2.00 per location per unit for safety stripes
         console.log('[ScreenPrintPricingCalculator] Initialized');
         
         // Initialize pricing service if available
@@ -87,9 +87,10 @@ class ScreenPrintPricingCalculator {
                             printSetup.locations || []
                         );
                         
-                        // Add safety stripe cost if enabled
+                        // Add safety stripe cost if enabled ($2.00 per location)
                         if (printSetup.safetyStripes) {
-                            unitPrice += this.SAFETY_STRIPE_COST;
+                            const numLocations = printSetup.locations ? printSetup.locations.length : 1;
+                            unitPrice += this.SAFETY_STRIPE_COST * numLocations;
                         }
                         
                         const lineTotal = unitPrice * quantity;
@@ -125,8 +126,9 @@ class ScreenPrintPricingCalculator {
             const setupFees = this.calculateSetupFees(printSetup);
             
             // Calculate safety stripe total (already included in subtotal through unit prices)
+            const numLocations = printSetup.locations ? printSetup.locations.length : 1;
             const safetyStripesTotal = printSetup.safetyStripes ? 
-                totalQuantity * this.SAFETY_STRIPE_COST : 0;
+                totalQuantity * this.SAFETY_STRIPE_COST * numLocations : 0;
             
             // Note: Safety stripe cost is already included in the subtotal 
             // because it was added to unit prices

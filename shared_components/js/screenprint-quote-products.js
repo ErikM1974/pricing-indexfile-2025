@@ -86,17 +86,26 @@ class ScreenPrintProductManager {
      */
     async getProductDetails(styleNumber) {
         try {
+            console.log('[ScreenPrintProductManager] Getting details for:', styleNumber);
+            
             // Check cache
             const cacheKey = `details_${styleNumber}`;
             if (this.productCache.has(cacheKey)) {
+                console.log('[ScreenPrintProductManager] Returning cached details');
                 return this.productCache.get(cacheKey);
             }
             
             // Fetch product details
+            console.log('[ScreenPrintProductManager] Fetching from API...');
             const [detailsResponse, colorsResponse] = await Promise.all([
                 fetch(`${this.baseURL}/api/product-details?styleNumber=${styleNumber}`),
                 fetch(`${this.baseURL}/api/product-colors?styleNumber=${styleNumber}`)
             ]);
+            
+            console.log('[ScreenPrintProductManager] API responses:', {
+                details: detailsResponse.ok,
+                colors: colorsResponse.ok
+            });
             
             if (!detailsResponse.ok || !colorsResponse.ok) {
                 throw new Error('Failed to fetch product details');
@@ -105,10 +114,16 @@ class ScreenPrintProductManager {
             const details = await detailsResponse.json();
             const colors = await colorsResponse.json();
             
+            console.log('[ScreenPrintProductManager] Details data:', details);
+            console.log('[ScreenPrintProductManager] Colors data:', colors);
+            
             const productData = {
                 ...details.data,
                 availableColors: colors.data || []
             };
+            
+            console.log('[ScreenPrintProductManager] Combined product data:', productData);
+            console.log('[ScreenPrintProductManager] Available colors count:', productData.availableColors.length);
             
             // Cache result
             this.productCache.set(cacheKey, productData);

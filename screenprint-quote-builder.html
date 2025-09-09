@@ -969,12 +969,12 @@
                             <div class="safety-label">
                                 <i class="fas fa-exclamation-triangle safety-icon"></i>
                                 <strong>Safety Stripes</strong>
-                                <span class="info-tooltip" data-tooltip="Typically includes 4-color print on front and 4-color print on back for maximum visibility">
+                                <span class="info-tooltip" data-tooltip="Typically includes 4-color print on each location. Pricing: $2.00 per location per unit (e.g., Front + Back = $4.00 per unit)">
                                     <i class="fas fa-info" style="font-size: 0.7rem;"></i>
                                 </span>
                             </div>
                             <p style="margin: 0; font-size: 0.875rem; color: #ff6b35;">
-                                Add reflective safety stripes for high-visibility workwear ($2.00 per unit)
+                                Add reflective safety stripes for high-visibility workwear ($2.00 per location per unit)
                             </p>
                         </div>
                     </div>
@@ -1453,8 +1453,13 @@
         
         async selectProductStyle(styleNumber) {
             try {
+                console.log('[selectProductStyle] Loading style:', styleNumber);
+                
                 // Get product details
                 const productDetails = await this.productService.getProductDetails(styleNumber);
+                
+                console.log('[selectProductStyle] Product details:', productDetails);
+                console.log('[selectProductStyle] Available colors:', productDetails?.availableColors);
                 
                 if (!productDetails) {
                     alert('Could not load product details');
@@ -1472,19 +1477,23 @@
                 colorSelect.innerHTML = '<option value="">Select a color...</option>';
                 
                 if (productDetails.availableColors && productDetails.availableColors.length > 0) {
+                    console.log('[selectProductStyle] Adding colors to dropdown:', productDetails.availableColors.length);
                     productDetails.availableColors.forEach(color => {
                         const option = document.createElement('option');
                         option.value = color;
                         option.textContent = color;
                         colorSelect.appendChild(option);
                     });
+                } else {
+                    console.warn('[selectProductStyle] No colors available for product');
+                    colorSelect.innerHTML = '<option value="">No colors available - check API response</option>';
                 }
                 
                 // Enable load button
                 document.getElementById('load-product-btn').disabled = false;
                 
             } catch (error) {
-                console.error('Error loading product:', error);
+                console.error('[selectProductStyle] Error loading product:', error);
                 alert('Error loading product details');
             }
         }
@@ -1708,7 +1717,7 @@
                         ` : ''}
                         ${pricingResult.safetyStripesTotal > 0 ? `
                             <div class="summary-row">
-                                <span class="summary-label">Safety Stripes ($2.00 × ${pricingResult.totalQuantity}):</span>
+                                <span class="summary-label">Safety Stripes (${this.printSetup.locations.length} ${this.printSetup.locations.length === 1 ? 'location' : 'locations'} × $2.00 × ${pricingResult.totalQuantity} pcs):</span>
                                 <span class="summary-value">$${pricingResult.safetyStripesTotal.toFixed(2)}</span>
                             </div>
                         ` : ''}

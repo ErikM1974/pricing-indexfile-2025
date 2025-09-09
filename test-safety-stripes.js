@@ -38,7 +38,7 @@ if (pricingCalculator) {
     console.log('Safety Stripe Cost Constant:', pricingCalculator.SAFETY_STRIPE_COST);
     
     if (pricingCalculator.SAFETY_STRIPE_COST === 2.00) {
-        console.log('✅ PASSED: Safety stripe cost is $2.00');
+        console.log('✅ PASSED: Safety stripe cost is $2.00 per location per unit');
     } else {
         console.error('❌ FAILED: Safety stripe cost not set correctly');
     }
@@ -48,8 +48,9 @@ console.groupEnd();
 // Test 3: Test pricing calculation with safety stripes
 console.group('Test 3: Pricing Calculation');
 async function testSafetyPricing() {
-    // Set up test scenario
-    const testSetup = {
+    // Test with 1 location
+    console.log('Testing with 1 location (Front only):');
+    let testSetup = {
         locations: ['FF'],
         colorsByLocation: {'FF': 2},
         darkGarments: false,
@@ -65,39 +66,48 @@ async function testSafetyPricing() {
     }];
     
     try {
-        // Calculate pricing with safety stripes
-        const withSafety = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
-        
-        // Calculate without safety stripes
+        // Test with 1 location
+        const withSafety1 = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
         testSetup.safetyStripes = false;
-        const withoutSafety = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
+        const withoutSafety1 = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
         
-        console.log('Pricing WITH safety stripes:');
-        console.log('  Subtotal:', withSafety.subtotal);
-        console.log('  Safety Stripes Total:', withSafety.safetyStripesTotal);
-        console.log('  Grand Total:', withSafety.grandTotal);
+        const difference1 = withSafety1.subtotal - withoutSafety1.subtotal;
+        const expected1 = 48 * 2.00 * 1; // 48 pieces × $2.00 × 1 location
         
-        console.log('Pricing WITHOUT safety stripes:');
-        console.log('  Subtotal:', withoutSafety.subtotal);
-        console.log('  Safety Stripes Total:', withoutSafety.safetyStripesTotal);
-        console.log('  Grand Total:', withoutSafety.grandTotal);
+        console.log('  Expected cost (1 location):', expected1);
+        console.log('  Actual difference:', difference1);
+        console.log('  Safety total:', withSafety1.safetyStripesTotal);
         
-        const expectedDifference = 48 * 2.00; // 48 pieces × $2.00
-        const actualDifference = withSafety.subtotal - withoutSafety.subtotal;
-        
-        console.log('Expected difference:', expectedDifference);
-        console.log('Actual difference:', actualDifference);
-        
-        if (Math.abs(actualDifference - expectedDifference) < 0.01) {
-            console.log('✅ PASSED: Safety stripe pricing adds $2.00 per unit');
+        if (Math.abs(difference1 - expected1) < 0.01) {
+            console.log('  ✅ PASSED: $2.00 per location pricing correct');
         } else {
-            console.error('❌ FAILED: Safety stripe pricing not calculating correctly');
+            console.error('  ❌ FAILED: Pricing not calculating correctly');
         }
         
-        if (withSafety.safetyStripesTotal === expectedDifference) {
-            console.log('✅ PASSED: Safety stripe total calculated correctly');
+        // Test with 2 locations
+        console.log('\nTesting with 2 locations (Front + Back):');
+        testSetup = {
+            locations: ['FF', 'FB'],
+            colorsByLocation: {'FF': 2, 'FB': 2},
+            darkGarments: false,
+            safetyStripes: true
+        };
+        
+        const withSafety2 = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
+        testSetup.safetyStripes = false;
+        const withoutSafety2 = await pricingCalculator.calculateQuotePricing(testProducts, testSetup);
+        
+        const difference2 = withSafety2.subtotal - withoutSafety2.subtotal;
+        const expected2 = 48 * 2.00 * 2; // 48 pieces × $2.00 × 2 locations
+        
+        console.log('  Expected cost (2 locations):', expected2);
+        console.log('  Actual difference:', difference2);
+        console.log('  Safety total:', withSafety2.safetyStripesTotal);
+        
+        if (Math.abs(difference2 - expected2) < 0.01) {
+            console.log('  ✅ PASSED: $2.00 per location pricing correct');
         } else {
-            console.error('❌ FAILED: Safety stripe total incorrect');
+            console.error('  ❌ FAILED: Pricing not calculating correctly');
         }
         
     } catch (error) {
