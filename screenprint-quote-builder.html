@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Quote Builder | Northwest Custom Apparel</title>
+    
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
+    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder.css">
+</head>
+<body>
+    <!-- Professional Header with Logo and Navigation -->
+    <header class="embroidery-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <!-- Logo Section -->
+                <div class="logo-section">
+                    <a href="/staff-dashboard.html" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
+                             class="logo-image">
+                    </a>
+                </div>
+                
+                <!-- Navigation Actions -->
+                <div class="nav-actions">
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Context Bar -->
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Screen Print Quote Builder</span>
+                    </div>
+                </div>
+                
+                <!-- Live Status -->
+                <div class="header-status">
+                    <div class="status-item">
+                        <span class="status-label">Quote Type:</span>
+                        <span class="status-value">Screen Print</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container screenprint-quote-builder">
+        <h1 class="page-title">
+            <i class="fas fa-paint-roller"></i> Screen Print Quote Builder
+        </h1>
+        <p class="page-description">
+            Create professional screen print quotes with multiple products, locations, and automatic tier pricing
+        </p>
+        
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" data-phase="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Print Setup</div>
+            </div>
+            <div class="phase-connector"></div>
+            <div class="phase-step" data-phase="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Add Products</div>
+            </div>
+            <div class="phase-connector"></div>
+            <div class="phase-step" data-phase="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Review & Save Quote</div>
+            </div>
+        </div>
+        
+        <!-- Phase 1: Print Setup -->
+        <div class="phase-content active" id="phase1">
+            <div class="phase-header">
+                <h2><i class="fas fa-palette"></i> Print Setup</h2>
+                <p>Define your screen print specifications that will apply to all products</p>
+            </div>
+            
+            <div class="print-setup-section">
+                <!-- Print Locations Section -->
+                <div class="setup-card">
+                    <h3 class="setup-title">Print Locations</h3>
+                    
+                    <div id="printLocations">
+                        <!-- Primary Location (Always Present) -->
+                        <div class="location-card primary-location" data-location-index="0">
+                            <div class="location-header">
+                                <div class="location-badge primary">Primary Location</div>
+                            </div>
+                            
+                            <div class="location-content">
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <select class="form-control location-select" required>
+                                        <option value="">Select Location...</option>
+                                        <option value="Front">Front</option>
+                                        <option value="Back">Back</option>
+                                        <option value="Left Chest">Left Chest</option>
+                                        <option value="Right Chest">Right Chest</option>
+                                        <option value="Left Sleeve">Left Sleeve</option>
+                                        <option value="Right Sleeve">Right Sleeve</option>
+                                        <option value="Full Front">Full Front</option>
+                                        <option value="Full Back">Full Back</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Number of Colors</label>
+                                    <div class="color-count-selector">
+                                        <button type="button" class="color-btn" data-colors="1">1 Color</button>
+                                        <button type="button" class="color-btn" data-colors="2">2 Colors</button>
+                                        <button type="button" class="color-btn" data-colors="3">3 Colors</button>
+                                        <button type="button" class="color-btn" data-colors="4">4 Colors</button>
+                                        <button type="button" class="color-btn" data-colors="5">5 Colors</button>
+                                        <button type="button" class="color-btn" data-colors="6">6 Colors</button>
+                                    </div>
+                                    <input type="hidden" class="color-count-input" value="1" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Location Button -->
+                    <button type="button" class="btn-add-location" id="addLocationBtn">
+                        <i class="fas fa-plus-circle"></i> Add Another Location
+                    </button>
+                </div>
+                
+                <!-- Additional Options -->
+                <div class="setup-card">
+                    <h3 class="setup-title">Additional Options</h3>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rushOrder">
+                            <span>Rush Order (24-48 hour turnaround)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Print Summary -->
+                <div class="print-summary-card">
+                    <h4>Print Configuration Summary</h4>
+                    <div id="printSummary" class="summary-content">
+                        <p class="summary-placeholder">Select print locations and colors to see summary</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button type="button" class="btn-primary btn-next" onclick="screenPrintQuoteBuilder.nextPhase()">
+                    Continue to Products <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Phase 2: Add Products -->
+        <div class="phase-content" id="phase2">
+            <div class="phase-header">
+                <h2><i class="fas fa-tshirt"></i> Add Products</h2>
+                <p>Search and add products with size quantities</p>
+            </div>
+            
+            <!-- Product Search -->
+            <div class="product-search-section">
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               id="productSearch" 
+                               class="product-search-input" 
+                               placeholder="Search by style number (e.g., PC54, PC61)..."
+                               autocomplete="off">
+                        <div id="searchResults" class="search-results-dropdown"></div>
+                    </div>
+                </div>
+                
+                <!-- Selected Product Details -->
+                <div id="productDetails" class="product-details-card" style="display: none;">
+                    <div class="product-info">
+                        <div class="product-image-placeholder">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="product-text">
+                            <h3 id="productTitle"></h3>
+                            <p id="productDescription"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Color Selection -->
+                    <div class="color-selection">
+                        <label>Select Color</label>
+                        <select id="colorSelect" class="form-control">
+                            <option value="">Choose a color...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Size Matrix -->
+                    <div class="size-matrix-section">
+                        <h4>Enter Quantities by Size</h4>
+                        <div id="sizeMatrix" class="size-matrix"></div>
+                        <div class="quantity-summary">
+                            <span>Total Quantity: </span>
+                            <strong id="totalQuantity">0</strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Product Button -->
+                    <button type="button" class="btn-primary" onclick="screenPrintQuoteBuilder.addProductToQuote()">
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Products List -->
+            <div class="products-list-section">
+                <h3>Products in Quote</h3>
+                <div id="productsList" class="products-list">
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>No products added yet. Search and add products above.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button type="button" class="btn-secondary" onclick="screenPrintQuoteBuilder.previousPhase()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button type="button" class="btn-primary btn-next" onclick="screenPrintQuoteBuilder.nextPhase()">
+                    Continue to Review <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Phase 3: Review & Save Quote -->
+        <div class="phase-content" id="phase3">
+            <div class="phase-header">
+                <h2><i class="fas fa-clipboard-check"></i> Review & Save Quote</h2>
+                <p>Review your quote and enter customer information</p>
+            </div>
+            
+            <!-- Customer Information -->
+            <div class="customer-info-section">
+                <h3>Customer Information</h3>
+                <form id="customerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Customer Name <span class="required">*</span></label>
+                            <input type="text" id="customerName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address <span class="required">*</span></label>
+                            <input type="email" id="customerEmail" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="companyName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Project Name</label>
+                            <input type="text" id="projectName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Sales Representative <span class="required">*</span></label>
+                            <select id="salesRep" class="form-control" required>
+                                <option value="sales@nwcustomapparel.com">General Sales</option>
+                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Special Instructions</label>
+                        <textarea id="specialInstructions" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Quote Summary -->
+            <div class="quote-summary-section">
+                <h3>Quote Summary</h3>
+                <div id="quoteSummary" class="quote-summary">
+                    <!-- Summary will be generated here -->
+                </div>
+                
+                <!-- Pricing Breakdown -->
+                <div class="pricing-breakdown">
+                    <table class="pricing-table">
+                        <tbody>
+                            <tr>
+                                <td>Products & Printing:</td>
+                                <td class="text-right" id="subtotalAmount">$0.00</td>
+                            </tr>
+                            <tr id="ltmFeeRow" style="display: none;">
+                                <td>Small Order Fee:</td>
+                                <td class="text-right" id="ltmFeeAmount">$50.00</td>
+                            </tr>
+                            <tr id="rushFeeRow" style="display: none;">
+                                <td>Rush Order Fee:</td>
+                                <td class="text-right" id="rushFeeAmount">$0.00</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Grand Total:</strong></td>
+                                <td class="text-right"><strong id="grandTotal">$0.00</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="quote-actions">
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="saveToDatabase" checked>
+                            <span>Save quote to database</span>
+                        </label>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" onclick="screenPrintQuoteBuilder.previousPhase()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn-primary" onclick="screenPrintQuoteBuilder.generateQuote()">
+                            <i class="fas fa-paper-plane"></i> Generate Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <i class="fas fa-check-circle"></i>
+                <h2>Quote Generated Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="success-info">
+                    <p class="quote-id-display">
+                        Quote ID: <strong id="modalQuoteId"></strong>
+                    </p>
+                    <p>Your quote has been sent to: <strong id="modalCustomerEmail"></strong></p>
+                    <p>Total Amount: <strong id="modalTotalAmount"></strong></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="screenPrintQuoteBuilder.printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-primary" onclick="screenPrintQuoteBuilder.startNewQuote()">
+                    <i class="fas fa-plus"></i> New Quote
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript Services -->
+    <script src="/shared_components/js/screenprint-quote-service.js"></script>
+    <script src="/shared_components/js/screenprint-quote-products.js"></script>
+    <script src="/shared_components/js/screenprint-quote-pricing.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    
+    <!-- Main Application -->
+    <script>
+    class ScreenPrintQuoteBuilder {
+        constructor() {
+            this.currentPhase = 1;
+            this.printLocations = [];
+            this.products = [];
+            this.currentProduct = null;
+            
+            // Initialize services
+            this.quoteService = new ScreenPrintQuoteService();
+            this.productService = new ScreenPrintQuoteProducts();
+            this.pricingService = new ScreenPrintQuotePricing();
+            
+            // Initialize EmailJS
+            emailjs.init('4qSbDO-SQs19TbP80');
+            
+            this.initializeEventListeners();
+            this.initializePrimaryLocation();
+        }
+        
+        initializeEventListeners() {
+            // Product search
+            const searchInput = document.getElementById('productSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => this.handleProductSearch(e));
+            }
+            
+            // Color count buttons
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => this.handleColorSelection(e));
+            });
+            
+            // Add location button
+            const addLocationBtn = document.getElementById('addLocationBtn');
+            if (addLocationBtn) {
+                addLocationBtn.addEventListener('click', () => this.addPrintLocation());
+            }
+            
+            // Size inputs
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('size-input')) {
+                    this.updateQuantityTotal();
+                }
+            });
+        }
+        
+        initializePrimaryLocation() {
+            // Set default primary location
+            const primaryLocation = document.querySelector('.primary-location');
+            if (primaryLocation) {
+                primaryLocation.querySelector('.color-btn[data-colors="1"]').classList.add('active');
+                this.updatePrintSummary();
+            }
+        }
+        
+        handleColorSelection(e) {
+            const btn = e.target;
+            const locationCard = btn.closest('.location-card');
+            
+            // Remove active class from siblings
+            locationCard.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            // Update hidden input
+            const colorInput = locationCard.querySelector('.color-count-input');
+            colorInput.value = btn.dataset.colors;
+            
+            this.updatePrintSummary();
+        }
+        
+        addPrintLocation() {
+            const locationsContainer = document.getElementById('printLocations');
+            const locationCount = locationsContainer.querySelectorAll('.location-card').length;
+            
+            if (locationCount >= 4) {
+                alert('Maximum 4 print locations allowed');
+                return;
+            }
+            
+            const locationCard = document.createElement('div');
+            locationCard.className = 'location-card additional-location';
+            locationCard.dataset.locationIndex = locationCount;
+            
+            locationCard.innerHTML = `
+                <div class="location-header">
+                    <div class="location-badge additional">Additional Location ${locationCount}</div>
+                    <button type="button" class="btn-remove-location" onclick="screenPrintQuoteBuilder.removeLocation(${locationCount})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="location-content">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select class="form-control location-select" required>
+                            <option value="">Select Location...</option>
+                            <option value="Front">Front</option>
+                            <option value="Back">Back</option>
+                            <option value="Left Chest">Left Chest</option>
+                            <option value="Right Chest">Right Chest</option>
+                            <option value="Left Sleeve">Left Sleeve</option>
+                            <option value="Right Sleeve">Right Sleeve</option>
+                            <option value="Full Front">Full Front</option>
+                            <option value="Full Back">Full Back</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Number of Colors</label>
+                        <div class="color-count-selector">
+                            <button type="button" class="color-btn" data-colors="1" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">1 Color</button>
+                            <button type="button" class="color-btn" data-colors="2" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">2 Colors</button>
+                            <button type="button" class="color-btn" data-colors="3" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">3 Colors</button>
+                            <button type="button" class="color-btn" data-colors="4" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">4 Colors</button>
+                            <button type="button" class="color-btn" data-colors="5" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">5 Colors</button>
+                            <button type="button" class="color-btn" data-colors="6" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">6 Colors</button>
+                        </div>
+                        <input type="hidden" class="color-count-input" value="1" required>
+                    </div>
+                </div>
+            `;
+            
+            locationsContainer.appendChild(locationCard);
+            
+            // Set default selection
+            locationCard.querySelector('.color-btn[data-colors="1"]').classList.add('active');
+            
+            this.updatePrintSummary();
+        }
+        
+        removeLocation(index) {
+            const locationCard = document.querySelector(`.location-card[data-location-index="${index}"]`);
+            if (locationCard) {
+                locationCard.remove();
+                this.updatePrintSummary();
+            }
+        }
+        
+        updatePrintSummary() {
+            const summaryContainer = document.getElementById('printSummary');
+            const locations = [];
+            
+            document.querySelectorAll('.location-card').forEach(card => {
+                const location = card.querySelector('.location-select').value;
+                const colors = card.querySelector('.color-count-input').value;
+                
+                if (location) {
+                    locations.push({
+                        location: location,
+                        colors: colors,
+                        isPrimary: card.classList.contains('primary-location')
+                    });
+                }
+            });
+            
+            if (locations.length === 0) {
+                summaryContainer.innerHTML = '<p class="summary-placeholder">Select print locations and colors to see summary</p>';
+                return;
+            }
+            
+            let summaryHTML = '<div class="summary-items">';
+            locations.forEach(loc => {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span class="summary-label">${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location}</span>
+                        <span class="summary-value">${loc.colors} Color${loc.colors > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            });
+            summaryHTML += '</div>';
+            
+            summaryContainer.innerHTML = summaryHTML;
+            
+            // Store locations for pricing calculations
+            this.printLocations = locations;
+        }
+        
+        async handleProductSearch(e) {
+            const query = e.target.value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (query.length < 2) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+            
+            const results = await this.productService.searchProducts(query);
+            
+            if (results.length > 0) {
+                let html = '';
+                results.forEach(product => {
+                    html += `
+                        <div class="search-result-item" onclick="screenPrintQuoteBuilder.selectProduct('${product.styleNumber}', '${product.productName.replace(/'/g, "\\'")}')">
+                            <strong>${product.styleNumber}</strong> - ${product.productName}
+                        </div>
+                    `;
+                });
+                resultsContainer.innerHTML = html;
+                resultsContainer.style.display = 'block';
+            } else {
+                resultsContainer.innerHTML = '<div class="no-results">No products found</div>';
+                resultsContainer.style.display = 'block';
+            }
+        }
+        
+        async selectProduct(styleNumber, productName) {
+            // Hide search results
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('productSearch').value = `${styleNumber} - ${productName}`;
+            
+            // Load product details
+            const productDetails = await this.productService.loadProductDetails(styleNumber);
+            
+            this.currentProduct = {
+                styleNumber: styleNumber,
+                productName: productName,
+                details: productDetails
+            };
+            
+            // Display product details
+            this.displayProductDetails(productDetails);
+        }
+        
+        displayProductDetails(product) {
+            document.getElementById('productTitle').textContent = `${product.styleNumber} - ${product.title}`;
+            document.getElementById('productDescription').textContent = product.description || '';
+            
+            // Populate colors
+            const colorSelect = document.getElementById('colorSelect');
+            colorSelect.innerHTML = '<option value="">Choose a color...</option>';
+            
+            if (product.colors && product.colors.length > 0) {
+                product.colors.forEach(color => {
+                    colorSelect.innerHTML += `<option value="${color}">${color}</option>`;
+                });
+            }
+            
+            // Show product details section
+            document.getElementById('productDetails').style.display = 'block';
+            
+            // Setup size matrix when color is selected
+            colorSelect.addEventListener('change', () => this.setupSizeMatrix());
+        }
+        
+        async setupSizeMatrix() {
+            const color = document.getElementById('colorSelect').value;
+            if (!color || !this.currentProduct) return;
+            
+            // Get available sizes
+            const sizes = await this.productService.getAvailableSizes(this.currentProduct.styleNumber, color);
+            
+            // Build size matrix
+            const matrixContainer = document.getElementById('sizeMatrix');
+            let matrixHTML = '<div class="size-inputs">';
+            
+            sizes.forEach(size => {
+                matrixHTML += `
+                    <div class="size-input-group">
+                        <label>${size}</label>
+                        <input type="number" 
+                               class="size-input" 
+                               data-size="${size}" 
+                               min="0" 
+                               value="0"
+                               onchange="screenPrintQuoteBuilder.updateQuantityTotal()">
+                    </div>
+                `;
+            });
+            
+            matrixHTML += '</div>';
+            matrixContainer.innerHTML = matrixHTML;
+        }
+        
+        updateQuantityTotal() {
+            let total = 0;
+            document.querySelectorAll('.size-input').forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            document.getElementById('totalQuantity').textContent = total;
+        }
+        
+        async addProductToQuote() {
+            const color = document.getElementById('colorSelect').value;
+            const sizeQuantities = {};
+            let totalQty = 0;
+            
+            document.querySelectorAll('.size-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                if (qty > 0) {
+                    sizeQuantities[input.dataset.size] = qty;
+                    totalQty += qty;
+                }
+            });
+            
+            if (totalQty === 0) {
+                alert('Please enter at least one size quantity');
+                return;
+            }
+            
+            if (!color) {
+                alert('Please select a color');
+                return;
+            }
+            
+            // Add product to list
+            const product = {
+                id: Date.now(),
+                styleNumber: this.currentProduct.styleNumber,
+                productName: this.currentProduct.productName,
+                color: color,
+                sizeQuantities: sizeQuantities,
+                totalQuantity: totalQty
+            };
+            
+            this.products.push(product);
+            this.displayProductsList();
+            
+            // Reset form
+            document.getElementById('productSearch').value = '';
+            document.getElementById('productDetails').style.display = 'none';
+            this.currentProduct = null;
+        }
+        
+        displayProductsList() {
+            const listContainer = document.getElementById('productsList');
+            
+            if (this.products.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>No products added yet. Search and add products above.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            this.products.forEach(product => {
+                const sizeList = Object.entries(product.sizeQuantities)
+                    .map(([size, qty]) => `${size}(${qty})`)
+                    .join(' ');
+                
+                html += `
+                    <div class="product-card" data-product-id="${product.id}">
+                        <div class="product-card-details">
+                            <h4>${product.styleNumber} - ${product.productName}</h4>
+                            <p class="product-color">Color: ${product.color}</p>
+                            <p class="product-sizes">${sizeList}</p>
+                            <p class="product-quantity">Total: ${product.totalQuantity} pieces</p>
+                        </div>
+                        <div class="product-card-actions">
+                            <button class="btn-remove" onclick="screenPrintQuoteBuilder.removeProduct(${product.id})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+        
+        removeProduct(productId) {
+            this.products = this.products.filter(p => p.id !== productId);
+            this.displayProductsList();
+        }
+        
+        nextPhase() {
+            if (this.currentPhase === 1) {
+                // Validate print setup
+                const primaryLocation = document.querySelector('.primary-location .location-select').value;
+                if (!primaryLocation) {
+                    alert('Please select at least the primary print location');
+                    return;
+                }
+            } else if (this.currentPhase === 2) {
+                // Validate products
+                if (this.products.length === 0) {
+                    alert('Please add at least one product');
+                    return;
+                }
+                
+                // Calculate pricing and prepare summary
+                this.prepareFinalQuote();
+            }
+            
+            // Move to next phase
+            this.currentPhase++;
+            this.updatePhaseDisplay();
+        }
+        
+        previousPhase() {
+            this.currentPhase--;
+            this.updatePhaseDisplay();
+        }
+        
+        updatePhaseDisplay() {
+            // Update phase indicators
+            document.querySelectorAll('.phase-step').forEach(step => {
+                const phase = parseInt(step.dataset.phase);
+                if (phase === this.currentPhase) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else if (phase < this.currentPhase) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update phase content
+            document.querySelectorAll('.phase-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`phase${this.currentPhase}`).classList.add('active');
+        }
+        
+        async prepareFinalQuote() {
+            // Calculate total quantity
+            const totalQuantity = this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
+            
+            // Calculate pricing for each product
+            let subtotal = 0;
+            let quoteSummaryHTML = '';
+            
+            for (const product of this.products) {
+                const pricing = await this.pricingService.calculatePricing(
+                    product,
+                    this.printLocations,
+                    totalQuantity
+                );
+                
+                product.pricing = pricing;
+                subtotal += pricing.lineTotal;
+                
+                // Build summary HTML
+                const sizeList = Object.entries(product.sizeQuantities)
+                    .map(([size, qty]) => `${size}(${qty})`)
+                    .join(' ');
+                
+                quoteSummaryHTML += `
+                    <div class="quote-item">
+                        <div class="item-header">
+                            <strong>${product.styleNumber} - ${product.productName}</strong>
+                            <span class="item-total">$${pricing.lineTotal.toFixed(2)}</span>
+                        </div>
+                        <div class="item-details">
+                            <p>Color: ${product.color} | Sizes: ${sizeList}</p>
+                            <p>Quantity: ${product.totalQuantity} @ $${pricing.unitPrice.toFixed(2)} each</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add print setup summary
+            let printSetupHTML = '<div class="print-setup-summary"><h4>Print Configuration</h4>';
+            this.printLocations.forEach(loc => {
+                printSetupHTML += `<p>${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location} - ${loc.colors} Color${loc.colors > 1 ? 's' : ''}</p>`;
+            });
+            printSetupHTML += '</div>';
+            
+            // Update summary display
+            document.getElementById('quoteSummary').innerHTML = printSetupHTML + quoteSummaryHTML;
+            
+            // Calculate fees
+            const ltmFee = totalQuantity < 24 ? 50 : 0;
+            const rushFee = document.getElementById('rushOrder').checked ? subtotal * 0.25 : 0;
+            const grandTotal = subtotal + ltmFee + rushFee;
+            
+            // Update pricing display
+            document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;
+            
+            if (ltmFee > 0) {
+                document.getElementById('ltmFeeRow').style.display = '';
+                document.getElementById('ltmFeeAmount').textContent = `$${ltmFee.toFixed(2)}`;
+            } else {
+                document.getElementById('ltmFeeRow').style.display = 'none';
+            }
+            
+            if (rushFee > 0) {
+                document.getElementById('rushFeeRow').style.display = '';
+                document.getElementById('rushFeeAmount').textContent = `$${rushFee.toFixed(2)}`;
+            } else {
+                document.getElementById('rushFeeRow').style.display = 'none';
+            }
+            
+            document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(2)}`;
+            
+            // Store quote data
+            this.quoteData = {
+                printLocations: this.printLocations,
+                products: this.products,
+                totalQuantity: totalQuantity,
+                subtotal: subtotal,
+                ltmFee: ltmFee,
+                rushFee: rushFee,
+                grandTotal: grandTotal,
+                isRush: document.getElementById('rushOrder').checked
+            };
+        }
+        
+        async generateQuote() {
+            // Validate customer form
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerEmail = document.getElementById('customerEmail').value.trim();
+            const salesRep = document.getElementById('salesRep').value;
+            
+            if (!customerName || !customerEmail || !salesRep) {
+                alert('Please fill in all required customer information');
+                return;
+            }
+            
+            // Prepare complete quote data
+            const completeQuoteData = {
+                ...this.quoteData,
+                customerName: customerName,
+                customerEmail: customerEmail,
+                companyName: document.getElementById('companyName').value.trim(),
+                customerPhone: document.getElementById('customerPhone').value.trim(),
+                projectName: document.getElementById('projectName').value.trim(),
+                specialInstructions: document.getElementById('specialInstructions').value.trim(),
+                salesRepEmail: salesRep,
+                salesRepName: document.getElementById('salesRep').selectedOptions[0].text
+            };
+            
+            try {
+                // Generate quote ID
+                const quoteId = this.quoteService.generateQuoteID();
+                completeQuoteData.quoteId = quoteId;
+                
+                // Save to database if checked
+                if (document.getElementById('saveToDatabase').checked) {
+                    await this.quoteService.saveQuote(completeQuoteData);
+                }
+                
+                // Send email
+                await this.sendQuoteEmail(completeQuoteData);
+                
+                // Show success modal
+                this.showSuccessModal(quoteId, completeQuoteData);
+                
+            } catch (error) {
+                console.error('Error generating quote:', error);
+                alert('Error generating quote. Please try again.');
+            }
+        }
+        
+        async sendQuoteEmail(quoteData) {
+            // Build email template data
+            const emailData = {
+                to_email: quoteData.customerEmail,
+                from_name: 'Northwest Custom Apparel',
+                reply_to: quoteData.salesRepEmail,
+                
+                quote_type: 'Screen Print',
+                quote_id: quoteData.quoteId,
+                quote_date: new Date().toLocaleDateString(),
+                
+                customer_name: quoteData.customerName,
+                customer_email: quoteData.customerEmail,
+                company_name: quoteData.companyName || '',
+                customer_phone: quoteData.customerPhone || '',
+                
+                project_name: quoteData.projectName || '',
+                special_instructions: quoteData.specialInstructions || 'No special instructions',
+                
+                total_quantity: quoteData.totalQuantity,
+                grand_total: `$${quoteData.grandTotal.toFixed(2)}`,
+                
+                sales_rep_name: quoteData.salesRepName,
+                sales_rep_email: quoteData.salesRepEmail,
+                sales_rep_phone: '253-922-5793',
+                
+                company_year: '1977',
+                
+                // Quote details HTML
+                quote_details_html: this.buildQuoteDetailsHTML(quoteData)
+            };
+            
+            // Send email via EmailJS
+            await emailjs.send(
+                'service_1c4k67j',
+                'template_screenprint', // You'll need to create this template
+                emailData
+            );
+        }
+        
+        buildQuoteDetailsHTML(quoteData) {
+            let html = '<div style="font-family: Arial, sans-serif;">';
+            
+            // Print configuration
+            html += '<h3>Print Configuration</h3>';
+            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
+            quoteData.printLocations.forEach(loc => {
+                html += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            ${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location}
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            ${loc.colors} Color${loc.colors > 1 ? 's' : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            html += '</table>';
+            
+            // Products
+            html += '<h3>Products</h3>';
+            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
+            html += '<thead><tr style="background: #f5f5f5;">';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product</th>';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Color</th>';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Sizes</th>';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Qty</th>';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Price</th>';
+            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>';
+            html += '</tr></thead><tbody>';
+            
+            quoteData.products.forEach(product => {
+                const sizeList = Object.entries(product.sizeQuantities)
+                    .map(([size, qty]) => `${size}(${qty})`)
+                    .join(' ');
+                
+                html += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.styleNumber} - ${product.productName}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.color}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${sizeList}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${product.totalQuantity}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${product.pricing.unitPrice.toFixed(2)}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${product.pricing.lineTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            
+            // Pricing summary
+            html += '<div style="text-align: right; margin-top: 20px;">';
+            html += `<p>Subtotal: $${quoteData.subtotal.toFixed(2)}</p>`;
+            if (quoteData.ltmFee > 0) {
+                html += `<p>Small Order Fee: $${quoteData.ltmFee.toFixed(2)}</p>`;
+            }
+            if (quoteData.rushFee > 0) {
+                html += `<p>Rush Order Fee: $${quoteData.rushFee.toFixed(2)}</p>`;
+            }
+            html += `<p style="font-weight: bold; font-size: 1.2em;">Grand Total: $${quoteData.grandTotal.toFixed(2)}</p>`;
+            html += '</div>';
+            
+            html += '</div>';
+            
+            return html;
+        }
+        
+        showSuccessModal(quoteId, quoteData) {
+            document.getElementById('modalQuoteId').textContent = quoteId;
+            document.getElementById('modalCustomerEmail').textContent = quoteData.customerEmail;
+            document.getElementById('modalTotalAmount').textContent = `$${quoteData.grandTotal.toFixed(2)}`;
+            
+            // Store for print functionality
+            this.lastQuoteData = quoteData;
+            
+            // Show modal
+            document.getElementById('successModal').classList.add('active');
+        }
+        
+        printQuote() {
+            if (!this.lastQuoteData) return;
+            
+            const printWindow = window.open('', '_blank');
+            const html = this.buildPrintHTML(this.lastQuoteData);
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+                setTimeout(() => printWindow.close(), 500);
+            };
+        }
+        
+        buildPrintHTML(quoteData) {
+            // Build a print-friendly HTML document
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Screen Print Quote ${quoteData.quoteId}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1, h2, h3 { color: #333; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+                        th { background: #f5f5f5; }
+                        .header { margin-bottom: 30px; }
+                        .total { text-align: right; font-weight: bold; font-size: 1.2em; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Northwest Custom Apparel</h1>
+                        <h2>Screen Print Quote</h2>
+                        <p>Quote ID: ${quoteData.quoteId}</p>
+                        <p>Date: ${new Date().toLocaleDateString()}</p>
+                        <p>Customer: ${quoteData.customerName}</p>
+                        <p>Company: ${quoteData.companyName || 'N/A'}</p>
+                    </div>
+                    
+                    ${this.buildQuoteDetailsHTML(quoteData)}
+                    
+                    <div style="margin-top: 40px;">
+                        <p>This quote is valid for 30 days.</p>
+                        <p>Contact: ${quoteData.salesRepName} - ${quoteData.salesRepEmail}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+        
+        startNewQuote() {
+            // Reset everything and reload page
+            if (confirm('Start a new quote? This will clear all current data.')) {
+                window.location.reload();
+            }
+        }
+    }
+    
+    // Initialize the application
+    const screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+    </script>
+</body>
+</html>
