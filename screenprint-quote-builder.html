@@ -1480,8 +1480,8 @@
                     console.log('[selectProductStyle] Adding colors to dropdown:', productDetails.availableColors.length);
                     productDetails.availableColors.forEach(color => {
                         const option = document.createElement('option');
-                        option.value = color;
-                        option.textContent = color;
+                        option.value = color.COLOR_NAME || color;
+                        option.textContent = color.COLOR_NAME || color;
                         colorSelect.appendChild(option);
                     });
                 } else {
@@ -1521,9 +1521,30 @@
                 // Display product
                 document.getElementById('product-display').style.display = 'block';
                 document.getElementById('product-name').textContent = 
-                    `${this.currentProduct.styleNumber} - ${this.currentProduct.details.ProductTitle || this.currentProduct.details.title || ''}`;
+                    `${this.currentProduct.styleNumber} - ${this.currentProduct.details.PRODUCT_TITLE || ''}`;
                 document.getElementById('product-description').textContent = 
-                    `${this.currentProduct.details.Brand || ''} | ${color}`;
+                    `${this.currentProduct.details.BRAND_NAME || ''} | ${color}`;
+                
+                // Update product image
+                const productImage = document.getElementById('product-image');
+                if (productImage) {
+                    // Find the selected color data to get color-specific image
+                    const selectedColor = this.currentProduct.details.availableColors.find(c => 
+                        c.COLOR_NAME === color
+                    );
+                    
+                    // Use color-specific image if available, otherwise use generic product image
+                    const imageUrl = selectedColor?.MAIN_IMAGE_URL || 
+                                    selectedColor?.FRONT_MODEL || 
+                                    selectedColor?.FRONT_FLAT || 
+                                    this.currentProduct.details.PRODUCT_IMAGE ||
+                                    '/images/placeholder-shirt.png';
+                    
+                    productImage.src = imageUrl;
+                    productImage.onerror = () => {
+                        productImage.src = '/images/placeholder-shirt.png';
+                    };
+                }
                 
                 // Create size inputs
                 const sizeInputsContainer = document.getElementById('size-inputs');
@@ -1588,8 +1609,8 @@
             // Add product
             const product = {
                 styleNumber: this.currentProduct.styleNumber,
-                productName: this.currentProduct.details.ProductTitle || this.currentProduct.details.title || '',
-                brand: this.currentProduct.details.Brand || '',
+                productName: this.currentProduct.details.PRODUCT_TITLE || '',
+                brand: this.currentProduct.details.BRAND_NAME || '',
                 color: this.currentProduct.color,
                 sizeBreakdown: sizeBreakdown,
                 quantity: totalQuantity,

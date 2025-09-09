@@ -237,6 +237,42 @@
             color: var(--white);
         }
         
+        /* Work in Progress Button Styles */
+        .quick-btn-wip {
+            position: relative;
+            background: linear-gradient(135deg, #fff 0%, #fffbf0 100%);
+            border: 2px dashed #ffa500;
+            opacity: 0.95;
+        }
+
+        .quick-btn-wip:hover {
+            background: #ffa500;
+            color: #fff;
+            border-color: #ff8c00;
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .wip-badge {
+            display: inline-block;
+            margin-left: 8px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            animation: subtle-pulse 3s infinite;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+        
         /* Coming Soon - Elegant Disabled State */
         .quick-btn.coming-soon {
             position: relative;
@@ -3826,7 +3862,10 @@
                                 <a href="/embroidery-quote-builder.html" class="quick-btn" title="Professional quote builder for multi-style embroidery orders">Embroidery Quote</a>
                                 <a href="/cap-embroidery-quote-builder.html" class="quick-btn" title="Professional quote builder for cap embroidery orders">Cap Embroidery Quote</a>
                                 <a href="/dtg-quote-builder.html" class="quick-btn" title="Professional quote builder for DTG printing orders">DTG Quote</a>
-                                <a href="/screenprint-quote-builder.html" class="quick-btn" title="Professional quote builder for screen print orders">Screen Print Quote</a>
+                                <a href="/screenprint-quote-builder.html" class="quick-btn quick-btn-wip" title="Work in Progress - Screen print quote builder (Beta)">
+                                    Screen Print Quote 
+                                    <span class="wip-badge">BETA</span>
+                                </a>
                             </div>
                         </div>
                         

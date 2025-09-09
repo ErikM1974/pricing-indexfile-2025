@@ -48,7 +48,8 @@
       "Bash(git push:*)",
       "Read(//mnt/c/Users/erik/Downloads/**)",
       "Bash(echo:*)",
-      "Read(//mnt/c/Users/erik/OneDrive/**)"
+      "Read(//mnt/c/Users/erik/OneDrive/**)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": [],

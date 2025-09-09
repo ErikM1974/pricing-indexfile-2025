@@ -117,9 +117,17 @@ class ScreenPrintProductManager {
             console.log('[ScreenPrintProductManager] Details data:', details);
             console.log('[ScreenPrintProductManager] Colors data:', colors);
             
+            // Extract first product detail (all colors have same base product info)
+            const firstDetail = details && details.length > 0 ? details[0] : {};
+            
             const productData = {
-                ...details.data,
-                availableColors: colors.data || []
+                PRODUCT_TITLE: firstDetail.PRODUCT_TITLE || '',
+                PRODUCT_DESCRIPTION: firstDetail.PRODUCT_DESCRIPTION || '',
+                BRAND_NAME: firstDetail.BRAND_NAME || '',
+                PRODUCT_IMAGE: firstDetail.PRODUCT_IMAGE || '',
+                CATEGORY_NAME: firstDetail.CATEGORY_NAME || '',
+                SUBCATEGORY_NAME: firstDetail.SUBCATEGORY_NAME || '',
+                availableColors: colors.colors || []
             };
             
             console.log('[ScreenPrintProductManager] Combined product data:', productData);
