@@ -4067,17 +4067,18 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                             <!-- Payment Terms Policy Card -->
                             <a href="policies/payment-terms.html" style="background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.06); border-left: 3px solid var(--wsu-crimson); text-decoration: none; color: inherit; transition: all 0.2s; display: block; position: relative;">
-                                <span style="position: absolute; top: -8px; right: 12px; background: #22c55e; color: white; font-size: 0.625rem; padding: 2px 6px; border-radius: 8px; font-weight: 700;">NEW</span>
                                 <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Payment Terms Guide</h4>
                                 <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Understanding our payment terms: Pay on Pickup, Prepaid, Net Terms, and more.</p>
                                 <span style="font-size: 0.75rem; color: var(--text-secondary);">Updated: Aug 22, 2025</span>
                             </a>
                             
-                            <!-- Placeholder for future policies -->
-                            <div style="background: var(--light-bg); border-radius: 8px; padding: 1rem; border: 2px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px;">
-                                <i class="fas fa-plus-circle" style="font-size: 1.5rem; color: var(--gray-400); margin-bottom: 0.5rem;"></i>
-                                <p style="font-size: 0.875rem; color: var(--text-secondary); text-align: center;">More policies coming soon</p>
-                            </div>
+                            <!-- LTM Order Decision Algorithm Policy Card -->
+                            <a href="policies/ltm-order-decision-algorithm.html" style="background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.06); border-left: 3px solid var(--wsu-crimson); text-decoration: none; color: inherit; transition: all 0.2s; display: block; position: relative;">
+                                <span style="position: absolute; top: -8px; right: 12px; background: #22c55e; color: white; font-size: 0.625rem; padding: 2px 6px; border-radius: 8px; font-weight: 700;">NEW</span>
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">LTM Order Decision Algorithm</h4>
+                                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Framework for handling Less-Than-Minimum orders: existing vs. new customers, upselling, and referrals.</p>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Updated: Sep 09, 2025</span>
+                            </a>
                         </div>
                     </div>
                     
@@ -6700,6 +6701,11 @@
                 const recentTips = tips.filter(tip => {
                     const tipDate = new Date(tip.addedDate);
                     return tipDate >= fourteenDaysAgo && tip.active;
+                });
+                
+                // Sort by date - newest first
+                recentTips.sort((a, b) => {
+                    return new Date(b.addedDate) - new Date(a.addedDate);
                 });
                 
                 console.log('[QuickTips] Recent tips found:', recentTips.length);

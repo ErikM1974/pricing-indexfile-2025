@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>LTM Order Decision Algorithm - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="../shared_components/css/dashboard-styles.css" rel="stylesheet">
+    
+    <style>
+        /* Policy Page Styles */
+        body {
+            background: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .policy-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb a {
+            color: var(--wsu-crimson);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        
+        .breadcrumb a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Policy Header */
+        .policy-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--wsu-crimson);
+        }
+        
+        .policy-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .policy-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .policy-metadata {
+            display: flex;
+            gap: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metadata-item i {
+            color: var(--wsu-grey);
+        }
+        
+        /* Policy Actions Bar */
+        .policy-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .policy-action-btn {
+            padding: 0.5rem 1rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .policy-action-btn:hover {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+        }
+        
+        /* Content Sections */
+        .policy-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--wsu-crimson);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Guiding Principles */
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .principle-card {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--wsu-crimson);
+        }
+        
+        .principle-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9375rem;
+        }
+        
+        .principle-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        /* Decision Tree */
+        .decision-tree {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #0284c7;
+            margin: 1.5rem 0;
+        }
+        
+        .decision-step {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--wsu-crimson);
+        }
+        
+        .decision-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--wsu-crimson);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-right: 0.75rem;
+        }
+        
+        .step-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-options {
+            margin-left: 2.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .option-yes {
+            background: #dcfce7;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #22c55e;
+        }
+        
+        .option-no {
+            background: #fee2e2;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border-left: 3px solid #ef4444;
+        }
+        
+        /* Scripts Box */
+        .script-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+        
+        .script-label {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            font-style: normal;
+        }
+        
+        /* Example Boxes */
+        .example-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Minimums Table */
+        .minimums-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .minimums-table th {
+            background: var(--wsu-grey);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .minimums-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .minimums-table tr:hover {
+            background: var(--light-bg);
+        }
+        
+        /* Checklist */
+        .checklist {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid var(--wsu-crimson);
+        }
+        
+        .checklist-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            background: var(--wsu-crimson);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .checklist-content {
+            flex: 1;
+        }
+        
+        .checklist-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .checklist-actions {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-left: 1rem;
+        }
+        
+        /* Referral Info */
+        .referral-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            border: 2px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+        
+        .referral-title {
+            font-weight: 600;
+            color: #92400e;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .referral-info {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .referral-icon {
+            font-size: 2rem;
+            color: #f59e0b;
+        }
+        
+        .referral-details {
+            flex: 1;
+        }
+        
+        .referral-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+        
+        .referral-location {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .policy-actions,
+            .breadcrumb,
+            .back-to-dashboard {
+                display: none;
+            }
+            
+            .policy-container {
+                padding: 0;
+                max-width: 100%;
+            }
+            
+            .policy-section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .policy-container {
+                padding: 1rem;
+            }
+            
+            .policy-header {
+                padding: 1.5rem;
+            }
+            
+            .policy-title {
+                font-size: 1.5rem;
+            }
+            
+            .principles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .policy-metadata {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="policy-container">
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb">
+            <a href="../staff-dashboard.html">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="../policies-hub.html">Policies Hub</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>LTM Order Decision Algorithm</span>
+        </div>
+        
+        <!-- Policy Header -->
+        <div class="policy-header">
+            <h1 class="policy-title">Less-Than-Minimum (LTM) Order Decision Algorithm</h1>
+            <p class="policy-subtitle">Structured framework for handling inquiries below standard minimums</p>
+            <div class="policy-metadata">
+                <div class="metadata-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Effective: January 9, 2025</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-sync"></i>
+                    <span>Review: Quarterly</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Owner: Erik Mickelson</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Version: 1.0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Policy Actions Bar -->
+        <div class="policy-actions">
+            <button class="policy-action-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Policy
+            </button>
+            <a href="mailto:erik@nwcustomapparel.com?subject=LTM%20Policy%20Question" class="policy-action-btn">
+                <i class="fas fa-envelope"></i> Ask Question
+            </a>
+            <button class="policy-action-btn" onclick="document.getElementById('checklist').scrollIntoView()">
+                <i class="fas fa-list-check"></i> Quick Checklist
+            </button>
+            <a href="ltm-fee-policy.html" class="policy-action-btn">
+                <i class="fas fa-dollar-sign"></i> LTM Fee Details
+            </a>
+        </div>
+        
+        <!-- Objective Section -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-bullseye"></i> Objective
+            </h2>
+            <p>This policy provides a structured framework for our Account Executives (AEs) to handle inquiries for orders that fall below our standard minimums. The goal is to protect company resources, ensure profitability, and deliver excellent customer service by identifying which LTM orders are strategically important and which should be politely referred to a trusted partner.</p>
+        </div>
+        
+        <!-- Guiding Principles -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-compass"></i> Guiding Principles
+            </h2>
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div class="principle-title">Existing Relationships First</div>
+                    <div class="principle-text">Our loyalty is to our established customers. We will go the extra mile for them in ways we cannot for new, single-item inquiries.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-title">Upselling is the Primary Goal</div>
+                    <div class="principle-text">The best outcome for both the customer and our company is to find a way for them to meet the standard minimum. This gives them better value and makes the job profitable for us.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-title">Time is a Resource</div>
+                    <div class="principle-text">AE time spent on quoting, artwork proofs, and order entry is a significant cost. The LTM process must account for this.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-title">Identify Strategic Opportunities</div>
+                    <div class="principle-text">A single-piece sample for a major company is not a "small order"; it's a "potential large account." We must be able to tell the difference.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Standard Minimums -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-ruler"></i> Standard Minimums
+            </h2>
+            <table class="minimums-table">
+                <thead>
+                    <tr>
+                        <th>Decoration Method</th>
+                        <th>Minimum Quantity</th>
+                        <th>LTM Fee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Embroidery</strong></td>
+                        <td>24 pieces</td>
+                        <td>$50.00</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DTG (Direct-to-Garment)</strong></td>
+                        <td>24 pieces</td>
+                        <td>$50.00</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Caps/Headwear</strong></td>
+                        <td>24 pieces</td>
+                        <td>$50.00</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Screen Printing</strong></td>
+                        <td>72 pieces</td>
+                        <td>$50.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- The Decision Algorithm -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-sitemap"></i> The LTM Order Decision Algorithm for AEs
+            </h2>
+            <p>When a customer requests an order below the minimums (24 for embroidery/DTG/caps, 72 for screen print), follow these steps in order:</p>
+            
+            <div class="decision-tree">
+                <div class="decision-step">
+                    <div class="step-question">
+                        <span class="step-number">1</span>
+                        The First Question: "Are you an existing customer?"
+                    </div>
+                    <p style="margin-left: 2.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        This is the most important question. Look them up in the system to verify.
+                    </p>
+                    <div class="step-options">
+                        <div class="option-yes">
+                            <strong>YES, existing customer:</strong> Proceed to Section A (Existing Customer Path)
+                        </div>
+                        <div class="option-no">
+                            <strong>NO, new customer:</strong> Proceed to Section B (New Customer Path)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section A: Existing Customer Path -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-user-check"></i> Section A: Existing Customer Path
+            </h2>
+            <p style="margin-bottom: 1.5rem;">Our goal here is to help them while still covering our costs.</p>
+            
+            <h3 class="section-subtitle">Question A1: Do we have your logo/design already on file and approved?</h3>
+            
+            <div style="margin-left: 1rem;">
+                <h4 style="color: #22c55e; margin: 1rem 0;">YES, art is on file:</h4>
+                <p>This is the most likely "we can do this" scenario.</p>
+                <ul style="margin: 1rem 0; color: var(--text-secondary);">
+                    <li><strong>Acknowledge the Exception:</strong> Let them know that doing a small run is an exception we make for our valued customers.</li>
+                    <li><strong>Explain the Cost:</strong> "Because this is a small batch run that requires a unique machine setup, there is a $50 Less-Than-Minimum Fee in addition to the per-item decoration cost."</li>
+                    <li><strong>Provide the Quote:</strong> Calculate the total: $50 LTM Fee + Per-Item Cost(s) = Total.</li>
+                    <li><strong>Process the Order:</strong> If they approve, proceed. This is common for adding a shirt for a new employee or fixing a mistake on a previous order.</li>
+                </ul>
+                
+                <h4 style="color: #ef4444; margin: 1rem 0;">NO, this is a new design for an existing customer:</h4>
+                <p>This requires more judgment.</p>
+                <ul style="margin: 1rem 0; color: var(--text-secondary);">
+                    <li><strong>Explain the Full Cost:</strong> Be transparent. "Since this is a brand new design, it requires a new art setup. For embroidery, that's a one-time $100 digitizing fee. So for this one item, you'd be looking at the art setup fee, the $50 small batch fee, and the decoration cost."</li>
+                    <li><strong>Ask About the Project:</strong> "Can you tell me a bit more about what this new design is for?"
+                        <ul style="margin-top: 0.5rem;">
+                            <li>If it's a new primary logo for their whole company, treat it as a strategic order. Consider waiving the LTM fee to win the new logo business.</li>
+                            <li>If it's a one-off personal gift for the owner's friend, it's less strategic. Politely explain the high cost and let them decide if it's worth it.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Consult a Manager:</strong> If you are unsure if the order is "strategic" enough to warrant the time and effort, check with the operations manager.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Section B: New Customer Path -->
+        <div class="policy-section">
+            <h2 class="section-title">
+                <i class="fas fa-user-plus"></i> Section B: New Customer Path
+            </h2>
+            <p style="margin-bottom: 1.5rem;">Our goal here is to convert them to a standard order or politely refer them elsewhere.</p>
+            
+            <h3 class="section-subtitle">Action B1: Attempt the Upsell (The Most Important Step!)</h3>
+            <p>Before you do anything else, explain the benefits of meeting the minimum.</p>
+            
+            <div class="script-box">
+                <div class="script-label">Sample Upsell Script:</div>
+                "I understand you just need one or two right now. However, our process is built for bulk orders, so the price for a single piece ends up being quite high because of the setup involved. For example, a single embroidered hat with a new design could cost over $150. But if you order our minimum of 24 hats, the per-hat price drops dramatically. Most of our clients find it's great to have extras on hand for new staff or future events. Would you be interested in a quote for the 24-piece minimum?"
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <p><strong>If they agree to meet the minimum:</strong> Excellent! Create a standard quote and proceed as a normal new customer.</p>
+                <p><strong>If they still insist on a less-than-minimum order:</strong> Proceed to Question B2.</p>
+            </div>
+            
+            <h3 class="section-subtitle">Question B2: The "Strategic Filter" - "What will you be using this for?"</h3>
+            
+            <div style="margin-left: 1rem;">
+                <h4 style="color: #22c55e; margin: 1rem 0;">If it's for a BUSINESS, large event, trade show, or sample for potential future bulk order:</h4>
+                <p>This could be a strategic opportunity.</p>
+                <ul style="margin: 1rem 0; color: var(--text-secondary);">
+                    <li><strong>Ask for Details:</strong> "What's the name of the company?" "What is the potential for future orders?"</li>
+                    <li><strong>The "Microsoft Test":</strong> If it's a large, well-known company (like your Bill Gates example), we should absolutely do the sample. Get manager approval, explain the setup and LTM fees, and treat them like a VIP.</li>
+                    <li><strong>Judgment Call:</strong> If it's a small local business, use your judgment. Is it a company you see growing? It might be worth it.</li>
+                    <li><strong>If Approved:</strong> Explain the full cost clearly: Art Setup Fee (if any) + $50 LTM Fee + Per-Item Cost = Total. If they approve, process the order.</li>
+                </ul>
+                
+                <h4 style="color: #ef4444; margin: 1rem 0;">If it's for PERSONAL use (a gift, a single gag shirt, a personal item):</h4>
+                <p>This is a non-strategic order. We should not take this work.</p>
+                <p><strong>Politely Decline and Refer:</strong> This is key to maintaining goodwill. Do not make them feel like their project is unimportant.</p>
+            </div>
+            
+            <div class="referral-box">
+                <div class="referral-title">Preferred Partner for Small Personal Orders</div>
+                <div class="referral-info">
+                    <div class="referral-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="referral-details">
+                        <div class="referral-name">Craig & Linda's Embroidery</div>
+                        <div class="referral-location">Milton, WA</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="script-box">
+                <div class="script-label">Polite Referral Script:</div>
+                "Thank you so much for thinking of us for your project! Our shop is set up for larger, bulk orders, so honestly, we wouldn't be the most cost-effective option for you. For single-piece and small personal projects, we actually recommend a great local specialist. They are fantastic with this kind of work. They are Craig & Linda's Embroidery, right here in Milton. They should be able to take great care of you."
+            </div>
+            
+            <p style="margin-top: 1rem; font-style: italic; color: var(--text-secondary);">
+                This approach positions you as a helpful expert, not a company that is rejecting their business. You are guiding them to a better solution.
+            </p>
+        </div>
+        
+        <!-- Summary Checklist -->
+        <div class="policy-section" id="checklist">
+            <h2 class="section-title">
+                <i class="fas fa-list-check"></i> Summary Checklist for AEs
+            </h2>
+            
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-number">1</div>
+                    <div class="checklist-content">
+                        <div class="checklist-question">Is the customer new or existing?</div>
+                        <div class="checklist-actions">
+                            • Existing: Go to step 2.<br>
+                            • New: Go to step 3.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="checklist-number">2</div>
+                    <div class="checklist-content">
+                        <div class="checklist-question">Existing Customer: Is the art on file?</div>
+                        <div class="checklist-actions">
+                            • Yes: Quote with the $50 LTM fee.<br>
+                            • No: Explain full setup + LTM fees. Assess if it's strategic.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="checklist-number">3</div>
+                    <div class="checklist-content">
+                        <div class="checklist-question">New Customer: Did they accept the upsell to the minimum?</div>
+                        <div class="checklist-actions">
+                            • Yes: Great! Proceed as a standard order.<br>
+                            • No: Go to step 4.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="checklist-number">4</div>
+                    <div class="checklist-content">
+                        <div class="checklist-question">New LTM Customer: Is the order for a business/strategic purpose or for personal use?</div>
+                        <div class="checklist-actions">
+                            • Business/Strategic: Assess potential. If approved, quote with full setup + $50 LTM fees.<br>
+                            • Personal: Politely decline and refer to Craig & Linda's.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 1.5rem; padding: 1rem; background: #dcfce7; border-radius: 8px; border-left: 3px solid #22c55e;">
+                <strong>Remember:</strong> By following this process, your AEs can confidently and consistently handle these tricky requests, ensuring you capture the right business and avoid the unprofitable work.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Back to Dashboard Button -->
+    <a href="../staff-dashboard.html" class="back-to-dashboard" style="position: fixed; bottom: 2rem; right: 2rem; padding: 0.75rem 1.25rem; background: var(--wsu-crimson); color: white; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; box-shadow: 0 4px 12px rgba(152, 30, 50, 0.3); transition: all 0.2s ease; z-index: 100;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</body>
+</html>
