@@ -184,6 +184,12 @@ app.get('/dtg-quote-builder.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dtg-quote-builder.html'));
 });
 
+// Serve the screen print quote builder
+app.get('/screenprint-quote-builder.html', (req, res) => {
+  console.log('Serving screenprint-quote-builder.html page');
+  res.sendFile(path.join(__dirname, 'screenprint-quote-builder.html'));
+});
+
 app.get('/ae-art-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
 });

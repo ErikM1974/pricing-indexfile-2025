@@ -12,7 +12,7 @@ class ScreenPrintProductManager {
     }
 
     /**
-     * Search for products by style number or keyword
+     * Search for products by style number - uses stylesearch endpoint for autocomplete
      */
     async searchProducts(searchTerm) {
         try {
@@ -27,19 +27,52 @@ class ScreenPrintProductManager {
                 return this.productCache.get(cacheKey);
             }
             
-            // Search API
-            const response = await fetch(`${this.baseURL}/api/products/search?q=${encodeURIComponent(searchTerm)}&limit=10`);
+            // Use the stylesearch endpoint like DTG quote builder for better autocomplete
+            const response = await fetch(`${this.baseURL}/api/stylesearch?term=${encodeURIComponent(searchTerm)}`);
             if (!response.ok) {
                 throw new Error('Product search failed');
             }
             
-            const data = await response.json();
-            const products = data.products || [];
+            const suggestions = await response.json();
+            
+            // stylesearch returns a simple array of {value, label} objects
+            // Transform to match what Screen Print quote builder expects
+            const products = suggestions.map(item => ({
+                style: item.value,
+                title: item.label.split(' - ')[1] || item.label,
+                styleNumber: item.value,
+                productName: item.label.split(' - ')[1] || item.label,
+                value: item.value,
+                label: item.label
+            }));
+            
+            // Sort suggestions by relevance - exact matches first, then "starts with", then contains
+            const queryUpper = searchTerm.toUpperCase();
+            products.sort((a, b) => {
+                const aUpper = a.style.toUpperCase();
+                const bUpper = b.style.toUpperCase();
+                
+                // Exact match gets highest priority (PC54 when searching for PC54)
+                const aExact = aUpper === queryUpper;
+                const bExact = bUpper === queryUpper;
+                if (aExact && !bExact) return -1;
+                if (!aExact && bExact) return 1;
+                
+                // "Starts with" gets second priority (PC54LS when searching for PC54)
+                const aStarts = aUpper.startsWith(queryUpper);
+                const bStarts = bUpper.startsWith(queryUpper);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                
+                // Otherwise alphabetical order
+                return aUpper.localeCompare(bUpper);
+            });
             
             // Cache results
             this.productCache.set(cacheKey, products);
             
-            console.log(`[ScreenPrintProductManager] Found ${products.length} products`);
+            console.log(`[ScreenPrintProductManager] Found ${products.length} products`, 
+                        products.length > 0 ? `First result: ${products[0].style}` : '');
             return products;
             
         } catch (error) {

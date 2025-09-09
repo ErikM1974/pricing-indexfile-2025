@@ -18,7 +18,707 @@
     <link rel="stylesheet" href="/shared_components/css/universal-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
-    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder.css">
+    <link rel="stylesheet" href="/shared_components/css/screenprint-safety-stripes.css">
+    
+    <!-- Custom Styles for Screen Print Quote Builder -->
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --primary-lightest: #e8f5e9;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        body {
+            background: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Phase Navigation */
+        .phase-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .phase-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .phase-step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .phase-step.completed .step-number {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .phase-step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .phase-connector {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: -1;
+        }
+
+        /* Phase Sections */
+        .phase-section {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .phase-section.active {
+            display: block;
+        }
+
+        .phase-header {
+            margin-bottom: 2rem;
+        }
+
+        .phase-header h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Setup Cards */
+        .setup-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .setup-title {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Print Locations Grid */
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .location-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .location-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .location-card.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-lightest);
+        }
+
+        .location-card input[type="checkbox"] {
+            display: none;
+        }
+        
+        .location-card label {
+            pointer-events: none; /* Prevent label from triggering events */
+        }
+
+        .location-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .location-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .location-code {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Color Selection */
+        .color-selector {
+            margin-top: 1rem;
+        }
+
+        .color-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .color-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .color-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Dark Garment Toggle */
+        .dark-garment-section {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border: 2px solid #6b7280;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .dark-garment-toggle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Safety Stripes Section */
+        .safety-stripes-section {
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%);
+            border: 2px solid #ff6b35;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .safety-stripes-toggle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .safety-label {
+            color: #ff6b35;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .safety-icon {
+            color: #ff6b35;
+        }
+
+        /* Product Search */
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-top: 0.25rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .suggestion-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: var(--primary-lightest);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-style {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .suggestion-name {
+            color: var(--text-primary);
+            margin-left: 0.5rem;
+        }
+
+        /* Product Display */
+        .product-display {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-info {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-info img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 0.5rem;
+        }
+
+        .product-details h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .product-details p {
+            color: var(--text-secondary);
+        }
+
+        /* Size Matrix */
+        .size-matrix {
+            margin-top: 1.5rem;
+        }
+
+        .size-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 1rem;
+        }
+
+        .size-input-group {
+            text-align: center;
+        }
+
+        .size-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .size-quantity {
+            width: 100%;
+            padding: 0.5rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .size-quantity:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .phase-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        /* Products List */
+        .products-list {
+            margin-top: 2rem;
+        }
+
+        .product-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-item-details h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .product-item-details p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .product-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Quote Summary */
+        .quote-summary {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .summary-total .summary-row {
+            border-bottom: none;
+        }
+
+        .summary-total .summary-value {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        /* Customer Info */
+        .customer-info-section {
+            margin-bottom: 2rem;
+        }
+
+        .customer-info-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header.success {
+            color: var(--primary-color);
+        }
+
+        .modal-header i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-id-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
     <!-- Professional Header with Logo and Navigation -->
@@ -88,9 +788,9 @@
     </header>
 
     <!-- Main Container -->
-    <div class="container screenprint-quote-builder">
+    <div class="container">
         <h1 class="page-title">
-            <i class="fas fa-paint-roller"></i> Screen Print Quote Builder
+            <i class="fas fa-paint-brush"></i> Screen Print Quote Builder
         </h1>
         <p class="page-description">
             Create professional screen print quotes with multiple products, locations, and automatic tier pricing
@@ -102,12 +802,10 @@
                 <div class="step-number">1</div>
                 <div class="step-label">Print Setup</div>
             </div>
-            <div class="phase-connector"></div>
             <div class="phase-step" data-phase="2">
                 <div class="step-number">2</div>
                 <div class="step-label">Add Products</div>
             </div>
-            <div class="phase-connector"></div>
             <div class="phase-step" data-phase="3">
                 <div class="step-number">3</div>
                 <div class="step-label">Review & Save Quote</div>
@@ -115,1045 +813,1085 @@
         </div>
         
         <!-- Phase 1: Print Setup -->
-        <div class="phase-content active" id="phase1">
+        <section id="setup-phase" class="phase-section active">
             <div class="phase-header">
                 <h2><i class="fas fa-palette"></i> Print Setup</h2>
                 <p>Define your screen print specifications that will apply to all products</p>
             </div>
             
-            <div class="print-setup-section">
-                <!-- Print Locations Section -->
-                <div class="setup-card">
-                    <h3 class="setup-title">Print Locations</h3>
-                    
-                    <div id="printLocations">
-                        <!-- Primary Location (Always Present) -->
-                        <div class="location-card primary-location" data-location-index="0">
-                            <div class="location-header">
-                                <div class="location-badge primary">Primary Location</div>
-                            </div>
-                            
-                            <div class="location-content">
-                                <div class="form-group">
-                                    <label>Location</label>
-                                    <select class="form-control location-select" required>
-                                        <option value="">Select Location...</option>
-                                        <option value="Front">Front</option>
-                                        <option value="Back">Back</option>
-                                        <option value="Left Chest">Left Chest</option>
-                                        <option value="Right Chest">Right Chest</option>
-                                        <option value="Left Sleeve">Left Sleeve</option>
-                                        <option value="Right Sleeve">Right Sleeve</option>
-                                        <option value="Full Front">Full Front</option>
-                                        <option value="Full Back">Full Back</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Number of Colors</label>
-                                    <div class="color-count-selector">
-                                        <button type="button" class="color-btn" data-colors="1">1 Color</button>
-                                        <button type="button" class="color-btn" data-colors="2">2 Colors</button>
-                                        <button type="button" class="color-btn" data-colors="3">3 Colors</button>
-                                        <button type="button" class="color-btn" data-colors="4">4 Colors</button>
-                                        <button type="button" class="color-btn" data-colors="5">5 Colors</button>
-                                        <button type="button" class="color-btn" data-colors="6">6 Colors</button>
-                                    </div>
-                                    <input type="hidden" class="color-count-input" value="1" required>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Print Locations -->
+            <div class="setup-card">
+                <h3 class="setup-title">Print Locations</h3>
+                
+                <div class="locations-grid">
+                    <div class="location-card" data-location="LC">
+                        <label>
+                            <input type="checkbox" name="location" value="LC">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Left Chest</div>
+                            <div class="location-code">LC</div>
+                        </label>
                     </div>
                     
-                    <!-- Add Location Button -->
-                    <button type="button" class="btn-add-location" id="addLocationBtn">
-                        <i class="fas fa-plus-circle"></i> Add Another Location
-                    </button>
-                </div>
-                
-                <!-- Additional Options -->
-                <div class="setup-card">
-                    <h3 class="setup-title">Additional Options</h3>
+                    <div class="location-card" data-location="RC">
+                        <label>
+                            <input type="checkbox" name="location" value="RC">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Right Chest</div>
+                            <div class="location-code">RC</div>
+                        </label>
+                    </div>
                     
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="rushOrder">
-                            <span>Rush Order (24-48 hour turnaround)</span>
+                    <div class="location-card" data-location="FF">
+                        <label>
+                            <input type="checkbox" name="location" value="FF">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Full Front</div>
+                            <div class="location-code">FF</div>
+                        </label>
+                    </div>
+                    
+                    <div class="location-card" data-location="FB">
+                        <label>
+                            <input type="checkbox" name="location" value="FB">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Full Back</div>
+                            <div class="location-code">FB</div>
+                        </label>
+                    </div>
+                    
+                    <div class="location-card" data-location="LS">
+                        <label>
+                            <input type="checkbox" name="location" value="LS">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Left Sleeve</div>
+                            <div class="location-code">LS</div>
+                        </label>
+                    </div>
+                    
+                    <div class="location-card" data-location="RS">
+                        <label>
+                            <input type="checkbox" name="location" value="RS">
+                            <div class="location-icon"><i class="fas fa-tshirt"></i></div>
+                            <div class="location-name">Right Sleeve</div>
+                            <div class="location-code">RS</div>
                         </label>
                     </div>
                 </div>
                 
-                <!-- Print Summary -->
-                <div class="print-summary-card">
-                    <h4>Print Configuration Summary</h4>
-                    <div id="printSummary" class="summary-content">
-                        <p class="summary-placeholder">Select print locations and colors to see summary</p>
+                <!-- Color Selection for Each Location -->
+                <div id="location-colors" style="display: none;">
+                    <div class="color-selector">
+                        <label class="setup-title">Number of Colors per Location</label>
+                        <div id="color-selections">
+                            <!-- Color selections will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Options -->
+            <div class="setup-card">
+                <h3 class="setup-title">Additional Options</h3>
+                
+                <!-- Dark Garments -->
+                <div class="dark-garment-section">
+                    <div class="dark-garment-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dark-garment-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div>
+                            <strong>Dark Garments</strong>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                Adds white underbase layer for printing on dark colored shirts (+1 color to each location)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Safety Stripes -->
+                <div class="safety-stripes-section">
+                    <div class="safety-stripes-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="safety-stripes-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div>
+                            <div class="safety-label">
+                                <i class="fas fa-exclamation-triangle safety-icon"></i>
+                                <strong>Safety Stripes</strong>
+                            </div>
+                            <p style="margin: 0; font-size: 0.875rem; color: #ff6b35;">
+                                Add reflective safety stripes for high-visibility workwear
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="phase-actions">
-                <button type="button" class="btn-primary btn-next" onclick="screenPrintQuoteBuilder.nextPhase()">
+                <div></div>
+                <button id="continue-to-products" class="btn btn-primary" disabled>
                     Continue to Products <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
-        </div>
-        
+        </section>
+
         <!-- Phase 2: Add Products -->
-        <div class="phase-content" id="phase2">
+        <section id="product-phase" class="phase-section">
             <div class="phase-header">
                 <h2><i class="fas fa-tshirt"></i> Add Products</h2>
                 <p>Search and add products with size quantities</p>
             </div>
             
             <!-- Product Search -->
-            <div class="product-search-section">
-                <div class="search-container">
-                    <div class="search-input-group">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" 
-                               id="productSearch" 
-                               class="product-search-input" 
-                               placeholder="Search by style number (e.g., PC54, PC61)..."
-                               autocomplete="off">
-                        <div id="searchResults" class="search-results-dropdown"></div>
+            <div class="search-row">
+                <div class="form-group" style="position: relative;">
+                    <label for="style-search">Style Number</label>
+                    <input type="text" 
+                           id="style-search" 
+                           placeholder="Enter style (e.g., PC54, PC61)" 
+                           autocomplete="off">
+                    <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color-select">Color</label>
+                    <select id="color-select" disabled>
+                        <option value="">Select style first</option>
+                    </select>
+                </div>
+                
+                <button id="load-product-btn" class="btn btn-primary" disabled>
+                    <i class="fas fa-search"></i> Load Product
+                </button>
+            </div>
+            
+            <!-- Product Display -->
+            <div id="product-display" class="product-display" style="display: none;">
+                <div class="product-info">
+                    <img id="product-image" src="/images/placeholder-shirt.png" alt="Product">
+                    <div class="product-details">
+                        <h3 id="product-name"></h3>
+                        <p id="product-description"></p>
                     </div>
                 </div>
                 
-                <!-- Selected Product Details -->
-                <div id="productDetails" class="product-details-card" style="display: none;">
-                    <div class="product-info">
-                        <div class="product-image-placeholder">
-                            <i class="fas fa-tshirt"></i>
-                        </div>
-                        <div class="product-text">
-                            <h3 id="productTitle"></h3>
-                            <p id="productDescription"></p>
-                        </div>
+                <!-- Size Matrix -->
+                <div class="size-matrix">
+                    <h4>Enter Quantities by Size</h4>
+                    <div id="size-inputs" class="size-inputs">
+                        <!-- Size inputs will be added dynamically -->
                     </div>
                     
-                    <!-- Color Selection -->
-                    <div class="color-selection">
-                        <label>Select Color</label>
-                        <select id="colorSelect" class="form-control">
-                            <option value="">Choose a color...</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Size Matrix -->
-                    <div class="size-matrix-section">
-                        <h4>Enter Quantities by Size</h4>
-                        <div id="sizeMatrix" class="size-matrix"></div>
-                        <div class="quantity-summary">
-                            <span>Total Quantity: </span>
-                            <strong id="totalQuantity">0</strong>
+                    <div class="phase-actions" style="border-top: none; padding-top: 1rem;">
+                        <div>
+                            Total Quantity: <strong id="product-total-qty">0</strong>
                         </div>
+                        <button id="add-to-quote-btn" class="btn btn-primary" disabled>
+                            <i class="fas fa-plus"></i> Add to Quote
+                        </button>
                     </div>
-                    
-                    <!-- Add Product Button -->
-                    <button type="button" class="btn-primary" onclick="screenPrintQuoteBuilder.addProductToQuote()">
-                        <i class="fas fa-plus"></i> Add to Quote
-                    </button>
                 </div>
             </div>
             
             <!-- Products List -->
-            <div class="products-list-section">
+            <div class="products-list">
                 <h3>Products in Quote</h3>
-                <div id="productsList" class="products-list">
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>No products added yet. Search and add products above.</p>
-                    </div>
+                <div id="products-container">
+                    <p style="color: var(--text-secondary);">No products added yet. Search and add products above.</p>
                 </div>
             </div>
             
             <div class="phase-actions">
-                <button type="button" class="btn-secondary" onclick="screenPrintQuoteBuilder.previousPhase()">
-                    <i class="fas fa-arrow-left"></i> Back
+                <button id="back-to-setup" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Setup
                 </button>
-                <button type="button" class="btn-primary btn-next" onclick="screenPrintQuoteBuilder.nextPhase()">
-                    Continue to Review <i class="fas fa-arrow-right"></i>
+                <button id="continue-to-summary" class="btn btn-primary" disabled>
+                    Continue to Summary <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
-        </div>
-        
+        </section>
+
         <!-- Phase 3: Review & Save Quote -->
-        <div class="phase-content" id="phase3">
+        <section id="summary-phase" class="phase-section">
             <div class="phase-header">
-                <h2><i class="fas fa-clipboard-check"></i> Review & Save Quote</h2>
+                <h2><i class="fas fa-file-invoice"></i> Review & Save Quote</h2>
                 <p>Review your quote and enter customer information</p>
+            </div>
+            
+            <!-- Quote Summary -->
+            <div id="quote-summary" class="quote-summary">
+                <!-- Summary will be generated dynamically -->
             </div>
             
             <!-- Customer Information -->
             <div class="customer-info-section">
                 <h3>Customer Information</h3>
-                <form id="customerForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Customer Name <span class="required">*</span></label>
-                            <input type="text" id="customerName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address <span class="required">*</span></label>
-                            <input type="email" id="customerEmail" class="form-control" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Company Name</label>
-                            <input type="text" id="companyName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Phone Number</label>
-                            <input type="tel" id="customerPhone" class="form-control">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Project Name</label>
-                            <input type="text" id="projectName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Sales Representative <span class="required">*</span></label>
-                            <select id="salesRep" class="form-control" required>
-                                <option value="sales@nwcustomapparel.com">General Sales</option>
-                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                                <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
-                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                            </select>
-                        </div>
-                    </div>
-                    
+                <div class="form-row">
                     <div class="form-group">
-                        <label>Special Instructions</label>
-                        <textarea id="specialInstructions" class="form-control" rows="3"></textarea>
+                        <label for="customer-name">Customer Name *</label>
+                        <input type="text" id="customer-name" class="form-control" required>
                     </div>
-                </form>
+                    <div class="form-group">
+                        <label for="customer-email">Email *</label>
+                        <input type="email" id="customer-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone</label>
+                        <input type="tel" id="customer-phone" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company-name">Company Name</label>
+                        <input type="text" id="company-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="sales-rep">Sales Representative *</label>
+                        <select id="sales-rep" class="form-control" required>
+                            <option value="">Select Sales Rep...</option>
+                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="special-notes">Special Notes</label>
+                    <textarea id="special-notes" rows="3" class="form-textarea"></textarea>
+                </div>
+                
+                <!-- Save to Database Option -->
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="save-to-database" checked>
+                        Save quote to database for future reference
+                    </label>
+                </div>
             </div>
             
-            <!-- Quote Summary -->
-            <div class="quote-summary-section">
-                <h3>Quote Summary</h3>
-                <div id="quoteSummary" class="quote-summary">
-                    <!-- Summary will be generated here -->
-                </div>
-                
-                <!-- Pricing Breakdown -->
-                <div class="pricing-breakdown">
-                    <table class="pricing-table">
-                        <tbody>
-                            <tr>
-                                <td>Products & Printing:</td>
-                                <td class="text-right" id="subtotalAmount">$0.00</td>
-                            </tr>
-                            <tr id="ltmFeeRow" style="display: none;">
-                                <td>Small Order Fee:</td>
-                                <td class="text-right" id="ltmFeeAmount">$50.00</td>
-                            </tr>
-                            <tr id="rushFeeRow" style="display: none;">
-                                <td>Rush Order Fee:</td>
-                                <td class="text-right" id="rushFeeAmount">$0.00</td>
-                            </tr>
-                            <tr class="total-row">
-                                <td><strong>Grand Total:</strong></td>
-                                <td class="text-right"><strong id="grandTotal">$0.00</strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="quote-actions">
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="saveToDatabase" checked>
-                            <span>Save quote to database</span>
-                        </label>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button type="button" class="btn-secondary" onclick="screenPrintQuoteBuilder.previousPhase()">
-                            <i class="fas fa-arrow-left"></i> Back
-                        </button>
-                        <button type="button" class="btn-primary" onclick="screenPrintQuoteBuilder.generateQuote()">
-                            <i class="fas fa-paper-plane"></i> Generate Quote
-                        </button>
-                    </div>
+            <div class="phase-actions">
+                <button id="back-to-products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Products
+                </button>
+                <div>
+                    <button id="generate-quote-btn" class="btn btn-primary">
+                        <i class="fas fa-file-export"></i> Generate Quote
+                    </button>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
-    
+
     <!-- Success Modal -->
-    <div id="successModal" class="modal">
+    <div id="success-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header success">
                 <i class="fas fa-check-circle"></i>
                 <h2>Quote Generated Successfully!</h2>
             </div>
             <div class="modal-body">
-                <div class="success-info">
-                    <p class="quote-id-display">
-                        Quote ID: <strong id="modalQuoteId"></strong>
-                    </p>
-                    <p>Your quote has been sent to: <strong id="modalCustomerEmail"></strong></p>
-                    <p>Total Amount: <strong id="modalTotalAmount"></strong></p>
-                </div>
+                <p>Your screen print quote has been created.</p>
+                <div class="quote-id-display" id="modal-quote-id">SP0909-1</div>
+                <p id="modal-message">Quote has been saved to the database.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="screenPrintQuoteBuilder.printQuote()">
-                    <i class="fas fa-print"></i> Print Quote
+                <button onclick="printQuote()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Print
                 </button>
-                <button class="btn-primary" onclick="screenPrintQuoteBuilder.startNewQuote()">
+                <button onclick="copyQuoteToClipboard()" class="btn btn-secondary">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button onclick="startNewQuote()" class="btn btn-primary">
                     <i class="fas fa-plus"></i> New Quote
                 </button>
             </div>
         </div>
     </div>
-    
+
     <!-- JavaScript Services -->
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
     <script src="/shared_components/js/screenprint-quote-products.js"></script>
     <script src="/shared_components/js/screenprint-quote-pricing.js"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     
-    <!-- Main Application -->
+    <!-- Main Application Script -->
     <script>
     class ScreenPrintQuoteBuilder {
         constructor() {
             this.currentPhase = 1;
-            this.printLocations = [];
+            this.printSetup = {
+                locations: [],
+                colorsByLocation: {},
+                darkGarments: false,
+                safetyStripes: false
+            };
             this.products = [];
             this.currentProduct = null;
             
             // Initialize services
             this.quoteService = new ScreenPrintQuoteService();
-            this.productService = new ScreenPrintQuoteProducts();
-            this.pricingService = new ScreenPrintQuotePricing();
+            this.productService = new ScreenPrintProductManager();
+            this.pricingService = new ScreenPrintPricingCalculator();
             
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
             
+            this.emailConfig = {
+                serviceId: 'service_1c4k67j',
+                templateId: 'template_screenprint' // You'll need to get the actual template ID
+            };
+            
             this.initializeEventListeners();
-            this.initializePrimaryLocation();
+            console.log('[ScreenPrintQuoteBuilder] Initialized');
         }
         
         initializeEventListeners() {
-            // Product search
-            const searchInput = document.getElementById('productSearch');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => this.handleProductSearch(e));
-            }
-            
-            // Color count buttons
-            document.querySelectorAll('.color-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => this.handleColorSelection(e));
+            // Phase navigation
+            document.querySelectorAll('.phase-step').forEach(step => {
+                step.addEventListener('click', (e) => {
+                    const phase = parseInt(e.currentTarget.dataset.phase);
+                    if (phase <= this.currentPhase) {
+                        this.navigateToPhase(phase);
+                    }
+                });
             });
             
-            // Add location button
-            const addLocationBtn = document.getElementById('addLocationBtn');
-            if (addLocationBtn) {
-                addLocationBtn.addEventListener('click', () => this.addPrintLocation());
-            }
+            // Print location selection
+            document.querySelectorAll('.location-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    // Don't process if clicking on the checkbox itself
+                    if (e.target.type === 'checkbox') return;
+                    this.handleLocationSelection(card);
+                });
+            });
             
-            // Size inputs
-            document.addEventListener('input', (e) => {
-                if (e.target.classList.contains('size-input')) {
-                    this.updateQuantityTotal();
+            // Dark garments toggle
+            document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
+                this.printSetup.darkGarments = e.target.checked;
+                this.updateColorSelections();
+            });
+            
+            // Safety stripes toggle
+            document.getElementById('safety-stripes-toggle').addEventListener('change', (e) => {
+                this.printSetup.safetyStripes = e.target.checked;
+            });
+            
+            // Continue buttons
+            document.getElementById('continue-to-products').addEventListener('click', () => {
+                if (this.validatePrintSetup()) {
+                    this.navigateToPhase(2);
                 }
             });
+            
+            document.getElementById('continue-to-summary').addEventListener('click', () => {
+                if (this.products.length > 0) {
+                    this.generateQuoteSummary();
+                    this.navigateToPhase(3);
+                }
+            });
+            
+            // Back buttons
+            document.getElementById('back-to-setup').addEventListener('click', () => {
+                this.navigateToPhase(1);
+            });
+            
+            document.getElementById('back-to-products').addEventListener('click', () => {
+                this.navigateToPhase(2);
+            });
+            
+            // Product search
+            const styleSearch = document.getElementById('style-search');
+            let searchTimeout;
+            
+            styleSearch.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const searchTerm = e.target.value.trim();
+                
+                if (searchTerm.length >= 2) {
+                    searchTimeout = setTimeout(() => {
+                        this.searchProducts(searchTerm);
+                    }, 300);
+                } else {
+                    document.getElementById('style-suggestions').style.display = 'none';
+                }
+            });
+            
+            // Click outside to close suggestions
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.form-group')) {
+                    document.getElementById('style-suggestions').style.display = 'none';
+                }
+            });
+            
+            // Load product button
+            document.getElementById('load-product-btn').addEventListener('click', () => {
+                this.loadProductDetails();
+            });
+            
+            // Add to quote button
+            document.getElementById('add-to-quote-btn').addEventListener('click', () => {
+                this.addProductToQuote();
+            });
+            
+            // Generate quote button
+            document.getElementById('generate-quote-btn').addEventListener('click', () => {
+                this.generateQuote();
+            });
         }
         
-        initializePrimaryLocation() {
-            // Set default primary location
-            const primaryLocation = document.querySelector('.primary-location');
-            if (primaryLocation) {
-                primaryLocation.querySelector('.color-btn[data-colors="1"]').classList.add('active');
-                this.updatePrintSummary();
+        handleLocationSelection(card) {
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            card.classList.toggle('selected', checkbox.checked);
+            
+            const location = card.dataset.location;
+            
+            if (checkbox.checked) {
+                // Only add if not already in array (prevent duplicates)
+                if (!this.printSetup.locations.includes(location)) {
+                    this.printSetup.locations.push(location);
+                }
+                this.printSetup.colorsByLocation[location] = 1;
+            } else {
+                this.printSetup.locations = this.printSetup.locations.filter(l => l !== location);
+                delete this.printSetup.colorsByLocation[location];
             }
+            
+            this.updateColorSelections();
+            this.updateContinueButton();
         }
         
-        handleColorSelection(e) {
-            const btn = e.target;
-            const locationCard = btn.closest('.location-card');
+        updateColorSelections() {
+            const container = document.getElementById('color-selections');
+            const locationColors = document.getElementById('location-colors');
             
-            // Remove active class from siblings
-            locationCard.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            // Deduplicate locations array (safety check)
+            this.printSetup.locations = [...new Set(this.printSetup.locations)];
             
-            // Add active class to clicked button
-            btn.classList.add('active');
-            
-            // Update hidden input
-            const colorInput = locationCard.querySelector('.color-count-input');
-            colorInput.value = btn.dataset.colors;
-            
-            this.updatePrintSummary();
-        }
-        
-        addPrintLocation() {
-            const locationsContainer = document.getElementById('printLocations');
-            const locationCount = locationsContainer.querySelectorAll('.location-card').length;
-            
-            if (locationCount >= 4) {
-                alert('Maximum 4 print locations allowed');
+            if (this.printSetup.locations.length === 0) {
+                locationColors.style.display = 'none';
                 return;
             }
             
-            const locationCard = document.createElement('div');
-            locationCard.className = 'location-card additional-location';
-            locationCard.dataset.locationIndex = locationCount;
+            locationColors.style.display = 'block';
+            container.innerHTML = '';
             
-            locationCard.innerHTML = `
-                <div class="location-header">
-                    <div class="location-badge additional">Additional Location ${locationCount}</div>
-                    <button type="button" class="btn-remove-location" onclick="screenPrintQuoteBuilder.removeLocation(${locationCount})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            this.printSetup.locations.forEach(location => {
+                const locationName = this.getLocationName(location);
+                const currentColors = this.printSetup.colorsByLocation[location] || 1;
                 
-                <div class="location-content">
-                    <div class="form-group">
-                        <label>Location</label>
-                        <select class="form-control location-select" required>
-                            <option value="">Select Location...</option>
-                            <option value="Front">Front</option>
-                            <option value="Back">Back</option>
-                            <option value="Left Chest">Left Chest</option>
-                            <option value="Right Chest">Right Chest</option>
-                            <option value="Left Sleeve">Left Sleeve</option>
-                            <option value="Right Sleeve">Right Sleeve</option>
-                            <option value="Full Front">Full Front</option>
-                            <option value="Full Back">Full Back</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Number of Colors</label>
-                        <div class="color-count-selector">
-                            <button type="button" class="color-btn" data-colors="1" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">1 Color</button>
-                            <button type="button" class="color-btn" data-colors="2" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">2 Colors</button>
-                            <button type="button" class="color-btn" data-colors="3" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">3 Colors</button>
-                            <button type="button" class="color-btn" data-colors="4" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">4 Colors</button>
-                            <button type="button" class="color-btn" data-colors="5" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">5 Colors</button>
-                            <button type="button" class="color-btn" data-colors="6" onclick="screenPrintQuoteBuilder.handleColorSelection(event)">6 Colors</button>
+                const colorRow = document.createElement('div');
+                colorRow.style.marginBottom = '1rem';
+                colorRow.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 600;">${locationName}:</span>
+                        <div class="color-buttons">
+                            ${[1,2,3,4,5,6].map(num => `
+                                <button class="color-btn ${currentColors === num ? 'active' : ''}" 
+                                        data-location="${location}" 
+                                        data-colors="${num}">
+                                    ${num} ${num === 1 ? 'Color' : 'Colors'}
+                                </button>
+                            `).join('')}
                         </div>
-                        <input type="hidden" class="color-count-input" value="1" required>
                     </div>
-                </div>
-            `;
+                    ${this.printSetup.darkGarments ? `
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: var(--text-secondary);">
+                            <i class="fas fa-info-circle"></i> +1 white underbase will be added automatically
+                        </p>
+                    ` : ''}
+                `;
+                
+                container.appendChild(colorRow);
+            });
             
-            locationsContainer.appendChild(locationCard);
-            
-            // Set default selection
-            locationCard.querySelector('.color-btn[data-colors="1"]').classList.add('active');
-            
-            this.updatePrintSummary();
+            // Add event listeners to color buttons
+            container.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const location = e.target.dataset.location;
+                    const colors = parseInt(e.target.dataset.colors);
+                    
+                    // Update active state
+                    e.target.parentElement.querySelectorAll('.color-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    
+                    // Store selection
+                    this.printSetup.colorsByLocation[location] = colors;
+                });
+            });
         }
         
-        removeLocation(index) {
-            const locationCard = document.querySelector(`.location-card[data-location-index="${index}"]`);
-            if (locationCard) {
-                locationCard.remove();
-                this.updatePrintSummary();
+        getLocationName(code) {
+            const names = {
+                'LC': 'Left Chest',
+                'RC': 'Right Chest',
+                'FF': 'Full Front',
+                'FB': 'Full Back',
+                'LS': 'Left Sleeve',
+                'RS': 'Right Sleeve'
+            };
+            return names[code] || code;
+        }
+        
+        updateContinueButton() {
+            const continueBtn = document.getElementById('continue-to-products');
+            continueBtn.disabled = this.printSetup.locations.length === 0;
+        }
+        
+        validatePrintSetup() {
+            if (this.printSetup.locations.length === 0) {
+                alert('Please select at least one print location');
+                return false;
+            }
+            return true;
+        }
+        
+        async searchProducts(searchTerm) {
+            try {
+                const products = await this.productService.searchProducts(searchTerm);
+                this.displaySearchSuggestions(products);
+            } catch (error) {
+                console.error('Search error:', error);
             }
         }
         
-        updatePrintSummary() {
-            const summaryContainer = document.getElementById('printSummary');
-            const locations = [];
+        displaySearchSuggestions(products) {
+            const container = document.getElementById('style-suggestions');
             
-            document.querySelectorAll('.location-card').forEach(card => {
-                const location = card.querySelector('.location-select').value;
-                const colors = card.querySelector('.color-count-input').value;
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="suggestion-item">No products found</div>';
+                container.style.display = 'block';
+                return;
+            }
+            
+            container.innerHTML = products.slice(0, 10).map(product => `
+                <div class="suggestion-item" data-style="${product.style}">
+                    <span class="suggestion-style">${product.style}</span>
+                    <span class="suggestion-name">${product.title || product.productName || ''}</span>
+                </div>
+            `).join('');
+            
+            container.style.display = 'block';
+            
+            // Add click handlers
+            container.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const style = item.dataset.style;
+                    document.getElementById('style-search').value = style;
+                    container.style.display = 'none';
+                    this.selectProductStyle(style);
+                });
+            });
+        }
+        
+        async selectProductStyle(styleNumber) {
+            try {
+                // Get product details
+                const productDetails = await this.productService.getProductDetails(styleNumber);
                 
-                if (location) {
-                    locations.push({
-                        location: location,
-                        colors: colors,
-                        isPrimary: card.classList.contains('primary-location')
+                if (!productDetails) {
+                    alert('Could not load product details');
+                    return;
+                }
+                
+                this.currentProduct = {
+                    styleNumber: styleNumber,
+                    details: productDetails
+                };
+                
+                // Enable color selection
+                const colorSelect = document.getElementById('color-select');
+                colorSelect.disabled = false;
+                colorSelect.innerHTML = '<option value="">Select a color...</option>';
+                
+                if (productDetails.availableColors && productDetails.availableColors.length > 0) {
+                    productDetails.availableColors.forEach(color => {
+                        const option = document.createElement('option');
+                        option.value = color;
+                        option.textContent = color;
+                        colorSelect.appendChild(option);
                     });
                 }
-            });
-            
-            if (locations.length === 0) {
-                summaryContainer.innerHTML = '<p class="summary-placeholder">Select print locations and colors to see summary</p>';
-                return;
-            }
-            
-            let summaryHTML = '<div class="summary-items">';
-            locations.forEach(loc => {
-                summaryHTML += `
-                    <div class="summary-item">
-                        <span class="summary-label">${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location}</span>
-                        <span class="summary-value">${loc.colors} Color${loc.colors > 1 ? 's' : ''}</span>
-                    </div>
-                `;
-            });
-            summaryHTML += '</div>';
-            
-            summaryContainer.innerHTML = summaryHTML;
-            
-            // Store locations for pricing calculations
-            this.printLocations = locations;
-        }
-        
-        async handleProductSearch(e) {
-            const query = e.target.value.trim();
-            const resultsContainer = document.getElementById('searchResults');
-            
-            if (query.length < 2) {
-                resultsContainer.style.display = 'none';
-                return;
-            }
-            
-            const results = await this.productService.searchProducts(query);
-            
-            if (results.length > 0) {
-                let html = '';
-                results.forEach(product => {
-                    html += `
-                        <div class="search-result-item" onclick="screenPrintQuoteBuilder.selectProduct('${product.styleNumber}', '${product.productName.replace(/'/g, "\\'")}')">
-                            <strong>${product.styleNumber}</strong> - ${product.productName}
-                        </div>
-                    `;
-                });
-                resultsContainer.innerHTML = html;
-                resultsContainer.style.display = 'block';
-            } else {
-                resultsContainer.innerHTML = '<div class="no-results">No products found</div>';
-                resultsContainer.style.display = 'block';
+                
+                // Enable load button
+                document.getElementById('load-product-btn').disabled = false;
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                alert('Error loading product details');
             }
         }
         
-        async selectProduct(styleNumber, productName) {
-            // Hide search results
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('productSearch').value = `${styleNumber} - ${productName}`;
-            
-            // Load product details
-            const productDetails = await this.productService.loadProductDetails(styleNumber);
-            
-            this.currentProduct = {
-                styleNumber: styleNumber,
-                productName: productName,
-                details: productDetails
-            };
-            
-            // Display product details
-            this.displayProductDetails(productDetails);
-        }
-        
-        displayProductDetails(product) {
-            document.getElementById('productTitle').textContent = `${product.styleNumber} - ${product.title}`;
-            document.getElementById('productDescription').textContent = product.description || '';
-            
-            // Populate colors
-            const colorSelect = document.getElementById('colorSelect');
-            colorSelect.innerHTML = '<option value="">Choose a color...</option>';
-            
-            if (product.colors && product.colors.length > 0) {
-                product.colors.forEach(color => {
-                    colorSelect.innerHTML += `<option value="${color}">${color}</option>`;
-                });
-            }
-            
-            // Show product details section
-            document.getElementById('productDetails').style.display = 'block';
-            
-            // Setup size matrix when color is selected
-            colorSelect.addEventListener('change', () => this.setupSizeMatrix());
-        }
-        
-        async setupSizeMatrix() {
-            const color = document.getElementById('colorSelect').value;
-            if (!color || !this.currentProduct) return;
-            
-            // Get available sizes
-            const sizes = await this.productService.getAvailableSizes(this.currentProduct.styleNumber, color);
-            
-            // Build size matrix
-            const matrixContainer = document.getElementById('sizeMatrix');
-            let matrixHTML = '<div class="size-inputs">';
-            
-            sizes.forEach(size => {
-                matrixHTML += `
-                    <div class="size-input-group">
-                        <label>${size}</label>
-                        <input type="number" 
-                               class="size-input" 
-                               data-size="${size}" 
-                               min="0" 
-                               value="0"
-                               onchange="screenPrintQuoteBuilder.updateQuantityTotal()">
-                    </div>
-                `;
-            });
-            
-            matrixHTML += '</div>';
-            matrixContainer.innerHTML = matrixHTML;
-        }
-        
-        updateQuantityTotal() {
-            let total = 0;
-            document.querySelectorAll('.size-input').forEach(input => {
-                total += parseInt(input.value) || 0;
-            });
-            document.getElementById('totalQuantity').textContent = total;
-        }
-        
-        async addProductToQuote() {
-            const color = document.getElementById('colorSelect').value;
-            const sizeQuantities = {};
-            let totalQty = 0;
-            
-            document.querySelectorAll('.size-input').forEach(input => {
-                const qty = parseInt(input.value) || 0;
-                if (qty > 0) {
-                    sizeQuantities[input.dataset.size] = qty;
-                    totalQty += qty;
-                }
-            });
-            
-            if (totalQty === 0) {
-                alert('Please enter at least one size quantity');
-                return;
-            }
+        async loadProductDetails() {
+            const color = document.getElementById('color-select').value;
             
             if (!color) {
                 alert('Please select a color');
                 return;
             }
             
-            // Add product to list
+            if (!this.currentProduct) {
+                alert('Please select a product style first');
+                return;
+            }
+            
+            try {
+                // Get available sizes
+                const sizes = await this.productService.getAvailableSizes(
+                    this.currentProduct.styleNumber, 
+                    color
+                );
+                
+                // Display product
+                document.getElementById('product-display').style.display = 'block';
+                document.getElementById('product-name').textContent = 
+                    `${this.currentProduct.styleNumber} - ${this.currentProduct.details.ProductTitle || this.currentProduct.details.title || ''}`;
+                document.getElementById('product-description').textContent = 
+                    `${this.currentProduct.details.Brand || ''} | ${color}`;
+                
+                // Create size inputs
+                const sizeInputsContainer = document.getElementById('size-inputs');
+                sizeInputsContainer.innerHTML = '';
+                
+                sizes.forEach(size => {
+                    const sizeGroup = document.createElement('div');
+                    sizeGroup.className = 'size-input-group';
+                    sizeGroup.innerHTML = `
+                        <label class="size-label">${size}</label>
+                        <input type="number" 
+                               class="size-quantity" 
+                               data-size="${size}" 
+                               min="0" 
+                               value="0"
+                               onchange="screenPrintQuoteBuilder.updateProductTotal()">
+                    `;
+                    sizeInputsContainer.appendChild(sizeGroup);
+                });
+                
+                // Store current product data
+                this.currentProduct.color = color;
+                this.currentProduct.sizes = sizes;
+                
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Error loading product details');
+            }
+        }
+        
+        updateProductTotal() {
+            const quantities = document.querySelectorAll('.size-quantity');
+            let total = 0;
+            
+            quantities.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            
+            document.getElementById('product-total-qty').textContent = total;
+            document.getElementById('add-to-quote-btn').disabled = total === 0;
+        }
+        
+        addProductToQuote() {
+            // Collect size breakdown
+            const sizeBreakdown = {};
+            let totalQuantity = 0;
+            
+            document.querySelectorAll('.size-quantity').forEach(input => {
+                const size = input.dataset.size;
+                const qty = parseInt(input.value) || 0;
+                if (qty > 0) {
+                    sizeBreakdown[size] = qty;
+                    totalQuantity += qty;
+                }
+            });
+            
+            if (totalQuantity === 0) {
+                alert('Please enter at least one quantity');
+                return;
+            }
+            
+            // Add product
             const product = {
-                id: Date.now(),
                 styleNumber: this.currentProduct.styleNumber,
-                productName: this.currentProduct.productName,
-                color: color,
-                sizeQuantities: sizeQuantities,
-                totalQuantity: totalQty
+                productName: this.currentProduct.details.ProductTitle || this.currentProduct.details.title || '',
+                brand: this.currentProduct.details.Brand || '',
+                color: this.currentProduct.color,
+                sizeBreakdown: sizeBreakdown,
+                quantity: totalQuantity,
+                locations: this.printSetup.locations
             };
             
-            this.products.push(product);
+            this.productService.addProduct(product);
+            this.products = this.productService.getSelectedProducts();
+            
+            // Update display
             this.displayProductsList();
             
             // Reset form
-            document.getElementById('productSearch').value = '';
-            document.getElementById('productDetails').style.display = 'none';
-            this.currentProduct = null;
+            document.getElementById('style-search').value = '';
+            document.getElementById('color-select').disabled = true;
+            document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
+            document.getElementById('load-product-btn').disabled = true;
+            document.getElementById('product-display').style.display = 'none';
+            
+            // Enable continue button
+            document.getElementById('continue-to-summary').disabled = false;
         }
         
         displayProductsList() {
-            const listContainer = document.getElementById('productsList');
+            const container = document.getElementById('products-container');
             
             if (this.products.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>No products added yet. Search and add products above.</p>
-                    </div>
-                `;
+                container.innerHTML = '<p style="color: var(--text-secondary);">No products added yet. Search and add products above.</p>';
                 return;
             }
             
-            let html = '';
-            this.products.forEach(product => {
-                const sizeList = Object.entries(product.sizeQuantities)
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
-                
-                html += `
-                    <div class="product-card" data-product-id="${product.id}">
-                        <div class="product-card-details">
+            container.innerHTML = this.products.map((product, index) => `
+                <div class="product-item">
+                    <div class="product-item-info">
+                        <div class="product-item-details">
                             <h4>${product.styleNumber} - ${product.productName}</h4>
-                            <p class="product-color">Color: ${product.color}</p>
-                            <p class="product-sizes">${sizeList}</p>
-                            <p class="product-quantity">Total: ${product.totalQuantity} pieces</p>
-                        </div>
-                        <div class="product-card-actions">
-                            <button class="btn-remove" onclick="screenPrintQuoteBuilder.removeProduct(${product.id})">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
+                            <p>${product.color} | Quantity: ${product.quantity} | ${this.productService.formatSizeBreakdown(product.sizeBreakdown)}</p>
                         </div>
                     </div>
-                `;
-            });
-            
-            listContainer.innerHTML = html;
+                    <div class="product-item-actions">
+                        <button class="btn-danger" onclick="screenPrintQuoteBuilder.removeProduct(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
         
-        removeProduct(productId) {
-            this.products = this.products.filter(p => p.id !== productId);
-            this.displayProductsList();
-        }
-        
-        nextPhase() {
-            if (this.currentPhase === 1) {
-                // Validate print setup
-                const primaryLocation = document.querySelector('.primary-location .location-select').value;
-                if (!primaryLocation) {
-                    alert('Please select at least the primary print location');
-                    return;
-                }
-            } else if (this.currentPhase === 2) {
-                // Validate products
-                if (this.products.length === 0) {
-                    alert('Please add at least one product');
-                    return;
-                }
+        removeProduct(index) {
+            const product = this.products[index];
+            if (confirm(`Remove ${product.styleNumber} from quote?`)) {
+                this.productService.removeProduct(product.id);
+                this.products = this.productService.getSelectedProducts();
+                this.displayProductsList();
                 
-                // Calculate pricing and prepare summary
-                this.prepareFinalQuote();
-            }
-            
-            // Move to next phase
-            this.currentPhase++;
-            this.updatePhaseDisplay();
-        }
-        
-        previousPhase() {
-            this.currentPhase--;
-            this.updatePhaseDisplay();
-        }
-        
-        updatePhaseDisplay() {
-            // Update phase indicators
-            document.querySelectorAll('.phase-step').forEach(step => {
-                const phase = parseInt(step.dataset.phase);
-                if (phase === this.currentPhase) {
-                    step.classList.add('active');
-                    step.classList.remove('completed');
-                } else if (phase < this.currentPhase) {
-                    step.classList.add('completed');
-                    step.classList.remove('active');
-                } else {
-                    step.classList.remove('active', 'completed');
+                if (this.products.length === 0) {
+                    document.getElementById('continue-to-summary').disabled = true;
                 }
-            });
-            
-            // Update phase content
-            document.querySelectorAll('.phase-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`phase${this.currentPhase}`).classList.add('active');
+            }
         }
         
-        async prepareFinalQuote() {
-            // Calculate total quantity
-            const totalQuantity = this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
-            
-            // Calculate pricing for each product
-            let subtotal = 0;
-            let quoteSummaryHTML = '';
-            
-            for (const product of this.products) {
-                const pricing = await this.pricingService.calculatePricing(
-                    product,
-                    this.printLocations,
-                    totalQuantity
+        async generateQuoteSummary() {
+            try {
+                // Calculate pricing
+                const pricingResult = await this.pricingService.calculateQuotePricing(
+                    this.products,
+                    this.printSetup
                 );
                 
-                product.pricing = pricing;
-                subtotal += pricing.lineTotal;
+                this.currentPricing = pricingResult;
                 
-                // Build summary HTML
-                const sizeList = Object.entries(product.sizeQuantities)
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
+                // Display summary
+                const summaryContainer = document.getElementById('quote-summary');
                 
-                quoteSummaryHTML += `
-                    <div class="quote-item">
-                        <div class="item-header">
-                            <strong>${product.styleNumber} - ${product.productName}</strong>
-                            <span class="item-total">$${pricing.lineTotal.toFixed(2)}</span>
+                summaryContainer.innerHTML = `
+                    <div class="summary-section">
+                        <h3 class="summary-title">Print Setup</h3>
+                        <div class="summary-row">
+                            <span class="summary-label">Locations:</span>
+                            <span class="summary-value">${this.printSetup.locations.map(l => this.getLocationName(l)).join(', ')}</span>
                         </div>
-                        <div class="item-details">
-                            <p>Color: ${product.color} | Sizes: ${sizeList}</p>
-                            <p>Quantity: ${product.totalQuantity} @ $${pricing.unitPrice.toFixed(2)} each</p>
+                        <div class="summary-row">
+                            <span class="summary-label">Colors:</span>
+                            <span class="summary-value">${this.getTotalColors()} total colors</span>
+                        </div>
+                        ${this.printSetup.darkGarments ? `
+                            <div class="summary-row">
+                                <span class="summary-label">Dark Garments:</span>
+                                <span class="summary-value">Yes (white underbase included)</span>
+                            </div>
+                        ` : ''}
+                        ${this.printSetup.safetyStripes ? `
+                            <div class="summary-row">
+                                <span class="summary-label">Safety Stripes:</span>
+                                <span class="summary-value">Yes</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="summary-section">
+                        <h3 class="summary-title">Products (${this.products.length} items, ${pricingResult.totalQuantity} pieces)</h3>
+                        ${this.products.map(product => `
+                            <div class="summary-row">
+                                <span class="summary-label">${product.styleNumber} - ${product.color}</span>
+                                <span class="summary-value">${product.quantity} pieces</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="summary-section">
+                        <h3 class="summary-title">Pricing</h3>
+                        <div class="summary-row">
+                            <span class="summary-label">Tier:</span>
+                            <span class="summary-value">${pricingResult.pricingTier}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Products & Printing:</span>
+                            <span class="summary-value">$${pricingResult.subtotal.toFixed(2)}</span>
+                        </div>
+                        ${pricingResult.ltmFeeTotal > 0 ? `
+                            <div class="summary-row">
+                                <span class="summary-label">Small Batch Fee:</span>
+                                <span class="summary-value">$${pricingResult.ltmFeeTotal.toFixed(2)}</span>
+                            </div>
+                        ` : ''}
+                        ${pricingResult.safetyStripesTotal > 0 ? `
+                            <div class="summary-row">
+                                <span class="summary-label">Safety Stripes ($2.00 × ${pricingResult.totalQuantity}):</span>
+                                <span class="summary-value">$${pricingResult.safetyStripesTotal.toFixed(2)}</span>
+                            </div>
+                        ` : ''}
+                        <div class="summary-row">
+                            <span class="summary-label">Setup Fees (Screens):</span>
+                            <span class="summary-value">$${pricingResult.setupFees.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-total">
+                            <div class="summary-row">
+                                <span class="summary-label" style="font-size: 1.125rem;">Grand Total:</span>
+                                <span class="summary-value">$${pricingResult.grandTotal.toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
                 `;
+                
+            } catch (error) {
+                console.error('Error generating summary:', error);
+                alert('Error calculating pricing. Please try again.');
             }
-            
-            // Add print setup summary
-            let printSetupHTML = '<div class="print-setup-summary"><h4>Print Configuration</h4>';
-            this.printLocations.forEach(loc => {
-                printSetupHTML += `<p>${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location} - ${loc.colors} Color${loc.colors > 1 ? 's' : ''}</p>`;
+        }
+        
+        getTotalColors() {
+            let total = 0;
+            Object.values(this.printSetup.colorsByLocation).forEach(colors => {
+                total += colors;
+                if (this.printSetup.darkGarments) {
+                    total += 1; // Add white underbase
+                }
             });
-            printSetupHTML += '</div>';
-            
-            // Update summary display
-            document.getElementById('quoteSummary').innerHTML = printSetupHTML + quoteSummaryHTML;
-            
-            // Calculate fees
-            const ltmFee = totalQuantity < 24 ? 50 : 0;
-            const rushFee = document.getElementById('rushOrder').checked ? subtotal * 0.25 : 0;
-            const grandTotal = subtotal + ltmFee + rushFee;
-            
-            // Update pricing display
-            document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;
-            
-            if (ltmFee > 0) {
-                document.getElementById('ltmFeeRow').style.display = '';
-                document.getElementById('ltmFeeAmount').textContent = `$${ltmFee.toFixed(2)}`;
-            } else {
-                document.getElementById('ltmFeeRow').style.display = 'none';
-            }
-            
-            if (rushFee > 0) {
-                document.getElementById('rushFeeRow').style.display = '';
-                document.getElementById('rushFeeAmount').textContent = `$${rushFee.toFixed(2)}`;
-            } else {
-                document.getElementById('rushFeeRow').style.display = 'none';
-            }
-            
-            document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(2)}`;
-            
-            // Store quote data
-            this.quoteData = {
-                printLocations: this.printLocations,
-                products: this.products,
-                totalQuantity: totalQuantity,
-                subtotal: subtotal,
-                ltmFee: ltmFee,
-                rushFee: rushFee,
-                grandTotal: grandTotal,
-                isRush: document.getElementById('rushOrder').checked
-            };
+            return total;
         }
         
         async generateQuote() {
-            // Validate customer form
-            const customerName = document.getElementById('customerName').value.trim();
-            const customerEmail = document.getElementById('customerEmail').value.trim();
-            const salesRep = document.getElementById('salesRep').value;
+            // Validate customer info
+            const customerName = document.getElementById('customer-name').value.trim();
+            const customerEmail = document.getElementById('customer-email').value.trim();
+            const salesRep = document.getElementById('sales-rep').value;
             
             if (!customerName || !customerEmail || !salesRep) {
-                alert('Please fill in all required customer information');
+                alert('Please fill in all required fields');
                 return;
             }
             
-            // Prepare complete quote data
-            const completeQuoteData = {
-                ...this.quoteData,
+            // Build quote data
+            const quoteData = {
+                // Customer info
                 customerName: customerName,
                 customerEmail: customerEmail,
-                companyName: document.getElementById('companyName').value.trim(),
-                customerPhone: document.getElementById('customerPhone').value.trim(),
-                projectName: document.getElementById('projectName').value.trim(),
-                specialInstructions: document.getElementById('specialInstructions').value.trim(),
+                customerPhone: document.getElementById('customer-phone').value.trim(),
+                companyName: document.getElementById('company-name').value.trim(),
+                projectName: document.getElementById('project-name').value.trim(),
+                
+                // Sales info
                 salesRepEmail: salesRep,
-                salesRepName: document.getElementById('salesRep').selectedOptions[0].text
+                salesRepName: this.getSalesRepName(salesRep),
+                
+                // Print setup
+                printLocations: this.printSetup.locations,
+                primaryColors: this.getTotalColors(),
+                darkGarments: this.printSetup.darkGarments,
+                safetyStripes: this.printSetup.safetyStripes,
+                
+                // Products
+                items: this.products,
+                totalQuantity: this.currentPricing.totalQuantity,
+                
+                // Pricing
+                subtotal: this.currentPricing.subtotal,
+                ltmFeeTotal: this.currentPricing.ltmFeeTotal,
+                safetyStripesTotal: this.currentPricing.safetyStripesTotal || 0,
+                setupFees: this.currentPricing.setupFees,
+                grandTotal: this.currentPricing.grandTotal,
+                
+                // Notes
+                notes: document.getElementById('special-notes').value.trim()
             };
             
-            try {
-                // Generate quote ID
-                const quoteId = this.quoteService.generateQuoteID();
-                completeQuoteData.quoteId = quoteId;
-                
-                // Save to database if checked
-                if (document.getElementById('saveToDatabase').checked) {
-                    await this.quoteService.saveQuote(completeQuoteData);
+            // Save to database if checked
+            let quoteId = null;
+            const saveToDb = document.getElementById('save-to-database').checked;
+            
+            if (saveToDb) {
+                const saveResult = await this.quoteService.saveQuote(quoteData);
+                if (saveResult.success) {
+                    quoteId = saveResult.quoteID;
+                    console.log('Quote saved:', quoteId);
+                } else {
+                    console.error('Failed to save quote:', saveResult.error);
                 }
-                
-                // Send email
-                await this.sendQuoteEmail(completeQuoteData);
-                
-                // Show success modal
-                this.showSuccessModal(quoteId, completeQuoteData);
-                
-            } catch (error) {
-                console.error('Error generating quote:', error);
-                alert('Error generating quote. Please try again.');
+            } else {
+                quoteId = this.quoteService.generateQuoteID();
             }
-        }
-        
-        async sendQuoteEmail(quoteData) {
-            // Build email template data
-            const emailData = {
-                to_email: quoteData.customerEmail,
-                from_name: 'Northwest Custom Apparel',
-                reply_to: quoteData.salesRepEmail,
-                
-                quote_type: 'Screen Print',
-                quote_id: quoteData.quoteId,
-                quote_date: new Date().toLocaleDateString(),
-                
-                customer_name: quoteData.customerName,
-                customer_email: quoteData.customerEmail,
-                company_name: quoteData.companyName || '',
-                customer_phone: quoteData.customerPhone || '',
-                
-                project_name: quoteData.projectName || '',
-                special_instructions: quoteData.specialInstructions || 'No special instructions',
-                
-                total_quantity: quoteData.totalQuantity,
-                grand_total: `$${quoteData.grandTotal.toFixed(2)}`,
-                
-                sales_rep_name: quoteData.salesRepName,
-                sales_rep_email: quoteData.salesRepEmail,
-                sales_rep_phone: '253-922-5793',
-                
-                company_year: '1977',
-                
-                // Quote details HTML
-                quote_details_html: this.buildQuoteDetailsHTML(quoteData)
-            };
             
-            // Send email via EmailJS
-            await emailjs.send(
-                'service_1c4k67j',
-                'template_screenprint', // You'll need to create this template
-                emailData
-            );
-        }
-        
-        buildQuoteDetailsHTML(quoteData) {
-            let html = '<div style="font-family: Arial, sans-serif;">';
+            quoteData.quoteId = quoteId;
             
-            // Print configuration
-            html += '<h3>Print Configuration</h3>';
-            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
-            quoteData.printLocations.forEach(loc => {
-                html += `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">
-                            ${loc.isPrimary ? 'Primary' : 'Additional'}: ${loc.location}
-                        </td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">
-                            ${loc.colors} Color${loc.colors > 1 ? 's' : ''}
-                        </td>
-                    </tr>
-                `;
-            });
-            html += '</table>';
+            // Show success modal
+            this.showSuccessModal(quoteId, saveToDb);
             
-            // Products
-            html += '<h3>Products</h3>';
-            html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
-            html += '<thead><tr style="background: #f5f5f5;">';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product</th>';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Color</th>';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Sizes</th>';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Qty</th>';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Price</th>';
-            html += '<th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>';
-            html += '</tr></thead><tbody>';
-            
-            quoteData.products.forEach(product => {
-                const sizeList = Object.entries(product.sizeQuantities)
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
-                
-                html += `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.styleNumber} - ${product.productName}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.color}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${sizeList}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${product.totalQuantity}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${product.pricing.unitPrice.toFixed(2)}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${product.pricing.lineTotal.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            
-            // Pricing summary
-            html += '<div style="text-align: right; margin-top: 20px;">';
-            html += `<p>Subtotal: $${quoteData.subtotal.toFixed(2)}</p>`;
-            if (quoteData.ltmFee > 0) {
-                html += `<p>Small Order Fee: $${quoteData.ltmFee.toFixed(2)}</p>`;
-            }
-            if (quoteData.rushFee > 0) {
-                html += `<p>Rush Order Fee: $${quoteData.rushFee.toFixed(2)}</p>`;
-            }
-            html += `<p style="font-weight: bold; font-size: 1.2em;">Grand Total: $${quoteData.grandTotal.toFixed(2)}</p>`;
-            html += '</div>';
-            
-            html += '</div>';
-            
-            return html;
-        }
-        
-        showSuccessModal(quoteId, quoteData) {
-            document.getElementById('modalQuoteId').textContent = quoteId;
-            document.getElementById('modalCustomerEmail').textContent = quoteData.customerEmail;
-            document.getElementById('modalTotalAmount').textContent = `$${quoteData.grandTotal.toFixed(2)}`;
-            
-            // Store for print functionality
+            // Store for print/copy
             this.lastQuoteData = quoteData;
-            
-            // Show modal
-            document.getElementById('successModal').classList.add('active');
         }
         
-        printQuote() {
-            if (!this.lastQuoteData) return;
-            
-            const printWindow = window.open('', '_blank');
-            const html = this.buildPrintHTML(this.lastQuoteData);
-            
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.onload = function() {
-                printWindow.print();
-                setTimeout(() => printWindow.close(), 500);
+        getSalesRepName(email) {
+            const reps = {
+                'sales@nwcustomapparel.com': 'General Sales',
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'taylar@nwcustomapparel.com': 'Taylar Hanson',
+                'nika@nwcustomapparel.com': 'Nika Lao',
+                'erik@nwcustomapparel.com': 'Erik Mickelson',
+                'adriyella@nwcustomapparel.com': 'Adriyella',
+                'bradley@nwcustomapparel.com': 'Bradley Wright',
+                'jim@nwcustomapparel.com': 'Jim Mickelson',
+                'art@nwcustomapparel.com': 'Steve Deland'
             };
+            return reps[email] || 'Sales Team';
         }
         
-        buildPrintHTML(quoteData) {
-            // Build a print-friendly HTML document
-            return `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Screen Print Quote ${quoteData.quoteId}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        h1, h2, h3 { color: #333; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                        th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
-                        th { background: #f5f5f5; }
-                        .header { margin-bottom: 30px; }
-                        .total { text-align: right; font-weight: bold; font-size: 1.2em; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>Northwest Custom Apparel</h1>
-                        <h2>Screen Print Quote</h2>
-                        <p>Quote ID: ${quoteData.quoteId}</p>
-                        <p>Date: ${new Date().toLocaleDateString()}</p>
-                        <p>Customer: ${quoteData.customerName}</p>
-                        <p>Company: ${quoteData.companyName || 'N/A'}</p>
-                    </div>
-                    
-                    ${this.buildQuoteDetailsHTML(quoteData)}
-                    
-                    <div style="margin-top: 40px;">
-                        <p>This quote is valid for 30 days.</p>
-                        <p>Contact: ${quoteData.salesRepName} - ${quoteData.salesRepEmail}</p>
-                    </div>
-                </body>
-                </html>
-            `;
+        showSuccessModal(quoteId, saved) {
+            document.getElementById('modal-quote-id').textContent = quoteId;
+            document.getElementById('modal-message').textContent = saved ? 
+                'Quote has been saved to the database.' : 
+                'Quote generated (not saved to database).';
+            
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('active');
         }
         
-        startNewQuote() {
-            // Reset everything and reload page
-            if (confirm('Start a new quote? This will clear all current data.')) {
-                window.location.reload();
-            }
+        navigateToPhase(phase) {
+            // Hide all phases
+            document.querySelectorAll('.phase-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected phase
+            const phases = ['setup-phase', 'product-phase', 'summary-phase'];
+            document.getElementById(phases[phase - 1]).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.phase-step').forEach(step => {
+                const stepPhase = parseInt(step.dataset.phase);
+                step.classList.remove('active', 'completed');
+                
+                if (stepPhase < phase) {
+                    step.classList.add('completed');
+                } else if (stepPhase === phase) {
+                    step.classList.add('active');
+                }
+            });
+            
+            this.currentPhase = phase;
         }
     }
     
     // Initialize the application
     const screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+    
+    // Global functions for buttons
+    function printQuote() {
+        if (!screenPrintQuoteBuilder.lastQuoteData) return;
+        window.print();
+    }
+    
+    function copyQuoteToClipboard() {
+        if (!screenPrintQuoteBuilder.lastQuoteData) return;
+        
+        const quoteText = `Screen Print Quote ${screenPrintQuoteBuilder.lastQuoteData.quoteId}
+        
+Customer: ${screenPrintQuoteBuilder.lastQuoteData.customerName}
+Company: ${screenPrintQuoteBuilder.lastQuoteData.companyName || 'N/A'}
+
+Total Quantity: ${screenPrintQuoteBuilder.lastQuoteData.totalQuantity} pieces
+Grand Total: $${screenPrintQuoteBuilder.lastQuoteData.grandTotal.toFixed(2)}
+
+This quote is valid for 30 days.`;
+        
+        navigator.clipboard.writeText(quoteText).then(() => {
+            alert('Quote copied to clipboard!');
+        });
+    }
+    
+    function startNewQuote() {
+        if (confirm('Start a new quote? This will clear all current data.')) {
+            window.location.reload();
+        }
+    }
+    
+    // Testing utilities
+    console.log('%c✅ Screen Print Quote Builder Loaded Successfully', 'color: #4cb354; font-size: 16px; font-weight: bold;');
+    console.log('Services initialized:', {
+        quoteService: !!screenPrintQuoteBuilder.quoteService,
+        productService: !!screenPrintQuoteBuilder.productService,
+        pricingService: !!screenPrintQuoteBuilder.pricingService
+    });
+    
+    // Add test helpers to window for console testing
+    window.SP_TEST = {
+        builder: screenPrintQuoteBuilder,
+        checkState: () => ({
+            phase: screenPrintQuoteBuilder.currentPhase,
+            locations: screenPrintQuoteBuilder.printSetup.locations,
+            colors: screenPrintQuoteBuilder.printSetup.colorsByLocation,
+            dark: screenPrintQuoteBuilder.printSetup.darkGarments,
+            safety: screenPrintQuoteBuilder.printSetup.safetyStripes,
+            products: screenPrintQuoteBuilder.products
+        }),
+        testSearch: async (term) => {
+            const results = await screenPrintQuoteBuilder.productService.searchProducts(term);
+            console.log(`Found ${results.length} products for "${term}":`, results.slice(0, 5));
+            return results;
+        },
+        generateQuoteId: () => {
+            const id = screenPrintQuoteBuilder.quoteService.generateQuoteID();
+            console.log('Generated Quote ID:', id);
+            return id;
+        },
+        selectLocations: (...codes) => {
+            codes.forEach(code => {
+                const card = document.querySelector(`[data-location="${code}"]`);
+                if (card) card.click();
+            });
+            console.log('Selected locations:', screenPrintQuoteBuilder.printSetup.locations);
+        },
+        setToggles: (dark, safety) => {
+            document.getElementById('dark-garment-toggle').checked = dark;
+            document.getElementById('dark-garment-toggle').dispatchEvent(new Event('change'));
+            document.getElementById('safety-stripes-toggle').checked = safety;
+            document.getElementById('safety-stripes-toggle').dispatchEvent(new Event('change'));
+            console.log('Toggles set:', {dark, safety});
+        }
+    };
+    
+    console.log('🧪 Test helpers available at window.SP_TEST');
+    console.log('Try: SP_TEST.checkState() or SP_TEST.testSearch("PC54")');
     </script>
 </body>
 </html>

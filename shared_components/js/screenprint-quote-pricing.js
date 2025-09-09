@@ -8,6 +8,7 @@ class ScreenPrintPricingCalculator {
         this.pricingService = null;
         this.cachedPricingData = null;
         this.currentStyleNumber = null;
+        this.SAFETY_STRIPE_COST = 2.00; // $2.00 per unit for safety stripes
         console.log('[ScreenPrintPricingCalculator] Initialized');
         
         // Initialize pricing service if available
@@ -79,12 +80,17 @@ class ScreenPrintPricingCalculator {
                 
                 Object.entries(product.sizeBreakdown).forEach(([size, quantity]) => {
                     if (quantity > 0) {
-                        const unitPrice = this.calculateUnitPrice(
+                        let unitPrice = this.calculateUnitPrice(
                             size,
                             pricingTier,
                             printSetup.primaryColors || 1,
                             printSetup.locations || []
                         );
+                        
+                        // Add safety stripe cost if enabled
+                        if (printSetup.safetyStripes) {
+                            unitPrice += this.SAFETY_STRIPE_COST;
+                        }
                         
                         const lineTotal = unitPrice * quantity;
                         productTotal += lineTotal;
@@ -117,6 +123,13 @@ class ScreenPrintPricingCalculator {
             const subtotal = pricedProducts.reduce((sum, p) => sum + p.lineTotal, 0);
             const ltmFeeTotal = totalQuantity < 24 ? 50 : 0;
             const setupFees = this.calculateSetupFees(printSetup);
+            
+            // Calculate safety stripe total (already included in subtotal through unit prices)
+            const safetyStripesTotal = printSetup.safetyStripes ? 
+                totalQuantity * this.SAFETY_STRIPE_COST : 0;
+            
+            // Note: Safety stripe cost is already included in the subtotal 
+            // because it was added to unit prices
             const grandTotal = subtotal + setupFees;
             
             return {
@@ -126,6 +139,8 @@ class ScreenPrintPricingCalculator {
                 subtotal: subtotal,
                 ltmFeeTotal: ltmFeeTotal,
                 setupFees: setupFees,
+                safetyStripes: printSetup.safetyStripes || false,
+                safetyStripesTotal: safetyStripesTotal,
                 grandTotal: grandTotal
             };
             
