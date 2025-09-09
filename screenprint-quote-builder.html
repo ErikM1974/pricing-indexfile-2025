@@ -314,6 +314,7 @@
             border-radius: 8px;
             padding: 1rem;
             margin: 1rem 0;
+            position: relative;
         }
 
         .safety-stripes-toggle {
@@ -327,11 +328,58 @@
             font-weight: 600;
             display: flex;
             align-items: center;
+            position: relative;
             gap: 0.5rem;
         }
 
         .safety-icon {
             color: #ff6b35;
+        }
+        
+        /* Tooltip for safety stripes */
+        .info-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff6b35;
+            color: white;
+            font-size: 0.75rem;
+            cursor: help;
+            position: relative;
+            margin-left: 0.25rem;
+        }
+        
+        .info-tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            max-width: 300px;
+            white-space: normal;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: normal;
+        }
+        
+        .info-tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #333;
+            z-index: 1000;
         }
 
         /* Product Search */
@@ -921,9 +969,12 @@
                             <div class="safety-label">
                                 <i class="fas fa-exclamation-triangle safety-icon"></i>
                                 <strong>Safety Stripes</strong>
+                                <span class="info-tooltip" data-tooltip="Typically includes 4-color print on front and 4-color print on back for maximum visibility">
+                                    <i class="fas fa-info" style="font-size: 0.7rem;"></i>
+                                </span>
                             </div>
                             <p style="margin: 0; font-size: 0.875rem; color: #ff6b35;">
-                                Add reflective safety stripes for high-visibility workwear
+                                Add reflective safety stripes for high-visibility workwear ($2.00 per unit)
                             </p>
                         </div>
                     </div>
