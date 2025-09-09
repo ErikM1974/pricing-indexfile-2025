@@ -235,106 +235,90 @@ Public Key: 4qSbDO-SQs19TbP80
 Service ID: service_1c4k67j
 ```
 
+### Quick Reference - Essential Information
+```
+Phone Number: 253-922-5793 (consistent across all templates)
+Company Year: 1977
+Quote ID Pattern: [PREFIX][MMDD]-[sequence] (e.g., DTG0130-1)
+Database Endpoints: /api/quote_sessions and /api/quote_items
+```
+
+### Active Quote Prefixes
+```
+DTG     // DTG Contract
+RICH    // Richardson Caps  
+EMB     // Embroidery Contract
+EMBC    // Customer Supplied Embroidery
+LT      // Laser Tumblers
+PATCH   // Embroidered Emblems
+SPC     // Customer Screen Print
+SSC     // Safety Stripe Creator
+WEB     // Webstore Setup
+```
+
 ## Pricing Calculations
 
 ### Minimum Fee Calculation
 - Less than minimum fee is calculated as a flat $50.00 when the total order value falls below the established minimum order threshold
 - This ensures a baseline revenue for small orders that do not meet the standard minimum pricing requirements
 
-## Git Workflow Documentation
+## Development Guides & References
 
-### Complete Workflow Guide
-@memory/GIT_WORKFLOW_GUIDE.md
-- Full step-by-step workflow from feature branch to production
-- Prerequisites and setup instructions
-- Troubleshooting common issues
-
-### Quick Reference
-@memory/GIT_WORKFLOW_QUICK_REFERENCE.md
-- Essential commands at a glance
-- One-line deployment scripts
-- Branch naming conventions
-
-## Development Guides
-
-### Calculator Implementation Guide
+### Core Implementation Guide
 @memory/CALCULATOR_GUIDE.md
-- Comprehensive guide for building new calculators
-- Combines best practices from all successful implementations
-- Required patterns, EmailJS setup, database integration
-- Active calculator registry and common pitfalls
+- Complete calculator implementation patterns
+- Database integration (quote_sessions + quote_items structure)
+- EmailJS setup and anti-corruption strategies
+- Quote workflow from generation to delivery
+- Active calculator registry and troubleshooting
 
-### EmailJS Integration
-@memory/EMAILJS_GUIDE.md
-- Complete EmailJS setup and configuration
-- Anti-corruption strategies and variable management
-- Template best practices and error handling
-- Testing procedures and debugging
-
-### Quote Workflow Guide
-@memory/QUOTE_WORKFLOW_GUIDE.md
-- Complete quote lifecycle from generation to delivery
-- Database integration patterns
-- Success modal and print functionality
-- Error handling best practices
-- Status management
-
-### Database Patterns
-@memory/DATABASE_PATTERNS.md
-- Two-table structure (quote_sessions + quote_items)
-- CRUD operations with complete examples
-- Field requirements and data types
-
-
-### Troubleshooting
-@memory/TROUBLESHOOTING.md
-
-### Quick Reference
-@memory/QUICK_REFERENCE.md
-
-### Staff Directory
+### Staff Directory & Quick Reference
 @memory/STAFF_DIRECTORY.md
-- Complete staff contact information
-- Authoritative source for all email addresses and names
-- JavaScript implementation examples
+- Complete staff contact information (authoritative source)
+- Essential URLs, credentials, and quote ID patterns
+- Console debug commands and common fixes
+- Git workflow and testing checklist
 
-### CRUD Test Results
-@memory/CRUD_TEST_RESULTS_QUOTES.md
-- Complete test results for all CRUD operations on quotes
-- Verified endpoints for CREATE, READ, UPDATE, DELETE
-- Key findings about API behavior and best practices
-- Test commands and examples for reference
+### Database & API Integration
+@memory/DATABASE_PATTERNS.md
+- Two-table structure with CRUD operations
+- Field requirements and validation patterns
+- Service vs product quote patterns
 
-### DTG Bundle Optimization
-@memory/DTG_BUNDLE_OPTIMIZATION.md
-- DTG pricing page API optimization strategy
-- Bundle endpoint specification and implementation
-- Testing utilities and performance metrics
-- Automatic fallback system documentation
-
-### Screen Print API Optimization
-@memory/SCREENPRINT_API_OPTIMIZATION.md
-- Screen print pricing converted from Caspio to API
-- Exact pricing calculation implementation
-- Testing utilities and console commands
-- Performance improvements and fallback system
-
-### Embroidery Quote Builder
+### Advanced Features
 @memory/EMBROIDERY_QUOTE_BUILDER.md
-- Comprehensive sales tool for multi-style embroidery quotes
-- Logo definition with multiple positions and stitch counts
-- Dynamic size matrix with API integration
-- Aggregate tier pricing across all styles
-- Professional quote output with database persistence
+- Multi-style embroidery quote builder
+- Professional sales tool with API integration
 
-## Key Takeaways
+## Key Takeaways & Common Issues
 
-1. **Follow Established Patterns**: All calculators use the same architecture - HTML page, quote service, EmailJS integration
-2. **Database Integration**: Always use the two-table structure (quote_sessions + quote_items)
+### Implementation Standards
+1. **Follow Established Patterns**: All calculators use same architecture - HTML page, quote service, EmailJS integration
+2. **Database Integration**: Always use two-table structure (quote_sessions + quote_items)
 3. **EmailJS Variables**: Provide ALL template variables with defaults to avoid corruption
 4. **Quote IDs**: Use unique prefixes and daily sequence reset
 5. **Error Handling**: Log details but don't stop email send on database failure
 6. **Testing**: Always show quote ID in success message for user reference
+
+### Common Fixes
+- **EmailJS "Corrupted variables"**: Add missing variables with defaults (`|| ''`)
+- **Database not saving**: Check endpoint `/api/quote_sessions` and field names  
+- **Quote ID not showing**: Add display element in success message
+- **Wrong template**: Use template ID, not name
+- **Script parsing error**: Escape closing tags: `<\/script>`
+- **CSS not updating**: Add cache-busting parameter to stylesheet link
+
+### Console Debug Commands
+```javascript
+// Check calculator initialization
+console.log(window.[name]Calculator);
+
+// Test quote ID generation  
+console.log(new [Name]QuoteService().generateQuoteID());
+
+// Debug email data
+console.log('Email data:', emailData);
+```
 
 ## Active Calculators
 
