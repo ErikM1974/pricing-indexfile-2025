@@ -151,19 +151,36 @@ class ScreenPrintProductManager {
         try {
             const cacheKey = `sizes_${styleNumber}_${color}`;
             if (this.productCache.has(cacheKey)) {
+                console.log('[ScreenPrintProductManager] Returning cached sizes for:', styleNumber, color);
                 return this.productCache.get(cacheKey);
             }
             
+            console.log('[ScreenPrintProductManager] Fetching sizes for:', styleNumber, color);
             const response = await fetch(
                 `${this.baseURL}/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(color)}`
             );
             
             if (!response.ok) {
-                throw new Error('Failed to fetch sizes');
+                console.error('[ScreenPrintProductManager] API response not OK:', response.status);
+                throw new Error(`Failed to fetch sizes: ${response.status}`);
             }
             
             const data = await response.json();
-            const sizes = data.data || [];
+            console.log('[ScreenPrintProductManager] API response data:', data);
+            
+            // Fix: Use data.sizes instead of data.data (matching DTG implementation)
+            const sizes = data.sizes || data.data || [];
+            console.log('[ScreenPrintProductManager] Extracted sizes:', sizes);
+            
+            if (sizes.length === 0) {
+                console.warn('[ScreenPrintProductManager] No sizes returned from API, using defaults');
+                const defaultSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+                // Show warning to user
+                if (typeof window !== 'undefined' && window.alert) {
+                    console.warn('API returned no sizes - using default sizes. Please verify product availability.');
+                }
+                return defaultSizes;
+            }
             
             // Cache result
             this.productCache.set(cacheKey, sizes);
@@ -172,7 +189,14 @@ class ScreenPrintProductManager {
             
         } catch (error) {
             console.error('[ScreenPrintProductManager] Error fetching sizes:', error);
-            return ['S', 'M', 'L', 'XL', '2XL', '3XL']; // Default sizes as fallback
+            console.error('[ScreenPrintProductManager] Using fallback sizes due to API error');
+            
+            // Show error to user (Erik's requirement: no silent failures)
+            const errorMessage = `Unable to load sizes from server. Using default sizes. Error: ${error.message}`;
+            console.error(errorMessage);
+            
+            // Return default sizes as fallback
+            return ['S', 'M', 'L', 'XL', '2XL', '3XL'];
         }
     }
 

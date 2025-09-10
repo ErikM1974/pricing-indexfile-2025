@@ -49,7 +49,11 @@
       "Read(//mnt/c/Users/erik/Downloads/**)",
       "Bash(echo:*)",
       "Read(//mnt/c/Users/erik/OneDrive/**)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "WebSearch",
+      "WebFetch(domain:screenprintdirect.com)",
+      "WebFetch(domain:www.printrenegades.com)",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": [],

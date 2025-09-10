@@ -363,6 +363,31 @@ class ScreenPrintPricingService {
     }
 
     /**
+     * Get tier data for a specific quantity
+     * Used by pricing calculator to get LTM fees
+     */
+    getTierData(quantity, pricingData) {
+        const data = pricingData || this.cachedData;
+        if (!data || !data.tierData) {
+            console.warn('[ScreenPrintPricingService] No tier data available');
+            return null;
+        }
+        
+        // Find the tier that contains this quantity
+        for (const tierKey in data.tierData) {
+            const tier = data.tierData[tierKey];
+            if (quantity >= tier.MinQuantity && 
+                (!tier.MaxQuantity || quantity <= tier.MaxQuantity)) {
+                console.log(`[ScreenPrintPricingService] Found tier for qty ${quantity}: ${tierKey}, LTM Fee: $${tier.LTM_Fee || 0}`);
+                return tier;
+            }
+        }
+        
+        console.warn(`[ScreenPrintPricingService] No tier found for quantity: ${quantity}`);
+        return null;
+    }
+    
+    /**
      * Service status and control
      */
     getStatus() {
