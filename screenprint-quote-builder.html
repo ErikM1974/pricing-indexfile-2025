@@ -381,6 +381,53 @@
             border-top-color: #333;
             z-index: 1000;
         }
+        
+        /* Price breakdown tooltip */
+        .price-with-tooltip {
+            position: relative;
+            display: inline-block;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: help;
+            border-bottom: 1px dashed var(--primary-color);
+        }
+        
+        .price-with-tooltip .tooltip-content {
+            visibility: hidden;
+            background: #333;
+            color: white;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 280px;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: pre-line;
+        }
+        
+        .price-with-tooltip .tooltip-content::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .price-with-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
 
         /* Product Search */
         .search-row {
@@ -766,6 +813,97 @@
             gap: 1rem;
             justify-content: center;
         }
+
+        /* Minimum Order Warning Styles */
+        .minimum-order-warning {
+            background: linear-gradient(135deg, #fff5e5 0%, #ffebe0 100%);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin: 20px 0;
+            display: none;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.15);
+        }
+
+        .minimum-order-warning.show {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .warning-icon {
+            font-size: 2.5rem;
+            color: #ff9800;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .warning-content {
+            flex: 1;
+        }
+
+        .warning-content h4 {
+            color: #e65100;
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .warning-content p {
+            color: #666;
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+
+        .warning-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .warning-content li {
+            color: #666;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .warning-content strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alternative-calculator-links {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .alternative-calculator-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #4cb354;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .alternative-calculator-links a:hover {
+            background: #3d8b44;
+        }
     </style>
 </head>
 <body>
@@ -958,27 +1096,6 @@
                     </div>
                 </div>
                 
-                <!-- Safety Stripes -->
-                <div class="safety-stripes-section">
-                    <div class="safety-stripes-toggle">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="safety-stripes-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div>
-                            <div class="safety-label">
-                                <i class="fas fa-exclamation-triangle safety-icon"></i>
-                                <strong>Safety Stripes</strong>
-                                <span class="info-tooltip" data-tooltip="Typically includes 4-color print on each location. Pricing: $2.00 per location per unit (e.g., Front + Back = $4.00 per unit)">
-                                    <i class="fas fa-info" style="font-size: 0.7rem;"></i>
-                                </span>
-                            </div>
-                            <p style="margin: 0; font-size: 0.875rem; color: #ff6b35;">
-                                Add reflective safety stripes for high-visibility workwear ($2.00 per location per unit)
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <div class="phase-actions">
@@ -1053,6 +1170,33 @@
                 <div id="products-container">
                     <p style="color: var(--text-secondary);">No products added yet. Search and add products above.</p>
                 </div>
+                
+                <!-- Minimum Order Warning -->
+                <div id="minimum-order-warning" class="minimum-order-warning" style="display: none;">
+                    <div class="warning-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="warning-content">
+                        <h4>Screen printing requires a minimum of 24 pieces</h4>
+                        <p>Current total: <span id="warning-quantity">0</span> pieces</p>
+                        <p>For smaller quantities, we recommend:</p>
+                        <ul>
+                            <li><strong>Direct to Garment (DTG)</strong> - Best for 1-23 pieces with full-color designs</li>
+                            <li><strong>Direct to Film (DTF) Transfers</strong> - Great for small batches with vibrant colors</li>
+                        </ul>
+                        <div class="warning-actions">
+                            <a href="/dtg-quote-builder.html" class="btn btn-secondary">
+                                <i class="fas fa-print"></i> Switch to DTG Calculator
+                            </a>
+                            <a href="/dtf-calculator.html" class="btn btn-secondary">
+                                <i class="fas fa-film"></i> Switch to DTF Calculator
+                            </a>
+                            <button onclick="this.parentElement.parentElement.parentElement.style.display='none'" class="btn btn-ghost">
+                                Continue Anyway
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="phase-actions">
@@ -1070,6 +1214,26 @@
             <div class="phase-header">
                 <h2><i class="fas fa-file-invoice"></i> Review & Save Quote</h2>
                 <p>Review your quote and enter customer information</p>
+            </div>
+            
+            <!-- Minimum Order Warning (duplicated for Phase 3) -->
+            <div id="summary-minimum-order-warning" class="minimum-order-warning" style="display: none;">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="warning-content">
+                    <h4>Screen printing requires a minimum of 24 pieces</h4>
+                    <p>Current total: <span id="summary-warning-quantity">0</span> pieces</p>
+                    <p>For smaller quantities, we recommend:</p>
+                    <ul>
+                        <li><strong>Direct to Garment (DTG)</strong> - Best for 1-23 pieces with full-color designs</li>
+                        <li><strong>Direct to Film (DTF) Transfers</strong> - Great for small batches with vibrant colors</li>
+                    </ul>
+                    <div class="alternative-calculator-links">
+                        <a href="/calculators/dtg-contract-calculator.html">Go to DTG Calculator</a>
+                        <a href="/calculators/dtf-calculator.html">Go to DTF Calculator</a>
+                    </div>
+                </div>
             </div>
             
             <!-- Quote Summary -->
@@ -1187,7 +1351,7 @@
                 locations: [],
                 colorsByLocation: {},
                 darkGarments: false,
-                safetyStripes: false
+                safetyStripesByLocation: {} // Track safety stripes per location
             };
             this.products = [];
             this.currentProduct = null;
@@ -1234,11 +1398,6 @@
             document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
                 this.printSetup.darkGarments = e.target.checked;
                 this.updateColorSelections();
-            });
-            
-            // Safety stripes toggle
-            document.getElementById('safety-stripes-toggle').addEventListener('change', (e) => {
-                this.printSetup.safetyStripes = e.target.checked;
             });
             
             // Continue buttons
@@ -1346,12 +1505,18 @@
                 const currentColors = this.printSetup.colorsByLocation[location] || 1;
                 
                 const colorRow = document.createElement('div');
-                colorRow.style.marginBottom = '1rem';
+                colorRow.style.marginBottom = '1.5rem';
+                colorRow.style.padding = '1rem';
+                colorRow.style.background = '#f9f9f9';
+                colorRow.style.borderRadius = '8px';
+                
+                const hasSafetyStripe = this.printSetup.safetyStripesByLocation[location] || false;
+                
                 colorRow.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-weight: 600;">${locationName}:</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 600; font-size: 1.1rem;">${locationName}:</span>
                         <div class="color-buttons">
-                            ${[1,2,3,4,5,6].map(num => `
+                            ${[0,1,2,3,4,5,6].map(num => `
                                 <button class="color-btn ${currentColors === num ? 'active' : ''}" 
                                         data-location="${location}" 
                                         data-colors="${num}">
@@ -1360,11 +1525,33 @@
                             `).join('')}
                         </div>
                     </div>
-                    ${this.printSetup.darkGarments ? `
-                        <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: var(--text-secondary);">
-                            <i class="fas fa-info-circle"></i> +1 white underbase will be added automatically
-                        </p>
+                    ${this.printSetup.darkGarments && currentColors > 0 ? `
+                        <div style="margin: 0.5rem 0; padding: 0.5rem; background: #fff; border-left: 3px solid #6b7280; border-radius: 4px;">
+                            <p style="margin: 0; font-size: 0.9rem; color: #4b5563;">
+                                <i class="fas fa-info-circle" style="color: #6b7280;"></i> 
+                                <strong>Dark Garment Pricing:</strong> ${currentColors} design ${currentColors === 1 ? 'color' : 'colors'} + 1 white underbase = ${currentColors + 1} colors total
+                            </p>
+                        </div>
                     ` : ''}
+                    <div style="margin-top: 0.75rem; padding: 0.75rem; background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%); border-radius: 6px; border: 1px solid #ffb088;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" 
+                                   id="safety-stripe-${location}" 
+                                   data-location="${location}"
+                                   ${hasSafetyStripe ? 'checked' : ''}
+                                   style="margin-right: 0.5rem;">
+                            <span style="color: #ff6b35; font-weight: 600;">
+                                <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem;"></i>
+                                Safety stripe elements (+$2.00/piece)
+                            </span>
+                            <span class="info-tooltip" data-tooltip="Typically requires 4 colors: white base + 2 stripe colors + company logo" style="margin-left: 0.5rem;">
+                                <i class="fas fa-info" style="font-size: 0.7rem;"></i>
+                            </span>
+                        </label>
+                        <p style="margin: 0.25rem 0 0 1.5rem; font-size: 0.8rem; color: #a0522d;">
+                            Add reflective safety stripes for high-visibility workwear
+                        </p>
+                    </div>
                 `;
                 
                 container.appendChild(colorRow);
@@ -1384,6 +1571,20 @@
                     
                     // Store selection
                     this.printSetup.colorsByLocation[location] = colors;
+                    
+                    // If dark garments, refresh to show transparent pricing
+                    if (this.printSetup.darkGarments) {
+                        this.updateColorSelections();
+                    }
+                });
+            });
+            
+            // Add event listeners to safety stripe checkboxes
+            container.querySelectorAll('input[type="checkbox"][id^="safety-stripe-"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const location = e.target.dataset.location;
+                    this.printSetup.safetyStripesByLocation[location] = e.target.checked;
+                    console.log(`[ScreenPrintQuoteBuilder] Safety stripe for ${location}: ${e.target.checked}`);
                 });
             });
         }
@@ -1512,11 +1713,30 @@
             }
             
             try {
+                console.log('[loadProductDetails] Loading sizes for:', this.currentProduct.styleNumber, color);
+                
                 // Get available sizes
                 const sizes = await this.productService.getAvailableSizes(
                     this.currentProduct.styleNumber, 
                     color
                 );
+                
+                console.log('[loadProductDetails] Received sizes:', sizes);
+                
+                if (!sizes || sizes.length === 0) {
+                    // Show warning but continue with default sizes
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className = 'alert alert-warning';
+                    warningDiv.style.cssText = 'background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 10px; margin: 10px 0; border-radius: 4px;';
+                    warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Unable to load sizes from server. Using default sizes.';
+                    
+                    const productDisplay = document.getElementById('product-display');
+                    const existingWarning = productDisplay.querySelector('.alert-warning');
+                    if (existingWarning) existingWarning.remove();
+                    productDisplay.insertBefore(warningDiv, productDisplay.firstChild);
+                    
+                    console.warn('[loadProductDetails] No sizes returned, using defaults');
+                }
                 
                 // Display product
                 document.getElementById('product-display').style.display = 'block';
@@ -1550,7 +1770,11 @@
                 const sizeInputsContainer = document.getElementById('size-inputs');
                 sizeInputsContainer.innerHTML = '';
                 
-                sizes.forEach(size => {
+                // Ensure we have sizes to display
+                const sizesToDisplay = sizes && sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+                console.log('[loadProductDetails] Creating size inputs for:', sizesToDisplay);
+                
+                sizesToDisplay.forEach(size => {
                     const sizeGroup = document.createElement('div');
                     sizeGroup.className = 'size-input-group';
                     sizeGroup.innerHTML = `
@@ -1565,13 +1789,49 @@
                     sizeInputsContainer.appendChild(sizeGroup);
                 });
                 
+                console.log('[loadProductDetails] Size inputs created:', sizeInputsContainer.children.length);
+                
                 // Store current product data
                 this.currentProduct.color = color;
-                this.currentProduct.sizes = sizes;
+                this.currentProduct.sizes = sizesToDisplay;
                 
             } catch (error) {
-                console.error('Error loading product details:', error);
-                alert('Error loading product details');
+                console.error('[loadProductDetails] Error loading product details:', error);
+                
+                // Show error message to user (Erik's requirement: no silent failures)
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.style.cssText = 'background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 10px; margin: 10px 0; border-radius: 4px;';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> Failed to load product details. ${error.message}. Please try again or contact support.`;
+                
+                const productDisplay = document.getElementById('product-display');
+                productDisplay.style.display = 'block';
+                const existingError = productDisplay.querySelector('.alert-danger');
+                if (existingError) existingError.remove();
+                productDisplay.insertBefore(errorDiv, productDisplay.firstChild);
+                
+                // Still try to show the form with default sizes
+                const sizeInputsContainer = document.getElementById('size-inputs');
+                sizeInputsContainer.innerHTML = '';
+                
+                const defaultSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+                defaultSizes.forEach(size => {
+                    const sizeGroup = document.createElement('div');
+                    sizeGroup.className = 'size-input-group';
+                    sizeGroup.innerHTML = `
+                        <label class="size-label">${size}</label>
+                        <input type="number" 
+                               class="size-quantity" 
+                               data-size="${size}" 
+                               min="0" 
+                               value="0"
+                               onchange="screenPrintQuoteBuilder.updateProductTotal()">
+                    `;
+                    sizeInputsContainer.appendChild(sizeGroup);
+                });
+                
+                this.currentProduct.color = color;
+                this.currentProduct.sizes = defaultSizes;
             }
         }
         
@@ -1639,6 +1899,12 @@
             
             if (this.products.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-secondary);">No products added yet. Search and add products above.</p>';
+                // Hide warning when no products
+                const warningElement = document.getElementById('minimum-order-warning');
+                if (warningElement) {
+                    warningElement.classList.remove('show');
+                    warningElement.style.display = 'none';
+                }
                 return;
             }
             
@@ -1657,6 +1923,9 @@
                     </div>
                 </div>
             `).join('');
+            
+            // Check minimum order after updating the product list
+            this.checkMinimumOrder();
         }
         
         removeProduct(index) {
@@ -1674,6 +1943,9 @@
         
         async generateQuoteSummary() {
             try {
+                // Check minimum order warning for Phase 3
+                this.checkMinimumOrder();
+                
                 // Calculate pricing
                 const pricingResult = await this.pricingService.calculateQuotePricing(
                     this.products,
@@ -1694,7 +1966,7 @@
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">Colors:</span>
-                            <span class="summary-value">${this.getTotalColors()} total colors</span>
+                            <span class="summary-value">${this.formatColorDisplay()}</span>
                         </div>
                         ${this.printSetup.darkGarments ? `
                             <div class="summary-row">
@@ -1702,22 +1974,70 @@
                                 <span class="summary-value">Yes (white underbase included)</span>
                             </div>
                         ` : ''}
-                        ${this.printSetup.safetyStripes ? `
-                            <div class="summary-row">
-                                <span class="summary-label">Safety Stripes:</span>
-                                <span class="summary-value">Yes</span>
-                            </div>
-                        ` : ''}
+                        ${(() => {
+                            const safetyLocations = [];
+                            if (this.printSetup.safetyStripesByLocation) {
+                                Object.entries(this.printSetup.safetyStripesByLocation).forEach(([location, enabled]) => {
+                                    if (enabled) {
+                                        safetyLocations.push(this.getLocationName(location));
+                                    }
+                                });
+                            }
+                            if (safetyLocations.length > 0) {
+                                return `
+                                    <div class="summary-row">
+                                        <span class="summary-label">Safety Stripes:</span>
+                                        <span class="summary-value">${safetyLocations.join(', ')} (+$2.00/piece per location)</span>
+                                    </div>
+                                `;
+                            }
+                            return '';
+                        })()}
                     </div>
                     
                     <div class="summary-section">
                         <h3 class="summary-title">Products (${this.products.length} items, ${pricingResult.totalQuantity} pieces)</h3>
-                        ${this.products.map(product => `
-                            <div class="summary-row">
-                                <span class="summary-label">${product.styleNumber} - ${product.color}</span>
-                                <span class="summary-value">${product.quantity} pieces</span>
-                            </div>
-                        `).join('')}
+                        ${pricingResult.products.map(product => {
+                            // Format product display with size breakdowns
+                            let productHTML = `
+                                <div class="product-summary-item">
+                                    <div class="product-header">
+                                        <strong>${product.styleNumber} - ${product.color}</strong>
+                                    </div>
+                            `;
+                            
+                            // Group sizes by price for cleaner display
+                            const priceGroups = {};
+                            Object.entries(product.pricedSizes || {}).forEach(([size, data]) => {
+                                const priceKey = data.unitPrice.toFixed(2);
+                                if (!priceGroups[priceKey]) {
+                                    priceGroups[priceKey] = {
+                                        sizes: [],
+                                        unitPrice: data.unitPrice,
+                                        totalQty: 0,
+                                        total: 0
+                                    };
+                                }
+                                priceGroups[priceKey].sizes.push(`${size}(${data.quantity})`);
+                                priceGroups[priceKey].totalQty += data.quantity;
+                                priceGroups[priceKey].total += data.lineTotal;
+                            });
+                            
+                            // Display each price group
+                            Object.values(priceGroups).forEach(group => {
+                                productHTML += `
+                                    <div class="summary-row" style="margin-left: 20px;">
+                                        <span class="summary-label">${group.sizes.join(' ')}</span>
+                                        <span class="summary-value">
+                                            ${group.totalQty} pieces @ $${group.unitPrice.toFixed(2)}/ea = $${group.total.toFixed(2)}
+                                        </span>
+                                    </div>
+                                `;
+                            });
+                            
+                            productHTML += `</div>`;
+                            return productHTML;
+                        }).join('')}
                     </div>
                     
                     <div class="summary-section">
@@ -1730,21 +2050,20 @@
                             <span class="summary-label">Products & Printing:</span>
                             <span class="summary-value">$${pricingResult.subtotal.toFixed(2)}</span>
                         </div>
-                        ${pricingResult.ltmFeeTotal > 0 ? `
+                        <div class="setup-fees-breakdown">
                             <div class="summary-row">
-                                <span class="summary-label">Small Batch Fee:</span>
-                                <span class="summary-value">$${pricingResult.ltmFeeTotal.toFixed(2)}</span>
+                                <span class="summary-label">Setup Fees (Screens):</span>
+                                <span class="summary-value">$${pricingResult.setupFees.toFixed(2)}</span>
                             </div>
-                        ` : ''}
-                        ${pricingResult.safetyStripesTotal > 0 ? `
-                            <div class="summary-row">
-                                <span class="summary-label">Safety Stripes (${this.printSetup.locations.length} ${this.printSetup.locations.length === 1 ? 'location' : 'locations'} × $2.00 × ${pricingResult.totalQuantity} pcs):</span>
-                                <span class="summary-value">$${pricingResult.safetyStripesTotal.toFixed(2)}</span>
-                            </div>
-                        ` : ''}
-                        <div class="summary-row">
-                            <span class="summary-label">Setup Fees (Screens):</span>
-                            <span class="summary-value">$${pricingResult.setupFees.toFixed(2)}</span>
+                            ${pricingResult.setupFeesBreakdown && pricingResult.setupFeesBreakdown.length > 0 ? `
+                                <div class="setup-breakdown-details" style="margin-left: 20px; font-size: 0.9em; color: #666;">
+                                    ${pricingResult.setupFeesBreakdown.map(item => `
+                                        <div class="breakdown-item">
+                                            ${item.location}: ${item.colors} colors${item.underbase > 0 ? ` + ${item.underbase} underbase` : ''} = ${item.totalScreens} @ $30 = $${item.subtotal.toFixed(2)}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                         <div class="summary-total">
                             <div class="summary-row">
@@ -1759,6 +2078,30 @@
                 console.error('Error generating summary:', error);
                 alert('Error calculating pricing. Please try again.');
             }
+        }
+        
+        formatColorDisplay() {
+            const colorDetails = [];
+            
+            if (this.printSetup.colorsByLocation && this.printSetup.locations) {
+                this.printSetup.locations.forEach(location => {
+                    const locationName = this.getLocationName(location);
+                    const colorCount = this.printSetup.colorsByLocation[location] || 0;
+                    
+                    if (colorCount > 0) {
+                        let displayText = `${locationName}: ${colorCount} ${colorCount === 1 ? 'color' : 'colors'}`;
+                        
+                        // Add underbase notation if dark garments
+                        if (this.printSetup.darkGarments) {
+                            displayText += ` (+1 underbase)`;
+                        }
+                        
+                        colorDetails.push(displayText);
+                    }
+                });
+            }
+            
+            return colorDetails.length > 0 ? colorDetails.join(', ') : 'No colors selected';
         }
         
         getTotalColors() {
@@ -1867,6 +2210,64 @@
             modal.classList.add('active');
         }
         
+        checkMinimumOrder() {
+            // Calculate total quantity across all products
+            const totalQuantity = this.products.reduce((sum, product) => sum + product.quantity, 0);
+            
+            // Get warning elements for both phases
+            const warningElement = document.getElementById('minimum-order-warning');
+            const summaryWarningElement = document.getElementById('summary-minimum-order-warning');
+            const quantitySpan = document.getElementById('warning-quantity');
+            const summaryQuantitySpan = document.getElementById('summary-warning-quantity');
+            const generateButton = document.getElementById('generate-quote-btn');
+            
+            if (totalQuantity > 0 && totalQuantity < 24) {
+                // Show warning in Phase 2
+                if (warningElement) {
+                    warningElement.classList.add('show');
+                    warningElement.style.display = 'flex';
+                    if (quantitySpan) {
+                        quantitySpan.textContent = totalQuantity;
+                    }
+                }
+                
+                // Show warning in Phase 3 (summary)
+                if (summaryWarningElement) {
+                    summaryWarningElement.classList.add('show');
+                    summaryWarningElement.style.display = 'flex';
+                    if (summaryQuantitySpan) {
+                        summaryQuantitySpan.textContent = totalQuantity;
+                    }
+                }
+                
+                // Still allow generating quote but with warning visible
+                if (generateButton) {
+                    generateButton.disabled = false;
+                }
+                
+                console.log(`[ScreenPrintQuoteBuilder] Minimum order warning shown. Total quantity: ${totalQuantity}`);
+                return false; // Doesn't meet minimum
+            } else {
+                // Hide warnings in both phases
+                if (warningElement) {
+                    warningElement.classList.remove('show');
+                    warningElement.style.display = 'none';
+                }
+                
+                if (summaryWarningElement) {
+                    summaryWarningElement.classList.remove('show');
+                    summaryWarningElement.style.display = 'none';
+                }
+                
+                // Enable generate button if we have products
+                if (generateButton && this.products.length > 0) {
+                    generateButton.disabled = false;
+                }
+                
+                return true; // Meets minimum or no products
+            }
+        }
+
         navigateToPhase(phase) {
             // Hide all phases
             document.querySelectorAll('.phase-section').forEach(section => {
@@ -1968,6 +2369,31 @@ This quote is valid for 30 days.`;
             document.getElementById('safety-stripes-toggle').checked = safety;
             document.getElementById('safety-stripes-toggle').dispatchEvent(new Event('change'));
             console.log('Toggles set:', {dark, safety});
+        },
+        // New debug function for testing sizes API
+        testSizes: async (style, color) => {
+            console.log(`Testing sizes API for ${style} in ${color}...`);
+            try {
+                const sizes = await screenPrintQuoteBuilder.productService.getAvailableSizes(style, color);
+                console.log('✅ Sizes loaded successfully:', sizes);
+                return sizes;
+            } catch (error) {
+                console.error('❌ Failed to load sizes:', error);
+                return null;
+            }
+        },
+        // Quick test for PC54
+        testPC54: async () => {
+            console.log('Running PC54 test...');
+            // Step 1: Search for PC54
+            await SP_TEST.testSearch('PC54');
+            // Step 2: Select style
+            document.getElementById('style-search').value = 'PC54';
+            await screenPrintQuoteBuilder.selectProductStyle('PC54');
+            // Step 3: Test sizes for common color
+            const sizes = await SP_TEST.testSizes('PC54', 'Woodland Brown');
+            console.log('PC54 test complete. Sizes:', sizes);
+            return sizes;
         }
     };
     
