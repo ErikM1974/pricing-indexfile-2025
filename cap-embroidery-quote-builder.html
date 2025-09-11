@@ -33,6 +33,10 @@
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
     
+    <!-- Phase 2 Persistence - v20250911 -->
+    <script src="/shared_components/js/quote-persistence.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-session.js?v=20250911"></script>
+    
     <!-- Verify files are loading -->
     <script>
         console.log('🔍 Cap Embroidery Quote Builder: Loading Phase 1 Infrastructure...');
@@ -58,6 +62,11 @@
             <div class="loading-spinner"></div>
             <div class="loading-text">Processing...</div>
         </div>
+    </div>
+    
+    <!-- Auto-Save Indicator -->
+    <div id="save-indicator" class="unsaved-indicator">
+        <span id="save-status">Draft saved</span>
     </div>
     
     <!-- Professional Header with Logo and Navigation -->
@@ -852,6 +861,140 @@
         
         // Debugging tools will be added by cap-quote-builder.js
         console.log('💡 Debug tools will be available at: window.CAP_DEBUG');
+        
+        // Phase 2 Persistence Integration - v20250911
+        // This is READ ONLY - does not interfere with pricing calculations
+        console.log('🔄 Phase 2: Initializing quote persistence system...');
+        console.log('ℹ️  Note: Persistence system is READ ONLY and does not affect pricing calculations');
+        
+        // Initialize persistence system (READ ONLY - separate from calculations)
+        if (typeof QuotePersistence !== 'undefined' && typeof QuoteSession !== 'undefined') {
+            try {
+                // Initialize persistence
+                const persistence = new QuotePersistence({
+                    prefix: 'CAPEMB',
+                    autoSave: true,
+                    autoSaveInterval: 30000, // 30 seconds
+                    debug: true
+                });
+                
+                // Initialize session
+                const session = new QuoteSession({
+                    prefix: 'CAPEMB',
+                    persistence: persistence,
+                    debug: true
+                });
+                
+                // Function to collect form data (READ ONLY - doesn't affect calculations)
+                function collectFormDataForSave() {
+                    const data = {
+                        // Customer info
+                        customerName: document.getElementById('customer-name')?.value || '',
+                        customerEmail: document.getElementById('customer-email')?.value || '',
+                        customerPhone: document.getElementById('customer-phone')?.value || '',
+                        companyName: document.getElementById('company-name')?.value || '',
+                        projectName: document.getElementById('project-name')?.value || '',
+                        salesRep: document.getElementById('sales-rep')?.value || '',
+                        specialNotes: document.getElementById('special-notes')?.value || '',
+                        
+                        // Current selections (just saving state, not changing calculations)
+                        selectedSize: document.querySelector('input[name="cap-size"]:checked')?.value || '',
+                        
+                        // Products (if any are loaded)
+                        products: window.capEmbroideryQuoteBuilder?.products || [],
+                        
+                        // Timestamp
+                        lastModified: new Date().toISOString()
+                    };
+                    
+                    return data;
+                }
+                
+                // Function to restore form data (just fills in fields, calculations run normally)
+                function restoreFormDataFromSave(data) {
+                    console.log('📂 Restoring saved draft...');
+                    
+                    // Restore customer info
+                    if (data.customerName) document.getElementById('customer-name').value = data.customerName;
+                    if (data.customerEmail) document.getElementById('customer-email').value = data.customerEmail;
+                    if (data.customerPhone) document.getElementById('customer-phone').value = data.customerPhone;
+                    if (data.companyName) document.getElementById('company-name').value = data.companyName;
+                    if (data.projectName) document.getElementById('project-name').value = data.projectName;
+                    if (data.salesRep) document.getElementById('sales-rep').value = data.salesRep;
+                    if (data.specialNotes) document.getElementById('special-notes').value = data.specialNotes;
+                    
+                    // Restore selections (this will trigger normal calculation flow)
+                    if (data.selectedSize) {
+                        const sizeRadio = document.querySelector(`input[name="cap-size"][value="${data.selectedSize}"]`);
+                        if (sizeRadio) {
+                            sizeRadio.checked = true;
+                            sizeRadio.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                }
+                
+                // Function to show save indicator
+                function showSaveIndicator(message = 'Draft saved') {
+                    const indicator = document.getElementById('save-indicator');
+                    const status = document.getElementById('save-status');
+                    if (indicator && status) {
+                        status.textContent = message;
+                        indicator.classList.add('show');
+                        setTimeout(() => {
+                            indicator.classList.remove('show');
+                        }, 3000);
+                    }
+                }
+                
+                // Set up auto-save
+                persistence.onAutoSave = function() {
+                    const data = collectFormDataForSave();
+                    if (persistence.save(data)) {
+                        showSaveIndicator('Draft saved');
+                        console.log('💾 Auto-save completed');
+                    }
+                };
+                
+                // Mark as dirty when inputs change
+                document.querySelectorAll('#customer-name, #customer-email, #customer-phone, #company-name, #project-name, #sales-rep, #special-notes').forEach(input => {
+                    input.addEventListener('input', () => {
+                        persistence.markDirty();
+                    });
+                    input.addEventListener('change', () => {
+                        persistence.markDirty();
+                    });
+                });
+                
+                // Check for recovery on page load
+                setTimeout(() => {
+                    if (session.shouldShowRecovery()) {
+                        session.showRecoveryDialog(
+                            (draft) => {
+                                restoreFormDataFromSave(draft);
+                                showSaveIndicator('Draft restored');
+                            },
+                            () => {
+                                console.log('Starting fresh quote');
+                                showSaveIndicator('Starting new quote');
+                            }
+                        );
+                    }
+                }, 1000);
+                
+                // Store references for potential use elsewhere
+                window.quotePersistence = persistence;
+                window.quoteSession = session;
+                
+                console.log('✅ CAPEMB Persistence initialized (auto-save enabled)');
+                console.log('ℹ️ Your pricing calculations remain completely unchanged');
+                
+            } catch (error) {
+                console.warn('⚠️ Phase 2 persistence initialization failed:', error);
+                console.log('💡 Quote builder will continue to work normally');
+            }
+        } else {
+            console.warn('⚠️ Phase 2 persistence files not loaded - quote builder will work without persistence');
+        }
     </script>
 </body>
 </html>

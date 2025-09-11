@@ -30,6 +30,10 @@
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
     
+    <!-- Phase 2 Persistence - v20250911 -->
+    <script src="/shared_components/js/quote-persistence.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-session.js?v=20250911"></script>
+    
     <!-- Verify files are loading -->
     <script>
         console.log('🔍 Embroidery Quote Builder: Loading Phase 1 Infrastructure...');
@@ -55,6 +59,11 @@
             <div class="loading-spinner"></div>
             <div class="loading-text">Processing...</div>
         </div>
+    </div>
+    
+    <!-- Auto-Save Indicator -->
+    <div id="save-indicator" class="unsaved-indicator">
+        <span id="save-status">Draft saved</span>
     </div>
     
     <!-- Professional Header with Logo and Navigation -->
@@ -826,6 +835,109 @@
         console.log('💡 Debug helpers available:');
         console.log('  EMB_DEBUG.testLineItem() - Test saving a minimal line item');
         console.log('  EMB_DEBUG.getLastQuoteData() - Get the current quote pricing data');
+        
+        // Phase 2 Persistence Integration - v20250911
+        // This is READ ONLY - does not interfere with pricing calculations
+        console.log('🔄 Phase 2: Initializing quote persistence system...');
+        console.log('ℹ️  Note: Persistence system is READ ONLY and does not affect pricing calculations');
+        
+        // Initialize persistence system (READ ONLY - separate from calculations)
+        if (typeof QuotePersistence !== 'undefined' && typeof QuoteSession !== 'undefined') {
+            try {
+                // Create persistence instance with EMB prefix (correct syntax)
+                const persistence = new QuotePersistence({
+                    prefix: 'EMB',
+                    autoSave: true,
+                    autoSaveInterval: 30000,
+                    debug: true
+                });
+                
+                // Create session manager (READ ONLY)
+                const session = new QuoteSession({
+                    prefix: 'EMB',
+                    persistence: persistence,
+                    debug: true
+                });
+                
+                // Store globally if needed
+                window.quotePersistence = persistence;
+                window.quoteSession = session;
+                
+                // Function to collect form data (READ ONLY)
+                function collectFormDataForSave() {
+                    return {
+                        customerName: document.getElementById('customer-name')?.value || '',
+                        customerEmail: document.getElementById('customer-email')?.value || '',
+                        customerPhone: document.getElementById('customer-phone')?.value || '',
+                        companyName: document.getElementById('company-name')?.value || '',
+                        projectName: document.getElementById('project-name')?.value || '',
+                        salesRep: document.getElementById('sales-rep')?.value || '',
+                        specialNotes: document.getElementById('special-notes')?.value || '',
+                        lastModified: new Date().toISOString()
+                    };
+                }
+                
+                // Show save indicator
+                function showSaveIndicator(message = 'Draft saved') {
+                    const indicator = document.getElementById('save-indicator');
+                    const status = document.getElementById('save-status');
+                    if (indicator && status) {
+                        status.textContent = message;
+                        indicator.classList.add('show');
+                        setTimeout(() => {
+                            indicator.classList.remove('show');
+                        }, 3000);
+                    }
+                }
+                
+                // Set up auto-save
+                persistence.onAutoSave = function() {
+                    const data = collectFormDataForSave();
+                    if (persistence.save(data)) {
+                        showSaveIndicator('Draft saved');
+                        console.log('💾 Auto-save completed');
+                    }
+                };
+                
+                // Mark as dirty when inputs change
+                document.querySelectorAll('#customer-name, #customer-email, #customer-phone, #company-name, #project-name, #sales-rep, #special-notes').forEach(input => {
+                    input.addEventListener('input', () => persistence.markDirty());
+                    input.addEventListener('change', () => persistence.markDirty());
+                });
+                
+                // Check for recovery on page load
+                setTimeout(() => {
+                    if (session.shouldShowRecovery()) {
+                        session.showRecoveryDialog(
+                            (draft) => {
+                                // Restore customer info only
+                                if (draft.customerName) document.getElementById('customer-name').value = draft.customerName;
+                                if (draft.customerEmail) document.getElementById('customer-email').value = draft.customerEmail;
+                                if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
+                                if (draft.companyName) document.getElementById('company-name').value = draft.companyName;
+                                if (draft.projectName) document.getElementById('project-name').value = draft.projectName;
+                                if (draft.salesRep) document.getElementById('sales-rep').value = draft.salesRep;
+                                if (draft.specialNotes) document.getElementById('special-notes').value = draft.specialNotes;
+                                showSaveIndicator('Draft restored');
+                            },
+                            () => {
+                                console.log('Starting fresh quote');
+                                showSaveIndicator('Starting new quote');
+                            }
+                        );
+                    }
+                }, 1000);
+                
+                console.log('✅ Phase 2 persistence initialized successfully');
+                console.log('📝 Auto-saving customer info only (pricing calculations unchanged)');
+                
+            } catch (error) {
+                console.warn('⚠️ Phase 2 persistence initialization failed:', error);
+                console.log('💡 Quote builder will continue to work normally');
+            }
+        } else {
+            console.warn('⚠️ Phase 2 persistence files not loaded - quote builder will work without persistence');
+        }
     </script>
 </body>
 </html>

@@ -53,7 +53,14 @@
       "WebSearch",
       "WebFetch(domain:screenprintdirect.com)",
       "WebFetch(domain:www.printrenegades.com)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(for file in \"quote-builder-base.js\" \"quote-formatter.js\")",
+      "Bash(do echo \"Testing /shared_components/js/$file:\")",
+      "Bash(done)",
+      "Bash(for file in \"quote-builder-common.css\" \"quote-print.css\")",
+      "Bash(do echo \"Testing /shared_components/css/$file:\")",
+      "Bash(chmod:*)",
+      "Bash(/tmp/test-all-persistence.sh:*)"
     ],
     "deny": [],
     "ask": [],
