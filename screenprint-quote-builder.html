@@ -923,6 +923,11 @@
     <script src="/shared_components/js/quote-persistence.js?v=20250911"></script>
     <script src="/shared_components/js/quote-session.js?v=20250911"></script>
     
+    <!-- Phase 3 Advanced Features - v20250911 -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-phase3.css?v=20250911">
+    <script src="/shared_components/js/quote-validation.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-ui-feedback.js?v=20250911"></script>
+    
     <!-- Verify files are loading -->
     <script>
         console.log('🔍 Screen Print Quote Builder: Loading Phase 1 Infrastructure...');
@@ -2785,6 +2790,27 @@ This quote is valid for 30 days.`;
                 persistence: persistence,
                 debug: true
             });
+            
+            // Phase 3: Initialize validation and UI feedback
+            console.log('🚀 Phase 3: Initializing advanced features...');
+            
+            // Initialize validation system
+            const validation = new QuoteValidation({
+                requiredFields: ['customer-name', 'customer-email', 'sales-rep'],
+                autoFormat: true,
+                realTimeValidation: true
+            });
+            
+            // Initialize UI feedback system
+            const uiFeedback = new QuoteUIFeedback({
+                toastDuration: 3000,
+                toastPosition: 'bottom-right',
+                loadingText: 'Processing...'
+            });
+            
+            // Make UI feedback globally available
+            window.validation = validation;
+            window.uiFeedback = uiFeedback;
             
             // Function to collect form data (READ ONLY - doesn't affect calculations)
             function collectFormDataForSave() {

@@ -60,7 +60,9 @@
       "Bash(for file in \"quote-builder-common.css\" \"quote-print.css\")",
       "Bash(do echo \"Testing /shared_components/css/$file:\")",
       "Bash(chmod:*)",
-      "Bash(/tmp/test-all-persistence.sh:*)"
+      "Bash(/tmp/test-all-persistence.sh:*)",
+      "Bash(/tmp/test-phase3-features.sh:*)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": [],
