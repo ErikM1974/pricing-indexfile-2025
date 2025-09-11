@@ -264,6 +264,22 @@ app.get('/test-catalog-layout.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'test-catalog-layout.html'));
 });
 
+// Phase 1 Infrastructure Test Pages
+app.get('/test-phase1-infrastructure.html', (req, res) => {
+  console.log('Serving test-phase1-infrastructure.html page');
+  res.sendFile(path.join(__dirname, 'test-phase1-infrastructure.html'));
+});
+
+app.get('/test-phase1-verification.html', (req, res) => {
+  console.log('Serving test-phase1-verification.html page');
+  res.sendFile(path.join(__dirname, 'test-phase1-verification.html'));
+});
+
+app.get('/test-screenprint-sizes.html', (req, res) => {
+  console.log('Serving test-screenprint-sizes.html page');
+  res.sendFile(path.join(__dirname, 'test-screenprint-sizes.html'));
+});
+
 // Also serve the new JS files explicitly if needed
 app.get('/app-new.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'app-new.js'));

@@ -1,0 +1,464 @@
+/**
+ * Quote Print Stylesheet
+ * Professional print formatting for NWCA quotes
+ * Hides UI elements and formats for clean PDF/print output
+ */
+
+@media print {
+    /* ============================================
+       PAGE SETUP
+       ============================================ */
+    
+    @page {
+        size: letter;
+        margin: 0.5in;
+    }
+    
+    /* Reset all elements */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* ============================================
+       HIDE NON-PRINT ELEMENTS
+       ============================================ */
+    
+    /* Hide all elements by default */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Show only quote container and its contents */
+    .quote-container,
+    .quote-container * {
+        visibility: visible;
+    }
+    
+    .quote-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    
+    /* Explicitly hide UI elements */
+    .btn,
+    .button,
+    button,
+    .modal,
+    .modal-backdrop,
+    .navigation,
+    .nav,
+    .navbar,
+    .header-nav,
+    .footer,
+    .sidebar,
+    .no-print,
+    .form-section,
+    .product-search,
+    .add-product,
+    .remove-btn,
+    .edit-btn,
+    .delete-btn,
+    .action-buttons,
+    .toast-container,
+    .loading-overlay,
+    .unsaved-indicator,
+    .progress-steps,
+    .breadcrumb,
+    .skip-to-content,
+    input[type="submit"],
+    input[type="button"],
+    select,
+    textarea,
+    .form-control,
+    .form-check,
+    .alert,
+    .badge {
+        display: none !important;
+    }
+    
+    /* ============================================
+       BASIC STYLES
+       ============================================ */
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 12pt;
+        line-height: 1.6;
+        color: #000;
+        background: white;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    /* ============================================
+       HEADER STYLES
+       ============================================ */
+    
+    .quote-header {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 3px solid #003f7f !important;
+        padding-bottom: 15pt;
+        margin-bottom: 20pt;
+    }
+    
+    .company-logo {
+        max-width: 180pt;
+        height: auto;
+        display: block !important;
+    }
+    
+    .company-info {
+        text-align: right;
+        flex: 1;
+        margin-left: 20pt;
+    }
+    
+    .company-info h1 {
+        color: #003f7f !important;
+        font-size: 24pt;
+        margin: 0 0 5pt 0;
+        font-weight: bold;
+    }
+    
+    .company-info p {
+        margin: 2pt 0;
+        font-size: 11pt;
+        color: #333 !important;
+    }
+    
+    .company-info .tagline {
+        font-style: italic;
+        color: #666 !important;
+    }
+    
+    /* ============================================
+       QUOTE META INFORMATION
+       ============================================ */
+    
+    .quote-meta {
+        display: flex !important;
+        justify-content: space-between;
+        margin-bottom: 20pt;
+        gap: 20pt;
+    }
+    
+    .quote-number {
+        flex: 1;
+    }
+    
+    .quote-number h2 {
+        color: #003f7f !important;
+        font-size: 18pt;
+        margin: 0 0 8pt 0;
+        font-weight: bold;
+    }
+    
+    .quote-number p {
+        font-size: 11pt;
+        color: #333 !important;
+        margin: 3pt 0;
+    }
+    
+    .customer-info {
+        flex: 1;
+        background: #f8f9fa !important;
+        padding: 12pt;
+        border: 1px solid #dee2e6;
+        border-radius: 4pt;
+    }
+    
+    .customer-info h3 {
+        color: #003f7f !important;
+        font-size: 12pt;
+        margin: 0 0 8pt 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        font-weight: bold;
+    }
+    
+    .customer-info p {
+        font-size: 11pt;
+        margin: 4pt 0;
+        color: #000 !important;
+    }
+    
+    .customer-info strong {
+        font-weight: bold;
+    }
+    
+    /* ============================================
+       QUOTE ITEMS TABLE
+       ============================================ */
+    
+    .quote-items {
+        margin: 20pt 0;
+    }
+    
+    .quote-items h3 {
+        color: #003f7f !important;
+        font-size: 14pt;
+        margin: 0 0 10pt 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        font-weight: bold;
+    }
+    
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15pt 0;
+        page-break-inside: avoid;
+    }
+    
+    .items-table thead {
+        display: table-header-group;
+    }
+    
+    .items-table th {
+        background: #003f7f !important;
+        color: white !important;
+        padding: 8pt;
+        text-align: left;
+        font-size: 11pt;
+        font-weight: bold;
+        border: 1px solid #003f7f;
+    }
+    
+    .items-table th:last-child,
+    .items-table td:last-child {
+        text-align: right;
+    }
+    
+    .items-table td {
+        padding: 8pt;
+        border: 1px solid #dee2e6;
+        font-size: 10pt;
+        color: #000 !important;
+        vertical-align: top;
+    }
+    
+    .items-table tbody tr {
+        page-break-inside: avoid;
+    }
+    
+    .items-table tbody tr:nth-child(even) {
+        background: #f8f9fa !important;
+    }
+    
+    /* Item details styling */
+    .item-details strong {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 2pt;
+        color: #000 !important;
+    }
+    
+    .item-details small {
+        display: block;
+        font-size: 9pt;
+        color: #666 !important;
+        margin: 1pt 0;
+    }
+    
+    /* ============================================
+       TOTALS SECTION
+       ============================================ */
+    
+    .items-table tfoot {
+        display: table-footer-group;
+    }
+    
+    .items-table tfoot td {
+        font-weight: bold;
+        padding: 8pt;
+        border: 1px solid #003f7f;
+        background: white;
+    }
+    
+    .subtotal-row td {
+        padding-top: 12pt !important;
+        border-top: 2px solid #003f7f !important;
+    }
+    
+    .grand-total td {
+        font-size: 14pt !important;
+        color: #003f7f !important;
+        padding: 10pt !important;
+        background: #f8f9fa !important;
+        border: 2px solid #003f7f !important;
+        font-weight: bold;
+    }
+    
+    /* ============================================
+       FOOTER SECTION
+       ============================================ */
+    
+    .quote-footer {
+        margin-top: 30pt;
+        padding-top: 15pt;
+        border-top: 1px solid #dee2e6;
+        page-break-inside: avoid;
+    }
+    
+    .footer-grid {
+        display: flex !important;
+        justify-content: space-between;
+        margin-bottom: 15pt;
+        gap: 15pt;
+    }
+    
+    .footer-section {
+        flex: 1;
+    }
+    
+    .footer-section h4 {
+        color: #003f7f !important;
+        font-size: 11pt;
+        margin: 0 0 6pt 0;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    
+    .footer-section p {
+        font-size: 10pt;
+        color: #333 !important;
+        margin: 2pt 0;
+    }
+    
+    /* Terms box */
+    .terms {
+        background: #fff3cd !important;
+        border: 1px solid #ffc107 !important;
+        padding: 10pt;
+        border-radius: 4pt;
+        margin: 15pt 0;
+        page-break-inside: avoid;
+    }
+    
+    .terms h4 {
+        color: #856404 !important;
+        font-size: 11pt;
+        margin: 0 0 6pt 0;
+        font-weight: bold;
+    }
+    
+    .terms p,
+    .terms li {
+        font-size: 9pt;
+        color: #856404 !important;
+        margin: 3pt 0;
+    }
+    
+    .terms ul {
+        margin: 0;
+        padding-left: 15pt;
+    }
+    
+    /* Thank you message */
+    .thank-you {
+        text-align: center;
+        font-size: 14pt;
+        font-weight: bold;
+        color: #003f7f !important;
+        margin: 20pt 0 10pt;
+    }
+    
+    /* Footer copyright */
+    .footer-logo {
+        text-align: center;
+        margin-top: 15pt;
+        padding-top: 10pt;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .footer-logo small {
+        font-size: 9pt;
+        color: #666 !important;
+    }
+    
+    /* ============================================
+       PAGE BREAK CONTROL
+       ============================================ */
+    
+    /* Avoid breaking inside these elements */
+    .customer-info,
+    .quote-meta,
+    .items-table,
+    .quote-footer,
+    .terms {
+        page-break-inside: avoid;
+    }
+    
+    /* Force page break before footer if needed */
+    .quote-footer {
+        page-break-before: auto;
+    }
+    
+    /* Keep table rows together */
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    /* Keep headers with content */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+    }
+    
+    /* ============================================
+       SPECIAL PRINT ADJUSTMENTS
+       ============================================ */
+    
+    /* Ensure backgrounds print */
+    * {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+    
+    /* Links as plain text */
+    a {
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    
+    /* Remove link URLs */
+    a[href]:after {
+        content: none !important;
+    }
+    
+    /* Ensure images print */
+    img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Print only classes */
+    .print-only {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* High quality text */
+    body {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    /* ============================================
+       FALLBACK FOR BROWSERS
+       ============================================ */
+    
+    /* For browsers that don't support print-color-adjust */
+    .quote-header,
+    .items-table th,
+    .grand-total td {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}

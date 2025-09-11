@@ -905,8 +905,39 @@
             background: #3d8b44;
         }
     </style>
+    
+    <!-- Phase 1 Infrastructure - v20250911 -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
+    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
+    <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
+    
+    <!-- Verify files are loading -->
+    <script>
+        console.log('🔍 Screen Print Quote Builder: Loading Phase 1 Infrastructure...');
+        window.addEventListener('load', function() {
+            if (typeof QuoteBuilderBase === 'undefined') {
+                console.error('❌ ERROR: quote-builder-base.js failed to load!');
+                alert('Critical files failed to load. Please clear cache (Ctrl+Shift+F5) and refresh.');
+            } else {
+                console.log('✅ QuoteBuilderBase loaded successfully');
+            }
+            if (typeof QuoteFormatter === 'undefined') {
+                console.error('❌ ERROR: quote-formatter.js failed to load!');
+            } else {
+                console.log('✅ QuoteFormatter loaded successfully');
+            }
+        });
+    </script>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing...</div>
+        </div>
+    </div>
     <!-- Professional Header with Logo and Navigation -->
     <header class="embroidery-header">
         <!-- Contact Bar -->
@@ -1270,16 +1301,15 @@
                     <div class="form-group">
                         <label for="sales-rep">Sales Representative *</label>
                         <select id="sales-rep" class="form-control" required>
-                            <option value="">Select Sales Rep...</option>
                             <option value="sales@nwcustomapparel.com" selected>General Sales</option>
-                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
-                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
                             <option value="adriyella@nwcustomapparel.com">Adriyella</option>
                             <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
                             <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
                             <option value="art@nwcustomapparel.com">Steve Deland</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                         </select>
                     </div>
                 </div>
@@ -1323,13 +1353,19 @@
                 <p id="modal-message">Quote has been saved to the database.</p>
             </div>
             <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Close
+                </button>
                 <button onclick="printQuote()" class="btn btn-secondary">
                     <i class="fas fa-print"></i> Print
                 </button>
-                <button onclick="copyQuoteToClipboard()" class="btn btn-secondary">
+                <button onclick="copyQuote()" class="btn btn-secondary">
                     <i class="fas fa-copy"></i> Copy
                 </button>
-                <button onclick="startNewQuote()" class="btn btn-primary">
+                <button onclick="emailQuote()" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i> Email
+                </button>
+                <button onclick="newQuote()" class="btn btn-primary">
                     <i class="fas fa-plus"></i> New Quote
                 </button>
             </div>
@@ -2188,14 +2224,14 @@
         getSalesRepName(email) {
             const reps = {
                 'sales@nwcustomapparel.com': 'General Sales',
-                'ruth@nwcustomapparel.com': 'Ruth Nhong',
-                'taylar@nwcustomapparel.com': 'Taylar Hanson',
-                'nika@nwcustomapparel.com': 'Nika Lao',
-                'erik@nwcustomapparel.com': 'Erik Mickelson',
                 'adriyella@nwcustomapparel.com': 'Adriyella',
                 'bradley@nwcustomapparel.com': 'Bradley Wright',
+                'erik@nwcustomapparel.com': 'Erik Mickelson',
                 'jim@nwcustomapparel.com': 'Jim Mickelson',
-                'art@nwcustomapparel.com': 'Steve Deland'
+                'nika@nwcustomapparel.com': 'Nika Lao',
+                'ruth@nwcustomapparel.com': 'Ruth Nhong',
+                'art@nwcustomapparel.com': 'Steve Deland',
+                'taneisha@nwcustomapparel.com': 'Taneisha Clark'
             };
             return reps[email] || 'Sales Team';
         }
@@ -2297,12 +2333,323 @@
     // Initialize the application
     const screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
     
-    // Global functions for buttons
+    // Initialize Phase 1 Infrastructure
+    let quoteBuilderBase;
+    let quoteFormatter;
+    
+    // Initialize base classes with inline fallback when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Screen Print Quote Builder Phase 1 initializing...');
+        
+        // Check if external files loaded, provide fallback if not
+        if (typeof QuoteBuilderBase === 'undefined') {
+            console.warn('⚠️ External QuoteBuilderBase not loaded, creating inline fallback');
+            
+            // Inline fallback for QuoteBuilderBase
+            window.QuoteBuilderBase = class {
+                constructor(config) {
+                    this.config = config;
+                    console.log('✅ Fallback QuoteBuilderBase initialized');
+                }
+                showSuccess(msg) { 
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
+                    toast.textContent = msg;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }
+                showError(msg) { 
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#dc3545;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
+                    toast.textContent = msg;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }
+                showInfo(msg) { 
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#17a2b8;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
+                    toast.textContent = msg;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }
+                showLoading(show, msg) { 
+                    let overlay = document.getElementById('loading-overlay-fallback');
+                    if (show) {
+                        if (!overlay) {
+                            overlay = document.createElement('div');
+                            overlay.id = 'loading-overlay-fallback';
+                            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999';
+                            overlay.innerHTML = '<div style="background:white;padding:20px;border-radius:5px"><div>' + (msg || 'Loading...') + '</div></div>';
+                            document.body.appendChild(overlay);
+                        }
+                    } else if (overlay) {
+                        overlay.remove();
+                    }
+                }
+                markDirty() { /* Auto-save tracking */ }
+                validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+                debounce(func, wait) { 
+                    let timeout;
+                    return function(...args) {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(this, args), wait);
+                    };
+                }
+            };
+        } else {
+            console.log('✅ External QuoteBuilderBase loaded successfully');
+        }
+        
+        if (typeof QuoteFormatter === 'undefined') {
+            console.warn('⚠️ External QuoteFormatter not loaded, creating inline fallback');
+            
+            // Inline fallback for QuoteFormatter
+            window.QuoteFormatter = class {
+                constructor() {
+                    console.log('✅ Fallback QuoteFormatter initialized');
+                }
+                openPrintDialog(data) {
+                    const printWindow = window.open('', '_blank', 'width=800,height=600');
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Quote ${data.quoteId}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; padding: 20px; }
+                                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #003f7f; padding-bottom: 20px; }
+                                .logo { color: #003f7f; font-size: 24px; font-weight: bold; }
+                                .info-row { display: flex; justify-content: space-between; margin: 10px 0; }
+                                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                                th { background: #003f7f; color: white; padding: 10px; text-align: left; }
+                                td { padding: 10px; border-bottom: 1px solid #ddd; }
+                                .total-row { font-weight: bold; font-size: 18px; text-align: right; margin-top: 20px; }
+                                @media print { button { display: none; } }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="header">
+                                <div class="logo">NORTHWEST CUSTOM APPAREL</div>
+                                <div>Since 1977 | 253-922-5793 | sales@nwcustomapparel.com</div>
+                                <h2 style="color: #003f7f;">Quote #${data.quoteId}</h2>
+                            </div>
+                            <div class="info-row">
+                                <div><strong>Customer:</strong> ${data.customerName}</div>
+                                <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+                            </div>
+                            <div class="info-row">
+                                <div><strong>Company:</strong> ${data.companyName || 'N/A'}</div>
+                                <div><strong>Project:</strong> ${data.projectName || 'N/A'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div><strong>Email:</strong> ${data.customerEmail}</div>
+                                <div><strong>Phone:</strong> ${data.customerPhone}</div>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Description</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${(data.items || []).map(item => `
+                                        <tr>
+                                            <td>${item.style ? item.style + ' - ' : ''}${item.description || item.name || 'Item'}</td>
+                                            <td>${item.quantity}</td>
+                                            <td>$${(item.unitPrice || 0).toFixed(2)}</td>
+                                            <td>$${(item.total || 0).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <div class="total-row">
+                                TOTAL: $${(data.grandTotal || 0).toFixed(2)}
+                            </div>
+                            <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#003f7f;color:white;border:none;border-radius:5px;cursor:pointer">Print Quote</button>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                }
+                async copyToClipboard(data) {
+                    const text = [
+                        `NORTHWEST CUSTOM APPAREL - QUOTE #${data.quoteId}`,
+                        `Date: ${new Date().toLocaleDateString()}`,
+                        '',
+                        `Customer: ${data.customerName}`,
+                        `Company: ${data.companyName || 'N/A'}`,
+                        `Email: ${data.customerEmail}`,
+                        `Phone: ${data.customerPhone}`,
+                        `Project: ${data.projectName || 'N/A'}`,
+                        '',
+                        'QUOTE DETAILS:',
+                        '----------------------------',
+                        ...(data.items || []).map(item => 
+                            `${item.style ? item.style + ' - ' : ''}${item.description || item.name}: ${item.quantity} units @ $${(item.unitPrice || 0).toFixed(2)} = $${(item.total || 0).toFixed(2)}`
+                        ),
+                        '----------------------------',
+                        `TOTAL: $${(data.grandTotal || 0).toFixed(2)}`,
+                        '',
+                        'Thank you for your business!',
+                        'Northwest Custom Apparel | 253-922-5793'
+                    ].join('\n');
+                    
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {
+                        console.error('Copy failed:', e);
+                        // Fallback method
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        const success = document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        return success;
+                    }
+                }
+                openEmailClient(data) {
+                    const subject = `Quote #${data.quoteId} - Northwest Custom Apparel`;
+                    const body = [
+                        `Dear ${data.customerName},`,
+                        '',
+                        `Thank you for your interest in Northwest Custom Apparel. Please find your quote details below:`,
+                        '',
+                        `Quote ID: ${data.quoteId}`,
+                        `Total: $${(data.grandTotal || 0).toFixed(2)}`,
+                        '',
+                        'Quote Details:',
+                        ...(data.items || []).map(item => 
+                            `• ${item.style ? item.style + ' - ' : ''}${item.description || item.name}: ${item.quantity} units @ $${(item.unitPrice || 0).toFixed(2)}`
+                        ),
+                        '',
+                        'This quote is valid for 30 days. Please contact us at 253-922-5793 with any questions.',
+                        '',
+                        'Best regards,',
+                        'Northwest Custom Apparel Team',
+                        'sales@nwcustomapparel.com',
+                        '253-922-5793'
+                    ].join('\n');
+                    
+                    window.location.href = `mailto:${data.customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                }
+            };
+        } else {
+            console.log('✅ External QuoteFormatter loaded successfully');
+        }
+        
+        // Initialize with either real or fallback classes
+        quoteBuilderBase = new QuoteBuilderBase({
+            prefix: 'SP',
+            autoSaveInterval: 30000
+        });
+        
+        // Initialize formatter
+        quoteFormatter = new QuoteFormatter();
+        
+        // Add input event listeners for auto-save
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => quoteBuilderBase.markDirty());
+            input.addEventListener('input', quoteBuilderBase.debounce(() => quoteBuilderBase.markDirty(), 500));
+        });
+        
+        // Add phone formatting
+        document.getElementById('customer-phone')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
+            } else if (value.length >= 3) {
+                value = `(${value.slice(0,3)}) ${value.slice(3)}`;
+            }
+            e.target.value = value;
+            
+            if (value.replace(/\D/g, '').length === 10) {
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            } else if (value.length > 0) {
+                e.target.classList.add('is-invalid');
+                e.target.classList.remove('is-valid');
+            }
+        });
+        
+        // Add email validation
+        document.getElementById('customer-email')?.addEventListener('blur', function(e) {
+            const email = e.target.value;
+            const isValid = quoteBuilderBase.validateEmail(email);
+            
+            if (isValid) {
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            } else if (email.length > 0) {
+                e.target.classList.add('is-invalid');
+                e.target.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Global functions for buttons - Updated with Phase 1 features
     function printQuote() {
-        if (!screenPrintQuoteBuilder.lastQuoteData) return;
-        window.print();
+        if (!screenPrintQuoteBuilder.lastQuoteData) {
+            quoteBuilderBase?.showError('No quote data available');
+            return;
+        }
+        // Use formatter for professional print
+        if (quoteFormatter) {
+            quoteFormatter.openPrintDialog(screenPrintQuoteBuilder.lastQuoteData);
+        } else {
+            window.print(); // Fallback
+        }
     }
     
+    function copyQuote() {
+        if (!screenPrintQuoteBuilder.lastQuoteData) {
+            quoteBuilderBase?.showError('No quote data available');
+            return;
+        }
+        
+        if (quoteFormatter) {
+            quoteFormatter.copyToClipboard(screenPrintQuoteBuilder.lastQuoteData).then(success => {
+                if (success) {
+                    quoteBuilderBase.showSuccess('Quote copied to clipboard!');
+                } else {
+                    quoteBuilderBase.showError('Failed to copy quote');
+                }
+            });
+        } else {
+            // Fall back to existing copyQuoteToClipboard
+            copyQuoteToClipboard();
+        }
+    }
+    
+    function emailQuote() {
+        if (!screenPrintQuoteBuilder.lastQuoteData) {
+            quoteBuilderBase?.showError('No quote data available');
+            return;
+        }
+        if (quoteFormatter) {
+            quoteFormatter.openEmailClient(screenPrintQuoteBuilder.lastQuoteData);
+        } else {
+            quoteBuilderBase?.showError('Email function not available');
+        }
+    }
+    
+    function newQuote() {
+        if (confirm('Start a new quote? Any unsaved changes will be lost.')) {
+            localStorage.removeItem('SP_draft');
+            location.reload();
+        }
+    }
+    
+    function closeModal() {
+        document.getElementById('success-modal').style.display = 'none';
+    }
+    
+    // Keep existing copyQuoteToClipboard for backward compatibility
     function copyQuoteToClipboard() {
         if (!screenPrintQuoteBuilder.lastQuoteData) return;
         
