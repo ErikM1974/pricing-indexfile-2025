@@ -32,6 +32,105 @@ body {
     line-height: 1.6;
 }
 
+/* Fitted Size Display Styles */
+.size-group-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fitted-sizes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.size-input-group.fitted {
+    background: #f9fafb;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.size-input-group.fitted:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.size-input-group.fitted .size-label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.size-input-group.fitted .size-label strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.size-input-group.fitted .size-label small {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: normal;
+}
+
+.size-input-group.fitted .size-qty-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.size-input-group.fitted .size-qty-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+}
+
+/* Upcharge Badge Styles */
+.upcharge-badge {
+    display: inline-block;
+    background: var(--warning-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.size-input-group.has-upcharge {
+    border-color: var(--warning-color);
+    background: #fef3c7;
+}
+
+.size-input-group.fitted.has-upcharge {
+    border-color: var(--warning-color);
+    background: linear-gradient(135deg, #fef3c7 0%, #f9fafb 100%);
+}
+
+.size-input-group.has-upcharge .size-qty-input {
+    border-color: #fbbf24;
+}
+
+.size-input-group.has-upcharge .size-qty-input:focus {
+    border-color: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;

@@ -294,6 +294,34 @@ class CapProductLineManager {
     }
     
     /**
+     * Check if a cap style is likely fitted based on style number or title
+     */
+    isLikelyFitted(styleNumber, title = '') {
+        const fittedPatterns = [
+            'PTS20', 'PTS30', 'PTS40',  // Richardson fitted styles
+            '110', '115',                // Richardson flex-fit models
+            'FITTED', 'FLEXFIT', 'R-FLEX', 'FLEX FIT',
+            'S/M', 'M/L', 'L/XL'
+        ];
+        
+        const searchText = `${styleNumber} ${title}`.toUpperCase();
+        return fittedPatterns.some(pattern => searchText.includes(pattern));
+    }
+    
+    /**
+     * Get default sizes based on cap type
+     */
+    getDefaultSizes(styleNumber, title = '') {
+        if (this.isLikelyFitted(styleNumber, title)) {
+            // Common fitted cap sizes
+            return ['S/M', 'M/L', 'L/XL', 'XL/2XL'];
+        } else {
+            // Standard one-size-fits-all
+            return ['OSFA'];
+        }
+    }
+    
+    /**
      * Load complete product with sizes
      */
     async loadProduct() {
@@ -310,6 +338,7 @@ class CapProductLineManager {
         const catalogColor = selectedOption.getAttribute('data-catalog') || color;
         
         const styleNumber = this.currentProduct.style;
+        const title = this.currentProduct.title || '';
         
         console.log('[CapProductLineManager] Loading sizes for:', styleNumber, color);
         console.log('[CapProductLineManager] Using catalog color for API:', catalogColor);
@@ -324,9 +353,9 @@ class CapProductLineManager {
             
             if (!sizesResponse.ok) {
                 console.warn(`[CapProductLineManager] Sizes API failed for catalog color: ${catalogColor} (${sizesResponse.status})`);
-                // Use default cap sizes as fallback - caps are typically One Size Fits All
+                // Use appropriate default sizes based on cap type
                 console.log('[CapProductLineManager] Using default cap sizes as fallback');
-                sizesArray = ['OSFA']; // One Size Fits All is standard for most caps
+                sizesArray = this.getDefaultSizes(styleNumber, title);
             } else {
                 const sizesData = await sizesResponse.json();
                 console.log('[CapProductLineManager] Sizes data:', sizesData);
@@ -335,12 +364,12 @@ class CapProductLineManager {
                 sizesArray = sizesData.data || sizesData.sizes || sizesData;
                 if (!Array.isArray(sizesArray)) {
                     console.warn('[CapProductLineManager] Invalid sizes data format, using default');
-                    sizesArray = ['OSFA'];
+                    sizesArray = this.getDefaultSizes(styleNumber, title);
                 }
                 
                 if (sizesArray.length === 0) {
                     console.warn('[CapProductLineManager] No sizes available, using default');
-                    sizesArray = ['OSFA'];
+                    sizesArray = this.getDefaultSizes(styleNumber, title);
                 }
             }
             
@@ -378,7 +407,7 @@ class CapProductLineManager {
     /**
      * Display loaded product
      */
-    displayProduct() {
+    async displayProduct() {
         console.log('[CapProductLineManager] Displaying product:', this.currentProduct);
         
         const display = document.getElementById('product-display');
@@ -408,32 +437,104 @@ class CapProductLineManager {
             productDescription.textContent = `${this.currentProduct.brand} | ${this.currentProduct.color}`;
         }
         
-        // Create size inputs
-        this.createSizeInputs();
+        // Create size inputs (now async to fetch upcharges)
+        await this.createSizeInputs();
         
         display.style.display = 'block';
         this.updateProductTotal();
     }
     
     /**
+     * Get size description for display
+     */
+    getSizeDescription(size) {
+        const sizeDescriptions = {
+            'S/M': 'Small/Medium (6½"-7")',
+            'M/L': 'Medium/Large (7"-7¼")',
+            'L/XL': 'Large/X-Large (7¼"-7½")',
+            'XL/2XL': 'X-Large/2X-Large (7½"-8")',
+            'OSFA': 'One Size Fits All',
+            'SM': 'Small',
+            'MD': 'Medium', 
+            'LG': 'Large',
+            'XL': 'X-Large',
+            '2XL': '2X-Large',
+            '3XL': '3X-Large'
+        };
+        
+        return sizeDescriptions[size] || size;
+    }
+    
+    /**
      * Create size input controls
      */
-    createSizeInputs() {
+    async createSizeInputs() {
         const sizeInputsDiv = document.getElementById('size-inputs');
         if (!sizeInputsDiv || !this.availableSizes.length) return;
         
-        sizeInputsDiv.innerHTML = this.availableSizes.map(size => `
-            <div class="size-input-group">
-                <label>${size}</label>
-                <input type="number" 
-                       class="size-qty-input" 
-                       data-size="${size}" 
-                       min="0" 
-                       value="0">
-            </div>
-        `).join('');
+        // Get size upcharges for this style
+        let sizeUpcharges = {};
+        try {
+            sizeUpcharges = await this.getSizeUpcharges(this.currentProduct.style);
+        } catch (error) {
+            console.log('[CapProductLineManager] Could not fetch size upcharges:', error);
+        }
+        
+        // Check if these are fitted sizes
+        const isFitted = this.availableSizes.some(size => 
+            size.includes('/') || ['S/M', 'M/L', 'L/XL'].includes(size)
+        );
+        
+        // Create grouped layout for fitted caps
+        if (isFitted) {
+            sizeInputsDiv.innerHTML = `
+                <div class="size-group-header">
+                    <i class="fas fa-ruler"></i> Fitted Cap Sizes
+                </div>
+                <div class="fitted-sizes-grid">
+                    ${this.availableSizes.map(size => {
+                        const upcharge = sizeUpcharges[size];
+                        const hasUpcharge = upcharge && upcharge > 0;
+                        return `
+                        <div class="size-input-group fitted ${hasUpcharge ? 'has-upcharge' : ''}">
+                            <label class="size-label">
+                                <strong>${size}</strong>
+                                <small>${this.getSizeDescription(size)}</small>
+                                ${hasUpcharge ? `<span class="upcharge-badge">+$${upcharge.toFixed(2)}</span>` : ''}
+                            </label>
+                            <input type="number" 
+                                   class="size-qty-input" 
+                                   data-size="${size}" 
+                                   min="0" 
+                                   value="0"
+                                   placeholder="Qty">
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+        } else {
+            // Standard layout for OSFA or simple sizes
+            sizeInputsDiv.innerHTML = this.availableSizes.map(size => {
+                const upcharge = sizeUpcharges[size];
+                const hasUpcharge = upcharge && upcharge > 0;
+                return `
+                <div class="size-input-group ${hasUpcharge ? 'has-upcharge' : ''}">
+                    <label>
+                        ${this.getSizeDescription(size)}
+                        ${hasUpcharge ? `<span class="upcharge-badge">+$${upcharge.toFixed(2)}</span>` : ''}
+                    </label>
+                    <input type="number" 
+                           class="size-qty-input" 
+                           data-size="${size}" 
+                           min="0" 
+                           value="0"
+                           placeholder="Quantity">
+                </div>
+            `}).join('');
+        }
         
         console.log('[CapProductLineManager] Size inputs created for:', this.availableSizes);
+        console.log('[CapProductLineManager] Size upcharges:', sizeUpcharges);
     }
     
     /**
