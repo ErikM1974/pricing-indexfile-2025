@@ -62,7 +62,10 @@
       "Bash(chmod:*)",
       "Bash(/tmp/test-all-persistence.sh:*)",
       "Bash(/tmp/test-phase3-features.sh:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "WebFetch(domain:cdnjs.cloudflare.com)",
+      "WebFetch(domain:fontawesome.com)",
+      "WebFetch(domain:cdnjs.com)"
     ],
     "deny": [],
     "ask": [],
