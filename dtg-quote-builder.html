@@ -8,8 +8,24 @@
     <!-- NWCA Favicon -->
     <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome - Simplified without integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- Force Font Awesome font-family -->
+    <style>
+    .fas, .far, .fab, .fa {
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
+        font-weight: 900 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-rendering: auto !important;
+        -webkit-font-smoothing: antialiased !important;
+    }
+    .fas::before, .far::before, .fab::before, .fa::before {
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
+        font-weight: 900 !important;
+    }
+    </style>
     
     <!-- Bootstrap CSS FIRST (foundation layer) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,8 +40,12 @@
     <!-- Base Quote Builder Styles (DTG inherits from embroidery) -->
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
     
-    <!-- DTG Specific Overrides (highest priority) -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css?v=20250908">
+    <!-- Unified Step 1 Styles -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css">
+    
+    <!-- DTG Specific Overrides (highest priority - must load AFTER unified CSS) -->
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css?v=20250911">
     
     <!-- Phase 1 Infrastructure - v20250911 -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -45,6 +65,39 @@
     <!-- Verify files are loading -->
     <script>
         console.log('🔍 DTG Quote Builder: Loading Phase 1 Infrastructure...');
+        
+        // Debug Font Awesome loading
+        window.addEventListener('load', function() {
+            // Check if Font Awesome CSS is loaded
+            const faStylesheet = document.querySelector('link[href*="font-awesome"]');
+            console.log('Font Awesome stylesheet found:', faStylesheet);
+            
+            // Test if fonts are actually loaded
+            const testElement = document.createElement('i');
+            testElement.className = 'fas fa-check';
+            testElement.style.fontFamily = '"Font Awesome 6 Free"';
+            document.body.appendChild(testElement);
+            const computedStyle = window.getComputedStyle(testElement);
+            console.log('Font family applied:', computedStyle.fontFamily);
+            console.log('Font weight:', computedStyle.fontWeight);
+            document.body.removeChild(testElement);
+            
+            // Check for any Font Awesome load errors
+            document.fonts.ready.then(() => {
+                console.log('Total fonts loaded:', document.fonts.size);
+                let faFound = false;
+                document.fonts.forEach(font => {
+                    if (font.family.includes('Awesome')) {
+                        console.log('Font Awesome loaded:', font.family, font.status);
+                        faFound = true;
+                    }
+                });
+                if (!faFound) {
+                    console.error('❌ Font Awesome fonts NOT loaded! Check network/CDN.');
+                }
+            });
+        });
+        
         window.addEventListener('load', function() {
             if (typeof QuoteBuilderBase === 'undefined') {
                 console.error('❌ ERROR: quote-builder-base.js failed to load!');
@@ -142,9 +195,7 @@
 
     <!-- Main Container -->
     <div class="container dtg-quote-builder">
-        <h1 class="page-title">
-            <i class="fas fa-print"></i> DTG Quote Builder
-        </h1>
+        <h1 class="page-title">DTG Quote Builder</h1>
         <p class="page-description">
             Create professional DTG printing quotes with multiple products and automatic tier pricing
         </p>
@@ -153,7 +204,7 @@
         <div class="phase-nav">
             <div class="phase-step active" id="phase-1-nav">
                 <div class="phase-step-number">1</div>
-                <div class="phase-step-label">Select Location</div>
+                <div class="phase-step-label">Setup</div>
             </div>
             <div class="phase-connector" id="connector-1"></div>
             <div class="phase-step" id="phase-2-nav">
@@ -170,18 +221,21 @@
         <!-- Phase 1: Location Selection -->
         <section id="location-phase" class="phase-section active">
             <div class="phase-header">
-                <h2><span class="phase-number">1</span> Select Print Location</h2>
-                <p>Choose one print location that will apply to all products in the quote</p>
+                <h2><span class="phase-number">1</span> Location Setup</h2>
+                <p>Choose one print location for all products</p>
             </div>
             
-            <div class="location-selection">
-                <div class="location-group">
-                    <h3>Single Locations</h3>
-                    <div class="location-options">
+            <!-- Main Content Container -->
+            <div class="content-container">
+                <div class="location-selection">
+                    <div class="content-block">
+                        <div class="location-group">
+                            <h3 class="setup-title">Single Locations</h3>
+                            <div class="location-options">
                         <label class="location-option">
                             <input type="radio" name="print-location" value="LC" id="loc-LC">
                             <div class="location-card">
-                                <i class="fas fa-tshirt"></i>
+                                <i class="fas fa-shirt"></i>
                                 <span class="location-name">Left Chest</span>
                                 <span class="location-code">LC</span>
                             </div>
@@ -189,7 +243,7 @@
                         <label class="location-option">
                             <input type="radio" name="print-location" value="FF" id="loc-FF">
                             <div class="location-card">
-                                <i class="fas fa-tshirt"></i>
+                                <i class="fas fa-shirt"></i>
                                 <span class="location-name">Full Front</span>
                                 <span class="location-code">FF</span>
                             </div>
@@ -197,7 +251,7 @@
                         <label class="location-option">
                             <input type="radio" name="print-location" value="FB" id="loc-FB">
                             <div class="location-card">
-                                <i class="fas fa-tshirt"></i>
+                                <i class="fas fa-shirt"></i>
                                 <span class="location-name">Full Back</span>
                                 <span class="location-code">FB</span>
                             </div>
@@ -205,7 +259,7 @@
                         <label class="location-option">
                             <input type="radio" name="print-location" value="JF" id="loc-JF">
                             <div class="location-card">
-                                <i class="fas fa-tshirt"></i>
+                                <i class="fas fa-shirt"></i>
                                 <span class="location-name">Jumbo Front</span>
                                 <span class="location-code">JF</span>
                             </div>
@@ -213,17 +267,22 @@
                         <label class="location-option">
                             <input type="radio" name="print-location" value="JB" id="loc-JB">
                             <div class="location-card">
-                                <i class="fas fa-tshirt"></i>
+                                <i class="fas fa-shirt"></i>
                                 <span class="location-name">Jumbo Back</span>
                                 <span class="location-code">JB</span>
                             </div>
                         </label>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="location-group">
-                    <h3>Combination Locations</h3>
-                    <div class="location-options">
+                    
+                    <!-- Section Divider -->
+                    <div class="section-divider"></div>
+                    
+                    <div class="content-block">
+                        <div class="location-group">
+                            <h3 class="setup-title">Combination Locations</h3>
+                            <div class="location-options">
                         <label class="location-option">
                             <input type="radio" name="print-location" value="LC_FB" id="loc-LC_FB">
                             <div class="location-card combo">
@@ -256,6 +315,8 @@
                                 <span class="location-code">Left Chest + Jumbo Back</span>
                             </div>
                         </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -266,6 +327,7 @@
                         <span id="selected-location-text"></span>
                     </div>
                 </div>
+            </div>
             </div>
             
             <div class="phase-actions">

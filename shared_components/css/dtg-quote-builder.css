@@ -49,13 +49,138 @@
     color: var(--text-primary);
 }
 
+/* DTG Grid Layout Enforcement - Override unified CSS with higher specificity */
+.dtg-quote-builder .location-selection .location-options {
+    display: grid !important;
+    gap: 20px !important;
+    padding: 20px 0 !important;
+    margin: 0 auto !important;
+}
+
+/* Single Locations Section - 3 columns with 5 cards (3-2 layout) */
+.dtg-quote-builder .location-selection .content-block:first-of-type .location-options {
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-width: 700px !important;  /* Prevent cards from getting too wide */
+}
+
+/* Combination Locations Section - 2 columns for better readability */
+.dtg-quote-builder .location-selection .content-block:last-of-type .location-options {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 500px !important;
+}
+
+/* Ensure combo cards have proper height */
+.dtg-quote-builder .location-selection .location-card.combo {
+    min-height: 170px !important;  /* Slightly taller for combo cards with more text */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dtg-quote-builder .location-selection .location-options {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .dtg-quote-builder .location-selection .content-block:first-of-type .location-options {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dtg-quote-builder .location-selection .location-options {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .dtg-quote-builder .location-selection .content-block:first-of-type .location-options,
+    .dtg-quote-builder .location-selection .content-block:last-of-type .location-options {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Ensure location cards are properly displayed */
+.dtg-quote-builder .location-option {
+    display: block !important;
+    margin: 0 !important;
+    width: 100% !important;  /* Ensure full width within grid cell */
+}
+
+.dtg-quote-builder .location-selection .location-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;  /* Center content vertically */
+    padding: 20px 15px !important;  /* Slightly less horizontal padding */
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    background: white !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    height: 100% !important;
+    min-height: 150px !important;  /* Override unified CSS min-height */
+    width: 100% !important;  /* Ensure card fills grid cell */
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.dtg-quote-builder .location-selection .location-card:hover {
+    border-color: #28a745 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15) !important;
+}
+
+.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card {
+    background: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card i,
+.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card .location-name,
+.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card .location-code {
+    color: white !important;
+}
+
+/* Icon styling */
+.dtg-quote-builder .location-selection .location-card i {
+    font-size: 2rem !important;
+    margin-bottom: 10px !important;
+    color: #28a745 !important;
+}
+
+/* Location name and code styling */
+.dtg-quote-builder .location-selection .location-card .location-name {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin-bottom: 5px !important;
+    line-height: 1.2 !important;
+    display: block !important;
+    color: #333 !important;
+}
+
+.dtg-quote-builder .location-selection .location-card .location-code {
+    font-size: 0.875rem !important;
+    opacity: 0.8 !important;
+    line-height: 1.3 !important;
+    display: block !important;
+    white-space: normal !important;  /* Allow text to wrap naturally */
+    word-wrap: break-word !important;
+    color: #666 !important;
+}
+
+/* Section divider */
+.dtg-quote-builder .section-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+    margin: 30px 0;
+}
+
 .size-group-line .total {
     text-align: right;
     font-weight: 600;
     color: var(--primary-color);
 }
 
-/* DTG print location selection specific */
+/* DTG print location selection specific - removed duplicate styles */
 .location-selection {
     margin-bottom: 2rem;
 }
@@ -71,68 +196,7 @@
     margin-bottom: 1rem;
 }
 
-.location-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-}
-
-.location-option {
-    position: relative;
-    cursor: pointer;
-}
-
-.location-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-}
-
-.location-card {
-    padding: 1.25rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    text-align: center;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.location-card:hover {
-    border-color: var(--primary-light);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.location-option input[type="radio"]:checked + .location-card {
-    border-color: var(--primary-color);
-    background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
-}
-
-.location-card i {
-    font-size: 2rem;
-    color: #6b7280; /* Neutral gray by default */
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
-/* Green icon only when selected */
-.location-option input[type="radio"]:checked + .location-card i {
-    color: var(--primary-color);
-}
-
-.location-name {
-    display: block;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-}
-
-.location-code {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
+/* Selected location display */
 .selected-location-display {
     background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
     border-left: 4px solid var(--primary-color);
