@@ -381,15 +381,14 @@
         
         <!-- Tab Buttons -->
         <div class="tab-buttons">
-            <button class="tab-button" onclick="showTab('mockup')">Mockup Queue</button>
-            <button class="tab-button active" onclick="showTab('sendmockup')">Send Mockup to AE</button>
+            <button class="tab-button active" onclick="showTab('mockup')">Mockup Queue</button>
             <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
         </div>
         
         <!-- Tab Content -->
         <div class="tab-content">
             <!-- Mockup Queue Tab -->
-            <div id="mockup-tab" class="tab-pane">
+            <div id="mockup-tab" class="tab-pane active">
                 <h2 class="tab-title">Production Mockup Queue</h2>
                 <!-- Caspio Mockup Queue DataPage Embed with isolation -->
                 <div class="caspio-isolated">
@@ -741,15 +740,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Send Mockup to AE Tab -->
-            <div id="sendmockup-tab" class="tab-pane active">
-                <h2 class="tab-title">Send Mockup to AE</h2>
-                <!-- Caspio Form with isolation wrapper -->
-                <div class="caspio-isolated">
-                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150007e382ee31dd04ad795fd/emb"></script>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -808,11 +798,8 @@
         if (tabName === 'mockup') {
             document.querySelectorAll('.tab-button')[0].classList.add('active');
             document.getElementById('mockup-tab').classList.add('active');
-        } else if (tabName === 'sendmockup') {
-            document.querySelectorAll('.tab-button')[1].classList.add('active');
-            document.getElementById('sendmockup-tab').classList.add('active');
         } else if (tabName === 'requirements') {
-            document.querySelectorAll('.tab-button')[2].classList.add('active');
+            document.querySelectorAll('.tab-button')[1].classList.add('active');
             document.getElementById('requirements-tab').classList.add('active');
         }
         
