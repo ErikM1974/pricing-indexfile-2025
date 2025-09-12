@@ -38,6 +38,10 @@ class CapQuoteBuilder {
             this.pricingCalculator = new CapQuotePricingCalculator();
             this.quoteService = new CapQuoteService();
             
+            // Expose managers to window for onclick handlers
+            window.capLogoManager = this.logoManager;
+            window.capProductLineManager = this.productManager;  // Match the name used in onclick handlers
+            
             // Wait for logo manager to load positions
             await this.waitForLogoManager();
             
