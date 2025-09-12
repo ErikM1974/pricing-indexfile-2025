@@ -227,95 +227,116 @@
             
             <!-- Main Content Container -->
             <div class="content-container">
-                <div class="location-selection">
-                    <div class="content-block">
-                        <div class="location-group">
-                            <h3 class="setup-title">Single Locations</h3>
-                            <div class="location-options">
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="LC" id="loc-LC">
-                            <div class="location-card">
-                                <i class="fas fa-shirt"></i>
-                                <span class="location-name">Left Chest</span>
-                                <span class="location-code">LC</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="FF" id="loc-FF">
-                            <div class="location-card">
-                                <i class="fas fa-shirt"></i>
-                                <span class="location-name">Full Front</span>
-                                <span class="location-code">FF</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="FB" id="loc-FB">
-                            <div class="location-card">
-                                <i class="fas fa-shirt"></i>
-                                <span class="location-name">Full Back</span>
-                                <span class="location-code">FB</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="JF" id="loc-JF">
-                            <div class="location-card">
-                                <i class="fas fa-shirt"></i>
-                                <span class="location-name">Jumbo Front</span>
-                                <span class="location-code">JF</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="JB" id="loc-JB">
-                            <div class="location-card">
-                                <i class="fas fa-shirt"></i>
-                                <span class="location-name">Jumbo Back</span>
-                                <span class="location-code">JB</span>
-                            </div>
-                        </label>
-                            </div>
+                <div class="location-selector">
+                    <!-- Single Locations Section -->
+                    <div class="location-section single-locations">
+                        <h3 class="section-header">
+                            <span class="section-number">1</span>
+                            <span class="section-title">Single Location</span>
+                            <span class="section-subtitle">Choose one print area</span>
+                        </h3>
+                        <div class="location-cards horizontal">
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="LC" id="loc-LC">
+                                <div class="location-card" data-price-tier="Standard">
+                                    <i class="fas fa-shirt"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">Left Chest</span>
+                                        <span class="location-code">LC</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="FF" id="loc-FF">
+                                <div class="location-card" data-price-tier="Standard">
+                                    <i class="fas fa-shirt"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">Full Front</span>
+                                        <span class="location-code">FF</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="FB" id="loc-FB">
+                                <div class="location-card" data-price-tier="Standard">
+                                    <i class="fas fa-shirt"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">Full Back</span>
+                                        <span class="location-code">FB</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="JF" id="loc-JF">
+                                <div class="location-card" data-price-tier="Premium">
+                                    <i class="fas fa-shirt"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">Jumbo Front</span>
+                                        <span class="location-code">JF</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="JB" id="loc-JB">
+                                <div class="location-card" data-price-tier="Premium">
+                                    <i class="fas fa-shirt"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">Jumbo Back</span>
+                                        <span class="location-code">JB</span>
+                                    </div>
+                                </div>
+                            </label>
                         </div>
                     </div>
                     
-                    <!-- Section Divider -->
-                    <div class="section-divider"></div>
-                    
-                    <div class="content-block">
-                        <div class="location-group">
-                            <h3 class="setup-title">Combination Locations</h3>
-                            <div class="location-options">
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="LC_FB" id="loc-LC_FB">
-                            <div class="location-card combo">
-                                <i class="fas fa-layer-group"></i>
-                                <span class="location-name">LC & FB</span>
-                                <span class="location-code">Left Chest + Full Back</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="FF_FB" id="loc-FF_FB">
-                            <div class="location-card combo">
-                                <i class="fas fa-layer-group"></i>
-                                <span class="location-name">FF & FB</span>
-                                <span class="location-code">Full Front + Full Back</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="JF_JB" id="loc-JF_JB">
-                            <div class="location-card combo">
-                                <i class="fas fa-layer-group"></i>
-                                <span class="location-name">JF & JB</span>
-                                <span class="location-code">Jumbo Front + Jumbo Back</span>
-                            </div>
-                        </label>
-                        <label class="location-option">
-                            <input type="radio" name="print-location" value="LC_JB" id="loc-LC_JB">
-                            <div class="location-card combo">
-                                <i class="fas fa-layer-group"></i>
-                                <span class="location-name">LC & JB</span>
-                                <span class="location-code">Left Chest + Jumbo Back</span>
-                            </div>
-                        </label>
-                            </div>
+                    <!-- Combination Locations Section -->
+                    <div class="location-section combo-locations">
+                        <h3 class="section-header">
+                            <span class="section-number">2</span>
+                            <span class="section-title">Combination Locations</span>
+                            <span class="section-subtitle">Multiple print areas</span>
+                        </h3>
+                        <div class="location-cards horizontal">
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="LC_FB" id="loc-LC_FB">
+                                <div class="location-card combo" data-price-tier="Combo">
+                                    <i class="fas fa-layer-group"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">LC + FB</span>
+                                        <span class="location-code">Chest & Back</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="FF_FB" id="loc-FF_FB">
+                                <div class="location-card combo" data-price-tier="Combo">
+                                    <i class="fas fa-layer-group"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">FF + FB</span>
+                                        <span class="location-code">Front & Back</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="JF_JB" id="loc-JF_JB">
+                                <div class="location-card combo" data-price-tier="Combo Plus">
+                                    <i class="fas fa-layer-group"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">JF + JB</span>
+                                        <span class="location-code">Jumbo Both</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="location-option">
+                                <input type="radio" name="print-location" value="LC_JB" id="loc-LC_JB">
+                                <div class="location-card combo" data-price-tier="Combo Plus">
+                                    <i class="fas fa-layer-group"></i>
+                                    <div class="location-text">
+                                        <span class="location-name">LC + JB</span>
+                                        <span class="location-code">Chest & Jumbo</span>
+                                    </div>
+                                </div>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -327,7 +348,6 @@
                         <span id="selected-location-text"></span>
                     </div>
                 </div>
-            </div>
             </div>
             
             <div class="phase-actions">

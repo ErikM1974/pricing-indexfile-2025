@@ -49,50 +49,106 @@
     color: var(--text-primary);
 }
 
-/* DTG Grid Layout Enforcement - Override unified CSS with higher specificity */
-.dtg-quote-builder .location-selection .location-options {
-    display: grid !important;
-    gap: 20px !important;
-    padding: 20px 0 !important;
-    margin: 0 auto !important;
+/* DTG Improved Location Selector Layout */
+.dtg-quote-builder .location-selector {
+    padding: 0;
 }
 
-/* Single Locations Section - 3 columns with 5 cards (3-2 layout) */
-.dtg-quote-builder .location-selection .content-block:first-of-type .location-options {
-    grid-template-columns: repeat(3, 1fr) !important;
-    max-width: 700px !important;  /* Prevent cards from getting too wide */
+/* Location Section Styling */
+.dtg-quote-builder .location-section {
+    margin-bottom: 2rem;
 }
 
-/* Combination Locations Section - 2 columns for better readability */
-.dtg-quote-builder .location-selection .content-block:last-of-type .location-options {
-    grid-template-columns: repeat(2, 1fr) !important;
-    max-width: 500px !important;
+/* Section Headers with Visual Separator Line */
+.dtg-quote-builder .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
 }
 
-/* Ensure combo cards have proper height */
-.dtg-quote-builder .location-selection .location-card.combo {
-    min-height: 170px !important;  /* Slightly taller for combo cards with more text */
+.dtg-quote-builder .section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, #28a745 0%, #28a745 30%, transparent 100%);
 }
 
-/* Responsive adjustments */
+.dtg-quote-builder .section-number {
+    background: #28a745;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.dtg-quote-builder .section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.dtg-quote-builder .section-subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin-left: auto;
+    font-weight: normal;
+}
+
+/* Horizontal Card Layout */
+.dtg-quote-builder .location-cards.horizontal {
+    display: flex !important;
+    gap: 12px !important;
+    overflow-x: auto !important;
+    padding: 16px 0 !important;
+    margin: 0 !important;
+}
+
+/* Single Location Cards - 5 cards fit nicely */
+.dtg-quote-builder .single-locations .location-cards {
+    justify-content: flex-start;
+}
+
+/* Combination Location Cards - 4 cards with more space */
+.dtg-quote-builder .combo-locations .location-cards {
+    justify-content: flex-start;
+}
+
+/* Responsive adjustments for mobile */
 @media (max-width: 768px) {
-    .dtg-quote-builder .location-selection .location-options {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .dtg-quote-builder .section-subtitle {
+        display: none; /* Hide subtitle on mobile */
     }
     
-    .dtg-quote-builder .location-selection .content-block:first-of-type .location-options {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .dtg-quote-builder .location-card {
+        min-width: 120px !important;
     }
 }
 
 @media (max-width: 480px) {
-    .dtg-quote-builder .location-selection .location-options {
-        grid-template-columns: 1fr !important;
+    .dtg-quote-builder .location-cards.horizontal {
+        gap: 8px !important;
     }
     
-    .dtg-quote-builder .location-selection .content-block:first-of-type .location-options,
-    .dtg-quote-builder .location-selection .content-block:last-of-type .location-options {
-        grid-template-columns: 1fr !important;
+    .dtg-quote-builder .location-card {
+        min-width: 100px !important;
+        height: 70px !important;
+        padding: 12px !important;
+    }
+    
+    .dtg-quote-builder .location-card i {
+        font-size: 1.25rem !important;
     }
 }
 
@@ -103,75 +159,154 @@
     width: 100% !important;  /* Ensure full width within grid cell */
 }
 
-.dtg-quote-builder .location-selection .location-card {
+/* Compact Horizontal Card Design */
+.dtg-quote-builder .location-card {
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;  /* Center content vertically */
-    padding: 20px 15px !important;  /* Slightly less horizontal padding */
+    gap: 12px !important;
+    padding: 16px 20px !important;
     border: 2px solid #e2e8f0 !important;
     border-radius: 8px !important;
     background: white !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    height: 100% !important;
-    min-height: 150px !important;  /* Override unified CSS min-height */
-    width: 100% !important;  /* Ensure card fills grid cell */
+    min-width: 140px !important;
+    height: 80px !important;
     box-sizing: border-box !important;
-    text-align: center !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
 }
 
-.dtg-quote-builder .location-selection .location-card:hover {
+/* Combo cards slightly wider */
+.dtg-quote-builder .location-card.combo {
+    min-width: 160px !important;
+}
+
+/* Hover and Selection States */
+.dtg-quote-builder .location-card:hover {
     border-color: #28a745 !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15) !important;
 }
 
-.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card {
-    background: #28a745 !important;
-    color: white !important;
+.dtg-quote-builder input[type="radio"]:checked + .location-card {
+    background: linear-gradient(135deg, #28a745, #218838) !important;
     border-color: #28a745 !important;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1) !important;
 }
 
-.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card i,
-.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card .location-name,
-.dtg-quote-builder .location-selection input[type="radio"]:checked + .location-card .location-code {
+.dtg-quote-builder input[type="radio"]:checked + .location-card i,
+.dtg-quote-builder input[type="radio"]:checked + .location-card .location-name,
+.dtg-quote-builder input[type="radio"]:checked + .location-card .location-code,
+.dtg-quote-builder input[type="radio"]:checked + .location-card::before {
     color: white !important;
 }
 
-/* Icon styling */
-.dtg-quote-builder .location-selection .location-card i {
-    font-size: 2rem !important;
-    margin-bottom: 10px !important;
+/* Icon styling - smaller for horizontal layout */
+.dtg-quote-builder .location-card i {
+    font-size: 1.5rem !important;
     color: #28a745 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Location text container */
+.dtg-quote-builder .location-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    flex: 1 !important;
 }
 
 /* Location name and code styling */
-.dtg-quote-builder .location-selection .location-card .location-name {
+.dtg-quote-builder .location-card .location-name {
     font-weight: 600 !important;
-    font-size: 1rem !important;
-    margin-bottom: 5px !important;
+    font-size: 0.95rem !important;
     line-height: 1.2 !important;
-    display: block !important;
     color: #333 !important;
+    white-space: nowrap !important;
 }
 
-.dtg-quote-builder .location-selection .location-card .location-code {
-    font-size: 0.875rem !important;
-    opacity: 0.8 !important;
-    line-height: 1.3 !important;
-    display: block !important;
-    white-space: normal !important;  /* Allow text to wrap naturally */
-    word-wrap: break-word !important;
+.dtg-quote-builder .location-card .location-code {
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
     color: #666 !important;
+    white-space: nowrap !important;
 }
 
-/* Section divider */
+/* Price tier indicator */
+.dtg-quote-builder .location-card::before {
+    content: attr(data-price-tier);
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 0.65rem;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Remove old section divider - no longer needed */
 .dtg-quote-builder .section-divider {
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-    margin: 30px 0;
+    display: none;
+}
+
+/* Scrollbar styling for horizontal scroll */
+.dtg-quote-builder .location-cards.horizontal::-webkit-scrollbar {
+    height: 6px;
+}
+
+.dtg-quote-builder .location-cards.horizontal::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.dtg-quote-builder .location-cards.horizontal::-webkit-scrollbar-thumb {
+    background: #28a745;
+    border-radius: 3px;
+}
+
+.dtg-quote-builder .location-cards.horizontal::-webkit-scrollbar-thumb:hover {
+    background: #218838;
+}
+
+/* =============================================
+   UNSAVED INDICATOR - REDESIGNED
+   ============================================= */
+.dtg-quote-builder .unsaved-indicator,
+.dtg-quote-builder #save-indicator {
+    position: fixed !important;
+    bottom: 30px !important;  /* Move to bottom */
+    right: 30px !important;
+    top: auto !important;
+    background: linear-gradient(135deg, #ffc107, #ff9800) !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 50px !important;
+    font-size: 0.875rem !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3) !important;
+    z-index: 100 !important;
+    animation: fadeIn 0.3s ease !important;
+}
+
+.dtg-quote-builder .unsaved-indicator.show,
+.dtg-quote-builder .unsaved-indicator.has-changes,
+.dtg-quote-builder #save-indicator.show {
+    display: flex !important;
+}
+
+/* Saved state (green) */
+.dtg-quote-builder #save-indicator.saved {
+    background: linear-gradient(135deg, #28a745, #218838) !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .size-group-line .total {
