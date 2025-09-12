@@ -604,6 +604,53 @@ body {
     margin-bottom: 2rem;
 }
 
+/* Pricing Breakdown Styles */
+.line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 0.5rem 0;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.line-item:last-child {
+    border-bottom: none;
+}
+
+.ltm-breakdown {
+    flex: 1;
+    margin: 0 1rem;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.6;
+}
+
+.additional-logos-line {
+    display: inline-block;
+    margin-left: 0.5rem;
+    color: #4169E1;
+    font-weight: 500;
+}
+
+.line-total {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.product-lines {
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+}
+
+.product-subtotal {
+    text-align: right;
+    font-weight: bold;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+}
+
 .quote-header h3 {
     font-size: 1.5rem;
     font-weight: 700;
