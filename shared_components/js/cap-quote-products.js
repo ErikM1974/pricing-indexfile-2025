@@ -407,7 +407,7 @@ class CapProductLineManager {
     /**
      * Display loaded product
      */
-    async displayProduct() {
+    displayProduct() {
         console.log('[CapProductLineManager] Displaying product:', this.currentProduct);
         
         const display = document.getElementById('product-display');
@@ -437,104 +437,33 @@ class CapProductLineManager {
             productDescription.textContent = `${this.currentProduct.brand} | ${this.currentProduct.color}`;
         }
         
-        // Create size inputs (now async to fetch upcharges)
-        await this.createSizeInputs();
+        // Create size inputs
+        this.createSizeInputs();
         
         display.style.display = 'block';
         this.updateProductTotal();
     }
     
     /**
-     * Get size description for display
-     */
-    getSizeDescription(size) {
-        const sizeDescriptions = {
-            'S/M': 'Small/Medium (6½"-7")',
-            'M/L': 'Medium/Large (7"-7¼")',
-            'L/XL': 'Large/X-Large (7¼"-7½")',
-            'XL/2XL': 'X-Large/2X-Large (7½"-8")',
-            'OSFA': 'One Size Fits All',
-            'SM': 'Small',
-            'MD': 'Medium', 
-            'LG': 'Large',
-            'XL': 'X-Large',
-            '2XL': '2X-Large',
-            '3XL': '3X-Large'
-        };
-        
-        return sizeDescriptions[size] || size;
-    }
-    
-    /**
      * Create size input controls
      */
-    async createSizeInputs() {
+    createSizeInputs() {
         const sizeInputsDiv = document.getElementById('size-inputs');
         if (!sizeInputsDiv || !this.availableSizes.length) return;
         
-        // Get size upcharges for this style
-        let sizeUpcharges = {};
-        try {
-            sizeUpcharges = await this.getSizeUpcharges(this.currentProduct.style);
-        } catch (error) {
-            console.log('[CapProductLineManager] Could not fetch size upcharges:', error);
-        }
-        
-        // Check if these are fitted sizes
-        const isFitted = this.availableSizes.some(size => 
-            size.includes('/') || ['S/M', 'M/L', 'L/XL'].includes(size)
-        );
-        
-        // Create grouped layout for fitted caps
-        if (isFitted) {
-            sizeInputsDiv.innerHTML = `
-                <div class="size-group-header">
-                    <i class="fas fa-ruler"></i> Fitted Cap Sizes
-                </div>
-                <div class="fitted-sizes-grid">
-                    ${this.availableSizes.map(size => {
-                        const upcharge = sizeUpcharges[size];
-                        const hasUpcharge = upcharge && upcharge > 0;
-                        return `
-                        <div class="size-input-group fitted ${hasUpcharge ? 'has-upcharge' : ''}">
-                            <label class="size-label">
-                                <strong>${size}</strong>
-                                <small>${this.getSizeDescription(size)}</small>
-                                ${hasUpcharge ? `<span class="upcharge-badge">+$${upcharge.toFixed(2)}</span>` : ''}
-                            </label>
-                            <input type="number" 
-                                   class="size-qty-input" 
-                                   data-size="${size}" 
-                                   min="0" 
-                                   value="0"
-                                   placeholder="Qty">
-                        </div>
-                    `}).join('')}
-                </div>
-            `;
-        } else {
-            // Standard layout for OSFA or simple sizes
-            sizeInputsDiv.innerHTML = this.availableSizes.map(size => {
-                const upcharge = sizeUpcharges[size];
-                const hasUpcharge = upcharge && upcharge > 0;
-                return `
-                <div class="size-input-group ${hasUpcharge ? 'has-upcharge' : ''}">
-                    <label>
-                        ${this.getSizeDescription(size)}
-                        ${hasUpcharge ? `<span class="upcharge-badge">+$${upcharge.toFixed(2)}</span>` : ''}
-                    </label>
-                    <input type="number" 
-                           class="size-qty-input" 
-                           data-size="${size}" 
-                           min="0" 
-                           value="0"
-                           placeholder="Quantity">
-                </div>
-            `}).join('');
-        }
+        // Simple, clean layout matching embroidery builder
+        sizeInputsDiv.innerHTML = this.availableSizes.map(size => `
+            <div class="size-input-group">
+                <label>${size}</label>
+                <input type="number" 
+                       class="size-qty-input" 
+                       data-size="${size}" 
+                       min="0" 
+                       value="0">
+            </div>
+        `).join('');
         
         console.log('[CapProductLineManager] Size inputs created for:', this.availableSizes);
-        console.log('[CapProductLineManager] Size upcharges:', sizeUpcharges);
     }
     
     /**
