@@ -129,8 +129,50 @@ class DTGQuoteService {
             // Save items
             let lineNumber = 1;
             for (const product of quoteData.products) {
-                // Save each size group separately for clarity
-                for (const sizeGroup of product.sizeGroups) {
+                // If product has sizeGroups (from pricing calculation), save each group separately
+                if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
+                    for (const sizeGroup of product.sizeGroups) {
+                        const itemData = {
+                            QuoteID: quoteID,
+                            LineNumber: lineNumber++,
+                            StyleNumber: product.styleNumber,
+                            ProductName: `${product.productName} - ${product.color}`,
+                            Color: product.color,
+                            ColorCode: product.colorCode || '',
+                            EmbellishmentType: 'dtg',
+                            PrintLocation: quoteData.location,
+                            PrintLocationName: quoteData.locationName,
+                            Quantity: parseInt(sizeGroup.quantity),
+                            HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
+                            BaseUnitPrice: parseFloat(sizeGroup.basePrice.toFixed(2)),
+                            LTMPerUnit: parseFloat((sizeGroup.ltmPerUnit || 0).toFixed(2)),
+                            FinalUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
+                            LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
+                            SizeBreakdown: JSON.stringify(sizeGroup.sizes),
+                            PricingTier: quoteData.tier,
+                            ImageURL: product.imageUrl || '',
+                            AddedAt: this.formatDateForCaspio(new Date())
+                        };
+                        
+                        const itemResponse = await fetch(`${this.baseURL}/quote_items`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(itemData)
+                        });
+                        
+                        if (!itemResponse.ok) {
+                            const errorText = await itemResponse.text();
+                            console.error('[DTGQuoteService] Item save failed:', errorText);
+                            // Continue saving other items even if one fails
+                        } else {
+                            const itemResult = await itemResponse.json();
+                            console.log('[DTGQuoteService] Item saved:', itemResult);
+                        }
+                    }
+                } else {
+                    // Fallback: save as single line item if no sizeGroups
                     const itemData = {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
@@ -141,14 +183,14 @@ class DTGQuoteService {
                         EmbellishmentType: 'dtg',
                         PrintLocation: quoteData.location,
                         PrintLocationName: quoteData.locationName,
-                        Quantity: parseInt(sizeGroup.quantity),
+                        Quantity: product.totalQuantity || 0,
                         HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
-                        BaseUnitPrice: parseFloat(sizeGroup.basePrice.toFixed(2)),
-                        LTMPerUnit: parseFloat((sizeGroup.ltmPerUnit || 0).toFixed(2)),
-                        FinalUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
-                        LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
-                        SizeBreakdown: JSON.stringify(sizeGroup.sizes),
-                        PricingTier: quoteData.tier,
+                        BaseUnitPrice: 0, // Will need pricing calculation
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: 0,
+                        LineTotal: 0,
+                        SizeBreakdown: JSON.stringify(product.sizeQuantities || {}),
+                        PricingTier: quoteData.tier || '',
                         ImageURL: product.imageUrl || '',
                         AddedAt: this.formatDateForCaspio(new Date())
                     };
@@ -164,10 +206,9 @@ class DTGQuoteService {
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('[DTGQuoteService] Item save failed:', errorText);
-                        // Continue saving other items even if one fails
                     } else {
                         const itemResult = await itemResponse.json();
-                        console.log('[DTGQuoteService] Item saved:', itemResult);
+                        console.log('[DTGQuoteService] Item saved (no sizeGroups):', itemResult);
                     }
                 }
             }
@@ -276,27 +317,46 @@ class DTGQuoteService {
                     <tbody>`;
         
         quoteData.products.forEach(product => {
-            product.sizeGroups.forEach(group => {
-                const sizeList = Object.entries(group.sizes)
+            if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
+                // If product has sizeGroups from pricing calculation
+                product.sizeGroups.forEach(group => {
+                    const sizeList = Object.entries(group.sizes)
+                        .map(([size, qty]) => `${size}(${qty})`)
+                        .join(' ');
+                    
+                    let priceDisplay = `$${group.basePrice.toFixed(2)}`;
+                    if (group.ltmPerUnit > 0) {
+                        priceDisplay = `$${group.basePrice.toFixed(2)} + $${group.ltmPerUnit.toFixed(2)} = $${group.unitPrice.toFixed(2)}`;
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">
+                                ${product.productName} - ${product.color}<br>
+                                <small>${sizeList}</small>
+                            </td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${group.quantity}</td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">${priceDisplay}</td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${group.total.toFixed(2)}</td>
+                        </tr>`;
+                });
+            } else {
+                // Fallback: create single row from product data
+                const sizeList = Object.entries(product.sizeQuantities || {})
                     .map(([size, qty]) => `${size}(${qty})`)
                     .join(' ');
-                
-                let priceDisplay = `$${group.basePrice.toFixed(2)}`;
-                if (group.ltmPerUnit > 0) {
-                    priceDisplay = `$${group.basePrice.toFixed(2)} + $${group.ltmPerUnit.toFixed(2)} = $${group.unitPrice.toFixed(2)}`;
-                }
-                
+                    
                 html += `
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd;">
                             ${product.productName} - ${product.color}<br>
-                            <small>${sizeList}</small>
+                            <small>${sizeList || 'N/A'}</small>
                         </td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${group.quantity}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">${priceDisplay}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${group.total.toFixed(2)}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${product.totalQuantity || 0}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">TBD</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">TBD</td>
                     </tr>`;
-            });
+            }
         });
         
         html += `

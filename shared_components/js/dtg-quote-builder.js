@@ -594,6 +594,7 @@ class DTGQuoteBuilder {
         
         try {
             // Build complete quote data
+            // Use products from currentQuoteData which have the sizeGroups from pricing calculation
             const quoteData = {
                 ...this.currentQuoteData,
                 customerName: this.customerName.value.trim(),
@@ -603,8 +604,8 @@ class DTGQuoteBuilder {
                 projectName: this.projectName.value.trim(),
                 specialNotes: this.specialNotes.value.trim(),
                 salesRep: this.salesRep.value,
-                salesRepName: this.getSalesRepName(this.salesRep.value),
-                products: this.productsManager.getAllProducts()
+                salesRepName: this.getSalesRepName(this.salesRep.value)
+                // Don't override products - use the ones from currentQuoteData which have sizeGroups
             };
             
             // Save to database
