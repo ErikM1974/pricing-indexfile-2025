@@ -773,8 +773,7 @@ class CapQuoteBuilder {
             });
             
             // Calculate consolidated subtotal including additional logos
-            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
-            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((logoSum, logo) => logoSum + logo.pricePerPiece, 0);
+            // Already have additionalLogoPrices and additionalLogoCostPerPiece from above
             const consolidatedSubtotal = product.sizePricedItems.reduce((sum, item) => {
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                 return sum + (consolidatedPricePerCap * item.quantity);
