@@ -122,10 +122,13 @@ class EmbroideryPricingCalculator {
                 const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB-AL`);
                 const alData = await alResponse.json();
                 
+                console.log('🔍 [DEBUG] Raw EMB-AL API Response:', alData);
+                
                 if (alData && alData.allEmbroideryCostsR && alData.allEmbroideryCostsR.length > 0) {
                     this.alTiers = {};
                     alData.allEmbroideryCostsR.forEach(cost => {
                         if (cost.ItemType === 'AL') {
+                            console.log(`🔍 [DEBUG] AL Tier ${cost.TierLabel}: EmbroideryCost = $${cost.EmbroideryCost}`);
                             this.alTiers[cost.TierLabel] = {
                                 embCost: cost.EmbroideryCost,
                                 hasLTM: cost.TierLabel === '1-23'
@@ -503,8 +506,19 @@ class EmbroideryPricingCalculator {
                             
                             const alTierCost = this.alTiers[tier].embCost;
                             
+                            // Debug logging for AL calculation
+                            console.log(`🔍 [DEBUG] AL Calculation for ${logo.position}:`);
+                            console.log(`   - Tier: ${tier}`);
+                            console.log(`   - AL Tier Cost: $${alTierCost}`);
+                            console.log(`   - Stitch Count: ${logo.stitchCount}`);
+                            console.log(`   - Extra Stitches: ${extraStitches}`);
+                            console.log(`   - Stitch Cost: $${stitchCost}`);
+                            console.log(`   - Raw Total: $${alTierCost + stitchCost}`);
+                            
                             // Direct tier cost + stitch cost (NO subset upcharge - simplified pricing)
-                            const unitPrice = this.roundPrice(alTierCost + stitchCost);
+                            // AL pricing uses raw price - no rounding applied
+                            const unitPrice = alTierCost + stitchCost;
+                            console.log(`   - Final Unit Price: $${unitPrice} (AL pricing - no rounding)`);
                             const total = unitPrice * quantity;
                             
                             // Generate part number

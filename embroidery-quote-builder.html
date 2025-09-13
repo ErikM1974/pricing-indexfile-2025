@@ -374,63 +374,43 @@
                 </div>
             </div>
             
+            <!-- Quote Actions - matching Cap Embroidery style -->
+            <div class="quote-actions">
+                <div class="action-row">
+                    <div class="save-option">
+                        <input type="checkbox" id="save-to-database" checked>
+                        <label for="save-to-database">Save to Database</label>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="save-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Quote
+                        </button>
+                        <button id="email-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Email Quote
+                        </button>
+                        <button id="copy-quote-btn" class="btn btn-secondary">
+                            <i class="fas fa-copy"></i> Copy Text
+                        </button>
+                        <button id="print-quote-btn" class="btn btn-secondary">
+                            <i class="fas fa-print"></i> Print PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="phase-actions">
                 <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </button>
-                <div class="form-check save-option" style="display: inline-block; margin: 0 15px;">
-                    <input type="checkbox" class="form-check-input" id="save-to-db" checked>
-                    <label class="form-check-label" for="save-to-db">
-                        Save quote to database
-                    </label>
-                </div>
-                <button id="save-quote-btn" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Quote
+                <button id="new-quote-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Quote
                 </button>
             </div>
         </section>
     </div>
 
-    <!-- Success Modal -->
-    <div id="success-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header success">
-                <i class="fas fa-check-circle"></i>
-                <h2>Quote Saved Successfully!</h2>
-            </div>
-            <div class="modal-body">
-                <div class="quote-id-display">
-                    <strong>Quote ID:</strong> 
-                    <span id="modal-quote-id"></span>
-                    <button class="copy-btn" onclick="copyQuoteId()">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-                <div class="modal-details">
-                    <p><strong>Customer:</strong> <span id="modal-customer"></span></p>
-                    <p><strong>Total:</strong> <span id="modal-total"></span></p>
-                    <p><strong>Date:</strong> <span id="modal-date"></span></p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeModal()" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Close
-                </button>
-                <button onclick="printQuote()" class="btn btn-secondary">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button onclick="copyQuote()" class="btn btn-secondary">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-                <button onclick="emailQuote()" class="btn btn-secondary">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-                <button onclick="newQuote()" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Quote
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Toast Notifications (replacing modal) -->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
     <!-- Remove duplicate loading overlay (already added at top) -->
 
@@ -736,27 +716,12 @@
             quoteFormatter.openEmailClient(lastQuoteData);
         }
         
-        function copyQuoteId() {
-            const quoteId = document.getElementById('modal-quote-id').textContent;
-            navigator.clipboard.writeText(quoteId).then(() => {
-                quoteBuilderBase.showSuccess('Quote ID copied!');
-            });
-        }
-        
+        // Updated function for new quote button
         function newQuote() {
             if (confirm('Start a new quote? Any unsaved changes will be lost.')) {
                 localStorage.removeItem('EMB_draft');
                 location.reload();
             }
-        }
-        
-        function closeModal() {
-            document.getElementById('success-modal').style.display = 'none';
-        }
-        
-        // Update existing closeSuccessModal to use new name
-        function closeSuccessModal() {
-            closeModal();
         }
         
         // Initialize the quote builder when DOM is ready
