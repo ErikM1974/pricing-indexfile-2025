@@ -65,7 +65,8 @@
       "Bash(bash:*)",
       "WebFetch(domain:cdnjs.cloudflare.com)",
       "WebFetch(domain:fontawesome.com)",
-      "WebFetch(domain:cdnjs.com)"
+      "WebFetch(domain:cdnjs.com)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": [],

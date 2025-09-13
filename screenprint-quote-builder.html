@@ -332,26 +332,28 @@
             </div>
             
             <!-- Product Search -->
-            <div class="search-row">
-                <div class="form-group" style="position: relative;">
-                    <label for="style-search">Style Number</label>
-                    <input type="text" 
-                           id="style-search" 
-                           placeholder="Enter style (e.g., PC54, PC61)" 
-                           autocomplete="off">
-                    <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
+            <div class="product-search-container">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label for="style-search">Style Number</label>
+                        <input type="text" 
+                               id="style-search" 
+                               placeholder="Enter style (e.g., PC54, PC61)" 
+                               autocomplete="off">
+                        <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color-select">Color</label>
+                        <select id="color-select" disabled>
+                            <option value="">Select style first</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-product-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-search"></i> Load Product
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="color-select">Color</label>
-                    <select id="color-select" disabled>
-                        <option value="">Select style first</option>
-                    </select>
-                </div>
-                
-                <button id="load-product-btn" class="btn btn-primary" disabled>
-                    <i class="fas fa-search"></i> Load Product
-                </button>
             </div>
             
             <!-- Product Display -->

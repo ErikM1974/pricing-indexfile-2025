@@ -724,114 +724,176 @@ class CapQuoteBuilder {
         if (!this.currentQuote) return '';
         
         const quoteId = this.quoteService.generateQuoteID();
+        const currentDate = new Date().toLocaleDateString('en-US');
         
-        let text = `CAP EMBROIDERY QUOTE #${quoteId}\n`;
-        text += `Valid for 30 days\n`;
-        text += `${'='.repeat(50)}\n\n`;
+        // Header with company info
+        let text = `NORTHWEST CUSTOM APPAREL
+`;
+        text += `2025 Freeman Road East, Milton, WA 98354
+`;
+        text += `Phone: (253) 922-5793 | sales@nwcustomapparel.com
+`;
+        text += `${'='.repeat(60)}
+
+`;
         
-        // Logo specifications
-        text += `EMBROIDERY SPECIFICATIONS:\n`;
+        // Quote section
+        text += `QUOTE
+`;
+        text += `${quoteId}
+`;
+        text += `Date: ${currentDate}
+`;
+        text += `Valid for: 30 days
+
+`;
+        
+        // Customer information
+        const customerInfo = this.collectCustomerInfo();
+        text += `CUSTOMER INFORMATION
+`;
+        text += `${customerInfo.name || 'Not provided'}
+`;
+        if (customerInfo.company) text += `${customerInfo.company}
+`;
+        text += `${customerInfo.email || 'Not provided'}
+`;
+        if (customerInfo.phone) text += `${customerInfo.phone}
+`;
+        text += `
+`;
+        
+        // Project details
+        text += `PROJECT DETAILS
+`;
+        text += `Type: Cap Embroidery
+`;
+        if (customerInfo.project) text += `Project: ${customerInfo.project}
+`;
+        text += `Total Pieces: ${this.currentQuote.totalQuantity}
+`;
+        text += `Pricing Tier: ${this.currentQuote.tier}
+`;
+        text += `Quote Prepared By: ${customerInfo.salesRepName || 'General Sales'}
+
+`;
+        
+        // Embroidery package
+        text += `EMBROIDERY PACKAGE FOR THIS ORDER:
+`;
         this.currentQuote.logos.forEach(logo => {
-            text += `• ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches`;
-            if (logo.needsDigitizing) text += ` ✓ Digitizing: $100`;
-            text += `\n`;
+            const isPrimary = logo.position === 'Cap Front';
+            text += `✓ ${logo.position} (${logo.stitchCount.toLocaleString()} stitches)`;
+            if (isPrimary) {
+                text += ` - INCLUDED IN BASE PRICE`;
+            } else {
+                text += ` - ADDITIONAL LOGO`;
+            }
+            text += `
+`;
         });
+        text += `
+`;
         
-        if (this.currentQuote.hasLTM) {
-            text += `*Includes small batch pricing for orders under 24 pieces\n`;
-        }
-        
-        text += `\n${'='.repeat(50)}\n\n`;
+        // Products table header
+        text += `${'='.repeat(60)}
+`;
+        text += `DESCRIPTION${' '.repeat(25)}QUANTITY    UNIT PRICE    TOTAL
+`;
+        text += `${'='.repeat(60)}
+`;
         
         // Products
-        text += `PRODUCTS:\n\n`;
+        let subtotal = 0;
         this.currentQuote.products.forEach(product => {
-            text += `${product.styleNumber} - ${product.color} - ${product.totalQuantity} caps\n`;
-            text += `${product.title}\n`;
+            // Main product line
+            text += `${product.styleNumber} - ${product.color}
+`;
+            text += `${product.title}
+`;
             
-            // Get additional logo cost per piece for all items
-            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
-            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-            
+            // Size breakdown
             product.sizePricedItems.forEach(item => {
-                const upcharge = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)})` : '';
-                
-                // Calculate components for consolidated price
-                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
-                
-                // Get pricing components from product breakdown
-                const capPrice = product.pricingBreakdown?.capPrice || 0;
-                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
-                
-                // Get front logo breakdown for extra stitch display
-                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
-                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
-                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
-                
-                // Calculate base price (cap + base embroidery, rounded)
-                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
-                const basePrice = Math.ceil(capPrice + baseEmbroideryPrice);
-                
-                // Calculate total consolidated price per cap
-                const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                const consolidatedTotal = consolidatedPricePerCap * item.quantity;
-                
-                text += `${item.size}${upcharge}(${item.quantity})\n`;
-                
-                // Build breakdown text with separate lines for base and additional logos
-                let baseComponents = [];
-                baseComponents.push(`Base: $${basePrice.toFixed(2)}`);
-                
-                if (hasExtraStitches && extraStitchCost > 0) {
-                    baseComponents.push(`Extra stitches: $${extraStitchCost.toFixed(2)}`);
-                }
-                
-                if (this.currentQuote.hasLTM && ltmPerPiece > 0) {
-                    baseComponents.push(`Small batch: $${ltmPerPiece.toFixed(2)}`);
-                }
-                
-                text += `  ${baseComponents.join(' + ')}\n`;
-                
-                // Add additional logos line if present
-                if (additionalLogoPrices.length > 0) {
-                    const logoDetails = additionalLogoPrices.map(logo => 
-                        `${logo.position}: $${logo.pricePerPiece.toFixed(2)}`
-                    ).join(' + ');
-                    text += `  + ${logoDetails}\n`;
-                }
-                
-                text += `  = $${consolidatedPricePerCap.toFixed(2)} each = $${consolidatedTotal.toFixed(2)}\n`;
+                text += `Size: ${item.size}
+`;
             });
             
-            // Calculate consolidated subtotal including additional logos
-            // Already have additionalLogoPrices and additionalLogoCostPerPiece from above
-            const consolidatedSubtotal = product.sizePricedItems.reduce((sum, item) => {
-                const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                return sum + (consolidatedPricePerCap * item.quantity);
-            }, 0);
-            text += `Subtotal: $${consolidatedSubtotal.toFixed(2)}\n\n`;
+            // Logo description
+            text += `Includes front logo`;
+            const additionalLogos = this.currentQuote.logos.filter(l => l.position !== 'Cap Front');
+            if (additionalLogos.length > 0) {
+                text += ` + ${additionalLogos.map(l => l.position.toLowerCase()).join(', ')}`;
+            }
+            text += `
+`;
+            
+            // Get consolidated price per cap (includes all logos and fees)
+            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
+            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
+            const pricePerCap = product.sizePricedItems[0].unitPrice + additionalLogoCostPerPiece;
+            const lineTotal = pricePerCap * product.totalQuantity;
+            subtotal += lineTotal;
+            
+            // Quantity, price, total aligned
+            const qtyStr = product.totalQuantity.toString();
+            const priceStr = `$${pricePerCap.toFixed(2)}`;
+            const totalStr = `$${lineTotal.toFixed(2)}`;
+            
+            text += `${' '.repeat(36)}${qtyStr.padEnd(12)}${priceStr.padEnd(14)}${totalStr}
+
+`;
         });
         
-        text += `${'='.repeat(50)}\n\n`;
+        text += `${'='.repeat(60)}
+`;
         
-        // Additional logos are now included in the consolidated price per cap above
+        // Subtotal
+        const productSubtotal = this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + this.currentQuote.setupFees;
+        text += `Subtotal (${this.currentQuote.totalQuantity} pieces):${' '.repeat(31)}$${subtotalBeforeTax.toFixed(2)}
+`;
         
-        // Totals
-        text += `${'='.repeat(50)}\n\n`;
-        text += `Total Quantity: ${this.currentQuote.totalQuantity} caps\n`;
-        text += `Decorated Caps Total${this.currentQuote.hasLTM ? ' (includes all embroidery & small batch)' : ' (includes all embroidery)'}: $${(this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0)).toFixed(2)}\n`;
+        // Sales tax
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        text += `Milton, WA Sales Tax (10.1%):${' '.repeat(23)}$${salesTax.toFixed(2)}
+`;
         
-        if (this.currentQuote.setupFees > 0) {
-            text += `Setup Fees: $${this.currentQuote.setupFees.toFixed(2)}\n`;
+        // Grand total
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        text += `
+GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
+
+`;
+        
+        // Special notes
+        const notes = document.getElementById('quote-notes')?.value.trim() || document.getElementById('special-notes')?.value.trim();
+        if (notes) {
+            text += `Special Notes
+`;
+            text += `${notes}
+
+`;
         }
         
-        // Small Batch Fee is now included in the per-piece pricing above
+        // Terms & Conditions
+        text += `Terms & Conditions:
+`;
+        text += `• This quote is valid for 30 days from the date of issue
+`;
+        text += `• 50% deposit required to begin production
+`;
+        text += `• Production time: 14 business days after order and art approval
+`;
+        text += `• Rush production available (7 business days) - add 25%
+`;
+        text += `• Prices subject to change based on final artwork requirements
+
+`;
         
-        text += `\nGRAND TOTAL: $${this.currentQuote.grandTotal.toFixed(2)}\n\n`;
-        
-        text += `Contact: Northwest Custom Apparel\n`;
-        text += `Phone: 253-922-5793\n`;
-        text += `Email: sales@nwcustomapparel.com\n`;
+        text += `Thank you for choosing Northwest Custom Apparel!
+`;
+        text += `Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793
+`;
         
         return text;
     }
