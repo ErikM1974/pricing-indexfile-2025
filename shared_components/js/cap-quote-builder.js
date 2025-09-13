@@ -678,39 +678,39 @@ class CapQuoteBuilder {
      * Build email data for EmailJS
      */
     buildEmailData(quoteID, quoteData) {
-        const customer = quoteData.customerInfo;
+        const customer = quoteData.customerInfo || {};
         
         // Calculate totals with tax
-        const productSubtotal = this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0);
-        const subtotalBeforeTax = productSubtotal + this.currentQuote.setupFees;
+        const productSubtotal = (this.currentQuote.subtotal || 0) + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + (this.currentQuote.setupFees || 0);
         const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
         const grandTotalWithTax = subtotalBeforeTax + salesTax;
         
-        return {
+        // Debug log to see what we're sending
+        const emailData = {
             // Email routing (these match EmailJS settings)
-            customerEmail: customer.email, // Maps to {{customerEmail}} in template
+            customerEmail: customer.email || '',
             
             // Quote identification
-            quoteID: quoteID,
+            quoteID: quoteID || '',
             currentDate: new Date().toLocaleDateString('en-US'),
             
-            // Customer information
-            customerName: customer.name || 'Not provided',
+            // Customer information - ALWAYS provide these even if empty
+            customerName: customer.name || '',
             customerCompany: customer.company || '',
-            customerEmail: customer.email || 'Not provided',
             customerPhone: customer.phone || '',
             
-            // Project details
-            projectName: customer.project || 'Cap Embroidery Order',
+            // Project details - ALWAYS provide these
+            projectName: customer.project || '',
             salesRepName: customer.salesRepName || 'General Sales',
-            totalQuantity: this.currentQuote.totalQuantity.toString(),
+            totalQuantity: (this.currentQuote.totalQuantity || 0).toString(),
             pricingTier: this.currentQuote.tier || 'Standard',
             
             // Embroidery details HTML
-            embroideryDetails: this.generateEmbroideryDetailsHTML(),
+            embroideryDetails: this.generateEmbroideryDetailsHTML() || '',
             
             // Products table HTML (just the rows, not the full table)
-            productsTable: this.generateProductsTableHTML(),
+            productsTable: this.generateProductsTableHTML() || '',
             
             // Pricing (without $ sign - template adds it)
             subtotal: subtotalBeforeTax.toFixed(2),
@@ -718,8 +718,14 @@ class CapQuoteBuilder {
             grandTotal: grandTotalWithTax.toFixed(2),
             
             // Optional notes
-            specialNotes: customer.notes || ''
+            specialNotes: customer.notes || '',
+            
+            // Add the full HTML quote as a fallback
+            quote_html: this.generateQuoteHTML(quoteID, quoteData) || ''
         };
+        
+        console.log('[CapQuoteBuilder] Email data being sent:', emailData);
+        return emailData;
     }
     
     /**
