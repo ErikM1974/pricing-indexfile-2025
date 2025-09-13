@@ -710,7 +710,7 @@ class EmbroideryQuoteBuilder {
         this.currentPricing.logos.forEach((logo, idx) => {
             const isPrimary = idx === 0;
             text += `• ${logo.position} (${logo.stitchCount.toLocaleString()} stitches)`;
-            text += isPrimary ? ' - INCLUDED IN BASE PRICE' : ' - ADDITIONAL LOGO';
+            text += isPrimary ? ' - INCLUDED IN BASE PRICE' : ` - ADDITIONAL LOGO (+$${logo.additionalLogoCost?.toFixed(2) || '0.00'} per piece)`;
             if (logo.needsDigitizing) text += ' [+$100 Digitizing]';
             text += `\n`;
         });
@@ -720,47 +720,49 @@ class EmbroideryQuoteBuilder {
         }
         text += `\n`;
         
-        // Products
+        // Calculate total additional logo cost per piece
+        let totalAdditionalLogoCost = 0;
+        if (this.currentPricing.additionalServices) {
+            totalAdditionalLogoCost = this.currentPricing.additionalServices
+                .reduce((sum, service) => sum + service.unitPrice, 0);
+        }
+        
+        // Products with consolidated pricing
         text += `PRODUCTS:\n`;
+        let overallTotal = 0;
+        
         this.currentPricing.products.forEach(pp => {
             text += `${pp.product.style} - ${pp.product.color} (${pp.product.totalQuantity} pieces)\n`;
             text += `  ${pp.product.title}\n`;
+            
+            let productSubtotal = 0;
             pp.lineItems.forEach(item => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                text += `  ${item.description}: ${item.quantity} @ $${displayPrice.toFixed(2)} = $${item.total.toFixed(2)}\n`;
+                // Calculate consolidated price (base + LTM + additional logos)
+                const basePrice = item.unitPriceWithLTM || item.unitPrice;
+                const consolidatedPrice = basePrice + totalAdditionalLogoCost;
+                const lineTotal = consolidatedPrice * item.quantity;
+                
+                text += `  ${item.description}: ${item.quantity} @ $${consolidatedPrice.toFixed(2)} = $${lineTotal.toFixed(2)}\n`;
+                productSubtotal += lineTotal;
             });
-            text += `  Subtotal: $${pp.subtotal.toFixed(2)}\n\n`;
+            
+            text += `  Subtotal: $${productSubtotal.toFixed(2)}\n\n`;
+            overallTotal += productSubtotal;
         });
         
-        // Additional Services
-        if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
-            text += `ADDITIONAL SERVICES:\n`;
-            this.currentPricing.additionalServices.forEach(service => {
-                text += `${service.description}: ${service.quantity} @ $${service.unitPrice.toFixed(2)} = $${service.total.toFixed(2)}\n`;
-            });
-            text += `\n`;
+        // Setup fees (digitizing)
+        if (this.currentPricing.setupFees > 0) {
+            text += `SETUP FEES:\n`;
+            text += `Digitizing: $${this.currentPricing.setupFees.toFixed(2)}\n\n`;
+            overallTotal += this.currentPricing.setupFees;
         }
         
-        // Totals
-        const subtotalBeforeTax = this.currentPricing.subtotal + 
-                                  (this.currentPricing.additionalServicesTotal || 0) + 
-                                  this.currentPricing.setupFees + 
-                                  (this.currentPricing.ltmFee || 0);
-        const salesTax = subtotalBeforeTax * 0.101;
-        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        // Totals - using corrected overall total
+        const salesTax = overallTotal * 0.101;
+        const grandTotalWithTax = overallTotal + salesTax;
         
         text += `TOTALS:\n`;
-        text += `Products & Primary Embroidery: $${this.currentPricing.subtotal.toFixed(2)}\n`;
-        if (this.currentPricing.additionalServicesTotal > 0) {
-            text += `Additional Services: $${this.currentPricing.additionalServicesTotal.toFixed(2)}\n`;
-        }
-        if (this.currentPricing.setupFees > 0) {
-            text += `Setup Fees: $${this.currentPricing.setupFees.toFixed(2)}\n`;
-        }
-        if (this.currentPricing.ltmFee > 0) {
-            text += `Small Batch Fee: $${this.currentPricing.ltmFee.toFixed(2)}\n`;
-        }
-        text += `Subtotal: $${subtotalBeforeTax.toFixed(2)}\n`;
+        text += `Subtotal: $${overallTotal.toFixed(2)}\n`;
         text += `Milton, WA Sales Tax (10.1%): $${salesTax.toFixed(2)}\n`;
         text += `GRAND TOTAL: $${grandTotalWithTax.toFixed(2)}\n`;
         text += `\n`;
@@ -1029,8 +1031,8 @@ class EmbroideryQuoteBuilder {
         // Build the embroidery package details
         if (pricing.logos && pricing.logos.length > 0) {
             pricing.logos.forEach((logo, index) => {
-                const isPrimary = logo.isPrimary !== false;
-                const logoType = isPrimary ? 'PRIMARY LOGO - INCLUDED IN BASE PRICE' : `ADDITIONAL LOGO ${index}`;
+                const isPrimary = index === 0; // First logo is always primary
+                const logoType = isPrimary ? 'PRIMARY LOGO - INCLUDED IN BASE PRICE' : `ADDITIONAL LOGO`;
                 
                 html += `<p>✓ <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches) - <em>${logoType}</em></p>`;
                 
@@ -1038,6 +1040,12 @@ class EmbroideryQuoteBuilder {
                     html += `<p style="margin-left: 15px; color: #666;">• Digitizing Fee: $100.00</p>`;
                 }
             });
+        }
+        
+        // Add LTM fee notice if applicable
+        if (pricing.ltmFee && pricing.ltmFee > 0) {
+            const ltmPerPiece = (pricing.ltmFee / pricing.totalQuantity).toFixed(2);
+            html += `<p style="color: #ff6b6b; margin-top: 5px;">⚠ Small Batch Fee: $${ltmPerPiece} per piece (orders under 24)</p>`;
         }
         
         html += `</div>`;
@@ -1056,49 +1064,26 @@ class EmbroideryQuoteBuilder {
                     <tbody>
         `;
         
-        // Add each product
+        // Add each product with consolidated pricing
         if (pricing.products && pricing.products.length > 0) {
+            // Calculate total additional logo cost from API data
+            let totalAdditionalLogoCost = 0;
+            if (pricing.additionalServices) {
+                totalAdditionalLogoCost = pricing.additionalServices
+                    .reduce((sum, service) => sum + service.unitPrice, 0);
+            }
+            
             pricing.products.forEach(productPricing => {
                 const product = productPricing.product;
                 
-                // Group regular sizes
-                const regularSizes = productPricing.lineItems.filter(item => {
-                    const desc = item.description || '';
-                    return !desc.includes('2XL') && !desc.includes('3XL') && 
-                           !desc.includes('4XL') && !desc.includes('5XL') && !desc.includes('6XL');
-                });
-                
-                if (regularSizes.length > 0) {
-                    const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
-                    const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
-                    const unitPrice = regularSizes[0].unitPriceWithLTM || regularSizes[0].unitPrice;
-                    
-                    html += `
-                        <tr>
-                            <td>
-                                <strong>${product.style} - ${product.color}</strong><br>
-                                ${product.title}<br>
-                                <span style="color: #666; font-size: 10px;">
-                                    Regular sizes (S-XL)<br>
-                                    ${pricing.logos ? pricing.logos.length + ' logo position(s)' : ''}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">${totalQty}</td>
-                            <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
-                        </tr>
-                    `;
-                }
-                
-                // Show each extended size separately
-                const extendedSizes = productPricing.lineItems.filter(item => {
-                    const desc = item.description || '';
-                    return desc.includes('2XL') || desc.includes('3XL') || 
-                           desc.includes('4XL') || desc.includes('5XL') || desc.includes('6XL');
-                });
-                
-                extendedSizes.forEach(item => {
+                // Process each line item with consolidated pricing
+                productPricing.lineItems.forEach(item => {
+                    const basePrice = item.unitPrice;
+                    const ltmPerPiece = pricing.ltmFee > 0 ? pricing.ltmFee / pricing.totalQuantity : 0;
                     const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
+                    const correctedTotal = consolidatedPrice * item.quantity;
+                    
                     html += `
                         <tr>
                             <td>
@@ -1110,34 +1095,15 @@ class EmbroideryQuoteBuilder {
                                 </span>
                             </td>
                             <td style="text-align: center;">${item.quantity}</td>
-                            <td style="text-align: right;">$${displayPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${item.total.toFixed(2)}</td>
+                            <td style="text-align: right;">$${consolidatedPrice.toFixed(2)}</td>
+                            <td style="text-align: right;">$${correctedTotal.toFixed(2)}</td>
                         </tr>
                     `;
                 });
             });
         }
         
-        // Add additional services if any
-        if (pricing.additionalServices && pricing.additionalServices.length > 0) {
-            pricing.additionalServices.forEach(service => {
-                const desc = service.type === 'monogram' 
-                    ? 'Personalized Names/Monogramming'
-                    : service.description.replace(/AL-\d+\s*/g, '');
-                
-                html += `
-                    <tr>
-                        <td>
-                            <strong>${desc}</strong><br>
-                            <span style="color: #666; font-size: 10px;">Additional service</span>
-                        </td>
-                        <td style="text-align: center;">${service.quantity}</td>
-                        <td style="text-align: right;">$${service.unitPrice.toFixed(2)}</td>
-                        <td style="text-align: right;">$${service.total.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-        }
+        // Additional services are already included in consolidated pricing, so we don't show them separately
         
         // Calculate totals - LTM fee is already included in pricing.subtotal
         const subtotal = pricing.subtotal + (pricing.additionalServicesTotal || 0) + pricing.setupFees;
@@ -1168,7 +1134,7 @@ class EmbroideryQuoteBuilder {
                             <td colspan="3" style="text-align: right; font-size: 14px;">
                                 <strong>GRAND TOTAL:</strong>
                             </td>
-                            <td style="text-align: right; font-size: 14px; color: #4cb354;">
+                            <td style="text-align: right; font-size: 14px; color: #333;">
                                 <strong>$${finalTotal.toFixed(2)}</strong>
                             </td>
                         </tr>
@@ -1327,156 +1293,6 @@ class EmbroideryQuoteBuilder {
         return text;
     }
     
-    /**
-     * Handle copy quote to clipboard
-     */
-    async handleCopyQuote() {
-        if (!this.validateCustomerInfo()) return;
-        
-        try {
-            const customerData = this.getCustomerData();
-            
-            // Generate quote ID
-            const quoteId = this.quoteService.generateQuoteID();
-            
-            // Store the quote ID in currentPricing for consistency
-            if (this.currentPricing) {
-                this.currentPricing.quoteId = quoteId;
-            }
-            
-            // Generate plain text quote
-            const quoteText = this.generatePlainTextQuote(quoteId, customerData, this.currentPricing);
-            
-            // Copy to clipboard
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                // Modern API
-                await navigator.clipboard.writeText(quoteText);
-            } else {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = quoteText;
-                textArea.style.position = 'fixed';
-                textArea.style.top = '-9999px';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            }
-            
-            // Save to database
-            try {
-                await this.quoteService.saveQuote(
-                    { quoteId },
-                    customerData,
-                    this.currentPricing
-                );
-            } catch (error) {
-                console.error('Database save error:', error);
-            }
-            
-            // Show success message
-            const copyBtn = document.getElementById('copy-quote-btn');
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            copyBtn.classList.add('btn-success');
-            copyBtn.classList.remove('btn-secondary');
-            
-            // Revert button after 2 seconds
-            setTimeout(() => {
-                copyBtn.innerHTML = originalText;
-                copyBtn.classList.remove('btn-success');
-                copyBtn.classList.add('btn-secondary');
-            }, 2000);
-            
-            // Also show alert
-            alert(`Quote #${quoteId} has been copied to your clipboard.\n\nYou can now paste it into any email client or document.`);
-            
-        } catch (error) {
-            console.error('Copy error:', error);
-            alert('Failed to copy quote to clipboard');
-        }
-    }
-    
-    /**
-     * Handle print quote
-     */
-    handlePrintQuote() {
-        if (!this.currentPricing) {
-            this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
-            return;
-        }
-        
-        console.log('[EmbroideryQuoteBuilder] Handling print quote...');
-        
-        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteId();
-        const customerData = this.getCustomerData();
-        const printContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
-        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-        
-        printWindow.onload = () => {
-            printWindow.print();
-            setTimeout(() => printWindow.close(), 500);
-        };
-    }
-    
-    /**
-     * Generate print HTML
-     */
-    generatePrintHTML() {
-        if (!this.currentPricing) return '';
-        
-        let html = '<div class="quote-content">';
-        
-        // Logos
-        html += '<h3>Embroidery Specifications:</h3>';
-        this.currentPricing.logos.forEach((logo, idx) => {
-            html += `<p>${idx + 1}. ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches`;
-            if (logo.needsDigitizing) html += ' ✓ Digitizing: $100';
-            html += '</p>';
-        });
-        
-        // Products
-        html += '<h3>Products:</h3>';
-        this.currentPricing.products.forEach(pp => {
-            html += `<div class="product-summary">`;
-            html += `<h4>${pp.product.style} - ${pp.product.color} - ${pp.product.totalQuantity} pieces</h4>`;
-            
-            pp.lineItems.forEach(item => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                html += `<p>${item.description} @ $${displayPrice.toFixed(2)} each = $${item.total.toFixed(2)}</p>`;
-            });
-            
-            html += `<p><strong>Subtotal: $${pp.subtotal.toFixed(2)}</strong></p></div>`;
-        });
-        
-        // Additional Services
-        if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
-            html += '<h3>Additional Services:</h3>';
-            this.currentPricing.additionalServices.forEach(service => {
-                html += `<p>${service.description} (${service.quantity} pieces) @ $${service.unitPrice.toFixed(2)} = $${service.total.toFixed(2)}</p>`;
-            });
-        }
-        
-        // Totals
-        html += '<div class="totals">';
-        html += `<p>Total Quantity: ${this.currentPricing.totalQuantity} pieces</p>`;
-        html += `<p>Products & Primary Embroidery: $${this.currentPricing.subtotal.toFixed(2)}</p>`;
-        if (this.currentPricing.additionalServicesTotal > 0) {
-            html += `<p>Additional Services: $${this.currentPricing.additionalServicesTotal.toFixed(2)}</p>`;
-        }
-        if (this.currentPricing.setupFees > 0) {
-            html += `<p>Setup Fees: $${this.currentPricing.setupFees.toFixed(2)}</p>`;
-        }
-        html += `<p class="grand-total">GRAND TOTAL: $${this.currentPricing.grandTotal.toFixed(2)}</p>`;
-        html += '</div>';
-        
-        html += '</div>';
-        return html;
-    }
     
     /**
      * Validate customer information
