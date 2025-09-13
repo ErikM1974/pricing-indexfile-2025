@@ -273,15 +273,36 @@ class EmbroideryQuoteService {
                 productsTable: this.generateProductsTableHTML(pricingResults) || '',
                 
                 // Pricing (without $ sign - template adds it)
-                subtotal: subtotalBeforeTax.toFixed(2),
-                salesTax: salesTax.toFixed(2),
-                grandTotal: grandTotalWithTax.toFixed(2),
+                subtotal: subtotalBeforeTax.toFixed(2) || '0.00',
+                salesTax: salesTax.toFixed(2) || '0.00',
+                grandTotal: grandTotalWithTax.toFixed(2) || '0.00',
                 
-                // Optional notes
-                specialNotes: customerData.notes || '',
+                // Optional notes - use 'none' to hide the section when empty
+                specialNotes: customerData.notes ? customerData.notes : 'none',
                 
                 // Add the full HTML quote as a fallback
-                quote_html: this.generateProfessionalQuoteHTML(quoteData, customerData, pricingResults) || ''
+                quote_html: this.generateProfessionalQuoteHTML(quoteData, customerData, pricingResults) || '',
+                
+                // Additional fields that might be expected by template
+                companyPhone: '253-922-5793',
+                companyEmail: 'sales@nwcustomapparel.com',
+                companyAddress: '2025 Freeman Road East, Milton, WA 98354',
+                validDays: '30',
+                depositPercent: '50',
+                productionDays: '14',
+                rushDays: '7',
+                rushPercent: '25',
+                taxRate: '10.1',
+                taxLocation: 'Milton, WA',
+                companyYear: '1977',
+                companyName: 'Northwest Custom Apparel',
+                quotationType: 'Embroidery Contract',
+                
+                // Ensure stitch count info - calculate if not provided
+                totalStitches: pricingResults.totalStitches 
+                    ? pricingResults.totalStitches.toLocaleString()
+                    : (pricingResults.logos?.reduce((sum, logo) => sum + (logo.stitchCount || 0), 0) || 0).toLocaleString(),
+                logoCount: (pricingResults.logos?.length || 0).toString()
             };
             
             console.log('[EmbroideryQuoteService] Email data being sent:', emailData);
@@ -328,11 +349,22 @@ class EmbroideryQuoteService {
     generateProductsTableHTML(pricingResults) {
         if (!pricingResults || !pricingResults.products) return '';
         
+        // Calculate total additional logo cost per piece
+        let totalAdditionalLogoCost = 0;
+        if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+            totalAdditionalLogoCost = pricingResults.additionalServices
+                .reduce((sum, service) => sum + service.unitPrice, 0);
+        }
+        
         let html = '';
         pricingResults.products.forEach(pp => {
             const product = pp.product;
             pp.lineItems.forEach(item => {
-                const price = item.unitPriceWithLTM || item.unitPrice;
+                // Consolidate pricing: base + LTM + additional logos
+                const basePrice = item.unitPriceWithLTM || item.unitPrice;
+                const consolidatedPrice = basePrice + totalAdditionalLogoCost;
+                const lineTotal = consolidatedPrice * item.quantity;
+                
                 html += `
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd;">
@@ -344,32 +376,14 @@ class EmbroideryQuoteService {
                             </span>
                         </td>
                         <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.quantity}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${price.toFixed(2)}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${item.total.toFixed(2)}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${consolidatedPrice.toFixed(2)}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${lineTotal.toFixed(2)}</td>
                     </tr>
                 `;
             });
         });
         
-        // Add additional services if any
-        if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
-            pricingResults.additionalServices.forEach(service => {
-                html += `
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #ddd;">
-                            <strong>${service.description}</strong><br>
-                            <span style="color: #666; font-size: 12px;">
-                                ${service.partNumber}
-                                ${service.hasSubsetUpcharge ? '<br>*Includes subset upcharge' : ''}
-                            </span>
-                        </td>
-                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${service.quantity}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${service.unitPrice.toFixed(2)}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${service.total.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-        }
+        // Don't show additional services as separate lines since they're included in consolidated pricing
         
         return html;
     }

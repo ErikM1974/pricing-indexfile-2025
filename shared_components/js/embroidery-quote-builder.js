@@ -529,11 +529,11 @@ class EmbroideryQuoteBuilder {
                         'Database Save Failed',
                         `Quote could not be saved to database: ${result.error}\nYou can still print or copy the quote.`
                     );
-                    quoteID = this.quoteService.generateQuoteId();
+                    quoteID = this.quoteService.generateQuoteID();
                 }
             } else {
                 // Generate quote ID for display even if not saving
-                quoteID = this.quoteService.generateQuoteId();
+                quoteID = this.quoteService.generateQuoteID();
                 saveSuccess = true;
             }
             
@@ -572,7 +572,7 @@ class EmbroideryQuoteBuilder {
             const customerData = this.getCustomerData();
             
             // Generate quote ID
-            const quoteID = this.quoteService.generateQuoteId();
+            const quoteID = this.quoteService.generateQuoteID();
             
             // Store the quote ID for other functions
             if (this.currentPricing) {
@@ -657,7 +657,7 @@ class EmbroideryQuoteBuilder {
         
         console.log('[EmbroideryQuoteBuilder] Handling print quote...');
         
-        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteId();
+        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
         const customerData = this.getCustomerData();
         const printContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
         
@@ -677,7 +677,7 @@ class EmbroideryQuoteBuilder {
     generateQuoteText() {
         if (!this.currentPricing) return '';
         
-        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteId();
+        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
         const customerData = this.getCustomerData();
         const currentDate = new Date().toLocaleDateString('en-US');
         
