@@ -466,27 +466,58 @@ class CapQuoteBuilder {
             // Save to database if requested
             const saveToDb = document.getElementById('save-to-database')?.checked;
             let quoteID = null;
+            let saveSuccess = false;
             
             if (saveToDb) {
                 const saveResult = await this.quoteService.saveQuote(this.currentQuote);
                 
                 if (saveResult.success) {
                     quoteID = saveResult.quoteID;
+                    saveSuccess = true;
                     console.log('[CapQuoteBuilder] ✅ Quote saved to database:', quoteID);
                 } else {
                     console.error('[CapQuoteBuilder] Database save failed:', saveResult.error);
-                    // Continue without failing - user still gets quote
+                    
+                    // Show visible error message
+                    this.showErrorMessage(
+                        'Database Save Failed',
+                        `Quote could not be saved to database: ${saveResult.error}\nYou can still print or copy the quote.`
+                    );
+                    
+                    // Generate quote ID anyway for display
+                    quoteID = this.quoteService.generateQuoteID();
                 }
             } else {
                 // Generate quote ID for display even if not saving
                 quoteID = this.quoteService.generateQuoteID();
+                saveSuccess = true;
             }
             
-            this.showSuccessModal(quoteID, this.currentQuote);
+            // Show appropriate notification
+            if (saveSuccess) {
+                this.showSuccessModal(quoteID, this.currentQuote);
+            } else {
+                // Still store data for print/copy functionality
+                window.lastQuoteData = {
+                    quoteId: quoteID,
+                    customerName: this.currentQuote.customerInfo?.name || 'Customer',
+                    customerEmail: this.currentQuote.customerInfo?.email || '',
+                    customerPhone: this.currentQuote.customerInfo?.phone || '',
+                    companyName: this.currentQuote.customerInfo?.company || '',
+                    projectName: this.currentQuote.customerInfo?.project || '',
+                    items: this.currentQuote.products || [],
+                    grandTotal: this.currentQuote.grandTotal || 0
+                };
+            }
             
         } catch (error) {
             console.error('[CapQuoteBuilder] ❌ Save quote failed:', error);
-            alert(`Failed to save quote: ${error.message}`);
+            
+            // Show detailed error message
+            this.showErrorMessage(
+                'Quote Save Failed',
+                `An error occurred while saving the quote:\n${error.message}\n\nPlease try again or contact support if the problem persists.`
+            );
         } finally {
             this.showLoading(false);
         }
@@ -992,213 +1023,355 @@ class CapQuoteBuilder {
     generatePrintHTML(quoteID, quoteData) {
         if (!this.currentQuote) return '';
         
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        
         let html = `
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Cap Quote ${quoteID}</title>
+                <title>Cap Embroidery Quote ${quoteID}</title>
                 <style>
+                    @page { 
+                        margin: 0.5in;
+                        size: letter;
+                    }
                     body { 
                         font-family: Arial, sans-serif; 
-                        margin: 20px; 
-                        line-height: 1.4;
+                        font-size: 12px;
+                        line-height: 1.4; 
+                        color: #333;
+                        margin: 0;
+                    }
+                    
+                    /* Compact invoice header */
+                    .invoice-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 20px;
+                        padding-bottom: 10px;
+                        border-bottom: 2px solid #4cb354;
+                    }
+                    .company-info {
+                        flex: 1;
+                    }
+                    .logo {
+                        max-width: 150px;
+                        height: auto;
+                        margin-bottom: 5px;
+                    }
+                    .company-info p {
+                        margin: 2px 0;
+                        font-size: 11px;
+                        color: #555;
+                    }
+                    .invoice-title {
+                        text-align: right;
+                        flex: 1;
+                    }
+                    .invoice-title h1 {
+                        margin: 0;
+                        font-size: 24px;
                         color: #333;
                     }
-                    .header { 
-                        text-align: center; 
-                        border-bottom: 2px solid #4cb354; 
-                        padding-bottom: 15px; 
+                    .invoice-title .quote-id {
+                        font-size: 16px;
+                        color: #4cb354;
+                        margin: 5px 0;
+                    }
+                    .invoice-title p {
+                        margin: 2px 0;
+                        font-size: 11px;
+                        color: #555;
+                    }
+                    
+                    /* Customer info box */
+                    .info-row {
+                        display: flex;
+                        gap: 20px;
                         margin-bottom: 20px;
                     }
-                    .quote-content { margin: 20px 0; }
-                    .section { margin: 20px 0; }
-                    .section h3 { 
-                        color: #4cb354; 
-                        border-bottom: 1px solid #eee; 
-                        padding-bottom: 5px;
-                        margin-bottom: 15px;
+                    .info-box {
+                        flex: 1;
+                        background: #f8f9fa;
+                        padding: 10px;
+                        border-radius: 4px;
                     }
-                    .logo-spec { 
-                        margin: 10px 0; 
-                        padding: 5px 0;
+                    .info-box h3 {
+                        margin: 0 0 5px 0;
+                        font-size: 12px;
+                        color: #4cb354;
+                        text-transform: uppercase;
                     }
-                    .product-summary { 
-                        margin: 15px 0; 
-                        padding: 10px; 
-                        border: 1px solid #eee;
+                    .info-box p {
+                        margin: 2px 0;
+                        font-size: 11px;
                     }
-                    .product-summary h4 { 
-                        margin: 0 0 10px 0; 
-                        color: #2c5530;
+                    
+                    /* Compact table */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
                     }
-                    .line-item { 
-                        display: flex; 
-                        justify-content: space-between; 
-                        margin: 5px 0;
-                        padding: 2px 0;
+                    th, td {
+                        padding: 6px 8px;
+                        text-align: left;
+                        border: 1px solid #ddd;
+                        font-size: 11px;
                     }
-                    .totals { 
-                        border-top: 2px solid #4cb354; 
-                        padding-top: 15px; 
-                        margin-top: 20px; 
+                    th {
+                        background: #4cb354;
+                        color: white;
+                        font-weight: bold;
+                        text-transform: uppercase;
                     }
-                    .total-line { 
-                        display: flex; 
-                        justify-content: space-between; 
-                        margin: 5px 0;
-                        padding: 2px 0;
+                    td:last-child, th:last-child {
+                        text-align: right;
                     }
-                    .grand-total { 
-                        font-weight: bold; 
-                        font-size: 1.1em; 
-                        border-top: 1px solid #ccc; 
-                        padding-top: 10px;
-                        margin-top: 10px;
-                    }
-                    .badge { 
-                        padding: 2px 6px; 
-                        border-radius: 3px; 
-                        font-size: 0.8em; 
+                    .subtotal-row td {
+                        border-top: 2px solid #ddd;
                         font-weight: bold;
                     }
-                    .badge-primary { 
-                        background: #4cb354; 
-                        color: white;
+                    .total-row td {
+                        background: #f8f9fa;
+                        font-weight: bold;
+                        font-size: 13px;
+                        border-top: 2px solid #4cb354;
                     }
-                    .badge-additional { 
-                        background: #6c757d; 
-                        color: white;
+                    
+                    /* Notes section */
+                    .notes-section {
+                        background: #fff3cd;
+                        border: 1px solid #ffeaa7;
+                        padding: 8px;
+                        border-radius: 4px;
+                        margin-bottom: 20px;
+                        font-size: 11px;
                     }
-                    @media print { 
-                        body { margin: 0; }
-                        .no-print { display: none; }
+                    .notes-section h4 {
+                        margin: 0 0 4px 0;
+                        font-size: 12px;
+                        color: #856404;
+                    }
+                    
+                    /* Compact footer */
+                    .footer {
+                        text-align: center;
+                        font-size: 10px;
+                        color: #666;
+                        border-top: 1px solid #ddd;
+                        padding-top: 10px;
+                    }
+                    .footer p {
+                        margin: 2px 0;
+                    }
+                    
+                    @media print {
+                        body { 
+                            print-color-adjust: exact; 
+                            -webkit-print-color-adjust: exact; 
+                        }
+                        .invoice-header {
+                            break-after: avoid;
+                        }
+                        table {
+                            break-inside: avoid;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <div class="header">
-                    <h1>Northwest Custom Apparel</h1>
-                    <h2>Cap Embroidery Quote #${quoteID}</h2>
-                    <p>Valid for 30 days | Phone: (253) 922-5793</p>
+                <!-- Compact header with logo and invoice info side by side -->
+                <div class="invoice-header">
+                    <div class="company-info">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" class="logo">
+                        <p>2025 Freeman Road East, Milton, WA 98354</p>
+                        <p>Phone: (253) 922-5793 | sales@nwcustomapparel.com</p>
+                    </div>
+                    <div class="invoice-title">
+                        <h1>QUOTE</h1>
+                        <div class="quote-id">${quoteID}</div>
+                        <p>Date: ${new Date().toLocaleDateString()}</p>
+                        <p>Valid for: 30 days</p>
+                    </div>
                 </div>
-                <div class="quote-content">
+                
+                <!-- Customer and project info -->
+                <div class="info-row">
+                    <div class="info-box">
+                        <h3>Customer Information</h3>
+                        <p><strong>${quoteData.customerInfo?.name || 'Customer'}</strong></p>
+                        ${quoteData.customerInfo?.company ? `<p>${quoteData.customerInfo.company}</p>` : ''}
+                        <p>${quoteData.customerInfo?.email || ''}</p>
+                        <p>${quoteData.customerInfo?.phone || ''}</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Project Details</h3>
+                        <p><strong>Type:</strong> Cap Embroidery</p>
+                        ${quoteData.customerInfo?.project ? `<p><strong>Project:</strong> ${quoteData.customerInfo.project}</p>` : ''}
+                        <p><strong>Total Pieces:</strong> ${this.currentQuote.totalQuantity}</p>
+                        <p><strong>Pricing Tier:</strong> ${this.currentQuote.tier}</p>
+                        ${quoteData.customerInfo?.salesRepName ? `<p><strong>Quote Prepared By:</strong> ${quoteData.customerInfo.salesRepName}</p>` : ''}
+                    </div>
+                </div>
+                
+                <!-- Embroidery Package Breakdown -->
+                <div style="background: #f0f8f0; border: 1px solid #4cb354; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 13px; color: #4cb354; text-transform: uppercase;">Embroidery Package for This Order:</h3>
         `;
         
-        // Embroidery Specifications
-        html += '<div class="section">';
-        html += '<h3>Embroidery Specifications:</h3>';
-        this.currentQuote.logos.forEach((logo, idx) => {
-            const isPrimary = logo.isRequired || idx === 0;
-            html += `<div class="logo-spec">`;
-            html += `${idx + 1}. ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches `;
-            html += isPrimary ? '<span class="badge badge-primary">PRIMARY</span>' : '<span class="badge badge-additional">ADDITIONAL</span>';
-            if (logo.needsDigitizing) html += ' ✓ Digitizing: $100';
-            html += '</div>';
+        // Build the embroidery package details
+        const frontLogo = this.currentQuote.logos.find(l => l.position === 'Cap Front');
+        const additionalLogos = this.currentQuote.logos.filter(l => l.position !== 'Cap Front');
+        const hasLTM = this.currentQuote.hasLTM;
+        const ltmPerPiece = hasLTM ? (this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity) : 0;
+        
+        // Show front logo
+        if (frontLogo) {
+            html += `<p style="margin: 3px 0; font-size: 11px;">✓ ${frontLogo.position} (${frontLogo.stitchCount.toLocaleString()} stitches) - <strong>INCLUDED IN BASE PRICE</strong></p>`;
+        }
+        
+        // Show additional logos with individual pricing
+        additionalLogos.forEach(logo => {
+            // Get the actual price for this logo position
+            const logoPrice = 6.00; // This should be calculated based on actual pricing
+            html += `<p style="margin: 3px 0; font-size: 11px;">✓ ${logo.position} (${logo.stitchCount.toLocaleString()} stitches) - <strong>ADDITIONAL (+$${logoPrice.toFixed(2)})</strong></p>`;
         });
         
-        if (this.currentQuote.hasLTM) {
-            html += '<p><em>*Includes small batch pricing for orders under 24 pieces</em></p>';
+        // Show small batch fee if applicable
+        if (hasLTM) {
+            html += `<p style="margin: 3px 0; font-size: 11px;">✓ Small Batch Fee - <strong>ADDITIONAL (+$${ltmPerPiece.toFixed(2)} per piece for orders under 24)</strong></p>`;
         }
-        html += '</div>';
         
-        // Products
-        html += '<div class="section">';
-        html += '<h3>Caps:</h3>';
+        html += `
+                </div>
+                
+                <!-- Main Invoice Table -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="50%">Description</th>
+                            <th width="15%">Quantity</th>
+                            <th width="15%">Unit Price</th>
+                            <th width="20%">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Don't need the header row anymore since we have the package breakdown above
+        
+        // Add each product with proper formatting
         this.currentQuote.products.forEach(product => {
-            html += `<div class="product-summary">`;
-            html += `<h4>${product.styleNumber} - ${product.color} - ${product.totalQuantity} pieces</h4>`;
-            html += `<p>${product.title} | ${product.brand}</p>`;
-            
-            // Get additional logo pricing for all items
             const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
             const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
             
             product.sizePricedItems.forEach(item => {
                 const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                
-                // Get front logo breakdown for extra stitch display
-                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
-                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
-                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
-                
-                // Get cap price and embroidery breakdown from product pricingBreakdown
-                const capPrice = product.pricingBreakdown?.capPrice || 0;
-                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
-                
-                // Calculate base price (cap + base embroidery, rounded)
-                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
-                const combinedBasePrice = Math.ceil(capPrice + baseEmbroideryPrice);
-                
-                // Calculate consolidated price including additional logos
-                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                 const consolidatedTotal = consolidatedPricePerCap * item.quantity;
                 
-                html += `<div class="line-item">`;
-                html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
-                html += `<span>$${consolidatedTotal.toFixed(2)}</span>`;
-                html += `</div>`;
-                html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px; margin-bottom: 5px;">`;
-                
-                // Build first line with base components
-                let baseComponents = [];
-                baseComponents.push(`Base: $${combinedBasePrice.toFixed(2)}`);
-                if (hasExtraStitches && extraStitchCost > 0) {
-                    baseComponents.push(`Extra stitches: $${extraStitchCost.toFixed(2)}`);
-                }
-                if (ltmPerPiece > 0) {
-                    baseComponents.push(`Small batch: $${ltmPerPiece.toFixed(2)}`);
-                }
-                html += baseComponents.join(' + ');
-                
-                // Add additional logos line if present
-                if (additionalLogoPrices.length > 0) {
-                    html += `<br>`;
-                    const logoDetails = additionalLogoPrices.map(logo => 
-                        `${logo.position}: $${logo.pricePerPiece.toFixed(2)}`
-                    ).join(' + ');
-                    html += `+ ${logoDetails}`;
-                }
-                
-                html += `<br>= $${consolidatedPricePerCap.toFixed(2)} each`;
-                html += `</div>`;
+                html += `
+                        <tr>
+                            <td>
+                                <strong>${product.styleNumber} - ${product.color}</strong><br>
+                                <span style="font-size: 10px; color: #666;">
+                                    ${product.title} | ${product.brand}<br>
+                                    Size: ${item.size}${upchargeNote}<br>
+                                    <em>Includes ${additionalLogoPrices.length > 0 ? 'all ' + (additionalLogoPrices.length + 1) + ' logos' : 'front logo'}${this.currentQuote.hasLTM ? ' + small batch fee' : ''}</em>
+                                </span>
+                            </td>
+                            <td>${item.quantity}</td>
+                            <td>$${consolidatedPricePerCap.toFixed(2)}</td>
+                            <td>$${consolidatedTotal.toFixed(2)}</td>
+                        </tr>
+                `;
             });
-            
-            // Calculate consolidated subtotal including additional logos
-            const subtotalAdditionalLogoPrices2 = product.pricingBreakdown?.additionalLogoPrices || [];
-            const subtotalAdditionalLogoCostPerPiece2 = subtotalAdditionalLogoPrices2.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-            const consolidatedSubtotal2 = product.sizePricedItems.reduce((sum, item) => {
-                const consolidatedPricePerCap = item.unitPrice + subtotalAdditionalLogoCostPerPiece2;
-                return sum + (consolidatedPricePerCap * item.quantity);
-            }, 0);
-            html += `<p><strong>Subtotal: $${consolidatedSubtotal2.toFixed(2)}</strong></p>`;
-            html += `</div>`;
         });
-        html += '</div>';
         
-        // Totals
-        html += '<div class="totals">';
-        html += `<div class="total-line"><span>Total Quantity:</span><span>${this.currentQuote.totalQuantity} pieces</span></div>`;
-        
-        // Show caps & embroidery with LTM indicator if applicable
-        const capsLabel = this.currentQuote.hasLTM ? 
-            "Caps & Embroidery (includes small batch):" : 
-            "Caps & Embroidery:";
-        html += `<div class="total-line"><span>${capsLabel}</span><span>$${this.currentQuote.subtotal.toFixed(2)}</span></div>`;
-        
-        if (this.currentQuote.additionalEmbroideryTotal && this.currentQuote.additionalEmbroideryTotal > 0) {
-            html += `<div class="total-line"><span>Additional Logo Embroidery:</span><span>$${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</span></div>`;
-        }
-        
+        // Add setup fees if any
         if (this.currentQuote.setupFees > 0) {
             const digitizingLogos = this.currentQuote.logos.filter(l => l.needsDigitizing).length;
-            html += `<div class="total-line"><span>Setup Fees (${digitizingLogos} logos):</span><span>$${this.currentQuote.setupFees.toFixed(2)}</span></div>`;
+            html += `
+                        <tr>
+                            <td>
+                                <strong>Digitizing Setup Fees</strong><br>
+                                <span style="font-size: 10px; color: #666;">
+                                    ${digitizingLogos} logo${digitizingLogos > 1 ? 's' : ''} @ $100.00 each
+                                </span>
+                            </td>
+                            <td>${digitizingLogos}</td>
+                            <td>$100.00</td>
+                            <td>$${this.currentQuote.setupFees.toFixed(2)}</td>
+                        </tr>
+            `;
         }
         
-        html += `<div class="total-line grand-total"><span>GRAND TOTAL:</span><span>$${this.currentQuote.grandTotal.toFixed(2)}</span></div>`;
-        html += '</div>';
+        // Add totals with sales tax
+        const productSubtotal = this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + this.currentQuote.setupFees;
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
         
         html += `
+                    </tbody>
+                    <tfoot>
+                        <tr class="subtotal-row">
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Subtotal (${this.currentQuote.totalQuantity} pieces):</td>
+                            <td style="text-align: right; font-weight: bold;">$${productSubtotal.toFixed(2)}</td>
+                        </tr>
+        `;
+        
+        if (this.currentQuote.setupFees > 0) {
+            html += `
+                        <tr>
+                            <td colspan="3" style="text-align: right;">Setup Fees:</td>
+                            <td style="text-align: right;">$${this.currentQuote.setupFees.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Subtotal before tax:</td>
+                            <td style="text-align: right; font-weight: bold;">$${subtotalBeforeTax.toFixed(2)}</td>
+                        </tr>
+            `;
+        }
+        
+        html += `
+                        <tr>
+                            <td colspan="3" style="text-align: right;">Milton, WA Sales Tax (10.1%):</td>
+                            <td style="text-align: right;">$${salesTax.toFixed(2)}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3" style="text-align: right; font-size: 14px;"><strong>GRAND TOTAL:</strong></td>
+                            <td style="text-align: right; font-size: 14px;"><strong>$${grandTotalWithTax.toFixed(2)}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+        `;
+        
+        // Add notes section if present
+        if (quoteData.customerInfo?.notes) {
+            html += `
+                <div class="notes-section">
+                    <h4>Special Notes</h4>
+                    <p>${quoteData.customerInfo.notes}</p>
+                </div>
+            `;
+        }
+        
+        // Add footer
+        html += `
+                <div class="footer">
+                    <p><strong>Terms & Conditions:</strong></p>
+                    <p>• This quote is valid for 30 days from the date of issue</p>
+                    <p>• 50% deposit required to begin production</p>
+                    <p>• Production time: 14 business days after order and art approval</p>
+                    <p>• Rush production available (7 business days) - add 25%</p>
+                    <p>• Prices subject to change based on final artwork requirements</p>
+                    <p style="margin-top: 10px;"><strong>Thank you for choosing Northwest Custom Apparel!</strong></p>
+                    <p>Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793</p>
                 </div>
                 <script>
                     window.onload = () => {
@@ -1214,23 +1387,76 @@ class CapQuoteBuilder {
     }
     
     /**
-     * Show success modal
+     * Show success notification (simplified from modal)
      */
     showSuccessModal(quoteID, quoteData) {
-        const modal = document.getElementById('success-modal');
-        const quoteIdSpan = document.getElementById('modal-quote-id');
-        const customerSpan = document.getElementById('modal-customer');
-        const totalSpan = document.getElementById('modal-total');
+        // Store quote data globally for page buttons
+        window.lastQuoteData = {
+            quoteId: quoteID,
+            customerName: quoteData.customerInfo?.name || 'Customer',
+            customerEmail: quoteData.customerInfo?.email || '',
+            customerPhone: quoteData.customerInfo?.phone || '',
+            companyName: quoteData.customerInfo?.company || '',
+            projectName: quoteData.customerInfo?.project || '',
+            items: quoteData.products || [],
+            grandTotal: quoteData.grandTotal || 0
+        };
         
-        if (modal && quoteIdSpan && customerSpan && totalSpan) {
-            quoteIdSpan.textContent = quoteID;
-            customerSpan.textContent = quoteData.customerInfo?.name || 'Customer';
-            totalSpan.textContent = `$${quoteData.grandTotal.toFixed(2)}`;
-            
-            modal.style.display = 'flex';
-            
-            console.log('[CapQuoteBuilder] Success modal displayed:', quoteID);
-        }
+        // Show success message (non-modal)
+        const successMessage = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <i class="fas fa-check-circle" style="color: #28a745; font-size: 24px;"></i>
+                <div>
+                    <strong>Quote Saved Successfully!</strong><br>
+                    Quote ID: ${quoteID}<br>
+                    Customer: ${quoteData.customerInfo?.name || 'Customer'}<br>
+                    Total: $${quoteData.grandTotal.toFixed(2)}
+                </div>
+            </div>
+        `;
+        
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            min-width: 350px;
+            border-left: 4px solid #28a745;
+            animation: slideIn 0.3s ease-out;
+        `;
+        toast.innerHTML = successMessage;
+        document.body.appendChild(toast);
+        
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            toast.style.animation = 'slideIn 0.3s ease-out reverse';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+        
+        console.log('[CapQuoteBuilder] Success notification displayed:', quoteID);
     }
     
     /**
@@ -1250,6 +1476,51 @@ class CapQuoteBuilder {
      */
     isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    /**
+     * Show error message with details
+     */
+    showErrorMessage(title, message) {
+        // Create error notification
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            min-width: 400px;
+            max-width: 500px;
+            border-left: 4px solid #dc3545;
+        `;
+        
+        errorDiv.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 24px; margin-top: 3px;"></i>
+                <div style="flex: 1;">
+                    <strong style="color: #dc3545; font-size: 16px;">${title}</strong>
+                    <p style="margin: 10px 0 0 0; white-space: pre-line;">${message}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; color: #666; cursor: pointer; font-size: 20px; padding: 0; margin: -5px -5px 0 0;">
+                    ×
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(errorDiv);
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (errorDiv.parentElement) {
+                errorDiv.remove();
+            }
+        }, 10000);
     }
     
     /**

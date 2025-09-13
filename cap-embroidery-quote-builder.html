@@ -445,46 +445,7 @@
         </section>
     </div>
 
-    <!-- Success Modal -->
-    <div id="success-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header success">
-                <i class="fas fa-check-circle"></i>
-                <h2>Quote Saved Successfully!</h2>
-            </div>
-            <div class="modal-body">
-                <div class="quote-id-display">
-                    <strong>Quote ID:</strong> 
-                    <span id="modal-quote-id"></span>
-                    <button class="copy-btn" onclick="copyQuoteId()">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-                <div class="modal-details">
-                    <p><strong>Customer:</strong> <span id="modal-customer"></span></p>
-                    <p><strong>Total:</strong> <span id="modal-total"></span></p>
-                    <p><strong>Date:</strong> <span id="modal-date"></span></p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeModal()" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Close
-                </button>
-                <button onclick="printQuote()" class="btn btn-secondary">
-                    <i class="fas fa-print"></i> Print
-                </button>
-                <button onclick="copyQuote()" class="btn btn-secondary">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-                <button onclick="emailQuote()" class="btn btn-secondary">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-                <button onclick="newQuote()" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Quote
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Success Modal Removed - Using page buttons instead -->
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
@@ -860,43 +821,29 @@
             });
         });
         
-        // Global functions for modal buttons
+        // Global functions for buttons - updated to work without modal
         function printQuote() {
-            if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+            if (!window.capQuoteBuilder?.currentQuote) {
+                alert('Please generate a quote first');
                 return;
             }
-            quoteFormatter.openPrintDialog(lastQuoteData);
+            window.capQuoteBuilder.handlePrintQuote();
         }
         
         function copyQuote() {
-            if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+            if (!window.capQuoteBuilder?.currentQuote) {
+                alert('Please generate a quote first');
                 return;
             }
-            
-            quoteFormatter.copyToClipboard(lastQuoteData).then(success => {
-                if (success) {
-                    quoteBuilderBase.showSuccess('Quote copied to clipboard!');
-                } else {
-                    quoteBuilderBase.showError('Failed to copy quote');
-                }
-            });
+            window.capQuoteBuilder.handleCopyQuote();
         }
         
         function emailQuote() {
-            if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+            if (!window.capQuoteBuilder?.currentQuote) {
+                alert('Please generate a quote first');
                 return;
             }
-            quoteFormatter.openEmailClient(lastQuoteData);
-        }
-        
-        function copyQuoteId() {
-            const quoteId = document.getElementById('modal-quote-id').textContent;
-            navigator.clipboard.writeText(quoteId).then(() => {
-                quoteBuilderBase.showSuccess('Quote ID copied!');
-            });
+            window.capQuoteBuilder.handleEmailQuote();
         }
         
         function newQuote() {
@@ -904,15 +851,6 @@
                 localStorage.removeItem('CAPEMB_draft');
                 location.reload();
             }
-        }
-        
-        function closeModal() {
-            document.getElementById('success-modal').style.display = 'none';
-        }
-        
-        // Update existing closeSuccessModal to use new name
-        function closeSuccessModal() {
-            closeModal();
         }
         
         // Debugging tools will be added by cap-quote-builder.js
