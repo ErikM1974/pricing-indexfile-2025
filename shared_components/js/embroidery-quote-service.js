@@ -241,50 +241,55 @@ class EmbroideryQuoteService {
             // Get sales rep info
             const salesRep = this.salesReps.find(rep => rep.email === salesRepEmail) || this.salesReps[0];
             
-            // Build email data
+            // Calculate totals with tax
+            const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
+            const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+            const grandTotalWithTax = subtotalBeforeTax + salesTax;
+            
+            // Build email data - ALWAYS provide all variables even if empty
             const emailData = {
-                // Email routing
-                to_email: customerData.email,
-                reply_to: salesRepEmail,
-                from_name: 'Northwest Custom Apparel',
+                // Email routing (these match EmailJS settings)
+                customerEmail: customerData.email || '',
                 
-                // Quote info
-                quote_type: 'Embroidery Quote',
-                quote_id: quoteData.quoteId,
-                quote_date: new Date().toLocaleDateString(),
+                // Quote identification
+                quoteID: quoteData.quoteId || '',
+                currentDate: new Date().toLocaleDateString('en-US'),
                 
-                // Customer info
-                customer_name: customerData.name,
-                customer_email: customerData.email,
-                customer_phone: customerData.phone || '',
-                company_name: customerData.company || '',
-                project_name: customerData.project || '',
+                // Customer information - ALWAYS provide these even if empty
+                customerName: customerData.name || '',
+                customerCompany: customerData.company || '',
+                customerPhone: customerData.phone || '',
                 
-                // Pricing
-                grand_total: `$${pricingResults.grandTotal.toFixed(2)}`,
-                subtotal: `$${pricingResults.subtotal.toFixed(2)}`,
-                setup_fees: `$${pricingResults.setupFees.toFixed(2)}`,
-                ltm_fee: pricingResults.ltmFee > 0 ? `$${pricingResults.ltmFee.toFixed(2)}` : '',
+                // Project details - ALWAYS provide these
+                projectName: customerData.project || '',
+                salesRepName: salesRep.name || 'General Sales',
+                totalQuantity: (pricingResults.totalQuantity || 0).toString(),
+                pricingTier: pricingResults.tier || 'Standard',
                 
-                // Sales rep
-                sales_rep_name: salesRep.name,
-                sales_rep_email: salesRepEmail,
-                sales_rep_phone: '253-922-5793',
+                // Embroidery details HTML
+                embroideryDetails: this.generateEmbroideryDetailsHTML(pricingResults) || '',
                 
-                // Company
-                company_year: '1977',
+                // Products table HTML (just the rows, not the full table)
+                productsTable: this.generateProductsTableHTML(pricingResults) || '',
                 
-                // Notes
-                notes: customerData.notes || 'No special notes for this order',
+                // Pricing (without $ sign - template adds it)
+                subtotal: subtotalBeforeTax.toFixed(2),
+                salesTax: salesTax.toFixed(2),
+                grandTotal: grandTotalWithTax.toFixed(2),
                 
-                // HTML content
-                quote_details_html: this.generateQuoteHTML(pricingResults)
+                // Optional notes
+                specialNotes: customerData.notes || '',
+                
+                // Add the full HTML quote as a fallback
+                quote_html: this.generateProfessionalQuoteHTML(quoteData, customerData, pricingResults) || ''
             };
+            
+            console.log('[EmbroideryQuoteService] Email data being sent:', emailData);
             
             // Send email
             const result = await emailjs.send(
                 'service_1c4k67j',
-                'template_embroidery_quote', // You'll need to create this template
+                'template_3wmw3no', // Embroidery Quote template
                 emailData
             );
             
@@ -298,7 +303,214 @@ class EmbroideryQuoteService {
     }
     
     /**
-     * Generate quote HTML for email
+     * Generate embroidery details HTML for email template
+     */
+    generateEmbroideryDetailsHTML(pricingResults) {
+        if (!pricingResults || !pricingResults.logos) return '';
+        
+        let html = '';
+        pricingResults.logos.forEach(logo => {
+            html += `
+                <div style="margin: 8px 0;">
+                    <span style="color: #4cb354;">✓</span> 
+                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches)
+                    ${logo.needsDigitizing ? '<span style="color: #666; font-style: italic;"> - Includes digitizing</span>' : ''}
+                </div>
+            `;
+        });
+        
+        return html;
+    }
+    
+    /**
+     * Generate products table HTML rows for email template
+     */
+    generateProductsTableHTML(pricingResults) {
+        if (!pricingResults || !pricingResults.products) return '';
+        
+        let html = '';
+        pricingResults.products.forEach(pp => {
+            const product = pp.product;
+            pp.lineItems.forEach(item => {
+                const price = item.unitPriceWithLTM || item.unitPrice;
+                html += `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            <strong>${product.style} - ${product.color}</strong><br>
+                            ${product.title}<br>
+                            <span style="color: #666; font-size: 12px;">
+                                ${item.description}<br>
+                                Includes embroidery
+                            </span>
+                        </td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.quantity}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${price.toFixed(2)}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${item.total.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        });
+        
+        // Add additional services if any
+        if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+            pricingResults.additionalServices.forEach(service => {
+                html += `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            <strong>${service.description}</strong><br>
+                            <span style="color: #666; font-size: 12px;">
+                                ${service.partNumber}
+                                ${service.hasSubsetUpcharge ? '<br>*Includes subset upcharge' : ''}
+                            </span>
+                        </td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${service.quantity}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${service.unitPrice.toFixed(2)}</td>
+                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${service.total.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        return html;
+    }
+    
+    /**
+     * Generate complete professional quote HTML
+     */
+    generateProfessionalQuoteHTML(quoteData, customerData, pricingResults) {
+        const currentDate = new Date().toLocaleDateString('en-US');
+        const salesRep = this.salesReps.find(rep => rep.email === (customerData.salesRepEmail || 'sales@nwcustomapparel.com')) || this.salesReps[0];
+        
+        // Calculate totals with tax
+        const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        
+        let html = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+            <!-- Header with Company Info -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px 8px 0 0;">
+                <div style="text-align: center;">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel" 
+                         style="max-width: 200px; height: auto; margin-bottom: 10px;">
+                    <div style="color: #666; font-size: 14px;">
+                        <p style="margin: 5px 0;">2025 Freeman Road East, Milton, WA 98354</p>
+                        <p style="margin: 5px 0;">Phone: (253) 922-5793 | sales@nwcustomapparel.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quote Header -->
+            <div style="background: #4cb354; color: white; padding: 15px; text-align: center;">
+                <h1 style="margin: 0; font-size: 24px;">QUOTE</h1>
+                <p style="margin: 5px 0; font-size: 18px;">${quoteData.quoteId}</p>
+                <p style="margin: 5px 0;">Date: ${currentDate} | Valid for: 30 days</p>
+            </div>
+            
+            <!-- Customer & Project Info -->
+            <div style="display: flex; gap: 20px; padding: 20px; background: #f8f9fa;">
+                <div style="flex: 1;">
+                    <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Customer Information</h3>
+                    <p style="margin: 5px 0; font-weight: bold;">${customerData.name || 'Not provided'}</p>
+                    ${customerData.company ? `<p style="margin: 5px 0;">${customerData.company}</p>` : ''}
+                    <p style="margin: 5px 0;">${customerData.email || 'Not provided'}</p>
+                    ${customerData.phone ? `<p style="margin: 5px 0;">${customerData.phone}</p>` : ''}
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Project Details</h3>
+                    <p style="margin: 5px 0;"><strong>Type:</strong> Embroidery</p>
+                    ${customerData.project ? `<p style="margin: 5px 0;"><strong>Project:</strong> ${customerData.project}</p>` : ''}
+                    <p style="margin: 5px 0;"><strong>Total Pieces:</strong> ${pricingResults.totalQuantity}</p>
+                    <p style="margin: 5px 0;"><strong>Quote Prepared By:</strong> ${salesRep.name}</p>
+                </div>
+            </div>
+            
+            <!-- Embroidery Package -->
+            <div style="padding: 20px; background: #e8f5e9; margin: 20px 0; border-radius: 8px;">
+                <h3 style="color: #4cb354; margin: 0 0 15px 0;">EMBROIDERY SPECIFICATIONS:</h3>
+                ${this.generateEmbroideryDetailsHTML(pricingResults)}
+            </div>
+            
+            <!-- Products Table -->
+            <div style="padding: 20px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background: #4cb354; color: white;">
+                            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">DESCRIPTION</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">QUANTITY</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">UNIT PRICE</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.generateProductsTableHTML(pricingResults)}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                <strong>Subtotal (${pricingResults.totalQuantity} pieces):</strong>
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                <strong>$${subtotalBeforeTax.toFixed(2)}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                Milton, WA Sales Tax (10.1%):
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                $${salesTax.toFixed(2)}
+                            </td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px;">
+                                <strong>GRAND TOTAL:</strong>
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px; color: #4cb354;">
+                                <strong>$${grandTotalWithTax.toFixed(2)}</strong>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <!-- Special Notes -->
+            ${customerData.notes ? `
+                <div style="padding: 20px; background: #fff9c4; margin: 20px; border-radius: 8px;">
+                    <h3 style="color: #f9a825; margin: 0 0 10px 0;">Special Notes</h3>
+                    <p style="margin: 0; color: #666;">${customerData.notes}</p>
+                </div>
+            ` : ''}
+            
+            <!-- Terms & Conditions -->
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 0 0 8px 8px;">
+                <h3 style="color: #4cb354; margin: 0 0 15px 0;">Terms & Conditions:</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #666; line-height: 1.6;">
+                    <li>This quote is valid for 30 days from the date of issue</li>
+                    <li>50% deposit required to begin production</li>
+                    <li>Production time: 14 business days after order and art approval</li>
+                    <li>Rush production available (7 business days) - add 25%</li>
+                    <li>Prices subject to change based on final artwork requirements</li>
+                </ul>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="color: #4cb354; font-weight: bold; margin: 10px 0;">
+                        Thank you for choosing Northwest Custom Apparel!
+                    </p>
+                    <p style="color: #666; font-size: 12px; margin: 5px 0;">
+                        Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793
+                    </p>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        return html;
+    }
+    
+    /**
+     * Generate simple quote HTML for legacy compatibility
      */
     generateQuoteHTML(pricingResults) {
         let html = '<div style="font-family: Arial, sans-serif;">';
