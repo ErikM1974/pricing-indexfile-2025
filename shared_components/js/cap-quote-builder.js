@@ -15,7 +15,7 @@ class CapQuoteBuilder {
         
         this.emailConfig = {
             serviceId: 'service_1c4k67j',
-            templateId: null // To be set when template is created
+            templateId: 'template_wlty7o8' // Cap Embroidery Quote template
         };
         
         // Initialize components
@@ -904,177 +904,190 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
     generateQuoteHTML(quoteID, quoteData) {
         if (!this.currentQuote) return '';
         
-        let html = '<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.4;">';
+        const currentDate = new Date().toLocaleDateString('en-US');
+        const customerInfo = this.collectCustomerInfo();
         
-        // Header
+        let html = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+            <!-- Header with Company Info -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px 8px 0 0;">
+                <div style="text-align: center;">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                         alt="Northwest Custom Apparel" 
+                         style="max-width: 200px; height: auto; margin-bottom: 10px;">
+                    <div style="color: #666; font-size: 14px;">
+                        <p style="margin: 5px 0;">2025 Freeman Road East, Milton, WA 98354</p>
+                        <p style="margin: 5px 0;">Phone: (253) 922-5793 | sales@nwcustomapparel.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quote Header -->
+            <div style="background: #4cb354; color: white; padding: 15px; text-align: center;">
+                <h1 style="margin: 0; font-size: 24px;">QUOTE</h1>
+                <p style="margin: 5px 0; font-size: 18px;">${quoteID}</p>
+                <p style="margin: 5px 0;">Date: ${currentDate} | Valid for: 30 days</p>
+            </div>
+            
+            <!-- Customer & Project Info -->
+            <div style="display: flex; gap: 20px; padding: 20px; background: #f8f9fa;">
+                <div style="flex: 1;">
+                    <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Customer Information</h3>
+                    <p style="margin: 5px 0; font-weight: bold;">${customerInfo.name || 'Not provided'}</p>
+                    ${customerInfo.company ? `<p style="margin: 5px 0;">${customerInfo.company}</p>` : ''}
+                    <p style="margin: 5px 0;">${customerInfo.email || 'Not provided'}</p>
+                    ${customerInfo.phone ? `<p style="margin: 5px 0;">${customerInfo.phone}</p>` : ''}
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Project Details</h3>
+                    <p style="margin: 5px 0;"><strong>Type:</strong> Cap Embroidery</p>
+                    ${customerInfo.project ? `<p style="margin: 5px 0;"><strong>Project:</strong> ${customerInfo.project}</p>` : ''}
+                    <p style="margin: 5px 0;"><strong>Total Pieces:</strong> ${this.currentQuote.totalQuantity}</p>
+                    <p style="margin: 5px 0;"><strong>Pricing Tier:</strong> ${this.currentQuote.tier}</p>
+                    <p style="margin: 5px 0;"><strong>Quote Prepared By:</strong> ${customerInfo.salesRepName || 'General Sales'}</p>
+                </div>
+            </div>
+            
+            <!-- Embroidery Package -->
+            <div style="padding: 20px; background: #e8f5e9; margin: 20px 0; border-radius: 8px;">
+                <h3 style="color: #4cb354; margin: 0 0 15px 0;">EMBROIDERY PACKAGE FOR THIS ORDER:</h3>
+        `;
+        
+        this.currentQuote.logos.forEach(logo => {
+            const isPrimary = logo.position === 'Cap Front';
+            html += `
+                <div style="margin: 8px 0;">
+                    <span style="color: #4cb354;">✓</span> 
+                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches)
+                    <span style="color: #666; font-style: italic;">
+                        - ${isPrimary ? 'INCLUDED IN BASE PRICE' : 'ADDITIONAL LOGO'}
+                    </span>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+        
+        // Products Table
         html += `
-            <div style="text-align: center; border-bottom: 2px solid #4cb354; padding-bottom: 10px; margin-bottom: 20px;">
-                <h2 style="color: #4cb354; margin: 0;">Cap Embroidery Quote #${quoteID}</h2>
-                <p style="margin: 5px 0;">Valid for 30 days</p>
+            <div style="padding: 20px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background: #4cb354; color: white;">
+                            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">DESCRIPTION</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">QUANTITY</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">UNIT PRICE</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Add each product
+        this.currentQuote.products.forEach(product => {
+            // Get consolidated price per cap
+            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
+            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
+            const pricePerCap = product.sizePricedItems[0].unitPrice + additionalLogoCostPerPiece;
+            const lineTotal = pricePerCap * product.totalQuantity;
+            
+            // Logo description
+            let logoDesc = 'Includes front logo';
+            const additionalLogos = this.currentQuote.logos.filter(l => l.position !== 'Cap Front');
+            if (additionalLogos.length > 0) {
+                logoDesc += ' + ' + additionalLogos.map(l => l.position.toLowerCase()).join(', ');
+            }
+            
+            html += `
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <strong>${product.styleNumber} - ${product.color}</strong><br>
+                        ${product.title}<br>
+                        <span style="color: #666; font-size: 12px;">
+                            Size: ${product.sizePricedItems.map(item => item.size).join(', ')}<br>
+                            ${logoDesc}
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${product.totalQuantity}</td>
+                    <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${pricePerCap.toFixed(2)}</td>
+                    <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${lineTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+        
+        // Calculate totals with tax
+        const productSubtotal = this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + this.currentQuote.setupFees;
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        
+        // Add totals rows
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                <strong>Subtotal (${this.currentQuote.totalQuantity} pieces):</strong>
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                <strong>$${subtotalBeforeTax.toFixed(2)}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                Milton, WA Sales Tax (10.1%):
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                $${salesTax.toFixed(2)}
+                            </td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px;">
+                                <strong>GRAND TOTAL:</strong>
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px; color: #4cb354;">
+                                <strong>$${grandTotalWithTax.toFixed(2)}</strong>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         `;
         
-        // Embroidery Specifications
-        html += '<div style="margin: 20px 0;">';
-        html += '<h3 style="color: #4cb354; border-bottom: 1px solid #eee; padding-bottom: 5px;">Embroidery Specifications:</h3>';
-        this.currentQuote.logos.forEach((logo, idx) => {
-            const isPrimary = logo.isRequired || idx === 0;
-            const badgeStyle = isPrimary ? 
-                'background: #4cb354; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;' :
-                'background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;';
-            
-            html += `<div style="margin: 10px 0;">`;
-            html += `${idx + 1}. ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches `;
-            html += `<span style="${badgeStyle}">${isPrimary ? 'PRIMARY' : 'ADDITIONAL'}</span>`;
-            if (logo.needsDigitizing) html += ' ✓ Digitizing: $100';
-            html += '</div>';
-        });
-        
-        if (this.currentQuote.hasLTM) {
-            html += '<p style="font-style: italic; color: #666;">*Includes small batch pricing for orders under 24 pieces</p>';
-        }
-        html += '</div>';
-        
-        // Products
-        html += '<div style="margin: 20px 0;">';
-        html += '<h3 style="color: #4cb354; border-bottom: 1px solid #eee; padding-bottom: 5px;">Caps:</h3>';
-        
-        this.currentQuote.products.forEach(product => {
-            html += `<div style="border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 5px;">`;
-            html += `<h4 style="margin: 0 0 10px 0; color: #2c5530;">${product.styleNumber} - ${product.color}</h4>`;
-            html += `<p style="margin: 0 0 10px 0; color: #666;">${product.title} | ${product.brand} | ${product.totalQuantity} pieces total</p>`;
-            
-            // Get additional logo pricing for all items
-            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
-            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-            
-            product.sizePricedItems.forEach(item => {
-                const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                
-                // Get front logo breakdown for extra stitch display
-                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
-                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
-                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
-                
-                // Get cap price and embroidery breakdown from product pricingBreakdown
-                const capPrice = product.pricingBreakdown?.capPrice || 0;
-                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
-                
-                // Calculate base price (cap + base embroidery, rounded)
-                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
-                const combinedBasePrice = Math.ceil(capPrice + baseEmbroideryPrice);
-                
-                // Calculate consolidated price including additional logos
-                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
-                const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                const consolidatedTotal = consolidatedPricePerCap * item.quantity;
-                
-                html += `<div style="margin: 5px 0; padding: 2px 0;">`;
-                html += `<div style="display: flex; justify-content: space-between;">`;
-                html += `<span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>`;
-                html += `<span>$${consolidatedTotal.toFixed(2)}</span>`;
-                html += `</div>`;
-                html += `<div style="font-size: 0.9em; color: #666; margin-left: 20px;">`;
-                
-                // Build first line with base components
-                let baseComponents = [];
-                baseComponents.push(`Base: $${combinedBasePrice.toFixed(2)}`);
-                if (hasExtraStitches && extraStitchCost > 0) {
-                    baseComponents.push(`Extra stitches: $${extraStitchCost.toFixed(2)}`);
-                }
-                if (ltmPerPiece > 0) {
-                    baseComponents.push(`Small batch: $${ltmPerPiece.toFixed(2)}`);
-                }
-                html += baseComponents.join(' + ');
-                
-                // Add additional logos line if present
-                if (additionalLogoPrices.length > 0) {
-                    html += `<br>`;
-                    const logoDetails = additionalLogoPrices.map(logo => 
-                        `${logo.position}: $${logo.pricePerPiece.toFixed(2)}`
-                    ).join(' + ');
-                    html += `+ ${logoDetails}`;
-                }
-                
-                html += `<br>= $${consolidatedPricePerCap.toFixed(2)} each`;
-                html += `</div>`;
-                html += `</div>`;
-            });
-            
-            // Calculate consolidated subtotal including additional logos
-            const subtotalAdditionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
-            const subtotalAdditionalLogoCostPerPiece = subtotalAdditionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-            const consolidatedSubtotal = product.sizePricedItems.reduce((sum, item) => {
-                const consolidatedPricePerCap = item.unitPrice + subtotalAdditionalLogoCostPerPiece;
-                return sum + (consolidatedPricePerCap * item.quantity);
-            }, 0);
-            html += `<p style="font-weight: bold; text-align: right; margin: 10px 0 0 0;">Subtotal: $${consolidatedSubtotal.toFixed(2)}</p>`;
-            html += `</div>`;
-        });
-        
-        html += '</div>';
-        
-        // Additional Logo Embroidery section (if applicable)
-        if (this.currentQuote.additionalEmbroideryTotal && this.currentQuote.additionalEmbroideryTotal > 0) {
-            html += '<div style="margin: 20px 0;">';
-            html += '<h3 style="color: #4cb354; border-bottom: 1px solid #eee; padding-bottom: 5px;">Additional Logo Embroidery:</h3>';
-            
-            const additionalLogos = this.currentQuote.logos.filter((logo, idx) => 
-                !logo.isRequired && idx > 0
-            );
-            
-            if (additionalLogos.length > 0) {
-                // Get individual logo pricing from the first product's breakdown
-                const individualLogoPrices = this.currentQuote.products[0]?.pricingBreakdown?.additionalLogoPrices || [];
-                
-                additionalLogos.forEach(logo => {
-                    // Find the matching individual logo price or fallback to equal division
-                    const logoData = individualLogoPrices.find(lp => lp.position === logo.position) || 
-                                   { pricePerPiece: (this.currentQuote.products[0]?.pricingBreakdown?.additionalEmbroideryPrice || 0) / additionalLogos.length };
-                    
-                    const additionalCostPerPiece = logoData.pricePerPiece;
-                    html += `<div style="border: 1px solid #eee; padding: 10px; margin: 5px 0; border-radius: 5px;">`;
-                    html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">`;
-                    html += `<span style="font-weight: bold;">${logo.position} - ${logo.stitchCount.toLocaleString()} stitches</span>`;
-                    html += `<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">ADDITIONAL</span>`;
-                    html += `</div>`;
-                    html += `<div style="display: flex; justify-content: space-between;">`;
-                    html += `<span>${this.currentQuote.totalQuantity} pieces @ $${additionalCostPerPiece.toFixed(2)} each</span>`;
-                    html += `<span style="font-weight: bold;">$${(additionalCostPerPiece * this.currentQuote.totalQuantity).toFixed(2)}</span>`;
-                    html += `</div>`;
-                    html += `</div>`;
-                });
-                
-                // Add subtotal for additional logo embroidery
-                html += `<div style="text-align: right; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">`;
-                html += `<strong>Additional Logo Subtotal: $${this.currentQuote.additionalEmbroideryTotal.toFixed(2)}</strong>`;
-                html += `</div>`;
-            }
-            
-            html += '</div>';
+        // Special Notes
+        const notes = document.getElementById('quote-notes')?.value.trim() || document.getElementById('special-notes')?.value.trim();
+        if (notes) {
+            html += `
+                <div style="padding: 20px; background: #fff9c4; margin: 20px; border-radius: 8px;">
+                    <h3 style="color: #f9a825; margin: 0 0 10px 0;">Special Notes</h3>
+                    <p style="margin: 0; color: #666;">${notes}</p>
+                </div>
+            `;
         }
         
-        // Totals
-        html += '<div style="border-top: 2px solid #4cb354; padding-top: 15px; margin-top: 20px;">';
-        html += '<h3 style="color: #4cb354; margin-bottom: 15px;">Quote Totals:</h3>';
-        
-        html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Total Quantity:</span><span>${this.currentQuote.totalQuantity} pieces</span></div>`;
-        
-        // Show consolidated caps total with all embroidery included
-        const capsLabel = this.currentQuote.hasLTM ? 
-            "Decorated Caps Total (includes all embroidery & small batch):" : 
-            "Decorated Caps Total (includes all embroidery):";
-        html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>${capsLabel}</span><span>$${(this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0)).toFixed(2)}</span></div>`;
-        
-        if (this.currentQuote.setupFees > 0) {
-            const digitizingLogos = this.currentQuote.logos.filter(l => l.needsDigitizing).length;
-            html += `<div style="display: flex; justify-content: space-between; margin: 5px 0;"><span>Setup Fees (${digitizingLogos} logos):</span><span>$${this.currentQuote.setupFees.toFixed(2)}</span></div>`;
-        }
-        
-        html += `<div style="display: flex; justify-content: space-between; margin: 10px 0; padding-top: 10px; border-top: 1px solid #ccc; font-weight: bold; font-size: 1.1em;"><span>GRAND TOTAL:</span><span>$${this.currentQuote.grandTotal.toFixed(2)}</span></div>`;
-        html += '</div>';
-        
-        html += '</div>';
+        // Terms & Conditions
+        html += `
+            <div style="padding: 20px; background: #f8f9fa; border-radius: 0 0 8px 8px;">
+                <h3 style="color: #4cb354; margin: 0 0 15px 0;">Terms & Conditions:</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #666; line-height: 1.6;">
+                    <li>This quote is valid for 30 days from the date of issue</li>
+                    <li>50% deposit required to begin production</li>
+                    <li>Production time: 14 business days after order and art approval</li>
+                    <li>Rush production available (7 business days) - add 25%</li>
+                    <li>Prices subject to change based on final artwork requirements</li>
+                </ul>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="color: #4cb354; font-weight: bold; margin: 10px 0;">
+                        Thank you for choosing Northwest Custom Apparel!
+                    </p>
+                    <p style="color: #666; font-size: 12px; margin: 5px 0;">
+                        Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793
+                    </p>
+                </div>
+            </div>
+        </div>
+        `;
         
         return html;
     }
