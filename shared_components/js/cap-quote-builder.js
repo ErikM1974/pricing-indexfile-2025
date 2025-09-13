@@ -680,41 +680,110 @@ class CapQuoteBuilder {
     buildEmailData(quoteID, quoteData) {
         const customer = quoteData.customerInfo;
         
+        // Calculate totals with tax
+        const productSubtotal = this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + this.currentQuote.setupFees;
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        
         return {
-            // Email routing
-            to_email: customer.email,
-            from_name: 'Northwest Custom Apparel',
-            reply_to: customer.salesRepEmail,
+            // Email routing (these match EmailJS settings)
+            customerEmail: customer.email, // Maps to {{customerEmail}} in template
             
             // Quote identification
-            quote_type: 'Cap Embroidery',
-            quote_id: quoteID,
-            quote_date: new Date().toLocaleDateString(),
+            quoteID: quoteID,
+            currentDate: new Date().toLocaleDateString('en-US'),
             
-            // Customer info
-            customer_name: customer.name,
-            customer_email: customer.email,
-            customer_phone: customer.phone || '',
-            company_name: customer.company || '',
-            project_name: customer.project || '',
+            // Customer information
+            customerName: customer.name || 'Not provided',
+            customerCompany: customer.company || '',
+            customerEmail: customer.email || 'Not provided',
+            customerPhone: customer.phone || '',
             
-            // Pricing
-            grand_total: `$${quoteData.grandTotal.toFixed(2)}`,
+            // Project details
+            projectName: customer.project || 'Cap Embroidery Order',
+            salesRepName: customer.salesRepName || 'General Sales',
+            totalQuantity: this.currentQuote.totalQuantity.toString(),
+            pricingTier: this.currentQuote.tier || 'Standard',
             
-            // Sales rep
-            sales_rep_name: customer.salesRepName,
-            sales_rep_email: customer.salesRepEmail,
-            sales_rep_phone: '253-922-5793',
+            // Embroidery details HTML
+            embroideryDetails: this.generateEmbroideryDetailsHTML(),
             
-            // Company
-            company_year: '1977',
+            // Products table HTML (just the rows, not the full table)
+            productsTable: this.generateProductsTableHTML(),
             
-            // Quote content (HTML)
-            quote_html: this.generateQuoteHTML(quoteID, quoteData),
+            // Pricing (without $ sign - template adds it)
+            subtotal: subtotalBeforeTax.toFixed(2),
+            salesTax: salesTax.toFixed(2),
+            grandTotal: grandTotalWithTax.toFixed(2),
             
-            // Notes
-            special_notes: customer.notes || 'No special notes for this order'
+            // Optional notes
+            specialNotes: customer.notes || ''
         };
+    }
+    
+    /**
+     * Generate embroidery details HTML for email template
+     */
+    generateEmbroideryDetailsHTML() {
+        if (!this.currentQuote || !this.currentQuote.logos) return '';
+        
+        let html = '';
+        this.currentQuote.logos.forEach(logo => {
+            const isPrimary = logo.position === 'Cap Front';
+            html += `
+                <div style="margin: 8px 0;">
+                    <span style="color: #4cb354;">✓</span> 
+                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches)
+                    <span style="color: #666; font-style: italic;">
+                        - ${isPrimary ? 'INCLUDED IN BASE PRICE' : 'ADDITIONAL LOGO'}
+                    </span>
+                </div>
+            `;
+        });
+        
+        return html;
+    }
+    
+    /**
+     * Generate products table HTML rows for email template
+     */
+    generateProductsTableHTML() {
+        if (!this.currentQuote || !this.currentQuote.products) return '';
+        
+        let html = '';
+        this.currentQuote.products.forEach(product => {
+            // Get consolidated price per cap
+            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
+            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
+            const pricePerCap = product.sizePricedItems[0].unitPrice + additionalLogoCostPerPiece;
+            const lineTotal = pricePerCap * product.totalQuantity;
+            
+            // Logo description
+            let logoDesc = 'Includes front logo';
+            const additionalLogos = this.currentQuote.logos.filter(l => l.position !== 'Cap Front');
+            if (additionalLogos.length > 0) {
+                logoDesc += ' + ' + additionalLogos.map(l => l.position.toLowerCase()).join(', ');
+            }
+            
+            html += `
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <strong>${product.styleNumber} - ${product.color}</strong><br>
+                        ${product.title}<br>
+                        <span style="color: #666; font-size: 12px;">
+                            Size: ${product.sizePricedItems.map(item => item.size).join(', ')}<br>
+                            ${logoDesc}
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${product.totalQuantity}</td>
+                    <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${pricePerCap.toFixed(2)}</td>
+                    <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${lineTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+        
+        return html;
     }
     
     /**
