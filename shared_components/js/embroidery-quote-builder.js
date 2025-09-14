@@ -340,10 +340,10 @@ class EmbroideryQuoteBuilder {
             pp.lineItems.forEach((item, index) => {
                 // Calculate pricing components
                 const ltmPerPiece = this.currentPricing.ltmFee > 0 ? this.currentPricing.ltmFee / this.currentPricing.totalQuantity : 0;
-                const extraStitchCharge = this.currentPricing.additionalStitchCost || 0; // Extra stitch charge for primary logo over 7500
+                const extraStitchCharge = this.currentPricing.additionalStitchCost || 0; // Extra stitch charge for primary logo over 8000
                 
-                // The basePrice already includes the base embroidery AND extra stitch charge
-                const basePrice = item.unitPrice;
+                // Use the stored basePrice from the line item (this is the rounded base without extra stitches)
+                const basePrice = item.basePrice || item.unitPrice; // Use stored basePrice if available
                 const displayPrice = item.unitPriceWithLTM || item.unitPrice;
                 const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
                 const correctedTotal = consolidatedPrice * item.quantity;
@@ -353,12 +353,11 @@ class EmbroideryQuoteBuilder {
                 let baseLine = '';
                 if (extraStitchCharge > 0) {
                     // Show base price with extra stitch charge separately
-                    const baseWithoutExtraStitch = basePrice - extraStitchCharge;
-                    baseLine = `Base (includes primary logo): $${baseWithoutExtraStitch.toFixed(2)} + Extra stitches: $${extraStitchCharge.toFixed(2)}`;
+                    baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCharge.toFixed(2)}`;
                     if (ltmPerPiece > 0) {
                         baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)} = $${displayPrice.toFixed(2)} each`;
                     } else {
-                        baseLine += ` = $${displayPrice.toFixed(2)} each`;
+                        baseLine += ` = $${(basePrice + extraStitchCharge).toFixed(2)} each`;
                     }
                 } else {
                     // No extra stitches, show normal breakdown
@@ -366,7 +365,7 @@ class EmbroideryQuoteBuilder {
                     if (ltmPerPiece > 0) {
                         baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)} = $${displayPrice.toFixed(2)} each`;
                     } else {
-                        baseLine += ` = $${displayPrice.toFixed(2)} each`;
+                        baseLine += ` = $${basePrice.toFixed(2)} each`;
                     }
                 }
                 

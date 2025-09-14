@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Quote #{{quoteID}}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); padding: 30px 20px; text-align: center;">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                 alt="Northwest Custom Apparel" 
+                 style="max-width: 200px; height: auto; margin-bottom: 10px;">
+            <h1 style="color: #ffffff; margin: 10px 0; font-size: 28px; font-weight: 300;">EMBROIDERY QUOTE</h1>
+            <p style="color: #ecf0f1; margin: 5px 0; font-size: 16px;">Quote #{{quoteID}}</p>
+        </div>
+
+        <!-- Quote Info Bar -->
+        <div style="background-color: #4cb354; padding: 15px 20px; color: #ffffff;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="font-size: 14px;">
+                        <strong>Date:</strong> {{currentDate}}
+                    </td>
+                    <td style="font-size: 14px; text-align: center;">
+                        <strong>Valid for:</strong> {{validDays}} days
+                    </td>
+                    <td style="font-size: 14px; text-align: right;">
+                        <strong>Quote Type:</strong> {{quotationType}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Customer Information -->
+        <div style="padding: 30px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td width="48%" style="vertical-align: top;">
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; min-height: 150px;">
+                            <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #4cb354; padding-bottom: 8px;">
+                                CUSTOMER INFORMATION
+                            </h3>
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">{{customerName}}</strong>
+                            </p>
+                            {{#if customerCompany}}
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">{{customerCompany}}</p>
+                            {{/if}}
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <a href="mailto:{{customerEmail}}" style="color: #4cb354; text-decoration: none;">{{customerEmail}}</a>
+                            </p>
+                            {{#if customerPhone}}
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">{{customerPhone}}</p>
+                            {{/if}}
+                        </div>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align: top;">
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; min-height: 150px;">
+                            <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #4cb354; padding-bottom: 8px;">
+                                PROJECT DETAILS
+                            </h3>
+                            {{#if projectName}}
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">Project:</strong> {{projectName}}
+                            </p>
+                            {{/if}}
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">Total Pieces:</strong> {{totalQuantity}}
+                            </p>
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">Total Stitches:</strong> {{totalStitches}}
+                            </p>
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">Logo Positions:</strong> {{logoCount}}
+                            </p>
+                            <p style="margin: 8px 0; color: #555; font-size: 14px;">
+                                <strong style="color: #2c3e50;">Sales Rep:</strong> {{salesRepName}}
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Embroidery Specifications -->
+            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 25px; border-left: 4px solid #4cb354;">
+                <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 16px;">
+                    EMBROIDERY SPECIFICATIONS
+                </h3>
+                <div style="color: #555; font-size: 14px;">
+                    {{{embroideryDetails}}}
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #4cb354; padding-bottom: 8px;">
+                    PRODUCTS & PRICING
+                </h3>
+                <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border: 1px solid #dee2e6;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa;">
+                            <th style="text-align: left; padding: 12px; color: #2c3e50; font-size: 13px; font-weight: 600; border-bottom: 2px solid #dee2e6;">
+                                DESCRIPTION
+                            </th>
+                            <th style="text-align: center; padding: 12px; color: #2c3e50; font-size: 13px; font-weight: 600; border-bottom: 2px solid #dee2e6;">
+                                QUANTITY
+                            </th>
+                            <th style="text-align: right; padding: 12px; color: #2c3e50; font-size: 13px; font-weight: 600; border-bottom: 2px solid #dee2e6;">
+                                UNIT PRICE
+                            </th>
+                            <th style="text-align: right; padding: 12px; color: #2c3e50; font-size: 13px; font-weight: 600; border-bottom: 2px solid #dee2e6;">
+                                TOTAL
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{{productsTable}}}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pricing Summary -->
+            <div style="margin-top: 30px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td width="60%"></td>
+                        <td width="40%">
+                            <table width="100%" cellpadding="8" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="text-align: right; color: #555; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+                                        Subtotal:
+                                    </td>
+                                    <td style="text-align: right; color: #555; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #dee2e6; font-weight: 600;">
+                                        ${{subtotal}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right; color: #555; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+                                        {{taxLocation}} Sales Tax ({{taxRate}}%):
+                                    </td>
+                                    <td style="text-align: right; color: #555; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
+                                        ${{salesTax}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right; color: #2c3e50; font-size: 18px; padding: 12px 0; font-weight: 600;">
+                                        TOTAL:
+                                    </td>
+                                    <td style="text-align: right; color: #4cb354; font-size: 18px; padding: 12px 0; font-weight: 600;">
+                                        ${{grandTotal}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Special Notes (if any) -->
+            {{#if specialNotes}}
+            <div style="background-color: #fff9c4; padding: 15px; border-radius: 8px; margin-top: 25px; border-left: 4px solid #f9a825;">
+                <h4 style="color: #f57c00; margin-top: 0; margin-bottom: 10px; font-size: 14px;">SPECIAL NOTES</h4>
+                <p style="color: #666; margin: 0; font-size: 14px;">{{specialNotes}}</p>
+            </div>
+            {{/if}}
+
+            <!-- Terms & Conditions -->
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 15px; font-size: 16px;">
+                    TERMS & CONDITIONS
+                </h3>
+                <ul style="color: #666; margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8;">
+                    <li>This quote is valid for {{validDays}} days from the date of issue</li>
+                    <li>{{depositPercent}}% deposit required to begin production</li>
+                    <li>Production time: {{productionDays}} business days after order and art approval</li>
+                    <li>Rush production available ({{rushDays}} business days) - add {{rushPercent}}%</li>
+                    <li>Prices subject to change based on final artwork requirements</li>
+                    <li>Digitizing fees are one-time charges for new artwork</li>
+                    <li>All artwork becomes property of {{companyName}}</li>
+                </ul>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; padding: 30px 20px;">
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    Ready to proceed with your order?
+                </p>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center">
+                            <a href="tel:{{companyPhone}}" 
+                               style="display: inline-block; padding: 12px 30px; background-color: #4cb354; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">
+                                Call Us: {{companyPhone}}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <p style="color: #999; font-size: 12px; margin-top: 20px;">
+                    or reply to this email with any questions
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #2c3e50; padding: 30px 20px; text-align: center;">
+            <p style="color: #ecf0f1; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">
+                {{companyName}}
+            </p>
+            <p style="color: #95a5a6; margin: 5px 0; font-size: 13px;">
+                Since {{companyYear}} | {{companyAddress}}
+            </p>
+            <p style="color: #95a5a6; margin: 5px 0; font-size: 13px;">
+                Phone: <a href="tel:{{companyPhone}}" style="color: #4cb354; text-decoration: none;">{{companyPhone}}</a> | 
+                Email: <a href="mailto:{{companyEmail}}" style="color: #4cb354; text-decoration: none;">{{companyEmail}}</a>
+            </p>
+            <p style="color: #7f8c8d; margin: 20px 0 0 0; font-size: 11px;">
+                This email was sent to {{customerEmail}} because you requested a quote from {{companyName}}.
+            </p>
+        </div>
+    </div>
+
+    <!-- Fallback HTML Quote (hidden, used as backup) -->
+    <div style="display: none;">
+        {{{quote_html}}}
+    </div>
+</body>
+</html>

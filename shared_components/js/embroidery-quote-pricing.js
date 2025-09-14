@@ -330,15 +330,19 @@ class EmbroideryPricingCalculator {
                 sizeList.push(`${item.size}(${item.qty})`);
             });
             
-            // Calculate decorated price using standard base price
-            const garmentPrice = standardBasePrice / this.marginDenominator;
-            const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
-            const finalPrice = this.roundPrice(decoratedPrice);
+            // Calculate decorated price using bottom-up logic
+            // Step 1: Calculate and ROUND the base price (garment cost + embroidery for 8k stitches)
+            const garmentCost = standardBasePrice / this.marginDenominator;
+            const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
+            const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
+            // Step 2: Add extra stitch fees on top (no more rounding)
+            const finalPrice = roundedBase + additionalStitchCost;
             
             lineItems.push({
                 description: sizeList.join(' '),
                 quantity: standardQty,
                 unitPrice: finalPrice,
+                basePrice: roundedBase,  // Store the rounded base for display
                 total: finalPrice * standardQty
             });
             
@@ -355,16 +359,20 @@ class EmbroideryPricingCalculator {
                 sizeList.push(`${item.size}(${item.qty})`);
             });
             
-            // Calculate decorated price using same standard base price + API upcharge
-            const garmentPrice = standardBasePrice / this.marginDenominator;
-            const decoratedPrice = garmentPrice + embCost + additionalStitchCost;
+            // Calculate decorated price using bottom-up logic with upcharge
+            // Step 1: Calculate and ROUND the base price with upcharge
             const upchargeAmount = parseFloat(apiUpcharge); // Use API upcharge value directly
-            const finalPrice = this.roundPrice(decoratedPrice + upchargeAmount);
+            const garmentCost = (standardBasePrice + upchargeAmount) / this.marginDenominator;
+            const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
+            const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
+            // Step 2: Add extra stitch fees on top (no more rounding)
+            const finalPrice = roundedBase + additionalStitchCost;
             
             lineItems.push({
                 description: sizeList.join(' '),
                 quantity: upchargeQty,
                 unitPrice: finalPrice,
+                basePrice: roundedBase,  // Store the rounded base for display
                 total: finalPrice * upchargeQty,
                 hasUpcharge: true
             });
