@@ -76,6 +76,25 @@ class LogoManager {
         }
     }
     
+    /**
+     * Get available positions for a logo (excludes positions used by other logos)
+     */
+    getAvailablePositions(currentLogoId) {
+        // Get all positions currently selected by OTHER logos
+        const usedPositions = this.logos
+            .filter(logo => logo.id !== currentLogoId)
+            .map(logo => logo.position);
+        
+        // Return positions that are not used by other logos
+        // OR the current logo's selected position (so it stays in dropdown)
+        const currentLogo = this.logos.find(l => l.id === currentLogoId);
+        const currentPosition = currentLogo ? currentLogo.position : null;
+        
+        return this.positions.filter(pos => 
+            !usedPositions.includes(pos) || pos === currentPosition
+        );
+    }
+    
     initializeEvents() {
         // Add logo button
         const addBtn = document.getElementById('add-logo-btn');
@@ -88,9 +107,20 @@ class LogoManager {
      * Add a new logo
      */
     addLogo() {
+        // Get available positions for the new logo (before adding it)
+        const availablePositions = this.positions.filter(pos => 
+            !this.logos.some(logo => logo.position === pos)
+        );
+        
+        // If no positions available, alert user
+        if (availablePositions.length === 0) {
+            alert('All logo positions have been used. Please remove a logo to add a new one.');
+            return;
+        }
+        
         const logo = {
             id: this.nextId++,
-            position: 'Left Chest',
+            position: availablePositions[0] || 'Left Chest', // Use first available position
             stitchCount: 8000,
             needsDigitizing: false,
             isPrimary: this.logos.length === 0,  // First logo is primary
@@ -213,7 +243,7 @@ class LogoManager {
                         <div class="form-group">
                             <label for="logo-position-${logo.id}">Position</label>
                             <select id="logo-position-${logo.id}" class="logo-position">
-                                ${this.positions.map(pos => `
+                                ${this.getAvailablePositions(logo.id).map(pos => `
                                     <option value="${pos}" ${logo.position === pos ? 'selected' : ''}>
                                         ${pos}
                                     </option>
