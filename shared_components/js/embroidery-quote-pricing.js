@@ -360,12 +360,16 @@ class EmbroideryPricingCalculator {
             });
             
             // Calculate decorated price using bottom-up logic with upcharge
-            // Step 1: Calculate and ROUND the base price with upcharge
-            const upchargeAmount = parseFloat(apiUpcharge); // Use API upcharge value directly
-            const garmentCost = (standardBasePrice + upchargeAmount) / this.marginDenominator;
+            // Step 1: Calculate standard base price FIRST (same as S-XL)
+            const garmentCost = standardBasePrice / this.marginDenominator;
             const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
-            const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
-            // Step 2: Add extra stitch fees on top (no more rounding)
+            const standardRoundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
+            
+            // Step 2: Add the upcharge to the rounded base
+            const upchargeAmount = parseFloat(apiUpcharge); // Use API upcharge value directly
+            const roundedBase = standardRoundedBase + upchargeAmount;  // Add upcharge AFTER rounding
+            
+            // Step 3: Add extra stitch fees on top (no more rounding)
             const finalPrice = roundedBase + additionalStitchCost;
             
             lineItems.push({
