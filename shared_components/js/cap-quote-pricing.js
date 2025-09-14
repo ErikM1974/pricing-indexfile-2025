@@ -125,9 +125,11 @@ class CapQuotePricingCalculator {
                 capTotal += (pricedProduct.pricingBreakdown.capPrice * productQuantity);
             }
             
-            // Calculate fees
-            const ltmFeeTotal = totalQuantity < 24 ? 50.00 : 0;
-            const setupFees = logos.reduce((sum, logo) => sum + (logo.needsDigitizing ? 100 : 0), 0);
+            // Calculate fees - get LTM fee from API data
+            const ltmFee = this.getLTMFeeFromAPI(totalQuantity);
+            const ltmFeeTotal = ltmFee;
+            const digitizingFee = this.getDigitizingFeeFromAPI();
+            const setupFees = logos.reduce((sum, logo) => sum + (logo.needsDigitizing ? digitizingFee : 0), 0);
             // Don't add ltmFeeTotal to grandTotal since it's already included in subtotal per-piece pricing
             const grandTotal = subtotal + additionalEmbroideryTotal + setupFees;
             
@@ -172,10 +174,11 @@ class CapQuotePricingCalculator {
             // Calculate decorated price per cap (returns detailed breakdown)
             const pricingBreakdown = this.calculateDecoratedPrice(baseCapPrice, logos, totalQuantity);
             
-            // Add LTM fee to base price if applicable (orders under 24 pieces)
+            // Add LTM fee to base price if applicable 
             let adjustedPrice = pricingBreakdown.totalPrice;
-            if (totalQuantity < 24) {
-                const ltmPerPiece = 50 / totalQuantity;
+            const ltmFee = this.getLTMFeeFromAPI(totalQuantity);
+            if (ltmFee > 0) {
+                const ltmPerPiece = ltmFee / totalQuantity;
                 adjustedPrice += ltmPerPiece;
                 console.log('[CapQuotePricingCalculator] 🔍 Adding LTM per piece:', '$' + ltmPerPiece.toFixed(2));
                 console.log('[CapQuotePricingCalculator] 🔍 Adjusted price with LTM:', '$' + adjustedPrice.toFixed(2));
@@ -276,8 +279,8 @@ class CapQuotePricingCalculator {
         console.log('[CapQuotePricingCalculator] 🔍 Input totalQuantity:', totalQuantity);
         console.log('[CapQuotePricingCalculator] 🔍 Input logos:', logos.length);
         
-        // Apply margin to cap price
-        const marginDenominator = this.pricingData.primary.tiersR[0]?.MarginDenominator || 0.6;
+        // Apply margin to cap price - get from API
+        const marginDenominator = this.getMarginDenominatorFromAPI(totalQuantity);
         const capSellingPrice = baseCapPrice / marginDenominator;
         console.log('[CapQuotePricingCalculator] 🔍 Margin denominator:', marginDenominator);
         console.log('[CapQuotePricingCalculator] 🔍 Cap selling price:', capSellingPrice);
@@ -389,7 +392,7 @@ class CapQuotePricingCalculator {
         const logoPrice = baseEmbroideryPrice + additionalStitchCost;
         
         // Note: LTM fee is handled separately as a line item, not per logo
-        // This prevents double-charging the $50 LTM fee
+        // This prevents double-charging the LTM fee
         
         console.log(`[CapQuotePricingCalculator] 🔍 FINAL ${logo.position} (${pricingType}) price:`, 
                    '$' + logoPrice.toFixed(2));
@@ -450,20 +453,82 @@ class CapQuotePricingCalculator {
             quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity
         );
         
-        // Handle missing 1-23 tier by creating synthetic tier data
+        // Handle missing 1-23 tier by creating synthetic tier data (should not be needed after API fix)
         if (!tier && quantity < 24) {
-            console.log('[CapQuotePricingCalculator] Creating synthetic 1-23 tier (API missing this tier)');
+            console.log('[CapQuotePricingCalculator] Creating synthetic 1-23 tier (API should provide this now)');
             return {
                 TierLabel: '1-23',
                 MinQuantity: 1,
                 MaxQuantity: 23,
-                MarginDenominator: 0.6, // Standard margin
+                MarginDenominator: this.getMarginDenominatorFromAPI(quantity),
                 TargetMargin: 0,
-                LTM_Fee: 50 // $50 LTM fee for orders under 24
+                LTM_Fee: this.getLTMFeeFromAPI(quantity)
             };
         }
         
         return tier;
+    }
+    
+    /**
+     * Get LTM fee from API data based on quantity
+     */
+    getLTMFeeFromAPI(quantity) {
+        if (!this.pricingData.primary?.tiersR) {
+            console.warn('[CapQuotePricingCalculator] No tier data available for LTM fee');
+            return quantity < 24 ? 50 : 0; // Fallback
+        }
+        
+        const tier = this.pricingData.primary.tiersR.find(t => {
+            // Parse tier label (e.g., "1-23", "24-47", "72+")
+            if (t.TierLabel.includes('+')) {
+                const min = parseInt(t.TierLabel.replace('+', ''));
+                return quantity >= min;
+            } else if (t.TierLabel.includes('-')) {
+                const [min, max] = t.TierLabel.split('-').map(n => parseInt(n));
+                return quantity >= min && quantity <= max;
+            }
+            return false;
+        });
+        
+        return tier?.LTM_Fee || 0;
+    }
+    
+    /**
+     * Get digitizing fee from API data
+     */
+    getDigitizingFeeFromAPI() {
+        if (!this.pricingData.primary?.allEmbroideryCostsR) {
+            console.warn('[CapQuotePricingCalculator] No embroidery cost data available for digitizing fee');
+            return 100; // Fallback
+        }
+        
+        // Get digitizing fee from first embroidery cost record
+        const embroideryData = this.pricingData.primary.allEmbroideryCostsR[0];
+        return embroideryData?.DigitizingFee || 100;
+    }
+    
+    /**
+     * Get margin denominator from API data based on quantity
+     */
+    getMarginDenominatorFromAPI(quantity) {
+        if (!this.pricingData.primary?.tiersR) {
+            console.warn('[CapQuotePricingCalculator] No tier data available for margin denominator');
+            return 0.6; // Fallback
+        }
+        
+        const tier = this.pricingData.primary.tiersR.find(t => {
+            // Parse tier label (e.g., "1-23", "24-47", "72+")
+            if (t.TierLabel.includes('+')) {
+                const min = parseInt(t.TierLabel.replace('+', ''));
+                return quantity >= min;
+            } else if (t.TierLabel.includes('-')) {
+                const [min, max] = t.TierLabel.split('-').map(n => parseInt(n));
+                return quantity >= min && quantity <= max;
+            }
+            return false;
+        });
+        
+        return tier?.MarginDenominator || 0.6;
     }
     
     /**
@@ -560,7 +625,8 @@ class CapQuotePricingCalculator {
             console.log('✅ [CapPricingTest] Results:');
             console.log('💰 Grand Total:', '$' + result.grandTotal.toFixed(2));
             console.log('📈 Tier:', result.tier);
-            console.log('🏷️ LTM Fee:', result.hasLTM ? '$50.00' : 'None');
+            const ltmAmount = this.getLTMFeeFromAPI(result.totalQuantity);
+            console.log('🏷️ LTM Fee:', ltmAmount > 0 ? '$' + ltmAmount.toFixed(2) : 'None');
             console.log('🎨 Setup Fees:', '$' + result.setupFees.toFixed(2));
             
             return result;
