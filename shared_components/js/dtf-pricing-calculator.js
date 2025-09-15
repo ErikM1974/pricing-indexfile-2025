@@ -375,6 +375,9 @@ class DTFPricingCalculator {
             this.renderTransferLocations();
         }
 
+        // Force immediate recalculation to ensure pricing is current
+        // This ensures that any API pricing changes are reflected immediately
+        this.calculatePricing();
         this.updateSummary();
     }
 
@@ -701,14 +704,33 @@ class DTFPricingCalculator {
 
     // Public methods for external data updates
     updateGarmentCost(cost) {
+        const previousCost = this.currentData.garmentCost;
         this.currentData.garmentCost = parseFloat(cost) || 0;
-        
+
         // Queue update if not rendered yet
         if (!this.isRendered) {
             this.pendingUpdates.push(() => this.updateSummary());
             return;
         }
-        
+
+        // Force immediate recalculation if cost changed significantly
+        if (Math.abs(previousCost - this.currentData.garmentCost) > 0.01) {
+            this.refreshTransferPricing();
+        }
+
+        this.updateSummary();
+    }
+
+    // Force recalculation of transfer pricing - useful when style changes
+    refreshTransferPricing() {
+        console.log('[DTF Calculator] Refreshing transfer pricing with new garment cost:', this.currentData.garmentCost);
+
+        // Re-render transfer locations to ensure all dropdowns are updated
+        if (this.currentData.transfers.length > 0) {
+            this.renderTransferLocations();
+        }
+
+        // Force immediate summary update
         this.updateSummary();
     }
 
@@ -737,20 +759,28 @@ class DTFPricingCalculator {
     }
 
     updateQuantity(qty) {
+        const previousQty = this.currentData.quantity;
         this.currentData.quantity = Math.max(parseInt(qty) || DTFConfig.settings.minQuantity, DTFConfig.settings.minQuantity);
-        
+
         // Only update DOM element if it exists
         const quantityInput = document.getElementById('dtf-quantity');
         if (quantityInput) {
             quantityInput.value = this.currentData.quantity;
         }
-        
+
         // Queue update if not rendered yet
         if (!this.isRendered) {
             this.pendingUpdates.push(() => this.updateSummary());
             return;
         }
-        
+
+        // Force recalculation if quantity changed (affects tier pricing)
+        if (previousQty !== this.currentData.quantity) {
+            console.log('[DTF Calculator] Quantity changed, refreshing pricing');
+            // Transfer prices may change based on quantity tiers
+            this.refreshTransferPricing();
+        }
+
         this.updateSummary();
     }
     

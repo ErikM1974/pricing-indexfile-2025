@@ -348,6 +348,10 @@
         }
 
         updatePricingData(data, skipDebounce = false) {
+            // Track if this is a critical update that needs immediate processing
+            const isCriticalUpdate = data.garmentCost !== undefined ||
+                                    (data.productInfo && data.productInfo.sku);
+
             // Update current data
             if (data.garmentCost !== undefined) {
                 this.currentData.garmentCost = data.garmentCost;
@@ -371,24 +375,25 @@
             // Store in sessionStorage for persistence
             sessionStorage.setItem('dtfPricingData', JSON.stringify(this.currentData));
 
-            // Dispatch event with debouncing (unless skipDebounce is true)
-            if (skipDebounce) {
+            // Dispatch event immediately for critical updates (garment cost or style changes)
+            // Use debouncing only for non-critical updates
+            if (skipDebounce || isCriticalUpdate) {
                 this.dispatchDataEvent();
             } else {
                 this.dispatchDataEventDebounced();
             }
         }
-        
+
         dispatchDataEventDebounced() {
             // Clear existing timer
             if (this.dispatchDebounceTimer) {
                 clearTimeout(this.dispatchDebounceTimer);
             }
-            
-            // Set new timer
+
+            // Set new timer - reduced to 25ms for faster response
             this.dispatchDebounceTimer = setTimeout(() => {
                 this.dispatchDataEvent();
-            }, 100); // 100ms debounce
+            }, 25); // Reduced from 100ms to 25ms for better responsiveness
         }
 
         dispatchDataEvent() {

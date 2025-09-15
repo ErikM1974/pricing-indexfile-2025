@@ -484,7 +484,7 @@
             // Listen for product data updates
             window.addEventListener('productDataUpdated', function(event) {
                 console.log('[DTF] Product data updated:', event.detail);
-                
+
                 // Extract pricing data
                 const productData = event.detail;
                 const pricingData = {
@@ -496,37 +496,51 @@
                         image: productData.imageUrl || productData.image
                     }
                 };
-                
-                // Update DTF calculator via adapter
+
+                // Update DTF calculator via adapter - force immediate update for product changes
                 if (window.DTFAdapter) {
                     window.DTFAdapter.updateData(pricingData);
+
+                    // Also trigger refresh on the calculator directly if it exists
+                    if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                        setTimeout(() => {
+                            console.log('[DTF] Triggering calculator refresh after product update');
+                            window.dtfIntegration.calculator.refreshTransferPricing();
+                        }, 100);
+                    }
                 }
             });
             
             // Listen for pricing data loaded event (from DTG/pricing system)
             window.addEventListener('pricingDataLoaded', async function(event) {
                 console.log('[DTF] Pricing data loaded:', event.detail);
-                
+
                 // Check if this is fallback pricing data
                 if (event.detail && event.detail.isFallback) {
                     console.log('[DTF] Detected fallback pricing - fetching real garment costs from API');
-                    
+
                     const urlParams = new URLSearchParams(window.location.search);
                     const styleNumber = event.detail.styleNumber || urlParams.get('StyleNumber');
                     if (styleNumber && window.DTFAdapter) {
                         const realCost = await window.DTFAdapter.fetchAndSetGarmentCost(styleNumber);
                         if (realCost !== null) {
                             console.log('[DTF] Successfully fetched real garment cost:', realCost);
+                            // Force a refresh after API cost is loaded
+                            if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                                setTimeout(() => {
+                                    window.dtfIntegration.calculator.refreshTransferPricing();
+                                }, 50);
+                            }
                             return; // Exit early, we've set the real cost
                         }
                     }
                 }
-                
+
                 if (event.detail && event.detail.prices) {
                     // Extract base garment price from first tier, first size group
                     // For DTF, we need the garment-only price (0 colors/locations)
                     let garmentPrice = 0;
-                    
+
                     // Try to get price from first size group and first tier
                     const sizeGroups = Object.keys(event.detail.prices);
                     if (sizeGroups.length > 0) {
@@ -537,7 +551,7 @@
                             garmentPrice = tierPrices[firstTier];
                         }
                     }
-                    
+
                     const pricingData = {
                         garmentCost: garmentPrice,
                         quantity: 24, // Default quantity
@@ -547,9 +561,16 @@
                             color: event.detail.color
                         }
                     };
-                    
+
                     if (window.DTFAdapter) {
                         window.DTFAdapter.updateData(pricingData);
+
+                        // Force refresh after pricing data is loaded
+                        if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                            setTimeout(() => {
+                                window.dtfIntegration.calculator.refreshTransferPricing();
+                            }, 100);
+                        }
                     }
                 }
             });

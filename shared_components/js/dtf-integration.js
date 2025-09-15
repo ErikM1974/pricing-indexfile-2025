@@ -62,19 +62,29 @@ class DTFIntegration {
 
     handleCaspioData(data) {
         if (!this.calculator || !this.isInitialized) {
-            console.error('DTF Integration: Calculator not initialized');
+            console.error('DTF Integration: Calculator not initialized, retrying in 250ms');
+            // Retry after a short delay if calculator isn't ready
+            setTimeout(() => {
+                if (this.calculator && this.isInitialized) {
+                    this.handleCaspioData(data);
+                }
+            }, 250);
             return;
         }
 
         console.log('DTF Integration: Processing data:', data);
 
-        // Update garment cost
+        // Track if this is a style/product change
+        const isStyleChange = data.productInfo && data.productInfo.sku &&
+                            this.lastProductSku !== data.productInfo.sku;
+
+        // Update garment cost - this will trigger transfer recalculation automatically
         if (data.garmentCost !== undefined) {
             console.log('DTF Integration: Updating garment cost to:', data.garmentCost);
             this.calculator.updateGarmentCost(data.garmentCost);
         }
 
-        // Update quantity
+        // Update quantity - this will also trigger recalculation
         if (data.quantity !== undefined) {
             this.calculator.updateQuantity(data.quantity);
         }
@@ -92,6 +102,15 @@ class DTFIntegration {
         // Handle any additional product data
         if (data.productInfo) {
             this.updateProductDisplay(data.productInfo);
+            this.lastProductSku = data.productInfo.sku;
+        }
+
+        // Force a complete refresh if this is a style change
+        if (isStyleChange && this.calculator.refreshTransferPricing) {
+            console.log('DTF Integration: Style changed, forcing complete pricing refresh');
+            setTimeout(() => {
+                this.calculator.refreshTransferPricing();
+            }, 50); // Small delay to ensure all data is updated
         }
     }
 
