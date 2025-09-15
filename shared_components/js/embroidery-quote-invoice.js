@@ -75,8 +75,20 @@ class EmbroideryInvoiceGenerator {
             .invoice-container {
                 max-width: 8.5in;
                 margin: 0 auto;
-                padding: 0.25in;
+                padding: 0.15in;
                 background: white;
+            }
+            
+            @page {
+                size: letter portrait;
+                margin: 0.3in;
+            }
+            
+            @media print {
+                body { margin: 0; }
+                .invoice-container { padding: 0; }
+                .invoice-header { page-break-inside: avoid; }
+                .products-table { page-break-inside: avoid; }
             }
             
             /* Header */
@@ -84,9 +96,9 @@ class EmbroideryInvoiceGenerator {
                 display: flex;
                 justify-content: space-between;
                 align-items: start;
-                padding-bottom: 10px;
+                padding-bottom: 8px;
                 border-bottom: 2px solid #4cb354;
-                margin-bottom: 15px;
+                margin-bottom: 10px;
             }
             
             .company-info {
@@ -94,9 +106,9 @@ class EmbroideryInvoiceGenerator {
             }
             
             .company-logo {
-                width: 150px;
+                width: 120px;
                 height: auto;
-                margin-bottom: 5px;
+                margin-bottom: 3px;
             }
             
             .company-details {
@@ -130,8 +142,8 @@ class EmbroideryInvoiceGenerator {
             .customer-section {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
-                padding: 8px;
+                margin-bottom: 8px;
+                padding: 6px;
                 background: #f8f9fa;
                 border-radius: 3px;
             }
@@ -187,14 +199,29 @@ class EmbroideryInvoiceGenerator {
             }
             
             .products-table td {
-                padding: 4px;
+                padding: 3px;
                 border-bottom: 1px solid #e0e0e0;
                 font-size: 9px;
+                vertical-align: top;
+            }
+            
+            .price-breakdown {
+                font-size: 8px;
+                line-height: 1.3;
+                color: #666;
+            }
+            
+            .price-total {
+                font-weight: bold;
+                color: #000;
+                border-top: 1px solid #ddd;
+                margin-top: 2px;
+                padding-top: 2px;
             }
             
             .product-image {
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
                 object-fit: contain;
                 display: block;
             }
@@ -368,29 +395,34 @@ class EmbroideryInvoiceGenerator {
         }
         
         let specsHTML = `
-            <div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 3px;">
-                <div style="font-size: 11px; font-weight: bold; color: #4cb354; margin-bottom: 5px;">EMBROIDERY SPECIFICATIONS:</div>
+            <div style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
+                <div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>
         `;
         
-        // List all logos
+        // List primary logo
         pricingData.logos.forEach((logo, index) => {
             if (logo.isPrimary !== false) {
                 specsHTML += `
-                    <div style="font-size: 10px; color: #333; margin: 2px 0;">
-                        • <strong>Primary Logo:</strong> ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
-                        ${logo.needsDigitizing ? ' <span style="color: #4cb354;">✓ Digitizing included</span>' : ''}
+                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                        ✓ <strong>Left Chest</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
+                        <span style="color: #4cb354;">INCLUDED IN BASE PRICE</span>
                     </div>
                 `;
             }
         });
         
-        // Add additional logos if any
+        // Add additional logos with clear pricing and digitizing info
         const additionalLogos = pricingData.logos.filter(l => l.isPrimary === false);
         additionalLogos.forEach((logo, index) => {
+            const alCost = pricingData.alCost || 11.50;
+            const needsDigitizing = logo.needsDigitizing || false;
+            const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
+            
             specsHTML += `
-                <div style="font-size: 10px; color: #333; margin: 2px 0;">
-                    • <strong>Additional Logo ${index + 2}:</strong> ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
-                    ${logo.needsDigitizing ? ' <span style="color: #4cb354;">✓ Digitizing included</span>' : ''}
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    ✓ <strong>Right Chest</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
+                    <span style="color: #ff6b35;">ADDITIONAL (+$${alCost.toFixed(2)} per piece)</span>
+                    <span style="color: #666;">${digitizingText}</span>
                 </div>
             `;
         });
@@ -409,9 +441,10 @@ class EmbroideryInvoiceGenerator {
         
         // Add LTM notice if applicable
         if (pricingData.ltmFee > 0) {
+            const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
                 <div style="font-size: 9px; color: #dc3545; margin-top: 5px; font-style: italic;">
-                    *Includes small batch pricing for orders under 24 pieces
+                    ⚠ Small Batch Fee: ADDITIONAL (+$${ltmPerPiece} per piece for orders under 24)
                 </div>
             `;
         }
@@ -422,109 +455,169 @@ class EmbroideryInvoiceGenerator {
     }
     
     /**
-     * Generate products table
+     * Generate products table matching screen layout
      */
     generateProductsTable(pricingData) {
+        // Calculate total pieces across all products
+        const totalPieces = pricingData.products.reduce((sum, pp) => {
+            return sum + pp.lineItems.reduce((s, item) => s + item.quantity, 0);
+        }, 0);
+        
+        // Start with Products header section
         let tableHTML = `
-            <table class="products-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">Image</th>
-                        <th style="width: 60px;">Style #</th>
-                        <th style="width: 80px;">Color</th>
-                        <th>Description</th>
-                        <th style="width: 150px;">Size</th>
-                        <th style="width: 40px;">Qty</th>
-                        <th style="width: 70px;">Unit Price</th>
-                        <th style="width: 80px;">Line Total</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div style="margin: 15px 0;">
+                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                    👕 Products
+                </div>
         `;
         
-        // Add product rows - consolidate regular sizes, show extended sizes separately
+        // Process each product
         pricingData.products.forEach(pp => {
             const imageUrl = pp.product.imageUrl || '';
+            const productPieces = pp.lineItems.reduce((sum, item) => sum + item.quantity, 0);
             
-            // Group line items - regular sizes vs extended sizes
+            // Product header box
+            tableHTML += `
+                <div style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 10px; margin-bottom: 10px; background: #fafafa;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        ${imageUrl ? `<img src="${imageUrl}" style="width: 40px; height: 40px; margin-right: 10px; object-fit: contain;">` : ''}
+                        <div style="flex: 1;">
+                            <strong style="font-size: 12px;">${pp.product.style} - ${pp.product.color}</strong>
+                            <span style="font-size: 11px; color: #666; margin-left: 10px;">${pp.product.title}</span>
+                            <span style="font-size: 11px; color: #4cb354; font-weight: bold; float: right;">${productPieces} pieces total</span>
+                        </div>
+                    </div>
+            `;
+            
+            // Group line items by size category
             const regularSizes = pp.lineItems.filter(item => {
                 const desc = item.description || '';
                 return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
-                       !desc.includes('5XL') && !desc.includes('6XL') && !desc.includes('XXL');
+                       !desc.includes('5XL') && !desc.includes('6XL');
             });
             
-            const extendedSizes = pp.lineItems.filter(item => {
+            const size2XL = pp.lineItems.filter(item => item.description && item.description.includes('2XL'));
+            const size3XL = pp.lineItems.filter(item => item.description && item.description.includes('3XL'));
+            const largerSizes = pp.lineItems.filter(item => {
                 const desc = item.description || '';
-                return desc.includes('2XL') || desc.includes('3XL') || desc.includes('4XL') || 
-                       desc.includes('5XL') || desc.includes('6XL') || desc.includes('XXL');
+                return desc.includes('4XL') || desc.includes('5XL') || desc.includes('6XL');
             });
             
-            // Calculate rowspan for image/style/color columns
-            const totalRows = (regularSizes.length > 0 ? 1 : 0) + extendedSizes.length;
-            let isFirstRow = true;
+            // Get AL cost from actual data
+            const alCost = pricingData.alCost || (regularSizes[0] && regularSizes[0].alCost) || 0
             
-            // Add regular sizes row if exists (grouped)
+            // Add regular sizes if exists
             if (regularSizes.length > 0) {
                 const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
+                const item = regularSizes[0];
+                const basePrice = item.basePrice;
+                const unitPrice = item.unitPriceWithLTM || item.unitPrice;
                 const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
-                const unitPrice = regularSizes[0].unitPriceWithLTM || regularSizes[0].unitPrice;
-                
-                // Combine size descriptions
                 const sizeDesc = regularSizes.map(item => this.parseSizeDisplay(item)).join(' ');
                 
+                // Format the pricing breakdown like the screen
                 tableHTML += `
-                    <tr>
-                        <td rowspan="${totalRows}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
-                        <td rowspan="${totalRows}">${pp.product.style}</td>
-                        <td rowspan="${totalRows}">${pp.product.color}</td>
-                        <td class="description-cell">
-                            <div class="logo-position">${pp.product.title}</div>
-                        </td>
-                        <td class="size-breakdown">${sizeDesc}</td>
-                        <td style="text-align: center;">${totalQty}</td>
-                        <td style="text-align: right;">$${unitPrice.toFixed(2)}</td>
-                        <td style="text-align: right;">$${totalAmount.toFixed(2)}</td>
-                    </tr>
+                    <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 11px;">${sizeDesc} (${totalQty} pieces)</strong>
+                            </div>
+                            <div style="text-align: right; font-size: 12px; font-weight: bold;">
+                                $${totalAmount.toFixed(2)}
+                            </div>
+                        </div>
+                        <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
+                            Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
+                            + AL Right Chest: $${alCost.toFixed(2)}<br>
+                            = $${unitPrice.toFixed(2)} each
+                        </div>
+                    </div>
                 `;
-                isFirstRow = false;
             }
             
-            // Add each extended size on its own row with its own price
-            extendedSizes.forEach((item, index) => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                const sizeDesc = this.parseSizeDisplay(item);
-                
-                if (isFirstRow) {
-                    // First row includes image/style/color
+            // Add 2XL sizes
+            if (size2XL.length > 0) {
+                size2XL.forEach(item => {
+                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    const basePrice = item.basePrice;
+                    const sizeDesc = this.parseSizeDisplay(item);
+                    
                     tableHTML += `
-                        <tr>
-                            <td rowspan="${totalRows}">${imageUrl ? `<img src="${imageUrl}" class="product-image" alt="Product">` : ''}</td>
-                            <td rowspan="${totalRows}">${pp.product.style}</td>
-                            <td rowspan="${totalRows}">${pp.product.color}</td>
-                            <td class="description-cell">
-                                <div class="logo-position">${pp.product.title}</div>
-                                <div style="font-size: 8px; color: #666;">${sizeDesc}</div>
-                            </td>
-                            <td class="size-breakdown">${sizeDesc}</td>
-                            <td style="text-align: center;">${item.quantity}</td>
-                            <td style="text-align: right;">$${displayPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${item.total.toFixed(2)}</td>
-                        </tr>
+                        <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <div style="flex: 1;">
+                                    <strong style="font-size: 11px;">${sizeDesc} (${item.quantity} piece${item.quantity > 1 ? 's' : ''})</strong>
+                                </div>
+                                <div style="text-align: right; font-size: 12px; font-weight: bold;">
+                                    $${item.total.toFixed(2)}
+                                </div>
+                            </div>
+                            <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
+                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
+                                + AL Right Chest: $${alCost.toFixed(2)}<br>
+                                = $${displayPrice.toFixed(2)} each
+                            </div>
+                        </div>
                     `;
-                    isFirstRow = false;
-                } else {
-                    // Subsequent rows skip the first 3 columns (covered by rowspan)
+                });
+            }
+            
+            // Add 3XL sizes
+            if (size3XL.length > 0) {
+                size3XL.forEach(item => {
+                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    const basePrice = item.basePrice;
+                    const sizeDesc = this.parseSizeDisplay(item);
+                    
                     tableHTML += `
-                        <tr>
-                            <td class="description-cell" style="font-size: 9px; color: #666;">${sizeDesc}</td>
-                            <td class="size-breakdown">${sizeDesc}</td>
-                            <td style="text-align: center;">${item.quantity}</td>
-                            <td style="text-align: right;">$${displayPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${item.total.toFixed(2)}</td>
-                        </tr>
+                        <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <div style="flex: 1;">
+                                    <strong style="font-size: 11px;">${sizeDesc} (${item.quantity} piece${item.quantity > 1 ? 's' : ''})</strong>
+                                </div>
+                                <div style="text-align: right; font-size: 12px; font-weight: bold;">
+                                    $${item.total.toFixed(2)}
+                                </div>
+                            </div>
+                            <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
+                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
+                                + AL Right Chest: $${alCost.toFixed(2)}<br>
+                                = $${displayPrice.toFixed(2)} each
+                            </div>
+                        </div>
                     `;
-                }
-            });
+                });
+            }
+            
+            // Add other larger sizes if any
+            if (largerSizes.length > 0) {
+                largerSizes.forEach(item => {
+                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    const basePrice = item.basePrice;
+                    const sizeDesc = this.parseSizeDisplay(item);
+                    
+                    tableHTML += `
+                        <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <div style="flex: 1;">
+                                    <strong style="font-size: 11px;">${sizeDesc} (${item.quantity} piece${item.quantity > 1 ? 's' : ''})</strong>
+                                </div>
+                                <div style="text-align: right; font-size: 12px; font-weight: bold;">
+                                    $${item.total.toFixed(2)}
+                                </div>
+                            </div>
+                            <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
+                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
+                                + AL Right Chest: $${alCost.toFixed(2)}<br>
+                                = $${displayPrice.toFixed(2)} each
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Close product box
+            tableHTML += `</div>`;
         });
         
         // Add additional services with better formatting
@@ -559,14 +652,14 @@ class EmbroideryInvoiceGenerator {
                     
                     tableHTML += `
                         <tr class="additional-service-row">
-                            <td></td>
-                            <td></td>
                             <td>Service</td>
+                            <td></td>
                             <td class="description-cell">
                                 <div class="logo-position">${description}</div>
                                 <div style="font-size: 9px; color: #666;">${appliedTo}</div>
                             </td>
                             <td></td>
+                            <td style="text-align: center; font-size: 9px;">Service charge</td>
                             <td style="text-align: center;">${service.quantity}</td>
                             <td style="text-align: right;">$${service.unitPrice.toFixed(2)}</td>
                             <td style="text-align: right;">$${service.total.toFixed(2)}</td>
@@ -576,9 +669,16 @@ class EmbroideryInvoiceGenerator {
             });
         }
         
+        // Calculate and add subtotal
+        const subtotal = pricingData.products.reduce((sum, pp) => {
+            return sum + pp.lineItems.reduce((s, item) => s + item.total, 0);
+        }, 0);
+        
         tableHTML += `
-                </tbody>
-            </table>
+            <div style="text-align: right; margin-top: 10px; padding-right: 10px;">
+                <strong style="font-size: 12px;">Subtotal: <span style="color: #4cb354;">$${subtotal.toFixed(2)}</span></strong>
+            </div>
+        </div>
         `;
         
         return tableHTML;

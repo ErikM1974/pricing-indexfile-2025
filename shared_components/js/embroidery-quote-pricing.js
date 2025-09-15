@@ -343,6 +343,8 @@ class EmbroideryPricingCalculator {
                 quantity: standardQty,
                 unitPrice: finalPrice,
                 basePrice: roundedBase,  // Store the rounded base for display
+                extraStitchCost: additionalStitchCost,  // Store extra stitch cost
+                alCost: 0,  // Will be added later if AL exists
                 total: finalPrice * standardQty
             });
             
@@ -377,6 +379,9 @@ class EmbroideryPricingCalculator {
                 quantity: upchargeQty,
                 unitPrice: finalPrice,
                 basePrice: roundedBase,  // Store the rounded base for display
+                extraStitchCost: additionalStitchCost,  // Store extra stitch cost
+                alCost: 0,  // Will be added later if AL exists
+                upcharge: upchargeAmount,  // Store the upcharge amount
                 total: finalPrice * upchargeQty,
                 hasUpcharge: true
             });

@@ -420,7 +420,7 @@
     <script src="/shared_components/js/embroidery-quote-products.js"></script>
     <script src="/shared_components/js/embroidery-quote-pricing.js"></script>
     <script src="/shared_components/js/embroidery-quote-service.js"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20250915"></script>
     <script src="/shared_components/js/embroidery-quote-builder.js"></script>
     
     <script>
@@ -501,6 +501,62 @@
                         console.log('✅ Fallback QuoteFormatter initialized');
                     }
                     openPrintDialog(data) {
+                        // Use the EmbroideryInvoiceGenerator if available
+                        if (typeof EmbroideryInvoiceGenerator !== 'undefined') {
+                            const invoiceGenerator = new EmbroideryInvoiceGenerator();
+                            
+                            // Prepare pricing data with AL cost info
+                            const pricingData = {
+                                ...data,
+                                alCost: data.additionalLogoCost || 0,
+                                totalQuantity: data.totalQuantity || data.pieces
+                            };
+                            
+                            // Ensure line items have breakdown fields
+                            if (pricingData.products) {
+                                pricingData.products.forEach(pp => {
+                                    if (pp.lineItems) {
+                                        pp.lineItems.forEach(item => {
+                                            // Ensure each line item has the breakdown fields
+                                            // basePrice should already be set from embroidery-quote-pricing.js
+                                            if (!item.basePrice) {
+                                                console.warn('Missing basePrice for item:', item);
+                                            }
+                                            if (!item.extraStitchCost) {
+                                                item.extraStitchCost = data.additionalStitchCost || 0;
+                                            }
+                                            if (!item.alCost && data.additionalLogoCost) {
+                                                item.alCost = data.additionalLogoCost;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            
+                            const customerData = {
+                                customerName: data.customerName,
+                                companyName: data.companyName,
+                                customerEmail: data.customerEmail,
+                                customerPhone: data.customerPhone,
+                                projectName: data.projectName,
+                                notes: data.notes,
+                                salesRepEmail: data.salesRepEmail || 'sales@nwcustomapparel.com'
+                            };
+                            
+                            const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
+                            const printWindow = window.open('', '_blank', 'width=800,height=600');
+                            printWindow.document.write(invoiceHTML);
+                            printWindow.document.close();
+                            
+                            // Auto-print after a short delay
+                            setTimeout(() => {
+                                printWindow.print();
+                            }, 500);
+                            
+                            return;
+                        }
+                        
+                        // Fallback to original inline template if invoice generator not available
                         const printWindow = window.open('', '_blank', 'width=800,height=600');
                         printWindow.document.write(`
                             <!DOCTYPE html>
@@ -642,6 +698,67 @@
             
             // Initialize formatter
             quoteFormatter = new QuoteFormatter();
+            
+            // Override openPrintDialog to use EmbroideryInvoiceGenerator for embroidery quotes
+            if (quoteFormatter && typeof EmbroideryInvoiceGenerator !== 'undefined') {
+                quoteFormatter.openPrintDialog = function(data) {
+                    const invoiceGenerator = new EmbroideryInvoiceGenerator();
+                    
+                    // Prepare pricing data with AL cost info
+                    const pricingData = {
+                        ...data,
+                        alCost: data.additionalLogoCost || 0,
+                        totalQuantity: data.totalQuantity || data.pieces
+                    };
+                    
+                    // Ensure line items have breakdown fields
+                    if (pricingData.products) {
+                        pricingData.products.forEach(pp => {
+                            if (pp.lineItems) {
+                                pp.lineItems.forEach(item => {
+                                    // Ensure each line item has the breakdown fields
+                                    // basePrice should already be set from embroidery-quote-pricing.js
+                                    if (!item.basePrice) {
+                                        console.warn('Missing basePrice for item:', item);
+                                    }
+                                    if (!item.extraStitchCost) {
+                                        item.extraStitchCost = data.additionalStitchCost || 0;
+                                    }
+                                    if (!item.alCost && data.additionalLogoCost) {
+                                        item.alCost = data.additionalLogoCost;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    const customerData = {
+                        customerName: data.customerName,
+                        companyName: data.companyName,
+                        customerEmail: data.customerEmail,
+                        customerPhone: data.customerPhone,
+                        projectName: data.projectName,
+                        notes: data.notes,
+                        salesRepEmail: data.salesRepEmail || 'sales@nwcustomapparel.com'
+                    };
+                    
+                    const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
+                    const printWindow = window.open('', '_blank', 'width=800,height=600');
+                    
+                    if (printWindow) {
+                        printWindow.document.write(invoiceHTML);
+                        printWindow.document.close();
+                        
+                        // Auto-print after a short delay
+                        setTimeout(() => {
+                            printWindow.print();
+                        }, 500);
+                    } else {
+                        alert('Please allow popups to print the quote');
+                    }
+                };
+                console.log('✅ QuoteFormatter.openPrintDialog overridden to use EmbroideryInvoiceGenerator');
+            }
             
             // Add input event listeners for auto-save
             const inputs = document.querySelectorAll('input, select, textarea');
