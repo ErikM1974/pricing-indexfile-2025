@@ -349,12 +349,17 @@ class EmbroideryQuoteService {
     generateProductsTableHTML(pricingResults) {
         if (!pricingResults || !pricingResults.products) return '';
         
-        // Calculate total additional logo cost per piece
+        // Calculate total additional logo cost per piece (exclude monograms)
         let totalAdditionalLogoCost = 0;
         if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+            // Only sum additional logo services (not monograms)
             totalAdditionalLogoCost = pricingResults.additionalServices
+                .filter(service => service.type === 'additional_logo')
                 .reduce((sum, service) => sum + service.unitPrice, 0);
         }
+        
+        console.log('[EmbroideryQuoteService] Total AL cost per piece for email:', totalAdditionalLogoCost);
+        console.log('[EmbroideryQuoteService] Additional services:', pricingResults.additionalServices);
         
         let html = '';
         pricingResults.products.forEach(pp => {
