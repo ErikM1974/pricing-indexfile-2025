@@ -1207,111 +1207,169 @@ class EmbroideryQuoteBuilder {
      */
     generatePlainTextQuote(quoteId, customerData, pricingData) {
         let text = '';
-        
-        // Header
-        text += `EMBROIDERY QUOTE #${quoteId}\n`;
-        text += `Northwest Custom Apparel\n`;
-        text += `${'='.repeat(40)}\n\n`;
-        
-        // Customer info
-        text += `CUSTOMER: ${customerData.name || 'N/A'}\n`;
-        if (customerData.company) text += `COMPANY: ${customerData.company}\n`;
-        text += `EMAIL: ${customerData.email}\n`;
-        if (customerData.phone) text += `PHONE: ${customerData.phone}\n`;
+
+        // Header with company info
+        text += `NORTHWEST CUSTOM APPAREL\n`;
+        text += `2025 Freeman Road East, Milton, WA 98354\n`;
+        text += `Phone: (253) 922-5793 | sales@nwcustomapparel.com\n`;
+        text += `${'='.repeat(60)}\n\n`;
+
+        // Quote section
+        text += `QUOTE\n`;
+        text += `${quoteId}\n`;
+        text += `Date: ${new Date().toLocaleDateString('en-US')}\n`;
+        text += `Valid for: 30 days\n\n`;
+
+        // Customer information
+        text += `CUSTOMER INFORMATION\n`;
+        text += `${customerData.name || 'Customer'}\n`;
+        if (customerData.company) text += `${customerData.company}\n`;
+        text += `${customerData.email || 'Not provided'}\n`;
+        if (customerData.phone) text += `${customerData.phone}\n`;
         text += '\n';
-        
-        // Embroidery specifications
-        text += `EMBROIDERY SPECIFICATIONS:\n`;
-        text += `${'-'.repeat(40)}\n`;
+
+        // Project details
+        text += `PROJECT DETAILS\n`;
+        text += `Type: Embroidery Contract\n`;
+        if (customerData.project) text += `Project: ${customerData.project}\n`;
+        text += `Total Pieces: ${pricingData.totalQuantity || 0}\n`;
+
+        // Get sales rep name from the email
+        const salesRepEmail = customerData.salesRepEmail || 'sales@nwcustomapparel.com';
+        const salesReps = this.quoteService.getSalesReps();
+        const salesRep = salesReps.find(rep => rep.email === salesRepEmail);
+        const salesRepName = salesRep ? salesRep.name : 'General Sales';
+        text += `Quote Prepared By: ${salesRepName}\n\n`;
+
+        // Embroidery package
+        text += `EMBROIDERY PACKAGE FOR THIS ORDER:\n`;
         pricingData.logos.forEach((logo, idx) => {
             const isPrimary = logo.isPrimary !== false;
-            const logoType = isPrimary ? 'Primary Logo' : `Additional Logo ${idx}`;
-            text += `${logoType}: ${logo.position}\n`;
-            text += `  ${logo.stitchCount.toLocaleString()} stitches`;
-            if (logo.needsDigitizing) text += ' (Digitizing: $100)';
-            text += '\n';
-        });
-        text += '\n';
-        
-        // Products
-        text += `PRODUCTS:\n`;
-        text += `${'-'.repeat(40)}\n`;
-        pricingData.products.forEach(pp => {
-            text += `${pp.product.style} - ${pp.product.color}\n`;
-            text += `${pp.product.title}\n`;
-            
-            // Group regular sizes
-            const regularSizes = pp.lineItems.filter(item => {
-                const desc = item.description || '';
-                return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
-                       !desc.includes('5XL') && !desc.includes('6XL');
-            });
-            
-            if (regularSizes.length > 0) {
-                const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
-                const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
-                const unitPrice = regularSizes[0].unitPriceWithLTM || regularSizes[0].unitPrice;
-                text += `- Regular sizes (${totalQty} pcs) @ $${unitPrice.toFixed(2)} = $${totalAmount.toFixed(2)}\n`;
+            text += `✓ ${logo.position} (${logo.stitchCount.toLocaleString()} stitches) - `;
+            if (isPrimary) {
+                text += `PRIMARY LOGO - INCLUDED IN BASE PRICE`;
+            } else {
+                text += `ADDITIONAL LOGO`;
             }
-            
-            // Show each extended size separately
-            const extendedSizes = pp.lineItems.filter(item => {
-                const desc = item.description || '';
-                return desc.includes('2XL') || desc.includes('3XL') || desc.includes('4XL') || 
-                       desc.includes('5XL') || desc.includes('6XL');
-            });
-            
-            extendedSizes.forEach(item => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                text += `- ${item.description} @ $${displayPrice.toFixed(2)} = $${item.total.toFixed(2)}\n`;
-            });
-            
+            if (logo.needsDigitizing) text += ` (Digitizing: $100)`;
             text += '\n';
         });
-        
-        // Additional services
-        if (pricingData.additionalServices && pricingData.additionalServices.length > 0) {
-            text += `ADDITIONAL SERVICES:\n`;
-            text += `${'-'.repeat(40)}\n`;
-            pricingData.additionalServices.forEach(service => {
-                const desc = service.type === 'monogram' 
-                    ? 'Personalized Names/Monogramming'
-                    : service.description.replace(/AL-\d+\s*/g, '');
-                text += `${desc}\n`;
-                text += `${service.quantity} pieces @ $${service.unitPrice.toFixed(2)} = $${service.total.toFixed(2)}\n`;
-            });
-            text += '\n';
-        }
-        
-        // Totals
-        text += `${'-'.repeat(40)}\n`;
-        text += `Subtotal: $${pricingData.subtotal.toFixed(2)}\n`;
-        if (pricingData.additionalServicesTotal > 0) {
-            text += `Additional Services: $${pricingData.additionalServicesTotal.toFixed(2)}\n`;
-        }
-        if (pricingData.setupFees > 0) {
-            text += `Setup Fees: $${pricingData.setupFees.toFixed(2)}\n`;
+
+        // Add LTM fee notice if applicable
+        if (pricingData.ltmFee && pricingData.ltmFee > 0) {
+            const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
+            text += `⚠ Small Batch Fee - ADDITIONAL (+$${ltmPerPiece} per piece for orders under 24)\n`;
         }
         text += '\n';
-        text += `Subtotal: $${pricingData.grandTotal.toFixed(2)}\n`;
-        
+
+        // Products table header
+        text += `${'='.repeat(60)}\n`;
+        text += `DESCRIPTION${' '.repeat(25)}QUANTITY    UNIT PRICE    TOTAL\n`;
+        text += `${'='.repeat(60)}\n`;
+
+        // Calculate total additional logo cost
+        let totalAdditionalLogoCost = 0;
+        if (pricingData.additionalServices) {
+            totalAdditionalLogoCost = pricingData.additionalServices
+                .reduce((sum, service) => sum + service.unitPrice, 0);
+        }
+
+        // Products with consolidated pricing
+        pricingData.products.forEach(pp => {
+            const product = pp.product;
+
+            // Product header
+            text += `${product.style} - ${product.color}\n`;
+            text += `${product.title}\n`;
+
+            // Group line items by price
+            const priceGroups = {};
+            pp.lineItems.forEach(item => {
+                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
+                const priceKey = consolidatedPrice.toFixed(2);
+
+                if (!priceGroups[priceKey]) {
+                    priceGroups[priceKey] = {
+                        price: consolidatedPrice,
+                        sizes: [],
+                        totalQty: 0,
+                        totalAmount: 0
+                    };
+                }
+
+                priceGroups[priceKey].sizes.push(item.description);
+                priceGroups[priceKey].totalQty += item.quantity;
+                priceGroups[priceKey].totalAmount += consolidatedPrice * item.quantity;
+            });
+
+            // Display grouped sizes
+            Object.values(priceGroups).forEach(group => {
+                group.sizes.forEach(size => {
+                    text += `Size: ${size}\n`;
+                });
+            });
+
+            // Logo description
+            const logoCount = pricingData.logos ? pricingData.logos.length : 0;
+            text += `${logoCount} logo position${logoCount !== 1 ? 's' : ''}\n`;
+
+            // Pricing line - align columns properly
+            const totalQty = pp.lineItems.reduce((sum, item) => sum + item.quantity, 0);
+            const firstItem = pp.lineItems[0];
+            const unitPrice = (firstItem.unitPriceWithLTM || firstItem.unitPrice) + totalAdditionalLogoCost;
+            const lineTotal = pp.lineItems.reduce((sum, item) => {
+                const itemPrice = (item.unitPriceWithLTM || item.unitPrice) + totalAdditionalLogoCost;
+                return sum + (itemPrice * item.quantity);
+            }, 0);
+
+            // Format the pricing line with proper spacing
+            const qtyStr = totalQty.toString().padEnd(12);
+            const priceStr = `$${unitPrice.toFixed(2)}`.padEnd(14);
+            const totalStr = `$${lineTotal.toFixed(2)}`;
+            text += `${' '.repeat(36)}${qtyStr}${priceStr}${totalStr}\n\n`;
+        });
+
+        // Setup fees if any
+        if (pricingData.setupFees > 0) {
+            const digitizingLogos = pricingData.logos.filter(l => l.needsDigitizing).length;
+            text += `Digitizing Setup Fees\n`;
+            text += `${digitizingLogos} logo${digitizingLogos > 1 ? 's' : ''} @ $100.00 each\n`;
+            const qtyStr = digitizingLogos.toString().padEnd(12);
+            const priceStr = '$100.00'.padEnd(14);
+            const totalStr = `$${pricingData.setupFees.toFixed(2)}`;
+            text += `${' '.repeat(36)}${qtyStr}${priceStr}${totalStr}\n\n`;
+        }
+
+        // Totals section
+        text += `${'='.repeat(60)}\n`;
+        const subtotal = pricingData.subtotal + (pricingData.additionalServicesTotal || 0) + pricingData.setupFees;
+        text += `Subtotal (${pricingData.totalQuantity} pieces):${' '.repeat(28)}$${subtotal.toFixed(2)}\n`;
+
         // Tax calculation
-        const taxAmount = pricingData.grandTotal * 0.101;
-        text += `WA Sales Tax (10.1%): $${taxAmount.toFixed(2)}\n`;
-        text += `${'='.repeat(40)}\n`;
-        text += `GRAND TOTAL: $${(pricingData.grandTotal + taxAmount).toFixed(2)}\n`;
-        text += `${'='.repeat(40)}\n\n`;
-        
+        const taxAmount = subtotal * 0.101;
+        text += `Milton, WA Sales Tax (10.1%):${' '.repeat(23)}$${taxAmount.toFixed(2)}\n\n`;
+
+        const grandTotal = subtotal + taxAmount;
+        text += `GRAND TOTAL:${' '.repeat(40)}$${grandTotal.toFixed(2)}\n\n`;
+
+        // Special notes if present
+        if (customerData.notes) {
+            text += `Special Notes:\n`;
+            text += `${customerData.notes}\n\n`;
+        }
+
+        // Terms & Conditions
+        text += `Terms & Conditions:\n`;
+        text += `• This quote is valid for 30 days from the date of issue\n`;
+        text += `• 50% deposit required to begin production\n`;
+        text += `• Production time: 14 business days after order and art approval\n`;
+        text += `• Rush production available (7 business days) - add 25%\n`;
+        text += `• Prices subject to change based on final artwork requirements\n\n`;
+
         // Footer
-        const today = new Date();
-        const expiryDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-        text += `Valid Until: ${expiryDate.toLocaleDateString()}\n`;
-        text += `\nPayment Terms: 50% deposit required\n`;
-        text += `\n${customerData.notes ? `Notes: ${customerData.notes}\n` : ''}`;
-        text += `\nThank you for your business!\n`;
-        text += `Northwest Custom Apparel\n`;
-        text += `(253) 922-5793\n`;
-        text += `www.nwcustomapparel.com\n`;
+        text += `Thank you for choosing Northwest Custom Apparel!\n`;
+        text += `Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793\n`;
         
         return text;
     }

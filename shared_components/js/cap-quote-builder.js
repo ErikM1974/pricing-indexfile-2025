@@ -884,6 +884,14 @@ class CapQuoteBuilder {
             text += `
 `;
         });
+
+        // Add LTM fee notice if applicable
+        if (this.currentQuote.hasLTM) {
+            const ltmPerPiece = this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity;
+            text += `⚠ Small Batch Fee - ADDITIONAL (+$${ltmPerPiece.toFixed(2)} per piece for orders under 24)
+`;
+        }
+
         text += `
 `;
         
@@ -911,12 +919,8 @@ class CapQuoteBuilder {
             });
             
             // Logo description
-            text += `Includes front logo`;
-            const additionalLogos = this.currentQuote.logos.filter(l => l.position !== 'Cap Front');
-            if (additionalLogos.length > 0) {
-                text += ` + ${additionalLogos.map(l => l.position.toLowerCase()).join(', ')}`;
-            }
-            text += `
+            const logoCount = this.currentQuote.logos ? this.currentQuote.logos.length : 0;
+            text += `${logoCount} logo position${logoCount !== 1 ? 's' : ''}
 `;
             
             // Get consolidated price per cap (includes all logos and fees)
@@ -958,9 +962,9 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
 `;
         
         // Special notes
-        const notes = document.getElementById('quote-notes')?.value.trim() || document.getElementById('special-notes')?.value.trim();
+        const notes = document.getElementById('quote-notes')?.value.trim() || document.getElementById('special-notes')?.value.trim() || customerInfo.notes;
         if (notes) {
-            text += `Special Notes
+            text += `Special Notes:
 `;
             text += `${notes}
 
