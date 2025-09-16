@@ -1647,10 +1647,20 @@
             const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
             
             // Find the first base size (no upcharge) to use for base pricing
-            const firstBaseSize = sizesWithOrder.find(s => 
+            // Find the base size - the size with the lowest upcharge (or zero upcharge)
+            // For standard products, this will be S/M/L/XL with zero upcharge
+            // For tall-only products, this will be the size with the minimum upcharge (e.g., LT)
+            let firstBaseSize = sizesWithOrder.find(s =>
                 !displayAddOns[s.size] || displayAddOns[s.size] === 0
             );
-            const baseSizeToUse = firstBaseSize ? firstBaseSize.size : 'S'; // Fallback to 'S' if no base size found
+
+            // If no size has zero upcharge (tall-only products), find the one with minimum upcharge
+            if (!firstBaseSize && sizesWithOrder.length > 0) {
+                const minUpcharge = Math.min(...sizesWithOrder.map(s => displayAddOns[s.size] || 0));
+                firstBaseSize = sizesWithOrder.find(s => (displayAddOns[s.size] || 0) === minUpcharge);
+            }
+
+            const baseSizeToUse = firstBaseSize ? firstBaseSize.size : sizesWithOrder[0]?.size || 'S';
             
             console.log('🎯 Using base size for pricing:', baseSizeToUse);
             
@@ -1729,14 +1739,23 @@
             tbody.innerHTML = '';
             
             // Determine base sizes dynamically from API data
-            // Base sizes are those with no upcharge (displayAddOns value of 0 or undefined)
-            const baseSizes = sortedSizes.filter(s => 
+            // For products with standard sizes (S/M/L/XL), base sizes are those with no upcharge
+            // For products without standard sizes (like tall-only jackets), use the size with lowest upcharge
+            let baseSizes = sortedSizes.filter(s =>
                 !displayAddOns[s.size] || displayAddOns[s.size] === 0
             );
-            
-            // Get the base size names for display
+
+            // If no sizes have zero upcharge (e.g., tall-only products), use the size(s) with lowest upcharge
+            if (baseSizes.length === 0 && sortedSizes.length > 0) {
+                // Find the minimum upcharge value
+                const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
+                // Get all sizes with that minimum upcharge (could be multiple like LT and XLT both at $4)
+                baseSizes = sortedSizes.filter(s => (displayAddOns[s.size] || 0) === minUpcharge);
+            }
+
+            // Get the base size names for display - always use actual sizes from API
             const baseSizeNames = baseSizes.map(s => s.size);
-            const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : 'S, M, L, XL'; // Fallback if no base sizes found
+            const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : sortedSizes[0]?.size || 'N/A';
             
             console.log('📏 Base sizes from API:', baseSizeNames);
             
@@ -1751,34 +1770,38 @@
             tbody.appendChild(baseRow);
             
             // Filter for extended sizes that have upcharges
-            const extendedSizes = sortedSizes.filter(s => 
-                displayAddOns[s.size] > 0
+            // For tall-only products, this means sizes with upcharges HIGHER than the base
+            const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
+            const extendedSizes = sortedSizes.filter(s =>
+                displayAddOns[s.size] > minUpcharge
             );
             
             // Add extended size rows in sorted order
             extendedSizes.forEach(sizeData => {
                 const size = sizeData.size;
-                const upcharge = displayAddOns[size] || 0;
-                
-                if (upcharge > 0) {
+                const absoluteUpcharge = displayAddOns[size] || 0;
+                // Calculate RELATIVE upcharge (difference from minimum upcharge)
+                const relativeUpcharge = absoluteUpcharge - minUpcharge;
+
+                if (relativeUpcharge > 0) {
                     let price1, price2, price3;
-                    
+
                     // Try to get calculated prices for this specific size first
                     if (pricingData.pricing) {
                         // Format: pricingData.pricing['24-47']['2XL'] or ['XXL']
-                        price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + upcharge);
-                        price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + upcharge);
-                        price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + upcharge);
+                        price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + relativeUpcharge);
+                        price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + relativeUpcharge);
                     } else if (pricingData.prices && pricingData.prices[size]) {
                         // Alternative format: pricingData.prices['2XL']['24-47']
-                        price1 = pricingData.prices[size]?.['24-47'] || (basePrices.tier1 + upcharge);
-                        price2 = pricingData.prices[size]?.['48-71'] || (basePrices.tier2 + upcharge);
-                        price3 = pricingData.prices[size]?.['72+'] || (basePrices.tier3 + upcharge);
+                        price1 = pricingData.prices[size]?.['24-47'] || (basePrices.tier1 + relativeUpcharge);
+                        price2 = pricingData.prices[size]?.['48-71'] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.prices[size]?.['72+'] || (basePrices.tier3 + relativeUpcharge);
                     } else {
-                        // Fall back to base price + upcharge
-                        price1 = basePrices.tier1 + upcharge;
-                        price2 = basePrices.tier2 + upcharge;
-                        price3 = basePrices.tier3 + upcharge;
+                        // Fall back to base price + relative upcharge
+                        price1 = basePrices.tier1 + relativeUpcharge;
+                        price2 = basePrices.tier2 + relativeUpcharge;
+                        price3 = basePrices.tier3 + relativeUpcharge;
                     }
                     
                     const extendedRow = document.createElement('tr');

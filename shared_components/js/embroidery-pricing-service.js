@@ -75,20 +75,26 @@ class EmbroideryPricingService {
      */
     calculatePricing(apiData) {
         console.log('[EmbroideryPricingService] Starting price calculations...');
-        
+
         const { tiersR, rulesR, allEmbroideryCostsR, sizes, sellingPriceDisplayAddOns } = apiData;
-        
+
         // Sort sizes by order and find standard garment (Small or first available)
         const sortedSizes = [...sizes].sort((a, b) => (a.sortOrder || Infinity) - (b.sortOrder || Infinity));
         const standardGarment = sortedSizes.find(s => s.size.toUpperCase() === 'S') || sortedSizes[0];
-        
+
         if (!standardGarment) {
             throw new Error("No sizes found to determine standard garment cost");
         }
-        
+
         const standardGarmentCost = parseFloat(standardGarment.price || standardGarment.maxCasePrice);
         console.log('[EmbroideryPricingService] Standard garment cost:', standardGarmentCost);
-        
+
+        // Find the base size upcharge (for relative upcharge calculation)
+        // For products without S/M/L/XL, the base size is the first size (lowest sortOrder)
+        const baseSize = sortedSizes.find(s => s.size.toUpperCase() === 'S') || sortedSizes[0];
+        const baseSizeUpcharge = parseFloat(sellingPriceDisplayAddOns?.[baseSize.size] || 0);
+        console.log(`[EmbroideryPricingService] Base size: ${baseSize.size}, Base upcharge: $${baseSizeUpcharge}`);
+
         // Rounding function based on rulesData
         const roundPrice = (price, roundingMethod) => {
             if (isNaN(price)) return null;
@@ -99,19 +105,19 @@ class EmbroideryPricingService {
             if (price % 0.5 === 0) return price;
             return Math.ceil(price * 2) / 2;
         };
-        
+
         const priceProfile = {};
-        
+
         // Process each tier
         tiersR.forEach(tier => {
             const tierLabel = tier.TierLabel;
             priceProfile[tierLabel] = {};
-            
+
             // Find embroidery cost for this tier
-            const costEntry = allEmbroideryCostsR.find(c => 
+            const costEntry = allEmbroideryCostsR.find(c =>
                 c.TierLabel === tierLabel
             );
-            
+
             if (!costEntry) {
                 console.warn(`[EmbroideryPricingService] No embroidery cost found for tier ${tierLabel}`);
                 sortedSizes.forEach(s => {
@@ -119,34 +125,41 @@ class EmbroideryPricingService {
                 });
                 return;
             }
-            
+
             const embCost = parseFloat(costEntry.EmbroideryCost);
             const marginDenom = parseFloat(tier.MarginDenominator);
-            
+
             console.log(`[EmbroideryPricingService] Tier ${tierLabel}: EmbCost=$${embCost}, MarginDenom=${marginDenom}`);
-            
+
             if (isNaN(marginDenom) || marginDenom === 0 || isNaN(embCost)) {
                 sortedSizes.forEach(s => {
                     priceProfile[tierLabel][s.size] = null;
                 });
                 return;
             }
-            
+
             // Calculate marked up garment price
             const markedUpGarment = standardGarmentCost / marginDenom;
-            
+
             // Add embroidery cost to get decorated price
             const decoratedStandardPrice = markedUpGarment + embCost;
-            
+
             // Apply rounding
             const roundedStandardPrice = roundPrice(decoratedStandardPrice, rulesR?.RoundingMethod);
-            
+
             console.log(`[EmbroideryPricingService] Tier ${tierLabel}: Garment=$${markedUpGarment.toFixed(2)}, Decorated=$${decoratedStandardPrice.toFixed(2)}, Rounded=$${roundedStandardPrice}`);
-            
-            // Apply to each size with upcharges
+
+            // Apply to each size with RELATIVE upcharges
             sortedSizes.forEach(sizeInfo => {
-                const upcharge = parseFloat(sellingPriceDisplayAddOns?.[sizeInfo.size] || 0);
-                const finalPrice = roundedStandardPrice + upcharge;
+                const absoluteUpcharge = parseFloat(sellingPriceDisplayAddOns?.[sizeInfo.size] || 0);
+                const relativeUpcharge = absoluteUpcharge - baseSizeUpcharge;
+                const finalPrice = roundedStandardPrice + relativeUpcharge;
+
+                // Debug logging for tall products
+                if (baseSizeUpcharge > 0) {
+                    console.log(`[EmbroideryPricingService] ${sizeInfo.size}: Absolute upcharge=$${absoluteUpcharge}, Relative upcharge=$${relativeUpcharge}, Final=$${finalPrice}`);
+                }
+
                 priceProfile[tierLabel][sizeInfo.size] = parseFloat(finalPrice.toFixed(2));
             });
         });
