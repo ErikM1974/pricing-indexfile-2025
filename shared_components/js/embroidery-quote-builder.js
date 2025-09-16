@@ -357,17 +357,13 @@ class EmbroideryQuoteBuilder {
                     // Show base price with extra stitch charge separately
                     baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCharge.toFixed(2)}`;
                     if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)} = $${displayPrice.toFixed(2)} each`;
-                    } else {
-                        baseLine += ` = $${(basePrice + extraStitchCharge).toFixed(2)} each`;
+                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
                     }
                 } else {
                     // No extra stitches, show normal breakdown
                     baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)}`;
                     if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)} = $${displayPrice.toFixed(2)} each`;
-                    } else {
-                        baseLine += ` = $${basePrice.toFixed(2)} each`;
+                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
                     }
                 }
                 
@@ -377,7 +373,6 @@ class EmbroideryQuoteBuilder {
                     this.currentPricing.additionalServices.forEach(service => {
                         additionalLogosLines += `<br>+ ${service.description}: $${service.unitPrice.toFixed(2)}`;
                     });
-                    additionalLogosLines += `<br>= $${consolidatedPrice.toFixed(2)} each`;
                 }
                 
                 html += `
@@ -391,7 +386,7 @@ class EmbroideryQuoteBuilder {
                                     <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
                                     <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPrice.toFixed(2)}</span>
                                 </div>
-                                <div style="font-size: 13px; color: #888; line-height: 1.5; padding-left: 20px; border-left: 3px solid #e0e0e0;">
+                                <div style="font-size: 11px; color: #999; line-height: 1.4; padding-left: 20px; border-left: 2px solid #e8e8e8; margin-top: -4px;">
                                     ${baseLine}
                                     ${additionalLogosLines}
                                 </div>

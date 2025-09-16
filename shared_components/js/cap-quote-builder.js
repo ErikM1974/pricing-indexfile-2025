@@ -308,16 +308,19 @@ class CapQuoteBuilder {
         
         this.currentQuote.products.forEach(product => {
             html += `
-                <div class="product-summary">
-                    <div class="product-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}" 
+                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
                              alt="${product.styleNumber} - ${product.color}"
+                             style="width: 85px; height: 85px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px; padding: 5px; background: #fff;"
                              onerror="this.src='https://via.placeholder.com/150x150/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
-                        <div class="product-info">
-                            <strong>${product.styleNumber} - ${product.color}</strong>
-                            <span>${product.title}</span>
-                            <span>${product.brand}</span>
-                            <span>${product.totalQuantity} pieces total</span>
+                        <div class="product-info" style="flex: 1;">
+                            <strong style="font-size: 18px; color: #333;">${product.styleNumber} - ${product.color}</strong>
+                            <p style="margin: 6px 0; color: #666; font-size: 14px;">${product.title}</p>
+                            <p style="margin: 6px 0; color: #888; font-size: 14px;">${product.brand}</p>
+                            <p style="margin: 6px 0; color: #4cb354; font-weight: 600; font-size: 15px;">
+                                <i class="fas fa-box"></i> ${product.totalQuantity} pieces total
+                            </p>
                         </div>
                     </div>
                     <div class="product-lines">
@@ -373,24 +376,37 @@ class CapQuoteBuilder {
                 }
                 
                 const baseLineTotal = baseComponents.join(' + ');
-                const fullBreakdown = additionalLogosLine 
-                    ? `${baseLineTotal}${additionalLogosLine}<br>= $${consolidatedPricePerCap.toFixed(2)} each`
-                    : `${baseLineTotal} = $${consolidatedPricePerCap.toFixed(2)} each`;
+                const fullBreakdown = additionalLogosLine
+                    ? `${baseLineTotal}${additionalLogosLine}`
+                    : baseLineTotal;
                 
                 html += `
-                    <div class="line-item">
-                        <span>${item.size}${upchargeNote} (${item.quantity} pieces)</span>
-                        <span class="ltm-breakdown">
-                            ${fullBreakdown}
-                        </span>
-                        <span class="line-total">$${consolidatedTotal.toFixed(2)}</span>
+                    <div class="line-item" style="padding: 16px 0; ${product.sizePricedItems.indexOf(item) > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
+                        <div style="margin-bottom: 12px;">
+                            <strong style="font-size: 15px;">${item.size}${upchargeNote} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
+                                    <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPricePerCap.toFixed(2)}</span>
+                                </div>
+                                <div style="font-size: 11px; color: #999; line-height: 1.4; padding-left: 20px; border-left: 2px solid #e8e8e8; margin-top: -4px;">
+                                    ${fullBreakdown}
+                                </div>
+                            </div>
+                            <div style="text-align: right; min-width: 120px; align-self: center;">
+                                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">Line total:</div>
+                                <div style="font-size: 18px; font-weight: bold; color: #333;">$${consolidatedTotal.toFixed(2)}</div>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
             
             html += `
                     </div>
-                    <div class="product-subtotal">
+                    <div class="product-subtotal" style="text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #f0f0f0;">
                         ${(() => {
                             // Calculate updated subtotal including additional logos
                             const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
@@ -399,7 +415,8 @@ class CapQuoteBuilder {
                                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                                 return sum + (consolidatedPricePerCap * item.quantity);
                             }, 0);
-                            return `Subtotal: <strong>$${consolidatedSubtotal.toFixed(2)}</strong>`;
+                            return `<span style="font-size: 14px; color: #666; margin-right: 8px;">Product Subtotal:</span>
+                                    <strong style="font-size: 20px; color: #4cb354;">$${consolidatedSubtotal.toFixed(2)}</strong>`;
                         })()}
                     </div>
                 </div>
