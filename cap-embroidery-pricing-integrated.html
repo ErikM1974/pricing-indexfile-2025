@@ -1345,27 +1345,36 @@
         // Get embroidery price for tier (8000 stitches, no extra stitches)
         function getEmbroideryPriceForTier(tier) {
             if (!pricingData || !pricingData.apiData || !pricingData.apiData.allEmbroideryCostsR) {
-                console.warn('No embroidery cost data available, using defaults');
-                // Return reasonable defaults based on typical cap embroidery pricing
-                if (tier === '72+') return 8.5;
-                if (tier === '48-71') return 10;
-                return 12; // 24-47 and 1-23
+                console.error('❌ No embroidery cost data available from API');
+                // NO FALLBACKS - must have API data for accurate pricing
+                showApiError('Embroidery pricing data unavailable. Please refresh the page or contact support.');
+                return 0; // Return 0 to prevent calculation with bad data
             }
-            
-            // Find the embroidery data for this tier
-            const embroideryData = pricingData.apiData.allEmbroideryCostsR.find(e => e.TierLabel === tier);
-            
+
+            // Find the embroidery data for this tier with 8000 stitch count
+            const embroideryData = pricingData.apiData.allEmbroideryCostsR.find(e =>
+                e.TierLabel === tier && e.StitchCount === 8000
+            );
+
             if (embroideryData) {
-                console.log(`✅ Found embroidery cost for ${tier}: $${embroideryData.EmbroideryCost}`);
-                return embroideryData.EmbroideryCost;
+                console.log(`✅ Found embroidery cost for ${tier} (8000 stitches): $${embroideryData.EmbroideryCost}`);
+                return parseFloat(embroideryData.EmbroideryCost);
             }
-            
-            // Fallback to defaults if not found
-            console.warn(`No embroidery data found for tier ${tier}, using default`);
-            if (tier === '72+') return 8.5;
-            if (tier === '48-71') return 10;
-            if (tier === '1-23') return 12;
-            return 12; // 24-47 default
+
+            // If no 8000 stitch data, try without stitch count filter (backward compatibility)
+            const embroideryDataAny = pricingData.apiData.allEmbroideryCostsR.find(e =>
+                e.TierLabel === tier
+            );
+
+            if (embroideryDataAny) {
+                console.log(`✅ Found embroidery cost for ${tier}: $${embroideryDataAny.EmbroideryCost}`);
+                return parseFloat(embroideryDataAny.EmbroideryCost);
+            }
+
+            // NO FALLBACKS - API data is required for accurate pricing
+            console.error(`❌ No embroidery cost found for tier ${tier} in API data`);
+            showApiError(`No embroidery pricing available for tier ${tier}. Please contact support.`);
+            return 0; // Return 0 to prevent calculation with bad data
         }
         
         // Update cap pricing table
