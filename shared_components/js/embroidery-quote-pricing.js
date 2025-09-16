@@ -227,6 +227,38 @@ class EmbroideryPricingCalculator {
     }
     
     /**
+     * Detect item type based on style number
+     */
+    detectItemType(styleNumber) {
+        const style = styleNumber.toUpperCase();
+
+        // Jacket patterns
+        if (style.startsWith('TLJ') || // Tall jacket
+            style.startsWith('J') ||    // Jacket
+            style.includes('JACKET') ||
+            style.includes('JKT')) {
+            return 'Jacket';
+        }
+
+        // Hoodie patterns
+        if (style.includes('HOOD') ||
+            style.startsWith('PC90H') ||
+            style.startsWith('F') && style.includes('H')) {
+            return 'Hoodie';
+        }
+
+        // Cap patterns
+        if (style.includes('CAP') ||
+            style.includes('HAT') ||
+            style.startsWith('C')) {
+            return 'Cap';
+        }
+
+        // Default to shirt
+        return 'Shirt';
+    }
+
+    /**
      * Get tier based on total quantity
      */
     getTier(totalQuantity) {
@@ -273,7 +305,15 @@ class EmbroideryPricingCalculator {
      */
     async calculateProductPrice(product, totalQuantity, additionalStitchCost) {
         const tier = this.getTier(totalQuantity);
+
+        // Detect item type and log for debugging
+        const itemType = this.detectItemType(product.style);
+        console.log(`[EmbroideryPricingCalculator] Product ${product.style} detected as: ${itemType}`);
+
+        // Get embroidery cost (currently API only returns Shirt costs)
+        // TODO: When API supports different item types, use itemType to get correct cost
         const embCost = this.getEmbroideryCost(tier);
+        console.log(`[EmbroideryPricingCalculator] Using embroidery cost: $${embCost} for tier ${tier}`);
         
         // Fetch size pricing for this style
         const sizePricingData = await this.fetchSizePricing(product.style);
@@ -292,31 +332,63 @@ class EmbroideryPricingCalculator {
         let lineSubtotal = 0;
         
         // Find the standard size base price (use S/M/L/XL prices)
+        // For products without standard sizes, use the first available size as base
         const standardSizes = ['S', 'M', 'L', 'XL'];
         let standardBasePrice = 0;
+        let baseSize = null;
+
+        // First try standard sizes
         for (const size of standardSizes) {
             if (priceData.basePrices[size]) {
                 standardBasePrice = priceData.basePrices[size];
+                baseSize = size;
                 break;
             }
+        }
+
+        // If no standard sizes found, use the first available size with lowest upcharge
+        if (standardBasePrice === 0) {
+            console.warn(`[EmbroideryPricingCalculator] No standard sizes found for ${product.style}, using alternative base`);
+
+            // Find the size with the lowest price (or no upcharge)
+            const availableSizes = Object.entries(priceData.basePrices);
+            if (availableSizes.length > 0) {
+                // Sort by price to get the lowest base price
+                availableSizes.sort((a, b) => a[1] - b[1]);
+                baseSize = availableSizes[0][0];
+                standardBasePrice = availableSizes[0][1];
+                console.log(`[EmbroideryPricingCalculator] Using ${baseSize} as base size with price $${standardBasePrice}`);
+            }
+        }
+
+        // Critical error if still no base price
+        if (standardBasePrice === 0) {
+            console.error(`[EmbroideryPricingCalculator] CRITICAL: No base price found for ${product.style}`);
+            return null;
         }
         
         // Group sizes by upcharge amount from API
         const standardSizeGroup = [];
         const upchargeSizeGroups = {};
-        
+
+        // For tall-only or non-standard products, calculate relative upcharges
+        const baseSizeUpcharge = baseSize ? (priceData.sizeUpcharges[baseSize] || 0) : 0;
+
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
-            const apiUpcharge = priceData.sizeUpcharges[size] || 0; // Use API upcharge values directly
-            
-            if (apiUpcharge === 0) {
-                // Standard sizes (S, M, L, XL)
+            const apiUpcharge = priceData.sizeUpcharges[size] || 0;
+
+            // Calculate relative upcharge from the base size
+            const relativeUpcharge = apiUpcharge - baseSizeUpcharge;
+
+            if (relativeUpcharge === 0) {
+                // This is a base/standard size (no upcharge relative to base)
                 standardSizeGroup.push({ size, qty, basePrice: standardBasePrice });
             } else {
-                // Upcharge sizes (2XL, 3XL, 4XL)
-                if (!upchargeSizeGroups[apiUpcharge]) {
-                    upchargeSizeGroups[apiUpcharge] = [];
+                // This has an upcharge relative to the base
+                if (!upchargeSizeGroups[relativeUpcharge]) {
+                    upchargeSizeGroups[relativeUpcharge] = [];
                 }
-                upchargeSizeGroups[apiUpcharge].push({ size, qty, basePrice: standardBasePrice, upcharge: apiUpcharge });
+                upchargeSizeGroups[relativeUpcharge].push({ size, qty, basePrice: standardBasePrice, upcharge: relativeUpcharge });
             }
         }
         
@@ -337,6 +409,17 @@ class EmbroideryPricingCalculator {
             const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
             // Step 2: Add extra stitch fees on top (no more rounding)
             const finalPrice = roundedBase + additionalStitchCost;
+
+            // Debug logging for pricing calculation
+            console.log(`[PRICING DEBUG] ${product.style} Standard Sizes:
+                Base Price: $${standardBasePrice}
+                Margin Denominator: ${this.marginDenominator}
+                Garment Cost: $${garmentCost.toFixed(2)}
+                Embroidery Cost: $${embCost}
+                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
+                Rounded Base: $${roundedBase}
+                Additional Stitch: $${additionalStitchCost}
+                Final Price: $${finalPrice}`);
             
             lineItems.push({
                 description: sizeList.join(' '),
@@ -366,13 +449,26 @@ class EmbroideryPricingCalculator {
             const garmentCost = standardBasePrice / this.marginDenominator;
             const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
             const standardRoundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
-            
+
             // Step 2: Add the upcharge to the rounded base
             const upchargeAmount = parseFloat(apiUpcharge); // Use API upcharge value directly
             const roundedBase = standardRoundedBase + upchargeAmount;  // Add upcharge AFTER rounding
-            
+
             // Step 3: Add extra stitch fees on top (no more rounding)
             const finalPrice = roundedBase + additionalStitchCost;
+
+            // Debug logging for upcharge pricing calculation
+            console.log(`[PRICING DEBUG] ${product.style} Upcharge Sizes (${sizeList.join(', ')}):
+                Base Price: $${standardBasePrice}
+                Margin Denominator: ${this.marginDenominator}
+                Garment Cost: $${garmentCost.toFixed(2)}
+                Embroidery Cost: $${embCost}
+                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
+                Standard Rounded: $${standardRoundedBase}
+                Upcharge Amount: $${upchargeAmount}
+                Rounded Base w/Upcharge: $${roundedBase}
+                Additional Stitch: $${additionalStitchCost}
+                Final Price: $${finalPrice}`);
             
             lineItems.push({
                 description: sizeList.join(' '),
