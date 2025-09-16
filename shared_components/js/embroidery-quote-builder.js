@@ -808,14 +808,14 @@ class EmbroideryQuoteBuilder {
             <head>
                 <title>Embroidery Quote ${quoteId}</title>
                 <style>
-                    @page { 
-                        margin: 0.5in;
+                    @page {
+                        margin: 0.3in;
                         size: letter;
                     }
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        font-size: 12px;
-                        line-height: 1.4; 
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 10px;
+                        line-height: 1.2;
                         color: #333;
                         margin: 0;
                     }
@@ -825,8 +825,8 @@ class EmbroideryQuoteBuilder {
                         display: flex;
                         justify-content: space-between;
                         align-items: flex-start;
-                        margin-bottom: 20px;
-                        padding-bottom: 10px;
+                        margin-bottom: 12px;
+                        padding-bottom: 8px;
                         border-bottom: 2px solid #4cb354;
                     }
                     .company-info {
@@ -1022,7 +1022,6 @@ class EmbroideryQuoteBuilder {
                         <p><strong>Type:</strong> Embroidery Contract</p>
                         ${customerData.project ? `<p><strong>Project:</strong> ${customerData.project}</p>` : ''}
                         <p><strong>Total Pieces:</strong> ${pricing.totalQuantity || 0}</p>
-                        <p><strong>Total Stitches:</strong> ${pricing.totalStitches?.toLocaleString() || 0}</p>
                         <p><strong>Quote Prepared By:</strong> General Sales</p>
                     </div>
                 </div>
@@ -1076,31 +1075,52 @@ class EmbroideryQuoteBuilder {
                 totalAdditionalLogoCost = pricing.additionalServices
                     .reduce((sum, service) => sum + service.unitPrice, 0);
             }
-            
+
             pricing.products.forEach(productPricing => {
                 const product = productPricing.product;
-                
-                // Process each line item with consolidated pricing
+
+                // Group line items by price (regular vs extended sizes)
+                const priceGroups = {};
                 productPricing.lineItems.forEach(item => {
-                    const basePrice = item.unitPrice;
-                    const ltmPerPiece = pricing.ltmFee > 0 ? pricing.ltmFee / pricing.totalQuantity : 0;
                     const displayPrice = item.unitPriceWithLTM || item.unitPrice;
                     const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
-                    const correctedTotal = consolidatedPrice * item.quantity;
-                    
+                    const priceKey = consolidatedPrice.toFixed(2);
+
+                    if (!priceGroups[priceKey]) {
+                        priceGroups[priceKey] = {
+                            price: consolidatedPrice,
+                            items: [],
+                            totalQty: 0,
+                            totalAmount: 0,
+                            sizes: []
+                        };
+                    }
+
+                    priceGroups[priceKey].items.push(item);
+                    priceGroups[priceKey].totalQty += item.quantity;
+                    priceGroups[priceKey].totalAmount += consolidatedPrice * item.quantity;
+                    priceGroups[priceKey].sizes.push(item.description);
+                });
+
+                // Display grouped items
+                Object.values(priceGroups).forEach(group => {
+                    const sizeLabel = group.sizes.length > 1 ?
+                        `Sizes: ${group.sizes.join(', ')}` :
+                        `Size: ${group.sizes[0]}`;
+
                     html += `
                         <tr>
                             <td>
                                 <strong>${product.style} - ${product.color}</strong><br>
                                 ${product.title}<br>
                                 <span style="color: #666; font-size: 10px;">
-                                    Size: ${item.description}<br>
-                                    ${pricing.logos ? pricing.logos.length + ' logo position(s)' : ''}
+                                    ${sizeLabel}<br>
+                                    ${pricing.logos ? pricing.logos.length + ' logo position' + (pricing.logos.length !== 1 ? 's' : '') : ''}
                                 </span>
                             </td>
-                            <td style="text-align: center;">${item.quantity}</td>
-                            <td style="text-align: right;">$${consolidatedPrice.toFixed(2)}</td>
-                            <td style="text-align: right;">$${correctedTotal.toFixed(2)}</td>
+                            <td style="text-align: center;">${group.totalQty}</td>
+                            <td style="text-align: right;">$${group.price.toFixed(2)}</td>
+                            <td style="text-align: right;">$${group.totalAmount.toFixed(2)}</td>
                         </tr>
                     `;
                 });
@@ -1148,15 +1168,14 @@ class EmbroideryQuoteBuilder {
                 <!-- Special Notes -->
         `;
         
-        const notes = customerData.notes || document.getElementById('quote-notes')?.value?.trim();
-        if (notes) {
-            html += `
-                <div style="background: #fff9c4; border: 1px solid #f9a825; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
-                    <h3 style="margin: 0 0 8px 0; color: #f9a825; font-size: 12px;">Special Notes</h3>
-                    <p style="margin: 0; font-size: 11px; color: #666;">${notes}</p>
-                </div>
-            `;
-        }
+        // Always show special notes section for consistency
+        const notes = customerData.notes || document.getElementById('quote-notes')?.value?.trim() || '';
+        html += `
+            <div style="background: #fff9c4; border: 1px solid #f9a825; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                <h3 style="margin: 0 0 8px 0; color: #f9a825; font-size: 12px;">Special Notes</h3>
+                <p style="margin: 0; font-size: 11px; color: #666;">${notes || '<em style="color: #999;">No special notes for this quote</em>'}</p>
+            </div>
+        `;
         
         // Terms & Conditions
         html += `
@@ -1172,9 +1191,9 @@ class EmbroideryQuoteBuilder {
                     </ul>
                 </div>
                 
-                <div class="footer">
-                    <p class="thank-you">Thank you for choosing Northwest Custom Apparel!</p>
-                    <p>Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793</p>
+                <div class="footer" style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #ddd;">
+                    <p style="color: #4cb354; font-weight: bold; font-size: 14px; margin-bottom: 8px;">Thank you for choosing Northwest Custom Apparel!</p>
+                    <p style="font-size: 10px; color: #666;">Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793</p>
                 </div>
             </body>
             </html>

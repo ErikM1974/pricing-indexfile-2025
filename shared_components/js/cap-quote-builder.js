@@ -1199,14 +1199,14 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
             <head>
                 <title>Cap Embroidery Quote ${quoteID}</title>
                 <style>
-                    @page { 
-                        margin: 0.5in;
+                    @page {
+                        margin: 0.3in;
                         size: letter;
                     }
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        font-size: 12px;
-                        line-height: 1.4; 
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 10px;
+                        line-height: 1.2;
                         color: #333;
                         margin: 0;
                     }
@@ -1216,8 +1216,8 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
                         display: flex;
                         justify-content: space-between;
                         align-items: flex-start;
-                        margin-bottom: 20px;
-                        padding-bottom: 10px;
+                        margin-bottom: 12px;
+                        padding-bottom: 8px;
                         border-bottom: 2px solid #4cb354;
                     }
                     .company-info {
@@ -1256,13 +1256,13 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
                     /* Customer info box */
                     .info-row {
                         display: flex;
-                        gap: 20px;
-                        margin-bottom: 20px;
+                        gap: 10px;
+                        margin-bottom: 10px;
                     }
                     .info-box {
                         flex: 1;
                         background: #f8f9fa;
-                        padding: 10px;
+                        padding: 6px;
                         border-radius: 4px;
                     }
                     .info-box h3 {
@@ -1280,13 +1280,13 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 20px;
+                        margin-bottom: 12px;
                     }
                     th, td {
-                        padding: 6px 8px;
+                        padding: 4px 6px;
                         text-align: left;
                         border: 1px solid #ddd;
-                        font-size: 11px;
+                        font-size: 10px;
                     }
                     th {
                         background: #4cb354;
@@ -1308,21 +1308,29 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
                         border-top: 2px solid #4cb354;
                     }
                     
-                    /* Notes section */
-                    .notes-section {
-                        background: #fff3cd;
-                        border: 1px solid #ffeaa7;
-                        padding: 8px;
+                    /* Terms section */
+                    .terms {
+                        margin-top: 20px;
+                        padding: 15px;
+                        background: #f8f9fa;
                         border-radius: 4px;
-                        margin-bottom: 20px;
-                        font-size: 11px;
                     }
-                    .notes-section h4 {
-                        margin: 0 0 4px 0;
+                    .terms h3 {
+                        margin: 0 0 10px 0;
                         font-size: 12px;
-                        color: #856404;
+                        color: #4cb354;
                     }
-                    
+                    .terms ul {
+                        margin: 0;
+                        padding-left: 20px;
+                        font-size: 11px;
+                        color: #666;
+                        line-height: 1.6;
+                    }
+                    .terms li {
+                        margin: 3px 0;
+                    }
+
                     /* Compact footer */
                     .footer {
                         text-align: center;
@@ -1435,25 +1443,53 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
         this.currentQuote.products.forEach(product => {
             const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
             const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-            
+
+            // Group line items by price (regular vs upsized)
+            const priceGroups = {};
             product.sizePricedItems.forEach(item => {
-                const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                const consolidatedTotal = consolidatedPricePerCap * item.quantity;
-                
+                const priceKey = consolidatedPricePerCap.toFixed(2);
+
+                if (!priceGroups[priceKey]) {
+                    priceGroups[priceKey] = {
+                        price: consolidatedPricePerCap,
+                        items: [],
+                        totalQty: 0,
+                        totalAmount: 0,
+                        sizes: [],
+                        hasUpcharge: false
+                    };
+                }
+
+                priceGroups[priceKey].items.push(item);
+                priceGroups[priceKey].totalQty += item.quantity;
+                priceGroups[priceKey].totalAmount += consolidatedPricePerCap * item.quantity;
+                priceGroups[priceKey].sizes.push(item.size);
+                if (item.sizeUpcharge > 0) {
+                    priceGroups[priceKey].hasUpcharge = true;
+                }
+            });
+
+            // Display grouped items
+            Object.values(priceGroups).forEach(group => {
+                const sizeLabel = group.sizes.length > 1 ?
+                    `Sizes: ${group.sizes.join(', ')}` :
+                    `Size: ${group.sizes[0]}`;
+                const upchargeNote = group.hasUpcharge ? ` (includes size upcharge)` : '';
+
                 html += `
                         <tr>
                             <td>
                                 <strong>${product.styleNumber} - ${product.color}</strong><br>
-                                <span style="font-size: 10px; color: #666;">
-                                    ${product.title} | ${product.brand}<br>
-                                    Size: ${item.size}${upchargeNote}<br>
-                                    <em>Includes ${additionalLogoPrices.length > 0 ? 'all ' + (additionalLogoPrices.length + 1) + ' logos' : 'front logo'}${this.currentQuote.hasLTM ? ' + small batch fee' : ''}</em>
+                                ${product.title} | ${product.brand}<br>
+                                <span style="color: #666; font-size: 10px;">
+                                    ${sizeLabel}${upchargeNote}<br>
+                                    ${this.currentQuote.logos.length} logo position${this.currentQuote.logos.length !== 1 ? 's' : ''}
                                 </span>
                             </td>
-                            <td>${item.quantity}</td>
-                            <td>$${consolidatedPricePerCap.toFixed(2)}</td>
-                            <td>$${consolidatedTotal.toFixed(2)}</td>
+                            <td>${group.totalQty}</td>
+                            <td>$${group.price.toFixed(2)}</td>
+                            <td>$${group.totalAmount.toFixed(2)}</td>
                         </tr>
                 `;
             });
@@ -1517,28 +1553,32 @@ GRAND TOTAL:${' '.repeat(40)}$${grandTotalWithTax.toFixed(2)}
                     </tfoot>
                 </table>
         `;
-        
-        // Add notes section if present
-        if (quoteData.customerInfo?.notes) {
-            html += `
-                <div class="notes-section">
-                    <h4>Special Notes</h4>
-                    <p>${quoteData.customerInfo.notes}</p>
-                </div>
-            `;
-        }
-        
-        // Add footer
+
+        // Always add special notes section (for consistency with embroidery)
+        const notes = quoteData.customerInfo?.notes || '';
         html += `
-                <div class="footer">
-                    <p><strong>Terms & Conditions:</strong></p>
-                    <p>• This quote is valid for 30 days from the date of issue</p>
-                    <p>• 50% deposit required to begin production</p>
-                    <p>• Production time: 14 business days after order and art approval</p>
-                    <p>• Rush production available (7 business days) - add 25%</p>
-                    <p>• Prices subject to change based on final artwork requirements</p>
-                    <p style="margin-top: 10px;"><strong>Thank you for choosing Northwest Custom Apparel!</strong></p>
-                    <p>Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793</p>
+            <div style="background: #fff9c4; border: 1px solid #f9a825; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                <h3 style="margin: 0 0 8px 0; color: #f9a825; font-size: 12px;">Special Notes</h3>
+                <p style="margin: 0; font-size: 11px; color: #666;">${notes || '<em style="color: #999;">No special notes for this quote</em>'}</p>
+            </div>
+        `;
+
+        // Add footer with terms - matching embroidery style
+        html += `
+                <div class="terms">
+                    <h3>Terms & Conditions:</h3>
+                    <ul>
+                        <li>This quote is valid for 30 days from the date of issue</li>
+                        <li>50% deposit required to begin production</li>
+                        <li>Production time: 14 business days after order and art approval</li>
+                        <li>Rush production available (7 business days) - add 25%</li>
+                        <li>Prices subject to change based on final artwork requirements</li>
+                    </ul>
+                </div>
+
+                <div class="footer" style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #ddd;">
+                    <p style="color: #4cb354; font-weight: bold; font-size: 14px; margin-bottom: 8px;">Thank you for choosing Northwest Custom Apparel!</p>
+                    <p style="font-size: 10px; color: #666;">Northwest Custom Apparel | Since 1977 | 2025 Freeman Road East, Milton, WA 98354 | (253) 922-5793</p>
                 </div>
                 <script>
                     window.onload = () => {
