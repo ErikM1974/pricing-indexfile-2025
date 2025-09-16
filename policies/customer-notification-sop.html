@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Notification SOP - Northwest Custom Apparel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #a8003f, #dc2626);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+        }
+
+        .document-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .document-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.875rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #a8003f;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section h4 {
+            color: #555;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .procedure-step {
+            background: #f8f9fa;
+            border-left: 4px solid #a8003f;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .procedure-step h4 {
+            color: #a8003f;
+            margin-top: 0;
+        }
+
+        .step-action {
+            margin-top: 1rem;
+        }
+
+        .step-action strong {
+            color: #333;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .script-box {
+            background: #fff9c4;
+            border-left: 4px solid #f9a825;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .script-box h4 {
+            color: #f57c00;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .script-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .script-item strong {
+            display: block;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .visual-guide {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .visual-guide img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #1976d2;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .visual-guide a {
+            color: #1976d2;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .visual-guide a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .alert strong {
+            color: #c62828;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #a8003f;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .export-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .export-button:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 0 1rem 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Customer Notification SOP</h1>
+            <p>Standard Operating Procedure for Order Pickup Notification</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="../staff-dashboard.html" class="back-link">
+            ← Back to Dashboard
+        </a>
+
+        <div class="document-header">
+            <h2>Standard Operating Procedure: Customer Notification for Order Pickup</h2>
+            <div class="document-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Company</span>
+                    <span class="meta-value">Northwest Custom Apparel</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">SOP ID</span>
+                    <span class="meta-value">NCA-OPS-003</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Department</span>
+                    <span class="meta-value">Office Administration / Operations</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Effective Date</span>
+                    <span class="meta-value">September 16, 2025</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Title</span>
+                    <span class="meta-value">Customer Notification for Order Pickup</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version</span>
+                    <span class="meta-value">1.3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>1.0 Purpose</h2>
+            <p>The purpose of this procedure is to establish a consistent and personal method for notifying customers when their orders are complete and ready for pickup. This process is designed to enhance customer service, ensure timely order pickup and payment, and maintain an organized and efficient customer pickup area.</p>
+        </div>
+
+        <div class="section">
+            <h2>2.0 Scope</h2>
+            <p>This SOP applies to all personnel responsible for customer communication regarding completed orders.</p>
+            <ul>
+                <li><strong>Primary Responsibility:</strong> Office Assistant</li>
+                <li><strong>Backup Responsibility:</strong> Shipping and Receiving Clerk</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>3.0 Procedure</h2>
+
+            <div class="procedure-step">
+                <h4>Step 1: Identify Ready Orders</h4>
+                <div class="step-action">
+                    <strong>Frequency:</strong> Daily, typically in the morning.
+                </div>
+                <div class="step-action">
+                    <strong>Action:</strong>
+                    <ul>
+                        <li>Check the production system (or the list provided by Ruthie and the factory team) for all orders marked as "Completed" and ready for pickup.</li>
+                        <li>For each order, confirm you have the correct customer name, order number, and a valid phone number.</li>
+                        <li>Physically verify that the completed order is present in the designated customer pickup area at the front.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="procedure-step">
+                <h4>Step 2: Make the Initial Customer Call</h4>
+                <div class="step-action">
+                    <strong>Action:</strong>
+                    <ul>
+                        <li>Call the customer using the Initial Pickup Call Script (see Section 4.1).</li>
+                        <li>If you speak with the customer, confirm their pickup intentions and answer any basic questions.</li>
+                        <li>If there is no answer, leave a clear and concise voicemail using the Voicemail Script (see Section 4.2).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="procedure-step">
+                <h4>Step 3: Log the Communication in Shopworks</h4>
+                <div class="step-action">
+                    <strong>Action:</strong>
+
+                    <div class="visual-guide">
+                        <strong>Visual Guide:</strong> For a screenshot of the activity log screen,
+                        <a href="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9121997" target="_blank">
+                            click here to view the Shopworks Activity Log Image
+                        </a>
+                        <br><br>
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9121997"
+                             alt="Shopworks Activity Log Screenshot"
+                             loading="lazy">
+                    </div>
+
+                    <ul>
+                        <li>Immediately after each call attempt, navigate to the main screen of the work order in Shopworks.</li>
+                        <li>In the 'Activity' section, click <strong>Add</strong>.</li>
+                        <li>Select the correct <strong>Contact</strong> you called.</li>
+                        <li>From the 'Activity Type' dropdown menu, choose <strong>'Order Notification'</strong>.</li>
+                        <li>Verify the <strong>Date</strong> and <strong>Time</strong> of the call are correct.</li>
+                        <li>Toggle the status button to <strong>Complete</strong>.</li>
+                        <li>In the <strong>Notes</strong> section, enter key details of the conversation (e.g., "Spoke with customer, will pick up on Friday," or "Left voicemail").</li>
+                        <li>Save the activity log. <strong>This must be done for every call attempt.</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="procedure-step">
+                <h4>Step 4: Follow Up (If Necessary)</h4>
+                <div class="step-action">
+                    <strong>Trigger:</strong> The order has not been picked up within 3-5 business days of the initial call.
+                </div>
+                <div class="step-action">
+                    <strong>Action:</strong>
+                    <ul>
+                        <li>Initiate a follow-up contact via a second phone call, email, or text message.</li>
+                        <li>Use the Follow-Up Script (see Section 4.3) as a guideline.</li>
+                        <li>Log the follow-up attempt in Shopworks using the same process outlined in Step 3.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="procedure-step">
+                <h4>Step 5: Record the Pickup</h4>
+                <div class="step-action">
+                    <strong>Trigger:</strong> The customer arrives to collect their order.
+                </div>
+                <div class="step-action">
+                    <strong>Action:</strong>
+                    <ul>
+                        <li>After the customer has picked up their order, immediately update the order status to "Picked Up" in Shopworks.</li>
+                        <li>Ensure the date of pickup is noted in the record.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4.0 Communication Scripts</h2>
+
+            <div class="script-box">
+                <h4>4.1 Initial Pickup Call Script</h4>
+                <div class="script-item">
+                    <strong>Greeting:</strong>
+                    "Hi, this is [Your Name] from Northwest Custom Apparel. May I speak with [Customer Name], please? I'm calling about your recent order."
+                </div>
+                <div class="script-item">
+                    <strong>Purpose:</strong>
+                    "Good news! Your custom apparel order, number [Order Number], is ready for pickup at our showroom."
+                </div>
+                <div class="script-item">
+                    <strong>Provide Details:</strong>
+                    "Our pickup hours are Monday through Friday, from 8:00 AM to 5:00 PM. We are located at 15307 Union Ave SW in Lakewood."
+                </div>
+                <div class="script-item">
+                    <strong>Confirm:</strong>
+                    "Do you have an idea of when you might be able to stop by?"
+                </div>
+                <div class="script-item">
+                    <strong>Closing:</strong>
+                    "Great! We look forward to seeing you. Please let us know if you have any questions. Thank you, and have a great day!"
+                </div>
+            </div>
+
+            <div class="script-box">
+                <h4>4.2 Voicemail Script</h4>
+                <div class="script-item">
+                    "Hi [Customer Name], this is [Your Name] calling from Northwest Custom Apparel. I'm calling to let you know that your order, number [Order Number], is finished and ready for pickup. You can pick it up anytime during our business hours, Monday to Friday, 8 AM to 5 PM, at our Lakewood showroom. If you have any questions, please give us a call back. Thank you!"
+                </div>
+            </div>
+
+            <div class="script-box">
+                <h4>4.3 Follow-Up Script</h4>
+                <div class="script-item">
+                    "Hi [Customer Name], this is [Your Name] from Northwest Custom Apparel. I'm just calling with a friendly reminder that your order, number [Order Number], is still here and ready for pickup at our showroom. Please let us know if you have any questions. We look forward to seeing you soon!"
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>5.0 Escalation & Special Cases</h2>
+            <ul>
+                <li>
+                    <strong>Customer Asks About Shipping:</strong> If a customer requests to have their order shipped instead of picking it up, direct them to their AE to make arrangements.
+                </li>
+                <li>
+                    <strong>Customer Has Detailed Order Questions:</strong> If the customer has specific questions about the invoice, artwork, or technical details of the order that you cannot answer, transfer the call or take a message for the appropriate salesperson or manager.
+                </li>
+            </ul>
+        </div>
+
+        <div class="section" style="text-align: center;">
+            <a href="https://docs.google.com/spreadsheets/d/1YOUR_SHEET_ID/export?format=xlsx" class="export-button">
+                📊 Export to Sheets
+            </a>
+        </div>
+    </div>
+</body>
+</html>
