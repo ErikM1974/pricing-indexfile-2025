@@ -354,51 +354,66 @@ class CapQuoteBuilder {
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                 const consolidatedTotal = consolidatedPricePerCap * item.quantity;
                 
-                // Build breakdown text with separate lines for base and additional logos
-                let baseComponents = [];
-                baseComponents.push(`Base: $${basePrice.toFixed(2)}`);
-                
-                if (hasExtraStitches && extraStitchCost > 0) {
-                    baseComponents.push(`Extra stitches: $${extraStitchCost.toFixed(2)}`);
-                }
-                
+                // Build the new detailed pricing breakdown
+                let pricingBreakdown = '<div style="background: #f8f9fa; border-radius: 6px; padding: 15px; margin: 15px 0; font-size: 16px; line-height: 1.8;">';
+
+                // Show individual components
+                pricingBreakdown += `<div style="margin-bottom: 8px;">Cap with Logo: <span style="color: #003f7f; font-weight: bold;">$${basePrice.toFixed(2)}</span></div>`;
+
                 if (this.currentQuote.hasLTM && ltmPerPiece > 0) {
-                    baseComponents.push(`Small batch: $${ltmPerPiece.toFixed(2)}`);
+                    pricingBreakdown += `<div style="margin-bottom: 8px;">Small Batch: <span style="color: #003f7f; font-weight: bold;">$${ltmPerPiece.toFixed(2)}</span></div>`;
                 }
-                
-                // Build additional logos line if present
-                let additionalLogosLine = '';
+
+                if (hasExtraStitches && extraStitchCost > 0) {
+                    pricingBreakdown += `<div style="margin-bottom: 8px;">Extra Stitches: <span style="color: #003f7f; font-weight: bold;">$${extraStitchCost.toFixed(2)}</span></div>`;
+                }
+
+                // Add separator line
+                pricingBreakdown += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
+
+                // Calculate front logo subtotal
+                const frontLogoSubtotal = basePrice + (hasExtraStitches ? extraStitchCost : 0) + (this.currentQuote.hasLTM ? ltmPerPiece : 0);
+                const frontLogoTotal = frontLogoSubtotal * item.quantity;
+
+                // Front logo subtotal with quantity calculation
+                pricingBreakdown += `<div style="margin-bottom: 8px;">Front Logo Subtotal: <span style="color: #28a745; font-weight: bold;">$${frontLogoSubtotal.toFixed(2)}</span>`;
+                pricingBreakdown += ` <span style="color: #6c757d; font-style: italic;">× ${item.quantity} caps =</span>`;
+                pricingBreakdown += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${frontLogoTotal.toFixed(2)}</span></div>`;
+
+                // Add additional logos with quantity calculations
+                let totalPerCapCalc = `$${frontLogoSubtotal.toFixed(2)}`;
                 if (additionalLogoPrices.length > 0) {
-                    const logoDetails = additionalLogoPrices.map(logo => 
-                        `${logo.position}: $${logo.pricePerPiece.toFixed(2)}`
-                    ).join(' + ');
-                    additionalLogosLine = `<br><span class="additional-logos-line">+ ${logoDetails}</span>`;
+                    additionalLogoPrices.forEach(logo => {
+                        const logoTotal = logo.pricePerPiece * item.quantity;
+                        pricingBreakdown += `<div style="margin-bottom: 8px;">${logo.position}: <span style="color: #003f7f; font-weight: bold;">$${logo.pricePerPiece.toFixed(2)}</span>`;
+                        pricingBreakdown += ` <span style="color: #6c757d; font-style: italic;">× ${item.quantity} caps =</span>`;
+                        pricingBreakdown += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${logoTotal.toFixed(2)}</span></div>`;
+                        totalPerCapCalc += ` + $${logo.pricePerPiece.toFixed(2)}`;
+                    });
                 }
-                
-                const baseLineTotal = baseComponents.join(' + ');
-                const fullBreakdown = additionalLogosLine
-                    ? `${baseLineTotal}${additionalLogosLine}`
-                    : baseLineTotal;
-                
+
+                // Add separator line before total per cap
+                pricingBreakdown += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
+
+                // Add Total Per Cap reference
+                pricingBreakdown += '<div style="background: #e8f4f8; padding: 8px 12px; border-radius: 6px; margin-top: 12px;">';
+                pricingBreakdown += '<strong style="color: #003f7f;">Total Per Cap: ';
+                pricingBreakdown += totalPerCapCalc;
+                pricingBreakdown += ` = <span style="font-size: 1.1em;">$${consolidatedPricePerCap.toFixed(2)}</span>`;
+                pricingBreakdown += '</strong>';
+                pricingBreakdown += '<br><span style="font-size: 0.9em; color: #6c757d;">(all logos & fees included)</span>';
+                pricingBreakdown += '</div>';
+
+                pricingBreakdown += '</div>';
+
                 html += `
                     <div class="line-item" style="padding: 16px 0; ${product.sizePricedItems.indexOf(item) > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
                         <div style="margin-bottom: 12px;">
                             <strong style="font-size: 15px;">${item.size}${upchargeNote} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="margin-bottom: 8px;">
-                                    <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
-                                    <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPricePerCap.toFixed(2)}</span>
-                                </div>
-                                <div style="font-size: 11px; color: #999; line-height: 1.4; padding-left: 20px; border-left: 2px solid #e8e8e8; margin-top: -4px;">
-                                    ${fullBreakdown}
-                                </div>
-                            </div>
-                            <div style="text-align: right; min-width: 120px; align-self: center;">
-                                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">Line total:</div>
-                                <div style="font-size: 18px; font-weight: bold; color: #333;">$${consolidatedTotal.toFixed(2)}</div>
-                            </div>
+                        ${pricingBreakdown}
+                        <div style="text-align: right; margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
+                            <div style="font-size: 18px; font-weight: bold; color: #003f7f;">Line Total: $${consolidatedTotal.toFixed(2)}</div>
                         </div>
                     </div>
                 `;

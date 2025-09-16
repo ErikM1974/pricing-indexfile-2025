@@ -1,0 +1,26 @@
+
+============================================================
+FINAL REPORT - SANMAR CAP EMBROIDERY PRICING TEST
+============================================================
+
+Total Styles Tested: 354
+Passed: 354 (100.0%)
+Failed: 0 (0.0%)
+Errors: 0 (0.0%)
+Skipped: 0
+
+Test Duration: 0m 41s
+Average Rate: 518 styles/minute
+
+Formula Used:
+  (Base Cap Price / 0.6) + Embroidery Cost, then Round UP
+
+Expected Embroidery Costs:
+  24-47 pieces: $12.00
+  48-71 pieces: $10.00
+  72+ pieces: $8.50
+
+Output Files:
+  Summary: cap-test-results-summary.txt
+  Failures: cap-test-failures.csv
+  Full Results: cap-test-full-results.json
