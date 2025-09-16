@@ -319,19 +319,21 @@ class EmbroideryQuoteBuilder {
             }
             
             html += `
-                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(pp.product.style)}" 
+                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(pp.product.style)}"
                              alt="${pp.product.style} - ${pp.product.color}"
-                             style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px;"
+                             style="width: 85px; height: 85px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px; padding: 5px; background: #fff;"
                              onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${pp.product.style}')">
                         <div class="product-info" style="flex: 1;">
-                            <strong style="font-size: 16px; color: #333;">${pp.product.style} - ${pp.product.color}</strong>
-                            <p style="margin: 5px 0; color: #666; font-size: 14px;">${pp.product.title}</p>
-                            <p style="margin: 5px 0; color: #4cb354; font-weight: bold;">${pp.product.totalQuantity} pieces total</p>
+                            <strong style="font-size: 18px; color: #333;">${pp.product.style} - ${pp.product.color}</strong>
+                            <p style="margin: 6px 0; color: #666; font-size: 14px;">${pp.product.title}</p>
+                            <p style="margin: 6px 0; color: #4cb354; font-weight: 600; font-size: 15px;">
+                                <i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces total
+                            </p>
                         </div>
                     </div>
-                    <div class="product-lines" style="background: #f8f9fa; padding: 10px; border-radius: 4px;">
+                    <div class="product-lines">
             `;
             
             // Calculate corrected product subtotal based on corrected line items
@@ -379,17 +381,24 @@ class EmbroideryQuoteBuilder {
                 }
                 
                 html += `
-                    <div class="line-item" style="padding: 12px 0; ${index > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
+                    <div class="line-item" style="padding: 16px 0; ${index > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
+                        <div style="margin-bottom: 12px;">
+                            <strong style="font-size: 15px;">${item.description} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
+                        </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div style="flex: 1;">
-                                <strong>${item.description} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
-                                <div style="font-size: 13px; color: #666; margin-top: 4px; line-height: 1.5;">
+                                <div style="margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
+                                    <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPrice.toFixed(2)}</span>
+                                </div>
+                                <div style="font-size: 13px; color: #888; line-height: 1.5; padding-left: 20px; border-left: 3px solid #e0e0e0;">
                                     ${baseLine}
                                     ${additionalLogosLines}
                                 </div>
                             </div>
-                            <div style="text-align: right; min-width: 100px; font-weight: bold; align-self: center;">
-                                $${correctedTotal.toFixed(2)}
+                            <div style="text-align: right; min-width: 120px; align-self: center;">
+                                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">Line total:</div>
+                                <div style="font-size: 18px; font-weight: bold; color: #333;">$${correctedTotal.toFixed(2)}</div>
                             </div>
                         </div>
                     </div>
@@ -401,8 +410,9 @@ class EmbroideryQuoteBuilder {
             
             html += `
                     </div>
-                    <div class="product-subtotal" style="text-align: right; margin-top: 10px; padding-top: 10px; border-top: 2px solid #4cb354;">
-                        <strong style="font-size: 16px;">Subtotal: <span style="color: #4cb354;">$${correctedProductSubtotal.toFixed(2)}</span></strong>
+                    <div class="product-subtotal" style="text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #f0f0f0;">
+                        <span style="font-size: 14px; color: #666; margin-right: 8px;">Product Subtotal:</span>
+                        <strong style="font-size: 20px; color: #4cb354;">$${correctedProductSubtotal.toFixed(2)}</strong>
                     </div>
                 </div>
             `;
