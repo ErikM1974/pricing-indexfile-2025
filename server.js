@@ -231,6 +231,11 @@ app.get('/policies-hub.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'policies-hub.html'));
 });
 
+// Christmas Bundles Calculator page
+app.get('/christmas-bundles.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'christmas-bundles.html'));
+});
+
 // Top Sellers Catalog page
 app.get('/top-sellers-catalog.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'top-sellers-catalog.html'));
@@ -968,6 +973,98 @@ app.get('/api/pricing-matrix/:id', async (req, res) => {
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch pricing matrix by ID' });
+  }
+});
+
+// Christmas Bundle Products API
+app.get('/api/christmas-products', async (req, res) => {
+  try {
+    // Define Christmas bundle products
+    const bundleProducts = {
+      products: {
+        'CTJ162': {
+          style: 'CTJ162',
+          name: 'Carhartt Shoreline Jacket',
+          category: 'jacket',
+          basePrice: 141.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 84.60
+        },
+        'CT100617': {
+          style: 'CT100617',
+          name: 'Carhartt Rain Defender Jacket',
+          category: 'jacket',
+          basePrice: 79.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 47.40
+        },
+        'CT103828': {
+          style: 'CT103828',
+          name: 'Carhartt Duck Detroit Jacket',
+          category: 'jacket',
+          basePrice: 124.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 74.40
+        },
+        'CTK121': {
+          style: 'CTK121',
+          name: 'Carhartt Midweight Hoodie',
+          category: 'hoodie',
+          basePrice: 44.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 26.40
+        },
+        'F281': {
+          style: 'F281',
+          name: 'Sport-Tek Super Heavyweight Hoodie',
+          category: 'hoodie',
+          basePrice: 45.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 27.00
+        },
+        'CT104597': {
+          style: 'CT104597',
+          name: 'Carhartt Watch Cap 2.0',
+          category: 'accessory',
+          basePrice: 22.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 13.20
+        },
+        'CTGD0794': {
+          style: 'CTGD0794',
+          name: 'Carhartt Insulated Work Gloves',
+          category: 'accessory',
+          basePrice: 19.00,
+          vendor: 'SANMAR',
+          sanmar_cost: 11.40
+        }
+      },
+      smallBatchFee: 6.25,
+      giftBoxCost: 9.00
+    };
+
+    res.json(bundleProducts);
+  } catch (error) {
+    console.error('Error fetching Christmas products:', error);
+    res.status(500).json({ error: 'Failed to fetch Christmas products' });
+  }
+});
+
+// Embroidery Pricing API
+app.get('/api/embroidery-pricing', async (req, res) => {
+  try {
+    // Return tiered embroidery pricing
+    const embroideryPricing = {
+      '1-23': 15.00,
+      '24-47': 13.00,
+      '48-71': 12.00,
+      '72+': 11.00
+    };
+
+    res.json(embroideryPricing);
+  } catch (error) {
+    console.error('Error fetching embroidery pricing:', error);
+    res.status(500).json({ error: 'Failed to fetch embroidery pricing' });
   }
 });
 

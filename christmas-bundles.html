@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Bundle Calculator - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2e7d32 50%, #c41e3a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .snow {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .snow::before,
+        .snow::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle, #fff 1px, transparent 1px),
+                radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 50px 50px, 100px 100px;
+            background-position: 0 0, 25px 25px;
+            animation: snowfall 10s linear infinite;
+        }
+
+        .snow::after {
+            animation-duration: 15s;
+            background-size: 80px 80px, 130px 130px;
+            opacity: 0.5;
+        }
+
+        @keyframes snowfall {
+            to {
+                transform: translateY(200%);
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #c41e3a;
+        }
+
+        h1 {
+            color: #1a472a;
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .api-status {
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .api-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .api-status.fallback {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .bundle-selector {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid #28a745;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #1a472a;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .included-items {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .included-items h4 {
+            color: #1a472a;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .included-items p {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #1a472a 0%, #2e7d32 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .price-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 25px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .details {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 15px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            background: linear-gradient(135deg, #c41e3a 0%, #dc3545 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-input input {
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .quantity-info {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            margin: -15px 0 0 -15px;
+            border: 3px solid #28a745;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .christmas-decorations {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 40px;
+            animation: swing 3s ease-in-out infinite;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .footer-note {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #664d00;
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h2 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .modal button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="snow"></div>
+
+    <div class="container">
+        <div class="christmas-decorations">🎄</div>
+
+        <div class="header">
+            <h1>
+                <span>🎅</span>
+                Christmas Bundle Calculator
+                <span>🎁</span>
+            </h1>
+            <p class="subtitle">Special Holiday Pricing for Carhartt Gift Bundles</p>
+        </div>
+
+        <div id="apiStatus" class="api-status fallback">
+            <i class="fas fa-sync-alt fa-spin"></i> Connecting to pricing server...
+        </div>
+
+        <div class="bundle-selector" id="bundleSelector">
+            <div class="form-group">
+                <label for="bundleType">Select Bundle Type:</label>
+                <select id="bundleType" onchange="updateBundle()">
+                    <option value="complete">🎄 Complete Worker Bundle (4 items)</option>
+                    <option value="foreman">👷 Foreman Package (3 items)</option>
+                    <option value="crew">🔨 Crew Essentials (3 items)</option>
+                    <option value="duo">🎁 Simple Duo (2 items)</option>
+                    <option value="custom">✨ Custom Bundle</option>
+                </select>
+            </div>
+
+            <div id="jacketSelection" class="form-group">
+                <label for="jacketStyle">Jacket Style:</label>
+                <select id="jacketStyle" onchange="updatePricing()">
+                    <!-- Options populated by JavaScript -->
+                </select>
+            </div>
+
+            <div id="hoodieSelection" class="form-group">
+                <label for="hoodieStyle">Hoodie Style:</label>
+                <select id="hoodieStyle" onchange="updatePricing()">
+                    <!-- Options populated by JavaScript -->
+                </select>
+            </div>
+
+            <div id="beanieSelection" class="form-group hidden">
+                <label>
+                    <input type="checkbox" id="includeBeanie" checked onchange="updatePricing()">
+                    Include CT104597 - Carhartt Beanie (<span id="beaniePrice">$35</span> w/ embroidery)
+                </label>
+            </div>
+
+            <div id="glovesSelection" class="form-group hidden">
+                <label>
+                    <input type="checkbox" id="includeGloves" checked onchange="updatePricing()">
+                    Include CTGD0794 - Carhartt Work Gloves (<span id="glovesPrice">$19</span> - no embroidery)
+                </label>
+            </div>
+
+            <div class="included-items" id="includedItems">
+                <h4>✅ Bundle Includes:</h4>
+                <p>🧢 CT104597 - Carhartt Beanie (with embroidery)</p>
+                <p>🧤 CTGD0794 - Carhartt Work Gloves (no embroidery)</p>
+                <p>🪡 Left chest embroidery (8,000 stitches) on jacket/hoodie</p>
+                <p>🎁 Individual gift box & premium packaging</p>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Number of Bundles:</label>
+                <div class="quantity-input">
+                    <input type="number" id="quantity" value="6" min="1" max="999" onchange="updatePricing()">
+                    <span class="quantity-info" id="quantityInfo">= 24 total pieces</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="customerName">Customer Name (Optional):</label>
+                <input type="text" id="customerName" placeholder="Enter customer name for quote">
+            </div>
+
+            <div class="form-group">
+                <label for="customerEmail">Customer Email (Optional):</label>
+                <input type="email" id="customerEmail" placeholder="Enter email to send quote">
+            </div>
+        </div>
+
+        <div id="pricingAlert" class="success">
+            <i class="fas fa-check-circle"></i>
+            <span>Qualifies for volume pricing! (24+ pieces)</span>
+        </div>
+
+        <div class="results">
+            <h3 style="text-align: center; margin-bottom: 10px;">Total Quote:</h3>
+            <div class="price-display" id="totalPrice">$0.00</div>
+
+            <div class="details">
+                <div class="detail-row">
+                    <span>Price per bundle:</span>
+                    <strong id="bundlePrice">$0.00</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Number of bundles:</span>
+                    <strong id="bundleCount">0</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Total pieces:</span>
+                    <strong id="totalPieces">0</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Embroidery rate:</span>
+                    <strong id="embroideryRate">$13/item (volume)</strong>
+                </div>
+                <div class="detail-row" id="savingsRow">
+                    <span>Volume savings:</span>
+                    <strong id="savings" style="color: #90EE90;">$0.00</strong>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <strong>⚠️ SIZE NOTE:</strong> Prices shown are for S-XL. Add $2 for 2XL, $3 for 3XL, $4 for 4XL per garment.
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="resetCalculator()" class="secondary">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+            <button onclick="saveQuote()" class="primary">
+                <i class="fas fa-save"></i> Save Quote
+            </button>
+            <button onclick="refreshPrices()">
+                <i class="fas fa-sync"></i> Refresh Prices
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>✅ Quote Saved!</h2>
+            <p>Quote ID: <strong id="quoteIdDisplay"></strong></p>
+            <p id="emailStatus"></p>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Include EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Include Quote Service -->
+    <script src="calculators/christmas-bundle-service.js"></script>
+
+    <script>
+        // API Configuration
+        const API_CONFIG = {
+            baseUrl: '/api', // Using local proxy to Heroku
+            endpoints: {
+                products: '/base-item-costs',
+                embroidery: '/pricing-matrix',
+                quotes: '/quote_sessions',
+                quoteItems: '/quote_items'
+            }
+        };
+
+        // EmailJS Configuration
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_1c4k67j',
+            templateId: 'template_quote', // Update with actual template ID
+            publicKey: '4qSbDO-SQs19TbP80'
+        };
+
+        // Fallback pricing (used if API fails)
+        const FALLBACK_PRICES = {
+            products: {
+                'CTJ162': {
+                    basePrice: 141.00,
+                    name: 'Carhartt Shoreline Jacket',
+                    category: 'jacket'
+                },
+                'CT100617': {
+                    basePrice: 79.00,
+                    name: 'Carhartt Rain Defender Jacket',
+                    category: 'jacket'
+                },
+                'CT103828': {
+                    basePrice: 124.00,
+                    name: 'Carhartt Duck Detroit Jacket',
+                    category: 'jacket'
+                },
+                'CTK121': {
+                    basePrice: 44.00,
+                    name: 'Carhartt Midweight Hoodie',
+                    category: 'hoodie'
+                },
+                'F281': {
+                    basePrice: 45.00,
+                    name: 'Sport-Tek Super Heavyweight Hoodie',
+                    category: 'hoodie'
+                },
+                'CT104597': {
+                    basePrice: 22.00,
+                    name: 'Carhartt Watch Cap 2.0',
+                    category: 'accessory'
+                },
+                'CTGD0794': {
+                    basePrice: 19.00,
+                    name: 'Carhartt Insulated Work Gloves',
+                    category: 'accessory'
+                }
+            },
+            embroideryPricing: {
+                '1-23': 15.00,
+                '24-47': 13.00,
+                '48-71': 12.00,
+                '72+': 11.00
+            },
+            smallBatchFee: 6.25,
+            giftBoxCost: 9.00
+        };
+
+        // Current pricing data
+        let currentPricing = {
+            products: {},
+            embroideryRates: {},
+            fees: {}
+        };
+
+        // Bundle configurations
+        const bundleConfigs = {
+            'complete': {
+                name: 'Complete Worker Bundle',
+                jacket: true,
+                hoodie: true,
+                beanie: true,
+                gloves: true,
+                items: 4,
+                minQty: 6
+            },
+            'foreman': {
+                name: 'Foreman Package',
+                jacket: true,
+                hoodie: false,
+                beanie: true,
+                gloves: true,
+                items: 3,
+                minQty: 8
+            },
+            'crew': {
+                name: 'Crew Essentials',
+                jacket: false,
+                hoodie: true,
+                beanie: true,
+                gloves: true,
+                items: 3,
+                minQty: 8
+            },
+            'duo': {
+                name: 'Simple Duo',
+                jacket: false,
+                hoodie: true,
+                beanie: true,
+                gloves: false,
+                items: 2,
+                minQty: 12
+            }
+        };
+
+        // Initialize calculator on page load
+        window.onload = async function() {
+            await loadPricingData();
+            populateProductSelects();
+            updateBundle();
+        }
+
+        // Load pricing data from API with fallback
+        async function loadPricingData() {
+            const statusEl = document.getElementById('apiStatus');
+            const bundleEl = document.getElementById('bundleSelector');
+
+            bundleEl.classList.add('loading');
+
+            try {
+                // Fetch Christmas products from API
+                const productsResponse = await fetch(`${API_CONFIG.baseUrl}/christmas-products`);
+                const embroideryResponse = await fetch(`${API_CONFIG.baseUrl}/embroidery-pricing`);
+
+                if (productsResponse.ok && embroideryResponse.ok) {
+                    const productsData = await productsResponse.json();
+                    const embroideryData = await embroideryResponse.json();
+
+                    // Process the data
+                    currentPricing.products = productsData.products;
+                    currentPricing.embroideryRates = embroideryData;
+                    currentPricing.fees = {
+                        smallBatch: productsData.smallBatchFee || 6.25,
+                        giftBox: productsData.giftBoxCost || 9.00
+                    };
+
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connected to live pricing';
+                    statusEl.className = 'api-status connected';
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                console.warn('API connection failed, using fallback pricing:', error);
+                useFallbackPricing();
+            }
+
+            bundleEl.classList.remove('loading');
+        }
+
+        // Process API product data
+        function processAPIProducts(apiData) {
+            const products = {};
+
+            if (Array.isArray(apiData)) {
+                apiData.forEach(product => {
+                    // Map API response to our format
+                    products[product.StyleNumber] = {
+                        basePrice: parseFloat(product.BaseCost) / 0.60, // Apply margin
+                        name: product.Description || product.StyleNumber,
+                        category: determineCategory(product.StyleNumber)
+                    };
+                });
+            }
+
+            if (Object.keys(products).length > 0) {
+                currentPricing.products = products;
+            } else {
+                currentPricing.products = FALLBACK_PRICES.products;
+            }
+        }
+
+        // Determine product category from style number
+        function determineCategory(styleNumber) {
+            if (styleNumber.startsWith('CTJ') || styleNumber.startsWith('CT10')) return 'jacket';
+            if (styleNumber.startsWith('CTK') || styleNumber === 'F281') return 'hoodie';
+            return 'accessory';
+        }
+
+        // Use fallback pricing
+        function useFallbackPricing() {
+            currentPricing.products = FALLBACK_PRICES.products;
+            currentPricing.embroideryRates = FALLBACK_PRICES.embroideryPricing;
+            currentPricing.fees = {
+                smallBatch: FALLBACK_PRICES.smallBatchFee,
+                giftBox: FALLBACK_PRICES.giftBoxCost
+            };
+
+            const statusEl = document.getElementById('apiStatus');
+            statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Using standard pricing';
+            statusEl.className = 'api-status fallback';
+        }
+
+        // Refresh prices from API
+        async function refreshPrices() {
+            await loadPricingData();
+            populateProductSelects();
+            updatePricing();
+        }
+
+        // Populate product select dropdowns
+        function populateProductSelects() {
+            const jacketSelect = document.getElementById('jacketStyle');
+            const hoodieSelect = document.getElementById('hoodieStyle');
+
+            // Clear existing options
+            jacketSelect.innerHTML = '';
+            hoodieSelect.innerHTML = '';
+
+            // Add jacket options
+            Object.keys(currentPricing.products).forEach(style => {
+                const product = currentPricing.products[style];
+                if (product.category === 'jacket') {
+                    const embroideryPrice = getEmbroideryPrice(1, 24);
+                    const totalPrice = product.basePrice + embroideryPrice;
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = `${style} - ${product.name} ($${totalPrice.toFixed(2)} w/ embroidery)`;
+                    jacketSelect.appendChild(option);
+                }
+            });
+
+            // Add "No Jacket" option
+            const noJacket = document.createElement('option');
+            noJacket.value = 'none';
+            noJacket.textContent = '-- No Jacket --';
+            jacketSelect.appendChild(noJacket);
+
+            // Add hoodie options
+            Object.keys(currentPricing.products).forEach(style => {
+                const product = currentPricing.products[style];
+                if (product.category === 'hoodie') {
+                    const embroideryPrice = getEmbroideryPrice(1, 24);
+                    const totalPrice = product.basePrice + embroideryPrice;
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = `${style} - ${product.name} ($${totalPrice.toFixed(2)} w/ embroidery)`;
+                    hoodieSelect.appendChild(option);
+                }
+            });
+
+            // Add "No Hoodie" option
+            const noHoodie = document.createElement('option');
+            noHoodie.value = 'none';
+            noHoodie.textContent = '-- No Hoodie --';
+            hoodieSelect.appendChild(noHoodie);
+
+            // Update accessory prices
+            if (currentPricing.products['CT104597']) {
+                const beaniePrice = currentPricing.products['CT104597'].basePrice + getEmbroideryPrice(1, 24);
+                document.getElementById('beaniePrice').textContent = `$${beaniePrice.toFixed(2)}`;
+            }
+
+            if (currentPricing.products['CTGD0794']) {
+                document.getElementById('glovesPrice').textContent = `$${currentPricing.products['CTGD0794'].basePrice.toFixed(2)}`;
+            }
+        }
+
+        // Get embroidery price based on quantity
+        function getEmbroideryPrice(embroideredItems, totalPieces) {
+            if (totalPieces >= 72) {
+                return currentPricing.embroideryRates['72+'] || 11;
+            } else if (totalPieces >= 48) {
+                return currentPricing.embroideryRates['48-71'] || 12;
+            } else if (totalPieces >= 24) {
+                return currentPricing.embroideryRates['24-47'] || 13;
+            } else {
+                return currentPricing.embroideryRates['1-23'] || 15;
+            }
+        }
+
+        // Update bundle configuration
+        function updateBundle() {
+            const bundleType = document.getElementById('bundleType').value;
+
+            if (bundleType === 'custom') {
+                // Show all options for custom
+                document.getElementById('jacketSelection').classList.remove('hidden');
+                document.getElementById('hoodieSelection').classList.remove('hidden');
+                document.getElementById('beanieSelection').classList.remove('hidden');
+                document.getElementById('glovesSelection').classList.remove('hidden');
+                document.getElementById('includedItems').classList.add('hidden');
+            } else {
+                const config = bundleConfigs[bundleType];
+
+                // Show/hide selections based on bundle
+                if (config.jacket) {
+                    document.getElementById('jacketSelection').classList.remove('hidden');
+                    document.getElementById('jacketStyle').selectedIndex = 0;
+                } else {
+                    document.getElementById('jacketSelection').classList.add('hidden');
+                    document.getElementById('jacketStyle').value = 'none';
+                }
+
+                if (config.hoodie) {
+                    document.getElementById('hoodieSelection').classList.remove('hidden');
+                    document.getElementById('hoodieStyle').selectedIndex = 0;
+                } else {
+                    document.getElementById('hoodieSelection').classList.add('hidden');
+                    document.getElementById('hoodieStyle').value = 'none';
+                }
+
+                // Hide individual checkboxes for preset bundles
+                document.getElementById('beanieSelection').classList.add('hidden');
+                document.getElementById('glovesSelection').classList.add('hidden');
+                document.getElementById('includedItems').classList.remove('hidden');
+
+                // Set minimum quantity
+                document.getElementById('quantity').value = config.minQty;
+            }
+
+            updatePricing();
+        }
+
+        // Update pricing calculations
+        function updatePricing() {
+            const bundleType = document.getElementById('bundleType').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+
+            let itemsPerBundle = 0;
+            let basePrice = 0;
+            let bundlePrice = 0;
+            let embroideredItems = 0;
+            let totalPieces = 0;
+
+            // Get selections
+            const jacket = document.getElementById('jacketStyle').value;
+            const hoodie = document.getElementById('hoodieStyle').value;
+
+            if (bundleType === 'custom') {
+                const hasBeanie = document.getElementById('includeBeanie').checked;
+                const hasGloves = document.getElementById('includeGloves').checked;
+
+                if (jacket !== 'none' && currentPricing.products[jacket]) {
+                    basePrice += currentPricing.products[jacket].basePrice;
+                    itemsPerBundle++;
+                    embroideredItems++;
+                }
+                if (hoodie !== 'none' && currentPricing.products[hoodie]) {
+                    basePrice += currentPricing.products[hoodie].basePrice;
+                    itemsPerBundle++;
+                    embroideredItems++;
+                }
+                if (hasBeanie && currentPricing.products['CT104597']) {
+                    basePrice += currentPricing.products['CT104597'].basePrice;
+                    itemsPerBundle++;
+                    embroideredItems++;
+                }
+                if (hasGloves && currentPricing.products['CTGD0794']) {
+                    basePrice += currentPricing.products['CTGD0794'].basePrice;
+                    itemsPerBundle++;
+                    // Gloves don't get embroidery
+                }
+            } else {
+                const config = bundleConfigs[bundleType];
+                itemsPerBundle = config.items;
+
+                if (config.jacket && jacket !== 'none' && currentPricing.products[jacket]) {
+                    basePrice += currentPricing.products[jacket].basePrice;
+                    embroideredItems++;
+                }
+                if (config.hoodie && hoodie !== 'none' && currentPricing.products[hoodie]) {
+                    basePrice += currentPricing.products[hoodie].basePrice;
+                    embroideredItems++;
+                }
+                if (config.beanie && currentPricing.products['CT104597']) {
+                    basePrice += currentPricing.products['CT104597'].basePrice;
+                    embroideredItems++;
+                }
+                if (config.gloves && currentPricing.products['CTGD0794']) {
+                    basePrice += currentPricing.products['CTGD0794'].basePrice;
+                    // Gloves don't get embroidery
+                }
+            }
+
+            totalPieces = itemsPerBundle * quantity;
+            const hasVolumePrice = totalPieces >= 24;
+
+            // Get embroidery rate and fees
+            const embroideryRate = getEmbroideryPrice(embroideredItems, totalPieces);
+            const smallBatchFee = hasVolumePrice ? 0 : currentPricing.fees.smallBatch;
+
+            // Calculate bundle price
+            bundlePrice = basePrice + (embroideryRate * embroideredItems) + (smallBatchFee * itemsPerBundle) + currentPricing.fees.giftBox;
+
+            const totalPrice = bundlePrice * quantity;
+
+            // Update display
+            document.getElementById('quantityInfo').textContent = `= ${totalPieces} total pieces`;
+            document.getElementById('bundlePrice').textContent = `$${bundlePrice.toFixed(2)}`;
+            document.getElementById('bundleCount').textContent = quantity;
+            document.getElementById('totalPieces').textContent = totalPieces;
+            document.getElementById('totalPrice').textContent = `$${totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+
+            // Update alerts
+            const alert = document.getElementById('pricingAlert');
+            if (hasVolumePrice) {
+                alert.className = 'success';
+                alert.innerHTML = '<i class="fas fa-check-circle"></i> <span>Qualifies for volume pricing! (24+ pieces)</span>';
+                document.getElementById('embroideryRate').textContent = `$${embroideryRate}/item (volume)`;
+
+                // Calculate savings
+                const withoutVolumeEmbroidery = getEmbroideryPrice(embroideredItems, 1) * embroideredItems;
+                const withVolumeEmbroidery = embroideryRate * embroideredItems;
+                const embroideryDifference = (withoutVolumeEmbroidery - withVolumeEmbroidery) * quantity;
+                const batchFeeSavings = (currentPricing.fees.smallBatch * itemsPerBundle) * quantity;
+                const totalSavings = embroideryDifference + batchFeeSavings;
+
+                document.getElementById('savings').textContent = `$${totalSavings.toFixed(2)}`;
+                document.getElementById('savingsRow').style.display = 'flex';
+            } else {
+                const needed = 24 - totalPieces;
+                const moreBundle = Math.ceil(needed / itemsPerBundle);
+                alert.className = 'warning';
+                alert.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>Add ${moreBundle} more bundle${moreBundle > 1 ? 's' : ''} for volume pricing (need ${needed} more pieces)</span>`;
+                document.getElementById('embroideryRate').textContent = `$${embroideryRate}/item + $${currentPricing.fees.smallBatch} batch fee`;
+                document.getElementById('savingsRow').style.display = 'none';
+            }
+        }
+
+        // Generate quote ID
+        function generateQuoteID() {
+            const date = new Date();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const sequence = Math.floor(Math.random() * 100) + 1;
+            return `XMAS${month}${day}-${sequence}`;
+        }
+
+        // Save quote
+        async function saveQuote() {
+            const quoteService = new ChristmasBundleQuoteService();
+            const bundleType = document.getElementById('bundleType').value;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const customerName = document.getElementById('customerName').value || 'Walk-in Customer';
+            const customerEmail = document.getElementById('customerEmail').value;
+
+            // Get current selections
+            const jacket = document.getElementById('jacketStyle').value;
+            const hoodie = document.getElementById('hoodieStyle').value;
+            const bundleConfig = bundleType === 'custom' ? null : bundleConfigs[bundleType];
+
+            // Determine what's included
+            const hasBeanie = bundleType === 'custom'
+                ? document.getElementById('includeBeanie').checked
+                : (bundleConfig ? bundleConfig.beanie : false);
+            const hasGloves = bundleType === 'custom'
+                ? document.getElementById('includeGloves').checked
+                : (bundleConfig ? bundleConfig.gloves : false);
+
+            // Calculate pricing details
+            const pricingData = quoteService.calculateBundlePricing({
+                bundleType,
+                quantity,
+                jacket,
+                hoodie,
+                hasBeanie,
+                hasGloves,
+                products: currentPricing.products,
+                embroideryRates: currentPricing.embroideryRates,
+                fees: currentPricing.fees
+            });
+
+            // Prepare quote data
+            const quoteData = {
+                customerName,
+                customerEmail,
+                bundleType: bundleConfigs[bundleType]?.name || 'Custom Bundle',
+                quantity,
+                itemCount: pricingData.itemsPerBundle * quantity,
+                totalAmount: pricingData.totalPrice,
+                items: pricingData.items,
+                bundlePrice: pricingData.bundlePrice,
+                totalPrice: pricingData.totalPrice,
+                embroideryRate: pricingData.embroideryRate,
+                hasVolumePrice: pricingData.hasVolumePrice,
+                savings: pricingData.savings
+            };
+
+            try {
+                // Save to database
+                const saveResult = await quoteService.saveQuote(quoteData);
+
+                if (saveResult.success) {
+                    quoteData.quoteId = saveResult.quoteId;
+
+                    // Send email if provided
+                    if (customerEmail) {
+                        const emailResult = await quoteService.sendQuoteEmail(quoteData);
+                        if (emailResult.success) {
+                            document.getElementById('emailStatus').textContent = `Quote sent to ${customerEmail}`;
+                        } else {
+                            document.getElementById('emailStatus').textContent = 'Quote saved (email pending)';
+                        }
+                    } else {
+                        document.getElementById('emailStatus').textContent = 'Quote saved successfully!';
+                    }
+
+                    document.getElementById('quoteIdDisplay').textContent = saveResult.quoteId;
+                } else {
+                    // If database save fails, still show the quote ID
+                    const quoteId = quoteService.generateQuoteID();
+                    document.getElementById('quoteIdDisplay').textContent = quoteId;
+                    document.getElementById('emailStatus').textContent = 'Quote saved locally';
+                }
+
+                document.getElementById('successModal').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error saving quote:', error);
+                const quoteId = quoteService.generateQuoteID();
+                alert('Quote saved locally. Quote ID: ' + quoteId);
+            }
+        }
+
+        // Reset calculator
+        function resetCalculator() {
+            document.getElementById('bundleType').value = 'complete';
+            document.getElementById('quantity').value = 6;
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            updateBundle();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
