@@ -1280,11 +1280,11 @@
                 category: category
             });
             
-            // Check if this is a cap product
+            // Check if this is a cap product - use word boundaries to avoid false matches
             const isCapProduct = (
-                productTitle.includes('cap') ||
-                description.includes('cap') ||
-                category.includes('cap') ||
+                /\bcap\b/i.test(productTitle) ||
+                /\bcap\b/i.test(description) ||
+                /\bcap\b/i.test(category) ||
                 productTitle.includes('trucker') ||
                 productTitle.includes('snapback') ||
                 productTitle.includes('fitted') ||
