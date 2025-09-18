@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christmas Bundle Calculator - Northwest Custom Apparel</title>
+    <title>Christmas Gift Box Builder - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,349 +17,794 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a472a 0%, #2e7d32 50%, #c41e3a 100%);
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8f5e9 100%);
             min-height: 100vh;
-            padding: 20px;
+            position: relative;
         }
 
-        .snow {
+        /* Snow animation */
+        .snow-overlay {
             position: fixed;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             pointer-events: none;
             overflow: hidden;
             z-index: 1;
         }
 
-        .snow::before,
-        .snow::after {
-            content: '';
+        .snowflake {
             position: absolute;
-            top: -100%;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                radial-gradient(circle, #fff 1px, transparent 1px),
-                radial-gradient(circle, #fff 1px, transparent 1px);
-            background-size: 50px 50px, 100px 100px;
-            background-position: 0 0, 25px 25px;
-            animation: snowfall 10s linear infinite;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            animation: fall linear infinite;
         }
 
-        .snow::after {
-            animation-duration: 15s;
-            background-size: 80px 80px, 130px 130px;
-            opacity: 0.5;
-        }
-
-        @keyframes snowfall {
+        @keyframes fall {
+            from {
+                transform: translateY(-100vh);
+            }
             to {
-                transform: translateY(200%);
+                transform: translateY(100vh);
             }
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            padding: 40px;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a472a 0%, #2e7d32 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             position: relative;
             z-index: 10;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #c41e3a;
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        h1 {
-            color: #1a472a;
-            font-size: 32px;
-            margin-bottom: 10px;
+        .header .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .christmas-icons {
+            font-size: 28px;
+            margin: 0 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .progress-steps {
             display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        .step.active::after,
+        .step.completed::after {
+            background: #4caf50;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #666;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
-        .subtitle {
+        .step.active .step-number {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.2);
+        }
+
+        .step.completed .step-number {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 14px;
             color: #666;
-            font-size: 16px;
-        }
-
-        .api-status {
-            text-align: center;
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
             font-weight: 500;
         }
 
-        .api-status.connected {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .api-status.fallback {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .bundle-selector {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border: 2px solid #28a745;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
+        .step.active .step-title {
             color: #1a472a;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
         }
 
-        select, input {
+        /* Main Container */
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            gap: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e8f5e9;
+            padding-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #1a472a;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-card {
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: #81c784;
+            background: #f8fdf9;
+        }
+
+        .product-card.selected {
+            border: 3px solid #4caf50;
+            background: #f1f8f4;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .product-card.selected:hover {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-image .placeholder {
+            color: #999;
+            font-size: 48px;
+        }
+
+        .selected-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .product-card.selected .selected-badge {
+            display: flex;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-style {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            margin: 5px 0;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 18px;
+            color: #4caf50;
+            font-weight: 700;
+            margin: 10px 0 5px 0;
+        }
+
+        .product-description {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            max-height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* Size and Color Selection */
+        .selection-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .selection-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 8px;
+        }
+
+        .size-btn {
+            padding: 8px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            border-color: #4caf50;
+        }
+
+        .size-btn.selected {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .color-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 2px;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-3px);
+        }
+
+        .swatch-image {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 4px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .color-swatch.selected .swatch-image {
+            border-color: #4caf50;
+            border-width: 3px;
+            box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.15);
+        }
+
+        .color-swatch:hover .swatch-image {
+            border-color: #999;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .swatch-name {
+            font-size: 11px;
+            color: #555;
+            line-height: 1.2;
+            font-weight: 500;
+            max-width: 60px;
+            margin: 0 auto;
+            display: none; /* Hide by default, show on hover */
+        }
+
+        .color-swatch:hover .swatch-name,
+        .color-swatch.selected .swatch-name {
+            display: block;
+        }
+
+        /* Select Button */
+        .select-btn {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
-        select:focus, input:focus {
-            outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        .select-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
-        .included-items {
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #2e7d32;
+        .select-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .included-items h4 {
-            color: #1a472a;
-            margin-bottom: 10px;
+        .select-btn.selected {
+            background: linear-gradient(135deg, #388e3c, #2e7d32);
+        }
+
+        .select-btn.selected:hover {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        }
+
+        /* Logo Upload Section */
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: #fafafa;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
             font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
         }
 
-        .included-items p {
-            margin-bottom: 5px;
+        .upload-hint {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .logo-preview {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .logo-preview.active {
+            display: block;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Shipping Form */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: #dc3545;
+        }
+
+        .form-input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Order Summary Sidebar */
+        .order-summary {
+            width: 380px;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #e8f5e9;
+        }
+
+        .summary-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a472a;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8f5e9;
+        }
+
+        .summary-items {
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .summary-item-image {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #999;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .summary-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .summary-item-image .image-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #999;
+            display: none;
+        }
+
+        .summary-item-image.fallback-active img {
+            display: none;
+        }
+
+        .summary-item-image.fallback-active .image-fallback {
+            display: block;
+        }
+
+        .summary-item-details {
+            flex: 1;
+        }
+
+        .summary-item-name {
+            font-weight: 600;
             color: #333;
             font-size: 14px;
         }
 
-        .results {
-            background: linear-gradient(135deg, #1a472a 0%, #2e7d32 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-top: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .price-display {
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-            margin: 25px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .details {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            font-size: 15px;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .warning {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            color: #856404;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .success {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            color: #155724;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        button {
-            flex: 1;
-            background: linear-gradient(135deg, #c41e3a 0%, #dc3545 100%);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-        }
-
-        button.secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
-        }
-
-        button.primary {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-        }
-
-        .quantity-input {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .quantity-input input {
-            width: 100px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .quantity-info {
+        .summary-item-specs {
+            font-size: 12px;
             color: #666;
+            margin-top: 4px;
+        }
+
+        .summary-item-remove {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        .summary-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .summary-empty-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            padding-top: 20px;
+            border-top: 2px solid #e8f5e9;
+            margin-top: 20px;
+        }
+
+        .summary-note {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .summary-note-icon {
+            color: #4caf50;
+            margin-right: 8px;
+        }
+
+        .summary-note-text {
             font-size: 14px;
+            color: #2e7d32;
             font-weight: 500;
         }
 
-        .hidden {
-            display: none;
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #c41e3a, #dc3545);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-            position: relative;
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #a01729, #c41e3a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
         }
 
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 30px;
-            height: 30px;
-            margin: -15px 0 0 -15px;
-            border: 3px solid #28a745;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Navigation Buttons */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
         }
 
-        .christmas-decorations {
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            font-size: 40px;
-            animation: swing 3s ease-in-out infinite;
+        .nav-btn {
+            padding: 12px 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes swing {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
+        .nav-btn:hover {
+            border-color: #4caf50;
+            color: #4caf50;
         }
 
-        .footer-note {
-            background: #fff9e6;
-            border-left: 4px solid #ffc107;
-            padding: 12px;
-            margin-top: 20px;
-            border-radius: 4px;
-            font-size: 14px;
-            color: #664d00;
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+        }
+
+        .nav-btn.primary:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
         /* Success Modal */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: slideIn 0.3s;
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
@@ -367,719 +812,1885 @@
             to { opacity: 1; }
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
         }
 
-        .modal h2 {
-            color: #28a745;
-            margin-bottom: 15px;
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
-        .modal p {
+        .success-icon {
+            font-size: 72px;
+            color: #4caf50;
             margin-bottom: 20px;
-            color: #666;
         }
 
-        .modal button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 5px;
+        .success-title {
+            font-size: 28px;
+            color: #1a472a;
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .success-reference {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .reference-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .reference-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a472a;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .order-summary {
+                width: 100%;
+                position: static;
+                margin-top: 30px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .progress-steps {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .step-title {
+                font-size: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .product-card {
+                border-radius: 8px;
+            }
+
+            .product-image {
+                height: 150px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+
+            .product-name {
+                font-size: 14px;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4caf50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Christmas Decorations */
+        .holly {
+            color: #c41e3a;
+            animation: sway 3s ease-in-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        /* Image Zoom Modal */
+        .image-zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            cursor: zoom-out;
+        }
+
+        .image-zoom-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .zoom-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            transition: all 0.2s;
+        }
+
+        .zoom-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .product-image {
+            cursor: zoom-in;
+        }
+
+        /* Glove Selection Styles */
+        .product-single-view {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .glove-product-card {
+            display: flex;
+            gap: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .glove-product-image {
+            flex: 0 0 400px;
+        }
+
+        .glove-product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .glove-product-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .glove-product-description {
+            font-size: 16px;
+            color: #666;
+            margin: 0;
+        }
+
+        .glove-color-display {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .glove-product-card {
+                flex-direction: column;
+            }
+
+            .glove-product-image {
+                flex: none;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="snow"></div>
-
-    <div class="container">
-        <div class="christmas-decorations">🎄</div>
-
-        <div class="header">
-            <h1>
-                <span>🎅</span>
-                Christmas Bundle Calculator
-                <span>🎁</span>
-            </h1>
-            <p class="subtitle">Special Holiday Pricing for Carhartt Gift Bundles</p>
+    <!-- Image Zoom Modal -->
+    <div class="image-zoom-modal" id="imageZoomModal">
+        <button class="zoom-close" onclick="closeZoomModal()">×</button>
+        <div class="zoom-content">
+            <img class="zoom-image" id="zoomImage" alt="Zoomed product image">
         </div>
+    </div>
 
-        <div id="apiStatus" class="api-status fallback">
-            <i class="fas fa-sync-alt fa-spin"></i> Connecting to pricing server...
-        </div>
+    <!-- Snow Effect -->
+    <div class="snow-overlay" id="snowOverlay"></div>
 
-        <div class="bundle-selector" id="bundleSelector">
-            <div class="form-group">
-                <label for="bundleType">Select Bundle Type:</label>
-                <select id="bundleType" onchange="updateBundle()">
-                    <option value="complete">🎄 Complete Worker Bundle (4 items)</option>
-                    <option value="foreman">👷 Foreman Package (3 items)</option>
-                    <option value="crew">🔨 Crew Essentials (3 items)</option>
-                    <option value="duo">🎁 Simple Duo (2 items)</option>
-                    <option value="custom">✨ Custom Bundle</option>
-                </select>
+    <!-- Header -->
+    <div class="header">
+        <h1>
+            <span class="christmas-icons">🎄</span>
+            Christmas Gift Box Builder
+            <span class="christmas-icons">🎁</span>
+        </h1>
+        <p class="subtitle">Create your custom holiday gift box - FREE with logo embroidery!</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">Select Jacket</div>
             </div>
-
-            <div id="jacketSelection" class="form-group">
-                <label for="jacketStyle">Jacket Style:</label>
-                <select id="jacketStyle" onchange="updatePricing()">
-                    <!-- Options populated by JavaScript -->
-                </select>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">Select Hoodie</div>
             </div>
-
-            <div id="hoodieSelection" class="form-group">
-                <label for="hoodieStyle">Hoodie Style:</label>
-                <select id="hoodieStyle" onchange="updatePricing()">
-                    <!-- Options populated by JavaScript -->
-                </select>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-title">Select Beanie</div>
             </div>
-
-            <div id="beanieSelection" class="form-group hidden">
-                <label>
-                    <input type="checkbox" id="includeBeanie" checked onchange="updatePricing()">
-                    Include CT104597 - Carhartt Beanie (<span id="beaniePrice">$35</span> w/ embroidery)
-                </label>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-title">Select Gloves</div>
             </div>
-
-            <div id="glovesSelection" class="form-group hidden">
-                <label>
-                    <input type="checkbox" id="includeGloves" checked onchange="updatePricing()">
-                    Include CTGD0794 - Carhartt Work Gloves (<span id="glovesPrice">$19</span> - no embroidery)
-                </label>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-title">Customize</div>
             </div>
-
-            <div class="included-items" id="includedItems">
-                <h4>✅ Bundle Includes:</h4>
-                <p>🧢 CT104597 - Carhartt Beanie (with embroidery)</p>
-                <p>🧤 CTGD0794 - Carhartt Work Gloves (no embroidery)</p>
-                <p>🪡 Left chest embroidery (8,000 stitches) on jacket/hoodie</p>
-                <p>🎁 Individual gift box & premium packaging</p>
-            </div>
-
-            <div class="form-group">
-                <label for="quantity">Number of Bundles:</label>
-                <div class="quantity-input">
-                    <input type="number" id="quantity" value="6" min="1" max="999" onchange="updatePricing()">
-                    <span class="quantity-info" id="quantityInfo">= 24 total pieces</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="customerName">Customer Name (Optional):</label>
-                <input type="text" id="customerName" placeholder="Enter customer name for quote">
-            </div>
-
-            <div class="form-group">
-                <label for="customerEmail">Customer Email (Optional):</label>
-                <input type="email" id="customerEmail" placeholder="Enter email to send quote">
+            <div class="step" data-step="6">
+                <div class="step-number">6</div>
+                <div class="step-title">Delivery Info</div>
             </div>
         </div>
+    </div>
 
-        <div id="pricingAlert" class="success">
-            <i class="fas fa-check-circle"></i>
-            <span>Qualifies for volume pricing! (24+ pieces)</span>
-        </div>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Step 1: Select Jacket -->
+            <div class="section active" id="step1">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-tshirt"></i>
+                        Choose Your Jacket
+                    </h2>
+                    <p class="section-subtitle">Select from our premium Carhartt jacket collection (optional)</p>
+                </div>
 
-        <div class="results">
-            <h3 style="text-align: center; margin-bottom: 10px;">Total Quote:</h3>
-            <div class="price-display" id="totalPrice">$0.00</div>
+                <div class="product-grid" id="jacketGrid">
+                    <!-- Jacket products will be dynamically inserted here -->
+                </div>
 
-            <div class="details">
-                <div class="detail-row">
-                    <span>Price per bundle:</span>
-                    <strong id="bundlePrice">$0.00</strong>
-                </div>
-                <div class="detail-row">
-                    <span>Number of bundles:</span>
-                    <strong id="bundleCount">0</strong>
-                </div>
-                <div class="detail-row">
-                    <span>Total pieces:</span>
-                    <strong id="totalPieces">0</strong>
-                </div>
-                <div class="detail-row">
-                    <span>Embroidery rate:</span>
-                    <strong id="embroideryRate">$13/item (volume)</strong>
-                </div>
-                <div class="detail-row" id="savingsRow">
-                    <span>Volume savings:</span>
-                    <strong id="savings" style="color: #90EE90;">$0.00</strong>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="skipJacket()">
+                        Skip Jacket
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="nav-btn primary" onclick="nextStep()" id="jacketNext" disabled>
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="footer-note">
-                <strong>⚠️ SIZE NOTE:</strong> Prices shown are for S-XL. Add $2 for 2XL, $3 for 3XL, $4 for 4XL per garment.
+            <!-- Step 2: Select Hoodie -->
+            <div class="section" id="step2">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-hoodie"></i>
+                        Choose Your Hoodie
+                    </h2>
+                    <p class="section-subtitle">Select from our comfortable hoodie collection (optional)</p>
+                </div>
+
+                <div class="product-grid" id="hoodieGrid">
+                    <!-- Hoodie products will be dynamically inserted here -->
+                </div>
+
+                <div class="navigation">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="nav-btn" onclick="skipHoodie()">
+                        Skip Hoodie
+                    </button>
+                    <button class="nav-btn primary" onclick="nextStep()" id="hoodieNext" disabled>
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Select Beanie -->
+            <div class="section" id="step3">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-hat-winter"></i>
+                        Choose Your Beanie
+                    </h2>
+                    <p class="section-subtitle">Select your winter beanie</p>
+                </div>
+
+                <div class="product-grid" id="beanieGrid">
+                    <!-- Beanie products will be dynamically inserted here -->
+                </div>
+
+                <div class="navigation">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="nav-btn primary" onclick="nextStep()" id="beanieNext" disabled>
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Select Gloves -->
+            <div class="section" id="step4">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-mitten"></i>
+                        Choose Your Glove Size
+                    </h2>
+                    <p class="section-subtitle">Select your Carhartt work gloves size</p>
+                </div>
+
+                <div class="product-single-view">
+                    <div class="glove-product-card">
+                        <div class="glove-product-image">
+                            <img src="https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg"
+                                 alt="Carhartt Work Gloves"
+                                 style="width: 100%; max-width: 400px; border-radius: 8px;"
+                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmNSIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn6ekPC90ZXh0Pgo8L3N2Zz4=';">
+                        </div>
+                        <div class="glove-product-details">
+                            <h3 class="glove-product-title">CTGD0794 - Carhartt® High-Dexterity Open-Cuff Glove</h3>
+                            <p class="glove-product-description">
+                                Premium insulated work gloves included FREE with your gift box
+                            </p>
+
+                            <div class="glove-color-display">
+                                <div class="selection-label">Color:</div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #2c2c2c 50%, #8b6f47 50%); border-radius: 4px; border: 2px solid #ddd;"></div>
+                                    <span>Black Barley</span>
+                                </div>
+                            </div>
+
+                            <div class="size-selection-group">
+                                <div class="selection-label">Select Size:</div>
+                                <div class="size-buttons">
+                                    <button class="size-btn" data-size="M" onclick="selectGloveSize('M')">M</button>
+                                    <button class="size-btn" data-size="L" onclick="selectGloveSize('L')">L</button>
+                                    <button class="size-btn" data-size="XL" onclick="selectGloveSize('XL')">XL</button>
+                                </div>
+                            </div>
+
+                            <div class="free-badge" style="margin-top: 20px; padding: 10px; background: #4caf50; color: white; border-radius: 6px; text-align: center; font-weight: 600;">
+                                <i class="fas fa-gift"></i> Included FREE with your gift box
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="nav-btn primary" onclick="nextStep()" id="gloveNext" disabled>
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Customize -->
+            <div class="section" id="step5">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-palette"></i>
+                        Customize Your Gift Box
+                    </h2>
+                    <p class="section-subtitle">Add your logo and special instructions</p>
+                </div>
+
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('logoFile').click()">
+                    <input type="file" id="logoFile" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">Click to upload your logo</div>
+                    <div class="upload-hint">or drag and drop your file here</div>
+                </div>
+
+                <div class="logo-preview" id="logoPreview">
+                    <img src="" alt="Logo Preview" class="preview-image" id="previewImage">
+                </div>
+
+                <div class="form-row" style="margin-top: 30px;">
+                    <div class="form-group">
+                        <label class="form-label">Embroidery Location</label>
+                        <select class="form-input" id="embLocation">
+                            <option value="left-chest" selected>Left Chest (Standard)</option>
+                            <option value="right-chest">Right Chest</option>
+                            <option value="center-chest">Center Chest</option>
+                            <option value="back">Back</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Thread Colors (Optional)</label>
+                        <input type="text" class="form-input" id="threadColors" placeholder="e.g., Red, White, Blue">
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label class="form-label">Special Instructions (Optional)</label>
+                    <textarea class="form-input form-textarea" id="specialInstructions" placeholder="Any special requests or notes about your gift box..."></textarea>
+                </div>
+
+                <div class="navigation">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="nav-btn primary" onclick="nextStep()">
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 6: Delivery Information -->
+            <div class="section" id="step6">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-shipping-fast"></i>
+                        Delivery Information
+                    </h2>
+                    <p class="section-subtitle">Tell us where to send your free gift box</p>
+                </div>
+
+                <form id="deliveryForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Contact Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="contactName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="companyName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email Address <span class="required">*</span></label>
+                            <input type="email" class="form-input" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number <span class="required">*</span></label>
+                            <input type="tel" class="form-input" id="phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">Shipping Address <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="address1" placeholder="Street Address" required>
+                    </div>
+
+                    <div class="form-group full">
+                        <input type="text" class="form-input" id="address2" placeholder="Apartment, suite, etc. (Optional)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">City <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State <span class="required">*</span></label>
+                            <select class="form-input" id="state" required>
+                                <option value="">Select State</option>
+                                <option value="WA">Washington</option>
+                                <option value="OR">Oregon</option>
+                                <option value="CA">California</option>
+                                <option value="ID">Idaho</option>
+                                <!-- Add more states as needed -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ZIP Code <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="zipCode" pattern="[0-9]{5}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Delivery Date</label>
+                            <input type="date" class="form-input" id="deliveryDate">
+                        </div>
+                    </div>
+                </form>
+
+                <div class="navigation">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="button-group">
-            <button onclick="resetCalculator()" class="secondary">
-                <i class="fas fa-redo"></i> Reset
-            </button>
-            <button onclick="saveQuote()" class="primary">
-                <i class="fas fa-save"></i> Save Quote
-            </button>
-            <button onclick="refreshPrices()">
-                <i class="fas fa-sync"></i> Refresh Prices
-            </button>
+        <!-- Order Summary Sidebar -->
+        <div class="order-summary">
+            <div class="summary-card">
+                <h3 class="summary-header">
+                    <i class="fas fa-gift holly"></i> Your Gift Box
+                </h3>
+
+                <div class="summary-note">
+                    <i class="fas fa-info-circle summary-note-icon"></i>
+                    <span class="summary-note-text">This is a FREE promotional gift box!</span>
+                </div>
+
+                <div class="summary-items" id="summaryItems">
+                    <div class="summary-empty">
+                        <div class="summary-empty-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>Start building your gift box</div>
+                    </div>
+                </div>
+
+                <div class="summary-total">
+                    <button class="submit-btn" id="submitBtn" onclick="submitGiftBox()" disabled>
+                        <i class="fas fa-gift"></i> Request Gift Box
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Success Modal -->
-    <div id="successModal" class="modal">
+    <div class="modal" id="successModal">
         <div class="modal-content">
-            <h2>✅ Quote Saved!</h2>
-            <p>Quote ID: <strong id="quoteIdDisplay"></strong></p>
-            <p id="emailStatus"></p>
-            <button onclick="closeModal()">Close</button>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="success-title">Gift Box Request Submitted!</h2>
+            <p class="success-message">
+                Thank you! We've received your gift box request and will process it shortly.
+            </p>
+            <div class="success-reference">
+                <div class="reference-label">Reference Number</div>
+                <div class="reference-number" id="referenceNumber">XMAS1225-001</div>
+            </div>
+            <button class="nav-btn primary" onclick="closeModal()" style="width: 100%;">
+                <i class="fas fa-check"></i> Done
+            </button>
         </div>
     </div>
 
     <!-- Include EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Include Product Search Service -->
+    <script src="product-search-service.js"></script>
+
     <!-- Include Quote Service -->
     <script src="calculators/christmas-bundle-service.js"></script>
 
     <script>
         // API Configuration
-        const API_CONFIG = {
-            baseUrl: '/api', // Using local proxy to Heroku
-            endpoints: {
-                products: '/base-item-costs',
-                embroidery: '/pricing-matrix',
-                quotes: '/quote_sessions',
-                quoteItems: '/quote_items'
-            }
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+
+        // Product Data (will be populated from API)
+        const products = {
+            jackets: [],
+            hoodies: [],
+            beanies: []
         };
 
-        // EmailJS Configuration
-        const EMAILJS_CONFIG = {
-            serviceId: 'service_1c4k67j',
-            templateId: 'template_quote', // Update with actual template ID
-            publicKey: '4qSbDO-SQs19TbP80'
+        // Product style numbers to fetch
+        const PRODUCT_STYLES = {
+            jackets: ['CTJ162', 'CT100617', 'CT103828'],
+            hoodies: ['CTK121', 'F281'],
+            beanies: ['CT104597']
         };
 
-        // Fallback pricing (used if API fails)
-        const FALLBACK_PRICES = {
-            products: {
-                'CTJ162': {
-                    basePrice: 141.00,
-                    name: 'Carhartt Shoreline Jacket',
-                    category: 'jacket'
-                },
-                'CT100617': {
-                    basePrice: 79.00,
-                    name: 'Carhartt Rain Defender Jacket',
-                    category: 'jacket'
-                },
-                'CT103828': {
-                    basePrice: 124.00,
-                    name: 'Carhartt Duck Detroit Jacket',
-                    category: 'jacket'
-                },
-                'CTK121': {
-                    basePrice: 44.00,
-                    name: 'Carhartt Midweight Hoodie',
-                    category: 'hoodie'
-                },
-                'F281': {
-                    basePrice: 45.00,
-                    name: 'Sport-Tek Super Heavyweight Hoodie',
-                    category: 'hoodie'
-                },
-                'CT104597': {
-                    basePrice: 22.00,
-                    name: 'Carhartt Watch Cap 2.0',
-                    category: 'accessory'
-                },
-                'CTGD0794': {
-                    basePrice: 19.00,
-                    name: 'Carhartt Insulated Work Gloves',
-                    category: 'accessory'
-                }
-            },
-            embroideryPricing: {
-                '1-23': 15.00,
-                '24-47': 13.00,
-                '48-71': 12.00,
-                '72+': 11.00
-            },
-            smallBatchFee: 6.25,
-            giftBoxCost: 9.00
+        // State Management
+        let currentStep = 1;
+        let selectedItems = {
+            jacket: null,
+            hoodie: null,
+            beanie: null,
+            gloves: null,
+            logo: null,
+            customization: {},
+            delivery: {}
         };
 
-        // Current pricing data
-        let currentPricing = {
-            products: {},
-            embroideryRates: {},
-            fees: {}
-        };
+        // Image Zoom Modal Functions
+        function openZoomModal(imageSrc) {
+            const modal = document.getElementById('imageZoomModal');
+            const zoomImage = document.getElementById('zoomImage');
 
-        // Bundle configurations
-        const bundleConfigs = {
-            'complete': {
-                name: 'Complete Worker Bundle',
-                jacket: true,
-                hoodie: true,
-                beanie: true,
-                gloves: true,
-                items: 4,
-                minQty: 6
-            },
-            'foreman': {
-                name: 'Foreman Package',
-                jacket: true,
-                hoodie: false,
-                beanie: true,
-                gloves: true,
-                items: 3,
-                minQty: 8
-            },
-            'crew': {
-                name: 'Crew Essentials',
-                jacket: false,
-                hoodie: true,
-                beanie: true,
-                gloves: true,
-                items: 3,
-                minQty: 8
-            },
-            'duo': {
-                name: 'Simple Duo',
-                jacket: false,
-                hoodie: true,
-                beanie: true,
-                gloves: false,
-                items: 2,
-                minQty: 12
-            }
-        };
+            zoomImage.src = imageSrc;
+            modal.classList.add('active');
 
-        // Initialize calculator on page load
-        window.onload = async function() {
-            await loadPricingData();
-            populateProductSelects();
-            updateBundle();
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
         }
 
-        // Load pricing data from API with fallback
-        async function loadPricingData() {
-            const statusEl = document.getElementById('apiStatus');
-            const bundleEl = document.getElementById('bundleSelector');
+        function closeZoomModal() {
+            const modal = document.getElementById('imageZoomModal');
+            modal.classList.remove('active');
 
-            bundleEl.classList.add('loading');
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
 
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeZoomModal();
+            }
+        });
+
+        // Show error banner for API failures
+        function showErrorBanner(message) {
+            const existingBanner = document.querySelector('.error-banner');
+            if (existingBanner) {
+                existingBanner.remove();
+            }
+
+            const banner = document.createElement('div');
+            banner.className = 'error-banner';
+            banner.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #ef4444;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 10000;
+                font-weight: 500;
+                animation: slideDown 0.3s ease-out;
+            `;
+            banner.textContent = message;
+
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(banner);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                banner.remove();
+            }, 5000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            initializeSnowEffect();
+            showLoadingState();
+            await loadChristmasProducts();
+            renderProducts();
+            setupDragDrop();
+            updateSummary();
+        });
+
+        // Show loading state
+        function showLoadingState() {
+            const grids = ['jacketGrid', 'hoodieGrid', 'beanieGrid'];
+            grids.forEach(gridId => {
+                const grid = document.getElementById(gridId);
+                if (grid) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 20px; color: #666;">Loading products...</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Load products from API
+        async function loadChristmasProducts() {
             try {
-                // Fetch Christmas products from API
-                const productsResponse = await fetch(`${API_CONFIG.baseUrl}/christmas-products`);
-                const embroideryResponse = await fetch(`${API_CONFIG.baseUrl}/embroidery-pricing`);
+                for (const [category, styles] of Object.entries(PRODUCT_STYLES)) {
+                    const categoryProducts = [];
 
-                if (productsResponse.ok && embroideryResponse.ok) {
-                    const productsData = await productsResponse.json();
-                    const embroideryData = await embroideryResponse.json();
+                    for (const style of styles) {
+                        try {
+                            // Fetch product data with colors from single endpoint
+                            const response = await fetch(`/api/product-colors?styleNumber=${style}`);
+                            const result = await response.json();
 
-                    // Process the data
-                    currentPricing.products = productsData.products;
-                    currentPricing.embroideryRates = embroideryData;
-                    currentPricing.fees = {
-                        smallBatch: productsData.smallBatchFee || 6.25,
-                        giftBox: productsData.giftBoxCost || 9.00
-                    };
+                            if (result && result.colors) {
+                                let colors = result.colors || [];
+                                const productTitle = result.productTitle || '';
+                                const productDescription = result.PRODUCT_DESCRIPTION || result.description || '';
 
-                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connected to live pricing';
-                    statusEl.className = 'api-status connected';
-                } else {
-                    throw new Error('API not available');
+                                // Skip inventory validation for initial load to improve performance
+                                // Inventory will be checked when user selects a color
+                                // This prevents excessive API calls that slow down page load
+
+                                // Optional: Only validate for specific known problematic products
+                                if (style === 'CTK121') {
+                                    // Only validate CTK121 since we know it has Dark Brown issue
+                                    colors = await validateColorAvailability(colors, style);
+
+                                    if (colors.length === 0) {
+                                        console.warn(`Product ${style} has no available colors with inventory`);
+                                        categoryProducts.push(createFallbackProduct(style, category));
+                                        continue;
+                                    }
+                                }
+
+                                // Extract product name from title (format: "Name. StyleNumber")
+                                const productName = productTitle.split('.')[0].trim() || `Style ${style}`;
+
+                                // Get price from first color if available
+                                let productPrice = 'FREE';
+                                if (colors[0]) {
+                                    // Check various price fields
+                                    const price = colors[0].ITEM_PRICE || colors[0].Price || colors[0].price;
+                                    if (price) {
+                                        // Format price with dollar sign if it's a number
+                                        productPrice = typeof price === 'number' ? `$${price.toFixed(2)}` :
+                                                    price.toString().startsWith('$') ? price : `$${price}`;
+                                    }
+                                }
+
+                                // Get first color's image as the main product image
+                                const mainImage = colors[0]?.MAIN_IMAGE_URL ||
+                                                colors[0]?.FRONT_MODEL ||
+                                                colors[0]?.FRONT_FLAT ||
+                                                null;
+
+                                // Get actual sizes from API for this product
+                                let sizes = [];
+                                if (category === 'beanies') {
+                                    sizes = ['One Size'];
+                                } else {
+                                    // Fetch actual sizes from API using first color
+                                    const apiSizes = await fetchDefaultSizesForProduct(style, colors);
+                                    if (apiSizes && apiSizes.length > 0) {
+                                        sizes = apiSizes;
+                                    } else {
+                                        // Fallback sizes if API fails - but limited based on product type
+                                        console.warn(`Using fallback sizes for ${style}`);
+                                        if (style === 'F281') {
+                                            // F281 specifically only goes to 4XL
+                                            sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+                                        } else if (category === 'jackets' || category === 'hoodies') {
+                                            // Default jacket/hoodie sizes - conservative approach
+                                            sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+                                        } else {
+                                            sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+                                        }
+                                    }
+                                }
+
+                                categoryProducts.push({
+                                    id: style,
+                                    name: productName,
+                                    description: productDescription,
+                                    price: productPrice,
+                                    image: mainImage,
+                                    colors: colors, // These now include COLOR_SQUARE_IMAGE
+                                    sizes: sizes,
+                                    rawData: result
+                                });
+                            } else {
+                                console.warn(`Could not load product ${style}: No color data available`);
+                                categoryProducts.push(createFallbackProduct(style, category));
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching ${style}:`, error);
+                            categoryProducts.push(createFallbackProduct(style, category));
+                        }
+                    }
+
+                    products[category] = categoryProducts;
                 }
             } catch (error) {
-                console.warn('API connection failed, using fallback pricing:', error);
-                useFallbackPricing();
+                console.error('Error loading products:', error);
+                // Use fallback products
+                loadFallbackProducts();
             }
-
-            bundleEl.classList.remove('loading');
         }
 
-        // Process API product data
-        function processAPIProducts(apiData) {
-            const products = {};
+        // Create fallback product
+        function createFallbackProduct(style, category) {
+            const fallbackNames = {
+                'CTJ162': 'Carhartt Shoreline Jacket',
+                'CT100617': 'Carhartt Rain Defender Jacket',
+                'CT103828': 'Carhartt Duck Detroit Jacket',
+                'CTK121': 'Carhartt Midweight Hoodie',
+                'F281': 'Sport-Tek Super Heavyweight Hoodie',
+                'CT104597': 'Carhartt Watch Cap 2.0'
+            };
 
-            if (Array.isArray(apiData)) {
-                apiData.forEach(product => {
-                    // Map API response to our format
-                    products[product.StyleNumber] = {
-                        basePrice: parseFloat(product.BaseCost) / 0.60, // Apply margin
-                        name: product.Description || product.StyleNumber,
-                        category: determineCategory(product.StyleNumber)
+            return {
+                id: style,
+                name: fallbackNames[style] || `Product ${style}`,
+                price: 'FREE',
+                image: null,
+                colors: [
+                    { COLOR_NAME: 'Black', COLOR_SQUARE_IMAGE: null, HEX_CODE: '#000000' },
+                    { COLOR_NAME: 'Navy', COLOR_SQUARE_IMAGE: null, HEX_CODE: '#1e3a8a' }
+                ],
+                sizes: category === 'beanies' ? ['One Size'] :
+                      style === 'F281' ? ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] : // F281 only goes to 4XL
+                      ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] // Conservative default
+            };
+        }
+
+        // Load fallback products
+        function loadFallbackProducts() {
+            products.jackets = PRODUCT_STYLES.jackets.map(style => createFallbackProduct(style, 'jackets'));
+            products.hoodies = PRODUCT_STYLES.hoodies.map(style => createFallbackProduct(style, 'hoodies'));
+            products.beanies = PRODUCT_STYLES.beanies.map(style => createFallbackProduct(style, 'beanies'));
+        }
+
+        // Snow Effect
+        function initializeSnowEffect() {
+            const snowOverlay = document.getElementById('snowOverlay');
+            const snowflakeCount = 50;
+
+            for (let i = 0; i < snowflakeCount; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerHTML = '❄';
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                snowflake.style.opacity = Math.random();
+                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+                snowflake.style.animationDelay = Math.random() * 2 + 's';
+                snowOverlay.appendChild(snowflake);
+            }
+        }
+
+        // Render Products
+        function renderProducts() {
+            renderJackets();
+            renderHoodies();
+            renderBeanies();
+        }
+
+        function renderJackets() {
+            const grid = document.getElementById('jacketGrid');
+            grid.innerHTML = '';
+
+            products.jackets.forEach(product => {
+                grid.appendChild(createProductCard(product, 'jacket'));
+            });
+        }
+
+        function renderHoodies() {
+            const grid = document.getElementById('hoodieGrid');
+            grid.innerHTML = '';
+
+            products.hoodies.forEach(product => {
+                grid.appendChild(createProductCard(product, 'hoodie'));
+            });
+        }
+
+        function renderBeanies() {
+            const grid = document.getElementById('beanieGrid');
+            grid.innerHTML = '';
+
+            products.beanies.forEach(product => {
+                grid.appendChild(createProductCard(product, 'beanie'));
+            });
+        }
+
+        // Create Product Card
+        function createProductCard(product, type) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.dataset.productId = product.id;
+            card.dataset.productType = type;
+
+            // Check if this product is already selected
+            const isSelected = selectedItems[type]?.id === product.id;
+
+            // Add selected class if this product is selected
+            if (isSelected) {
+                card.classList.add('selected');
+            }
+
+            // Generate size buttons from actual API data
+            const sizeButtons = createSizeButtons(product);
+
+            // Generate color swatches from actual API data
+            const colorSwatches = createColorSwatches(product);
+
+            const buttonText = isSelected ? 'Change Selection' : `Select This ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            const buttonClass = isSelected ? 'select-btn selected' : 'select-btn';
+
+            card.innerHTML = `
+                <div class="product-image" ${product.image ? `onclick="openZoomModal('${product.image}')"` : ''}>
+                    ${product.image ?
+                        `<img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='/placeholder.jpg'">` :
+                        `<div class="placeholder"><i class="fas fa-${type === 'jacket' ? 'tshirt' : type === 'hoodie' ? 'hoodie' : 'hat-winter'}"></i></div>`
+                    }
+                    <div class="selected-badge">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-style">${product.id}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${product.price}</div>
+                    ${product.description ? `<div class="product-description" title="${product.description}">${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}</div>` : ''}
+
+                    <div class="selection-group">
+                        <div class="selection-label">Select Size:</div>
+                        <div class="size-grid">
+                            ${sizeButtons}
+                        </div>
+                    </div>
+
+                    <div class="selection-group">
+                        <div class="selection-label">Select Color:</div>
+                        <div class="color-grid">
+                            ${colorSwatches}
+                        </div>
+                    </div>
+
+                    <button class="${buttonClass}" onclick="selectProduct('${product.id}', '${type}')">
+                        ${buttonText}
+                    </button>
+                </div>
+            `;
+
+            // Add click handler to the whole card after innerHTML is set
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking on buttons or interactive elements
+                if (!e.target.closest('.size-btn') && !e.target.closest('.color-swatch') && !e.target.closest('.select-btn') && !e.target.closest('.product-image')) {
+                    selectProduct(product.id, type);
+                }
+            });
+
+            return card;
+        }
+
+        // Create size buttons from API data
+        function createSizeButtons(product) {
+            const sizes = product.sizes || [];
+
+            // Handle different size formats
+            if (Array.isArray(sizes) && sizes.length > 0) {
+                return sizes.map(size => {
+                    const sizeCode = typeof size === 'string' ? size : (size.code || size.name || size);
+                    return `<button class="size-btn" data-size="${sizeCode}" onclick="selectSize(event, '${product.id}')">${sizeCode}</button>`;
+                }).join('');
+            }
+
+            // Fallback
+            return '<button class="size-btn" data-size="One Size" onclick="selectSize(event, \'' + product.id + '\')">One Size</button>';
+        }
+
+        // Create color swatches from API data
+        function createColorSwatches(product) {
+            const colors = product.colors || [];
+
+            if (Array.isArray(colors) && colors.length > 0) {
+                return colors.map(color => {
+                    // Extract data from API response
+                    const colorName = color.COLOR_NAME || color.name || 'Unknown';
+                    const colorCode = color.CATALOG_COLOR || color.code || colorName;
+                    const swatchImage = color.COLOR_SQUARE_IMAGE || '';
+                    const hexColor = color.HEX_CODE || color.hex || '#cccccc';
+
+                    // Store additional image URLs for this color
+                    const colorImages = {
+                        main: color.MAIN_IMAGE_URL || '',
+                        frontModel: color.FRONT_MODEL || '',
+                        backModel: color.BACK_MODEL || '',
+                        frontFlat: color.FRONT_FLAT || '',
+                        backFlat: color.BACK_FLAT || ''
                     };
+
+                    // Always prefer the actual swatch image from API
+                    const swatchStyle = swatchImage ?
+                        `background-image: url('${swatchImage}');` :
+                        `background-color: ${hexColor};`;
+
+                    return `
+                        <div class="color-swatch"
+                             data-color="${colorName}"
+                             data-color-code="${colorCode}"
+                             data-color-images='${JSON.stringify(colorImages)}'
+                             onclick="selectColor(event, '${product.id}')"
+                             title="${colorName}">
+                            <div class="swatch-image" style="${swatchStyle}"></div>
+                            <div class="swatch-name">${colorName}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Fallback with basic colors
+            return `
+                <div class="color-swatch" data-color="Black" onclick="selectColor(event, '${product.id}')" title="Black">
+                    <div class="swatch-image" style="background-color: #000000"></div>
+                    <div class="swatch-name">Black</div>
+                </div>
+                <div class="color-swatch" data-color="Navy" onclick="selectColor(event, '${product.id}')" title="Navy">
+                    <div class="swatch-image" style="background-color: #1e3a8a"></div>
+                    <div class="swatch-name">Navy</div>
+                </div>
+            `;
+        }
+
+        // Get Color Hex (fallback for when no swatch image is available)
+        function getColorHex(colorName) {
+            const colors = {
+                'Black': '#000000',
+                'Navy': '#1e3a8a',
+                'Dark Gray': '#6b7280',
+                'Brown': '#92400e',
+                'Carhartt Brown': '#8b4513',
+                'Heather Gray': '#9ca3af',
+                'Carbon Heather': '#4b5563',
+                'Athletic Heather': '#d1d5db',
+                'Dark Green': '#14532d',
+                'Coal Heather': '#374151',
+                'White': '#ffffff',
+                'Red': '#dc2626'
+            };
+            return colors[colorName] || '#cccccc';
+        }
+
+        // Selection Functions
+        function selectSize(event, productId) {
+            event.stopPropagation();
+            const button = event.target;
+            const card = button.closest('.product-card');
+
+            // Clear other size selections in this card
+            card.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+        }
+
+        async function selectColor(event, productId) {
+            event.stopPropagation();
+            const swatch = event.target.closest('.color-swatch');
+            const card = swatch.closest('.product-card');
+
+            // Clear other color selections in this card
+            card.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+            swatch.classList.add('selected');
+
+            // Update product image based on selected color
+            const colorImages = swatch.dataset.colorImages;
+            if (colorImages) {
+                try {
+                    const images = JSON.parse(colorImages);
+                    const productImage = card.querySelector('.product-image img');
+
+                    // Use the first available image from the color
+                    const newImage = images.main || images.frontModel || images.frontFlat;
+
+                    if (productImage && newImage) {
+                        productImage.src = newImage;
+                        productImage.alt = swatch.dataset.color + ' - ' + productId;
+                        // Update the zoom modal onclick
+                        const productImageDiv = card.querySelector('.product-image');
+                        if (productImageDiv) {
+                            productImageDiv.setAttribute('onclick', `openZoomModal('${newImage}')`);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error updating product image:', e);
+                }
+            }
+
+            // Fetch actual sizes for this color
+            const colorCode = swatch.dataset.colorCode || swatch.dataset.color;
+            try {
+                const sizesResponse = await fetch(`/api/sizes-by-style-color?styleNumber=${productId}&color=${encodeURIComponent(colorCode)}`);
+
+                if (sizesResponse.ok) {
+                    const sizesData = await sizesResponse.json();
+                    updateProductSizes(card, sizesData, productId);
+                }
+            } catch (error) {
+                console.warn('Could not fetch sizes for color:', error);
+            }
+        }
+
+        // Validate color availability by checking inventory per size
+        async function validateColorAvailability(colors, styleNumber) {
+            const availableColors = [];
+
+            for (const color of colors) {
+                try {
+                    const colorCode = color.COLOR_CODE || color.CATALOG_COLOR || color.COLOR_NAME;
+                    if (!colorCode) continue;
+
+                    // Check inventory for this color
+                    const response = await fetch(`/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(colorCode)}`);
+
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        // Check if ANY size has inventory (not just grandTotal)
+                        let hasAnyInventory = false;
+                        const availableSizesForColor = [];
+
+                        if (data.sizeTotals && Array.isArray(data.sizeTotals)) {
+                            // Check each size's inventory
+                            data.sizeTotals.forEach((inventory, index) => {
+                                if (inventory > 0) {
+                                    hasAnyInventory = true;
+                                    if (data.sizes && data.sizes[index]) {
+                                        availableSizesForColor.push({
+                                            size: data.sizes[index],
+                                            inventory: inventory
+                                        });
+                                    }
+                                }
+                            });
+                        } else if (data.grandTotal && data.grandTotal > 0) {
+                            // Fallback to grandTotal if sizeTotals not available
+                            hasAnyInventory = true;
+                        }
+
+                        if (hasAnyInventory) {
+                            // Store inventory data with the color for later use
+                            color._inventoryData = data;
+                            color._availableSizes = availableSizesForColor;
+                            availableColors.push(color);
+                        } else {
+                            console.warn(`Filtering out ${colorCode} for ${styleNumber} - zero inventory across all sizes`);
+                        }
+                    } else {
+                        // If we can't check inventory, include the color (fail open)
+                        availableColors.push(color);
+                    }
+                } catch (error) {
+                    console.warn(`Could not validate color ${color.COLOR_NAME}:`, error);
+                    // If validation fails, include the color to avoid blocking
+                    availableColors.push(color);
+                }
+            }
+
+            return availableColors;
+        }
+
+        // Fetch default sizes for a product using its first available color
+        async function fetchDefaultSizesForProduct(styleNumber, colors) {
+            try {
+                // Get the first available color
+                const firstColor = colors[0]?.COLOR_CODE || colors[0]?.COLOR_NAME;
+                if (!firstColor) {
+                    console.warn(`No color available for product ${styleNumber}`);
+                    return null;
+                }
+
+                const response = await fetch(`/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(firstColor)}`);
+
+                if (!response.ok) {
+                    console.warn(`Failed to fetch sizes for ${styleNumber} with color ${firstColor}`);
+                    return null;
+                }
+
+                const sizesData = await response.json();
+                return extractSizesFromData(sizesData);
+            } catch (error) {
+                console.error(`Error fetching sizes for product ${styleNumber}:`, error);
+                showErrorBanner(`Unable to load sizes for product ${styleNumber}. Please refresh the page.`);
+                return null;
+            }
+        }
+
+        // Extract sizes with inventory from API response data
+        function extractSizesWithInventory(sizesData) {
+            const sizesWithInventory = [];
+
+            if (sizesData && typeof sizesData === 'object') {
+                // Check if it has sizes and sizeTotals arrays (standard format)
+                if (sizesData.sizes && sizesData.sizeTotals &&
+                    Array.isArray(sizesData.sizes) && Array.isArray(sizesData.sizeTotals)) {
+
+                    sizesData.sizes.forEach((size, index) => {
+                        const inventory = sizesData.sizeTotals[index] || 0;
+                        sizesWithInventory.push({
+                            size: size,
+                            inventory: inventory,
+                            available: inventory > 0
+                        });
+                    });
+                }
+                // Check if it's an array of size objects
+                else if (Array.isArray(sizesData)) {
+                    sizesData.forEach(item => {
+                        if (item.SIZE || item.size) {
+                            sizesWithInventory.push({
+                                size: item.SIZE || item.size,
+                                inventory: item.inventory || item.quantity || 1,
+                                available: true
+                            });
+                        }
+                    });
+                }
+                // Fallback: check standard size fields
+                else {
+                    const sizeFields = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                    sizeFields.forEach(size => {
+                        const inventory = sizesData[size] || sizesData[size.toLowerCase()] || 0;
+                        if (inventory !== undefined) {
+                            sizesWithInventory.push({
+                                size: size === 'XXL' ? '2XL' : size,
+                                inventory: parseInt(inventory),
+                                available: parseInt(inventory) > 0
+                            });
+                        }
+                    });
+                }
+            }
+
+            return sizesWithInventory;
+        }
+
+        // Extract sizes from API response data (backward compatibility)
+        function extractSizesFromData(sizesData) {
+            const sizesWithInventory = extractSizesWithInventory(sizesData);
+            // Return only available sizes
+            return sizesWithInventory
+                .filter(item => item.available)
+                .map(item => item.size);
+        }
+
+        // Update sizes based on API response with inventory awareness
+        function updateProductSizes(card, sizesData, productId) {
+            const sizeGrid = card.querySelector('.size-grid');
+            if (!sizeGrid || !sizesData) return;
+
+            // Get sizes with inventory information
+            const sizesWithInventory = extractSizesWithInventory(sizesData);
+
+            // Generate size buttons - show all sizes but disable out-of-stock
+            if (sizesWithInventory.length > 0) {
+                const sizeButtons = sizesWithInventory.map(sizeInfo => {
+                    const { size, inventory, available } = sizeInfo;
+
+                    // Create button with appropriate styling and state
+                    if (available) {
+                        // Available size - normal button
+                        return `<button class="size-btn" data-size="${size}" data-inventory="${inventory}"
+                                onclick="selectSize(event, '${productId}')">${size}</button>`;
+                    } else {
+                        // Out of stock - disabled button with visual indicator
+                        return `<button class="size-btn out-of-stock" data-size="${size}"
+                                disabled style="opacity: 0.4; cursor: not-allowed; position: relative;"
+                                title="Out of Stock">${size}</button>`;
+                    }
+                }).join('');
+
+                sizeGrid.innerHTML = sizeButtons;
+
+                // Add CSS for out-of-stock styling if not already present
+                if (!document.querySelector('#out-of-stock-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'out-of-stock-styles';
+                    style.textContent = `
+                        .size-btn.out-of-stock {
+                            text-decoration: line-through;
+                            background: #e5e7eb !important;
+                            color: #9ca3af !important;
+                            border-color: #d1d5db !important;
+                        }
+                        .size-btn.out-of-stock:hover {
+                            background: #e5e7eb !important;
+                            transform: none !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                // Clear any previous size selection
+                const selectedSize = card.querySelector('.size-btn.selected');
+                if (selectedSize) {
+                    selectedSize.classList.remove('selected');
+                }
+            }
+        }
+
+        // Select Product
+        function selectProduct(productId, type) {
+            const card = document.querySelector(`[data-product-id="${productId}"]`);
+
+            // Clear previous selection of this type
+            document.querySelectorAll(`[data-product-type="${type}"]`).forEach(c => {
+                c.classList.remove('selected');
+            });
+
+            // Mark this card as selected
+            card.classList.add('selected');
+
+            // Get selected size and color if any
+            const selectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
+            const selectedColorElement = card.querySelector('.color-swatch.selected');
+            const selectedColor = selectedColorElement?.dataset.color;
+            const selectedColorCode = selectedColorElement?.dataset.colorCode;
+
+            // Find product data
+            let product = null;
+            if (type === 'jacket') {
+                product = products.jackets.find(p => p.id === productId);
+            } else if (type === 'hoodie') {
+                product = products.hoodies.find(p => p.id === productId);
+            } else if (type === 'beanie') {
+                product = products.beanies.find(p => p.id === productId);
+            }
+
+            // Find the selected color object from the product
+            let selectedColorData = null;
+            if (product && product.colors) {
+                selectedColorData = product.colors.find(c => {
+                    if (typeof c === 'string') {
+                        return c === selectedColor;
+                    } else {
+                        return (c.COLOR_NAME || c.name) === selectedColor;
+                    }
                 });
             }
 
-            if (Object.keys(products).length > 0) {
-                currentPricing.products = products;
-            } else {
-                currentPricing.products = FALLBACK_PRICES.products;
-            }
-        }
-
-        // Determine product category from style number
-        function determineCategory(styleNumber) {
-            if (styleNumber.startsWith('CTJ') || styleNumber.startsWith('CT10')) return 'jacket';
-            if (styleNumber.startsWith('CTK') || styleNumber === 'F281') return 'hoodie';
-            return 'accessory';
-        }
-
-        // Use fallback pricing
-        function useFallbackPricing() {
-            currentPricing.products = FALLBACK_PRICES.products;
-            currentPricing.embroideryRates = FALLBACK_PRICES.embroideryPricing;
-            currentPricing.fees = {
-                smallBatch: FALLBACK_PRICES.smallBatchFee,
-                giftBox: FALLBACK_PRICES.giftBoxCost
+            // Save selection with full product data
+            selectedItems[type] = {
+                ...product,
+                selectedSize,
+                selectedColor,
+                selectedColorCode,
+                selectedColorData // Store the full color object for later use
             };
 
-            const statusEl = document.getElementById('apiStatus');
-            statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Using standard pricing';
-            statusEl.className = 'api-status fallback';
-        }
-
-        // Refresh prices from API
-        async function refreshPrices() {
-            await loadPricingData();
-            populateProductSelects();
-            updatePricing();
-        }
-
-        // Populate product select dropdowns
-        function populateProductSelects() {
-            const jacketSelect = document.getElementById('jacketStyle');
-            const hoodieSelect = document.getElementById('hoodieStyle');
-
-            // Clear existing options
-            jacketSelect.innerHTML = '';
-            hoodieSelect.innerHTML = '';
-
-            // Add jacket options
-            Object.keys(currentPricing.products).forEach(style => {
-                const product = currentPricing.products[style];
-                if (product.category === 'jacket') {
-                    const embroideryPrice = getEmbroideryPrice(1, 24);
-                    const totalPrice = product.basePrice + embroideryPrice;
-                    const option = document.createElement('option');
-                    option.value = style;
-                    option.textContent = `${style} - ${product.name} ($${totalPrice.toFixed(2)} w/ embroidery)`;
-                    jacketSelect.appendChild(option);
+            // Update button text on all cards of this type
+            document.querySelectorAll(`[data-product-type="${type}"] .select-btn`).forEach(btn => {
+                const btnCard = btn.closest('.product-card');
+                if (btnCard.classList.contains('selected')) {
+                    btn.textContent = 'Change Selection';
+                    btn.classList.add('selected');
+                } else {
+                    btn.textContent = `Select This ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                    btn.classList.remove('selected');
                 }
             });
 
-            // Add "No Jacket" option
-            const noJacket = document.createElement('option');
-            noJacket.value = 'none';
-            noJacket.textContent = '-- No Jacket --';
-            jacketSelect.appendChild(noJacket);
+            // Enable next button
+            document.getElementById(`${type}Next`).disabled = false;
 
-            // Add hoodie options
-            Object.keys(currentPricing.products).forEach(style => {
-                const product = currentPricing.products[style];
-                if (product.category === 'hoodie') {
-                    const embroideryPrice = getEmbroideryPrice(1, 24);
-                    const totalPrice = product.basePrice + embroideryPrice;
-                    const option = document.createElement('option');
-                    option.value = style;
-                    option.textContent = `${style} - ${product.name} ($${totalPrice.toFixed(2)} w/ embroidery)`;
-                    hoodieSelect.appendChild(option);
-                }
+            // Update summary
+            updateSummary();
+        }
+
+        // Glove Selection Function
+        function selectGloveSize(size) {
+            // Clear previous size selection
+            document.querySelectorAll('#step4 .size-btn').forEach(btn => {
+                btn.classList.remove('selected');
             });
 
-            // Add "No Hoodie" option
-            const noHoodie = document.createElement('option');
-            noHoodie.value = 'none';
-            noHoodie.textContent = '-- No Hoodie --';
-            hoodieSelect.appendChild(noHoodie);
-
-            // Update accessory prices
-            if (currentPricing.products['CT104597']) {
-                const beaniePrice = currentPricing.products['CT104597'].basePrice + getEmbroideryPrice(1, 24);
-                document.getElementById('beaniePrice').textContent = `$${beaniePrice.toFixed(2)}`;
+            // Mark this size as selected
+            const sizeBtn = document.querySelector(`#step4 .size-btn[data-size="${size}"]`);
+            if (sizeBtn) {
+                sizeBtn.classList.add('selected');
             }
 
-            if (currentPricing.products['CTGD0794']) {
-                document.getElementById('glovesPrice').textContent = `$${currentPricing.products['CTGD0794'].basePrice.toFixed(2)}`;
+            // Store glove selection
+            selectedItems.gloves = {
+                id: 'CTGD0794',
+                name: 'Carhartt Work Gloves',
+                selectedSize: size,
+                selectedColor: 'Black Barley',
+                image: 'https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg'
+            };
+
+            // Enable next button
+            document.getElementById('gloveNext').disabled = false;
+
+            // Update summary
+            updateSummary();
+        }
+
+        // Skip Functions
+        function skipJacket() {
+            selectedItems.jacket = null;
+            nextStep();
+        }
+
+        function skipHoodie() {
+            selectedItems.hoodie = null;
+            nextStep();
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep < 6) {
+                // Hide current step
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+
+                // Update progress
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('completed');
+
+                currentStep++;
+
+                // Show next step
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Get embroidery price based on quantity
-        function getEmbroideryPrice(embroideredItems, totalPieces) {
-            if (totalPieces >= 72) {
-                return currentPricing.embroideryRates['72+'] || 11;
-            } else if (totalPieces >= 48) {
-                return currentPricing.embroideryRates['48-71'] || 12;
-            } else if (totalPieces >= 24) {
-                return currentPricing.embroideryRates['24-47'] || 13;
-            } else {
-                return currentPricing.embroideryRates['1-23'] || 15;
+        function previousStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+
+                currentStep--;
+
+                // Show previous step
+                document.getElementById(`step${currentStep}`).classList.add('active');
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Update bundle configuration
-        function updateBundle() {
-            const bundleType = document.getElementById('bundleType').value;
-
-            if (bundleType === 'custom') {
-                // Show all options for custom
-                document.getElementById('jacketSelection').classList.remove('hidden');
-                document.getElementById('hoodieSelection').classList.remove('hidden');
-                document.getElementById('beanieSelection').classList.remove('hidden');
-                document.getElementById('glovesSelection').classList.remove('hidden');
-                document.getElementById('includedItems').classList.add('hidden');
-            } else {
-                const config = bundleConfigs[bundleType];
-
-                // Show/hide selections based on bundle
-                if (config.jacket) {
-                    document.getElementById('jacketSelection').classList.remove('hidden');
-                    document.getElementById('jacketStyle').selectedIndex = 0;
-                } else {
-                    document.getElementById('jacketSelection').classList.add('hidden');
-                    document.getElementById('jacketStyle').value = 'none';
-                }
-
-                if (config.hoodie) {
-                    document.getElementById('hoodieSelection').classList.remove('hidden');
-                    document.getElementById('hoodieStyle').selectedIndex = 0;
-                } else {
-                    document.getElementById('hoodieSelection').classList.add('hidden');
-                    document.getElementById('hoodieStyle').value = 'none';
-                }
-
-                // Hide individual checkboxes for preset bundles
-                document.getElementById('beanieSelection').classList.add('hidden');
-                document.getElementById('glovesSelection').classList.add('hidden');
-                document.getElementById('includedItems').classList.remove('hidden');
-
-                // Set minimum quantity
-                document.getElementById('quantity').value = config.minQty;
-            }
-
-            updatePricing();
-        }
-
-        // Update pricing calculations
-        function updatePricing() {
-            const bundleType = document.getElementById('bundleType').value;
-            const quantity = parseInt(document.getElementById('quantity').value) || 1;
-
-            let itemsPerBundle = 0;
-            let basePrice = 0;
-            let bundlePrice = 0;
-            let embroideredItems = 0;
-            let totalPieces = 0;
-
-            // Get selections
-            const jacket = document.getElementById('jacketStyle').value;
-            const hoodie = document.getElementById('hoodieStyle').value;
-
-            if (bundleType === 'custom') {
-                const hasBeanie = document.getElementById('includeBeanie').checked;
-                const hasGloves = document.getElementById('includeGloves').checked;
-
-                if (jacket !== 'none' && currentPricing.products[jacket]) {
-                    basePrice += currentPricing.products[jacket].basePrice;
-                    itemsPerBundle++;
-                    embroideredItems++;
-                }
-                if (hoodie !== 'none' && currentPricing.products[hoodie]) {
-                    basePrice += currentPricing.products[hoodie].basePrice;
-                    itemsPerBundle++;
-                    embroideredItems++;
-                }
-                if (hasBeanie && currentPricing.products['CT104597']) {
-                    basePrice += currentPricing.products['CT104597'].basePrice;
-                    itemsPerBundle++;
-                    embroideredItems++;
-                }
-                if (hasGloves && currentPricing.products['CTGD0794']) {
-                    basePrice += currentPricing.products['CTGD0794'].basePrice;
-                    itemsPerBundle++;
-                    // Gloves don't get embroidery
-                }
-            } else {
-                const config = bundleConfigs[bundleType];
-                itemsPerBundle = config.items;
-
-                if (config.jacket && jacket !== 'none' && currentPricing.products[jacket]) {
-                    basePrice += currentPricing.products[jacket].basePrice;
-                    embroideredItems++;
-                }
-                if (config.hoodie && hoodie !== 'none' && currentPricing.products[hoodie]) {
-                    basePrice += currentPricing.products[hoodie].basePrice;
-                    embroideredItems++;
-                }
-                if (config.beanie && currentPricing.products['CT104597']) {
-                    basePrice += currentPricing.products['CT104597'].basePrice;
-                    embroideredItems++;
-                }
-                if (config.gloves && currentPricing.products['CTGD0794']) {
-                    basePrice += currentPricing.products['CTGD0794'].basePrice;
-                    // Gloves don't get embroidery
-                }
-            }
-
-            totalPieces = itemsPerBundle * quantity;
-            const hasVolumePrice = totalPieces >= 24;
-
-            // Get embroidery rate and fees
-            const embroideryRate = getEmbroideryPrice(embroideredItems, totalPieces);
-            const smallBatchFee = hasVolumePrice ? 0 : currentPricing.fees.smallBatch;
-
-            // Calculate bundle price
-            bundlePrice = basePrice + (embroideryRate * embroideredItems) + (smallBatchFee * itemsPerBundle) + currentPricing.fees.giftBox;
-
-            const totalPrice = bundlePrice * quantity;
-
-            // Update display
-            document.getElementById('quantityInfo').textContent = `= ${totalPieces} total pieces`;
-            document.getElementById('bundlePrice').textContent = `$${bundlePrice.toFixed(2)}`;
-            document.getElementById('bundleCount').textContent = quantity;
-            document.getElementById('totalPieces').textContent = totalPieces;
-            document.getElementById('totalPrice').textContent = `$${totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-
-            // Update alerts
-            const alert = document.getElementById('pricingAlert');
-            if (hasVolumePrice) {
-                alert.className = 'success';
-                alert.innerHTML = '<i class="fas fa-check-circle"></i> <span>Qualifies for volume pricing! (24+ pieces)</span>';
-                document.getElementById('embroideryRate').textContent = `$${embroideryRate}/item (volume)`;
-
-                // Calculate savings
-                const withoutVolumeEmbroidery = getEmbroideryPrice(embroideredItems, 1) * embroideredItems;
-                const withVolumeEmbroidery = embroideryRate * embroideredItems;
-                const embroideryDifference = (withoutVolumeEmbroidery - withVolumeEmbroidery) * quantity;
-                const batchFeeSavings = (currentPricing.fees.smallBatch * itemsPerBundle) * quantity;
-                const totalSavings = embroideryDifference + batchFeeSavings;
-
-                document.getElementById('savings').textContent = `$${totalSavings.toFixed(2)}`;
-                document.getElementById('savingsRow').style.display = 'flex';
-            } else {
-                const needed = 24 - totalPieces;
-                const moreBundle = Math.ceil(needed / itemsPerBundle);
-                alert.className = 'warning';
-                alert.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>Add ${moreBundle} more bundle${moreBundle > 1 ? 's' : ''} for volume pricing (need ${needed} more pieces)</span>`;
-                document.getElementById('embroideryRate').textContent = `$${embroideryRate}/item + $${currentPricing.fees.smallBatch} batch fee`;
-                document.getElementById('savingsRow').style.display = 'none';
+        // Logo Upload
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('logoPreview').classList.add('active');
+                    selectedItems.logo = e.target.result;
+                    updateSummary();
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // Generate quote ID
-        function generateQuoteID() {
+        // Drag and Drop
+        function setupDragDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const input = document.getElementById('logoFile');
+                    input.files = e.dataTransfer.files;
+                    handleLogoUpload({ target: input });
+                }
+            });
+        }
+
+        // Update Summary
+        function updateSummary() {
+            const summaryItems = document.getElementById('summaryItems');
+            const hasItems = selectedItems.jacket || selectedItems.hoodie || selectedItems.beanie || selectedItems.gloves;
+
+            if (!hasItems) {
+                summaryItems.innerHTML = `
+                    <div class="summary-empty">
+                        <div class="summary-empty-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>Start building your gift box</div>
+                    </div>
+                `;
+                document.getElementById('submitBtn').disabled = true;
+                return;
+            }
+
+            let html = '';
+
+            // Add selected items
+            if (selectedItems.jacket) {
+                html += createSummaryItem(selectedItems.jacket, 'jacket');
+            }
+            if (selectedItems.hoodie) {
+                html += createSummaryItem(selectedItems.hoodie, 'hoodie');
+            }
+            if (selectedItems.beanie) {
+                html += createSummaryItem(selectedItems.beanie, 'beanie');
+            }
+
+            // Add gloves (if selected, show selected size; otherwise show pending selection)
+            const gloveImageUrl = 'https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg';
+
+            if (selectedItems.gloves) {
+                // Create unique ID for glove image
+                const gloveImageId = `summary-img-gloves-${Date.now()}`;
+                html += `
+                    <div class="summary-item">
+                        <div class="summary-item-image" id="${gloveImageId}-container">
+                            <img id="${gloveImageId}"
+                                 src="${gloveImageUrl}"
+                                 alt="Carhartt Work Gloves - ${selectedItems.gloves.selectedColor}"
+                                 onerror="handleImageError('${gloveImageId}', 'fa-mitten')">
+                            <div class="image-fallback">
+                                <i class="fas fa-mitten"></i>
+                            </div>
+                        </div>
+                        <div class="summary-item-details">
+                            <div class="summary-item-name">Carhartt Work Gloves</div>
+                            <div class="summary-item-specs">CTGD0794 • ${selectedItems.gloves.selectedSize} • ${selectedItems.gloves.selectedColor}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Create unique ID for unselected glove image
+                const gloveImageId = `summary-img-gloves-pending-${Date.now()}`;
+                html += `
+                    <div class="summary-item" style="opacity: 0.5;">
+                        <div class="summary-item-image" id="${gloveImageId}-container">
+                            <img id="${gloveImageId}"
+                                 src="${gloveImageUrl}"
+                                 alt="Carhartt Work Gloves"
+                                 onerror="handleImageError('${gloveImageId}', 'fa-mitten')">
+                            <div class="image-fallback">
+                                <i class="fas fa-mitten"></i>
+                            </div>
+                        </div>
+                        <div class="summary-item-details">
+                            <div class="summary-item-name">Carhartt Work Gloves</div>
+                            <div class="summary-item-specs">CTGD0794 • Size not selected • Included</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            summaryItems.innerHTML = html;
+
+            // Enable submit if on last step and form is valid
+            if (currentStep === 6) {
+                validateForm();
+            }
+        }
+
+        function createSummaryItem(item, type) {
+            // Get the correct product image for the selected color
+            let productImage = null;
+            let fallbackIcon = type === 'jacket' ? 'fa-tshirt' : type === 'hoodie' ? 'fa-hoodie' : 'fa-hat-winter';
+
+            // Try to get image from selectedColorData (which contains the color-specific image)
+            if (item.selectedColorData) {
+                // Priority order: MAIN_IMAGE_URL, then FRONT_FLAT, then FRONT_MODEL
+                productImage = item.selectedColorData.MAIN_IMAGE_URL ||
+                              item.selectedColorData.FRONT_FLAT ||
+                              item.selectedColorData.FRONT_MODEL ||
+                              item.selectedColorData.IMAGE_URL;
+
+                // Handle cases where image might be empty string
+                if (productImage === '' || productImage === 'null' || productImage === null) {
+                    productImage = null;
+                }
+            }
+
+            // Fallback to default product image if no color-specific image
+            if (!productImage && item.image) {
+                productImage = item.image;
+            }
+
+            // Create unique ID for this item's image to handle error events
+            const imageId = `summary-img-${type}-${Date.now()}`;
+
+            // Determine what to display - image or icon
+            const imageContent = productImage
+                ? `<img id="${imageId}"
+                        src="${productImage}"
+                        alt="${item.name} - ${item.selectedColor}"
+                        onerror="handleImageError('${imageId}', '${fallbackIcon}')">
+                   <div class="image-fallback">
+                        <i class="fas ${fallbackIcon}"></i>
+                   </div>`
+                : `<i class="fas ${fallbackIcon}"></i>`;
+
+            return `
+                <div class="summary-item">
+                    <div class="summary-item-image" id="${imageId}-container">
+                        ${imageContent}
+                    </div>
+                    <div class="summary-item-details">
+                        <div class="summary-item-name">${item.name}</div>
+                        <div class="summary-item-specs">${item.id} • ${item.selectedSize || 'Size not selected'} • ${item.selectedColor || 'Color not selected'}</div>
+                    </div>
+                    <div class="summary-item-remove" onclick="removeItem('${type}')">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Handle image load errors
+        function handleImageError(imageId, fallbackIcon) {
+            const container = document.getElementById(`${imageId}-container`);
+            if (container) {
+                container.classList.add('fallback-active');
+            }
+            // Log for debugging
+            console.log(`Image failed to load for ${imageId}, showing fallback icon`);
+        }
+
+        // Debug function to verify image selection
+        function debugGiftBoxImages() {
+            console.log('=== Gift Box Image Debug ===');
+            ['jacket', 'hoodie', 'beanie'].forEach(type => {
+                const item = selectedItems[type];
+                if (item) {
+                    console.log(`\n${type.toUpperCase()}:`);
+                    console.log(`  Product: ${item.name} (${item.id})`);
+                    console.log(`  Selected Color: ${item.selectedColor}`);
+                    if (item.selectedColorData) {
+                        console.log(`  Color Data Available: Yes`);
+                        console.log(`  MAIN_IMAGE_URL: ${item.selectedColorData.MAIN_IMAGE_URL || 'Not available'}`);
+                        console.log(`  FRONT_FLAT: ${item.selectedColorData.FRONT_FLAT || 'Not available'}`);
+                        console.log(`  FRONT_MODEL: ${item.selectedColorData.FRONT_MODEL || 'Not available'}`);
+                    } else {
+                        console.log(`  Color Data Available: No`);
+                        console.log(`  Fallback Image: ${item.image || 'None'}`);
+                    }
+                }
+            });
+            console.log('\n=== End Debug ===');
+        }
+
+        // Add debug command to window for testing
+        window.debugGiftBox = debugGiftBoxImages;
+
+        function removeItem(type) {
+            selectedItems[type] = null;
+
+            // Clear selection in UI
+            document.querySelectorAll(`[data-product-type="${type}"]`).forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Disable next button for that step
+            if (document.getElementById(`${type}Next`)) {
+                document.getElementById(`${type}Next`).disabled = true;
+            }
+
+            updateSummary();
+        }
+
+        // Form Validation
+        function validateForm() {
+            const form = document.getElementById('deliveryForm');
+            const isValid = form.checkValidity();
+            document.getElementById('submitBtn').disabled = !isValid;
+        }
+
+        // Add event listeners for form validation
+        document.querySelectorAll('#deliveryForm input, #deliveryForm select').forEach(input => {
+            input.addEventListener('input', validateForm);
+        });
+
+        // Submit Gift Box
+        async function submitGiftBox() {
+            // Collect all data
+            const formData = {
+                items: {
+                    jacket: selectedItems.jacket,
+                    hoodie: selectedItems.hoodie,
+                    beanie: selectedItems.beanie
+                },
+                customization: {
+                    logo: selectedItems.logo,
+                    embLocation: document.getElementById('embLocation').value,
+                    threadColors: document.getElementById('threadColors').value,
+                    specialInstructions: document.getElementById('specialInstructions').value
+                },
+                delivery: {
+                    contactName: document.getElementById('contactName').value,
+                    companyName: document.getElementById('companyName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    address1: document.getElementById('address1').value,
+                    address2: document.getElementById('address2').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    deliveryDate: document.getElementById('deliveryDate').value
+                }
+            };
+
+            // Generate reference number
+            const referenceNumber = generateReferenceNumber();
+            document.getElementById('referenceNumber').textContent = referenceNumber;
+
+            // Here you would normally send this data to your server
+            console.log('Submitting gift box request:', formData);
+
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function generateReferenceNumber() {
             const date = new Date();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
-            const sequence = Math.floor(Math.random() * 100) + 1;
-            return `XMAS${month}${day}-${sequence}`;
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `XMAS${month}${day}-${random}`;
         }
 
-        // Save quote
-        async function saveQuote() {
-            const quoteService = new ChristmasBundleQuoteService();
-            const bundleType = document.getElementById('bundleType').value;
-            const quantity = parseInt(document.getElementById('quantity').value) || 1;
-            const customerName = document.getElementById('customerName').value || 'Walk-in Customer';
-            const customerEmail = document.getElementById('customerEmail').value;
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+            // Reset form
+            resetForm();
+        }
 
-            // Get current selections
-            const jacket = document.getElementById('jacketStyle').value;
-            const hoodie = document.getElementById('hoodieStyle').value;
-            const bundleConfig = bundleType === 'custom' ? null : bundleConfigs[bundleType];
-
-            // Determine what's included
-            const hasBeanie = bundleType === 'custom'
-                ? document.getElementById('includeBeanie').checked
-                : (bundleConfig ? bundleConfig.beanie : false);
-            const hasGloves = bundleType === 'custom'
-                ? document.getElementById('includeGloves').checked
-                : (bundleConfig ? bundleConfig.gloves : false);
-
-            // Calculate pricing details
-            const pricingData = quoteService.calculateBundlePricing({
-                bundleType,
-                quantity,
-                jacket,
-                hoodie,
-                hasBeanie,
-                hasGloves,
-                products: currentPricing.products,
-                embroideryRates: currentPricing.embroideryRates,
-                fees: currentPricing.fees
-            });
-
-            // Prepare quote data
-            const quoteData = {
-                customerName,
-                customerEmail,
-                bundleType: bundleConfigs[bundleType]?.name || 'Custom Bundle',
-                quantity,
-                itemCount: pricingData.itemsPerBundle * quantity,
-                totalAmount: pricingData.totalPrice,
-                items: pricingData.items,
-                bundlePrice: pricingData.bundlePrice,
-                totalPrice: pricingData.totalPrice,
-                embroideryRate: pricingData.embroideryRate,
-                hasVolumePrice: pricingData.hasVolumePrice,
-                savings: pricingData.savings
+        function resetForm() {
+            currentStep = 1;
+            selectedItems = {
+                jacket: null,
+                hoodie: null,
+                beanie: null,
+                gloves: null,
+                logo: null,
+                customization: {},
+                delivery: {}
             };
 
-            try {
-                // Save to database
-                const saveResult = await quoteService.saveQuote(quoteData);
+            // Reset UI
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('step1').classList.add('active');
 
-                if (saveResult.success) {
-                    quoteData.quoteId = saveResult.quoteId;
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            document.querySelector('[data-step="1"]').classList.add('active');
 
-                    // Send email if provided
-                    if (customerEmail) {
-                        const emailResult = await quoteService.sendQuoteEmail(quoteData);
-                        if (emailResult.success) {
-                            document.getElementById('emailStatus').textContent = `Quote sent to ${customerEmail}`;
-                        } else {
-                            document.getElementById('emailStatus').textContent = 'Quote saved (email pending)';
-                        }
-                    } else {
-                        document.getElementById('emailStatus').textContent = 'Quote saved successfully!';
-                    }
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
 
-                    document.getElementById('quoteIdDisplay').textContent = saveResult.quoteId;
-                } else {
-                    // If database save fails, still show the quote ID
-                    const quoteId = quoteService.generateQuoteID();
-                    document.getElementById('quoteIdDisplay').textContent = quoteId;
-                    document.getElementById('emailStatus').textContent = 'Quote saved locally';
-                }
+            document.querySelectorAll('.size-btn, .color-swatch').forEach(btn => {
+                btn.classList.remove('selected');
+            });
 
-                document.getElementById('successModal').style.display = 'block';
+            document.querySelectorAll('.select-btn').forEach(btn => {
+                btn.disabled = true;
+            });
 
-            } catch (error) {
-                console.error('Error saving quote:', error);
-                const quoteId = quoteService.generateQuoteID();
-                alert('Quote saved locally. Quote ID: ' + quoteId);
-            }
-        }
+            document.getElementById('deliveryForm').reset();
+            document.getElementById('logoPreview').classList.remove('active');
 
-        // Reset calculator
-        function resetCalculator() {
-            document.getElementById('bundleType').value = 'complete';
-            document.getElementById('quantity').value = 6;
-            document.getElementById('customerName').value = '';
-            document.getElementById('customerEmail').value = '';
-            updateBundle();
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('successModal').style.display = 'none';
+            updateSummary();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
