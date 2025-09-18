@@ -99,7 +99,8 @@
       "Bash(source ~/.bashrc)",
       "mcp__uvx__kokoro_install",
       "mcp__uvx__voice_mode_info",
-      "Bash(wsl.exe:*)"
+      "Bash(wsl.exe:*)",
+      "WebFetch(domain:www.sanmar.com)"
     ],
     "deny": [],
     "ask": [],
