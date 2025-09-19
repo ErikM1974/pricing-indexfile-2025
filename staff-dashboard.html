@@ -7530,12 +7530,13 @@
                                             if (bundleConfig.gloves && bundleConfig.gloves.trim()) {
                                                 const parts = bundleConfig.gloves.split(' - ');
                                                 const style = parts[0] || '';
-                                                const color = parts[1] || 'N/A';
+                                                const size = parts[1] || 'N/A';
+                                                const color = parts[2] || 'N/A';
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">🧤 Gloves</strong></td>
                                                     <td style="padding: 0.75rem; font-family: monospace; font-size: 1.1rem;">${style}</td>
-                                                    <td style="padding: 0.75rem;"><span style="background: #e5e7eb; padding: 2px 8px; border-radius: 4px;">OSFA</span></td>
+                                                    <td style="padding: 0.75rem;"><span style="background: #dbeafe; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${size}</span></td>
                                                     <td style="padding: 0.75rem; text-align: center; font-weight: 600;">1</td>
                                                     <td style="padding: 0.75rem; color: #6b7280; font-size: 0.875rem;">${color}</td>
                                                 </tr>`;

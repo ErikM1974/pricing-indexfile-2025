@@ -2331,7 +2331,7 @@
                         jacket: quoteData.jacketStyle ? `${quoteData.jacketStyle} - ${quoteData.jacketSize || 'N/A'} - ${quoteData.jacketColor || 'N/A'}` : '',
                         hoodie: quoteData.hoodieStyle ? `${quoteData.hoodieStyle} - ${quoteData.hoodieSize || 'N/A'} - ${quoteData.hoodieColor || 'N/A'}` : '',
                         beanie: quoteData.beanieStyle ? `${quoteData.beanieStyle} - ${quoteData.beanieColor || 'N/A'}` : '',
-                        gloves: quoteData.glovesStyle ? `${quoteData.glovesStyle} - ${quoteData.glovesColor || 'N/A'}` : ''
+                        gloves: quoteData.glovesStyle ? `${quoteData.glovesStyle} - ${quoteData.glovesSize || 'N/A'} - ${quoteData.glovesColor || 'N/A'}` : ''
                     };
 
                     // Log bundle configuration for debugging
@@ -2461,6 +2461,7 @@
                 beanieStyle: selectedItems.beanie?.id,
                 beanieColor: selectedItems.beanie?.selectedColor,
                 glovesStyle: selectedItems.gloves?.id,
+                glovesSize: selectedItems.gloves?.selectedSize,
                 glovesColor: selectedItems.gloves?.selectedColor,
 
                 // Additional Info
