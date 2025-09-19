@@ -875,12 +875,110 @@
             background: linear-gradient(135deg, #4caf50, #45a049);
             color: white;
             border: none;
+            /* Make Continue button larger and more prominent */
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .nav-btn.primary:hover {
             background: linear-gradient(135deg, #45a049, #3d8b40);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Pulsing animation for enabled Continue button */
+        .nav-btn.primary:not(:disabled) {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        /* Floating Continue Button */
+        .floating-continue-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+            z-index: 1000;
+            animation: slideInUp 0.5s ease, pulse 2s infinite;
+            border: none;
+        }
+
+        .floating-continue-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(76, 175, 80, 0.5);
+        }
+
+        .floating-continue-btn.show {
+            display: flex;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Helper Text */
+        .selection-helper {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            animation: slideInRight 0.5s ease;
+        }
+
+        .selection-helper.show {
+            display: flex;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px) translateY(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) translateY(-50%);
+                opacity: 1;
+            }
         }
 
         /* Success Modal */
@@ -1292,6 +1390,18 @@
     </style>
 </head>
 <body>
+    <!-- Floating Continue Button -->
+    <button class="floating-continue-btn" id="floatingContinue" onclick="clickActiveContinueButton()">
+        Continue to Next Step
+        <i class="fas fa-arrow-right"></i>
+    </button>
+
+    <!-- Helper Text -->
+    <div class="selection-helper" id="selectionHelper">
+        <i class="fas fa-check-circle"></i>
+        <span>Product selected! Click Continue below</span>
+    </div>
+
     <!-- Image Zoom Modal -->
     <div class="image-zoom-modal" id="imageZoomModal">
         <button class="zoom-close" onclick="closeZoomModal()">×</button>
@@ -1856,6 +1966,38 @@
             setTimeout(() => {
                 banner.remove();
             }, 5000);
+        }
+
+        // Floating Continue Button Functions
+        function showFloatingContinue() {
+            const floatingBtn = document.getElementById('floatingContinue');
+            floatingBtn.classList.add('show');
+        }
+
+        function hideFloatingContinue() {
+            const floatingBtn = document.getElementById('floatingContinue');
+            floatingBtn.classList.remove('show');
+        }
+
+        function clickActiveContinueButton() {
+            // Find and click the active step's Continue button
+            const activeStep = document.querySelector('.step-content:not([style*="display: none"])');
+            if (activeStep) {
+                const continueBtn = activeStep.querySelector('.nav-btn.primary');
+                if (continueBtn && !continueBtn.disabled) {
+                    continueBtn.click();
+                }
+            }
+        }
+
+        function showSelectionHelper() {
+            const helper = document.getElementById('selectionHelper');
+            helper.classList.add('show');
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                helper.classList.remove('show');
+            }, 3000);
         }
 
         // Initialize
@@ -2855,7 +2997,27 @@
             });
 
             // Enable next button
-            document.getElementById(`${type}Next`).disabled = false;
+            const nextButton = document.getElementById(`${type}Next`);
+            nextButton.disabled = false;
+
+            // Show floating Continue button and helper text
+            showFloatingContinue();
+            showSelectionHelper();
+
+            // Auto-scroll to Continue button with smooth animation
+            setTimeout(() => {
+                nextButton.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Add a temporary glow effect to draw attention
+                nextButton.style.transition = 'all 0.5s ease';
+                nextButton.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.8)';
+                setTimeout(() => {
+                    nextButton.style.boxShadow = '';
+                }, 2000);
+            }, 300);
 
             // Update summary
             updateSummary();
@@ -2884,7 +3046,27 @@
             };
 
             // Enable next button
-            document.getElementById('gloveNext').disabled = false;
+            const gloveNextBtn = document.getElementById('gloveNext');
+            gloveNextBtn.disabled = false;
+
+            // Show floating Continue button and helper text
+            showFloatingContinue();
+            showSelectionHelper();
+
+            // Auto-scroll to Continue button with smooth animation
+            setTimeout(() => {
+                gloveNextBtn.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Add a temporary glow effect to draw attention
+                gloveNextBtn.style.transition = 'all 0.5s ease';
+                gloveNextBtn.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.8)';
+                setTimeout(() => {
+                    gloveNextBtn.style.boxShadow = '';
+                }, 2000);
+            }, 300);
 
             // Update summary
             updateSummary();
@@ -2915,6 +3097,9 @@
                 // Show next step
                 document.getElementById(`step${currentStep}`).classList.add('active');
                 document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+                // Hide floating Continue button when moving to next step
+                hideFloatingContinue();
 
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
