@@ -1705,9 +1705,7 @@
                         <label class="form-label">Jacket Embroidery Location</label>
                         <select class="form-input" id="jacketEmbLocation">
                             <option value="right-chest" selected>Right Chest (Best for Carhartt)</option>
-                            <option value="left-chest">Left Chest</option>
-                            <option value="center-chest">Center Chest</option>
-                            <option value="back">Back</option>
+                            <option value="left-chest">Left Chest (Depends on location of Carhartt Logo and size of your logo)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1715,8 +1713,6 @@
                         <select class="form-input" id="hoodieEmbLocation">
                             <option value="left-chest" selected>Left Chest (Standard)</option>
                             <option value="right-chest">Right Chest</option>
-                            <option value="center-chest">Center Chest</option>
-                            <option value="back">Back</option>
                         </select>
                     </div>
                 </div>
@@ -1729,7 +1725,9 @@
                     <div class="form-group">
                         <div class="form-label" style="color: #666; font-size: 14px;">
                             <i class="fas fa-info-circle"></i>
-                            Note: Beanies will have front center embroidery
+                            Note: Beanies will have front center embroidery<br>
+                            <i class="fas fa-info-circle"></i>
+                            Note: Gloves do not receive embroidery
                         </div>
                     </div>
                 </div>
@@ -2178,7 +2176,7 @@
                         Shipping_Zip: quoteData.shippingZip || '',
 
                         // Customization
-                        EmbroideryLocation: quoteData.embroideryLocation || '',
+                        EmbroideryLocation: `Jacket: ${quoteData.jacketEmbLocation || 'N/A'}, Hoodie: ${quoteData.hoodieEmbLocation || 'N/A'}`,
                         Thread_Colors: quoteData.threadColors || '',
                         Image_Upload: quoteData.imageUpload || '', // ExternalKey from file upload
 
