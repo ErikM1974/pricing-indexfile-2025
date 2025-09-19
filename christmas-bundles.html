@@ -24,38 +24,45 @@
 
         /* Subtle Pricing Info Bar */
         .pricing-info-bar {
-            background: #f8f9fa;
-            margin: 10px 20px;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
+            background: white;
+            margin: 15px auto;
+            max-width: 800px;
+            border-radius: 8px;
+            border: 1px solid #d4d4d4;
+            border-left: 4px solid #2e7d32;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             overflow: hidden;
             transition: all 0.3s ease;
             font-size: 14px;
         }
 
         .pricing-bar-toggle {
-            padding: 12px 20px;
+            padding: 14px 20px;
             cursor: pointer;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            color: #666;
+            position: relative;
+            color: #2e7d32;
             transition: background 0.2s ease;
         }
 
         .pricing-bar-toggle:hover {
-            background: #f0f0f0;
+            background: #f8faf8;
         }
 
         .pricing-bar-text {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 500;
         }
 
         .pricing-arrow {
+            position: absolute;
+            right: 20px;
             transition: transform 0.3s ease;
-            color: #999;
+            color: #2e7d32;
         }
 
         .pricing-info-bar.expanded .pricing-arrow {
@@ -75,25 +82,29 @@
         }
 
         .pricing-simple {
-            padding: 15px 20px;
+            padding: 20px;
+            text-align: center;
         }
 
         .pricing-row {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: #333;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
         }
 
         .pricing-includes {
             color: #666;
             font-size: 13px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
         }
 
         .pricing-volume {
-            color: #999;
-            font-size: 12px;
-            font-style: italic;
+            color: #2e7d32;
+            font-size: 13px;
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -1812,8 +1823,7 @@
     <div class="pricing-info-bar collapsed" id="pricingInfoBar">
         <div class="pricing-bar-toggle" onclick="togglePricing()">
             <span class="pricing-bar-text">
-                <i class="fas fa-info-circle" style="font-size: 14px;"></i>
-                Bundle pricing available for team orders
+                🎄 Christmas Bundle Pricing 2025
             </span>
             <i class="fas fa-chevron-right pricing-arrow" id="pricingArrow"></i>
         </div>
