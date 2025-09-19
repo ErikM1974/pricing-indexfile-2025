@@ -480,6 +480,36 @@
             transform: none;
         }
 
+        /* Select & Continue Combo Button */
+        .select-continue-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        .select-continue-btn:hover {
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .product-card.selected .select-continue-btn {
+            display: none;
+        }
+
         .select-btn.selected {
             background: linear-gradient(135deg, #388e3c, #2e7d32);
         }
@@ -843,13 +873,25 @@
             transform: none;
         }
 
-        /* Navigation Buttons */
+        /* Navigation Buttons - Sticky at bottom */
         .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e0e0e0;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(255,255,255,1) 80%, rgba(255,255,255,0.95) 100%);
+            border-top: 2px solid #4caf50;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        /* Add padding to bottom of content to account for fixed navigation */
+        .step-content {
+            padding-bottom: 120px;
         }
 
         .nav-btn {
@@ -904,25 +946,9 @@
             }
         }
 
-        /* Floating Continue Button */
+        /* Remove floating continue button since we now have sticky navigation */
         .floating-continue-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            padding: 16px 32px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
-            z-index: 1000;
-            animation: slideInUp 0.5s ease, pulse 2s infinite;
-            border: none;
+            display: none !important;
         }
 
         .floating-continue-btn:hover {
@@ -949,21 +975,76 @@
         /* Helper Text */
         .selection-helper {
             position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: linear-gradient(135deg, #4caf50, #45a049);
             color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
             display: none;
             align-items: center;
-            gap: 10px;
-            z-index: 999;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-            animation: slideInRight 0.5s ease;
+            gap: 12px;
+            z-index: 1001;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+            animation: slideDown 0.5s ease;
+        }
+
+        /* Visual Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 998;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator.show {
+            display: flex;
+        }
+
+        .scroll-indicator-text {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .scroll-indicator-arrow {
+            color: #4caf50;
+            font-size: 24px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
         }
 
         .selection-helper.show {
@@ -1399,7 +1480,15 @@
     <!-- Helper Text -->
     <div class="selection-helper" id="selectionHelper">
         <i class="fas fa-check-circle"></i>
-        <span>Product selected! Click Continue below</span>
+        <span>Product selected! Continue button is at the bottom</span>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator">
+        <div class="scroll-indicator-text">Continue button below</div>
+        <div class="scroll-indicator-arrow">
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </div>
 
     <!-- Image Zoom Modal -->
@@ -2293,7 +2382,31 @@
             renderProducts();
             setupDragDrop();
             updateSummary();
+
+            // Show scroll indicator on first step
+            showScrollIndicator();
         });
+
+        // Show scroll indicator function
+        function showScrollIndicator() {
+            const indicator = document.getElementById('scrollIndicator');
+            if (currentStep === 1 || currentStep === 2) {
+                indicator.classList.add('show');
+
+                // Hide indicator when user scrolls
+                let hasScrolled = false;
+                const handleScroll = () => {
+                    if (!hasScrolled && window.scrollY > 50) {
+                        hasScrolled = true;
+                        indicator.classList.remove('show');
+                        window.removeEventListener('scroll', handleScroll);
+                    }
+                };
+                window.addEventListener('scroll', handleScroll);
+            } else {
+                indicator.classList.remove('show');
+            }
+        }
 
         // Show loading state
         function showLoadingState() {
@@ -2576,6 +2689,11 @@
 
                     <button class="${buttonClass}" onclick="selectProduct('${product.id}', '${type}')">
                         ${buttonText}
+                    </button>
+                    <button class="select-continue-btn" onclick="selectProductAndContinue('${product.id}', '${type}')" ${isSelected ? 'style="display:none"' : ''}>
+                        <i class="fas fa-check-circle"></i>
+                        Select & Continue
+                        <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             `;
@@ -2935,6 +3053,15 @@
             }
         }
 
+        // Select Product and Continue Combo Function
+        function selectProductAndContinue(productId, type) {
+            selectProduct(productId, type);
+            // Small delay to allow selection animation
+            setTimeout(() => {
+                nextStep();
+            }, 300);
+        }
+
         // Select Product
         function selectProduct(productId, type) {
             const card = document.querySelector(`[data-product-id="${productId}"]`);
@@ -3000,8 +3127,7 @@
             const nextButton = document.getElementById(`${type}Next`);
             nextButton.disabled = false;
 
-            // Show floating Continue button and helper text
-            showFloatingContinue();
+            // Show helper text
             showSelectionHelper();
 
             // Auto-scroll to Continue button with smooth animation
@@ -3049,8 +3175,7 @@
             const gloveNextBtn = document.getElementById('gloveNext');
             gloveNextBtn.disabled = false;
 
-            // Show floating Continue button and helper text
-            showFloatingContinue();
+            // Show helper text
             showSelectionHelper();
 
             // Auto-scroll to Continue button with smooth animation
@@ -3098,8 +3223,8 @@
                 document.getElementById(`step${currentStep}`).classList.add('active');
                 document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
 
-                // Hide floating Continue button when moving to next step
-                hideFloatingContinue();
+                // Show scroll indicator for product selection steps
+                showScrollIndicator();
 
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
