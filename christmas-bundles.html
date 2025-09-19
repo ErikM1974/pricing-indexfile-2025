@@ -2077,7 +2077,7 @@
                         <i class="fas fa-arrow-left"></i>
                         Back
                     </button>
-                    <button class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder()" style="background: linear-gradient(135deg, #ff9800, #f57c00); padding: 20px 40px; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);">
+                    <button id="submitBtn" class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder(this)" style="background: linear-gradient(135deg, #ff9800, #f57c00); padding: 20px 40px; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);">
                         <i class="fas fa-check-circle"></i>
                         Submit Order
                         <i class="fas fa-arrow-right"></i>
@@ -2403,7 +2403,7 @@
         }
 
         // Submit Order Function
-        async function submitOrder() {
+        async function submitOrder(button) {
             // Validate required fields
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
@@ -2415,10 +2415,12 @@
                 return;
             }
 
-            // Show loading state
-            const submitBtn = event.target;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            // Show loading state - use passed button or find by id
+            const submitBtn = button || document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            }
 
             // Upload logo if present
             let imageExternalKey = null;
@@ -2489,8 +2491,10 @@
                 }, 3000);
             } else {
                 alert('There was an error submitting your order. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Order';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Order';
+                }
             }
         }
 
@@ -3917,7 +3921,11 @@
                         <div>Start building your gift box</div>
                     </div>
                 `;
-                document.getElementById('submitBtn').disabled = true;
+                // Only disable submit button if it exists
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
                 return;
             }
 
@@ -4097,7 +4105,10 @@
         function validateForm() {
             const form = document.getElementById('deliveryForm');
             const isValid = form.checkValidity();
-            document.getElementById('submitBtn').disabled = !isValid;
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = !isValid;
+            }
         }
 
         // Add event listeners for form validation
