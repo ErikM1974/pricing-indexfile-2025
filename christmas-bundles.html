@@ -2657,6 +2657,19 @@
         // Open custom calendar
         function openCustomCalendar() {
             const calendar = document.getElementById('customCalendar');
+
+            // Ensure we have a selected date and calendar opens to its month
+            if (selectedCalendarDate) {
+                // Set calendar to the month of the selected date
+                currentCalendarMonth = new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), 1);
+            } else if (minSelectableDate) {
+                // Fallback to minimum selectable date's month
+                currentCalendarMonth = new Date(minSelectableDate.getFullYear(), minSelectableDate.getMonth(), 1);
+                selectedCalendarDate = new Date(minSelectableDate);
+                const dateInput = document.getElementById('deliveryDate');
+                dateInput.value = formatDate(selectedCalendarDate);
+            }
+
             calendar.classList.add('show');
             renderCalendar();
         }
@@ -2819,10 +2832,26 @@
             const dateInput = document.getElementById('deliveryDate');
             const validationMessage = document.getElementById('dateValidationMessage');
 
+            // If no date selected, use the default (2 weeks out)
             if (!dateInput.value) {
-                validationMessage.textContent = 'Please select a delivery date.';
-                validationMessage.classList.add('show');
-                return false;
+                // Calculate minimum date again
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let defaultDate = new Date(today);
+                defaultDate.setDate(defaultDate.getDate() + 14);
+
+                // Skip weekends
+                while (isWeekend(defaultDate)) {
+                    defaultDate.setDate(defaultDate.getDate() + 1);
+                }
+
+                // Set the default date
+                dateInput.value = formatDate(defaultDate);
+                selectedCalendarDate = defaultDate;
+
+                // Clear any error messages since we're providing a valid default
+                validationMessage.classList.remove('show');
+                return true;
             }
 
             const selectedDate = new Date(dateInput.value);
@@ -4078,6 +4107,28 @@
 
         // Submit Gift Box
         async function submitGiftBox() {
+            // Validate and ensure delivery date has a value
+            validateDeliveryDate();
+
+            // Get delivery date value (will have default if empty)
+            let deliveryDateValue = document.getElementById('deliveryDate').value;
+
+            // Final safeguard: if still no date, calculate default
+            if (!deliveryDateValue) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let defaultDate = new Date(today);
+                defaultDate.setDate(defaultDate.getDate() + 14);
+
+                // Skip weekends
+                while (isWeekend(defaultDate)) {
+                    defaultDate.setDate(defaultDate.getDate() + 1);
+                }
+
+                deliveryDateValue = formatDate(defaultDate);
+                document.getElementById('deliveryDate').value = deliveryDateValue;
+            }
+
             // Collect all data
             const formData = {
                 items: {
@@ -4102,7 +4153,7 @@
                     city: document.getElementById('city').value,
                     state: document.getElementById('state').value,
                     zipCode: document.getElementById('zipCode').value,
-                    deliveryDate: document.getElementById('deliveryDate').value
+                    deliveryDate: deliveryDateValue
                 }
             };
 
