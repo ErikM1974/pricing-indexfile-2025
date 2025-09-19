@@ -1492,6 +1492,189 @@
         #pickupInfo {
             display: none;
         }
+
+        /* Custom Date Picker Styles */
+        .date-input-wrapper {
+            position: relative;
+        }
+
+        .date-validation-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .date-validation-message.show {
+            display: block;
+        }
+
+        /* Enhanced date input styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Custom calendar overlay */
+        .custom-calendar {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 5px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 320px;
+        }
+
+        .custom-calendar.show {
+            display: block;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px 10px;
+            color: #4caf50;
+            transition: background 0.2s;
+        }
+
+        .calendar-nav:hover {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .calendar-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-month-year {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 8px;
+            color: #666;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.selected) {
+            background: #f0fff0;
+            border-color: #4caf50;
+        }
+
+        .calendar-day.selected {
+            background: #4caf50;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #4caf50;
+            font-weight: 600;
+        }
+
+        .calendar-day.disabled {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .calendar-day.weekend {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .calendar-day.weekend.disabled {
+            background: #f5f5f5;
+            color: #ccc;
+        }
+
+        .calendar-day.buffer-period {
+            background: #fffbeb;
+            color: #d97706;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.other-month {
+            color: #ddd;
+        }
+
+        .calendar-legend {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 15px;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #ddd;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+
+        .legend-color.available {
+            background: white;
+        }
+
+        .legend-color.unavailable {
+            background: #f5f5f5;
+        }
+
+        .legend-color.weekend {
+            background: #fef2f2;
+        }
+
+        .legend-color.buffer {
+            background: #fffbeb;
+        }
     </style>
 </head>
 <body>
@@ -1790,10 +1973,14 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Preferred Delivery Date</label>
-                            <input type="date" class="form-input" id="deliveryDate">
+                            <div class="date-input-wrapper">
+                                <input type="date" class="form-input" id="deliveryDate" readonly onclick="openCustomCalendar()">
+                                <div class="custom-calendar" id="customCalendar"></div>
+                            </div>
                             <small style="color: #666; display: block; margin-top: 5px;">
                                 Minimum 2 weeks production time required (excludes weekends)
                             </small>
+                            <div class="date-validation-message" id="dateValidationMessage"></div>
                         </div>
                     </div>
 
@@ -2386,60 +2573,268 @@
             initializeDeliveryDate();
         });
 
-        // Initialize delivery date with 2 weeks minimum and no weekends
+        // Calendar state variables
+        let currentCalendarMonth = new Date();
+        let selectedCalendarDate = null;
+        let minSelectableDate = null;
+
+        // Initialize delivery date with custom calendar
         function initializeDeliveryDate() {
             const dateInput = document.getElementById('deliveryDate');
             if (!dateInput) return;
 
-            // Calculate date 2 weeks from today
+            // Calculate minimum date (2 weeks from today, skip weekends)
             const today = new Date();
-            let minDate = new Date(today);
-            minDate.setDate(minDate.getDate() + 14);
+            today.setHours(0, 0, 0, 0);
 
-            // If minimum date is a weekend, move to next Monday
-            const dayOfWeek = minDate.getDay();
-            if (dayOfWeek === 0) { // Sunday
-                minDate.setDate(minDate.getDate() + 1);
-            } else if (dayOfWeek === 6) { // Saturday
-                minDate.setDate(minDate.getDate() + 2);
+            minSelectableDate = new Date(today);
+            minSelectableDate.setDate(minSelectableDate.getDate() + 14);
+
+            // If minimum date is weekend, move to next Monday
+            while (isWeekend(minSelectableDate)) {
+                minSelectableDate.setDate(minSelectableDate.getDate() + 1);
             }
 
-            // Format date for input (YYYY-MM-DD)
-            const formatDate = (date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
+            // Set initial selected date to minimum selectable date
+            selectedCalendarDate = new Date(minSelectableDate);
+            dateInput.value = formatDate(selectedCalendarDate);
 
-            // Set minimum date attribute
-            dateInput.min = formatDate(minDate);
+            // Initialize calendar
+            currentCalendarMonth = new Date(minSelectableDate.getFullYear(), minSelectableDate.getMonth(), 1);
+            renderCalendar();
 
-            // Set default value to minimum date
-            dateInput.value = formatDate(minDate);
-
-            // Add validation to prevent weekend selection
-            dateInput.addEventListener('change', function() {
-                const selectedDate = new Date(this.value);
-                const day = selectedDate.getDay();
-
-                // If weekend selected, move to next Monday
-                if (day === 0) { // Sunday
-                    selectedDate.setDate(selectedDate.getDate() + 1);
-                    this.value = formatDate(selectedDate);
-                    alert('Weekend delivery not available. Date adjusted to Monday.');
-                } else if (day === 6) { // Saturday
-                    selectedDate.setDate(selectedDate.getDate() + 2);
-                    this.value = formatDate(selectedDate);
-                    alert('Weekend delivery not available. Date adjusted to Monday.');
-                }
-
-                // Check if date is before minimum
-                if (selectedDate < minDate) {
-                    this.value = formatDate(minDate);
-                    alert('Minimum 2 weeks production time required. Date adjusted to earliest available.');
+            // Close calendar when clicking outside
+            document.addEventListener('click', function(e) {
+                const calendar = document.getElementById('customCalendar');
+                const dateWrapper = document.querySelector('.date-input-wrapper');
+                if (!dateWrapper.contains(e.target)) {
+                    calendar.classList.remove('show');
                 }
             });
+        }
+
+        // Format date for input (YYYY-MM-DD)
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Check if date is a weekend
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6; // Sunday or Saturday
+        }
+
+        // Check if date is within the 2-week buffer
+        function isWithinBuffer(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const bufferEnd = new Date(today);
+            bufferEnd.setDate(bufferEnd.getDate() + 13); // 13 days + today = 14 days
+
+            return date < bufferEnd;
+        }
+
+        // Check if date is selectable
+        function isDateSelectable(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Can't select past dates
+            if (date < today) return false;
+
+            // Can't select weekends
+            if (isWeekend(date)) return false;
+
+            // Can't select dates within 2-week buffer
+            if (isWithinBuffer(date)) return false;
+
+            return true;
+        }
+
+        // Open custom calendar
+        function openCustomCalendar() {
+            const calendar = document.getElementById('customCalendar');
+            calendar.classList.add('show');
+            renderCalendar();
+        }
+
+        // Close custom calendar
+        function closeCustomCalendar() {
+            const calendar = document.getElementById('customCalendar');
+            calendar.classList.remove('show');
+        }
+
+        // Render the calendar
+        function renderCalendar() {
+            const calendar = document.getElementById('customCalendar');
+            if (!calendar) return;
+
+            const year = currentCalendarMonth.getFullYear();
+            const month = currentCalendarMonth.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const prevLastDay = new Date(year, month, 0);
+
+            const firstDayOfWeek = firstDay.getDay();
+            const lastDateOfMonth = lastDay.getDate();
+            const prevLastDate = prevLastDay.getDate();
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+
+            let html = `
+                <div class="calendar-header">
+                    <button class="calendar-nav" onclick="changeMonth(-1)" ${!canNavigateToPrevMonth() ? 'disabled' : ''}>‹</button>
+                    <div class="calendar-month-year">${monthNames[month]} ${year}</div>
+                    <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+                </div>
+                <div class="calendar-grid">
+            `;
+
+            // Day headers
+            const dayHeaders = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            dayHeaders.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+
+            // Previous month days
+            for (let i = firstDayOfWeek; i > 0; i--) {
+                const date = prevLastDate - i + 1;
+                html += `<div class="calendar-day other-month disabled">${date}</div>`;
+            }
+
+            // Current month days
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let date = 1; date <= lastDateOfMonth; date++) {
+                const currentDate = new Date(year, month, date);
+                currentDate.setHours(0, 0, 0, 0);
+
+                let classes = ['calendar-day'];
+
+                // Check if today
+                if (currentDate.getTime() === today.getTime()) {
+                    classes.push('today');
+                }
+
+                // Check if selected
+                if (selectedCalendarDate && currentDate.getTime() === selectedCalendarDate.getTime()) {
+                    classes.push('selected');
+                }
+
+                // Check if weekend
+                if (isWeekend(currentDate)) {
+                    classes.push('weekend');
+                }
+
+                // Check if within buffer period
+                if (isWithinBuffer(currentDate)) {
+                    classes.push('buffer-period');
+                    classes.push('disabled');
+                }
+
+                // Check if past date
+                if (currentDate < today) {
+                    classes.push('disabled');
+                }
+
+                // Check if selectable
+                const selectable = isDateSelectable(currentDate);
+                if (!selectable) {
+                    classes.push('disabled');
+                }
+
+                const onclick = selectable ? `onclick="selectDate(${year}, ${month}, ${date})"` : '';
+
+                html += `<div class="${classes.join(' ')}" ${onclick}>${date}</div>`;
+            }
+
+            // Next month days
+            const remainingDays = 42 - (firstDayOfWeek + lastDateOfMonth); // 6 rows * 7 days
+            for (let date = 1; date <= remainingDays; date++) {
+                html += `<div class="calendar-day other-month disabled">${date}</div>`;
+            }
+
+            html += `
+                </div>
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <div class="legend-color available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color buffer"></div>
+                        <span>2-week buffer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color weekend"></div>
+                        <span>Weekend</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color unavailable"></div>
+                        <span>Unavailable</span>
+                    </div>
+                </div>
+            `;
+
+            calendar.innerHTML = html;
+        }
+
+        // Check if can navigate to previous month
+        function canNavigateToPrevMonth() {
+            const today = new Date();
+            const currentYear = currentCalendarMonth.getFullYear();
+            const currentMonth = currentCalendarMonth.getMonth();
+
+            return currentYear > today.getFullYear() ||
+                   (currentYear === today.getFullYear() && currentMonth > today.getMonth());
+        }
+
+        // Change calendar month
+        function changeMonth(direction) {
+            currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + direction);
+            renderCalendar();
+        }
+
+        // Select a date from calendar
+        function selectDate(year, month, date) {
+            selectedCalendarDate = new Date(year, month, date);
+            const dateInput = document.getElementById('deliveryDate');
+            dateInput.value = formatDate(selectedCalendarDate);
+
+            // Clear any validation messages
+            const validationMessage = document.getElementById('dateValidationMessage');
+            validationMessage.classList.remove('show');
+
+            renderCalendar();
+            closeCustomCalendar();
+        }
+
+        // Validate selected date (for form submission)
+        function validateDeliveryDate() {
+            const dateInput = document.getElementById('deliveryDate');
+            const validationMessage = document.getElementById('dateValidationMessage');
+
+            if (!dateInput.value) {
+                validationMessage.textContent = 'Please select a delivery date.';
+                validationMessage.classList.add('show');
+                return false;
+            }
+
+            const selectedDate = new Date(dateInput.value);
+
+            if (!isDateSelectable(selectedDate)) {
+                validationMessage.textContent = 'Selected date is not available. Please choose a weekday at least 2 weeks from today.';
+                validationMessage.classList.add('show');
+                return false;
+            }
+
+            validationMessage.classList.remove('show');
+            return true;
         }
 
         // Show scroll indicator function
