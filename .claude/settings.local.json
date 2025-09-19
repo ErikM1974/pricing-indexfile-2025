@@ -100,7 +100,8 @@
       "mcp__uvx__kokoro_install",
       "mcp__uvx__voice_mode_info",
       "Bash(wsl.exe:*)",
-      "WebFetch(domain:www.sanmar.com)"
+      "WebFetch(domain:www.sanmar.com)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": [],
