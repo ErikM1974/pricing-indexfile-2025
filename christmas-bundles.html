@@ -260,6 +260,27 @@
             font-weight: 600;
         }
 
+        /* Clickable step indicators */
+        .step.completed,
+        .step.active {
+            cursor: pointer;
+        }
+
+        .step.completed:hover .step-number,
+        .step.active:hover .step-number {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 6px rgba(76, 175, 80, 0.3);
+        }
+
+        .step:not(.completed):not(.active) {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .step:not(.completed):not(.active) .step-number {
+            background: #e0e0e0;
+        }
+
         /* Main Container */
         .main-container {
             display: flex;
@@ -1847,27 +1868,27 @@
     <!-- Progress Bar -->
     <div class="progress-container">
         <div class="progress-steps">
-            <div class="step active" data-step="1">
+            <div class="step active" data-step="1" onclick="goToStep(1)">
                 <div class="step-number">1</div>
                 <div class="step-title">Select Jacket</div>
             </div>
-            <div class="step" data-step="2">
+            <div class="step" data-step="2" onclick="goToStep(2)">
                 <div class="step-number">2</div>
                 <div class="step-title">Select Hoodie</div>
             </div>
-            <div class="step" data-step="3">
+            <div class="step" data-step="3" onclick="goToStep(3)">
                 <div class="step-number">3</div>
                 <div class="step-title">Select Beanie</div>
             </div>
-            <div class="step" data-step="4">
+            <div class="step" data-step="4" onclick="goToStep(4)">
                 <div class="step-number">4</div>
                 <div class="step-title">Select Gloves</div>
             </div>
-            <div class="step" data-step="5">
+            <div class="step" data-step="5" onclick="goToStep(5)">
                 <div class="step-number">5</div>
                 <div class="step-title">Customize</div>
             </div>
-            <div class="step" data-step="6">
+            <div class="step" data-step="6" onclick="goToStep(6)">
                 <div class="step-number">6</div>
                 <div class="step-title">Delivery Info</div>
             </div>
@@ -2288,6 +2309,7 @@
 
         // State Management
         let currentStep = 1;
+        let highestStepReached = 1;  // Track the furthest step user has reached
         let selectedItems = {
             jacket: null,
             hoodie: null,
@@ -2664,6 +2686,7 @@
         function resetForm() {
             // Reset to step 1
             currentStep = 1;
+            highestStepReached = 1;
             selectedItems = { jacket: null, hoodie: null, beanie: null, gloves: null, logo: null };
 
             // Clear form fields
@@ -3449,12 +3472,22 @@
             // Clear other size selections in this card
             card.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
             button.classList.add('selected');
+
+            // If this product is already selected, update the continue button state
+            if (card.classList.contains('selected')) {
+                const type = card.dataset.productType;
+                // Re-run selectProduct to update the selection with the size
+                selectProduct(productId, type);
+            }
         }
 
         async function selectColor(event, productId) {
             event.stopPropagation();
             const swatch = event.target.closest('.color-swatch');
             const card = swatch.closest('.product-card');
+
+            // IMPORTANT: Capture the currently selected size BEFORE any DOM updates
+            const previouslySelectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
 
             // Clear other color selections in this card
             card.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
@@ -3491,7 +3524,8 @@
 
                 if (sizesResponse.ok) {
                     const sizesData = await sizesResponse.json();
-                    updateProductSizes(card, sizesData, productId);
+                    // Pass the previously selected size to the update function
+                    updateProductSizes(card, sizesData, productId, previouslySelectedSize);
                 }
             } catch (error) {
                 console.warn('Could not fetch sizes for color:', error);
@@ -3642,12 +3676,12 @@
         }
 
         // Update sizes based on API response with inventory awareness
-        function updateProductSizes(card, sizesData, productId) {
+        function updateProductSizes(card, sizesData, productId, preservedSize = null) {
             const sizeGrid = card.querySelector('.size-grid');
             if (!sizeGrid || !sizesData) return;
 
-            // Store the previously selected size before updating
-            const previouslySelectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
+            // Use the passed-in preserved size, or try to get it from current selection
+            const previouslySelectedSize = preservedSize || card.querySelector('.size-btn.selected')?.dataset.size;
 
             // Get sizes with inventory information
             const sizesWithInventory = extractSizesWithInventory(sizesData);
@@ -3674,10 +3708,16 @@
 
                 // Re-apply the previously selected size if it still exists and is available
                 if (previouslySelectedSize) {
-                    const sizeBtn = sizeGrid.querySelector(`.size-btn[data-size="${previouslySelectedSize}"]:not(:disabled)`);
-                    if (sizeBtn) {
-                        sizeBtn.classList.add('selected');
-                    }
+                    // Use setTimeout to ensure DOM is fully updated
+                    setTimeout(() => {
+                        const sizeBtn = sizeGrid.querySelector(`.size-btn[data-size="${previouslySelectedSize}"]:not(:disabled)`);
+                        if (sizeBtn) {
+                            sizeBtn.classList.add('selected');
+                            console.log('Size preserved:', previouslySelectedSize); // Debug log
+                        } else {
+                            console.log('Size not available in new color:', previouslySelectedSize); // Debug log
+                        }
+                    }, 0);
                 }
 
                 // Add CSS for out-of-stock styling if not already present
@@ -3733,6 +3773,16 @@
             const selectedColorElement = card.querySelector('.color-swatch.selected');
             const selectedColor = selectedColorElement?.dataset.color;
             const selectedColorCode = selectedColorElement?.dataset.colorCode;
+
+            // Check if size is required but not selected
+            const hasSizeOptions = card.querySelector('.size-grid');
+            if (hasSizeOptions && !selectedSize) {
+                // Don't save the selection if size is missing
+                console.log('Please select a size before continuing');
+                // Keep the card visually selected but don't enable continue
+                updateContinueButtons();
+                return;
+            }
 
             // Find product data
             let product = null;
@@ -3828,6 +3878,56 @@
         }
 
         // Navigation
+        function goToStep(targetStep) {
+            // Convert to number if string
+            targetStep = parseInt(targetStep);
+
+            // Only allow navigation to visited steps (up to highestStepReached)
+            if (targetStep >= 1 && targetStep <= highestStepReached) {
+                // Hide current step
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+
+                // Update completed status for all steps
+                // Mark all steps before target as completed
+                for (let i = 1; i < targetStep; i++) {
+                    document.querySelector(`[data-step="${i}"]`).classList.add('completed');
+                    document.querySelector(`[data-step="${i}"]`).classList.remove('active');
+                }
+
+                // Mark all steps after target as not active (but keep completed if they were visited)
+                for (let i = targetStep + 1; i <= 6; i++) {
+                    document.querySelector(`[data-step="${i}"]`).classList.remove('active');
+                    if (i <= highestStepReached) {
+                        document.querySelector(`[data-step="${i}"]`).classList.add('completed');
+                    }
+                }
+
+                // Update current step
+                currentStep = targetStep;
+
+                // Show target step
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+                // Remove completed class from current step and add active
+                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('completed');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+                // Update submit button state if on last step
+                if (currentStep === 6) {
+                    validateForm();
+                }
+
+                // Update continue button states based on selections
+                updateContinueButtons();
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            // If trying to go forward to unvisited step, do nothing (cursor: not-allowed will show)
+        }
+
         function nextStep() {
             if (currentStep < 6) {
                 // Hide current step
@@ -3837,6 +3937,11 @@
                 document.querySelector(`[data-step="${currentStep}"]`).classList.add('completed');
 
                 currentStep++;
+
+                // Update highest step reached
+                if (currentStep > highestStepReached) {
+                    highestStepReached = currentStep;
+                }
 
                 // Show next step
                 document.getElementById(`step${currentStep}`).classList.add('active');
@@ -3852,17 +3957,55 @@
 
         function previousStep() {
             if (currentStep > 1) {
-                // Hide current step
-                document.getElementById(`step${currentStep}`).classList.remove('active');
-                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+                goToStep(currentStep - 1);
+            }
+        }
 
-                currentStep--;
+        // Update continue button states based on selections
+        function updateContinueButtons() {
+            // Helper function to check if a product is fully selected (including required options)
+            function isProductComplete(productId, type) {
+                if (!productId) return false;
 
-                // Show previous step
-                document.getElementById(`step${currentStep}`).classList.add('active');
+                const card = document.querySelector(`[data-product-id="${productId}"]`);
+                if (!card) return false;
 
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Check if size is selected (if size options exist)
+                const hasSizeOptions = card.querySelector('.size-grid');
+                if (hasSizeOptions) {
+                    const selectedSize = card.querySelector('.size-btn.selected');
+                    if (!selectedSize) return false;
+                }
+
+                return true;
+            }
+
+            // Update jacket continue button
+            if (selectedItems.jacket && isProductComplete(selectedItems.jacket.id, 'jacket')) {
+                document.getElementById('jacketNext')?.removeAttribute('disabled');
+            } else {
+                document.getElementById('jacketNext')?.setAttribute('disabled', 'disabled');
+            }
+
+            // Update hoodie continue button
+            if (selectedItems.hoodie && isProductComplete(selectedItems.hoodie.id, 'hoodie')) {
+                document.getElementById('hoodieNext')?.removeAttribute('disabled');
+            } else {
+                document.getElementById('hoodieNext')?.setAttribute('disabled', 'disabled');
+            }
+
+            // Update beanie continue button
+            if (selectedItems.beanie && isProductComplete(selectedItems.beanie.id, 'beanie')) {
+                document.getElementById('beanieNext')?.removeAttribute('disabled');
+            } else {
+                document.getElementById('beanieNext')?.setAttribute('disabled', 'disabled');
+            }
+
+            // Update gloves continue button
+            if (selectedItems.gloves && isProductComplete(selectedItems.gloves.id, 'gloves')) {
+                document.getElementById('glovesNext')?.removeAttribute('disabled');
+            } else {
+                document.getElementById('glovesNext')?.setAttribute('disabled', 'disabled');
             }
         }
 
