@@ -1656,55 +1656,21 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <i class="fas fa-mitten"></i>
-                        Choose Your Glove Size
+                        Choose Your Gloves
                     </h2>
-                    <p class="section-subtitle">Select your Carhartt work gloves size</p>
+                    <p class="section-subtitle">Select from our premium Carhartt work gloves (optional)</p>
                 </div>
 
-                <div class="product-single-view">
-                    <div class="glove-product-card">
-                        <div class="glove-product-image">
-                            <img src="https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg"
-                                 alt="Carhartt Work Gloves"
-                                 style="width: 100%; max-width: 400px; border-radius: 8px;"
-                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmNSIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn6ekPC90ZXh0Pgo8L3N2Zz4=';">
-                        </div>
-                        <div class="glove-product-details">
-                            <h3 class="glove-product-title">CTGD0794 - Carhartt® High-Dexterity Open-Cuff Glove</h3>
-                            <p class="glove-product-description">
-                                Premium insulated work gloves included FREE with your gift box
-                            </p>
-
-                            <div class="glove-color-display">
-                                <div class="selection-label">Color:</div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #2c2c2c 50%, #8b6f47 50%); border-radius: 4px; border: 2px solid #ddd;"></div>
-                                    <span>Black Barley</span>
-                                </div>
-                            </div>
-
-                            <div class="size-selection-group">
-                                <div class="selection-label">Select Size:</div>
-                                <div class="size-buttons">
-                                    <button class="size-btn" data-size="M" onclick="selectGloveSize('M')">M</button>
-                                    <button class="size-btn" data-size="L" onclick="selectGloveSize('L')">L</button>
-                                    <button class="size-btn" data-size="XL" onclick="selectGloveSize('XL')">XL</button>
-                                </div>
-                            </div>
-
-                            <div class="free-badge" style="margin-top: 20px; padding: 10px; background: #4caf50; color: white; border-radius: 6px; text-align: center; font-weight: 600;">
-                                <i class="fas fa-gift"></i> Included FREE with your gift box
-                            </div>
-                        </div>
-                    </div>
+                <div class="product-grid" id="glovesGrid">
+                    <!-- Gloves products will be dynamically inserted here -->
                 </div>
 
                 <div class="navigation">
-                    <button class="nav-btn" onclick="previousStep()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
+                    <button class="nav-btn" onclick="skipGloves()">
+                        Skip Gloves
+                        <i class="fas fa-arrow-right"></i>
                     </button>
-                    <button class="nav-btn primary" onclick="nextStep()" id="gloveNext" disabled>
+                    <button class="nav-btn primary" onclick="nextStep()" id="glovesNext" disabled>
                         Continue
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -1998,14 +1964,16 @@
         const products = {
             jackets: [],
             hoodies: [],
-            beanies: []
+            beanies: [],
+            gloves: []
         };
 
         // Product style numbers to fetch
         const PRODUCT_STYLES = {
             jackets: ['CT104670', 'CT100617', 'CT103828'],
             hoodies: ['CTK121', 'F281'],
-            beanies: ['CT104597']
+            beanies: ['CT104597'],
+            gloves: ['CTGD0794']
         };
 
         // State Management
@@ -2668,6 +2636,7 @@
             products.jackets = PRODUCT_STYLES.jackets.map(style => createFallbackProduct(style, 'jackets'));
             products.hoodies = PRODUCT_STYLES.hoodies.map(style => createFallbackProduct(style, 'hoodies'));
             products.beanies = PRODUCT_STYLES.beanies.map(style => createFallbackProduct(style, 'beanies'));
+            products.gloves = PRODUCT_STYLES.gloves.map(style => createFallbackProduct(style, 'gloves'));
         }
 
         // Snow Effect
@@ -2693,6 +2662,7 @@
             renderJackets();
             renderHoodies();
             renderBeanies();
+            renderGloves();
         }
 
         function renderJackets() {
@@ -2719,6 +2689,35 @@
 
             products.beanies.forEach(product => {
                 grid.appendChild(createProductCard(product, 'beanie'));
+            });
+        }
+
+        function renderGloves() {
+            const grid = document.getElementById('glovesGrid');
+            grid.innerHTML = '';
+
+            // Add specific gloves data if not already loaded
+            if (products.gloves.length === 0) {
+                // Create default gloves product
+                products.gloves = [{
+                    id: 'CTGD0794',
+                    name: 'Carhartt® High-Dexterity Open-Cuff Glove',
+                    price: 'FREE',
+                    description: 'Premium insulated work gloves included FREE with your gift box',
+                    image: 'https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg',
+                    colors: [
+                        {
+                            COLOR_NAME: 'Black Barley',
+                            COLOR_CODE: 'BLACKBARLEY',
+                            COLOR_SWATCH_IMG: null
+                        }
+                    ],
+                    sizes: ['M', 'L', 'XL']
+                }];
+            }
+
+            products.gloves.forEach(product => {
+                grid.appendChild(createProductCard(product, 'gloves'));
             });
         }
 
@@ -3188,6 +3187,8 @@
                 product = products.hoodies.find(p => p.id === productId);
             } else if (type === 'beanie') {
                 product = products.beanies.find(p => p.id === productId);
+            } else if (type === 'gloves') {
+                product = products.gloves.find(p => p.id === productId);
             }
 
             // Find the selected color object from the product
@@ -3249,53 +3250,6 @@
             updateSummary();
         }
 
-        // Glove Selection Function
-        function selectGloveSize(size) {
-            // Clear previous size selection
-            document.querySelectorAll('#step4 .size-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-
-            // Mark this size as selected
-            const sizeBtn = document.querySelector(`#step4 .size-btn[data-size="${size}"]`);
-            if (sizeBtn) {
-                sizeBtn.classList.add('selected');
-            }
-
-            // Store glove selection
-            selectedItems.gloves = {
-                id: 'CTGD0794',
-                name: 'Carhartt Work Gloves',
-                selectedSize: size,
-                selectedColor: 'Black Barley',
-                image: 'https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg'
-            };
-
-            // Enable next button
-            const gloveNextBtn = document.getElementById('gloveNext');
-            gloveNextBtn.disabled = false;
-
-            // Show helper text
-            showSelectionHelper();
-
-            // Auto-scroll to Continue button with smooth animation
-            setTimeout(() => {
-                gloveNextBtn.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-
-                // Add a temporary glow effect to draw attention
-                gloveNextBtn.style.transition = 'all 0.5s ease';
-                gloveNextBtn.style.boxShadow = '0 0 20px rgba(76, 175, 80, 0.8)';
-                setTimeout(() => {
-                    gloveNextBtn.style.boxShadow = '';
-                }, 2000);
-            }, 300);
-
-            // Update summary
-            updateSummary();
-        }
 
         // Skip Functions
         function skipJacket() {
@@ -3305,6 +3259,16 @@
 
         function skipHoodie() {
             selectedItems.hoodie = null;
+            nextStep();
+        }
+
+        function skipBeanie() {
+            selectedItems.beanie = null;
+            nextStep();
+        }
+
+        function skipGloves() {
+            selectedItems.gloves = null;
             nextStep();
         }
 
