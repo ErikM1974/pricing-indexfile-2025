@@ -934,6 +934,30 @@
             animation: pulse 2s infinite;
         }
 
+        /* Enhanced Submit Order button */
+        .submit-order-btn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            animation: pulse-orange 2s infinite !important;
+        }
+
+        .submit-order-btn:hover {
+            background: linear-gradient(135deg, #f57c00, #e65100) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.5) !important;
+        }
+
+        @keyframes pulse-orange {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 152, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+            }
+        }
+
         @keyframes pulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
@@ -1698,7 +1722,7 @@
                 </div>
 
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('logoFile').click()">
-                    <input type="file" id="logoFile" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                    <input type="file" id="logoFile" accept="image/*,.pdf" style="display: none;" onchange="handleLogoUpload(event)">
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
@@ -1712,17 +1736,35 @@
 
                 <div class="form-row" style="margin-top: 30px;">
                     <div class="form-group">
-                        <label class="form-label">Embroidery Location</label>
-                        <select class="form-input" id="embLocation">
+                        <label class="form-label">Jacket Embroidery Location</label>
+                        <select class="form-input" id="jacketEmbLocation">
+                            <option value="right-chest" selected>Right Chest (Best for Carhartt)</option>
+                            <option value="left-chest">Left Chest</option>
+                            <option value="center-chest">Center Chest</option>
+                            <option value="back">Back</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hoodie Embroidery Location</label>
+                        <select class="form-input" id="hoodieEmbLocation">
                             <option value="left-chest" selected>Left Chest (Standard)</option>
                             <option value="right-chest">Right Chest</option>
                             <option value="center-chest">Center Chest</option>
                             <option value="back">Back</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Thread Colors (Optional)</label>
                         <input type="text" class="form-input" id="threadColors" placeholder="e.g., Red, White, Blue">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label" style="color: #666; font-size: 14px;">
+                            <i class="fas fa-info-circle"></i>
+                            Note: Beanies will have front center embroidery
+                        </div>
                     </div>
                 </div>
 
@@ -1785,6 +1827,9 @@
                         <div class="form-group">
                             <label class="form-label">Preferred Delivery Date</label>
                             <input type="date" class="form-input" id="deliveryDate">
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                Minimum 2 weeks production time required (excludes weekends)
+                            </small>
                         </div>
                     </div>
 
@@ -1873,16 +1918,7 @@
                         </div>
                     </div>
 
-                    <!-- Additional Information -->
-                    <div class="form-group full">
-                        <label class="form-label">Gift Message (Optional)</label>
-                        <textarea class="form-input form-textarea" id="giftMessage" placeholder="Add a gift message for the recipient..."></textarea>
-                    </div>
-
-                    <div class="form-group full">
-                        <label class="form-label">Employee Names (Optional)</label>
-                        <textarea class="form-input form-textarea" id="employeeNames" placeholder="List employee names for personalization (one per line)..."></textarea>
-                    </div>
+                    <!-- Removed Gift Message and Employee Names fields as per feedback -->
                 </form>
 
                 <div class="navigation">
@@ -1890,9 +1926,10 @@
                         <i class="fas fa-arrow-left"></i>
                         Back
                     </button>
-                    <button class="nav-btn nav-btn-primary" onclick="submitOrder()">
+                    <button class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder()" style="background: linear-gradient(135deg, #ff9800, #f57c00); padding: 20px 40px; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);">
                         <i class="fas fa-check-circle"></i>
                         Submit Order
+                        <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
@@ -1919,11 +1956,7 @@
                     </div>
                 </div>
 
-                <div class="summary-total">
-                    <button class="submit-btn" id="submitBtn" onclick="submitGiftBox()" disabled>
-                        <i class="fas fa-gift"></i> Request Gift Box
-                    </button>
-                </div>
+                <!-- Removed confusing Request Gift Box button that did nothing -->
             </div>
         </div>
     </div>
@@ -2186,8 +2219,6 @@
                         Notes: quoteData.specialInstructions || quoteData.description || 'Christmas Gift Box Bundle',
 
                         // Additional Fields
-                        GiftMessage: quoteData.giftMessage || '',
-                        EmployeeNames: quoteData.employeeNames || '',
                         RushOrder: quoteData.rushOrder ? true : false
                     };
 
@@ -2259,7 +2290,8 @@
                 shippingZip: document.getElementById('shippingZip')?.value,
 
                 // Customization
-                embroideryLocation: document.getElementById('embLocation')?.value,
+                jacketEmbLocation: document.getElementById('jacketEmbLocation')?.value,
+                hoodieEmbLocation: document.getElementById('hoodieEmbLocation')?.value,
                 threadColors: document.getElementById('threadColors')?.value,
                 specialInstructions: document.getElementById('specialInstructions')?.value,
                 imageUpload: imageExternalKey,
@@ -2277,8 +2309,6 @@
                 glovesColor: selectedItems.gloves?.selectedColor,
 
                 // Additional Info
-                giftMessage: document.getElementById('giftMessage')?.value,
-                employeeNames: document.getElementById('employeeNames')?.value,
                 rushOrder: document.getElementById('rushOrder')?.checked,
 
                 // Totals
@@ -2385,7 +2415,66 @@
 
             // Show scroll indicator on first step
             showScrollIndicator();
+
+            // Initialize delivery date field with 2 weeks minimum
+            initializeDeliveryDate();
         });
+
+        // Initialize delivery date with 2 weeks minimum and no weekends
+        function initializeDeliveryDate() {
+            const dateInput = document.getElementById('deliveryDate');
+            if (!dateInput) return;
+
+            // Calculate date 2 weeks from today
+            const today = new Date();
+            let minDate = new Date(today);
+            minDate.setDate(minDate.getDate() + 14);
+
+            // If minimum date is a weekend, move to next Monday
+            const dayOfWeek = minDate.getDay();
+            if (dayOfWeek === 0) { // Sunday
+                minDate.setDate(minDate.getDate() + 1);
+            } else if (dayOfWeek === 6) { // Saturday
+                minDate.setDate(minDate.getDate() + 2);
+            }
+
+            // Format date for input (YYYY-MM-DD)
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            // Set minimum date attribute
+            dateInput.min = formatDate(minDate);
+
+            // Set default value to minimum date
+            dateInput.value = formatDate(minDate);
+
+            // Add validation to prevent weekend selection
+            dateInput.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const day = selectedDate.getDay();
+
+                // If weekend selected, move to next Monday
+                if (day === 0) { // Sunday
+                    selectedDate.setDate(selectedDate.getDate() + 1);
+                    this.value = formatDate(selectedDate);
+                    alert('Weekend delivery not available. Date adjusted to Monday.');
+                } else if (day === 6) { // Saturday
+                    selectedDate.setDate(selectedDate.getDate() + 2);
+                    this.value = formatDate(selectedDate);
+                    alert('Weekend delivery not available. Date adjusted to Monday.');
+                }
+
+                // Check if date is before minimum
+                if (selectedDate < minDate) {
+                    this.value = formatDate(minDate);
+                    alert('Minimum 2 weeks production time required. Date adjusted to earliest available.');
+                }
+            });
+        }
 
         // Show scroll indicator function
         function showScrollIndicator() {
@@ -2674,16 +2763,16 @@
                     ${product.description ? `<div class="product-description" title="${product.description}">${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}</div>` : ''}
 
                     <div class="selection-group">
-                        <div class="selection-label">Select Size:</div>
-                        <div class="size-grid">
-                            ${sizeButtons}
+                        <div class="selection-label">Select Color:</div>
+                        <div class="color-grid">
+                            ${colorSwatches}
                         </div>
                     </div>
 
                     <div class="selection-group">
-                        <div class="selection-label">Select Color:</div>
-                        <div class="color-grid">
-                            ${colorSwatches}
+                        <div class="selection-label">Select Size:</div>
+                        <div class="size-grid">
+                            ${sizeButtons}
                         </div>
                     </div>
 
@@ -3003,6 +3092,9 @@
             const sizeGrid = card.querySelector('.size-grid');
             if (!sizeGrid || !sizesData) return;
 
+            // Store the previously selected size before updating
+            const previouslySelectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
+
             // Get sizes with inventory information
             const sizesWithInventory = extractSizesWithInventory(sizesData);
 
@@ -3025,6 +3117,14 @@
                 }).join('');
 
                 sizeGrid.innerHTML = sizeButtons;
+
+                // Re-apply the previously selected size if it still exists and is available
+                if (previouslySelectedSize) {
+                    const sizeBtn = sizeGrid.querySelector(`.size-btn[data-size="${previouslySelectedSize}"]:not(:disabled)`);
+                    if (sizeBtn) {
+                        sizeBtn.classList.add('selected');
+                    }
+                }
 
                 // Add CSS for out-of-stock styling if not already present
                 if (!document.querySelector('#out-of-stock-styles')) {
@@ -3252,12 +3352,20 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validate file type
-            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application/pdf'];
+            // Clear any previous file selection first to prevent freezing
+            if (window.selectedLogoFile) {
+                window.selectedLogoFile = null;
+                document.getElementById('logoPreview').classList.remove('active');
+                document.getElementById('previewImage').src = '';
+                selectedItems.logo = null;
+            }
+
+            // Validate file type - INCLUDING PDF support
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml', 'application/pdf'];
             const maxSize = 20 * 1024 * 1024; // 20MB
 
             if (!validTypes.includes(file.type)) {
-                alert('Please upload an image (PNG, JPG, GIF) or PDF file');
+                alert('Please upload an image (PNG, JPG, GIF, SVG) or PDF file');
                 event.target.value = '';
                 return;
             }
@@ -3619,9 +3727,10 @@
                 },
                 customization: {
                     logo: selectedItems.logo,
-                    embLocation: document.getElementById('embLocation').value,
-                    threadColors: document.getElementById('threadColors').value,
-                    specialInstructions: document.getElementById('specialInstructions').value
+                    jacketEmbLocation: document.getElementById('jacketEmbLocation')?.value,
+                    hoodieEmbLocation: document.getElementById('hoodieEmbLocation')?.value,
+                    threadColors: document.getElementById('threadColors')?.value,
+                    specialInstructions: document.getElementById('specialInstructions')?.value
                 },
                 delivery: {
                     contactName: document.getElementById('contactName').value,
