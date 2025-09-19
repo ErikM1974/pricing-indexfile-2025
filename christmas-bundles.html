@@ -2556,6 +2556,9 @@
                                 let sizes = [];
                                 if (category === 'beanies') {
                                     sizes = ['One Size'];
+                                } else if (category === 'gloves') {
+                                    // Gloves only come in M, L, XL
+                                    sizes = ['M', 'L', 'XL'];
                                 } else {
                                     // Fetch actual sizes from API using first color
                                     const apiSizes = await fetchDefaultSizesForProduct(style, colors);
@@ -3528,7 +3531,7 @@
                         </div>
                         <div class="summary-item-details">
                             <div class="summary-item-name">Carhartt Work Gloves</div>
-                            <div class="summary-item-specs">CTGD0794 • ${selectedItems.gloves.selectedSize} • ${selectedItems.gloves.selectedColor}</div>
+                            <div class="summary-item-specs">CTGD0794 • ${selectedItems.gloves.selectedSize || 'Size not selected'} • ${selectedItems.gloves.selectedColor || 'Black Barley'}</div>
                         </div>
                     </div>
                 `;
@@ -3607,7 +3610,7 @@
                     </div>
                     <div class="summary-item-details">
                         <div class="summary-item-name">${item.name}</div>
-                        <div class="summary-item-specs">${item.id} • ${item.selectedSize || 'Size not selected'} • ${item.selectedColor || 'Color not selected'}</div>
+                        <div class="summary-item-specs">${item.id} • ${type === 'beanie' ? 'OSFA' : (item.selectedSize || 'Size not selected')} • ${item.selectedColor || 'Color not selected'}</div>
                     </div>
                     <div class="summary-item-remove" onclick="removeItem('${type}')">
                         <i class="fas fa-times"></i>
