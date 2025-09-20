@@ -2088,7 +2088,7 @@
                     <p class="section-subtitle">Tell us where to send your free gift box</p>
                 </div>
 
-                <form id="deliveryForm">
+                <form id="deliveryForm" onsubmit="return false;">
                     <!-- Contact Information -->
                     <div class="form-row">
                         <div class="form-group">
@@ -2483,6 +2483,11 @@
 
                     // Log bundle configuration for debugging
                     console.log('Bundle configuration being saved:', bundleConfig);
+                    console.log('Gloves data from quoteData:', {
+                        style: quoteData.glovesStyle,
+                        size: quoteData.glovesSize,
+                        color: quoteData.glovesColor
+                    });
                     console.log('JSON stringified:', JSON.stringify(bundleConfig));
 
                     // Create quote item with all fields
@@ -3914,6 +3919,13 @@
                 document.querySelector(`[data-step="${currentStep}"]`).classList.remove('completed');
                 document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
 
+                // Initialize delivery date when reaching step 5
+                if (currentStep === 5) {
+                    setTimeout(() => {
+                        initializeDeliveryDate();
+                    }, 100);
+                }
+
                 // Update submit button state if on last step
                 if (currentStep === 6) {
                     validateForm();
@@ -3946,6 +3958,13 @@
                 // Show next step
                 document.getElementById(`step${currentStep}`).classList.add('active');
                 document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+                // Initialize delivery date when reaching step 5
+                if (currentStep === 5) {
+                    setTimeout(() => {
+                        initializeDeliveryDate();
+                    }, 100);
+                }
 
                 // Show scroll indicator for product selection steps
                 showScrollIndicator();

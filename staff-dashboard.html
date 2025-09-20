@@ -7144,7 +7144,7 @@
             
             tbody.innerHTML = requests.map(request => {
                 const date = new Date(request.CreatedAt).toLocaleDateString();
-                const delivery = request.DeliveryMethod || 'pickup';
+                const delivery = request.DeliveryMethod || 'Pickup';
                 const statusBadge = getStatusBadge(request.Status);
                 const isChristmas = request.QuoteID && request.QuoteID.startsWith('XMAS');
 
@@ -7165,9 +7165,9 @@
                         </td>
                         <td style="padding: 0.75rem; font-weight: 500;">$${(request.TotalAmount || 0).toFixed(2)}</td>
                         <td style="padding: 0.75rem;">
-                            <span class="badge ${delivery === 'ship' ? 'badge-warning' : 'badge-info'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; text-transform: capitalize;">
-                                <i class="fas ${delivery === 'ship' ? 'fa-truck' : 'fa-store'}" style="margin-right: 0.25rem;"></i>
-                                ${delivery === 'ship' ? 'Ship' : 'Pickup'}
+                            <span class="badge ${delivery.toLowerCase() === 'ship' ? 'badge-warning' : 'badge-info'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; text-transform: capitalize;">
+                                <i class="fas ${delivery.toLowerCase() === 'ship' ? 'fa-truck' : 'fa-store'}" style="margin-right: 0.25rem;"></i>
+                                ${delivery.toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}
                             </span>
                         </td>
                         <td style="padding: 0.75rem;">${statusBadge}</td>
@@ -7376,17 +7376,19 @@
                                 <div><strong>Date:</strong> ${new Date(request.CreatedAt).toLocaleString()}</div>
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
                                 <div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>
-                                ${request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${request.DeliveryMethod === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
+                                ${request.DueDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(request.DueDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
+                                ${request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${request.DeliveryMethod.toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
+                                ${items[0]?.RushOrder || request.IsRushOrder ? `<div style="grid-column: 1 / -1;"><strong style="color: #dc2626;">⚠️ RUSH ORDER - EXPEDITED PROCESSING</strong></div>` : ''}
                                 ${orderDetails.totals || request.SubtotalAmount ? `
                                     <div><strong>Samples Cost:</strong> $${(orderDetails.totals?.samples || request.SubtotalAmount || 0).toFixed(2)}</div>
-                                    ${request.DeliveryMethod === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
-                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - (request.DeliveryMethod === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
+                                    ${request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
+                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - (request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
                                 ` : ''}
                             </div>
                         </div>
                         
                         <!-- Shipping Address (if applicable) -->
-                        ${request.DeliveryMethod === 'ship' ? `
+                        ${request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? `
                             <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border: 2px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 <h4 style="margin: 0 0 1.25rem 0; color: #92400e; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
                                     <i class="fas fa-shipping-fast" style="color: #f59e0b;"></i> 
@@ -7397,8 +7399,8 @@
                                     <div style="display: flex; align-items: start; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">Street Address:</label>
                                         <div style="flex: 1;">
-                                            ${request.ShippingAddress ? 
-                                                `<span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">${request.ShippingAddress}</span>` : 
+                                            ${request.Shipping_Address || request.ShippingAddress ?
+                                                `<span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">${request.Shipping_Address || request.ShippingAddress}${request.Shipping_Apartment || request.ShippingApartment ? `, ${request.Shipping_Apartment || request.ShippingApartment}` : ''}</span>` :
                                                 `<span style="color: #dc2626; font-style: italic; font-size: 0.875rem;">
                                                     <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem;"></i>
                                                     Missing - Contact customer for street address
@@ -7411,7 +7413,7 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">City:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.ShippingCity || extractCityFromNotes(request.Notes) || 'Not provided'}
+                                            ${request.Shipping_City || request.ShippingCity || extractCityFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                     
@@ -7419,7 +7421,7 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">State:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.ShippingState || extractStateFromNotes(request.Notes) || 'Not provided'}
+                                            ${request.Shipping_State || request.ShippingState || extractStateFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                     
@@ -7427,12 +7429,12 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">ZIP Code:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.ShippingZip || extractZipFromNotes(request.Notes) || 'Not provided'}
+                                            ${request.Shipping_Zip || request.ShippingZip || extractZipFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                 </div>
                                 
-                                ${!request.ShippingAddress ? `
+                                ${!(request.Shipping_Address || request.ShippingAddress) ? `
                                     <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
                                         <div style="font-size: 0.875rem; color: #92400e; font-weight: 600; margin-bottom: 0.25rem;">
                                             <i class="fas fa-info-circle"></i> Action Required
@@ -7451,7 +7453,7 @@
                         <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; border: 1px solid #fca5a5;">
                             <h4 style="margin: 0 0 1rem 0; color: #dc2626; font-size: 1.1rem;">
                                 <i class="fas fa-gift" style="margin-right: 0.5rem;"></i>
-                                Christmas Bundle Components - Ready for ShopWorks Entry
+                                Christmas Bundle Components (Qty: ${request.TotalQuantity || 1})
                             </h4>
 
                             <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem; border: 1px solid #fecaca;">
@@ -7461,7 +7463,7 @@
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Item Type</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Style Number</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Size</th>
-                                            <th style="padding: 0.75rem; text-align: center; font-weight: 600;">Qty</th>
+                                            <th style="padding: 0.75rem; text-align: center; font-weight: 600;">Qty per Bundle</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Notes</th>
                                         </tr>
                                     </thead>
@@ -7528,10 +7530,12 @@
 
                                             // Display gloves if present
                                             if (bundleConfig.gloves && bundleConfig.gloves.trim()) {
+                                                // Parse gloves: "CTGD0794 - XL - Black Barley"
                                                 const parts = bundleConfig.gloves.split(' - ');
                                                 const style = parts[0] || '';
                                                 const size = parts[1] || 'N/A';
-                                                const color = parts[2] || 'N/A';
+                                                // Combine remaining parts for color (in case color has hyphen)
+                                                const color = parts.slice(2).join(' - ') || 'N/A';
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">🧤 Gloves</strong></td>
@@ -7548,40 +7552,28 @@
                                 </table>
                             </div>
 
-                            <!-- Embroidery Details Box -->
-                            <div style="background: #fffbeb; padding: 1rem; border: 1px solid #fbbf24; border-radius: 4px; margin-top: 1rem;">
+                            <!-- Embroidery & Customization Details -->
+                            ${(items[0]?.EmbroideryLocation || items[0]?.Thread_Colors || items[0]?.SpecialInstructions) ? `
+                            <div style="background: #fffbeb; padding: 1rem; border-radius: 4px; margin-top: 1rem; border: 1px solid #fbbf24;">
                                 <h5 style="margin: 0 0 0.75rem 0; color: #92400e; font-size: 1rem;">
-                                    <i class="fas fa-sewing-needle" style="margin-right: 0.5rem;"></i>
-                                    Embroidery Instructions:
+                                    <i class="fas fa-palette" style="margin-right: 0.5rem;"></i>
+                                    Customization Details
                                 </h5>
                                 <ul style="margin: 0.5rem 0; padding-left: 1.5rem; line-height: 1.8;">
-                                    <li><strong>Location:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].EmbroideryLocation || 'Left Chest (Standard)'}</span></li>
-                                    <li><strong>Thread Colors:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].Thread_Colors || 'Customer choice at pickup'}</span></li>
-                                    ${items[0].Image_Upload ? '<li><strong>Logo:</strong> <span style="color: #059669;">✅ Customer logo uploaded (see above)</span></li>' : '<li><strong>Logo:</strong> <span style="color: #6b7280;">No logo provided - use standard embroidery</span></li>'}
-                                    ${items[0].SpecialInstructions ? `<li><strong>Special Notes:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].SpecialInstructions}</span></li>` : ''}
+                                    ${items[0]?.JacketEmbroideryLocation ? `<li><strong>Jacket Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].JacketEmbroideryLocation}</span></li>` : ''}
+                                    ${items[0]?.HoodieEmbroideryLocation ? `<li><strong>Hoodie Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].HoodieEmbroideryLocation}</span></li>` : ''}
+                                    ${items[0]?.Thread_Colors ? `<li><strong>Thread Colors:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].Thread_Colors}</span></li>` : ''}
+                                    ${items[0]?.SpecialInstructions || items[0]?.Notes ? `<li><strong>Special Instructions:</strong> <span style="background: #fef3c7; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">${items[0].SpecialInstructions || items[0].Notes}</span></li>` : ''}
                                 </ul>
                             </div>
-
-                            <!-- Quick Copy for ShopWorks -->
-                            <div style="background: #dbeafe; padding: 1rem; border: 1px solid #3b82f6; border-radius: 4px; margin-top: 1rem;">
-                                <h5 style="margin: 0 0 0.75rem 0; color: #1e40af; font-size: 1rem;">
-                                    <i class="fas fa-clipboard-list" style="margin-right: 0.5rem;"></i>
-                                    Quick Copy for ShopWorks:
-                                </h5>
-                                <textarea readonly style="width: 100%; height: 120px; font-family: monospace; padding: 0.75rem; border: 1px solid #93c5fd; border-radius: 4px; background: white; font-size: 0.875rem;">${generateShopWorksText(items[0], request)}</textarea>
-                                <button onclick="copyToClipboard(this.previousElementSibling.value)"
-                                        class="quick-btn"
-                                        style="background: #3b82f6 !important; color: white !important; margin-top: 0.5rem;">
-                                    <i class="fas fa-copy"></i> Copy to Clipboard
-                                </button>
-                            </div>
+                            ` : ''}
                         </div>
-                        ` : `
+                        ` : items.length > 0 ? `
                         <!-- Regular Sample Items -->
                         <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
                             <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">
                                 Sample Items (${items.length}${request.TotalQuantity > items.length ? ` of ${request.TotalQuantity} requested` : ''})
-                            </h4>`}
+                            </h4>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead>
                                     <tr style="border-bottom: 2px solid #e5e7eb;">
@@ -7633,9 +7625,10 @@
                                 </div>
                             ` : ''}
                         </div>
-                        
-                        <!-- Missing Items Alert -->
-                        ${request.TotalQuantity > items.length ? `
+                        ` : ''}
+
+                        <!-- Missing Items Alert (Skip for bundles) -->
+                        ${(request.TotalQuantity > items.length && !items.some(item => item.StyleNumber === 'XMAS-BUNDLE')) ? `
                             <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem;">
                                 <h4 style="margin: 0 0 0.5rem 0; color: #dc2626; font-size: 1rem;">
                                     <i class="fas fa-exclamation-triangle"></i> Missing Items Alert
