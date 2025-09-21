@@ -4698,6 +4698,207 @@
             updateSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // ============================================
+        // DEBUG FUNCTIONS FOR TESTING
+        // ============================================
+
+        // Store last submitted quote ID for debugging
+        window.lastSubmittedQuoteID = null;
+
+        // Programmatically submit a test order with all fields filled
+        window.debugSubmitTestOrder = async function() {
+            console.log('=== STARTING AUTOMATED TEST ORDER SUBMISSION ===');
+
+            // Reset form first
+            resetForm();
+
+            // Step 1: Fill contact information
+            document.getElementById('firstName').value = 'Test';
+            document.getElementById('lastName').value = 'Debug' + Date.now();
+            document.getElementById('email').value = 'test@nwcustomapparel.com';
+            document.getElementById('phone').value = '2531234567';
+            document.getElementById('companyName').value = 'Test Company Debug';
+
+            // Step 2: Set delivery to Ship and fill address
+            document.querySelector('input[value="Ship"]').checked = true;
+            toggleDeliveryFields();
+
+            document.getElementById('address1').value = '123 Test Street';
+            document.getElementById('city').value = 'Tacoma';
+            document.getElementById('state').value = 'WA';
+            document.getElementById('zipCode').value = '98402';
+
+            // Step 3: Set delivery date (2 weeks from now)
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 14);
+            document.getElementById('deliveryDate').value = futureDate.toISOString().split('T')[0];
+
+            // Step 4: Check rush order
+            document.getElementById('rushOrder').checked = true;
+
+            // Step 5: Set customization
+            document.getElementById('jacketEmbLocation').value = 'left-chest';
+            document.getElementById('hoodieEmbLocation').value = 'right-chest';
+            document.getElementById('threadColors').value = 'Red, Blue, Green';
+            document.getElementById('specialInstructions').value = 'DEBUG TEST ORDER - ' + new Date().toISOString();
+
+            // Step 6: Pre-select all items with sizes and colors
+            selectedItems = {
+                jacket: {
+                    id: 'CT104670',
+                    name: 'Carhartt Jacket',
+                    selectedSize: 'XL',
+                    selectedColor: 'Black',
+                    price: 50
+                },
+                hoodie: {
+                    id: 'F281',
+                    name: 'Gildan Hoodie',
+                    selectedSize: 'XL',
+                    selectedColor: 'Red',
+                    price: 50
+                },
+                beanie: {
+                    id: 'CT104597',
+                    name: 'Carhartt Beanie',
+                    selectedSize: 'OSFA',
+                    selectedColor: 'Navy',
+                    price: 50
+                },
+                gloves: {
+                    id: 'CTGD0794',
+                    name: 'Carhartt Gloves',
+                    selectedSize: 'L',
+                    selectedColor: 'Black Barley',
+                    price: 50
+                }
+            };
+
+            console.log('Test order data prepared:', {
+                contact: {
+                    name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                },
+                shipping: {
+                    method: document.querySelector('input[name="deliveryMethod"]:checked').value,
+                    address: document.getElementById('address1').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zipCode').value
+                },
+                dueDate: document.getElementById('deliveryDate').value,
+                items: selectedItems
+            });
+
+            // Submit the order
+            try {
+                await submitOrder();
+                console.log('=== TEST ORDER SUBMITTED SUCCESSFULLY ===');
+                console.log('Quote ID:', window.lastSubmittedQuoteID);
+                return window.lastSubmittedQuoteID;
+            } catch (error) {
+                console.error('Test order submission failed:', error);
+                return null;
+            }
+        };
+
+        // Query database to check what was actually saved
+        window.debugCheckOrder = async function(quoteID) {
+            if (!quoteID) {
+                console.error('Please provide a quote ID');
+                return;
+            }
+
+            console.log(`=== CHECKING DATABASE FOR ORDER ${quoteID} ===`);
+
+            try {
+                // Query quote_sessions
+                const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions`);
+                const sessions = await sessionResponse.json();
+                const session = sessions.find(s => s.QuoteID === quoteID);
+
+                // Query quote_items
+                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
+                const items = await itemsResponse.json();
+
+                console.log('=== DATABASE CHECK RESULTS ===');
+                console.log('Session found:', session ? 'Yes' : 'No');
+                if (session) {
+                    console.log('Session DueDate:', session.DueDate);
+                    console.log('Session DeliveryMethod:', session.DeliveryMethod);
+                    console.log('Session Status:', session.Status);
+                }
+
+                console.log('Items found:', items.length);
+                if (items.length > 0) {
+                    console.log('Item[0] DueDate:', items[0].DueDate);
+                    console.log('Item[0] DeliveryMethod:', items[0].DeliveryMethod);
+                    console.log('Item[0] Shipping_Zip:', items[0].Shipping_Zip);
+                    console.log('Item[0] Shipping_Address:', items[0].Shipping_Address);
+                    console.log('Item[0] Shipping_City:', items[0].Shipping_City);
+                    console.log('Item[0] Shipping_State:', items[0].Shipping_State);
+                    console.log('Item[0] RushOrder:', items[0].RushOrder);
+
+                    // Parse and check bundle configuration
+                    try {
+                        const bundleConfig = JSON.parse(items[0].BundleConfiguration);
+                        console.log('Bundle Configuration:', bundleConfig);
+                        console.log('- Jacket:', bundleConfig.jacket);
+                        console.log('- Hoodie:', bundleConfig.hoodie);
+                        console.log('- Beanie:', bundleConfig.beanie);
+                        console.log('- Gloves:', bundleConfig.gloves);
+                    } catch (e) {
+                        console.error('Could not parse BundleConfiguration');
+                    }
+                }
+
+                return { session, items };
+            } catch (error) {
+                console.error('Database check failed:', error);
+                return null;
+            }
+        };
+
+        // Run full test and check
+        window.debugFullTest = async function() {
+            console.log('=== RUNNING FULL DEBUG TEST ===');
+            console.log('1. Submitting test order...');
+
+            const quoteID = await window.debugSubmitTestOrder();
+
+            if (quoteID) {
+                console.log('2. Waiting 2 seconds for database...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                console.log('3. Checking database...');
+                const dbData = await window.debugCheckOrder(quoteID);
+
+                console.log('4. Test complete. Check the staff dashboard for:', quoteID);
+                console.log('Dashboard URL: /staff-dashboard.html');
+
+                return { quoteID, dbData };
+            } else {
+                console.error('Test failed - no quote ID returned');
+                return null;
+            }
+        };
+
+        // Override submitQuote in ChristmasBundleQuoteService to capture quote ID
+        const originalSubmitQuote = ChristmasBundleQuoteService.prototype.submitQuote;
+        ChristmasBundleQuoteService.prototype.submitQuote = async function(quoteData) {
+            const result = await originalSubmitQuote.call(this, quoteData);
+            if (result && result.success && result.quoteID) {
+                window.lastSubmittedQuoteID = result.quoteID;
+            }
+            return result;
+        };
+
+        console.log('Debug functions loaded. Available commands:');
+        console.log('- window.debugSubmitTestOrder() - Submit a test order');
+        console.log('- window.debugCheckOrder("XMAS####-###") - Check database for an order');
+        console.log('- window.debugFullTest() - Run full test and check');
     </script>
 </body>
 </html>
