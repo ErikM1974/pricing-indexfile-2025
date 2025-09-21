@@ -2533,7 +2533,8 @@
                         Notes: quoteData.specialInstructions || quoteData.description || 'Christmas Gift Box Bundle',
 
                         // Additional Fields
-                        RushOrder: quoteData.rushOrder ? true : false
+                        RushOrder: quoteData.rushOrder ? true : false,
+                        DueDate: quoteData.dueDate || ''
                     };
 
                     // Log the item data being sent
@@ -2574,6 +2575,21 @@
             if (!firstName || !lastName || !email || !phone) {
                 alert('Please fill in all required contact information');
                 return;
+            }
+
+            // Validate shipping fields if shipping is selected
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value;
+            if (deliveryMethod === 'Ship') {
+                const address = document.getElementById('address1')?.value;
+                const city = document.getElementById('city')?.value;
+                const state = document.getElementById('state')?.value;
+                const zipCode = document.getElementById('zipCode')?.value;
+
+                if (!address || !city || !state || !zipCode) {
+                    alert('Please fill in all required shipping information including ZIP code');
+                    console.warn('Missing shipping fields:', { address, city, state, zipCode });
+                    return;
+                }
             }
 
             // Show loading state - use passed button or find by id
@@ -3492,6 +3508,17 @@
                     if (osfaBtn && !card.querySelector('.size-btn.selected')) {
                         console.log('Auto-selecting OSFA for beanie');
                         osfaBtn.click();
+                    }
+                }, 100);
+            }
+
+            // Auto-select single color for gloves (Black Barley)
+            if (type === 'gloves') {
+                setTimeout(() => {
+                    const colorSwatches = card.querySelectorAll('.color-swatch');
+                    if (colorSwatches.length === 1 && !card.querySelector('.color-swatch.selected')) {
+                        console.log('Auto-selecting Black Barley color for gloves');
+                        colorSwatches[0].click();
                     }
                 }, 100);
             }
