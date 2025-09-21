@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Bundle Debug Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .warning {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        .status.success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+        }
+        .status.error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+        }
+        iframe {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎄 Christmas Bundle Debug Tester</h1>
+
+        <div class="test-section">
+            <h2>Quick Test</h2>
+            <p>Run a complete test cycle: Submit order → Check database → Verify dashboard</p>
+            <button onclick="runFullTest()">Run Full Test</button>
+            <div id="quickResults" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Check Existing Order</h2>
+            <p>Enter a Quote ID to check what's in the database:</p>
+            <input type="text" id="quoteIdInput" placeholder="XMAS0921-123" style="padding: 10px; width: 200px; margin-right: 10px;">
+            <button onclick="checkExistingOrder()">Check Order</button>
+            <div id="checkResults" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results Summary</h2>
+            <div id="summary" class="results">No tests run yet.</div>
+        </div>
+    </div>
+
+    <!-- Hidden iframe to load Christmas bundle page -->
+    <iframe id="testFrame" src="/christmas-bundles.html" onload="iframeLoaded()"></iframe>
+
+    <script>
+        let testFrame = null;
+        let frameReady = false;
+
+        function iframeLoaded() {
+            testFrame = document.getElementById('testFrame').contentWindow;
+            frameReady = true;
+            console.log('Christmas bundle page loaded');
+        }
+
+        async function runFullTest() {
+            const resultsDiv = document.getElementById('quickResults');
+            const summaryDiv = document.getElementById('summary');
+
+            if (!frameReady) {
+                resultsDiv.innerHTML = '<span class="error">Error: Christmas bundle page not loaded yet. Please wait...</span>';
+                return;
+            }
+
+            resultsDiv.innerHTML = 'Starting test...\\n';
+
+            try {
+                // Run the full test
+                const result = await testFrame.debugFullTest();
+
+                if (result && result.quoteID) {
+                    resultsDiv.innerHTML = `<span class="success">✓ Test order created successfully!</span>
+Quote ID: ${result.quoteID}
+
+Database Check Results:
+`;
+
+                    // Check session data
+                    if (result.dbData.session) {
+                        resultsDiv.innerHTML += `
+<strong>Session Data:</strong>
+- DueDate: ${result.dbData.session.DueDate || '<span class="error">MISSING</span>'}
+- Status: ${result.dbData.session.Status}
+`;
+                    }
+
+                    // Check items data
+                    if (result.dbData.items && result.dbData.items.length > 0) {
+                        const item = result.dbData.items[0];
+                        resultsDiv.innerHTML += `
+<strong>Item Data:</strong>
+- DueDate: ${item.DueDate || '<span class="error">MISSING</span>'}
+- DeliveryMethod: ${item.DeliveryMethod || '<span class="error">MISSING</span>'}
+- Shipping_Zip: ${item.Shipping_Zip || '<span class="error">MISSING</span>'}
+- Shipping_Address: ${item.Shipping_Address || '<span class="error">MISSING</span>'}
+- Shipping_City: ${item.Shipping_City || '<span class="error">MISSING</span>'}
+- Shipping_State: ${item.Shipping_State || '<span class="error">MISSING</span>'}
+
+<strong>Bundle Config:</strong>`;
+
+                        try {
+                            const bundle = JSON.parse(item.BundleConfiguration);
+                            resultsDiv.innerHTML += `
+- Jacket: ${bundle.jacket || '<span class="error">MISSING</span>'}
+- Hoodie: ${bundle.hoodie || '<span class="error">MISSING</span>'}
+- Beanie: ${bundle.beanie || '<span class="error">MISSING</span>'}
+- Gloves: ${bundle.gloves || '<span class="error">MISSING</span>'}
+`;
+                        } catch (e) {
+                            resultsDiv.innerHTML += '\\n<span class="error">Could not parse bundle configuration</span>';
+                        }
+                    }
+
+                    // Update summary
+                    updateSummary(result);
+
+                } else {
+                    resultsDiv.innerHTML = '<span class="error">✗ Test failed - no quote ID returned</span>';
+                }
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Test failed: ${error.message}</span>`;
+                console.error('Test error:', error);
+            }
+        }
+
+        async function checkExistingOrder() {
+            const quoteId = document.getElementById('quoteIdInput').value;
+            const resultsDiv = document.getElementById('checkResults');
+
+            if (!quoteId) {
+                resultsDiv.innerHTML = '<span class="warning">Please enter a Quote ID</span>';
+                return;
+            }
+
+            if (!frameReady) {
+                resultsDiv.innerHTML = '<span class="error">Error: Christmas bundle page not loaded yet. Please wait...</span>';
+                return;
+            }
+
+            resultsDiv.innerHTML = `Checking ${quoteId}...\\n`;
+
+            try {
+                const result = await testFrame.debugCheckOrder(quoteId);
+
+                if (result && result.session) {
+                    resultsDiv.innerHTML = `<strong>Order Found: ${quoteId}</strong>
+
+<strong>Session Data:</strong>
+- Created: ${new Date(result.session.CreatedAt).toLocaleString()}
+- DueDate: ${result.session.DueDate || '<span class="error">NOT SPECIFIED</span>'}
+- Status: ${result.session.Status}
+`;
+                }
+
+                if (result && result.items && result.items.length > 0) {
+                    const item = result.items[0];
+                    resultsDiv.innerHTML += `
+<strong>Item Data:</strong>
+- DueDate: ${item.DueDate || '<span class="error">NOT SPECIFIED</span>'}
+- DeliveryMethod: ${item.DeliveryMethod || '<span class="warning">NOT SET</span>'}
+- Shipping_Zip: ${item.Shipping_Zip || '<span class="error">NOT PROVIDED</span>'}
+- Shipping_Address: ${item.Shipping_Address || '<span class="error">MISSING</span>'}
+- Shipping_City: ${item.Shipping_City || '<span class="error">MISSING</span>'}
+- Shipping_State: ${item.Shipping_State || '<span class="error">MISSING</span>'}
+
+<strong>Issues Found:</strong>`;
+
+                    // Check for issues
+                    let issues = [];
+                    if (!item.DueDate) issues.push('- Due Date not saved to items table');
+                    if (!item.Shipping_Zip) issues.push('- ZIP code not saved');
+                    if (!item.DeliveryMethod) issues.push('- Delivery method not saved to items');
+
+                    if (issues.length > 0) {
+                        resultsDiv.innerHTML += '\\n<span class="error">' + issues.join('\\n') + '</span>';
+                    } else {
+                        resultsDiv.innerHTML += '\\n<span class="success">All fields properly saved!</span>';
+                    }
+
+                } else {
+                    resultsDiv.innerHTML += '\\n<span class="error">No items found for this order</span>';
+                }
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">Check failed: ${error.message}</span>`;
+            }
+        }
+
+        function updateSummary(result) {
+            const summaryDiv = document.getElementById('summary');
+            let issues = [];
+            let successes = [];
+
+            if (result.dbData.items && result.dbData.items.length > 0) {
+                const item = result.dbData.items[0];
+
+                // Check each field
+                if (item.DueDate) {
+                    successes.push('✓ Due Date saved correctly');
+                } else {
+                    issues.push('✗ Due Date NOT saved to items');
+                }
+
+                if (item.Shipping_Zip) {
+                    successes.push('✓ ZIP code saved correctly');
+                } else {
+                    issues.push('✗ ZIP code NOT saved');
+                }
+
+                if (item.DeliveryMethod === 'Ship') {
+                    successes.push('✓ Delivery method saved correctly');
+                } else {
+                    issues.push('✗ Delivery method NOT saved correctly');
+                }
+
+                // Check bundle config
+                try {
+                    const bundle = JSON.parse(item.BundleConfiguration);
+                    if (bundle.gloves && bundle.gloves.includes('Black Barley')) {
+                        successes.push('✓ Gloves color saved correctly');
+                    } else {
+                        issues.push('✗ Gloves color NOT saved');
+                    }
+                } catch (e) {}
+            }
+
+            summaryDiv.innerHTML = `<strong>Test Summary for ${result.quoteID}:</strong>
+
+<span class="success">Successes (${successes.length}):</span>
+${successes.join('\\n')}
+
+<span class="error">Issues (${issues.length}):</span>
+${issues.length > 0 ? issues.join('\\n') : 'None found!'}
+
+<strong>Next Steps:</strong>
+1. Check the staff dashboard at <a href="/staff-dashboard.html" target="_blank">/staff-dashboard.html</a>
+2. Look for order ${result.quoteID}
+3. Verify all data displays correctly
+`;
+        }
+    </script>
+</body>
+</html>
