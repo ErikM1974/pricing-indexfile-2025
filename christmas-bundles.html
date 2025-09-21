@@ -2599,10 +2599,10 @@
 
                 // Delivery Info
                 deliveryMethod: document.querySelector('input[name="deliveryMethod"]:checked').value,
-                shippingAddress: document.getElementById('shippingAddress')?.value,
-                shippingCity: document.getElementById('shippingCity')?.value,
-                shippingState: document.getElementById('shippingState')?.value,
-                shippingZip: document.getElementById('shippingZip')?.value,
+                shippingAddress: document.getElementById('address1')?.value,
+                shippingCity: document.getElementById('city')?.value,
+                shippingState: document.getElementById('state')?.value,
+                shippingZip: document.getElementById('zip')?.value,
 
                 // Customization
                 jacketEmbLocation: document.getElementById('jacketEmbLocation')?.value,
@@ -4280,10 +4280,10 @@
                 pickupInfo.style.display = 'none';
 
                 // Make shipping fields required
-                const addressField = document.getElementById('shippingAddress');
-                const cityField = document.getElementById('shippingCity');
-                const stateField = document.getElementById('shippingState');
-                const zipField = document.getElementById('shippingZip');
+                const addressField = document.getElementById('address1');
+                const cityField = document.getElementById('city');
+                const stateField = document.getElementById('state');
+                const zipField = document.getElementById('zip');
 
                 if (addressField) addressField.required = true;
                 if (cityField) cityField.required = true;
@@ -4294,10 +4294,10 @@
                 pickupInfo.style.display = 'block';
 
                 // Remove required from shipping fields
-                const addressField = document.getElementById('shippingAddress');
-                const cityField = document.getElementById('shippingCity');
-                const stateField = document.getElementById('shippingState');
-                const zipField = document.getElementById('shippingZip');
+                const addressField = document.getElementById('address1');
+                const cityField = document.getElementById('city');
+                const stateField = document.getElementById('state');
+                const zipField = document.getElementById('zip');
 
                 if (addressField) addressField.required = false;
                 if (cityField) cityField.required = false;
