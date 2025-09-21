@@ -7394,7 +7394,7 @@
                                 <div><strong>Date:</strong> ${new Date(request.CreatedAt).toLocaleString()}</div>
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
                                 <div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>
-                                ${items[0]?.DueDate || request.DueDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(items[0]?.DueDate || request.DueDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
+                                ${items[0]?.DeliveryDate || request.DeliveryDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(items[0]?.DeliveryDate || request.DeliveryDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
                                 ${items[0]?.DeliveryMethod || request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
                                 ${items[0]?.RushOrder || request.IsRushOrder ? `<div style="grid-column: 1 / -1;"><strong style="color: #dc2626;">⚠️ RUSH ORDER - EXPEDITED PROCESSING</strong></div>` : ''}
                                 ${orderDetails.totals || request.SubtotalAmount ? `

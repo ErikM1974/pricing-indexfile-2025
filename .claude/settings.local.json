@@ -101,7 +101,8 @@
       "mcp__uvx__voice_mode_info",
       "Bash(wsl.exe:*)",
       "WebFetch(domain:www.sanmar.com)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": [],

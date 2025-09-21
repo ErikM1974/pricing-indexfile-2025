@@ -2462,7 +2462,7 @@
                     LTMFeeTotal: 0,
                     TotalAmount: quoteData.totalPrice || 0,
                     ExpiresAt: formattedExpiresAt,
-                    DueDate: quoteData.dueDate || '',
+                    DeliveryDate: quoteData.dueDate || '',',
                     Notes: 'Christmas Gift Box Bundle Order'
                 };
 
@@ -2534,7 +2534,7 @@
 
                         // Additional Fields
                         RushOrder: quoteData.rushOrder ? true : false,
-                        DueDate: quoteData.dueDate || ''
+                        DeliveryDate: quoteData.dueDate || ''
                     };
 
                     // Log the item data being sent
@@ -4628,7 +4628,7 @@
                     city: document.getElementById('city').value,
                     state: document.getElementById('state').value,
                     zipCode: document.getElementById('zipCode').value,
-                    deliveryDate: deliveryDateValue
+                    dueDate: deliveryDateValue
                 }
             };
 
@@ -4786,9 +4786,9 @@
                     address: document.getElementById('address1').value,
                     city: document.getElementById('city').value,
                     state: document.getElementById('state').value,
-                    zip: document.getElementById('zipCode').value
+                    zipCode: document.getElementById('zipCode').value
                 },
-                dueDate: document.getElementById('deliveryDate').value,
+                dueDate: testData.formData.dueDate,
                 items: selectedItems
             });
 
@@ -4826,14 +4826,14 @@
                 console.log('=== DATABASE CHECK RESULTS ===');
                 console.log('Session found:', session ? 'Yes' : 'No');
                 if (session) {
-                    console.log('Session DueDate:', session.DueDate);
+                    console.log('Session DeliveryDate:', session.DeliveryDate);
                     console.log('Session DeliveryMethod:', session.DeliveryMethod);
                     console.log('Session Status:', session.Status);
                 }
 
                 console.log('Items found:', items.length);
                 if (items.length > 0) {
-                    console.log('Item[0] DueDate:', items[0].DueDate);
+                    console.log('Item[0] DeliveryDate:', items[0].DeliveryDate);
                     console.log('Item[0] DeliveryMethod:', items[0].DeliveryMethod);
                     console.log('Item[0] Shipping_Zip:', items[0].Shipping_Zip);
                     console.log('Item[0] Shipping_Address:', items[0].Shipping_Address);
