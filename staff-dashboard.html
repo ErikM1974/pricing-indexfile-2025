@@ -7377,18 +7377,18 @@
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
                                 <div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>
                                 ${request.DueDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(request.DueDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
-                                ${request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${request.DeliveryMethod.toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
+                                ${items[0]?.DeliveryMethod || request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
                                 ${items[0]?.RushOrder || request.IsRushOrder ? `<div style="grid-column: 1 / -1;"><strong style="color: #dc2626;">⚠️ RUSH ORDER - EXPEDITED PROCESSING</strong></div>` : ''}
                                 ${orderDetails.totals || request.SubtotalAmount ? `
                                     <div><strong>Samples Cost:</strong> $${(orderDetails.totals?.samples || request.SubtotalAmount || 0).toFixed(2)}</div>
-                                    ${request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
-                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - (request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
+                                    ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
+                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - ((items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
                                 ` : ''}
                             </div>
                         </div>
                         
                         <!-- Shipping Address (if applicable) -->
-                        ${request.DeliveryMethod && request.DeliveryMethod.toLowerCase() === 'ship' ? `
+                        ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `
                             <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border: 2px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 <h4 style="margin: 0 0 1.25rem 0; color: #92400e; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
                                     <i class="fas fa-shipping-fast" style="color: #f59e0b;"></i> 
@@ -7399,8 +7399,8 @@
                                     <div style="display: flex; align-items: start; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">Street Address:</label>
                                         <div style="flex: 1;">
-                                            ${request.Shipping_Address || request.ShippingAddress ?
-                                                `<span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">${request.Shipping_Address || request.ShippingAddress}${request.Shipping_Apartment || request.ShippingApartment ? `, ${request.Shipping_Apartment || request.ShippingApartment}` : ''}</span>` :
+                                            ${items[0]?.Shipping_Address || request.Shipping_Address || request.ShippingAddress ?
+                                                `<span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">${items[0]?.Shipping_Address || request.Shipping_Address || request.ShippingAddress}${items[0]?.Shipping_Apartment || request.Shipping_Apartment || request.ShippingApartment ? `, ${items[0]?.Shipping_Apartment || request.Shipping_Apartment || request.ShippingApartment}` : ''}</span>` :
                                                 `<span style="color: #dc2626; font-style: italic; font-size: 0.875rem;">
                                                     <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem;"></i>
                                                     Missing - Contact customer for street address
@@ -7413,7 +7413,7 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">City:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.Shipping_City || request.ShippingCity || extractCityFromNotes(request.Notes) || 'Not provided'}
+                                            ${items[0]?.Shipping_City || request.Shipping_City || request.ShippingCity || extractCityFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                     
@@ -7421,7 +7421,7 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">State:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.Shipping_State || request.ShippingState || extractStateFromNotes(request.Notes) || 'Not provided'}
+                                            ${items[0]?.Shipping_State || request.Shipping_State || request.ShippingState || extractStateFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                     
@@ -7429,12 +7429,12 @@
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label style="font-weight: 600; color: #374151; min-width: 120px; font-size: 0.9375rem;">ZIP Code:</label>
                                         <span style="color: #111827; font-size: 0.9375rem; user-select: all; cursor: text;">
-                                            ${request.Shipping_Zip || request.ShippingZip || extractZipFromNotes(request.Notes) || 'Not provided'}
+                                            ${items[0]?.Shipping_Zip || request.Shipping_Zip || request.ShippingZip || extractZipFromNotes(request.Notes) || 'Not provided'}
                                         </span>
                                     </div>
                                 </div>
                                 
-                                ${!(request.Shipping_Address || request.ShippingAddress) ? `
+                                ${!(items[0]?.Shipping_Address || request.Shipping_Address || request.ShippingAddress) ? `
                                     <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
                                         <div style="font-size: 0.875rem; color: #92400e; font-weight: 600; margin-bottom: 0.25rem;">
                                             <i class="fas fa-info-circle"></i> Action Required
@@ -7464,7 +7464,7 @@
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Style Number</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Size</th>
                                             <th style="padding: 0.75rem; text-align: center; font-weight: 600;">Qty per Bundle</th>
-                                            <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Notes</th>
+                                            <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Color</th>
                                         </tr>
                                     </thead>
                                     <tbody>
