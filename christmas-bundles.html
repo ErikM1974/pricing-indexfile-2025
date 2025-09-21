@@ -2272,6 +2272,10 @@
                 <div class="reference-label">Reference Number</div>
                 <div class="reference-number" id="referenceNumber">XMAS1225-001</div>
             </div>
+            <!-- Order Confirmation Details -->
+            <div id="orderConfirmationDetails" style="margin: 20px 0; padding: 15px; background: #f9fafb; border-radius: 8px; text-align: left;">
+                <!-- Order details will be populated here -->
+            </div>
             <button class="nav-btn primary" onclick="closeModal()" style="width: 100%;">
                 <i class="fas fa-check"></i> Done
             </button>
@@ -2483,6 +2487,10 @@
 
                     // Log bundle configuration for debugging
                     console.log('Bundle configuration being saved:', bundleConfig);
+                    console.log('Beanie data from quoteData:', {
+                        style: quoteData.beanieStyle,
+                        color: quoteData.beanieColor
+                    });
                     console.log('Gloves data from quoteData:', {
                         style: quoteData.glovesStyle,
                         size: quoteData.glovesSize,
@@ -2629,6 +2637,11 @@
             // Log the quote data before submission
             console.log('Complete quote data being submitted:', quoteData);
             console.log('Selected items:', selectedItems);
+            console.log('Selected items - beanie specifically:', {
+                full: selectedItems.beanie,
+                id: selectedItems.beanie?.id,
+                color: selectedItems.beanie?.selectedColor
+            });
 
             // Submit to API
             const quoteService = new ChristmasBundleQuoteService();
@@ -2685,6 +2698,83 @@
             const modal = document.getElementById('successModal');
             const referenceNumber = document.getElementById('referenceNumber');
             referenceNumber.textContent = quoteID;
+
+            // Populate order confirmation details
+            const orderDetails = document.getElementById('orderConfirmationDetails');
+            let detailsHTML = '<h3 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Order Summary:</h3>';
+
+            // Bundle items
+            detailsHTML += '<div style="margin-bottom: 15px;">';
+            detailsHTML += '<strong style="color: #666;">Bundle Items:</strong>';
+            detailsHTML += '<ul style="margin: 5px 0 0 20px; padding: 0;">';
+
+            if (selectedItems.jacket) {
+                detailsHTML += `<li style="margin: 5px 0;">
+                    <strong>Jacket:</strong> ${selectedItems.jacket.id}
+                    ${selectedItems.jacket.selectedSize ? ` - Size: ${selectedItems.jacket.selectedSize}` : ''}
+                    ${selectedItems.jacket.selectedColor ? ` - Color: ${selectedItems.jacket.selectedColor}` : ''}
+                </li>`;
+            }
+
+            if (selectedItems.hoodie) {
+                detailsHTML += `<li style="margin: 5px 0;">
+                    <strong>Hoodie:</strong> ${selectedItems.hoodie.id}
+                    ${selectedItems.hoodie.selectedSize ? ` - Size: ${selectedItems.hoodie.selectedSize}` : ''}
+                    ${selectedItems.hoodie.selectedColor ? ` - Color: ${selectedItems.hoodie.selectedColor}` : ''}
+                </li>`;
+            }
+
+            if (selectedItems.beanie) {
+                detailsHTML += `<li style="margin: 5px 0;">
+                    <strong>Beanie:</strong> ${selectedItems.beanie.id}
+                    ${selectedItems.beanie.selectedColor ? ` - Color: ${selectedItems.beanie.selectedColor}` : ''}
+                </li>`;
+            }
+
+            if (selectedItems.gloves) {
+                detailsHTML += `<li style="margin: 5px 0;">
+                    <strong>Gloves:</strong> ${selectedItems.gloves.id}
+                    ${selectedItems.gloves.selectedSize ? ` - Size: ${selectedItems.gloves.selectedSize}` : ''}
+                    ${selectedItems.gloves.selectedColor ? ` - Color: ${selectedItems.gloves.selectedColor}` : ''}
+                </li>`;
+            }
+
+            detailsHTML += '</ul></div>';
+
+            // Customization details
+            const threadColors = document.getElementById('threadColors')?.value;
+            const jacketEmbLocation = document.getElementById('jacketEmbLocation')?.value;
+            const hoodieEmbLocation = document.getElementById('hoodieEmbLocation')?.value;
+            const specialInstructions = document.getElementById('specialInstructions')?.value;
+
+            if (threadColors || jacketEmbLocation || hoodieEmbLocation || specialInstructions) {
+                detailsHTML += '<div style="margin-bottom: 15px;">';
+                detailsHTML += '<strong style="color: #666;">Customization:</strong>';
+                detailsHTML += '<ul style="margin: 5px 0 0 20px; padding: 0;">';
+
+                if (jacketEmbLocation) {
+                    detailsHTML += `<li style="margin: 5px 0;">Jacket Embroidery: ${jacketEmbLocation}</li>`;
+                }
+                if (hoodieEmbLocation) {
+                    detailsHTML += `<li style="margin: 5px 0;">Hoodie Embroidery: ${hoodieEmbLocation}</li>`;
+                }
+                if (threadColors) {
+                    detailsHTML += `<li style="margin: 5px 0;">Thread Colors: ${threadColors}</li>`;
+                }
+                if (specialInstructions) {
+                    detailsHTML += `<li style="margin: 5px 0;">Special Instructions: ${specialInstructions}</li>`;
+                }
+
+                detailsHTML += '</ul></div>';
+            }
+
+            // Total quantity
+            const totalQuantity = calculateTotalQuantity();
+            detailsHTML += `<div style="padding-top: 10px; border-top: 1px solid #e5e7eb; color: #333;">
+                <strong>Total Items in Bundle:</strong> ${totalQuantity}
+            </div>`;
+
+            orderDetails.innerHTML = detailsHTML;
             modal.classList.add('active');
         }
 
