@@ -2643,6 +2643,12 @@
                 color: selectedItems.beanie?.selectedColor
             });
 
+            // Log if any items are missing
+            if (!selectedItems.jacket?.id) console.warn('Jacket not selected or missing ID');
+            if (!selectedItems.hoodie?.id) console.warn('Hoodie not selected or missing ID');
+            if (!selectedItems.beanie?.id) console.warn('Beanie not selected or missing ID');
+            if (!selectedItems.gloves?.id) console.warn('Gloves not selected or missing ID:', selectedItems.gloves);
+
             // Submit to API
             const quoteService = new ChristmasBundleQuoteService();
             const result = await quoteService.submitQuote(quoteData);
@@ -3467,6 +3473,17 @@
                 }
             });
 
+            // Auto-select OSFA for beanie since it's the only size option
+            if (type === 'beanie') {
+                setTimeout(() => {
+                    const osfaBtn = card.querySelector('.size-btn[data-size="OSFA"]');
+                    if (osfaBtn && !card.querySelector('.size-btn.selected')) {
+                        console.log('Auto-selecting OSFA for beanie');
+                        osfaBtn.click();
+                    }
+                }, 100);
+            }
+
             return card;
         }
 
@@ -3853,6 +3870,7 @@
 
         // Select Product
         function selectProduct(productId, type) {
+            console.log(`selectProduct called for ${type}: ${productId}`);
             const card = document.querySelector(`[data-product-id="${productId}"]`);
 
             // Clear previous selection of this type
@@ -3872,8 +3890,22 @@
             // Check if size is required but not selected
             const hasSizeOptions = card.querySelector('.size-grid');
             if (hasSizeOptions && !selectedSize) {
-                // Don't save the selection if size is missing
-                console.log('Please select a size before continuing');
+                // Provide clear feedback to user
+                alert(`Please select a size for the ${type} before clicking Select`);
+                console.log(`${type} requires size but none selected - NOT saving selection`);
+
+                // Highlight the size selection area
+                const sizeGrid = card.querySelector('.size-grid');
+                if (sizeGrid) {
+                    sizeGrid.style.border = '2px solid red';
+                    sizeGrid.style.borderRadius = '4px';
+                    sizeGrid.style.padding = '4px';
+                    setTimeout(() => {
+                        sizeGrid.style.border = '';
+                        sizeGrid.style.padding = '';
+                    }, 3000);
+                }
+
                 // Keep the card visually selected but don't enable continue
                 updateContinueButtons();
                 return;
@@ -3911,6 +3943,8 @@
                 selectedColorCode,
                 selectedColorData // Store the full color object for later use
             };
+
+            console.log(`${type} saved successfully:`, selectedItems[type]);
 
             // Update button text on all cards of this type
             document.querySelectorAll(`[data-product-type="${type}"] .select-btn`).forEach(btn => {
