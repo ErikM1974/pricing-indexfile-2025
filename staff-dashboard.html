@@ -7068,7 +7068,66 @@
         function hideSampleRequests() {
             document.getElementById('sampleRequestDashboard').style.display = 'none';
         }
-        
+
+        // Retail pricing structure for Christmas bundles
+        const RETAIL_PRICES = {
+            jackets: {
+                'CT100617': 92,  // Rain Defender
+                'CT103828': 137, // Detroit (Duck Detroit Jacket)
+                'CT104670': 174  // Storm Defender (Shoreline Jacket)
+            },
+            hoodies: 58,  // CTK121 and F281 both use same base price
+            beanies: 35,
+            gloves: 19,
+            giftBox: 9,
+            shipping: 25
+        };
+
+        // Cache for size upcharges from API
+        const sizeUpchargeCache = {};
+
+        // Fetch size upcharges from API
+        async function fetchSizeUpcharges(styleNumber) {
+            // Check cache first
+            if (sizeUpchargeCache[styleNumber]) {
+                console.log(`[Size Upcharges] Using cached data for ${styleNumber}`);
+                return sizeUpchargeCache[styleNumber];
+            }
+
+            try {
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+
+                if (!response.ok) {
+                    console.warn(`[Size Upcharges] Failed to fetch for ${styleNumber}:`, response.status);
+                    return null;
+                }
+
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    // Extract upcharges from first color (all colors have same upcharges)
+                    const upcharges = data[0].sizeUpcharges || {};
+                    console.log(`[Size Upcharges] Fetched for ${styleNumber}:`, upcharges);
+
+                    // Cache the result
+                    sizeUpchargeCache[styleNumber] = upcharges;
+                    return upcharges;
+                }
+
+                return null;
+            } catch (error) {
+                console.error(`[Size Upcharges] Error fetching for ${styleNumber}:`, error);
+                return null;
+            }
+        }
+
+        // Calculate value including size upcharges
+        function calculateItemValue(styleNumber, size, basePrice) {
+            const upcharges = sizeUpchargeCache[styleNumber] || {};
+            const upcharge = upcharges[size] || 0;
+            return basePrice + upcharge;
+        }
+
         async function loadSampleRequests() {
             try {
                 // Get all sample request sessions (not just specific status)
@@ -7253,15 +7312,40 @@
         
         async function viewSampleDetails(quoteID) {
             currentRequestID = quoteID;
-            
+
             try {
                 // Fetch the request details
                 const request = currentSampleRequests.find(r => r.QuoteID === quoteID);
                 if (!request) throw new Error('Request not found');
-                
+
                 // Fetch the items using QuoteID (now unique with timestamp+random generation)
                 const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
                 const items = await itemsResponse.json();
+
+                // For Christmas bundles, fetch size upcharges for pricing calculation
+                if (quoteID && quoteID.startsWith('XMAS') && items && items[0] && items[0].BundleConfiguration) {
+                    try {
+                        const bundleConfig = JSON.parse(items[0].BundleConfiguration);
+                        const stylesToFetch = [];
+
+                        // Collect all styles that need upcharge data
+                        if (bundleConfig.jacket) {
+                            const jacketStyle = bundleConfig.jacket.split(' - ')[0];
+                            if (jacketStyle) stylesToFetch.push(jacketStyle);
+                        }
+                        if (bundleConfig.hoodie) {
+                            const hoodieStyle = bundleConfig.hoodie.split(' - ')[0];
+                            if (hoodieStyle) stylesToFetch.push(hoodieStyle);
+                        }
+
+                        // Fetch upcharges for all styles
+                        const upchargePromises = stylesToFetch.map(style => fetchSizeUpcharges(style));
+                        await Promise.all(upchargePromises);
+                        console.log('[Modal] Size upcharges fetched for Christmas bundle:', sizeUpchargeCache);
+                    } catch (e) {
+                        console.log('Error fetching upcharges for bundle:', e);
+                    }
+                }
                 
                 // Parse the order details from the session's ProjectName field
                 let orderDetails = {};
@@ -7393,18 +7477,99 @@
                                 <div><strong>Request ID:</strong> ${request.QuoteID}</div>
                                 <div><strong>Date:</strong> ${new Date(request.CreatedAt).toLocaleString()}</div>
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
-                                <div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>
+                                ${/* Hide Total Amount for Christmas bundles since we show value summary */ ''}
+                                ${!(request.QuoteID && request.QuoteID.startsWith('XMAS')) ? `<div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>` : ''}
                                 ${items[0]?.DeliveryDate || request.DeliveryDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(items[0]?.DeliveryDate || request.DeliveryDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
                                 ${items[0]?.DeliveryMethod || request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
                                 ${items[0]?.RushOrder || request.IsRushOrder ? `<div style="grid-column: 1 / -1;"><strong style="color: #dc2626;">⚠️ RUSH ORDER - EXPEDITED PROCESSING</strong></div>` : ''}
-                                ${orderDetails.totals || request.SubtotalAmount ? `
+                                ${/* Only show pricing details for non-Christmas sample requests */ ''}
+                                ${!(request.QuoteID && request.QuoteID.startsWith('XMAS')) && (orderDetails.totals || request.SubtotalAmount) ? `
                                     <div><strong>Samples Cost:</strong> $${(orderDetails.totals?.samples || request.SubtotalAmount || 0).toFixed(2)}</div>
-                                    ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `<div><strong>Shipping:</strong> $10.00</div>` : ''}
-                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - ((items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 10 : 0)).toFixed(2)}</div>` : ''}
+                                    ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `<div><strong>Shipping:</strong> $${RETAIL_PRICES.shipping}.00</div>` : ''}
+                                    ${request.TotalAmount > request.SubtotalAmount ? `<div><strong>Tax:</strong> $${(request.TotalAmount - request.SubtotalAmount - ((items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? RETAIL_PRICES.shipping : 0)).toFixed(2)}</div>` : ''}
                                 ` : ''}
                             </div>
                         </div>
-                        
+
+                        <!-- Value Summary for Christmas Bundles -->
+                        ${request.QuoteID && request.QuoteID.startsWith('XMAS') && items[0] ? (() => {
+                            // Calculate total retail value
+                            let totalRetailValue = 0;
+                            let bundleConfig = {};
+
+                            try {
+                                if (items[0].BundleConfiguration) {
+                                    bundleConfig = JSON.parse(items[0].BundleConfiguration);
+                                }
+                            } catch (e) {
+                                console.log('Error parsing BundleConfiguration for value calculation:', e);
+                            }
+
+                            // Add jacket value with upcharge
+                            if (bundleConfig.jacket && bundleConfig.jacket.trim()) {
+                                const parts = bundleConfig.jacket.split(' - ');
+                                const style = parts[0];
+                                const size = parts[1];
+                                let jacketValue = RETAIL_PRICES.jackets[style] || 0;
+                                if (jacketValue && size && size !== 'N/A') {
+                                    jacketValue = calculateItemValue(style, size, jacketValue);
+                                }
+                                totalRetailValue += jacketValue;
+                            }
+
+                            // Add hoodie value with upcharge
+                            if (bundleConfig.hoodie && bundleConfig.hoodie.trim()) {
+                                const parts = bundleConfig.hoodie.split(' - ');
+                                const style = parts[0];
+                                const size = parts[1];
+                                let hoodieValue = RETAIL_PRICES.hoodies;
+                                if (size && size !== 'N/A') {
+                                    hoodieValue = calculateItemValue(style, size, hoodieValue);
+                                }
+                                totalRetailValue += hoodieValue;
+                            }
+
+                            // Add beanie value
+                            if (bundleConfig.beanie && bundleConfig.beanie.trim()) {
+                                totalRetailValue += RETAIL_PRICES.beanies;
+                            }
+
+                            // Add gloves value
+                            if (bundleConfig.gloves && bundleConfig.gloves.trim()) {
+                                totalRetailValue += RETAIL_PRICES.gloves;
+                            }
+
+                            // Add gift box and shipping
+                            totalRetailValue += RETAIL_PRICES.giftBox;
+                            if ((items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship') {
+                                totalRetailValue += RETAIL_PRICES.shipping;
+                            }
+
+                            return `
+                            <div style="background: linear-gradient(135deg, #d4edda 0%, #cce5ff 100%); padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #10b981;">
+                                <h4 style="margin: 0 0 0.75rem 0; color: #065f46; font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-gift" style="color: #dc2626;"></i>
+                                    Christmas Bundle Value Summary
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                                    <div style="background: white; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Total Retail Value</div>
+                                        <div style="font-size: 1.75rem; font-weight: 700; color: #059669;">$${totalRetailValue}</div>
+                                    </div>
+                                    <div style="background: white; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Customer Savings</div>
+                                        <div style="font-size: 1.75rem; font-weight: 700; color: #dc2626;">$${totalRetailValue}</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.5);">
+                                    <span style="background: white; color: #dc2626; font-weight: 700; padding: 0.5rem 1rem; border-radius: 6px; display: inline-block;">
+                                        🎄 100% FREE GIFT BUNDLE!
+                                    </span>
+                                </div>
+                            </div>
+                            `;
+                        })() : ''}
+
                         <!-- Shipping Address (if applicable) -->
                         ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `
                             <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border: 2px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -7481,8 +7646,9 @@
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Item Type</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Style Number</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Size</th>
-                                            <th style="padding: 0.75rem; text-align: center; font-weight: 600;">Qty per Bundle</th>
+                                            <th style="padding: 0.75rem; text-align: center; font-weight: 600;">Qty</th>
                                             <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Color</th>
+                                            <th style="padding: 0.75rem; text-align: right; font-weight: 600;">Retail Value</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -7505,6 +7671,13 @@
                                                 const style = parts[0] || '';
                                                 const size = parts[1] || 'N/A';
                                                 const color = parts[2] || 'N/A';
+
+                                                // Calculate jacket value with upcharge
+                                                let jacketValue = RETAIL_PRICES.jackets[style] || 0;
+                                                if (jacketValue && size && size !== 'N/A') {
+                                                    jacketValue = calculateItemValue(style, size, jacketValue);
+                                                }
+
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">🧥 Jacket</strong></td>
@@ -7512,6 +7685,10 @@
                                                     <td style="padding: 0.75rem;"><span style="background: #dbeafe; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${size}</span></td>
                                                     <td style="padding: 0.75rem; text-align: center; font-weight: 600;">1</td>
                                                     <td style="padding: 0.75rem; color: #6b7280; font-size: 0.875rem;">${color}</td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <span style="color: #059669; font-weight: 700;">$${jacketValue}</span>
+                                                        <span style="color: #dc2626; font-size: 0.75rem; font-weight: 600; margin-left: 4px;">FREE!</span>
+                                                    </td>
                                                 </tr>`;
                                             }
 
@@ -7521,6 +7698,13 @@
                                                 const style = parts[0] || '';
                                                 const size = parts[1] || 'N/A';
                                                 const color = parts[2] || 'N/A';
+
+                                                // Calculate hoodie value with upcharge
+                                                let hoodieValue = RETAIL_PRICES.hoodies;
+                                                if (size && size !== 'N/A') {
+                                                    hoodieValue = calculateItemValue(style, size, hoodieValue);
+                                                }
+
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">👕 Hoodie</strong></td>
@@ -7528,6 +7712,10 @@
                                                     <td style="padding: 0.75rem;"><span style="background: #dbeafe; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${size}</span></td>
                                                     <td style="padding: 0.75rem; text-align: center; font-weight: 600;">1</td>
                                                     <td style="padding: 0.75rem; color: #6b7280; font-size: 0.875rem;">${color}</td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <span style="color: #059669; font-weight: 700;">$${hoodieValue}</span>
+                                                        <span style="color: #dc2626; font-size: 0.75rem; font-weight: 600; margin-left: 4px;">FREE!</span>
+                                                    </td>
                                                 </tr>`;
                                             }
 
@@ -7536,6 +7724,8 @@
                                                 const parts = bundleConfig.beanie.split(' - ');
                                                 const style = parts[0] || '';
                                                 const color = parts[1] || 'N/A';
+                                                const beanieValue = RETAIL_PRICES.beanies;
+
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">🧢 Beanie</strong></td>
@@ -7543,6 +7733,10 @@
                                                     <td style="padding: 0.75rem;"><span style="background: #e5e7eb; padding: 2px 8px; border-radius: 4px;">OSFA</span></td>
                                                     <td style="padding: 0.75rem; text-align: center; font-weight: 600;">1</td>
                                                     <td style="padding: 0.75rem; color: #6b7280; font-size: 0.875rem;">${color}</td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <span style="color: #059669; font-weight: 700;">$${beanieValue}</span>
+                                                        <span style="color: #dc2626; font-size: 0.75rem; font-weight: 600; margin-left: 4px;">FREE!</span>
+                                                    </td>
                                                 </tr>`;
                                             }
 
@@ -7554,6 +7748,8 @@
                                                 const size = parts[1] || 'N/A';
                                                 // Combine remaining parts for color (in case color has hyphen)
                                                 const color = parts.slice(2).join(' - ') || 'N/A';
+                                                const glovesValue = RETAIL_PRICES.gloves;
+
                                                 rows += `
                                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                                     <td style="padding: 0.75rem;"><strong style="color: #dc2626;">🧤 Gloves</strong></td>
@@ -7561,10 +7757,14 @@
                                                     <td style="padding: 0.75rem;"><span style="background: #dbeafe; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${size}</span></td>
                                                     <td style="padding: 0.75rem; text-align: center; font-weight: 600;">1</td>
                                                     <td style="padding: 0.75rem; color: #6b7280; font-size: 0.875rem;">${color}</td>
+                                                    <td style="padding: 0.75rem; text-align: right;">
+                                                        <span style="color: #059669; font-weight: 700;">$${glovesValue}</span>
+                                                        <span style="color: #dc2626; font-size: 0.75rem; font-weight: 600; margin-left: 4px;">FREE!</span>
+                                                    </td>
                                                 </tr>`;
                                             }
 
-                                            return rows || '<tr><td colspan="5" style="padding: 1rem; text-align: center; color: #6b7280;">No bundle components found</td></tr>';
+                                            return rows || '<tr><td colspan="6" style="padding: 1rem; text-align: center; color: #6b7280;">No bundle components found</td></tr>';
                                         })()}
                                     </tbody>
                                 </table>
@@ -7578,8 +7778,26 @@
                                     Customization Details
                                 </h5>
                                 <ul style="margin: 0.5rem 0; padding-left: 1.5rem; line-height: 1.8;">
-                                    ${items[0]?.JacketEmbroideryLocation ? `<li><strong>Jacket Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].JacketEmbroideryLocation}</span></li>` : ''}
-                                    ${items[0]?.HoodieEmbroideryLocation ? `<li><strong>Hoodie Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].HoodieEmbroideryLocation}</span></li>` : ''}
+                                    ${(() => {
+                                        // Parse embroidery locations from combined field
+                                        if (items[0]?.EmbroideryLocation) {
+                                            const embLoc = items[0].EmbroideryLocation;
+                                            let result = '';
+
+                                            // Parse "Jacket: location, Hoodie: location" format
+                                            const jacketMatch = embLoc.match(/Jacket:\s*([^,]+)/);
+                                            const hoodieMatch = embLoc.match(/Hoodie:\s*([^,]+)/);
+
+                                            if (jacketMatch && jacketMatch[1] && jacketMatch[1] !== 'N/A') {
+                                                result += `<li><strong>Jacket Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${jacketMatch[1].trim()}</span></li>`;
+                                            }
+                                            if (hoodieMatch && hoodieMatch[1] && hoodieMatch[1] !== 'N/A') {
+                                                result += `<li><strong>Hoodie Embroidery:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${hoodieMatch[1].trim()}</span></li>`;
+                                            }
+                                            return result;
+                                        }
+                                        return '';
+                                    })()}
                                     ${items[0]?.Thread_Colors ? `<li><strong>Thread Colors:</strong> <span style="background: white; padding: 2px 6px; border-radius: 4px;">${items[0].Thread_Colors}</span></li>` : ''}
                                     ${items[0]?.SpecialInstructions || items[0]?.Notes ? `<li><strong>Special Instructions:</strong> <span style="background: #fef3c7; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">${items[0].SpecialInstructions || items[0].Notes}</span></li>` : ''}
                                 </ul>
