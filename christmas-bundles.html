@@ -2462,6 +2462,7 @@
                     LTMFeeTotal: 0,
                     TotalAmount: quoteData.totalPrice || 0,
                     ExpiresAt: formattedExpiresAt,
+                    DueDate: quoteData.dueDate || '',
                     Notes: 'Christmas Gift Box Bundle Order'
                 };
 
@@ -2602,7 +2603,7 @@
                 shippingAddress: document.getElementById('address1')?.value,
                 shippingCity: document.getElementById('city')?.value,
                 shippingState: document.getElementById('state')?.value,
-                shippingZip: document.getElementById('zip')?.value,
+                shippingZip: document.getElementById('zipCode')?.value,
 
                 // Customization
                 jacketEmbLocation: document.getElementById('jacketEmbLocation')?.value,
@@ -2626,6 +2627,7 @@
 
                 // Additional Info
                 rushOrder: document.getElementById('rushOrder')?.checked,
+                dueDate: document.getElementById('deliveryDate')?.value,
 
                 // Totals
                 totalQuantity: calculateTotalQuantity(),
@@ -2641,6 +2643,16 @@
                 full: selectedItems.beanie,
                 id: selectedItems.beanie?.id,
                 color: selectedItems.beanie?.selectedColor
+            });
+
+            // Log shipping details specifically
+            console.log('Shipping details being submitted:', {
+                deliveryMethod: quoteData.deliveryMethod,
+                address: quoteData.shippingAddress,
+                city: quoteData.shippingCity,
+                state: quoteData.shippingState,
+                zip: quoteData.shippingZip,
+                dueDate: quoteData.dueDate
             });
 
             // Log if any items are missing
@@ -4283,7 +4295,7 @@
                 const addressField = document.getElementById('address1');
                 const cityField = document.getElementById('city');
                 const stateField = document.getElementById('state');
-                const zipField = document.getElementById('zip');
+                const zipField = document.getElementById('zipCode');
 
                 if (addressField) addressField.required = true;
                 if (cityField) cityField.required = true;
@@ -4297,7 +4309,7 @@
                 const addressField = document.getElementById('address1');
                 const cityField = document.getElementById('city');
                 const stateField = document.getElementById('state');
-                const zipField = document.getElementById('zip');
+                const zipField = document.getElementById('zipCode');
 
                 if (addressField) addressField.required = false;
                 if (cityField) cityField.required = false;
