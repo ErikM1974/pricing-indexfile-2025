@@ -8033,7 +8033,7 @@
             const margin = 15;
             let yPos = margin;
 
-            // Company header
+            // Company header - Professional green background
             doc.setFillColor(26, 71, 42); // NWCA Green
             doc.rect(0, 0, pageWidth, 30, 'F');
 
@@ -8046,113 +8046,199 @@
             doc.setFont(undefined, 'normal');
             doc.text('2025 Freeman Road East, Milton, WA 98354 | 253-922-5793', pageWidth / 2, 22, { align: 'center' });
 
-            // Christmas Bundle title with gift emoji representation
-            yPos = 45;
+            // Christmas Bundle title - No emoji
+            yPos = 40;
             doc.setTextColor(220, 38, 38); // Christmas red
-            doc.setFontSize(18);
+            doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('🎁 CHRISTMAS BUNDLE ORDER', pageWidth / 2, yPos, { align: 'center' });
+            doc.text('CHRISTMAS BUNDLE ORDER', pageWidth / 2, yPos, { align: 'center' });
 
-            // Order ID
-            yPos += 10;
+            // Order ID and Date
+            yPos += 8;
             doc.setTextColor(0, 0, 0);
-            doc.setFontSize(14);
+            doc.setFontSize(12);
             doc.text(`Order ID: ${request.QuoteID}`, pageWidth / 2, yPos, { align: 'center' });
+            yPos += 6;
+            doc.setFontSize(10);
+            doc.text(`Date: ${new Date(request.CreatedAt || Date.now()).toLocaleDateString()}`, pageWidth / 2, yPos, { align: 'center' });
 
-            // Rush order banner if applicable
+            // Rush order banner if applicable - No emoji
             if (items[0]?.RushOrder === 'Yes') {
-                yPos += 10;
-                doc.setFillColor(220, 38, 38);
-                doc.rect(margin, yPos - 5, pageWidth - (margin * 2), 10, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'bold');
-                doc.text('⚠️ RUSH ORDER - EXPEDITE PROCESSING ⚠️', pageWidth / 2, yPos + 2, { align: 'center' });
                 yPos += 8;
+                doc.setFillColor(220, 38, 38);
+                doc.rect(margin, yPos - 4, pageWidth - (margin * 2), 8, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text('RUSH ORDER - EXPEDITE PROCESSING', pageWidth / 2, yPos + 1, { align: 'center' });
+                yPos += 6;
             }
 
             // Customer Information Box
-            yPos += 15;
+            yPos += 10;
             doc.setTextColor(0, 0, 0);
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.text('CUSTOMER INFORMATION', margin, yPos);
 
-            yPos += 5;
+            yPos += 4;
             doc.setDrawColor(200, 200, 200);
             doc.setFillColor(249, 250, 251);
-            doc.rect(margin, yPos, pageWidth - (margin * 2), 30, 'FD');
+            doc.rect(margin, yPos, pageWidth - (margin * 2), 22, 'FD');
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
-            yPos += 8;
-            doc.text(`Name: ${request.CustomerName || 'N/A'}`, margin + 5, yPos);
-            doc.text(`Company: ${request.CompanyName || 'N/A'}`, pageWidth / 2, yPos);
-            yPos += 8;
-            doc.text(`Email: ${request.CustomerEmail || 'N/A'}`, margin + 5, yPos);
-            doc.text(`Phone: ${request.Phone || 'N/A'}`, pageWidth / 2, yPos);
+            yPos += 6;
+            const leftCol = margin + 5;
+            const rightCol = pageWidth / 2 + 10;
+
+            doc.text(`Name: ${request.CustomerName || 'N/A'}`, leftCol, yPos);
+            doc.text(`Company: ${request.CompanyName || 'N/A'}`, rightCol, yPos);
+            yPos += 6;
+            doc.text(`Email: ${request.CustomerEmail || 'N/A'}`, leftCol, yPos);
+            doc.text(`Phone: ${request.Phone || 'N/A'}`, rightCol, yPos);
 
             // Bundle Components Table
-            yPos += 20;
-            doc.setFontSize(12);
+            yPos += 14;
+            doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.text('BUNDLE COMPONENTS', margin, yPos);
 
-            yPos += 5;
+            yPos += 4;
             const bundleItems = [];
 
-            // Parse BundleConfiguration JSON to get components
-            let bundleConfig = {};
-            try {
-                if (items[0]?.BundleConfiguration) {
-                    bundleConfig = JSON.parse(items[0].BundleConfiguration);
+            // Parse items more carefully
+            if (items && items.length > 0) {
+                // Look for individual item fields or parse bundle configuration
+                const firstItem = items[0];
+
+                // Try to get items from individual fields first
+                if (firstItem.JacketStyle || firstItem.HoodieStyle || firstItem.BeanieStyle || firstItem.GlovesStyle) {
+                    // Using individual fields
+                    if (firstItem.JacketStyle) {
+                        bundleItems.push([
+                            'Jacket',
+                            firstItem.JacketStyle || '',
+                            firstItem.JacketSize || 'N/A',
+                            '1',
+                            firstItem.JacketColor || ''
+                        ]);
+                    }
+                    if (firstItem.HoodieStyle) {
+                        bundleItems.push([
+                            'Hoodie',
+                            firstItem.HoodieStyle || '',
+                            firstItem.HoodieSize || 'N/A',
+                            '1',
+                            firstItem.HoodieColor || ''
+                        ]);
+                    }
+                    if (firstItem.BeanieStyle) {
+                        bundleItems.push([
+                            'Beanie',
+                            firstItem.BeanieStyle || '',
+                            'OSFA',
+                            '1',
+                            firstItem.BeanieColor || ''
+                        ]);
+                    }
+                    if (firstItem.GlovesStyle) {
+                        bundleItems.push([
+                            'Gloves',
+                            firstItem.GlovesStyle || '',
+                            firstItem.GlovesSize || 'OSFA',
+                            '1',
+                            firstItem.GlovesColor || ''
+                        ]);
+                    }
+                } else {
+                    // Try parsing BundleConfiguration
+                    try {
+                        if (firstItem.BundleConfiguration) {
+                            const bundleConfig = JSON.parse(firstItem.BundleConfiguration);
+
+                            // Parse each item from configuration
+                            if (bundleConfig.jacket) {
+                                const jacketData = bundleConfig.jacket;
+                                bundleItems.push([
+                                    'Jacket',
+                                    jacketData.style || jacketData.id || '',
+                                    jacketData.selectedSize || jacketData.size || 'N/A',
+                                    '1',
+                                    jacketData.selectedColor || jacketData.color || ''
+                                ]);
+                            }
+
+                            if (bundleConfig.hoodie) {
+                                const hoodieData = bundleConfig.hoodie;
+                                bundleItems.push([
+                                    'Hoodie',
+                                    hoodieData.style || hoodieData.id || '',
+                                    hoodieData.selectedSize || hoodieData.size || 'N/A',
+                                    '1',
+                                    hoodieData.selectedColor || hoodieData.color || ''
+                                ]);
+                            }
+
+                            if (bundleConfig.beanie) {
+                                const beanieData = bundleConfig.beanie;
+                                bundleItems.push([
+                                    'Beanie',
+                                    beanieData.style || beanieData.id || '',
+                                    'OSFA',
+                                    '1',
+                                    beanieData.selectedColor || beanieData.color || ''
+                                ]);
+                            }
+
+                            if (bundleConfig.gloves) {
+                                const glovesData = bundleConfig.gloves;
+                                bundleItems.push([
+                                    'Gloves',
+                                    glovesData.style || glovesData.id || '',
+                                    glovesData.selectedSize || 'OSFA',
+                                    '1',
+                                    glovesData.selectedColor || glovesData.color || ''
+                                ]);
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Error parsing BundleConfiguration:', e);
+                    }
                 }
-            } catch (e) {
-                console.log('Error parsing BundleConfiguration for PDF:', e);
+
+                // If still no items, try parsing from Description field
+                if (bundleItems.length === 0 && firstItem.Description) {
+                    // Add a single line for the bundle description
+                    bundleItems.push([
+                        'Gift Bundle',
+                        firstItem.Description || 'Christmas Bundle',
+                        '',
+                        '1',
+                        'See details below'
+                    ]);
+                }
             }
 
-            // Add jacket if present
-            if (bundleConfig.jacket && bundleConfig.jacket.trim()) {
-                const parts = bundleConfig.jacket.split(' - ');
-                const color = parts[2] || 'N/A';
-                bundleItems.push(['🧥 Jacket', parts[0] || '', parts[1] || 'N/A', '1', color]);
-            }
-
-            // Add hoodie if present
-            if (bundleConfig.hoodie && bundleConfig.hoodie.trim()) {
-                const parts = bundleConfig.hoodie.split(' - ');
-                const color = parts[2] || 'N/A';
-                bundleItems.push(['👕 Hoodie', parts[0] || '', parts[1] || 'N/A', '1', color]);
-            }
-
-            // Add beanie if present
-            if (bundleConfig.beanie && bundleConfig.beanie.trim()) {
-                const parts = bundleConfig.beanie.split(' - ');
-                const color = parts[1] || 'N/A';
-                bundleItems.push(['🧢 Beanie', parts[0] || '', 'OSFA', '1', color]);
-            }
-
-            // Add gloves if present
-            if (bundleConfig.gloves && bundleConfig.gloves.trim()) {
-                const parts = bundleConfig.gloves.split(' - ');
-                const color = parts[1] || 'N/A';
-                bundleItems.push(['🧤 Gloves', parts[0] || '', 'OSFA', '1', color]);
-            }
-
+            // Create the items table
             doc.autoTable({
                 startY: yPos,
-                head: [['Item Type', 'Style Number', 'Size', 'Qty', 'Notes']],
-                body: bundleItems,
+                head: [['Item Type', 'Style Number', 'Size', 'Qty', 'Color/Notes']],
+                body: bundleItems.length > 0 ? bundleItems : [['No items found', '', '', '', '']],
                 theme: 'grid',
                 headStyles: {
                     fillColor: [220, 38, 38],
                     textColor: 255,
                     fontStyle: 'bold',
+                    fontSize: 9,
                     halign: 'center'
                 },
+                bodyStyles: {
+                    fontSize: 9
+                },
                 columnStyles: {
-                    0: { fontStyle: 'bold', cellWidth: 30 },
-                    1: { fontStyle: 'bold', cellWidth: 50 },
+                    0: { fontStyle: 'bold', cellWidth: 35 },
+                    1: { cellWidth: 45 },
                     2: { halign: 'center', cellWidth: 20 },
                     3: { halign: 'center', cellWidth: 15 },
                     4: { cellWidth: 'auto' }
@@ -8160,88 +8246,75 @@
                 margin: { left: margin, right: margin }
             });
 
-            yPos = doc.lastAutoTable.finalY + 10;
+            yPos = doc.lastAutoTable.finalY + 8;
 
             // Embroidery Details
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.text('EMBROIDERY DETAILS', margin, yPos);
 
-            yPos += 5;
+            yPos += 4;
             doc.setFillColor(255, 251, 235);
             doc.setDrawColor(251, 191, 36);
-            doc.rect(margin, yPos, pageWidth - (margin * 2), 35, 'FD');
+            doc.rect(margin, yPos, pageWidth - (margin * 2), 28, 'FD');
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
-            yPos += 8;
-            doc.text(`Location: ${items[0]?.EmbroideryLocation || 'Left Chest (Standard)'}`, margin + 5, yPos);
-            yPos += 7;
-            doc.text(`Thread Colors: ${items[0]?.Thread_Colors || 'Customer choice at pickup'}`, margin + 5, yPos);
-            yPos += 7;
-            const logoStatus = items[0]?.Image_Upload ? '✅ Customer logo uploaded' : '❌ No logo - use standard embroidery';
+            yPos += 6;
+
+            // Parse embroidery location
+            const jacketLoc = items[0]?.JacketEmbroideryLocation || 'Right Chest';
+            const hoodieLoc = items[0]?.HoodieEmbroideryLocation || 'Left Chest';
+            doc.text(`Location: Jacket: ${jacketLoc}, Hoodie: ${hoodieLoc}`, margin + 5, yPos);
+
+            yPos += 5;
+            doc.text(`Thread Colors: ${items[0]?.Thread_Colors || items[0]?.ThreadColors || 'Customer choice'}`, margin + 5, yPos);
+
+            yPos += 5;
+            const logoStatus = items[0]?.Image_Upload ? 'Customer logo uploaded' : 'Customer logo uploaded';
             doc.text(`Logo: ${logoStatus}`, margin + 5, yPos);
 
             if (items[0]?.SpecialInstructions) {
-                yPos += 7;
-                doc.text(`Special Instructions: ${items[0].SpecialInstructions}`, margin + 5, yPos);
+                yPos += 5;
+                const instructions = items[0].SpecialInstructions.substring(0, 80);
+                doc.text(`Special Instructions: ${instructions}`, margin + 5, yPos);
             }
 
             // Delivery Information
-            yPos += 15;
-            doc.setFontSize(12);
+            yPos += 12;
+            doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.text('DELIVERY INFORMATION', margin, yPos);
 
-            yPos += 5;
-            const isShipping = items[0]?.DeliveryMethod === 'Ship';
-            doc.setFillColor(...(isShipping ? [219, 234, 254] : [220, 252, 231]));
-            doc.setDrawColor(...(isShipping ? [59, 130, 246] : [34, 197, 94]));
-            doc.rect(margin, yPos, pageWidth - (margin * 2), isShipping ? 35 : 25, 'FD');
+            yPos += 4;
+            const isShipping = items[0]?.DeliveryMethod === 'Ship' || items[0]?.DeliveryType === 'Shipping';
+            doc.setFillColor(isShipping ? 219 : 220, isShipping ? 234 : 252, isShipping ? 254 : 231);
+            doc.setDrawColor(isShipping ? 59 : 34, isShipping ? 130 : 197, isShipping ? 246 : 94);
+            doc.rect(margin, yPos, pageWidth - (margin * 2), isShipping ? 28 : 18, 'FD');
 
-            doc.setFontSize(10);
-            yPos += 8;
+            doc.setFontSize(9);
+            yPos += 6;
             if (isShipping) {
                 doc.setFont(undefined, 'bold');
                 doc.text('SHIP TO CUSTOMER', margin + 5, yPos);
                 doc.setFont(undefined, 'normal');
-                yPos += 7;
-                doc.text(`Address: ${items[0]?.ShippingAddress || 'N/A'}`, margin + 5, yPos);
-                yPos += 7;
-                doc.text(`${items[0]?.ShippingCity || ''}, ${items[0]?.ShippingState || ''} ${items[0]?.ShippingZip || ''}`, margin + 5, yPos);
+                yPos += 5;
+                const address = items[0]?.ShippingAddress || items[0]?.Address1 || 'N/A';
+                const city = items[0]?.ShippingCity || items[0]?.City || '';
+                const state = items[0]?.ShippingState || items[0]?.State || '';
+                const zip = items[0]?.ShippingZip || items[0]?.Zip || '';
+
+                doc.text(`${address}`, margin + 5, yPos);
+                yPos += 5;
+                doc.text(`${city}, ${state} ${zip}`, margin + 5, yPos);
             } else {
                 doc.setFont(undefined, 'bold');
                 doc.text('FACTORY PICKUP', margin + 5, yPos);
                 doc.setFont(undefined, 'normal');
-                yPos += 7;
-                doc.text('Location: 2025 Freeman Road East, Milton, WA 98354', margin + 5, yPos);
-                yPos += 7;
-                doc.text('Hours: 8:30 AM - 4:45 PM', margin + 5, yPos);
-            }
-
-            // Additional Notes
-            if (items[0]?.GiftMessage || items[0]?.EmployeeNames) {
-                yPos += 15;
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'bold');
-                doc.text('ADDITIONAL NOTES', margin, yPos);
-
                 yPos += 5;
-                doc.setFillColor(240, 244, 248);
-                doc.rect(margin, yPos, pageWidth - (margin * 2), 25, 'FD');
-
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'normal');
-                yPos += 8;
-
-                if (items[0]?.GiftMessage) {
-                    doc.text(`Gift Message: ${items[0].GiftMessage}`, margin + 5, yPos, { maxWidth: pageWidth - (margin * 2) - 10 });
-                    yPos += 7;
-                }
-
-                if (items[0]?.EmployeeNames) {
-                    doc.text(`Employee Names: ${items[0].EmployeeNames}`, margin + 5, yPos, { maxWidth: pageWidth - (margin * 2) - 10 });
-                }
+                doc.text('Location: 2025 Freeman Road East, Milton, WA 98354', margin + 5, yPos);
+                yPos += 5;
+                doc.text('Hours: 8:30 AM - 4:45 PM', margin + 5, yPos);
             }
 
             // Footer
