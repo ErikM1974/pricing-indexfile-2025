@@ -8158,48 +8158,98 @@
                             const bundleConfig = JSON.parse(firstItem.BundleConfiguration);
 
                             // Parse each item from configuration
+                            // Items are stored as strings like "CT104670 - 2XL - New Navy"
                             if (bundleConfig.jacket) {
-                                const jacketData = bundleConfig.jacket;
-                                bundleItems.push([
-                                    'Jacket',
-                                    jacketData.style || jacketData.id || '',
-                                    jacketData.selectedSize || jacketData.size || 'N/A',
-                                    '1',
-                                    jacketData.selectedColor || jacketData.color || ''
-                                ]);
+                                if (typeof bundleConfig.jacket === 'string' && bundleConfig.jacket.trim()) {
+                                    const parts = bundleConfig.jacket.split(' - ');
+                                    bundleItems.push([
+                                        'Jacket',
+                                        parts[0] || '',  // Style number
+                                        parts[1] || 'N/A',  // Size
+                                        '1',
+                                        parts[2] || ''  // Color
+                                    ]);
+                                } else if (typeof bundleConfig.jacket === 'object') {
+                                    // Fallback for object format if it exists
+                                    const jacketData = bundleConfig.jacket;
+                                    bundleItems.push([
+                                        'Jacket',
+                                        jacketData.style || jacketData.id || '',
+                                        jacketData.selectedSize || jacketData.size || 'N/A',
+                                        '1',
+                                        jacketData.selectedColor || jacketData.color || ''
+                                    ]);
+                                }
                             }
 
                             if (bundleConfig.hoodie) {
-                                const hoodieData = bundleConfig.hoodie;
-                                bundleItems.push([
-                                    'Hoodie',
-                                    hoodieData.style || hoodieData.id || '',
-                                    hoodieData.selectedSize || hoodieData.size || 'N/A',
-                                    '1',
-                                    hoodieData.selectedColor || hoodieData.color || ''
-                                ]);
+                                if (typeof bundleConfig.hoodie === 'string' && bundleConfig.hoodie.trim()) {
+                                    const parts = bundleConfig.hoodie.split(' - ');
+                                    bundleItems.push([
+                                        'Hoodie',
+                                        parts[0] || '',  // Style number
+                                        parts[1] || 'N/A',  // Size
+                                        '1',
+                                        parts[2] || ''  // Color
+                                    ]);
+                                } else if (typeof bundleConfig.hoodie === 'object') {
+                                    // Fallback for object format if it exists
+                                    const hoodieData = bundleConfig.hoodie;
+                                    bundleItems.push([
+                                        'Hoodie',
+                                        hoodieData.style || hoodieData.id || '',
+                                        hoodieData.selectedSize || hoodieData.size || 'N/A',
+                                        '1',
+                                        hoodieData.selectedColor || hoodieData.color || ''
+                                    ]);
+                                }
                             }
 
                             if (bundleConfig.beanie) {
-                                const beanieData = bundleConfig.beanie;
-                                bundleItems.push([
-                                    'Beanie',
-                                    beanieData.style || beanieData.id || '',
-                                    'OSFA',
-                                    '1',
-                                    beanieData.selectedColor || beanieData.color || ''
-                                ]);
+                                if (typeof bundleConfig.beanie === 'string' && bundleConfig.beanie.trim()) {
+                                    const parts = bundleConfig.beanie.split(' - ');
+                                    bundleItems.push([
+                                        'Beanie',
+                                        parts[0] || '',  // Style number
+                                        'OSFA',
+                                        '1',
+                                        parts[1] || ''  // Color (beanie has no size, just style - color)
+                                    ]);
+                                } else if (typeof bundleConfig.beanie === 'object') {
+                                    // Fallback for object format if it exists
+                                    const beanieData = bundleConfig.beanie;
+                                    bundleItems.push([
+                                        'Beanie',
+                                        beanieData.style || beanieData.id || '',
+                                        'OSFA',
+                                        '1',
+                                        beanieData.selectedColor || beanieData.color || ''
+                                    ]);
+                                }
                             }
 
                             if (bundleConfig.gloves) {
-                                const glovesData = bundleConfig.gloves;
-                                bundleItems.push([
-                                    'Gloves',
-                                    glovesData.style || glovesData.id || '',
-                                    glovesData.selectedSize || 'OSFA',
-                                    '1',
-                                    glovesData.selectedColor || glovesData.color || ''
-                                ]);
+                                if (typeof bundleConfig.gloves === 'string' && bundleConfig.gloves.trim()) {
+                                    const parts = bundleConfig.gloves.split(' - ');
+                                    // Gloves might be "CTGD0794 - XL" or similar
+                                    bundleItems.push([
+                                        'Gloves',
+                                        parts[0] || '',  // Style number
+                                        parts[1] || 'OSFA',  // Size or OSFA
+                                        '1',
+                                        parts[2] || parts[1] || ''  // Color if exists, or size info
+                                    ]);
+                                } else if (typeof bundleConfig.gloves === 'object') {
+                                    // Fallback for object format if it exists
+                                    const glovesData = bundleConfig.gloves;
+                                    bundleItems.push([
+                                        'Gloves',
+                                        glovesData.style || glovesData.id || '',
+                                        glovesData.selectedSize || 'OSFA',
+                                        '1',
+                                        glovesData.selectedColor || glovesData.color || ''
+                                    ]);
+                                }
                             }
                         }
                     } catch (e) {
