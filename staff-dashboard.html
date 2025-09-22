@@ -4005,6 +4005,15 @@
                                     <option value="Cancelled">Cancelled</option>
                                     <option value="Archived">Archived</option>
                                 </select>
+                                <select id="salesRepFilter" onchange="filterSampleRequests()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                                    <option value="">All Sales Reps</option>
+                                    <option value="unassigned">Unassigned</option>
+                                    <option value="Nika">Nika</option>
+                                    <option value="Taneisha">Taneisha</option>
+                                    <option value="Ruth">Ruth</option>
+                                    <option value="Erik">Erik</option>
+                                    <option value="Adriyella">Adriyella</option>
+                                </select>
                                 <input type="date" id="sampleDateFrom" onchange="filterSampleRequests()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
                                 <input type="date" id="sampleDateTo" onchange="filterSampleRequests()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
                             </div>
@@ -4023,12 +4032,13 @@
                                         <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Total</th>
                                         <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Delivery</th>
                                         <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Status</th>
+                                        <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Sales Rep</th>
                                         <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sampleRequestsBody">
                                     <tr>
-                                        <td colspan="9" style="padding: 2rem; text-align: center; color: #6b7280;">
+                                        <td colspan="10" style="padding: 2rem; text-align: center; color: #6b7280;">
                                             <i class="fas fa-spinner fa-spin"></i> Loading sample requests...
                                         </td>
                                     </tr>
@@ -7196,7 +7206,7 @@
                 console.error('Error loading sample requests:', error);
                 document.getElementById('sampleRequestsBody').innerHTML = `
                     <tr>
-                        <td colspan="9" style="padding: 2rem; text-align: center; color: #dc2626;">
+                        <td colspan="10" style="padding: 2rem; text-align: center; color: #dc2626;">
                             <i class="fas fa-exclamation-triangle"></i> Error loading sample requests
                         </td>
                     </tr>
@@ -7210,7 +7220,7 @@
             if (requests.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" style="padding: 2rem; text-align: center; color: #6b7280;">
+                        <td colspan="10" style="padding: 2rem; text-align: center; color: #6b7280;">
                             No sample requests found
                         </td>
                     </tr>
@@ -7248,6 +7258,19 @@
                             </span>
                         </td>
                         <td style="padding: 0.75rem;">${statusBadge}</td>
+                        <td style="padding: 0.75rem;">
+                            <select
+                                id="salesRep_${request.QuoteID}"
+                                onchange="updateSalesRep('${request.QuoteID}', this.value)"
+                                style="padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; background: ${request.SalesRep ? '#f0fdf4' : '#fafafa'};">
+                                <option value="">Unassigned</option>
+                                <option value="Nika" ${request.SalesRep === 'Nika' ? 'selected' : ''}>Nika</option>
+                                <option value="Taneisha" ${request.SalesRep === 'Taneisha' ? 'selected' : ''}>Taneisha</option>
+                                <option value="Ruth" ${request.SalesRep === 'Ruth' ? 'selected' : ''}>Ruth</option>
+                                <option value="Erik" ${request.SalesRep === 'Erik' ? 'selected' : ''}>Erik</option>
+                                <option value="Adriyella" ${request.SalesRep === 'Adriyella' ? 'selected' : ''}>Adriyella</option>
+                            </select>
+                        </td>
                         <td style="padding: 0.75rem;">
                             <button onclick="viewSampleDetails('${request.QuoteID}')" class="quick-btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                 <i class="fas fa-eye"></i> View
@@ -8441,6 +8464,98 @@
             }
         }
 
+        // Update Sales Rep for a sample request
+        async function updateSalesRep(quoteID, salesRep) {
+            const selectElement = document.getElementById(`salesRep_${quoteID}`);
+            const originalValue = selectElement.value;
+            const originalBg = selectElement.style.background;
+
+            // Show loading state
+            selectElement.style.background = '#fef3c7'; // Yellow loading color
+            selectElement.disabled = true;
+
+            try {
+                // Find the request to get the PK_ID
+                const request = currentSampleRequests.find(r => r.QuoteID === quoteID);
+                if (!request || !request.PK_ID) {
+                    throw new Error('Request not found');
+                }
+
+                // Update via API - first update the session
+                const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${request.PK_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        SalesRep: salesRep || null
+                    })
+                });
+
+                if (!sessionResponse.ok) {
+                    throw new Error('Failed to update sales rep in session');
+                }
+
+                // Also update all quote items for this quote
+                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
+                if (itemsResponse.ok) {
+                    const items = await itemsResponse.json();
+
+                    // Update each item with the sales rep
+                    for (const item of items) {
+                        await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items/${item.PK_ID}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                SalesRep: salesRep || null
+                            })
+                        });
+                    }
+                }
+
+                // Update local data
+                request.SalesRep = salesRep;
+
+                // Show success state
+                selectElement.style.background = salesRep ? '#f0fdf4' : '#fafafa'; // Green if assigned, gray if unassigned
+                selectElement.disabled = false;
+
+                // Show success feedback
+                const successMsg = document.createElement('span');
+                successMsg.style.cssText = 'position: absolute; margin-left: 10px; color: #10b981; font-size: 12px;';
+                successMsg.innerHTML = '<i class="fas fa-check"></i> Saved';
+                selectElement.parentElement.appendChild(successMsg);
+
+                setTimeout(() => {
+                    if (successMsg.parentElement) {
+                        successMsg.remove();
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error updating sales rep:', error);
+
+                // Restore original value on error
+                selectElement.value = originalValue;
+                selectElement.style.background = originalBg;
+                selectElement.disabled = false;
+
+                // Show error feedback
+                const errorMsg = document.createElement('span');
+                errorMsg.style.cssText = 'position: absolute; margin-left: 10px; color: #dc2626; font-size: 12px;';
+                errorMsg.innerHTML = '<i class="fas fa-times"></i> Failed';
+                selectElement.parentElement.appendChild(errorMsg);
+
+                setTimeout(() => {
+                    if (errorMsg.parentElement) {
+                        errorMsg.remove();
+                    }
+                }, 3000);
+            }
+        }
+
         async function markAsProcessed() {
             if (!currentRequestID) return;
             
@@ -8524,23 +8639,34 @@
         async function filterSampleRequests() {
             const searchText = document.getElementById('sampleSearchInput').value.toLowerCase();
             const statusFilter = document.getElementById('sampleStatusFilter').value;
+            const salesRepFilter = document.getElementById('salesRepFilter').value;
             const dateFrom = document.getElementById('sampleDateFrom').value;
             const dateTo = document.getElementById('sampleDateTo').value;
-            
+
             // Reload data when status filter changes (server-side filtering)
             await loadSampleRequests();
-            
+
             let filtered = currentSampleRequests;
-            
+
             // Text search (client-side filtering)
             if (searchText) {
-                filtered = filtered.filter(r => 
+                filtered = filtered.filter(r =>
                     r.QuoteID.toLowerCase().includes(searchText) ||
                     (r.CustomerName && r.CustomerName.toLowerCase().includes(searchText)) ||
-                    (r.CustomerEmail && r.CustomerEmail.toLowerCase().includes(searchText))
+                    (r.CustomerEmail && r.CustomerEmail.toLowerCase().includes(searchText)) ||
+                    (r.SalesRep && r.SalesRep.toLowerCase().includes(searchText))
                 );
             }
-            
+
+            // Sales rep filter
+            if (salesRepFilter) {
+                if (salesRepFilter === 'unassigned') {
+                    filtered = filtered.filter(r => !r.SalesRep || r.SalesRep === '');
+                } else {
+                    filtered = filtered.filter(r => r.SalesRep === salesRepFilter);
+                }
+            }
+
             // Date filters (client-side filtering)
             if (dateFrom) {
                 filtered = filtered.filter(r => new Date(r.CreatedAt) >= new Date(dateFrom));
@@ -8550,7 +8676,7 @@
                 endDate.setHours(23, 59, 59, 999);
                 filtered = filtered.filter(r => new Date(r.CreatedAt) <= endDate);
             }
-            
+
             renderSampleRequests(filtered);
         }
         
