@@ -2872,14 +2872,34 @@
         }
 
         function calculateTotalPrice() {
-            // This would calculate actual prices based on products
-            // For now, using placeholder
-            return calculateTotalQuantity() * 50.00;
+            // Calculate the actual retail value of the bundle
+            let total = 0;
+
+            // Use the global selectedItems object which contains the actual selected products
+            if (selectedItems.jacket && selectedItems.jacket.retailPrice) {
+                total += selectedItems.jacket.retailPrice;
+            }
+            if (selectedItems.hoodie && selectedItems.hoodie.retailPrice) {
+                total += selectedItems.hoodie.retailPrice;
+            }
+            if (selectedItems.beanie && selectedItems.beanie.retailPrice) {
+                total += selectedItems.beanie.retailPrice;
+            }
+            if (selectedItems.gloves && selectedItems.gloves.retailPrice) {
+                total += selectedItems.gloves.retailPrice;
+            }
+
+            // Add gift box and shipping (from RETAIL_PRICES)
+            total += RETAIL_PRICES.giftBox || 9;   // Gift box
+            total += RETAIL_PRICES.shipping || 25; // Shipping
+
+            // Return the total retail value
+            return total;
         }
 
         function calculateUnitPrice() {
-            const total = calculateTotalQuantity();
-            return total > 0 ? calculateTotalPrice() / total : 0;
+            // For a bundle, return the full bundle value
+            return calculateTotalPrice();
         }
 
         function generateBundleDescription() {
@@ -4259,9 +4279,41 @@
             const selectedColor = selectedColorElement?.dataset.color;
             const selectedColorCode = selectedColorElement?.dataset.colorCode;
 
+            // Check if color is required but not selected
+            const hasColorOptions = card.querySelector('.color-swatches');
+            if (hasColorOptions && !selectedColor) {
+                // Clear any previous selection of this type
+                selectedItems[type] = null;
+
+                // Provide clear feedback to user
+                alert(`Please select a color for the ${type} before clicking Select`);
+                console.log(`${type} requires color but none selected - NOT saving selection`);
+
+                // Highlight the color selection area
+                const colorSwatches = card.querySelector('.color-swatches');
+                if (colorSwatches) {
+                    colorSwatches.style.border = '2px solid red';
+                    colorSwatches.style.borderRadius = '4px';
+                    colorSwatches.style.padding = '4px';
+                    setTimeout(() => {
+                        colorSwatches.style.border = '';
+                        colorSwatches.style.padding = '';
+                    }, 3000);
+                }
+
+                // Remove selected class since selection is incomplete
+                card.classList.remove('selected');
+                updateContinueButtons();
+                updateGiftBoxDisplay();
+                return;
+            }
+
             // Check if size is required but not selected
             const hasSizeOptions = card.querySelector('.size-grid');
             if (hasSizeOptions && !selectedSize) {
+                // Clear any previous selection of this type
+                selectedItems[type] = null;
+
                 // Provide clear feedback to user
                 alert(`Please select a size for the ${type} before clicking Select`);
                 console.log(`${type} requires size but none selected - NOT saving selection`);
@@ -4278,8 +4330,10 @@
                     }, 3000);
                 }
 
-                // Keep the card visually selected but don't enable continue
+                // Remove selected class since selection is incomplete
+                card.classList.remove('selected');
                 updateContinueButtons();
+                updateGiftBoxDisplay();
                 return;
             }
 
@@ -4460,7 +4514,56 @@
             // If trying to go forward to unvisited step, do nothing (cursor: not-allowed will show)
         }
 
+        // Validate current step selections
+        function validateCurrentStep() {
+            switch(currentStep) {
+                case 1: // Jacket step
+                    if (!selectedItems.jacket) return false;
+                    return selectedItems.jacket.selectedColor && selectedItems.jacket.selectedSize;
+
+                case 2: // Hoodie step (can be skipped)
+                    if (!selectedItems.hoodie) return true; // Allow skipping
+                    return selectedItems.hoodie.selectedColor && selectedItems.hoodie.selectedSize;
+
+                case 3: // Beanie step
+                    if (!selectedItems.beanie) return false;
+                    // Beanies usually have OSFA, so just check color
+                    return selectedItems.beanie.selectedColor;
+
+                case 4: // Gloves step (can be skipped)
+                    if (!selectedItems.gloves) return true; // Allow skipping
+                    return selectedItems.gloves.selectedSize;
+
+                default:
+                    return true; // Other steps don't require product validation
+            }
+        }
+
         function nextStep() {
+            // Validate current step before advancing
+            if (!validateCurrentStep()) {
+                // Determine what's missing for specific feedback
+                let missingInfo = '';
+                if (currentStep === 1 && selectedItems.jacket) {
+                    if (!selectedItems.jacket.selectedColor) missingInfo = 'Please select a color for your jacket.';
+                    else if (!selectedItems.jacket.selectedSize) missingInfo = 'Please select a size for your jacket.';
+                } else if (currentStep === 1) {
+                    missingInfo = 'Please select a jacket to continue.';
+                } else if (currentStep === 2 && selectedItems.hoodie) {
+                    if (!selectedItems.hoodie.selectedColor) missingInfo = 'Please select a color for your hoodie.';
+                    else if (!selectedItems.hoodie.selectedSize) missingInfo = 'Please select a size for your hoodie.';
+                } else if (currentStep === 3 && selectedItems.beanie) {
+                    if (!selectedItems.beanie.selectedColor) missingInfo = 'Please select a color for your beanie.';
+                } else if (currentStep === 3) {
+                    missingInfo = 'Please select a beanie to continue.';
+                } else if (currentStep === 4 && selectedItems.gloves) {
+                    if (!selectedItems.gloves.selectedSize) missingInfo = 'Please select a size for your gloves.';
+                }
+
+                alert(missingInfo || 'Please complete your selection before continuing.');
+                return;
+            }
+
             if (currentStep < 6) {
                 // Hide current step
                 document.getElementById(`step${currentStep}`).classList.remove('active');
@@ -4509,6 +4612,13 @@
                 const card = document.querySelector(`[data-product-id="${productId}"]`);
                 if (!card) return false;
 
+                // Check if color is selected (if color options exist)
+                const hasColorOptions = card.querySelector('.color-swatches');
+                if (hasColorOptions) {
+                    const selectedColor = card.querySelector('.color-swatch.selected');
+                    if (!selectedColor) return false;
+                }
+
                 // Check if size is selected (if size options exist)
                 const hasSizeOptions = card.querySelector('.size-grid');
                 if (hasSizeOptions) {
@@ -4519,32 +4629,52 @@
                 return true;
             }
 
-            // Update jacket continue button
-            if (selectedItems.jacket && isProductComplete(selectedItems.jacket.id, 'jacket')) {
+            // Update jacket continue button - check for required fields
+            if (selectedItems.jacket &&
+                selectedItems.jacket.selectedColor &&
+                selectedItems.jacket.selectedSize &&
+                isProductComplete(selectedItems.jacket.id, 'jacket')) {
                 document.getElementById('jacketNext')?.removeAttribute('disabled');
             } else {
                 document.getElementById('jacketNext')?.setAttribute('disabled', 'disabled');
             }
 
-            // Update hoodie continue button
-            if (selectedItems.hoodie && isProductComplete(selectedItems.hoodie.id, 'hoodie')) {
+            // Update hoodie continue button - check for required fields
+            if (selectedItems.hoodie &&
+                selectedItems.hoodie.selectedColor &&
+                selectedItems.hoodie.selectedSize &&
+                isProductComplete(selectedItems.hoodie.id, 'hoodie')) {
                 document.getElementById('hoodieNext')?.removeAttribute('disabled');
             } else {
-                document.getElementById('hoodieNext')?.setAttribute('disabled', 'disabled');
+                // Hoodie can be skipped, so enable if no selection
+                if (!selectedItems.hoodie) {
+                    document.getElementById('hoodieNext')?.removeAttribute('disabled');
+                } else {
+                    document.getElementById('hoodieNext')?.setAttribute('disabled', 'disabled');
+                }
             }
 
-            // Update beanie continue button
-            if (selectedItems.beanie && isProductComplete(selectedItems.beanie.id, 'beanie')) {
+            // Update beanie continue button - check for required fields
+            if (selectedItems.beanie &&
+                selectedItems.beanie.selectedColor &&
+                isProductComplete(selectedItems.beanie.id, 'beanie')) {
                 document.getElementById('beanieNext')?.removeAttribute('disabled');
             } else {
                 document.getElementById('beanieNext')?.setAttribute('disabled', 'disabled');
             }
 
-            // Update gloves continue button
-            if (selectedItems.gloves && isProductComplete(selectedItems.gloves.id, 'gloves')) {
+            // Update gloves continue button - check for required fields
+            if (selectedItems.gloves &&
+                selectedItems.gloves.selectedSize &&
+                isProductComplete(selectedItems.gloves.id, 'gloves')) {
                 document.getElementById('glovesNext')?.removeAttribute('disabled');
             } else {
-                document.getElementById('glovesNext')?.setAttribute('disabled', 'disabled');
+                // Gloves can be skipped, so enable if no selection
+                if (!selectedItems.gloves) {
+                    document.getElementById('glovesNext')?.removeAttribute('disabled');
+                } else {
+                    document.getElementById('glovesNext')?.setAttribute('disabled', 'disabled');
+                }
             }
         }
 
