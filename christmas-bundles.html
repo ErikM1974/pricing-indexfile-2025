@@ -151,15 +151,83 @@
             }
         }
 
+        /* Contact Bar */
+        .contact-bar {
+            background: #1a472a;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .contact-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item i {
+            color: #4caf50;
+        }
+
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-item a:hover {
+            color: #4caf50;
+        }
+
         /* Header */
         .header {
             background: linear-gradient(135deg, #1a472a 0%, #2e7d32 100%);
             color: white;
-            padding: 30px 0;
-            text-align: center;
+            padding: 20px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             position: relative;
             z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .header-logo {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .header-text {
+            text-align: center;
+            flex: 1;
         }
 
         .header h1 {
@@ -179,6 +247,67 @@
             font-size: 28px;
             margin: 0 15px;
             animation: bounce 2s infinite;
+        }
+
+        /* Deadline Banner */
+        .deadline-banner {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: #1a472a;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(255,152,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deadline-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .deadline-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .deadline-icon {
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .deadline-text {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .deadline-date {
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 20px;
         }
 
         @keyframes bounce {
@@ -1391,8 +1520,54 @@
         }
 
         @media (max-width: 768px) {
+            /* Contact Bar Mobile */
+            .contact-bar-content {
+                flex-direction: column;
+                gap: 8px;
+                padding: 8px 15px;
+            }
+
+            .contact-item {
+                font-size: 13px;
+            }
+
+            /* Header Mobile */
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .header-logo img {
+                height: 50px;
+            }
+
             .header h1 {
-                font-size: 28px;
+                font-size: 24px;
+            }
+
+            .header .subtitle {
+                font-size: 16px;
+            }
+
+            /* Deadline Banner Mobile */
+            .deadline-banner {
+                padding: 12px 15px;
+            }
+
+            .deadline-content {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .deadline-text {
+                font-size: 14px;
+            }
+
+            .deadline-date {
+                font-size: 16px;
+                display: block;
+                margin: 5px 0;
             }
 
             .progress-steps {
@@ -1915,13 +2090,49 @@
     <div class="snow-overlay" id="snowOverlay"></div>
 
     <!-- Header -->
+    <!-- Contact Bar -->
+    <div class="contact-bar">
+        <div class="contact-bar-content">
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <a href="tel:253-922-5793">253-922-5793</a>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header with Logo -->
     <div class="header">
-        <h1>
-            <span class="christmas-icons">🎄</span>
-            Christmas Gift Box Builder
-            <span class="christmas-icons">🎁</span>
-        </h1>
-        <p class="subtitle">Create your custom holiday gift box - FREE with logo embroidery!</p>
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel">
+            </div>
+            <div class="header-text">
+                <h1>
+                    <span class="christmas-icons">🎄</span>
+                    Christmas Gift Box Builder
+                    <span class="christmas-icons">🎁</span>
+                </h1>
+                <p class="subtitle">Create your custom holiday gift box - FREE with logo embroidery!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deadline Banner -->
+    <div class="deadline-banner">
+        <div class="deadline-content">
+            <span class="deadline-icon">⏰</span>
+            <span class="deadline-text">
+                Special Free Bundle Deal Ends
+                <span class="deadline-date">OCTOBER 1ST, 2025</span>
+                - Place Your Bundle Order Today!
+            </span>
+            <span class="deadline-icon">🎁</span>
+        </div>
     </div>
 
     <!-- Dynamic Value Summary Banner -->
