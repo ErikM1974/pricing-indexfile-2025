@@ -7149,8 +7149,14 @@
 
                 const data = await response.json();
 
-                // For Christmas bundles, fetch items to get delivery method
+                // Map SalesRepName to SalesRep for consistency with UI
                 for (let request of data) {
+                    // Map SalesRepName to SalesRep for backward compatibility with UI code
+                    if (request.SalesRepName !== undefined) {
+                        request.SalesRep = request.SalesRepName;
+                    }
+
+                    // For Christmas bundles, fetch items to get delivery method
                     if (request.QuoteID && request.QuoteID.startsWith('XMAS')) {
                         try {
                             const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(request.QuoteID)}`);
@@ -8372,10 +8378,10 @@
                 doc.text('SHIP TO CUSTOMER', margin + 5, yPos);
                 doc.setFont(undefined, 'normal');
                 yPos += 5;
-                const address = items[0]?.ShippingAddress || items[0]?.Address1 || 'N/A';
-                const city = items[0]?.ShippingCity || items[0]?.City || '';
-                const state = items[0]?.ShippingState || items[0]?.State || '';
-                const zip = items[0]?.ShippingZip || items[0]?.Zip || '';
+                const address = items[0]?.Shipping_Address || items[0]?.Address1 || 'N/A';
+                const city = items[0]?.Shipping_City || items[0]?.City || '';
+                const state = items[0]?.Shipping_State || items[0]?.State || '';
+                const zip = items[0]?.Shipping_Zip || items[0]?.Zip || '';
 
                 doc.text(`${address}`, margin + 5, yPos);
                 yPos += 5;
@@ -8481,14 +8487,14 @@
                     throw new Error('Request not found');
                 }
 
-                // Update via API - first update the session
+                // Update via API - first update the session (use SalesRepName for quote_sessions table)
                 const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${request.PK_ID}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        SalesRep: salesRep || null
+                        SalesRepName: salesRep || null
                     })
                 });
 
@@ -8515,8 +8521,9 @@
                     }
                 }
 
-                // Update local data
+                // Update local data (both fields for consistency)
                 request.SalesRep = salesRep;
+                request.SalesRepName = salesRep;
 
                 // Show success state
                 selectElement.style.background = salesRep ? '#f0fdf4' : '#fafafa'; // Green if assigned, gray if unassigned
