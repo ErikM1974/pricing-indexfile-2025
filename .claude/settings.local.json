@@ -102,7 +102,9 @@
       "Bash(wsl.exe:*)",
       "WebFetch(domain:www.sanmar.com)",
       "Bash(awk:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(for id in 810 811 812 813 814)",
+      "Bash(do)"
     ],
     "deny": [],
     "ask": [],
