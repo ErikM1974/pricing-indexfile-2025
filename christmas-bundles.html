@@ -1994,6 +1994,10 @@
                 <div class="step-number">6</div>
                 <div class="step-title">Delivery Info</div>
             </div>
+            <div class="step" data-step="7" onclick="goToStep(7)">
+                <div class="step-number">7</div>
+                <div class="step-title">Review</div>
+            </div>
         </div>
     </div>
 
@@ -2328,10 +2332,78 @@
                         <i class="fas fa-arrow-left"></i>
                         Back
                     </button>
+                    <button id="reviewBtn" class="nav-btn nav-btn-primary" onclick="nextStep()" style="background: linear-gradient(135deg, #16a34a, #059669); padding: 20px 40px; font-size: 20px; font-weight: 700;">
+                        Review Order
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 7: Review & Confirm -->
+            <div class="section" id="step7">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        Review Your Christmas Bundle Order
+                    </h2>
+                    <p class="section-subtitle">Please review all details before submitting</p>
+                </div>
+
+                <!-- Order Review Container -->
+                <div class="review-container" style="background: #f8f9fa; border-radius: 12px; padding: 30px; margin-top: 20px;">
+
+                    <!-- Selected Items Review -->
+                    <div class="review-section" style="margin-bottom: 30px;">
+                        <h3 style="color: #16a34a; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #16a34a; padding-bottom: 10px;">
+                            <i class="fas fa-gift"></i> Your Selected Items
+                        </h3>
+                        <div id="reviewItems" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <!-- Items will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Customization Review -->
+                    <div class="review-section" style="margin-bottom: 30px;">
+                        <h3 style="color: #0284c7; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #0284c7; padding-bottom: 10px;">
+                            <i class="fas fa-palette"></i> Customization Details
+                        </h3>
+                        <div id="reviewCustomization" style="background: white; padding: 20px; border-radius: 8px;">
+                            <!-- Customization details will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Delivery Review -->
+                    <div class="review-section" style="margin-bottom: 30px;">
+                        <h3 style="color: #dc2626; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">
+                            <i class="fas fa-truck"></i> Delivery Information
+                        </h3>
+                        <div id="reviewDelivery" style="background: white; padding: 20px; border-radius: 8px;">
+                            <!-- Delivery details will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Important Notice -->
+                    <div style="background: #fef3c7; border: 2px solid #facc15; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: center;">
+                        <h4 style="color: #a16207; margin: 0 0 10px 0;">
+                            <i class="fas fa-exclamation-triangle"></i> Important Reminder
+                        </h4>
+                        <p style="color: #854d0e; margin: 0; font-size: 16px;">
+                            This is a FREE sample gift box. To order for your employees, please place your order by
+                            <strong style="color: #dc2626;">October 20, 2025</strong> for holiday delivery.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Edit
+                    </button>
                     <button id="submitBtn" class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder(this)" style="background: linear-gradient(135deg, #ff9800, #f57c00); padding: 20px 40px; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);">
                         <i class="fas fa-check-circle"></i>
-                        Submit Order
-                        <i class="fas fa-arrow-right"></i>
+                        Confirm & Submit Order
+                        <i class="fas fa-gift"></i>
                     </button>
                 </div>
             </div>
@@ -3039,6 +3111,146 @@
             if (selectedItems.beanie) items.push(`Beanie: ${selectedItems.beanie.id}`);
             if (selectedItems.gloves) items.push(`Gloves: ${selectedItems.gloves.id}`);
             return items.join(', ') || 'Christmas Gift Box';
+        }
+
+        // Populate Review Data for Step 7
+        function populateReviewData() {
+            // Populate Selected Items
+            const reviewItemsDiv = document.getElementById('reviewItems');
+            reviewItemsDiv.innerHTML = '';
+
+            const itemTypes = [
+                { key: 'jacket', label: 'Jacket', icon: '🧥' },
+                { key: 'hoodie', label: 'Hoodie', icon: '👔' },
+                { key: 'beanie', label: 'Beanie', icon: '🧢' },
+                { key: 'gloves', label: 'Gloves', icon: '🧤' }
+            ];
+
+            itemTypes.forEach(type => {
+                const item = selectedItems[type.key];
+                if (item) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.cssText = 'background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;';
+                    itemDiv.innerHTML = `
+                        <h4 style="color: #16a34a; margin: 0 0 10px 0;">${type.icon} ${type.label}</h4>
+                        <p style="margin: 5px 0; color: #333;"><strong>Style:</strong> ${item.name || 'Not specified'}</p>
+                        <p style="margin: 5px 0; color: #333;"><strong>Color:</strong> ${item.selectedColor || 'Not selected'}</p>
+                        <p style="margin: 5px 0; color: #333;"><strong>Size:</strong> ${item.selectedSize || 'Not selected'}</p>
+                    `;
+                    reviewItemsDiv.appendChild(itemDiv);
+                } else {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.cssText = 'background: #f3f4f6; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;';
+                    itemDiv.innerHTML = `
+                        <h4 style="color: #9ca3af; margin: 0;">${type.icon} ${type.label}: Not Selected</h4>
+                    `;
+                    reviewItemsDiv.appendChild(itemDiv);
+                }
+            });
+
+            // Populate Customization Details
+            const reviewCustomDiv = document.getElementById('reviewCustomization');
+            const logoFile = document.getElementById('logoFile').files[0];
+            const jacketLoc = document.getElementById('jacketEmbLocation')?.value || 'Standard';
+            const hoodieLoc = document.getElementById('hoodieEmbLocation')?.value || 'Standard';
+            const threadColor1 = document.getElementById('threadColor1')?.value || 'Not selected';
+            const threadColor2 = document.getElementById('threadColor2')?.value || 'Not selected';
+            const threadColor3 = document.getElementById('threadColor3')?.value || 'Not selected';
+            const customText = document.getElementById('customText')?.value || 'None';
+            const specialInstructions = document.getElementById('specialInstructions')?.value || 'None';
+
+            reviewCustomDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <strong style="color: #666;">Company Logo:</strong>
+                        <p style="margin: 5px 0; color: #333;">${logoFile ? logoFile.name : 'No logo uploaded'}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Thread Colors:</strong>
+                        <p style="margin: 5px 0; color: #333;">
+                            1: ${threadColor1}<br>
+                            2: ${threadColor2}<br>
+                            3: ${threadColor3}
+                        </p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Jacket Embroidery:</strong>
+                        <p style="margin: 5px 0; color: #333;">${jacketLoc}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Hoodie Embroidery:</strong>
+                        <p style="margin: 5px 0; color: #333;">${hoodieLoc}</p>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <strong style="color: #666;">Custom Text:</strong>
+                        <p style="margin: 5px 0; color: #333;">${customText}</p>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <strong style="color: #666;">Special Instructions:</strong>
+                        <p style="margin: 5px 0; color: #333;">${specialInstructions}</p>
+                    </div>
+                </div>
+            `;
+
+            // Populate Delivery Information
+            const reviewDeliveryDiv = document.getElementById('reviewDelivery');
+            const firstName = document.getElementById('firstName').value || '';
+            const lastName = document.getElementById('lastName').value || '';
+            const company = document.getElementById('companyName').value || '';
+            const email = document.getElementById('email').value || '';
+            const phone = document.getElementById('phone').value || '';
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'Not selected';
+            const deliveryDate = document.getElementById('deliveryDate')?.value || 'Not specified';
+
+            let deliveryHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <strong style="color: #666;">Name:</strong>
+                        <p style="margin: 5px 0; color: #333;">${firstName} ${lastName}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Company:</strong>
+                        <p style="margin: 5px 0; color: #333;">${company || 'Not provided'}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Email:</strong>
+                        <p style="margin: 5px 0; color: #333;">${email}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Phone:</strong>
+                        <p style="margin: 5px 0; color: #333;">${phone}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Delivery Method:</strong>
+                        <p style="margin: 5px 0; color: #333;">${deliveryMethod}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666;">Preferred Date:</strong>
+                        <p style="margin: 5px 0; color: #333;">${deliveryDate}</p>
+                    </div>
+            `;
+
+            if (deliveryMethod === 'Ship') {
+                const address1 = document.getElementById('address1')?.value || '';
+                const address2 = document.getElementById('address2')?.value || '';
+                const city = document.getElementById('city')?.value || '';
+                const state = document.getElementById('state')?.value || '';
+                const zip = document.getElementById('zipCode')?.value || '';
+
+                deliveryHTML += `
+                    <div style="grid-column: span 2;">
+                        <strong style="color: #666;">Shipping Address:</strong>
+                        <p style="margin: 5px 0; color: #333;">
+                            ${address1}<br>
+                            ${address2 ? address2 + '<br>' : ''}
+                            ${city}, ${state} ${zip}
+                        </p>
+                    </div>
+                `;
+            }
+
+            deliveryHTML += '</div>';
+            reviewDeliveryDiv.innerHTML = deliveryHTML;
         }
 
         function showSuccessModal(quoteID) {
@@ -4694,7 +4906,7 @@
                 return;
             }
 
-            if (currentStep < 6) {
+            if (currentStep < 7) {
                 // Hide current step
                 document.getElementById(`step${currentStep}`).classList.remove('active');
 
@@ -4717,6 +4929,11 @@
                     setTimeout(() => {
                         initializeDeliveryDate();
                     }, 100);
+                }
+
+                // Populate review data when reaching step 7
+                if (currentStep === 7) {
+                    populateReviewData();
                 }
 
                 // Show scroll indicator for product selection steps
