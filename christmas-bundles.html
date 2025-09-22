@@ -3153,25 +3153,18 @@
             const logoFile = document.getElementById('logoFile').files[0];
             const jacketLoc = document.getElementById('jacketEmbLocation')?.value || 'Standard';
             const hoodieLoc = document.getElementById('hoodieEmbLocation')?.value || 'Standard';
-            const threadColor1 = document.getElementById('threadColor1')?.value || 'Not selected';
-            const threadColor2 = document.getElementById('threadColor2')?.value || 'Not selected';
-            const threadColor3 = document.getElementById('threadColor3')?.value || 'Not selected';
-            const customText = document.getElementById('customText')?.value || 'None';
+            const threadColors = document.getElementById('threadColors')?.value || 'Not specified';
             const specialInstructions = document.getElementById('specialInstructions')?.value || 'None';
 
             reviewCustomDiv.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                    <div>
+                    <div id="logoSection">
                         <strong style="color: #666;">Company Logo:</strong>
                         <p style="margin: 5px 0; color: #333;">${logoFile ? logoFile.name : 'No logo uploaded'}</p>
                     </div>
                     <div>
                         <strong style="color: #666;">Thread Colors:</strong>
-                        <p style="margin: 5px 0; color: #333;">
-                            1: ${threadColor1}<br>
-                            2: ${threadColor2}<br>
-                            3: ${threadColor3}
-                        </p>
+                        <p style="margin: 5px 0; color: #333;">${threadColors}</p>
                     </div>
                     <div>
                         <strong style="color: #666;">Jacket Embroidery:</strong>
@@ -3182,15 +3175,25 @@
                         <p style="margin: 5px 0; color: #333;">${hoodieLoc}</p>
                     </div>
                     <div style="grid-column: span 2;">
-                        <strong style="color: #666;">Custom Text:</strong>
-                        <p style="margin: 5px 0; color: #333;">${customText}</p>
-                    </div>
-                    <div style="grid-column: span 2;">
                         <strong style="color: #666;">Special Instructions:</strong>
                         <p style="margin: 5px 0; color: #333;">${specialInstructions}</p>
                     </div>
                 </div>
             `;
+
+            // Add logo image preview if file exists
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoSection = document.getElementById('logoSection');
+                    const logoPreview = document.createElement('img');
+                    logoPreview.src = e.target.result;
+                    logoPreview.alt = 'Company Logo';
+                    logoPreview.style.cssText = 'max-width: 150px; max-height: 100px; border: 1px solid #ddd; padding: 5px; margin-top: 10px; background: white; display: block;';
+                    logoSection.appendChild(logoPreview);
+                };
+                reader.readAsDataURL(logoFile);
+            }
 
             // Populate Delivery Information
             const reviewDeliveryDiv = document.getElementById('reviewDelivery');
