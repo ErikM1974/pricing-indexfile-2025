@@ -2386,6 +2386,125 @@
 
     <!-- Include EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // Initialize EmailJS with your public key
+            emailjs.init("4qSbDO-SQs19TbP80");
+        })();
+
+        // Send confirmation email function
+        async function sendConfirmationEmail(quoteData, quoteID) {
+            try {
+                // Format items for email - simplified for Outlook compatibility (NO PRICES)
+                const formatItem = (item, type) => {
+                    if (!item) return 'Not selected';
+                    // Extract the actual values from the selectedItems structure
+                    const productName = (item.name || item.style || 'Item').replace(/[^\w\s-]/g, '');
+                    const color = (item.selectedColor || 'No color').replace(/[^\w\s-]/g, '');
+                    const size = item.selectedSize || 'No size';
+                    // Return WITHOUT price since this is a free gift
+                    return `${productName}, Color: ${color}, Size: ${size}`;
+                };
+
+                // Calculate totals
+                const subtotal = calculateTotalPrice() - (RETAIL_PRICES.shipping || 25);
+                const total = calculateTotalPrice();
+
+                // Get thread colors from form - clean for email
+                const threadColor1 = (document.getElementById('threadColor1')?.value || '').replace(/[^\w\s-]/g, '');
+                const threadColor2 = (document.getElementById('threadColor2')?.value || '').replace(/[^\w\s-]/g, '');
+                const threadColor3 = (document.getElementById('threadColor3')?.value || '').replace(/[^\w\s-]/g, '');
+
+                // Format embroidery locations - simplified
+                const jacketEmbLocation = (quoteData.jacketEmbLocation || document.getElementById('jacketEmbLocation')?.value || 'Standard').replace(/[^\w\s-]/g, '');
+                const hoodieEmbLocation = (quoteData.hoodieEmbLocation || document.getElementById('hoodieEmbLocation')?.value || 'Standard').replace(/[^\w\s-]/g, '');
+                const embroideryLocation = `Jacket Location: ${jacketEmbLocation} | Hoodie Location: ${hoodieEmbLocation}`;
+
+                // Get custom text - sanitized
+                const customText = (document.getElementById('customText')?.value || '').replace(/[<>]/g, '');
+
+                // Sanitize helper function for names and text fields
+                const sanitizeText = (text) => {
+                    if (!text) return '';
+                    return String(text).replace(/[<>\"'&]/g, '').trim();
+                };
+
+                // Prepare email template parameters - simplified for Outlook
+                const emailParams = {
+                    // Customer information - sanitized
+                    to_email: sanitizeText(quoteData.email) || 'noreply@nwcustomapparel.com',
+                    customer_name: sanitizeText(`${quoteData.firstName || ''} ${quoteData.lastName || ''}`).trim() || 'Customer',
+                    company_name: sanitizeText(quoteData.company) || 'Not Provided',
+
+                    // Quote details
+                    quote_number: quoteID || 'PENDING',
+                    quote_date: new Date().toLocaleDateString('en-US'),
+
+                    // Bundle items
+                    jacket_details: formatItem(selectedItems.jacket, 'Jacket'),
+                    hoodie_details: formatItem(selectedItems.hoodie, 'Hoodie'),
+                    beanie_details: formatItem(selectedItems.beanie, 'Beanie'),
+                    gloves_details: formatItem(selectedItems.gloves, 'Gloves'),
+
+                    // Customization details - plain text
+                    thread_color_1: threadColor1 || 'Not selected',
+                    thread_color_2: threadColor2 || 'Not selected',
+                    thread_color_3: threadColor3 || 'Not selected',
+                    embroidery_location: embroideryLocation,
+                    custom_text: sanitizeText(customText) || 'None',
+                    logo_upload: quoteData.imageUpload ? 'Logo uploaded' : 'No logo',
+
+                    // Contact information - sanitized
+                    phone: sanitizeText(quoteData.phone) || 'Not Provided',
+                    email: sanitizeText(quoteData.email) || 'Not Provided',
+
+                    // Delivery information - clean format
+                    delivery_type: quoteData.deliveryMethod || 'Pickup',
+                    delivery_date: quoteData.dueDate || 'To Be Determined',
+                    address_1: sanitizeText(quoteData.shippingAddress) || 'Not Provided',
+                    address_2: '',
+                    city: sanitizeText(quoteData.shippingCity) || '',
+                    state: sanitizeText(quoteData.shippingState) || '',
+                    zip: sanitizeText(quoteData.shippingZip) || '',
+
+                    // Pricing - plain numbers for Outlook
+                    subtotal: String(subtotal.toFixed(2)),
+                    shipping: String((RETAIL_PRICES.shipping || 25).toFixed(2)),
+                    gift_box: String((RETAIL_PRICES.giftBox || 9).toFixed(2)),
+                    total: String(total.toFixed(2)),
+
+                    // Additional fields - sanitized
+                    special_instructions: sanitizeText(quoteData.specialInstructions || document.getElementById('specialInstructions')?.value) || 'None',
+                    quantity: String(calculateTotalQuantity()),
+
+                    // Default values to prevent corruption - always provide safe strings
+                    reply_to: sanitizeText(quoteData.email) || 'noreply@nwcustomapparel.com',
+                    from_name: 'Northwest Custom Apparel',
+                    company_phone: '253-922-5793',
+                    company_year: '1977',
+
+                    // Add safe defaults for any fields the template might use
+                    sales_rep: 'Sales Team',
+                    valid_days: '30'
+                };
+
+                // Send email using EmailJS
+                const response = await emailjs.send(
+                    'service_1c4k67j',  // Service ID
+                    'template_v80ysfp',  // Template ID for Xmas Bundle
+                    emailParams
+                );
+
+                console.log('Email sent successfully:', response);
+                return { success: true, response };
+
+            } catch (error) {
+                console.error('Failed to send confirmation email:', error);
+                // Don't throw error to prevent blocking order submission
+                return { success: false, error: error.toString() };
+            }
+        }
+    </script>
 
     <!-- Include Product Search Service -->
     <script src="product-search-service.js"></script>
@@ -2845,6 +2964,14 @@
             const result = await quoteService.submitQuote(quoteData);
 
             if (result.success) {
+                // Send confirmation email
+                const emailResult = await sendConfirmationEmail(quoteData, result.quoteID);
+
+                if (!emailResult.success) {
+                    console.error('Email failed to send:', emailResult.error);
+                    // Still show success modal even if email fails
+                }
+
                 // Show success modal
                 showSuccessModal(result.quoteID);
 
