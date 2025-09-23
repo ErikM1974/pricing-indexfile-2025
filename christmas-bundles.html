@@ -3965,10 +3965,8 @@
                 const phone = document.getElementById('phone').value;
 
                 if (!firstName || !lastName || !email || !phone) {
-                    overlay.classList.remove('active');
-                    window.isSubmitting = false;
-                    clearTimeout(submissionTimeout);
                     alert('Please fill in all required contact information');
+                    finalizeSubmission();
                     return;
                 }
 
@@ -3981,11 +3979,9 @@
                     const zipCode = document.getElementById('zipCode')?.value;
 
                     if (!address || !city || !state || !zipCode) {
-                        overlay.classList.remove('active');
-                        window.isSubmitting = false;
-                        clearTimeout(submissionTimeout);
                         alert('Please fill in all required shipping information including ZIP code');
                         console.warn('Missing shipping fields:', { address, city, state, zipCode });
+                        finalizeSubmission();
                         return;
                     }
                 }
