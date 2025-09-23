@@ -4547,7 +4547,36 @@
                 return;
             }
 
-            // ...
+            // Get the submit button
+            const submitBtn = document.getElementById('submitBtn');
+            if (!submitBtn) {
+                console.error('Submit button not found!');
+                return;
+            }
+
+            // Check if handlers are already attached
+            if (submitBtn.hasAttribute('data-handlers-attached')) {
+                console.log('Submit handlers already attached, skipping');
+                return;
+            }
+
+            // Define the click handler
+            const handleSubmitClick = function(e) {
+                e.preventDefault();
+                window.submitOrder(submitBtn);
+            };
+
+            // Define the touch handler
+            const handleSubmitTouch = function(e) {
+                e.preventDefault();
+                // Remove click listener temporarily to prevent double submission
+                submitBtn.removeEventListener('click', handleSubmitClick);
+                window.submitOrder(submitBtn);
+                // Re-add click listener after a delay
+                setTimeout(() => {
+                    submitBtn.addEventListener('click', handleSubmitClick);
+                }, 500);
+            };
 
             // Store handlers on the button element for later removal if needed
             submitBtn._handleSubmitClick = handleSubmitClick;
@@ -4563,20 +4592,6 @@
             try { validateForm(); } catch (e) { console.warn('[Submit] validateForm failed:', e); }
             console.log('Submit button handlers attached successfully');
         }
-
-        // ...
-            if (overlay) {
-                overlay.classList.remove('active');
-            }
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('processing');
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
-            }
-            console.log('Submission state has been reset. You can now submit your order.');
-            return 'Ready to submit';
-        };
 
         // Phone number formatting function
         function formatPhoneNumber(value) {
