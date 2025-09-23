@@ -3166,8 +3166,8 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button with inline onclick as failsafe -->
-                        <button id="submitBtn" class="submit-btn" onclick="window.submitOrder(this)" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
+                        <!-- Submit Button -->
+                        <button id="submitBtn" class="submit-btn" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
                             <i class="fas fa-paper-plane"></i> Submit Order
                         </button>
 
@@ -4459,15 +4459,36 @@
         function attachSubmitHandlers() {
             const submitBtn = document.getElementById('submitBtn');
             if (submitBtn && !submitBtn.hasAttribute('data-handlers-attached')) {
-                // Remove any existing handlers first
-                submitBtn.onclick = null;
-
-                // Add new click handler
-                submitBtn.onclick = function(e) {
+                // Define handler functions
+                function handleSubmitClick(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    window.submitOrder(this);
-                };
+                    // Prevent double submission on devices that fire both touch and click
+                    if (e.detail > 1) return;
+                    if (window.mobileDebug) window.mobileDebug.log('Submit button clicked');
+                    window.submitOrder(submitBtn);
+                }
+
+                function handleSubmitTouch(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.mobileDebug) window.mobileDebug.log('Submit button touched');
+                    // Prevent the click event from also firing
+                    submitBtn.removeEventListener('click', handleSubmitClick);
+                    window.submitOrder(submitBtn);
+                    // Re-add click listener after a short delay
+                    setTimeout(function() {
+                        submitBtn.addEventListener('click', handleSubmitClick);
+                    }, 500);
+                }
+
+                // Store handlers on the button element for later removal if needed
+                submitBtn._handleSubmitClick = handleSubmitClick;
+                submitBtn._handleSubmitTouch = handleSubmitTouch;
+
+                // Add event listeners
+                submitBtn.addEventListener('click', handleSubmitClick);
+                submitBtn.addEventListener('touchend', handleSubmitTouch);
 
                 // Mark as attached to prevent duplicates
                 submitBtn.setAttribute('data-handlers-attached', 'true');
@@ -4563,6 +4584,17 @@
         }
 
         document.addEventListener('DOMContentLoaded', async function() {
+            // Ensure submission overlay is hidden on page load
+            window.isSubmitting = false;
+            const overlay = document.getElementById('submissionOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                overlay.style.display = 'none';
+                setTimeout(() => {
+                    overlay.style.display = '';
+                }, 100);
+            }
+
             initializeSnowEffect();
             showLoadingState();
             await loadChristmasProducts();
@@ -4576,40 +4608,8 @@
             // Show scroll indicator on first step
             showScrollIndicator();
 
-            // Setup submit button event listeners for mobile compatibility
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                // Remove any existing listeners to prevent duplicates
-                submitBtn.removeEventListener('click', handleSubmitClick);
-                submitBtn.removeEventListener('touchend', handleSubmitTouch);
-
-                // Define handler functions
-                function handleSubmitClick(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // Prevent double submission on devices that fire both touch and click
-                    if (e.detail > 1) return;
-                    if (window.mobileDebug) window.mobileDebug.log('Submit button clicked');
-                    window.submitOrder(submitBtn);
-                }
-
-                function handleSubmitTouch(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (window.mobileDebug) window.mobileDebug.log('Submit button touched');
-                    // Prevent the click event from also firing
-                    submitBtn.removeEventListener('click', handleSubmitClick);
-                    window.submitOrder(submitBtn);
-                    // Re-add click listener after a short delay
-                    setTimeout(function() {
-                        submitBtn.addEventListener('click', handleSubmitClick);
-                    }, 500);
-                }
-
-                // Add event listeners
-                submitBtn.addEventListener('click', handleSubmitClick);
-                submitBtn.addEventListener('touchend', handleSubmitTouch);
-            }
+            // NOTE: Submit button event listeners are now attached in attachSubmitHandlers()
+            // when Step 7 is reached, not on page load. This prevents accidental triggering.
 
             // Initialize delivery date field with 2 weeks minimum
             initializeDeliveryDate();
@@ -6225,13 +6225,21 @@
                     const overlay = document.getElementById('submissionOverlay');
                     if (overlay) {
                         overlay.classList.remove('active');
+                        // Force style recalculation to ensure it's hidden
+                        overlay.style.display = 'none';
+                        setTimeout(() => {
+                            overlay.style.display = '';
+                        }, 10);
                     }
 
                     // Populate the review data
                     populateReviewData();
 
-                    // Attach submit button handlers
-                    attachSubmitHandlers();
+                    // Attach submit button handlers after a delay
+                    // This delay ensures the DOM is fully settled before attaching handlers
+                    setTimeout(() => {
+                        attachSubmitHandlers();
+                    }, 200);
                 }
 
                 // Update continue button states based on selections
@@ -6393,15 +6401,21 @@
                     const overlay = document.getElementById('submissionOverlay');
                     if (overlay) {
                         overlay.classList.remove('active');
+                        // Force style recalculation to ensure it's hidden
+                        overlay.style.display = 'none';
+                        setTimeout(() => {
+                            overlay.style.display = '';
+                        }, 10);
                     }
 
                     // Populate the review data
                     populateReviewData();
 
-                    // Ensure submit button has handlers attached
+                    // Ensure submit button has handlers attached after a delay
+                    // This delay ensures the DOM is fully settled before attaching handlers
                     setTimeout(() => {
                         attachSubmitHandlers();
-                    }, 100);
+                    }, 200);
                 }
 
                 // Show scroll indicator for product selection steps
