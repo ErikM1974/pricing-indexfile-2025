@@ -3899,6 +3899,38 @@
                 // Still allow but log for debugging
             }
 
+            // CRITICAL FIX: Centralized cleanup function to ensure UI always resets
+            let submissionTimeout;
+            let submitBtn;
+            let originalButtonHTML;
+            function finalizeSubmission() {
+                try {
+                    const overlayEl = document.getElementById('submissionOverlay');
+                    if (overlayEl) overlayEl.classList.remove('active');
+                } catch (e) {
+                    console.warn('[Submit] overlay finalize error:', e);
+                }
+                try {
+                    window.isSubmitting = false;
+                } catch (e) {
+                    console.warn('[Submit] flag finalize error:', e);
+                }
+                try {
+                    if (typeof submissionTimeout !== 'undefined') clearTimeout(submissionTimeout);
+                } catch (e) {
+                    console.warn('[Submit] timeout finalize error:', e);
+                }
+                try {
+                    const btn = button || document.getElementById('submitBtn');
+                    if (btn) {
+                        btn.classList.remove('processing');
+                        btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                    }
+                } catch (e) {
+                    console.warn('[Submit] button finalize error:', e);
+                }
+            }
+
             // Prevent double submissions
             if (window.isSubmitting) {
                 console.log('Already submitting, ignoring duplicate click');
@@ -3913,7 +3945,7 @@
                 overlay.classList.add('active');
 
                 // Set a 30-second timeout to auto-recover if submission gets stuck
-                const submissionTimeout = setTimeout(() => {
+                submissionTimeout = setTimeout(() => {
                     if (window.isSubmitting) {
                         console.warn('[Submit] 20s failsafe triggered — auto-recovering UI');
                         finalizeSubmission();
@@ -3959,55 +3991,26 @@
                 }
 
                 // Update button to show processing state (but not disabled)
-                const submitBtn = button || document.getElementById('submitBtn');
-                const originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
+                submitBtn = button || document.getElementById('submitBtn');
+                originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
                 if (submitBtn) {
                     submitBtn.classList.add('processing');
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 }
 
-                // CRITICAL FIX: Centralized cleanup function to ensure UI always resets
-                const finalizeSubmission = () => {
-                    try {
-                        const overlayEl = document.getElementById('submissionOverlay');
-                        if (overlayEl) overlayEl.classList.remove('active');
-                    } catch (e) {
-                        console.warn('[Submit] overlay finalize error:', e);
+                // Upload logo if present
+                let imageExternalKey = null;
+                if (window.selectedLogoFile) {
+                    updateSubmissionProgress('logo', 'Uploading your logo...');
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
+                } else {
+                    // Skip logo step if no logo
+                    const logoStep = document.querySelector('.submission-step[data-step="logo"]');
+                    if (logoStep) {
+                        logoStep.style.display = 'none';
                     }
-                    try {
-                        window.isSubmitting = false;
-                    } catch (e) {
-                        console.warn('[Submit] flag finalize error:', e);
-                    }
-                    try {
-                        if (typeof submissionTimeout !== 'undefined') clearTimeout(submissionTimeout);
-                    } catch (e) {
-                        console.warn('[Submit] timeout finalize error:', e);
-                    }
-                    try {
-                        const btn = button || document.getElementById('submitBtn');
-                        if (btn) {
-                            btn.classList.remove('processing');
-                            btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
-                        }
-                    } catch (e) {
-                        console.warn('[Submit] button finalize error:', e);
-                    }
-                };
-
-            // Upload logo if present
-            let imageExternalKey = null;
-            if (window.selectedLogoFile) {
-                updateSubmissionProgress('logo', 'Uploading your logo...');
-                await new Promise(resolve => setTimeout(resolve, 200));
-                imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
-            } else {
-                // Skip logo step if no logo
-                const logoStep = document.querySelector('.submission-step[data-step="logo"]');
-                if (logoStep) {
-                    logoStep.style.display = 'none';
                 }
-            }
 
             // Collect all form data
             const quoteData = {
