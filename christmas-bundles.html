@@ -1098,6 +1098,314 @@
             border: 2px solid #e8f5e9;
         }
 
+        /* New Confirmation Page Styles */
+        .confirmation-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .confirmation-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .confirmation-sidebar {
+            width: 380px;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .confirmation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .confirmation-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .product-item-card {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .product-item-card:hover {
+            background: #f3f4f6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .product-item-image {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .product-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .product-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-item-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .product-item-meta {
+            font-size: 13px;
+            color: #6b7280;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .product-item-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #d1d5db;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .product-item-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .retail-price {
+            font-size: 12px;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        .free-tag {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .summary-total-card {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border: 2px solid #0284c7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 2px solid #0284c7;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .summary-label {
+            color: #475569;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .summary-value.free {
+            color: #10b981;
+            font-size: 20px;
+        }
+
+        .summary-value.savings {
+            color: #dc2626;
+        }
+
+        .deadline-notice-card {
+            background: #fef3c7;
+            border: 2px solid #facc15;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .deadline-date {
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .customization-item {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .customization-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .customization-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .logo-preview-container {
+            grid-column: span 2;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #d1d5db;
+        }
+
+        .logo-preview-image {
+            max-width: 200px;
+            max-height: 150px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .delivery-info-compact {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .delivery-info-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .delivery-info-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .delivery-info-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 600;
+            margin-left: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .confirmation-container {
+                flex-direction: column;
+            }
+
+            .confirmation-sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+
+            .customization-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-preview-container {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-item-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .product-item-image {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto;
+            }
+
+            .product-item-price {
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            .delivery-info-compact {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
         .summary-header {
             font-size: 20px;
             font-weight: 700;
@@ -2614,86 +2922,86 @@
                     <p class="section-subtitle">Please review all details before submitting</p>
                 </div>
 
-                <!-- Order Review Container -->
-                <div class="review-container" style="background: #f8f9fa; border-radius: 12px; padding: 30px; margin-top: 20px;">
-
-                    <!-- Selected Items Review -->
-                    <div class="review-section" style="margin-bottom: 30px;">
-                        <h3 style="color: #16a34a; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #16a34a; padding-bottom: 10px;">
-                            <i class="fas fa-gift"></i> Your Selected Items
-                        </h3>
-                        <div id="reviewItems" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                            <!-- Items will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- Customization Review -->
-                    <div class="review-section" style="margin-bottom: 30px;">
-                        <h3 style="color: #0284c7; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #0284c7; padding-bottom: 10px;">
-                            <i class="fas fa-palette"></i> Customization Details
-                        </h3>
-                        <div id="reviewCustomization" style="background: white; padding: 20px; border-radius: 8px;">
-                            <!-- Customization details will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- Delivery Review -->
-                    <div class="review-section" style="margin-bottom: 30px;">
-                        <h3 style="color: #dc2626; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">
-                            <i class="fas fa-truck"></i> Delivery Information
-                        </h3>
-                        <div id="reviewDelivery" style="background: white; padding: 20px; border-radius: 8px;">
-                            <!-- Delivery details will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- Value Summary -->
-                    <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); border: 2px solid #0284c7; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center;">
-                        <h4 style="color: #075985; margin: 0 0 15px 0; font-size: 20px;">
-                            <i class="fas fa-tags"></i> Order Summary
-                        </h4>
-                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">Retail Value</p>
-                                <p style="color: #333; margin: 0; font-size: 24px; font-weight: 700;">$${calculateRetailValue().toFixed(2)}</p>
+                <!-- New Two-Column Layout -->
+                <div class="confirmation-container">
+                    <!-- Main Content Column -->
+                    <div class="confirmation-main">
+                        <!-- Selected Items Card -->
+                        <div class="confirmation-card">
+                            <h3 class="confirmation-card-title">
+                                <i class="fas fa-gift" style="color: #10b981;"></i>
+                                Your Gift Box Items
+                            </h3>
+                            <div id="reviewItems">
+                                <!-- Product cards will be populated here -->
                             </div>
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">Your Price</p>
-                                <p style="color: #16a34a; margin: 0; font-size: 28px; font-weight: 700;">FREE</p>
+                        </div>
+
+                        <!-- Customization Card -->
+                        <div class="confirmation-card">
+                            <h3 class="confirmation-card-title">
+                                <i class="fas fa-palette" style="color: #0284c7;"></i>
+                                Customization Details
+                            </h3>
+                            <div id="reviewCustomization">
+                                <!-- Customization grid will be populated here -->
                             </div>
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">You Save</p>
-                                <p style="color: #dc2626; margin: 0; font-size: 24px; font-weight: 700;">$${calculateRetailValue().toFixed(2)}</p>
+                        </div>
+
+                        <!-- Delivery Information Card -->
+                        <div class="confirmation-card">
+                            <h3 class="confirmation-card-title">
+                                <i class="fas fa-truck" style="color: #dc2626;"></i>
+                                Delivery Information
+                            </h3>
+                            <div id="reviewDelivery">
+                                <!-- Delivery info will be populated here -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- Important Notice -->
-                    <div style="background: #fef3c7; border: 2px solid #facc15; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: center;">
-                        <h4 style="color: #a16207; margin: 0 0 10px 0;">
-                            <i class="fas fa-exclamation-triangle"></i> Important Deadline
-                        </h4>
-                        <p style="color: #854d0e; margin: 0; font-size: 18px; font-weight: 600;">
-                            To order for your employees, place your order by
-                            <strong style="color: #dc2626; font-size: 20px;">October 20, 2025</strong>
-                        </p>
-                        <p style="color: #854d0e; margin: 5px 0 0 0; font-size: 14px;">
-                            This ensures holiday delivery for your team
-                        </p>
-                    </div>
-                </div>
+                    <!-- Sticky Sidebar -->
+                    <div class="confirmation-sidebar">
+                        <!-- Order Summary Card -->
+                        <div class="summary-total-card">
+                            <h4 style="color: #075985; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
+                                <i class="fas fa-tags"></i> Order Summary
+                            </h4>
+                            <div class="summary-row">
+                                <span class="summary-label">Retail Value:</span>
+                                <span class="summary-value" id="orderSummaryRetailValue">$0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Your Price:</span>
+                                <span class="summary-value free">FREE</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label" style="font-weight: 700;">You Save:</span>
+                                <span class="summary-value savings" id="orderSummarySavings">$0.00</span>
+                            </div>
+                        </div>
 
-                <!-- Navigation Buttons -->
-                <div class="nav-buttons">
-                    <button class="nav-btn" onclick="previousStep()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Edit
-                    </button>
-                    <button id="submitBtn" class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder(this)" style="background: linear-gradient(135deg, #16a34a, #15803d); padding: 20px 50px; font-size: 22px; font-weight: 700; box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4); border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                        <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
-                        Confirm & Submit FREE Gift Box
-                        <i class="fas fa-gift" style="margin-left: 10px;"></i>
-                    </button>
+                        <!-- Deadline Notice Card -->
+                        <div class="deadline-notice-card">
+                            <p style="margin: 0 0 8px 0; font-size: 14px; color: #854d0e;">
+                                <i class="fas fa-exclamation-triangle"></i> Important Deadline
+                            </p>
+                            <p style="margin: 0; color: #854d0e;">Order by</p>
+                            <p class="deadline-date" style="margin: 4px 0;">October 20, 2025</p>
+                            <p style="margin: 0; font-size: 12px; color: #92400e;">for holiday delivery</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button id="submitBtn" class="submit-btn" onclick="submitOrder(this)" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
+                            <i class="fas fa-paper-plane"></i> Submit Order
+                            <span class="loader"></span>
+                        </button>
+
+                        <!-- Previous Button -->
+                        <button class="nav-btn" onclick="previousStep()" style="width: 100%; margin-top: 10px;">
+                            <i class="fas fa-arrow-left"></i> Previous Step
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3405,7 +3713,19 @@
 
         // Populate Review Data for Step 7
         function populateReviewData() {
-            // Populate Selected Items
+            // Update Order Summary values
+            const retailValue = calculateRetailValue();
+            const retailValueElement = document.getElementById('orderSummaryRetailValue');
+            const savingsElement = document.getElementById('orderSummarySavings');
+
+            if (retailValueElement) {
+                retailValueElement.textContent = `$${retailValue.toFixed(2)}`;
+            }
+            if (savingsElement) {
+                savingsElement.textContent = `$${retailValue.toFixed(2)}`;
+            }
+
+            // Populate Selected Items with new compact card design
             const reviewItemsDiv = document.getElementById('reviewItems');
             reviewItemsDiv.innerHTML = '';
 
@@ -3416,29 +3736,62 @@
                 { key: 'gloves', label: 'Gloves', icon: '🧤' }
             ];
 
+            // All 4 items are required now, so display them all with images
             itemTypes.forEach(type => {
                 const item = selectedItems[type.key];
                 if (item) {
+                    // Get the image URL - prefer color-specific image if available
+                    let imageUrl = '';
+                    if (item.selectedColorData && item.selectedColorData.MAIN_IMAGE_URL) {
+                        imageUrl = item.selectedColorData.MAIN_IMAGE_URL;
+                    } else if (item.selectedColorData && item.selectedColorData.FRONT_FLAT) {
+                        imageUrl = item.selectedColorData.FRONT_FLAT;
+                    } else if (item.image) {
+                        imageUrl = item.image;
+                    } else {
+                        // Fallback placeholder
+                        imageUrl = 'https://via.placeholder.com/80x80/f3f4f6/9ca3af?text=' + type.label;
+                    }
+
+                    // Get color hex code for swatch
+                    let colorHex = '#e5e7eb';
+                    if (item.selectedColorData && item.selectedColorData.HEX_CODE) {
+                        colorHex = item.selectedColorData.HEX_CODE;
+                    } else if (item.selectedColorCode) {
+                        colorHex = item.selectedColorCode;
+                    }
+
+                    // Create compact product card
                     const itemDiv = document.createElement('div');
-                    itemDiv.style.cssText = 'background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;';
+                    itemDiv.className = 'product-item-card';
                     itemDiv.innerHTML = `
-                        <h4 style="color: #16a34a; margin: 0 0 10px 0;">${type.icon} ${type.label}</h4>
-                        <p style="margin: 5px 0; color: #333;"><strong>Style:</strong> ${item.name || 'Not specified'}</p>
-                        <p style="margin: 5px 0; color: #333;"><strong>Color:</strong> ${item.selectedColor || 'Not selected'}</p>
-                        <p style="margin: 5px 0; color: #333;"><strong>Size:</strong> ${item.selectedSize || 'Not selected'}</p>
-                    `;
-                    reviewItemsDiv.appendChild(itemDiv);
-                } else {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.style.cssText = 'background: #f3f4f6; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;';
-                    itemDiv.innerHTML = `
-                        <h4 style="color: #9ca3af; margin: 0;">${type.icon} ${type.label}: Not Selected</h4>
+                        <div class="product-item-image">
+                            <img src="${imageUrl}" alt="${item.name || type.label}" onerror="this.src='https://via.placeholder.com/80x80/f3f4f6/9ca3af?text=${type.label}'">
+                        </div>
+                        <div class="product-item-details">
+                            <div class="product-item-name">${item.name || item.id || 'Product'}</div>
+                            <div class="product-item-meta">
+                                <div class="product-item-meta-row">
+                                    <span>Color:</span>
+                                    <span class="color-swatch" style="background-color: ${colorHex};"></span>
+                                    <span>${item.selectedColor || 'Not selected'}</span>
+                                </div>
+                                ${type.key !== 'beanie' ? `
+                                <div class="product-item-meta-row">
+                                    <span>Size: ${item.selectedSize || 'Not selected'}</span>
+                                </div>` : '<div class="product-item-meta-row"><span>Size: One Size</span></div>'}
+                            </div>
+                        </div>
+                        <div class="product-item-price">
+                            ${item.retailPrice ? `<div class="retail-price">$${item.retailPrice.toFixed(2)}</div>` : ''}
+                            <div class="free-tag">FREE</div>
+                        </div>
                     `;
                     reviewItemsDiv.appendChild(itemDiv);
                 }
             });
 
-            // Populate Customization Details
+            // Populate Customization Details with improved layout
             const reviewCustomDiv = document.getElementById('reviewCustomization');
             const logoFile = document.getElementById('logoFile').files[0];
             const jacketLoc = document.getElementById('jacketEmbLocation')?.value || 'Standard';
@@ -3453,47 +3806,73 @@
                     .map(color => color.charAt(0).toUpperCase() + color.slice(1))
                     .join(', ') : 'Not specified';
 
-            reviewCustomDiv.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                    <div id="logoSection">
-                        <strong style="color: #666;">Company Logo:</strong>
-                        <p style="margin: 5px 0; color: #333;">${logoFile ? logoFile.name : 'No logo uploaded'}</p>
-                        ${logoFile && window.selectedLogoDataURL ? `<img src="${window.selectedLogoDataURL}" style="max-width: 150px; max-height: 150px; margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 8px;">` : ''}
+            // Build customization HTML with new grid layout
+            let customizationHTML = '<div class="customization-grid">';
+
+            // Logo section - spans 2 columns if logo exists
+            if (logoFile) {
+                customizationHTML += `
+                    <div class="logo-preview-container">
+                        <div class="customization-label">Company Logo</div>
+                        <div class="customization-value">${logoFile.name}</div>
+                        ${window.selectedLogoDataURL ?
+                            `<img src="${window.selectedLogoDataURL}" class="logo-preview-image" alt="Company Logo">` :
+                            '<div id="logoPreviewPlaceholder"></div>'}
                     </div>
-                    <div>
-                        <strong style="color: #666;">Thread Colors:</strong>
-                        <p style="margin: 5px 0; color: #333;">${formattedThreadColors}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Jacket Embroidery:</strong>
-                        <p style="margin: 5px 0; color: #333;">${jacketLoc}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Hoodie Embroidery:</strong>
-                        <p style="margin: 5px 0; color: #333;">${hoodieLoc}</p>
-                    </div>
-                    <div style="grid-column: span 2;">
-                        <strong style="color: #666;">Special Instructions:</strong>
-                        <p style="margin: 5px 0; color: #333;">${specialInstructions}</p>
-                    </div>
+                `;
+            }
+
+            // Thread colors
+            customizationHTML += `
+                <div class="customization-item">
+                    <div class="customization-label">Thread Colors</div>
+                    <div class="customization-value">${formattedThreadColors}</div>
                 </div>
             `;
 
-            // Add logo image preview if file exists
-            if (logoFile) {
+            // Jacket embroidery location
+            customizationHTML += `
+                <div class="customization-item">
+                    <div class="customization-label">Jacket Embroidery</div>
+                    <div class="customization-value">${jacketLoc}</div>
+                </div>
+            `;
+
+            // Hoodie embroidery location
+            customizationHTML += `
+                <div class="customization-item">
+                    <div class="customization-label">Hoodie Embroidery</div>
+                    <div class="customization-value">${hoodieLoc}</div>
+                </div>
+            `;
+
+            // Special instructions - spans full width if present
+            if (specialInstructions && specialInstructions !== 'None') {
+                customizationHTML += `
+                    <div class="customization-item" style="grid-column: span 2;">
+                        <div class="customization-label">Special Instructions</div>
+                        <div class="customization-value">${specialInstructions}</div>
+                    </div>
+                `;
+            }
+
+            customizationHTML += '</div>';
+            reviewCustomDiv.innerHTML = customizationHTML;
+
+            // Load logo preview if file exists and dataURL not ready
+            if (logoFile && !window.selectedLogoDataURL) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const logoSection = document.getElementById('logoSection');
-                    const logoPreview = document.createElement('img');
-                    logoPreview.src = e.target.result;
-                    logoPreview.alt = 'Company Logo';
-                    logoPreview.style.cssText = 'max-width: 150px; max-height: 100px; border: 1px solid #ddd; padding: 5px; margin-top: 10px; background: white; display: block;';
-                    logoSection.appendChild(logoPreview);
+                    window.selectedLogoDataURL = e.target.result;
+                    const placeholder = document.getElementById('logoPreviewPlaceholder');
+                    if (placeholder) {
+                        placeholder.outerHTML = `<img src="${e.target.result}" class="logo-preview-image" alt="Company Logo">`;
+                    }
                 };
                 reader.readAsDataURL(logoFile);
             }
 
-            // Populate Delivery Information
+            // Populate Delivery Information with compact layout
             const reviewDeliveryDiv = document.getElementById('reviewDelivery');
             const firstName = document.getElementById('firstName').value || '';
             const lastName = document.getElementById('lastName').value || '';
@@ -3503,34 +3882,45 @@
             const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'Not selected';
             const deliveryDate = document.getElementById('deliveryDate')?.value || 'Not specified';
 
-            let deliveryHTML = `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                    <div>
-                        <strong style="color: #666;">Name:</strong>
-                        <p style="margin: 5px 0; color: #333;">${firstName} ${lastName}</p>
+            // Build compact delivery info
+            let deliveryHTML = '<div class="delivery-info-compact">';
+
+            // Contact person
+            deliveryHTML += `
+                <div class="delivery-info-item">
+                    <div class="delivery-info-icon">
+                        <i class="fas fa-user"></i> Contact
                     </div>
-                    <div>
-                        <strong style="color: #666;">Company:</strong>
-                        <p style="margin: 5px 0; color: #333;">${company || 'Not provided'}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Email:</strong>
-                        <p style="margin: 5px 0; color: #333;">${email}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Phone:</strong>
-                        <p style="margin: 5px 0; color: #333;">${phone}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Delivery Method:</strong>
-                        <p style="margin: 5px 0; color: #333;">${deliveryMethod}</p>
-                    </div>
-                    <div>
-                        <strong style="color: #666;">Preferred Date:</strong>
-                        <p style="margin: 5px 0; color: #333;">${deliveryDate}</p>
-                    </div>
+                    <div class="delivery-info-value">${firstName} ${lastName}</div>
+                    ${company ? `<div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">${company}</div>` : ''}
+                </div>
             `;
 
+            // Communication
+            deliveryHTML += `
+                <div class="delivery-info-item">
+                    <div class="delivery-info-icon">
+                        <i class="fas fa-envelope"></i> Communication
+                    </div>
+                    <div class="delivery-info-value">${email}</div>
+                    <div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">${phone}</div>
+                </div>
+            `;
+
+            // Delivery details
+            deliveryHTML += `
+                <div class="delivery-info-item">
+                    <div class="delivery-info-icon">
+                        <i class="fas fa-${deliveryMethod === 'Ship' ? 'truck' : 'building'}"></i> Delivery
+                    </div>
+                    <div class="delivery-info-value">${deliveryMethod}</div>
+                    ${deliveryDate !== 'Not specified' ? `<div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">By: ${new Date(deliveryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>` : ''}
+                </div>
+            `;
+
+            deliveryHTML += '</div>';
+
+            // Add shipping address separately if Ship is selected
             if (deliveryMethod === 'Ship') {
                 const address1 = document.getElementById('address1')?.value || '';
                 const address2 = document.getElementById('address2')?.value || '';
@@ -3538,19 +3928,23 @@
                 const state = document.getElementById('state')?.value || '';
                 const zip = document.getElementById('zipCode')?.value || '';
 
-                deliveryHTML += `
-                    <div style="grid-column: span 2;">
-                        <strong style="color: #666;">Shipping Address:</strong>
-                        <p style="margin: 5px 0; color: #333;">
-                            ${address1}<br>
-                            ${address2 ? address2 + '<br>' : ''}
-                            ${city}, ${state} ${zip}
-                        </p>
-                    </div>
-                `;
+                if (address1 && city && state) {
+                    deliveryHTML += `
+                        <div style="margin-top: 15px; padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #dc2626;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #6b7280; font-size: 14px;">
+                                <i class="fas fa-map-marker-alt" style="color: #dc2626;"></i>
+                                <span style="font-weight: 600;">Shipping Address</span>
+                            </div>
+                            <div style="font-size: 14px; color: #1f2937; line-height: 1.5;">
+                                ${address1}<br>
+                                ${address2 ? address2 + '<br>' : ''}
+                                ${city}, ${state} ${zip}
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
-            deliveryHTML += '</div>';
             reviewDeliveryDiv.innerHTML = deliveryHTML;
         }
 
