@@ -3923,6 +3923,7 @@
                 try {
                     const btn = button || document.getElementById('submitBtn');
                     if (btn) {
+                        btn.disabled = false;  // CRITICAL: Re-enable the button
                         btn.classList.remove('processing');
                         btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
                     }
