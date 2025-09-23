@@ -1525,6 +1525,13 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            /* Mobile touch optimizations */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .submit-btn:hover {
@@ -2968,7 +2975,7 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <button id="submitBtn" class="submit-btn" onclick="submitOrder(this)" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
+                        <button id="submitBtn" class="submit-btn" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
                             <i class="fas fa-paper-plane"></i> Submit Order
                             <span class="loader"></span>
                         </button>
@@ -3162,6 +3169,124 @@
     <!-- <script src="calculators/christmas-bundle-service.js"></script> --> <!-- Removed to fix duplicate class declaration -->
 
     <script>
+        // Console safety wrapper for mobile devices (especially iOS Safari)
+        // This prevents JavaScript from breaking when console.log is called without dev tools open
+        (function() {
+            if (!window.console) {
+                window.console = {};
+            }
+            // Store original functions if they exist
+            const originalConsole = {
+                log: window.console.log || function() {},
+                warn: window.console.warn || function() {},
+                error: window.console.error || function() {},
+                info: window.console.info || function() {},
+                debug: window.console.debug || function() {}
+            };
+
+            // Wrap console methods to prevent errors on mobile
+            ['log', 'warn', 'error', 'info', 'debug'].forEach(function(method) {
+                window.console[method] = function() {
+                    try {
+                        // Only call original if it exists and we're in a safe environment
+                        if (originalConsole[method] && typeof originalConsole[method] === 'function') {
+                            originalConsole[method].apply(console, arguments);
+                        }
+                    } catch (e) {
+                        // Silently fail on mobile if console is not available
+                    }
+                };
+            });
+        })();
+
+        // Mobile Debug Helper - Creates visible debug output on mobile devices
+        window.mobileDebug = {
+            enabled: false,
+            logs: [],
+            maxLogs: 50,
+
+            init: function() {
+                // Create debug panel if it doesn't exist
+                if (!document.getElementById('mobileDebugPanel')) {
+                    const panel = document.createElement('div');
+                    panel.id = 'mobileDebugPanel';
+                    panel.style.cssText = `
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        max-height: 200px;
+                        overflow-y: auto;
+                        background: rgba(0, 0, 0, 0.9);
+                        color: #0f0;
+                        font-family: monospace;
+                        font-size: 10px;
+                        padding: 10px;
+                        z-index: 99999;
+                        display: none;
+                        border-top: 2px solid #0f0;
+                    `;
+                    document.body.appendChild(panel);
+                }
+            },
+
+            log: function(message, type = 'log') {
+                if (!this.enabled) return;
+
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+
+                this.logs.push(logEntry);
+                if (this.logs.length > this.maxLogs) {
+                    this.logs.shift();
+                }
+
+                const panel = document.getElementById('mobileDebugPanel');
+                if (panel) {
+                    panel.style.display = 'block';
+                    panel.innerHTML = this.logs.join('<br>');
+                    panel.scrollTop = panel.scrollHeight;
+                }
+
+                // Also log to console
+                console[type](message);
+            },
+
+            error: function(message) {
+                this.log(message, 'error');
+            },
+
+            warn: function(message) {
+                this.log(message, 'warn');
+            },
+
+            clear: function() {
+                this.logs = [];
+                const panel = document.getElementById('mobileDebugPanel');
+                if (panel) {
+                    panel.innerHTML = '';
+                }
+            },
+
+            toggle: function() {
+                this.enabled = !this.enabled;
+                const panel = document.getElementById('mobileDebugPanel');
+                if (panel) {
+                    panel.style.display = this.enabled ? 'block' : 'none';
+                }
+                if (this.enabled) {
+                    this.log('Mobile debug enabled');
+                }
+            }
+        };
+
+        // Initialize mobile debug on page load (disabled by default)
+        if (window.location.search.includes('debug=true')) {
+            window.mobileDebug.init();
+            window.mobileDebug.enabled = true;
+            window.mobileDebug.log('Mobile debug mode activated');
+        }
+
         // API Configuration
         const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
@@ -3497,38 +3622,45 @@
 
         // Submit Order Function - Make it globally accessible
         window.submitOrder = async function(button) {
-            // Validate required fields
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-
-            if (!firstName || !lastName || !email || !phone) {
-                alert('Please fill in all required contact information');
-                return;
+            // Debug log for mobile
+            if (window.mobileDebug) {
+                window.mobileDebug.log('submitOrder function called');
             }
 
-            // Validate shipping fields if shipping is selected
-            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value;
-            if (deliveryMethod === 'Ship') {
-                const address = document.getElementById('address1')?.value;
-                const city = document.getElementById('city')?.value;
-                const state = document.getElementById('state')?.value;
-                const zipCode = document.getElementById('zipCode')?.value;
+            try {
+                // Validate required fields
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
 
-                if (!address || !city || !state || !zipCode) {
-                    alert('Please fill in all required shipping information including ZIP code');
-                    console.warn('Missing shipping fields:', { address, city, state, zipCode });
+                if (!firstName || !lastName || !email || !phone) {
+                    alert('Please fill in all required contact information');
                     return;
                 }
-            }
 
-            // Show loading state - use passed button or find by id
-            const submitBtn = button || document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            }
+                // Validate shipping fields if shipping is selected
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked')?.value;
+                if (deliveryMethod === 'Ship') {
+                    const address = document.getElementById('address1')?.value;
+                    const city = document.getElementById('city')?.value;
+                    const state = document.getElementById('state')?.value;
+                    const zipCode = document.getElementById('zipCode')?.value;
+
+                    if (!address || !city || !state || !zipCode) {
+                        alert('Please fill in all required shipping information including ZIP code');
+                        console.warn('Missing shipping fields:', { address, city, state, zipCode });
+                        return;
+                    }
+                }
+
+                // Show loading state - use passed button or find by id
+                const submitBtn = button || document.getElementById('submitBtn');
+                const originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                }
 
             // Upload logo if present
             let imageExternalKey = null;
@@ -3632,7 +3764,30 @@
                 alert('There was an error submitting your order. Please try again.');
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Order';
+                    submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                }
+            }
+            } catch (error) {
+                // Comprehensive error handling for mobile
+                console.error('Error in submitOrder:', error);
+
+                // Show user-friendly error message
+                let errorMessage = 'An error occurred while submitting your order. ';
+                if (!navigator.onLine) {
+                    errorMessage += 'Please check your internet connection and try again.';
+                } else if (error.message && error.message.includes('network')) {
+                    errorMessage += 'Network error. Please check your connection and try again.';
+                } else {
+                    errorMessage += 'Please try again or contact support at 253-922-5793.';
+                }
+
+                alert(errorMessage);
+
+                // Re-enable the submit button
+                const submitBtn = button || document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order <span class="loader"></span>';
                 }
             }
         }
@@ -4087,6 +4242,41 @@
 
             // Show scroll indicator on first step
             showScrollIndicator();
+
+            // Setup submit button event listeners for mobile compatibility
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                // Remove any existing listeners to prevent duplicates
+                submitBtn.removeEventListener('click', handleSubmitClick);
+                submitBtn.removeEventListener('touchend', handleSubmitTouch);
+
+                // Define handler functions
+                function handleSubmitClick(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Prevent double submission on devices that fire both touch and click
+                    if (e.detail > 1) return;
+                    if (window.mobileDebug) window.mobileDebug.log('Submit button clicked');
+                    window.submitOrder(submitBtn);
+                }
+
+                function handleSubmitTouch(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.mobileDebug) window.mobileDebug.log('Submit button touched');
+                    // Prevent the click event from also firing
+                    submitBtn.removeEventListener('click', handleSubmitClick);
+                    window.submitOrder(submitBtn);
+                    // Re-add click listener after a short delay
+                    setTimeout(function() {
+                        submitBtn.addEventListener('click', handleSubmitClick);
+                    }, 500);
+                }
+
+                // Add event listeners
+                submitBtn.addEventListener('click', handleSubmitClick);
+                submitBtn.addEventListener('touchend', handleSubmitTouch);
+            }
 
             // Initialize delivery date field with 2 weeks minimum
             initializeDeliveryDate();
