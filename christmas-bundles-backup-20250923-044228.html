@@ -676,44 +676,6 @@
             50% { transform: scale(1.05); }
         }
 
-        /* Error Highlighting */
-        .missing-selection {
-            border: 2px solid #f44336 !important;
-            background: #ffebee !important;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        /* Bottom padding fix for Mehar */
-        .section:last-child {
-            margin-bottom: 50px;
-        }
-
-        /* Disabled button styling */
-        .disabled-btn {
-            background: #e0e0e0 !important;
-            color: #999 !important;
-            cursor: not-allowed !important;
-            opacity: 0.6;
-        }
-
-        .disabled-btn:hover {
-            background: #e0e0e0 !important;
-            transform: none !important;
-        }
-
-        /* Required field indicator */
-        .required-indicator {
-            color: #dc2626;
-            font-weight: 700;
-            margin-left: 3px;
-        }
-
         .product-description {
             font-size: 11px;
             color: #666;
@@ -1797,29 +1759,6 @@
                 flex: none;
                 width: 100%;
             }
-
-            /* Review page mobile styles */
-            #reviewItems {
-                grid-template-columns: 1fr !important;
-            }
-
-            #reviewCustomization > div {
-                grid-template-columns: 1fr !important;
-            }
-
-            .nav-buttons {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-buttons button {
-                width: 100%;
-            }
-
-            #submitBtn {
-                font-size: 18px !important;
-                padding: 15px 30px !important;
-            }
         }
 
         /* Step 6 Delivery Information Styles */
@@ -2284,7 +2223,7 @@
                         <i class="fas fa-tshirt"></i>
                         Choose Your Jacket
                     </h2>
-                    <p class="section-subtitle">Select from our premium Carhartt jacket collection</p>
+                    <p class="section-subtitle">Select from our premium Carhartt jacket collection (optional)</p>
                 </div>
 
                 <div class="product-grid" id="jacketGrid">
@@ -2292,6 +2231,10 @@
                 </div>
 
                 <div class="navigation">
+                    <button class="nav-btn" onclick="skipJacket()">
+                        Skip Jacket
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                     <button class="nav-btn primary" onclick="nextStep()" id="jacketNext" disabled>
                         Continue
                         <i class="fas fa-arrow-right"></i>
@@ -2306,7 +2249,7 @@
                         <i class="fas fa-hoodie"></i>
                         Choose Your Hoodie
                     </h2>
-                    <p class="section-subtitle">Select from our comfortable hoodie collection</p>
+                    <p class="section-subtitle">Select from our comfortable hoodie collection (optional)</p>
                 </div>
 
                 <div class="product-grid" id="hoodieGrid">
@@ -2317,6 +2260,9 @@
                     <button class="nav-btn" onclick="previousStep()">
                         <i class="fas fa-arrow-left"></i>
                         Back
+                    </button>
+                    <button class="nav-btn" onclick="skipHoodie()">
+                        Skip Hoodie
                     </button>
                     <button class="nav-btn primary" onclick="nextStep()" id="hoodieNext" disabled>
                         Continue
@@ -2358,7 +2304,7 @@
                         <i class="fas fa-mitten"></i>
                         Choose Your Gloves
                     </h2>
-                    <p class="section-subtitle">Select from our premium Carhartt work gloves</p>
+                    <p class="section-subtitle">Select from our premium Carhartt work gloves (optional)</p>
                 </div>
 
                 <div class="product-grid" id="glovesGrid">
@@ -2366,9 +2312,9 @@
                 </div>
 
                 <div class="navigation">
-                    <button class="nav-btn" onclick="previousStep()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
+                    <button class="nav-btn" onclick="skipGloves()">
+                        Skip Gloves
+                        <i class="fas fa-arrow-right"></i>
                     </button>
                     <button class="nav-btn primary" onclick="nextStep()" id="glovesNext" disabled>
                         Continue
@@ -2647,38 +2593,14 @@
                         </div>
                     </div>
 
-                    <!-- Value Summary -->
-                    <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); border: 2px solid #0284c7; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center;">
-                        <h4 style="color: #075985; margin: 0 0 15px 0; font-size: 20px;">
-                            <i class="fas fa-tags"></i> Order Summary
-                        </h4>
-                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">Retail Value</p>
-                                <p style="color: #333; margin: 0; font-size: 24px; font-weight: 700;">$${calculateRetailValue().toFixed(2)}</p>
-                            </div>
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">Your Price</p>
-                                <p style="color: #16a34a; margin: 0; font-size: 28px; font-weight: 700;">FREE</p>
-                            </div>
-                            <div>
-                                <p style="color: #666; margin: 0; font-size: 14px;">You Save</p>
-                                <p style="color: #dc2626; margin: 0; font-size: 24px; font-weight: 700;">$${calculateRetailValue().toFixed(2)}</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Important Notice -->
                     <div style="background: #fef3c7; border: 2px solid #facc15; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: center;">
                         <h4 style="color: #a16207; margin: 0 0 10px 0;">
-                            <i class="fas fa-exclamation-triangle"></i> Important Deadline
+                            <i class="fas fa-exclamation-triangle"></i> Important Reminder
                         </h4>
-                        <p style="color: #854d0e; margin: 0; font-size: 18px; font-weight: 600;">
-                            To order for your employees, place your order by
-                            <strong style="color: #dc2626; font-size: 20px;">October 20, 2025</strong>
-                        </p>
-                        <p style="color: #854d0e; margin: 5px 0 0 0; font-size: 14px;">
-                            This ensures holiday delivery for your team
+                        <p style="color: #854d0e; margin: 0; font-size: 16px;">
+                            This is a FREE sample gift box. To order for your employees, please place your order by
+                            <strong style="color: #dc2626;">October 20, 2025</strong> for holiday delivery.
                         </p>
                     </div>
                 </div>
@@ -2689,10 +2611,10 @@
                         <i class="fas fa-arrow-left"></i>
                         Back to Edit
                     </button>
-                    <button id="submitBtn" class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder(this)" style="background: linear-gradient(135deg, #16a34a, #15803d); padding: 20px 50px; font-size: 22px; font-weight: 700; box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4); border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                        <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
-                        Confirm & Submit FREE Gift Box
-                        <i class="fas fa-gift" style="margin-left: 10px;"></i>
+                    <button id="submitBtn" class="nav-btn nav-btn-primary submit-order-btn" onclick="submitOrder(this)" style="background: linear-gradient(135deg, #ff9800, #f57c00); padding: 20px 40px; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);">
+                        <i class="fas fa-check-circle"></i>
+                        Confirm & Submit Order
+                        <i class="fas fa-gift"></i>
                     </button>
                 </div>
             </div>
@@ -2730,10 +2652,9 @@
             <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h2 class="success-title">🎉 Gift Box Order Successfully Submitted!</h2>
+            <h2 class="success-title">Gift Box Request Submitted!</h2>
             <p class="success-message">
-                Thank you! Your FREE Christmas gift box order has been received.<br>
-                You'll receive a confirmation email shortly at the email address provided.
+                Thank you! We've received your gift box request and will process it shortly.
             </p>
             <div class="success-reference">
                 <div class="reference-label">Reference Number</div>
@@ -3211,8 +3132,8 @@
             }
         }
 
-        // Submit Order Function - Make it globally accessible
-        window.submitOrder = async function(button) {
+        // Submit Order Function
+        async function submitOrder(button) {
             // Validate required fields
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
@@ -3446,23 +3367,15 @@
             const threadColors = document.getElementById('threadColors')?.value || 'Not specified';
             const specialInstructions = document.getElementById('specialInstructions')?.value || 'None';
 
-            // Format thread colors properly
-            const formattedThreadColors = threadColors ?
-                threadColors.split(/\s+and\s+|\s+/)
-                    .filter(color => color.length > 0)
-                    .map(color => color.charAt(0).toUpperCase() + color.slice(1))
-                    .join(', ') : 'Not specified';
-
             reviewCustomDiv.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                     <div id="logoSection">
                         <strong style="color: #666;">Company Logo:</strong>
                         <p style="margin: 5px 0; color: #333;">${logoFile ? logoFile.name : 'No logo uploaded'}</p>
-                        ${logoFile && window.selectedLogoDataURL ? `<img src="${window.selectedLogoDataURL}" style="max-width: 150px; max-height: 150px; margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 8px;">` : ''}
                     </div>
                     <div>
                         <strong style="color: #666;">Thread Colors:</strong>
-                        <p style="margin: 5px 0; color: #333;">${formattedThreadColors}</p>
+                        <p style="margin: 5px 0; color: #333;">${threadColors}</p>
                     </div>
                     <div>
                         <strong style="color: #666;">Jacket Embroidery:</strong>
@@ -3557,10 +3470,7 @@
         function showSuccessModal(quoteID) {
             const modal = document.getElementById('successModal');
             const referenceNumber = document.getElementById('referenceNumber');
-
-            // Display the quote ID prominently
             referenceNumber.textContent = quoteID;
-            referenceNumber.style.cssText = 'font-size: 28px; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 15px 25px; border-radius: 8px; border: 2px solid #16a34a; letter-spacing: 1px;';
 
             // Populate order confirmation details
             const orderDetails = document.getElementById('orderConfirmationDetails');
@@ -4363,14 +4273,14 @@
                     ${product.description ? `<div class="product-description" title="${product.description}">${product.description.substring(0, 100)}${product.description.length > 100 ? '...' : ''}</div>` : ''}
 
                     <div class="selection-group">
-                        <div class="selection-label">Select Color:<span class="required-indicator">*</span></div>
-                        <div class="color-grid color-swatches">
+                        <div class="selection-label">Select Color:</div>
+                        <div class="color-grid">
                             ${colorSwatches}
                         </div>
                     </div>
 
                     <div class="selection-group">
-                        <div class="selection-label">Select Size:<span class="required-indicator">*</span></div>
+                        <div class="selection-label">Select Size:</div>
                         <div class="size-grid">
                             ${sizeButtons}
                         </div>
@@ -4410,8 +4320,6 @@
             // This handles both beanies (OSFA) and gloves (Black Barley) automatically
             setTimeout(() => {
                 autoSelectSingleOptions(card);
-                // Update the button state based on current selections
-                updateProductButtonState(card);
             }, 100);
 
             return card;
@@ -4631,9 +4539,6 @@
                 // Re-run selectProduct to update the selection with the size
                 selectProduct(productId, type);
             }
-
-            // Update the Select button state to reflect the new selection
-            updateProductButtonState(card);
         }
 
         async function selectColor(event, productId) {
@@ -4872,9 +4777,6 @@
                         } else {
                             console.log('Size not available in new color:', previouslySelectedSize); // Debug log
                         }
-
-                        // Update the Select button state after color and size selections
-                        updateProductButtonState(card);
                     }, 0);
                 }
 
@@ -4919,57 +4821,6 @@
             console.log(`selectProduct called for ${type}: ${productId}`);
             const card = document.querySelector(`[data-product-id="${productId}"]`);
 
-            // Get selected size and color FIRST before any changes
-            const selectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
-            const selectedColorElement = card.querySelector('.color-swatch.selected');
-            const selectedColor = selectedColorElement?.dataset.color;
-            const selectedColorCode = selectedColorElement?.dataset.colorCode;
-
-            // VALIDATE FIRST - Check what's missing
-            const hasColorOptions = card.querySelector('.color-swatches');
-            const hasSizeOptions = card.querySelector('.size-grid');
-
-            // Check for missing selections
-            if ((hasColorOptions && !selectedColor) || (hasSizeOptions && !selectedSize)) {
-                console.log(`${type} validation failed - missing required fields`);
-
-                // Determine specific error message
-                let errorMessage = '';
-                if (hasColorOptions && !selectedColor && hasSizeOptions && !selectedSize) {
-                    errorMessage = `Please select a color and size for the ${type}.`;
-                    // Highlight both areas
-                    const colorSwatches = card.querySelector('.color-swatches');
-                    const sizeGrid = card.querySelector('.size-grid');
-                    if (colorSwatches) colorSwatches.classList.add('missing-selection');
-                    if (sizeGrid) sizeGrid.classList.add('missing-selection');
-                } else if (hasColorOptions && !selectedColor) {
-                    errorMessage = `Please select a color for the ${type}.`;
-                    // Highlight color area
-                    const colorSwatches = card.querySelector('.color-swatches');
-                    if (colorSwatches) colorSwatches.classList.add('missing-selection');
-                } else if (hasSizeOptions && !selectedSize) {
-                    errorMessage = `Please select a size for the ${type}.`;
-                    // Highlight size area
-                    const sizeGrid = card.querySelector('.size-grid');
-                    if (sizeGrid) sizeGrid.classList.add('missing-selection');
-                }
-
-                // Show inline error
-                showInlineError(errorMessage);
-
-                // Remove highlights after 3 seconds
-                setTimeout(() => {
-                    card.querySelectorAll('.missing-selection').forEach(el => {
-                        el.classList.remove('missing-selection');
-                    });
-                }, 3000);
-
-                // Don't proceed with selection
-                updateContinueButtons();
-                return;
-            }
-
-            // VALIDATION PASSED - Now we can mark as selected
             // Clear previous selection of this type
             document.querySelectorAll(`[data-product-type="${type}"]`).forEach(c => {
                 c.classList.remove('selected');
@@ -4977,6 +4828,70 @@
 
             // Mark this card as selected
             card.classList.add('selected');
+
+            // Get selected size and color if any
+            const selectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
+            const selectedColorElement = card.querySelector('.color-swatch.selected');
+            const selectedColor = selectedColorElement?.dataset.color;
+            const selectedColorCode = selectedColorElement?.dataset.colorCode;
+
+            // Check if color is required but not selected
+            const hasColorOptions = card.querySelector('.color-swatches');
+            if (hasColorOptions && !selectedColor) {
+                // Clear any previous selection of this type
+                selectedItems[type] = null;
+
+                // Provide clear feedback to user
+                alert(`Please select a color for the ${type} before clicking Select`);
+                console.log(`${type} requires color but none selected - NOT saving selection`);
+
+                // Highlight the color selection area
+                const colorSwatches = card.querySelector('.color-swatches');
+                if (colorSwatches) {
+                    colorSwatches.style.border = '2px solid red';
+                    colorSwatches.style.borderRadius = '4px';
+                    colorSwatches.style.padding = '4px';
+                    setTimeout(() => {
+                        colorSwatches.style.border = '';
+                        colorSwatches.style.padding = '';
+                    }, 3000);
+                }
+
+                // Remove selected class since selection is incomplete
+                card.classList.remove('selected');
+                updateContinueButtons();
+                updateGiftBoxDisplay();
+                return;
+            }
+
+            // Check if size is required but not selected
+            const hasSizeOptions = card.querySelector('.size-grid');
+            if (hasSizeOptions && !selectedSize) {
+                // Clear any previous selection of this type
+                selectedItems[type] = null;
+
+                // Provide clear feedback to user
+                alert(`Please select a size for the ${type} before clicking Select`);
+                console.log(`${type} requires size but none selected - NOT saving selection`);
+
+                // Highlight the size selection area
+                const sizeGrid = card.querySelector('.size-grid');
+                if (sizeGrid) {
+                    sizeGrid.style.border = '2px solid red';
+                    sizeGrid.style.borderRadius = '4px';
+                    sizeGrid.style.padding = '4px';
+                    setTimeout(() => {
+                        sizeGrid.style.border = '';
+                        sizeGrid.style.padding = '';
+                    }, 3000);
+                }
+
+                // Remove selected class since selection is incomplete
+                card.classList.remove('selected');
+                updateContinueButtons();
+                updateGiftBoxDisplay();
+                return;
+            }
 
             // Find product data
             let product = null;
@@ -5076,203 +4991,29 @@
         }
 
 
-        // Skip Functions - REMOVED (all items now required)
-
-        // Update Gift Box Display Function
-        function updateGiftBoxDisplay() {
-            // Update the sidebar gift box display
-            updateSummary();
+        // Skip Functions
+        function skipJacket() {
+            selectedItems.jacket = null;
+            nextStep();
         }
 
-        // Check what's missing on any product cards for the current step
-        function checkMissingSelections(stepNumber) {
-            const typeMap = {
-                1: 'jacket',
-                2: 'hoodie',
-                3: 'beanie',
-                4: 'gloves'
-            };
-
-            const type = typeMap[stepNumber];
-            if (!type) return { hasInteraction: false, missingColor: false, missingSize: false };
-
-            // Find all product cards for this type
-            const cards = document.querySelectorAll(`[data-product-type="${type}"]`);
-            let hasInteraction = false;
-            let missingColor = false;
-            let missingSize = false;
-
-            cards.forEach(card => {
-                const hasColorOptions = card.querySelector('.color-swatches');
-                const hasSizeOptions = card.querySelector('.size-grid');
-                const hasSelectedColor = card.querySelector('.color-swatch.selected');
-                const hasSelectedSize = card.querySelector('.size-btn.selected');
-
-                // Check if user has made any selection on this card
-                if (hasSelectedColor || hasSelectedSize) {
-                    hasInteraction = true;
-                }
-
-                // Check what's missing
-                if (hasColorOptions && !hasSelectedColor && (hasSelectedSize || card.querySelector('.select-btn:focus'))) {
-                    missingColor = true;
-                    hasInteraction = true;
-                }
-
-                if (hasSizeOptions && !hasSelectedSize && (hasSelectedColor || card.querySelector('.select-btn:focus'))) {
-                    missingSize = true;
-                    hasInteraction = true;
-                }
-            });
-
-            return { hasInteraction, missingColor, missingSize };
+        function skipHoodie() {
+            selectedItems.hoodie = null;
+            nextStep();
         }
 
-        // Update product card button states based on selections
-        function updateProductButtonState(card) {
-            if (!card) return;
-
-            const productId = card.dataset.productId;
-            const productType = card.dataset.productType;
-            const selectBtn = card.querySelector(`button[onclick*="selectProduct"]`);
-
-            if (!selectBtn) return;
-
-            // Check if all required fields are selected
-            const hasColorOptions = card.querySelector('.color-swatches');
-            const hasSizeOptions = card.querySelector('.size-grid');
-
-            let colorSelected = true;
-            let sizeSelected = true;
-
-            if (hasColorOptions) {
-                colorSelected = !!card.querySelector('.color-swatch.selected');
-            }
-
-            if (hasSizeOptions) {
-                sizeSelected = !!card.querySelector('.size-btn.selected');
-            }
-
-            // Update button state and text
-            if (colorSelected && sizeSelected) {
-                selectBtn.disabled = false;
-                selectBtn.classList.remove('disabled-btn');
-                selectBtn.classList.add('select-btn');
-                selectBtn.innerHTML = '<i class="fas fa-check"></i> Select This ' +
-                    productType.charAt(0).toUpperCase() + productType.slice(1);
-            } else {
-                selectBtn.disabled = true;
-                selectBtn.classList.add('disabled-btn');
-                selectBtn.classList.remove('select-btn');
-
-                // Show what's missing
-                if (!colorSelected && !sizeSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Color & Size First';
-                } else if (!colorSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Color First';
-                } else if (!sizeSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Size First';
-                }
-            }
+        function skipBeanie() {
+            selectedItems.beanie = null;
+            nextStep();
         }
 
-        // Calculate Retail Value Function
-        function calculateRetailValue() {
-            let total = 0;
-            if (selectedItems.jacket && selectedItems.jacket.retailPrice) {
-                total += selectedItems.jacket.retailPrice;
-            }
-            if (selectedItems.hoodie && selectedItems.hoodie.retailPrice) {
-                total += selectedItems.hoodie.retailPrice;
-            }
-            if (selectedItems.beanie && selectedItems.beanie.retailPrice) {
-                total += selectedItems.beanie.retailPrice;
-            }
-            if (selectedItems.gloves && selectedItems.gloves.retailPrice) {
-                total += selectedItems.gloves.retailPrice;
-            }
-            // Add gift box and shipping
-            total += RETAIL_PRICES.giftBox || 9;
-            total += RETAIL_PRICES.shipping || 25;
-            return total;
-        }
-
-        // Inline Error Display Function
-        function showInlineError(message) {
-            // Remove any existing error messages
-            const existingError = document.querySelector('.inline-error-message');
-            if (existingError) {
-                existingError.remove();
-            }
-
-            // Create error message element
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'inline-error-message';
-            errorDiv.style.cssText = `
-                background: #ffebee;
-                border: 2px solid #f44336;
-                color: #b71c1c;
-                padding: 12px 20px;
-                border-radius: 8px;
-                margin: 20px auto;
-                max-width: 600px;
-                text-align: center;
-                font-weight: 500;
-                animation: shake 0.5s;
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1000;
-                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-            `;
-            errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-circle"></i> ${message}
-            `;
-
-            // Add to page
-            document.body.appendChild(errorDiv);
-
-            // Remove after 5 seconds
-            setTimeout(() => {
-                errorDiv.style.opacity = '0';
-                errorDiv.style.transition = 'opacity 0.3s';
-                setTimeout(() => errorDiv.remove(), 300);
-            }, 5000);
-
-            // Also highlight missing selections
-            highlightMissingSelections();
-        }
-
-        // Highlight Missing Selections
-        function highlightMissingSelections() {
-            // Remove existing highlights
-            document.querySelectorAll('.missing-selection').forEach(el => {
-                el.classList.remove('missing-selection');
-            });
-
-            // Check current step and highlight missing items
-            const currentStepElement = document.getElementById(`step${currentStep}`);
-
-            if (currentStep === 1 && selectedItems.jacket) {
-                // Highlight missing color or size
-                const jacketCard = document.querySelector('[data-product-type="jacket"].selected');
-                if (jacketCard) {
-                    if (!jacketCard.querySelector('.color-swatch.selected')) {
-                        const colorSection = jacketCard.querySelector('.color-swatches');
-                        if (colorSection) colorSection.classList.add('missing-selection');
-                    }
-                    if (!jacketCard.querySelector('.size-btn.selected')) {
-                        const sizeSection = jacketCard.querySelector('.size-grid');
-                        if (sizeSection) sizeSection.classList.add('missing-selection');
-                    }
-                }
-            }
-            // Similar for other steps...
+        function skipGloves() {
+            selectedItems.gloves = null;
+            nextStep();
         }
 
         // Navigation
-        window.goToStep = function(targetStep) {
+        function goToStep(targetStep) {
             // Convert to number if string
             targetStep = parseInt(targetStep);
 
@@ -5289,16 +5030,11 @@
                     document.querySelector(`[data-step="${i}"]`).classList.remove('active');
                 }
 
-                // Mark target step as active (not completed)
-                document.querySelector(`[data-step="${targetStep}"]`).classList.remove('completed');
-                document.querySelector(`[data-step="${targetStep}"]`).classList.add('active');
-
-                // Mark all steps after target as not active and not completed
-                for (let i = targetStep + 1; i <= 7; i++) {
-                    const stepElement = document.querySelector(`[data-step="${i}"]`);
-                    if (stepElement) {
-                        stepElement.classList.remove('active');
-                        stepElement.classList.remove('completed');
+                // Mark all steps after target as not active (but keep completed if they were visited)
+                for (let i = targetStep + 1; i <= 6; i++) {
+                    document.querySelector(`[data-step="${i}"]`).classList.remove('active');
+                    if (i <= highestStepReached) {
+                        document.querySelector(`[data-step="${i}"]`).classList.add('completed');
                     }
                 }
 
@@ -5307,6 +5043,7 @@
 
                 // Show target step
                 document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
 
                 // Remove completed class from current step and add active
                 document.querySelector(`[data-step="${currentStep}"]`).classList.remove('completed');
@@ -5336,45 +5073,21 @@
         // Validate current step selections
         function validateCurrentStep() {
             switch(currentStep) {
-                case 1: // Jacket step - REQUIRED
+                case 1: // Jacket step
                     if (!selectedItems.jacket) return false;
-                    // Check if we have the required fields OR if the card is properly selected in DOM
-                    const jacketCard = document.querySelector('[data-product-type="jacket"].selected');
-                    if (jacketCard) {
-                        // If card is selected, ensure we have color and size
-                        const hasColor = selectedItems.jacket.selectedColor || jacketCard.querySelector('.color-swatch.selected');
-                        const hasSize = selectedItems.jacket.selectedSize || jacketCard.querySelector('.size-btn.selected');
-                        return hasColor && hasSize;
-                    }
                     return selectedItems.jacket.selectedColor && selectedItems.jacket.selectedSize;
 
-                case 2: // Hoodie step - NOW REQUIRED (no skipping)
-                    if (!selectedItems.hoodie) return false;
-                    const hoodieCard = document.querySelector('[data-product-type="hoodie"].selected');
-                    if (hoodieCard) {
-                        const hasColor = selectedItems.hoodie.selectedColor || hoodieCard.querySelector('.color-swatch.selected');
-                        const hasSize = selectedItems.hoodie.selectedSize || hoodieCard.querySelector('.size-btn.selected');
-                        return hasColor && hasSize;
-                    }
+                case 2: // Hoodie step (can be skipped)
+                    if (!selectedItems.hoodie) return true; // Allow skipping
                     return selectedItems.hoodie.selectedColor && selectedItems.hoodie.selectedSize;
 
-                case 3: // Beanie step - REQUIRED
+                case 3: // Beanie step
                     if (!selectedItems.beanie) return false;
-                    const beanieCard = document.querySelector('[data-product-type="beanie"].selected');
-                    if (beanieCard) {
-                        const hasColor = selectedItems.beanie.selectedColor || beanieCard.querySelector('.color-swatch.selected');
-                        return hasColor;
-                    }
                     // Beanies usually have OSFA, so just check color
                     return selectedItems.beanie.selectedColor;
 
-                case 4: // Gloves step - NOW REQUIRED (no skipping)
-                    if (!selectedItems.gloves) return false;
-                    const glovesCard = document.querySelector('[data-product-type="gloves"].selected');
-                    if (glovesCard) {
-                        const hasSize = selectedItems.gloves.selectedSize || glovesCard.querySelector('.size-btn.selected');
-                        return hasSize;
-                    }
+                case 4: // Gloves step (can be skipped)
+                    if (!selectedItems.gloves) return true; // Allow skipping
                     return selectedItems.gloves.selectedSize;
 
                 default:
@@ -5382,72 +5095,28 @@
             }
         }
 
-        window.nextStep = function() {
+        function nextStep() {
             // Validate current step before advancing
             if (!validateCurrentStep()) {
+                // Determine what's missing for specific feedback
                 let missingInfo = '';
-                const productNames = {
-                    1: 'jacket',
-                    2: 'hoodie',
-                    3: 'beanie',
-                    4: 'gloves'
-                };
-
-                const productName = productNames[currentStep];
-
-                // Check what's missing on the current step's product cards
-                const missing = checkMissingSelections(currentStep);
-
-                // Provide specific feedback based on what's missing
-                if (missing.hasInteraction) {
-                    // User has started selecting but hasn't completed
-                    if (missing.missingColor && missing.missingSize) {
-                        missingInfo = `Please select a color and size for the ${productName}.`;
-                    } else if (missing.missingColor) {
-                        // Be more specific for beanies since size is often auto-selected
-                        if (productName === 'beanie') {
-                            missingInfo = `Please select a color for the beanie.`;
-                        } else {
-                            missingInfo = `Please select a color for the ${productName}.`;
-                        }
-                    } else if (missing.missingSize) {
-                        missingInfo = `Please select a size for the ${productName}.`;
-                    } else {
-                        // User interacted but selection isn't complete
-                        missingInfo = `Please complete your ${productName} selection.`;
-                    }
-                } else {
-                    // No interaction at all - check if something is in selectedItems but incomplete
-                    const item = selectedItems[productName];
-                    if (item) {
-                        // Item partially selected in data but not complete
-                        if (!item.selectedColor && !item.selectedSize) {
-                            missingInfo = `Please select a color and size for the ${productName}.`;
-                        } else if (!item.selectedColor) {
-                            missingInfo = `Please select a color for the ${productName}.`;
-                        } else if (!item.selectedSize) {
-                            missingInfo = `Please select a size for the ${productName}.`;
-                        } else {
-                            missingInfo = `Please complete your ${productName} selection.`;
-                        }
-                    } else {
-                        // Nothing selected at all
-                        missingInfo = `Please select a ${productName}. All items are required.`;
-                    }
+                if (currentStep === 1 && selectedItems.jacket) {
+                    if (!selectedItems.jacket.selectedColor) missingInfo = 'Please select a color for your jacket.';
+                    else if (!selectedItems.jacket.selectedSize) missingInfo = 'Please select a size for your jacket.';
+                } else if (currentStep === 1) {
+                    missingInfo = 'Please select a jacket to continue.';
+                } else if (currentStep === 2 && selectedItems.hoodie) {
+                    if (!selectedItems.hoodie.selectedColor) missingInfo = 'Please select a color for your hoodie.';
+                    else if (!selectedItems.hoodie.selectedSize) missingInfo = 'Please select a size for your hoodie.';
+                } else if (currentStep === 3 && selectedItems.beanie) {
+                    if (!selectedItems.beanie.selectedColor) missingInfo = 'Please select a color for your beanie.';
+                } else if (currentStep === 3) {
+                    missingInfo = 'Please select a beanie to continue.';
+                } else if (currentStep === 4 && selectedItems.gloves) {
+                    if (!selectedItems.gloves.selectedSize) missingInfo = 'Please select a size for your gloves.';
                 }
 
-                // Log for debugging
-                console.log('Validation failed:', {
-                    step: currentStep,
-                    product: productName,
-                    hasInteraction: missing.hasInteraction,
-                    missingColor: missing.missingColor,
-                    missingSize: missing.missingSize,
-                    errorMessage: missingInfo
-                });
-
-                // Show inline error instead of alert
-                showInlineError(missingInfo || 'Please complete your selection before continuing.');
+                alert(missingInfo || 'Please complete your selection before continuing.');
                 return;
             }
 
@@ -5489,101 +5158,84 @@
             }
         }
 
-        window.previousStep = function() {
+        function previousStep() {
             if (currentStep > 1) {
-                // Hide current step
-                document.getElementById(`step${currentStep}`).classList.remove('active');
-                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
-
-                // Update current step
-                currentStep--;
-
-                // Show previous step
-                document.getElementById(`step${currentStep}`).classList.add('active');
-                document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
-
-                // Update progress bar - mark current as active, not completed
-                document.querySelector(`[data-step="${currentStep}"]`).classList.remove('completed');
-
-                // Update summary and continue buttons
-                updateSummary();
-                updateContinueButtons();
-
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                goToStep(currentStep - 1);
             }
         }
 
         // Update continue button states based on selections
         function updateContinueButtons() {
-            // Helper function to check if a product is FULLY selected with ALL required attributes
-            function isProductFullyComplete(type) {
-                const item = selectedItems[type];
-                if (!item || !item.id) return false;
+            // Helper function to check if a product is fully selected (including required options)
+            function isProductComplete(productId, type) {
+                if (!productId) return false;
 
-                // Check the actual product card to verify selections match
-                const card = document.querySelector(`[data-product-id="${item.id}"]`);
-                if (!card || !card.classList.contains('selected')) return false;
+                const card = document.querySelector(`[data-product-id="${productId}"]`);
+                if (!card) return false;
 
-                // For jackets and hoodies - MUST have color AND size
-                if (type === 'jacket' || type === 'hoodie') {
-                    if (!item.selectedColor || !item.selectedSize) return false;
-                    // Double-check the DOM
-                    const hasColorSelected = card.querySelector('.color-swatch.selected');
-                    const hasSizeSelected = card.querySelector('.size-btn.selected');
-                    return hasColorSelected && hasSizeSelected;
+                // Check if color is selected (if color options exist)
+                const hasColorOptions = card.querySelector('.color-swatches');
+                if (hasColorOptions) {
+                    const selectedColor = card.querySelector('.color-swatch.selected');
+                    if (!selectedColor) return false;
                 }
 
-                // For beanies - MUST have color (size is often OSFA)
-                if (type === 'beanie') {
-                    if (!item.selectedColor) return false;
-                    const hasColorSelected = card.querySelector('.color-swatch.selected');
-                    return hasColorSelected;
-                }
-
-                // For gloves - MUST have size (and color if available)
-                if (type === 'gloves') {
-                    if (!item.selectedSize) return false;
-                    const hasSizeSelected = card.querySelector('.size-btn.selected');
-                    // If gloves have color options, check that too
-                    const hasColorOptions = card.querySelector('.color-swatches');
-                    if (hasColorOptions) {
-                        if (!item.selectedColor) return false;
-                        const hasColorSelected = card.querySelector('.color-swatch.selected');
-                        return hasSizeSelected && hasColorSelected;
-                    }
-                    return hasSizeSelected;
+                // Check if size is selected (if size options exist)
+                const hasSizeOptions = card.querySelector('.size-grid');
+                if (hasSizeOptions) {
+                    const selectedSize = card.querySelector('.size-btn.selected');
+                    if (!selectedSize) return false;
                 }
 
                 return true;
             }
 
-            // Update jacket continue button - ALL items are now REQUIRED
-            if (isProductFullyComplete('jacket')) {
+            // Update jacket continue button - check for required fields
+            if (selectedItems.jacket &&
+                selectedItems.jacket.selectedColor &&
+                selectedItems.jacket.selectedSize &&
+                isProductComplete(selectedItems.jacket.id, 'jacket')) {
                 document.getElementById('jacketNext')?.removeAttribute('disabled');
             } else {
                 document.getElementById('jacketNext')?.setAttribute('disabled', 'disabled');
             }
 
-            // Update hoodie continue button - ALL items are now REQUIRED (no skipping)
-            if (isProductFullyComplete('hoodie')) {
+            // Update hoodie continue button - check for required fields
+            if (selectedItems.hoodie &&
+                selectedItems.hoodie.selectedColor &&
+                selectedItems.hoodie.selectedSize &&
+                isProductComplete(selectedItems.hoodie.id, 'hoodie')) {
                 document.getElementById('hoodieNext')?.removeAttribute('disabled');
             } else {
-                document.getElementById('hoodieNext')?.setAttribute('disabled', 'disabled');
+                // Hoodie can be skipped, so enable if no selection
+                if (!selectedItems.hoodie) {
+                    document.getElementById('hoodieNext')?.removeAttribute('disabled');
+                } else {
+                    document.getElementById('hoodieNext')?.setAttribute('disabled', 'disabled');
+                }
             }
 
-            // Update beanie continue button - ALL items are now REQUIRED
-            if (isProductFullyComplete('beanie')) {
+            // Update beanie continue button - check for required fields
+            if (selectedItems.beanie &&
+                selectedItems.beanie.selectedColor &&
+                isProductComplete(selectedItems.beanie.id, 'beanie')) {
                 document.getElementById('beanieNext')?.removeAttribute('disabled');
             } else {
                 document.getElementById('beanieNext')?.setAttribute('disabled', 'disabled');
             }
 
-            // Update gloves continue button - ALL items are now REQUIRED (no skipping)
-            if (isProductFullyComplete('gloves')) {
+            // Update gloves continue button - check for required fields
+            if (selectedItems.gloves &&
+                selectedItems.gloves.selectedSize &&
+                isProductComplete(selectedItems.gloves.id, 'gloves')) {
                 document.getElementById('glovesNext')?.removeAttribute('disabled');
             } else {
-                document.getElementById('glovesNext')?.setAttribute('disabled', 'disabled');
+                // Gloves can be skipped, so enable if no selection
+                if (!selectedItems.gloves) {
+                    document.getElementById('glovesNext')?.removeAttribute('disabled');
+                } else {
+                    document.getElementById('glovesNext')?.setAttribute('disabled', 'disabled');
+                }
             }
         }
 
