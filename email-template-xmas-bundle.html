@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation {{quote_number}}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f7f7f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+
+    <!-- Outlook-safe wrapper -->
+    <!--[if mso]>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center">
+    <![endif]-->
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7f7f7;">
+        <tr>
+            <td align="center" style="padding: 20px 10px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e5e5e5; max-width: 600px;">
+
+                    <!-- Header - Dark text on white background -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 30px 20px; text-align: center; border-bottom: 3px solid #16a34a;">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                                 alt="Northwest Custom Apparel"
+                                 style="max-width: 180px; height: auto; margin-bottom: 15px;">
+                            <h1 style="color: #1a1a1a; margin: 15px 0 10px 0; font-size: 24px; font-weight: 600;">
+                                Order Confirmation
+                            </h1>
+                            <p style="color: #16a34a; margin: 0; font-size: 18px; font-weight: 500;">
+                                Order #{{quote_number}}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Thank You Message -->
+                    <tr>
+                        <td style="padding: 30px 30px 20px 30px;">
+                            <h2 style="color: #1a1a1a; margin: 0 0 10px 0; font-size: 20px; font-weight: 600;">
+                                Thank you for your order!
+                            </h2>
+                            <p style="color: #666666; margin: 0; font-size: 15px; line-height: 22px;">
+                                Your complimentary Christmas gift box has been confirmed. We'll send you an email when your order ships.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Order Details Section -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <!-- Customer Information Box -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e5e5; margin-bottom: 20px;">
+                                <tr>
+                                    <td style="background-color: #fafafa; padding: 15px 20px; border-bottom: 1px solid #e5e5e5;">
+                                        <h3 style="color: #1a1a1a; margin: 0; font-size: 16px; font-weight: 600;">
+                                            Customer Information
+                                        </h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="50%" style="padding-bottom: 10px;">
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Name:</strong><br>
+                                                        {{customer_name}}
+                                                    </p>
+                                                </td>
+                                                <td width="50%" style="padding-bottom: 10px;">
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Company:</strong><br>
+                                                        {{company_name}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%">
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Email:</strong><br>
+                                                        {{email}}
+                                                    </p>
+                                                </td>
+                                                <td width="50%">
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Phone:</strong><br>
+                                                        {{phone}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Order Summary -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e5e5; margin-bottom: 20px;">
+                                <tr>
+                                    <td style="background-color: #fafafa; padding: 15px 20px; border-bottom: 1px solid #e5e5e5;">
+                                        <h3 style="color: #1a1a1a; margin: 0; font-size: 16px; font-weight: 600;">
+                                            Order Summary
+                                        </h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <!-- Jacket -->
+                                            <tr>
+                                                <td style="padding: 15px 20px; border-bottom: 1px solid #f0f0f0;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 14px; font-weight: 500;">
+                                                                    Carhartt Jacket
+                                                                </p>
+                                                                <p style="margin: 0; color: #666666; font-size: 13px;">
+                                                                    {{jacket_details}}
+                                                                </p>
+                                                            </td>
+                                                            <td width="60" align="right">
+                                                                <p style="margin: 0; color: #16a34a; font-size: 14px; font-weight: 500;">
+                                                                    FREE
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <!-- Hoodie -->
+                                            <tr>
+                                                <td style="padding: 15px 20px; border-bottom: 1px solid #f0f0f0;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 14px; font-weight: 500;">
+                                                                    Carhartt Hoodie
+                                                                </p>
+                                                                <p style="margin: 0; color: #666666; font-size: 13px;">
+                                                                    {{hoodie_details}}
+                                                                </p>
+                                                            </td>
+                                                            <td width="60" align="right">
+                                                                <p style="margin: 0; color: #16a34a; font-size: 14px; font-weight: 500;">
+                                                                    FREE
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <!-- Beanie -->
+                                            <tr>
+                                                <td style="padding: 15px 20px; border-bottom: 1px solid #f0f0f0;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 14px; font-weight: 500;">
+                                                                    Carhartt Beanie
+                                                                </p>
+                                                                <p style="margin: 0; color: #666666; font-size: 13px;">
+                                                                    {{beanie_details}}
+                                                                </p>
+                                                            </td>
+                                                            <td width="60" align="right">
+                                                                <p style="margin: 0; color: #16a34a; font-size: 14px; font-weight: 500;">
+                                                                    FREE
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <!-- Gloves -->
+                                            <tr>
+                                                <td style="padding: 15px 20px; border-bottom: 1px solid #e5e5e5;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0 0 5px 0; color: #1a1a1a; font-size: 14px; font-weight: 500;">
+                                                                    Carhartt Gloves
+                                                                </p>
+                                                                <p style="margin: 0; color: #666666; font-size: 13px;">
+                                                                    {{gloves_details}}
+                                                                </p>
+                                                            </td>
+                                                            <td width="60" align="right">
+                                                                <p style="margin: 0; color: #16a34a; font-size: 14px; font-weight: 500;">
+                                                                    FREE
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <!-- Total -->
+                                            <tr>
+                                                <td style="padding: 15px 20px; background-color: #fafafa;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">
+                                                                    Total Value
+                                                                </p>
+                                                            </td>
+                                                            <td align="right">
+                                                                <p style="margin: 0;">
+                                                                    <span style="color: #999999; text-decoration: line-through; font-size: 14px;">$295.00</span>
+                                                                    <span style="color: #16a34a; font-size: 18px; font-weight: 600; margin-left: 10px;">FREE</span>
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Shipping Information -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e5e5; margin-bottom: 20px;">
+                                <tr>
+                                    <td style="background-color: #fafafa; padding: 15px 20px; border-bottom: 1px solid #e5e5e5;">
+                                        <h3 style="color: #1a1a1a; margin: 0; font-size: 16px; font-weight: 600;">
+                                            Delivery Information
+                                        </h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="50%">
+                                                    <p style="margin: 0 0 15px 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Delivery Method:</strong><br>
+                                                        {{delivery_type}}
+                                                    </p>
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Expected Delivery:</strong><br>
+                                                        {{delivery_date}}
+                                                    </p>
+                                                </td>
+                                                <td width="50%">
+                                                    <p style="margin: 0; color: #666666; font-size: 14px;">
+                                                        <strong style="color: #1a1a1a;">Shipping Address:</strong><br>
+                                                        {{address_1}}<br>
+                                                        {{city}}, {{state}} {{zip}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Important Notice - Professional Style -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #facc15; background-color: #fffef5; margin-bottom: 20px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <h3 style="color: #1a1a1a; margin: 0 0 10px 0; font-size: 18px; font-weight: 600;">
+                                            Important Holiday Ordering Information
+                                        </h3>
+                                        <p style="color: #666666; margin: 0 0 10px 0; font-size: 14px; line-height: 20px;">
+                                            Love your gift? Order for your entire team!
+                                        </p>
+                                        <p style="color: #1a1a1a; margin: 0 0 10px 0; font-size: 20px; font-weight: 600;">
+                                            Order by October 20, 2025
+                                        </p>
+                                        <p style="color: #666666; margin: 0; font-size: 14px;">
+                                            to guarantee delivery before the holidays
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #1a1a1a; padding: 30px; text-align: center;">
+                            <p style="color: #ffffff; margin: 0 0 10px 0; font-size: 16px; font-weight: 500;">
+                                Thank you for choosing Northwest Custom Apparel
+                            </p>
+                            <p style="color: #cccccc; margin: 0 0 15px 0; font-size: 14px; line-height: 20px;">
+                                Questions about your order? Call us at 253-922-5793<br>
+                                or email sales@nwcustomapparel.com
+                            </p>
+                            <p style="color: #999999; margin: 0; font-size: 12px;">
+                                Northwest Custom Apparel | Serving the Pacific Northwest Since 1977<br>
+                                2025 Freeman Road East, Milton, WA 98354
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!--[if mso]>
+            </td>
+        </tr>
+    </table>
+    <![endif]-->
+
+</body>
+</html>
