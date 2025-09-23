@@ -3166,8 +3166,8 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <button id="submitBtn" class="submit-btn" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
+                        <!-- Submit Button with inline onclick as failsafe -->
+                        <button id="submitBtn" class="submit-btn" onclick="window.submitOrder(this)" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
                             <i class="fas fa-paper-plane"></i> Submit Order
                         </button>
 
@@ -3825,8 +3825,8 @@
             }
         }
 
-        // Flag to prevent double submissions
-        let isSubmitting = false;
+        // Flag to prevent double submissions - make it global for easier debugging
+        window.isSubmitting = false;
 
         // Helper function to update submission progress
         function updateSubmissionProgress(stepName, message) {
@@ -3858,17 +3858,34 @@
             }
 
             // Prevent double submissions
-            if (isSubmitting) {
+            if (window.isSubmitting) {
                 console.log('Already submitting, ignoring duplicate click');
                 return;
             }
 
             try {
-                isSubmitting = true;
+                window.isSubmitting = true;
 
                 // Show loading overlay immediately
                 const overlay = document.getElementById('submissionOverlay');
                 overlay.classList.add('active');
+
+                // Set a 30-second timeout to auto-recover if submission gets stuck
+                const submissionTimeout = setTimeout(() => {
+                    if (window.isSubmitting) {
+                        // Auto-recover after 30 seconds
+                        overlay.classList.remove('active');
+                        window.isSubmitting = false;
+                        alert('The submission is taking longer than expected. Please try again or contact support at 253-922-5793.');
+
+                        // Re-enable submit button
+                        const submitBtn = button || document.getElementById('submitBtn');
+                        if (submitBtn) {
+                            submitBtn.classList.remove('processing');
+                            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+                        }
+                    }
+                }, 30000);
 
                 // Start with validation step
                 updateSubmissionProgress('validate', 'Validating your order details...');
@@ -3883,7 +3900,8 @@
 
                 if (!firstName || !lastName || !email || !phone) {
                     overlay.classList.remove('active');
-                    isSubmitting = false;
+                    window.isSubmitting = false;
+                    clearTimeout(submissionTimeout);
                     alert('Please fill in all required contact information');
                     return;
                 }
@@ -3898,7 +3916,8 @@
 
                     if (!address || !city || !state || !zipCode) {
                         overlay.classList.remove('active');
-                        isSubmitting = false;
+                        window.isSubmitting = false;
+                        clearTimeout(submissionTimeout);
                         alert('Please fill in all required shipping information including ZIP code');
                         console.warn('Missing shipping fields:', { address, city, state, zipCode });
                         return;
@@ -4020,13 +4039,16 @@
                 const overlay = document.getElementById('submissionOverlay');
                 overlay.classList.remove('active');
 
+                // Clear the timeout since submission completed successfully
+                clearTimeout(submissionTimeout);
+
                 // Show success modal
                 showSuccessModal(result.quoteID);
 
                 // Reset form after a delay
                 setTimeout(() => {
                     resetForm();
-                    isSubmitting = false;
+                    window.isSubmitting = false;
                     if (submitBtn) {
                         submitBtn.classList.remove('processing');
                         submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
@@ -4035,7 +4057,8 @@
             } else {
                 const overlay = document.getElementById('submissionOverlay');
                 overlay.classList.remove('active');
-                isSubmitting = false;
+                window.isSubmitting = false;
+                clearTimeout(submissionTimeout);
 
                 alert('There was an error submitting your order. Please try again.');
                 if (submitBtn) {
@@ -4062,7 +4085,8 @@
                 // Hide overlay and re-enable the submit button
                 const overlay = document.getElementById('submissionOverlay');
                 if (overlay) overlay.classList.remove('active');
-                isSubmitting = false;
+                window.isSubmitting = false;
+                clearTimeout(submissionTimeout);
 
                 const submitBtn = button || document.getElementById('submitBtn');
                 if (submitBtn) {
@@ -4430,6 +4454,43 @@
             // Close modal
             document.getElementById('successModal').classList.remove('active');
         }
+
+        // Function to attach submit button handlers (called when Step 7 loads)
+        function attachSubmitHandlers() {
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn && !submitBtn.hasAttribute('data-handlers-attached')) {
+                // Remove any existing handlers first
+                submitBtn.onclick = null;
+
+                // Add new click handler
+                submitBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.submitOrder(this);
+                };
+
+                // Mark as attached to prevent duplicates
+                submitBtn.setAttribute('data-handlers-attached', 'true');
+                console.log('Submit button handlers attached successfully');
+            }
+        }
+
+        // Global reset function for customer support
+        window.resetSubmission = function() {
+            window.isSubmitting = false;
+            const overlay = document.getElementById('submissionOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('processing');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+            }
+            console.log('Submission state has been reset. You can now submit your order.');
+            return 'Ready to submit';
+        };
 
         // Phone number formatting function
         function formatPhoneNumber(value) {
@@ -6296,7 +6357,20 @@
 
                 // Populate review data when reaching step 7
                 if (currentStep === 7) {
+                    // IMPORTANT: Reset any stuck submission state when entering Step 7
+                    window.isSubmitting = false;
+                    const overlay = document.getElementById('submissionOverlay');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                    }
+
+                    // Populate the review data
                     populateReviewData();
+
+                    // Ensure submit button has handlers attached
+                    setTimeout(() => {
+                        attachSubmitHandlers();
+                    }, 100);
                 }
 
                 // Show scroll indicator for product selection steps
