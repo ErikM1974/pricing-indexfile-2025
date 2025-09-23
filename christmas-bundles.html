@@ -3904,6 +3904,11 @@
             let submitBtn;
             let originalButtonHTML;
             function finalizeSubmission() {
+                if (window.submissionFlowDebug) {
+                    console.log('🚀 finalizeSubmission called');
+                    console.log('  - submitBtn value:', submitBtn);
+                    console.log('  - originalButtonHTML:', originalButtonHTML);
+                }
                 try {
                     const overlayEl = document.getElementById('submissionOverlay');
                     if (overlayEl) overlayEl.classList.remove('active');
@@ -3999,6 +4004,12 @@
                 // Update button to show processing state (but not disabled)
                 submitBtn = button || document.getElementById('submitBtn');
                 originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
+                if (window.submissionFlowDebug) {
+                    console.log('📌 submitBtn assigned:', submitBtn);
+                    console.log('  - button parameter:', button);
+                    console.log('  - submitBtn element:', submitBtn);
+                    console.log('  - originalButtonHTML:', originalButtonHTML);
+                }
                 if (submitBtn) {
                     submitBtn.classList.add('processing');
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
@@ -4121,6 +4132,9 @@
 
                 // Schedule cleanup FIRST so it happens even if the modal throws
                 setTimeout(() => {
+                    if (window.submissionFlowDebug) {
+                        console.log('⏰ 3-second timer fired, calling finalizeSubmission');
+                    }
                     try { resetForm(); } catch (e) { console.error('[Submit] resetForm error:', e); }
                     finalizeSubmission();
                 }, 3000);
@@ -4133,6 +4147,9 @@
                     // Cleanup still scheduled above
                 }
             } else {
+                if (window.submissionFlowDebug) {
+                    console.log('❌ API error - calling finalizeSubmission immediately');
+                }
                 alert('There was an error submitting your order. Please try again.');
                 finalizeSubmission();
             }
@@ -4151,6 +4168,9 @@
                 }
 
                 alert(errorMessage);
+                if (window.submissionFlowDebug) {
+                    console.log('🔥 Exception caught - calling finalizeSubmission immediately');
+                }
                 finalizeSubmission();
             }
         }
