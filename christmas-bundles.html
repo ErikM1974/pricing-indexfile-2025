@@ -7416,10 +7416,202 @@
             return result;
         };
 
+        // ============================================
+        // SPINNER DEBUG FUNCTIONS
+        // ============================================
+
+        // Check spinner and submission state
+        window.debugSpinner = function() {
+            const overlay = document.getElementById('submissionOverlay');
+            const submitBtn = document.getElementById('submitBtn');
+            const modal = document.getElementById('successModal');
+
+            console.log('=== SPINNER DEBUG INFO ===');
+            console.log('Overlay element exists:', !!overlay);
+            console.log('Overlay has "active" class:', overlay?.classList.contains('active'));
+            console.log('Overlay display style:', overlay?.style.display);
+            console.log('Overlay computed display:', overlay ? window.getComputedStyle(overlay).display : 'N/A');
+            console.log('');
+            console.log('Submission state (isSubmitting):', window.isSubmitting);
+            console.log('Current step:', currentStep);
+            console.log('User has interacted:', userHasInteracted);
+            console.log('');
+            console.log('Submit button exists:', !!submitBtn);
+            console.log('Submit button disabled:', submitBtn?.disabled);
+            console.log('Submit button HTML:', submitBtn?.innerHTML);
+            console.log('Submit button has handlers:', submitBtn?.hasAttribute('data-handlers-attached'));
+            console.log('');
+            console.log('Success modal exists:', !!modal);
+            console.log('Success modal has "active" class:', modal?.classList.contains('active'));
+
+            return 'Debug info logged above';
+        };
+
+        // Force remove spinner
+        window.clearSpinner = function() {
+            console.log('=== FORCE CLEARING SPINNER ===');
+
+            const overlay = document.getElementById('submissionOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                overlay.style.display = 'none';
+                console.log('✓ Overlay "active" class removed');
+                console.log('✓ Overlay display set to "none"');
+            } else {
+                console.log('✗ Overlay element not found!');
+            }
+
+            window.isSubmitting = false;
+            console.log('✓ isSubmitting set to false');
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('processing');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+                console.log('✓ Submit button reset');
+            } else {
+                console.log('✗ Submit button not found!');
+            }
+
+            return 'Spinner cleared - try submitting again';
+        };
+
+        // Enable detailed submission flow logging
+        window.debugSubmissionFlow = function() {
+            console.log('=== ENABLING SUBMISSION FLOW DEBUG ===');
+
+            // Monkey-patch submitOrder to add logging
+            const originalSubmitOrder = window.submitOrder;
+            window.submitOrder = async function(button) {
+                console.log('📍 submitOrder called');
+                console.log('  - currentStep:', currentStep);
+                console.log('  - isSubmitting:', window.isSubmitting);
+                console.log('  - userHasInteracted:', userHasInteracted);
+
+                try {
+                    const result = await originalSubmitOrder.call(this, button);
+                    console.log('📍 submitOrder completed successfully');
+                    return result;
+                } catch (error) {
+                    console.error('📍 submitOrder failed:', error);
+                    throw error;
+                }
+            };
+
+            // Monkey-patch showSuccessModal to add logging
+            const originalShowSuccess = showSuccessModal;
+            window.showSuccessModal = function(quoteID) {
+                console.log('📍 showSuccessModal called with quote ID:', quoteID);
+
+                const modal = document.getElementById('successModal');
+                if (!modal) {
+                    console.error('❌ Success modal element not found!');
+                    return;
+                }
+
+                try {
+                    originalShowSuccess(quoteID);
+                    console.log('✓ Success modal shown');
+                } catch (error) {
+                    console.error('❌ Error showing success modal:', error);
+                }
+            };
+
+            return 'Submission flow debugging enabled - submit an order to see detailed logs';
+        };
+
+        // Test success modal directly
+        window.testSuccessModal = function() {
+            console.log('=== TESTING SUCCESS MODAL ===');
+
+            const modal = document.getElementById('successModal');
+            if (!modal) {
+                console.error('❌ Success modal element not found!');
+                return 'Modal element missing';
+            }
+
+            const referenceNumber = document.getElementById('referenceNumber');
+            if (!referenceNumber) {
+                console.error('❌ Reference number element not found!');
+                return 'Reference number element missing';
+            }
+
+            const orderDetails = document.getElementById('orderConfirmationDetails');
+            if (!orderDetails) {
+                console.error('❌ Order details element not found!');
+                return 'Order details element missing';
+            }
+
+            console.log('✓ All modal elements found');
+
+            // Try to show it with test data
+            try {
+                showSuccessModal('TEST-123');
+                console.log('✓ Modal shown with test data');
+
+                // Hide it after 3 seconds
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    console.log('✓ Modal hidden');
+                }, 3000);
+
+                return 'Modal test successful - should be visible now';
+            } catch (error) {
+                console.error('❌ Error showing modal:', error);
+                return 'Modal test failed - check console for error';
+            }
+        };
+
+        // Monitor overlay changes
+        window.monitorOverlay = function() {
+            console.log('=== MONITORING OVERLAY CHANGES ===');
+
+            const overlay = document.getElementById('submissionOverlay');
+            if (!overlay) {
+                console.error('❌ Overlay element not found!');
+                return;
+            }
+
+            // Create MutationObserver to watch for changes
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        console.log('📍 Overlay class changed:', overlay.className);
+                        console.log('  - Has "active":', overlay.classList.contains('active'));
+                    }
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        console.log('📍 Overlay style changed:', overlay.style.cssText);
+                    }
+                });
+            });
+
+            observer.observe(overlay, {
+                attributes: true,
+                attributeFilter: ['class', 'style']
+            });
+
+            console.log('✓ Now monitoring overlay changes');
+            console.log('  - Current classes:', overlay.className);
+            console.log('  - Current style:', overlay.style.cssText);
+
+            // Store observer so it can be disconnected
+            window.overlayObserver = observer;
+
+            return 'Monitoring started - submit an order to see overlay changes';
+        };
+
         console.log('Debug functions loaded. Available commands:');
         console.log('- window.debugSubmitTestOrder() - Submit a test order');
         console.log('- window.debugCheckOrder("XMAS####-###") - Check database for an order');
         console.log('- window.debugFullTest() - Run full test and check');
+        console.log('');
+        console.log('🔍 SPINNER DEBUG COMMANDS:');
+        console.log('- window.debugSpinner() - Check spinner and submission state');
+        console.log('- window.clearSpinner() - Force remove the spinner');
+        console.log('- window.debugSubmissionFlow() - Enable detailed submission logging');
+        console.log('- window.testSuccessModal() - Test if success modal works');
+        console.log('- window.monitorOverlay() - Monitor overlay changes in real-time');
     </script>
 </body>
 </html>
