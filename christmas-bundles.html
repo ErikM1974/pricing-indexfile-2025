@@ -6218,6 +6218,22 @@
                     validateForm();
                 }
 
+                // Reset submission state when entering Step 7
+                if (currentStep === 7) {
+                    // IMPORTANT: Reset any stuck submission state when entering Step 7
+                    window.isSubmitting = false;
+                    const overlay = document.getElementById('submissionOverlay');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                    }
+
+                    // Populate the review data
+                    populateReviewData();
+
+                    // Attach submit button handlers
+                    attachSubmitHandlers();
+                }
+
                 // Update continue button states based on selections
                 updateContinueButtons();
 
