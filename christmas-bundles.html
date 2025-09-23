@@ -3902,17 +3902,9 @@
                 // Set a 30-second timeout to auto-recover if submission gets stuck
                 const submissionTimeout = setTimeout(() => {
                     if (window.isSubmitting) {
-                        // Auto-recover after 30 seconds
-                        overlay.classList.remove('active');
-                        window.isSubmitting = false;
+                        console.warn('[Submit] 30s failsafe triggered — auto-recovering UI');
+                        finalizeSubmission();
                         alert('The submission is taking longer than expected. Please try again or contact support at 253-922-5793.');
-
-                        // Re-enable submit button
-                        const submitBtn = button || document.getElementById('submitBtn');
-                        if (submitBtn) {
-                            submitBtn.classList.remove('processing');
-                            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
-                        }
                     }
                 }, 30000);
 
@@ -3960,6 +3952,35 @@
                     submitBtn.classList.add('processing');
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 }
+
+                // CRITICAL FIX: Centralized cleanup function to ensure UI always resets
+                const finalizeSubmission = () => {
+                    try {
+                        const overlayEl = document.getElementById('submissionOverlay');
+                        if (overlayEl) overlayEl.classList.remove('active');
+                    } catch (e) {
+                        console.warn('[Submit] overlay finalize error:', e);
+                    }
+                    try {
+                        window.isSubmitting = false;
+                    } catch (e) {
+                        console.warn('[Submit] flag finalize error:', e);
+                    }
+                    try {
+                        if (typeof submissionTimeout !== 'undefined') clearTimeout(submissionTimeout);
+                    } catch (e) {
+                        console.warn('[Submit] timeout finalize error:', e);
+                    }
+                    try {
+                        const btn = button || document.getElementById('submitBtn');
+                        if (btn) {
+                            btn.classList.remove('processing');
+                            btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                        }
+                    } catch (e) {
+                        console.warn('[Submit] button finalize error:', e);
+                    }
+                };
 
             // Upload logo if present
             let imageExternalKey = null;
@@ -4064,36 +4085,29 @@
                     // Still show success modal even if email fails
                 }
 
-                // Hide overlay and show success modal
+                // Hide overlay
                 const overlay = document.getElementById('submissionOverlay');
                 overlay.classList.remove('active');
 
                 // Clear the timeout since submission completed successfully
                 clearTimeout(submissionTimeout);
 
-                // Show success modal
-                showSuccessModal(result.quoteID);
-
-                // Reset form after a delay
+                // Schedule cleanup FIRST so it happens even if the modal throws
                 setTimeout(() => {
-                    resetForm();
-                    window.isSubmitting = false;
-                    if (submitBtn) {
-                        submitBtn.classList.remove('processing');
-                        submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
-                    }
+                    try { resetForm(); } catch (e) { console.error('[Submit] resetForm error:', e); }
+                    finalizeSubmission();
                 }, 3000);
-            } else {
-                const overlay = document.getElementById('submissionOverlay');
-                overlay.classList.remove('active');
-                window.isSubmitting = false;
-                clearTimeout(submissionTimeout);
 
-                alert('There was an error submitting your order. Please try again.');
-                if (submitBtn) {
-                    submitBtn.classList.remove('processing');
-                    submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                // Show success modal (do not allow this to block cleanup)
+                try {
+                    showSuccessModal(result.quoteID);
+                } catch (e) {
+                    console.error('[Submit] showSuccessModal error:', e);
+                    // Cleanup still scheduled above
                 }
+            } else {
+                alert('There was an error submitting your order. Please try again.');
+                finalizeSubmission();
             }
             } catch (error) {
                 // Comprehensive error handling for mobile
@@ -4110,18 +4124,7 @@
                 }
 
                 alert(errorMessage);
-
-                // Hide overlay and re-enable the submit button
-                const overlay = document.getElementById('submissionOverlay');
-                if (overlay) overlay.classList.remove('active');
-                window.isSubmitting = false;
-                clearTimeout(submissionTimeout);
-
-                const submitBtn = button || document.getElementById('submitBtn');
-                if (submitBtn) {
-                    submitBtn.classList.remove('processing');
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
-                }
+                finalizeSubmission();
             }
         }
 
