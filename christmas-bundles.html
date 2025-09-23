@@ -6017,6 +6017,9 @@
 
             if (!selectBtn) return;
 
+            // Check if product is already selected
+            const isAlreadySelected = card.classList.contains('selected');
+
             // Check if all required fields are selected
             const hasColorOptions = card.querySelector('.color-swatches');
             const hasSizeOptions = card.querySelector('.size-grid');
@@ -6032,8 +6035,20 @@
                 sizeSelected = !!card.querySelector('.size-btn.selected');
             }
 
+            // AUTO-SELECT: If both size and color are selected but product isn't selected yet
+            if (colorSelected && sizeSelected && !isAlreadySelected) {
+                console.log(`Auto-selecting ${productType} since all options are selected`);
+                selectProduct(productId, productType);
+                return; // Exit early since selectProduct will update everything
+            }
+
             // Update button state and text
-            if (colorSelected && sizeSelected) {
+            if (isAlreadySelected) {
+                selectBtn.disabled = false;
+                selectBtn.classList.remove('disabled-btn');
+                selectBtn.classList.add('select-btn', 'selected');
+                selectBtn.innerHTML = '<i class="fas fa-check-circle"></i> Product Selected';
+            } else if (colorSelected && sizeSelected) {
                 selectBtn.disabled = false;
                 selectBtn.classList.remove('disabled-btn');
                 selectBtn.classList.add('select-btn');
