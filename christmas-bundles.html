@@ -707,6 +707,146 @@
             transform: none !important;
         }
 
+        /* Loading Overlay Styles */
+        .submission-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .submission-overlay.active {
+            display: flex;
+        }
+
+        .submission-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .submission-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #c41e3a;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .submission-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .submission-message {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            min-height: 24px;
+        }
+
+        .submission-steps {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .submission-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #9ca3af;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .submission-step.active {
+            color: #c41e3a;
+            font-weight: 500;
+        }
+
+        .submission-step.complete {
+            color: #10b981;
+        }
+
+        .submission-step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .submission-step.complete .submission-step-icon {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .submission-step.active .submission-step-icon {
+            background: #c41e3a;
+            border-color: #c41e3a;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Processing state for submit button */
+        .submit-btn.processing {
+            background: linear-gradient(135deg, #c41e3a, #dc3545) !important;
+            opacity: 0.9;
+            cursor: wait !important;
+            animation: subtlePulse 2s infinite;
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% {
+                opacity: 0.9;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
         /* Required field indicator */
         .required-indicator {
             color: #dc2626;
@@ -1513,7 +1653,7 @@
 
         .submit-btn:disabled {
             background: #ccc;
-            cursor: not-allowed;
+            cursor: wait;
             transform: none;
         }
 
@@ -2391,6 +2531,34 @@
     </style>
 </head>
 <body>
+    <!-- Loading Overlay for Submission -->
+    <div id="submissionOverlay" class="submission-overlay">
+        <div class="submission-modal">
+            <div class="submission-spinner"></div>
+            <h2 class="submission-title">Processing Your Order</h2>
+            <p class="submission-message">Please wait while we create your gift box...</p>
+
+            <div class="submission-steps">
+                <div class="submission-step" data-step="validate">
+                    <div class="submission-step-icon">1</div>
+                    <span>Validating order details</span>
+                </div>
+                <div class="submission-step" data-step="logo">
+                    <div class="submission-step-icon">2</div>
+                    <span>Uploading your logo</span>
+                </div>
+                <div class="submission-step" data-step="quote">
+                    <div class="submission-step-icon">3</div>
+                    <span>Creating your quote</span>
+                </div>
+                <div class="submission-step" data-step="email">
+                    <div class="submission-step-icon">4</div>
+                    <span>Sending confirmation email</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Continue Button -->
     <button class="floating-continue-btn" id="floatingContinue" onclick="clickActiveContinueButton()">
         Continue to Next Step
@@ -3591,6 +3759,31 @@
             }
         }
 
+        // Flag to prevent double submissions
+        let isSubmitting = false;
+
+        // Helper function to update submission progress
+        function updateSubmissionProgress(stepName, message) {
+            const overlay = document.getElementById('submissionOverlay');
+            const messageEl = overlay.querySelector('.submission-message');
+            const steps = overlay.querySelectorAll('.submission-step');
+
+            steps.forEach(step => {
+                const stepData = step.getAttribute('data-step');
+                if (stepData === stepName) {
+                    step.classList.add('active');
+                    step.classList.remove('complete');
+                } else if (step.classList.contains('active')) {
+                    step.classList.remove('active');
+                    step.classList.add('complete');
+                }
+            });
+
+            if (messageEl && message) {
+                messageEl.textContent = message;
+            }
+        }
+
         // Submit Order Function - Make it globally accessible
         window.submitOrder = async function(button) {
             // Debug log for mobile
@@ -3598,7 +3791,24 @@
                 window.mobileDebug.log('submitOrder function called');
             }
 
+            // Prevent double submissions
+            if (isSubmitting) {
+                console.log('Already submitting, ignoring duplicate click');
+                return;
+            }
+
             try {
+                isSubmitting = true;
+
+                // Show loading overlay immediately
+                const overlay = document.getElementById('submissionOverlay');
+                overlay.classList.add('active');
+
+                // Start with validation step
+                updateSubmissionProgress('validate', 'Validating your order details...');
+
+                // Small delay to show the overlay
+                await new Promise(resolve => setTimeout(resolve, 300));
                 // Validate required fields
                 const firstName = document.getElementById('firstName').value;
                 const lastName = document.getElementById('lastName').value;
@@ -3606,6 +3816,8 @@
                 const phone = document.getElementById('phone').value;
 
                 if (!firstName || !lastName || !email || !phone) {
+                    overlay.classList.remove('active');
+                    isSubmitting = false;
                     alert('Please fill in all required contact information');
                     return;
                 }
@@ -3619,24 +3831,34 @@
                     const zipCode = document.getElementById('zipCode')?.value;
 
                     if (!address || !city || !state || !zipCode) {
+                        overlay.classList.remove('active');
+                        isSubmitting = false;
                         alert('Please fill in all required shipping information including ZIP code');
                         console.warn('Missing shipping fields:', { address, city, state, zipCode });
                         return;
                     }
                 }
 
-                // Show loading state - use passed button or find by id
+                // Update button to show processing state (but not disabled)
                 const submitBtn = button || document.getElementById('submitBtn');
                 const originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
                 if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                    submitBtn.classList.add('processing');
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 }
 
             // Upload logo if present
             let imageExternalKey = null;
             if (window.selectedLogoFile) {
+                updateSubmissionProgress('logo', 'Uploading your logo...');
+                await new Promise(resolve => setTimeout(resolve, 200));
                 imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
+            } else {
+                // Skip logo step if no logo
+                const logoStep = document.querySelector('.submission-step[data-step="logo"]');
+                if (logoStep) {
+                    logoStep.style.display = 'none';
+                }
             }
 
             // Collect all form data
@@ -3712,11 +3934,15 @@
             if (!selectedItems.gloves?.id) console.warn('Gloves not selected or missing ID:', selectedItems.gloves);
 
             // Submit to API
+            updateSubmissionProgress('quote', 'Creating your quote...');
+            await new Promise(resolve => setTimeout(resolve, 200));
             const quoteService = new ChristmasBundleQuoteService();
             const result = await quoteService.submitQuote(quoteData);
 
             if (result.success) {
                 // Send confirmation email
+                updateSubmissionProgress('email', 'Sending confirmation email...');
+                await new Promise(resolve => setTimeout(resolve, 200));
                 const emailResult = await sendConfirmationEmail(quoteData, result.quoteID);
 
                 if (!emailResult.success) {
@@ -3724,17 +3950,30 @@
                     // Still show success modal even if email fails
                 }
 
+                // Hide overlay and show success modal
+                const overlay = document.getElementById('submissionOverlay');
+                overlay.classList.remove('active');
+
                 // Show success modal
                 showSuccessModal(result.quoteID);
 
                 // Reset form after a delay
                 setTimeout(() => {
                     resetForm();
+                    isSubmitting = false;
+                    if (submitBtn) {
+                        submitBtn.classList.remove('processing');
+                        submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                    }
                 }, 3000);
             } else {
+                const overlay = document.getElementById('submissionOverlay');
+                overlay.classList.remove('active');
+                isSubmitting = false;
+
                 alert('There was an error submitting your order. Please try again.');
                 if (submitBtn) {
-                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('processing');
                     submitBtn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
                 }
             }
@@ -3754,11 +3993,15 @@
 
                 alert(errorMessage);
 
-                // Re-enable the submit button
+                // Hide overlay and re-enable the submit button
+                const overlay = document.getElementById('submissionOverlay');
+                if (overlay) overlay.classList.remove('active');
+                isSubmitting = false;
+
                 const submitBtn = button || document.getElementById('submitBtn');
                 if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order <span class="loader"></span>';
+                    submitBtn.classList.remove('processing');
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
                 }
             }
         }
