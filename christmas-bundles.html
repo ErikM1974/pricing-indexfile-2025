@@ -3921,11 +3921,20 @@
                     console.warn('[Submit] timeout finalize error:', e);
                 }
                 try {
-                    const btn = button || document.getElementById('submitBtn');
+                    const btn = submitBtn || document.getElementById('submitBtn');
                     if (btn) {
+                        if (window.submissionFlowDebug) {
+                            console.log('📍 finalizeSubmission: Re-enabling button');
+                            console.log('  - Button was disabled:', btn.disabled);
+                        }
                         btn.disabled = false;  // CRITICAL: Re-enable the button
                         btn.classList.remove('processing');
                         btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                        if (window.submissionFlowDebug) {
+                            console.log('  - Button now disabled:', btn.disabled);
+                        }
+                    } else {
+                        console.warn('[Submit] No button found to finalize!');
                     }
                 } catch (e) {
                     console.warn('[Submit] button finalize error:', e);
