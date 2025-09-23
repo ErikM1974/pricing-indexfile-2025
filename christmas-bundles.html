@@ -3728,12 +3728,18 @@
                 };
 
                 try {
-                    // Create session
+                    // Create session with 10-second timeout
+                    const sessionController = new AbortController();
+                    const sessionTimeoutId = setTimeout(() => sessionController.abort(), 10000);
+
                     const sessionResponse = await fetch(`${this.apiBase}/api/quote_sessions`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(sessionData)
+                        body: JSON.stringify(sessionData),
+                        signal: sessionController.signal
                     });
+
+                    clearTimeout(sessionTimeoutId);
 
                     if (!sessionResponse.ok) {
                         console.error('Session creation failed:', sessionResponse.statusText);
@@ -3802,11 +3808,18 @@
                     console.log('Sending item data to API:', itemData);
                     console.log('BundleConfiguration field:', itemData.BundleConfiguration);
 
+                    // Create item with 10-second timeout
+                    const itemController = new AbortController();
+                    const itemTimeoutId = setTimeout(() => itemController.abort(), 10000);
+
                     const itemResponse = await fetch(`${this.apiBase}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(itemData)
+                        body: JSON.stringify(itemData),
+                        signal: itemController.signal
                     });
+
+                    clearTimeout(itemTimeoutId);
 
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
@@ -3902,11 +3915,11 @@
                 // Set a 30-second timeout to auto-recover if submission gets stuck
                 const submissionTimeout = setTimeout(() => {
                     if (window.isSubmitting) {
-                        console.warn('[Submit] 30s failsafe triggered — auto-recovering UI');
+                        console.warn('[Submit] 20s failsafe triggered — auto-recovering UI');
                         finalizeSubmission();
                         alert('The submission is taking longer than expected. Please try again or contact support at 253-922-5793.');
                     }
-                }, 30000);
+                }, 20000);
 
                 // Start with validation step
                 updateSubmissionProgress('validate', 'Validating your order details...');
@@ -4075,10 +4088,15 @@
             const result = await quoteService.submitQuote(quoteData);
 
             if (result.success) {
-                // Send confirmation email
+                // Send confirmation email with 10-second timeout
                 updateSubmissionProgress('email', 'Sending confirmation email...');
                 await new Promise(resolve => setTimeout(resolve, 200));
-                const emailResult = await sendConfirmationEmail(quoteData, result.quoteID);
+                const emailResult = await Promise.race([
+                    sendConfirmationEmail(quoteData, result.quoteID),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Email timeout after 10 seconds')), 10000)
+                    )
+                ]);
 
                 if (!emailResult.success) {
                     console.error('Email failed to send:', emailResult.error);
