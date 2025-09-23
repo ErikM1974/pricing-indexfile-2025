@@ -852,35 +852,6 @@
             transform: none;
         }
 
-        /* Select & Continue Combo Button */
-        .select-continue-btn {
-            width: 100%;
-            padding: 14px;
-            margin-top: 10px;
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
-        }
-
-        .select-continue-btn:hover {
-            background: linear-gradient(135deg, #f57c00, #e65100);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
-        }
-
-        .product-card.selected .select-continue-btn {
-            display: none;
-        }
 
         .select-btn.selected {
             background: linear-gradient(135deg, #388e3c, #2e7d32);
@@ -4939,11 +4910,6 @@
                     <button class="${buttonClass}" onclick="selectProduct('${product.id}', '${type}')">
                         ${buttonText}
                     </button>
-                    <button class="select-continue-btn" onclick="selectProductAndContinue('${product.id}', '${type}')" ${isSelected ? 'style="display:none"' : ''}>
-                        <i class="fas fa-check-circle"></i>
-                        Select & Continue
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
                 </div>
             `;
 
@@ -5463,15 +5429,6 @@
                     selectedSize.classList.remove('selected');
                 }
             }
-        }
-
-        // Select Product and Continue Combo Function
-        function selectProductAndContinue(productId, type) {
-            selectProduct(productId, type);
-            // Small delay to allow selection animation
-            setTimeout(() => {
-                nextStep();
-            }, 300);
         }
 
         // Select Product
