@@ -1900,8 +1900,57 @@
             padding: 40px;
             max-width: 500px;
             width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
             text-align: center;
             animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        /* Close button for modal */
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .modal-close-btn:hover {
+            background: #e5e7eb;
+            transform: scale(1.1);
+        }
+
+        .modal-close-btn i {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        /* Mobile optimizations for modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 30px 20px;
+                max-height: 90vh;
+                width: 95%;
+                margin: 20px;
+            }
+
+            .success-title {
+                font-size: 20px !important;
+            }
+
+            .reference-number {
+                font-size: 24px !important;
+            }
         }
 
         @keyframes slideUp {
@@ -3155,25 +3204,39 @@
     </div>
 
     <!-- Success Modal -->
-    <div class="modal" id="successModal">
+    <div class="modal" id="successModal" onclick="closeModalOnBackdrop(event)">
         <div class="modal-content">
+            <!-- Close button -->
+            <button class="modal-close-btn" onclick="closeModal()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+
             <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h2 class="success-title">🎉 Gift Box Order Successfully Submitted!</h2>
+            <h2 class="success-title">🎉 Order Submitted!</h2>
             <p class="success-message">
-                Thank you! Your FREE Christmas gift box order has been received.<br>
-                You'll receive a confirmation email shortly at the email address provided.
+                Your FREE Christmas gift box has been confirmed!
             </p>
+
+            <!-- Reference Number - Most prominent -->
             <div class="success-reference">
-                <div class="reference-label">Reference Number</div>
+                <div class="reference-label">Your Order Number</div>
                 <div class="reference-number" id="referenceNumber">XMAS1225-001</div>
             </div>
-            <!-- Order Confirmation Details -->
-            <div id="orderConfirmationDetails" style="margin: 20px 0; padding: 15px; background: #f9fafb; border-radius: 8px; text-align: left;">
-                <!-- Order details will be populated here -->
+
+            <!-- Simplified order summary -->
+            <div id="orderConfirmationDetails" style="margin: 20px 0; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                <!-- Simplified details will go here -->
             </div>
-            <button class="nav-btn primary" onclick="closeModal()" style="width: 100%;">
+
+            <!-- Email reminder -->
+            <p style="color: #6b7280; font-size: 14px; margin: 15px 0;">
+                <i class="fas fa-envelope"></i> Check your email for full order details
+            </p>
+
+            <!-- Done button -->
+            <button class="nav-btn primary" onclick="closeModal()" style="width: 100%; font-size: 16px; padding: 14px;">
                 <i class="fas fa-check"></i> Done
             </button>
         </div>
@@ -4301,9 +4364,9 @@
             referenceNumber.textContent = quoteID;
             referenceNumber.style.cssText = 'font-size: 28px; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 15px 25px; border-radius: 8px; border: 2px solid #16a34a; letter-spacing: 1px;';
 
-            // Populate order confirmation details
+            // Populate SIMPLIFIED order confirmation details
             const orderDetails = document.getElementById('orderConfirmationDetails');
-            let detailsHTML = '<h3 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Order Summary:</h3>';
+            let detailsHTML = '';
 
             // Calculate total value for display
             let totalRetailValue = 0;
@@ -4317,102 +4380,21 @@
                 totalRetailValue += RETAIL_PRICES.shipping;
             }
 
-            // Show value summary at top
-            detailsHTML += `<div style="background: linear-gradient(135deg, #d4edda 0%, #cce5ff 100%); padding: 12px; border-radius: 6px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 600; color: #155724;">Total Value: <span style="text-decoration: line-through;">$${totalRetailValue}</span></span>
-                    <span style="font-weight: 700; font-size: 18px; color: #28a745;">FREE!</span>
+            // Show ONLY simplified summary - much shorter!
+            detailsHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #6b7280; font-size: 14px;">Bundle Items:</span>
+                    <span style="color: #374151; font-weight: 600;">4 items</span>
                 </div>
-                <div style="margin-top: 5px; color: #dc3545; font-weight: 600;">You Save: $${totalRetailValue}!</div>
-            </div>`;
-
-            // Bundle items with retail values
-            detailsHTML += '<div style="margin-bottom: 15px;">';
-            detailsHTML += '<strong style="color: #666;">Bundle Items:</strong>';
-            detailsHTML += '<ul style="margin: 5px 0 0 20px; padding: 0;">';
-
-            if (selectedItems.jacket) {
-                detailsHTML += `<li style="margin: 5px 0;">
-                    <strong>Jacket:</strong> ${selectedItems.jacket.id}
-                    ${selectedItems.jacket.selectedSize ? ` - Size: ${selectedItems.jacket.selectedSize}` : ''}
-                    ${selectedItems.jacket.selectedColor ? ` - Color: ${selectedItems.jacket.selectedColor}` : ''}
-                    <span style="color: #666; font-size: 12px;"> ($${selectedItems.jacket.retailPrice || 0} value)</span>
-                </li>`;
-            }
-
-            if (selectedItems.hoodie) {
-                detailsHTML += `<li style="margin: 5px 0;">
-                    <strong>Hoodie:</strong> ${selectedItems.hoodie.id}
-                    ${selectedItems.hoodie.selectedSize ? ` - Size: ${selectedItems.hoodie.selectedSize}` : ''}
-                    ${selectedItems.hoodie.selectedColor ? ` - Color: ${selectedItems.hoodie.selectedColor}` : ''}
-                    <span style="color: #666; font-size: 12px;"> ($${selectedItems.hoodie.retailPrice || 0} value)</span>
-                </li>`;
-            }
-
-            if (selectedItems.beanie) {
-                detailsHTML += `<li style="margin: 5px 0;">
-                    <strong>Beanie:</strong> ${selectedItems.beanie.id}
-                    ${selectedItems.beanie.selectedColor ? ` - Color: ${selectedItems.beanie.selectedColor}` : ''}
-                    <span style="color: #666; font-size: 12px;"> ($${selectedItems.beanie.retailPrice || 0} value)</span>
-                </li>`;
-            }
-
-            if (selectedItems.gloves) {
-                detailsHTML += `<li style="margin: 5px 0;">
-                    <strong>Gloves:</strong> ${selectedItems.gloves.id}
-                    ${selectedItems.gloves.selectedSize ? ` - Size: ${selectedItems.gloves.selectedSize}` : ''}
-                    ${selectedItems.gloves.selectedColor ? ` - Color: ${selectedItems.gloves.selectedColor}` : ''}
-                    <span style="color: #666; font-size: 12px;"> ($${selectedItems.gloves.retailPrice || 0} value)</span>
-                </li>`;
-            }
-
-            // Add gift box and shipping values
-            detailsHTML += `<li style="margin: 5px 0;">
-                <strong>Gift Box & Handling:</strong>
-                <span style="color: #666; font-size: 12px;"> ($${RETAIL_PRICES.giftBox} value)</span>
-            </li>`;
-
-            if (deliveryMethod && deliveryMethod.value === 'Ship') {
-                detailsHTML += `<li style="margin: 5px 0;">
-                    <strong>Shipping:</strong>
-                    <span style="color: #666; font-size: 12px;"> ($${RETAIL_PRICES.shipping} value)</span>
-                </li>`;
-            }
-
-            detailsHTML += '</ul></div>';
-
-            // Customization details
-            const threadColors = document.getElementById('threadColors')?.value;
-            const jacketEmbLocation = document.getElementById('jacketEmbLocation')?.value;
-            const hoodieEmbLocation = document.getElementById('hoodieEmbLocation')?.value;
-            const specialInstructions = document.getElementById('specialInstructions')?.value;
-
-            if (threadColors || jacketEmbLocation || hoodieEmbLocation || specialInstructions) {
-                detailsHTML += '<div style="margin-bottom: 15px;">';
-                detailsHTML += '<strong style="color: #666;">Customization:</strong>';
-                detailsHTML += '<ul style="margin: 5px 0 0 20px; padding: 0;">';
-
-                if (jacketEmbLocation) {
-                    detailsHTML += `<li style="margin: 5px 0;">Jacket Embroidery: ${jacketEmbLocation}</li>`;
-                }
-                if (hoodieEmbLocation) {
-                    detailsHTML += `<li style="margin: 5px 0;">Hoodie Embroidery: ${hoodieEmbLocation}</li>`;
-                }
-                if (threadColors) {
-                    detailsHTML += `<li style="margin: 5px 0;">Thread Colors: ${threadColors}</li>`;
-                }
-                if (specialInstructions) {
-                    detailsHTML += `<li style="margin: 5px 0;">Special Instructions: ${specialInstructions}</li>`;
-                }
-
-                detailsHTML += '</ul></div>';
-            }
-
-            // Total quantity
-            const totalQuantity = calculateTotalQuantity();
-            detailsHTML += `<div style="padding-top: 10px; border-top: 1px solid #e5e7eb; color: #333;">
-                <strong>Total Items in Bundle:</strong> ${totalQuantity}
-            </div>`;
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #6b7280; font-size: 14px;">Total Value:</span>
+                    <span style="text-decoration: line-through; color: #9ca3af;">$${totalRetailValue}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #6b7280; font-size: 14px;">Your Price:</span>
+                    <span style="color: #16a34a; font-weight: 700; font-size: 18px;">FREE!</span>
+                </div>
+            `;
 
             orderDetails.innerHTML = detailsHTML;
             modal.classList.add('active');
@@ -6855,6 +6837,13 @@
             document.getElementById('successModal').classList.remove('active');
             // Reset form
             resetForm();
+        }
+
+        // Allow clicking outside the modal to close it
+        function closeModalOnBackdrop(event) {
+            if (event.target.id === 'successModal') {
+                closeModal();
+            }
         }
 
         function resetForm() {
