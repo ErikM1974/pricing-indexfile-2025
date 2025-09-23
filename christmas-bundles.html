@@ -1203,7 +1203,7 @@
             gap: 8px;
         }
 
-        .color-swatch {
+        .review-color-swatch {
             width: 16px;
             height: 16px;
             border-radius: 50%;
@@ -1275,20 +1275,6 @@
             color: #dc2626;
         }
 
-        .deadline-notice-card {
-            background: #fef3c7;
-            border: 2px solid #facc15;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .deadline-date {
-            color: #dc2626;
-            font-weight: 700;
-            font-size: 18px;
-        }
 
         .customization-grid {
             display: grid;
@@ -2981,16 +2967,6 @@
                             </div>
                         </div>
 
-                        <!-- Deadline Notice Card -->
-                        <div class="deadline-notice-card">
-                            <p style="margin: 0 0 8px 0; font-size: 14px; color: #854d0e;">
-                                <i class="fas fa-exclamation-triangle"></i> Important Deadline
-                            </p>
-                            <p style="margin: 0; color: #854d0e;">Order by</p>
-                            <p class="deadline-date" style="margin: 4px 0;">October 20, 2025</p>
-                            <p style="margin: 0; font-size: 12px; color: #92400e;">for holiday delivery</p>
-                        </div>
-
                         <!-- Submit Button -->
                         <button id="submitBtn" class="submit-btn" onclick="submitOrder(this)" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
                             <i class="fas fa-paper-plane"></i> Submit Order
@@ -3773,7 +3749,7 @@
                             <div class="product-item-meta">
                                 <div class="product-item-meta-row">
                                     <span>Color:</span>
-                                    <span class="color-swatch" style="background-color: ${colorHex};"></span>
+                                    <span class="review-color-swatch" style="background-color: ${colorHex};"></span>
                                     <span>${item.selectedColor || 'Not selected'}</span>
                                 </div>
                                 ${type.key !== 'beanie' ? `
