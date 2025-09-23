@@ -3532,6 +3532,8 @@
         // State Management
         let currentStep = 1;
         let highestStepReached = 1;  // Track the furthest step user has reached
+        let lastStepNavigationTime = 0;  // Track last navigation to prevent rapid advancement
+        let userHasInteracted = false;  // Track if user has actually interacted with the page
         let selectedItems = {
             jacket: null,
             hoodie: null,
@@ -3869,6 +3871,19 @@
                 console.error('Submit called but not on Step 7. Current step:', currentStep);
                 alert('Please complete all steps before submitting your order.');
                 return;
+            }
+
+            // Detect automated submission attempts
+            if (!userHasInteracted) {
+                console.error('No user interaction detected - blocking automated submission');
+                alert('Please interact with the form before submitting.');
+                return;
+            }
+
+            // Check if navigation was suspiciously fast (reached Step 7 in under 5 seconds)
+            if (window.pageLoadTime && Date.now() - window.pageLoadTime < 5000) {
+                console.warn('Reached Step 7 suspiciously fast - possible automation');
+                // Still allow but log for debugging
             }
 
             // Prevent double submissions
@@ -4652,6 +4667,38 @@
 
             // Prevent form submission for first 2 seconds after page load
             window.pageLoadTime = Date.now();
+
+            // Track user interaction - add listeners for actual user events
+            document.addEventListener('click', function() {
+                if (!userHasInteracted) {
+                    console.log('User interaction detected');
+                    userHasInteracted = true;
+                }
+            }, { once: true });
+
+            document.addEventListener('touchstart', function() {
+                if (!userHasInteracted) {
+                    console.log('User touch interaction detected');
+                    userHasInteracted = true;
+                }
+            }, { once: true });
+
+            // Clear all form fields on page load to prevent autofill issues
+            const deliveryForm = document.getElementById('deliveryForm');
+            if (deliveryForm) {
+                deliveryForm.reset();
+                // Also clear individual fields to be sure
+                document.getElementById('firstName').value = '';
+                document.getElementById('lastName').value = '';
+                document.getElementById('companyName').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('address1').value = '';
+                document.getElementById('address2').value = '';
+                document.getElementById('city').value = '';
+                document.getElementById('state').value = '';
+                document.getElementById('zipCode').value = '';
+            }
 
             initializeSnowEffect();
             showLoadingState();
@@ -6093,11 +6140,18 @@
                 sizeSelected = !!card.querySelector('.size-btn.selected');
             }
 
-            // AUTO-SELECT: If both size and color are selected but product isn't selected yet
+            // AUTO-SELECT: Disabled on page load to prevent automation issues
+            // Only auto-select if user has interacted with the page (after 3 seconds)
             if (colorSelected && sizeSelected && !isAlreadySelected) {
-                console.log(`Auto-selecting ${productType} since all options are selected`);
-                selectProduct(productId, productType);
-                return; // Exit early since selectProduct will update everything
+                // Check if enough time has passed since page load (3 seconds)
+                if (window.pageLoadTime && Date.now() - window.pageLoadTime > 3000) {
+                    console.log(`Auto-selecting ${productType} since all options are selected`);
+                    selectProduct(productId, productType);
+                    return; // Exit early since selectProduct will update everything
+                } else {
+                    // Don't auto-select during initial page load
+                    console.log(`Skipping auto-select for ${productType} - too soon after page load`);
+                }
             }
 
             // Update button state and text
@@ -6228,8 +6282,17 @@
             // Convert to number if string
             targetStep = parseInt(targetStep);
 
+            // Detect automation - prevent if navigating too fast
+            const now = Date.now();
+            if (lastStepNavigationTime && now - lastStepNavigationTime < 300) {
+                console.warn('Suspicious navigation pattern detected - blocking rapid navigation');
+                return;
+            }
+
             // Only allow navigation to visited steps (up to highestStepReached)
             if (targetStep >= 1 && targetStep <= highestStepReached) {
+                // Update navigation timing
+                lastStepNavigationTime = now;
                 // Hide current step
                 document.getElementById(`step${currentStep}`).classList.remove('active');
                 document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
@@ -6359,6 +6422,19 @@
         }
 
         window.nextStep = function() {
+            // Prevent rapid navigation (500ms cooldown between steps)
+            const now = Date.now();
+            if (lastStepNavigationTime && now - lastStepNavigationTime < 500) {
+                console.warn('Navigation too fast - preventing rapid step advancement');
+                return;
+            }
+
+            // Require user interaction before allowing navigation (except for Step 5 which has no products)
+            if (!userHasInteracted && currentStep < 5) {
+                console.warn('No user interaction detected - blocking automated navigation');
+                return;
+            }
+
             // Validate current step before advancing
             if (!validateCurrentStep()) {
                 let missingInfo = '';
@@ -6428,6 +6504,9 @@
             }
 
             if (currentStep < 7) {
+                // Update navigation timing
+                lastStepNavigationTime = Date.now();
+
                 // Hide current step
                 document.getElementById(`step${currentStep}`).classList.remove('active');
 
