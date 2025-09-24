@@ -3358,6 +3358,40 @@
                 );
 
                 console.log('Email sent successfully:', response);
+
+                // Send sales team notification
+                try {
+                    const salesEmailParams = {
+                        to_email: 'nika@nwcustomapparel.com, taneisha@nwcustomapparel.com',
+                        quote_id: quoteID,
+                        order_date: new Date().toLocaleString('en-US', {
+                            timeZone: 'America/Los_Angeles',
+                            month: 'numeric',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        }),
+                        customer_name: `${quoteData.firstName} ${quoteData.lastName}`,
+                        customer_email: quoteData.email,
+                        customer_phone: quoteData.phone,
+                        customer_company: quoteData.company || 'Not provided'
+                    };
+
+                    // Send notification to sales team
+                    await emailjs.send(
+                        'service_1c4k67j',
+                        'template_sales_xmas', // Template ID for sales team notification
+                        salesEmailParams
+                    );
+                    console.log('Sales team notified of order:', quoteID);
+                } catch (salesError) {
+                    console.error('Failed to notify sales team:', salesError);
+                    // Don't block order - sales notification is not critical
+                }
+
                 return { success: true, response };
 
             } catch (error) {
