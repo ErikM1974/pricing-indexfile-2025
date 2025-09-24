@@ -5563,7 +5563,8 @@
             const colorSwatches = card.querySelectorAll('.color-swatch');
             if (colorSwatches.length === 1) {
                 const singleColorSwatch = colorSwatches[0];
-                const colorName = singleColorSwatch.dataset.colorName;
+                // Fix: Use dataset.color instead of dataset.colorName
+                const colorName = singleColorSwatch.dataset.color;
 
                 // Mark as selected
                 singleColorSwatch.classList.add('selected');
@@ -5656,11 +5657,25 @@
                 console.log(`[Value Update] ${type} ${product.id} size ${selectedSize}: $${basePrice} + $${upcharge} = $${totalValue}`);
             }
 
-            // If this product is already selected, update the continue button state
+            // If this product is already selected, update the saved selection
             if (card.classList.contains('selected')) {
                 const type = card.dataset.productType;
-                // Re-run selectProduct to update the selection with the size
-                selectProduct(productId, type);
+
+                // For gloves, ensure the auto-selected color is properly set
+                if (type === 'gloves') {
+                    const colorSwatch = card.querySelector('.color-swatch');
+                    if (colorSwatch && !colorSwatch.classList.contains('selected')) {
+                        colorSwatch.classList.add('selected');
+                    }
+                }
+
+                // Only call selectProduct if all required selections are present
+                const hasColor = card.querySelector('.color-swatch.selected');
+                const hasSize = card.querySelector('.size-btn.selected');
+
+                if (hasColor && hasSize) {
+                    selectProduct(productId, type);
+                }
             }
 
             // Update the Select button state to reflect the new selection
@@ -5940,6 +5955,14 @@
         function selectProduct(productId, type) {
             console.log(`selectProduct called for ${type}: ${productId}`);
             const card = document.querySelector(`[data-product-id="${productId}"]`);
+
+            // For gloves, ensure single color is selected
+            if (type === 'gloves') {
+                const colorSwatches = card.querySelectorAll('.color-swatch');
+                if (colorSwatches.length === 1 && !colorSwatches[0].classList.contains('selected')) {
+                    colorSwatches[0].classList.add('selected');
+                }
+            }
 
             // Get selected size and color FIRST before any changes
             const selectedSize = card.querySelector('.size-btn.selected')?.dataset.size;
