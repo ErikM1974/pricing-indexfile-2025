@@ -154,13 +154,13 @@
                     <div class="text-center md:text-left">
                         <div class="flex items-center gap-2 justify-center md:justify-start mb-2">
                             <span class="text-2xl">⏰</span>
-                            <h3 class="text-xl md:text-2xl font-bold">ORDER BY SEPTEMBER 30TH for October Delivery!</h3>
+                            <h3 class="text-xl md:text-2xl font-bold">ORDER BY SEPTEMBER 30TH for Early October Events!</h3>
                         </div>
                         <p class="text-sm md:text-base opacity-95">
                             Only <span id="daysLeft" class="font-bold text-lg"></span> left to order for Breast Cancer Awareness Month
                         </p>
                         <p class="text-xs md:text-sm mt-1 opacity-90">
-                            🚀 Rush production available - Ships in 5-7 business days
+                            🚀 <span class="font-semibold">RUSH PRODUCTION AVAILABLE</span> - Ships in 5-7 business days
                         </p>
                     </div>
                     <button onclick="this.parentElement.parentElement.style.display='none'"
@@ -248,10 +248,10 @@
                                 <span class="text-orange-800 text-lg mr-2">⏰</span>
                                 <div>
                                     <p class="text-sm font-semibold text-orange-800">
-                                        Order by September 30th for October Delivery
+                                        Order by September 30th for Early October Events
                                     </p>
                                     <p class="text-xs text-orange-700 mt-1">
-                                        Rush production available • Ships in 5-7 business days
+                                        <span class="font-semibold">RUSH PRODUCTION</span> • Ships in 5-7 business days
                                     </p>
                                 </div>
                             </div>
@@ -735,8 +735,11 @@
         function updateDeadlineCountdown() {
             const deadline = new Date('2025-09-30T23:59:59');
             const now = new Date();
-            const timeDiff = deadline - now;
-            const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            // Set time to start of day for accurate day counting
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const deadlineStart = new Date(2025, 8, 30); // Sept 30 (month is 0-indexed)
+            const timeDiff = deadlineStart - todayStart;
+            const daysLeft = Math.round(timeDiff / (1000 * 60 * 60 * 24));
 
             const daysElement = document.getElementById('daysLeft');
             if (daysElement) {
