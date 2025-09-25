@@ -576,6 +576,48 @@
                             </div>
                         </div>
 
+                        <!-- Logo Upload Section -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-upload text-pink-600 mr-2"></i>
+                                Upload Your Company Logo (Optional)
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Add your company or organization logo to personalize your bundles
+                            </p>
+
+                            <!-- Upload Area -->
+                            <div id="logoUploadArea"
+                                 onclick="document.getElementById('logoFile').click()"
+                                 class="border-2 border-dashed border-pink-300 rounded-lg p-8 text-center cursor-pointer hover:bg-pink-50 transition">
+                                <input type="file" id="logoFile" accept="image/*,.pdf" style="display: none;" onchange="handleLogoUpload(event)">
+
+                                <div class="text-pink-500 mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl"></i>
+                                </div>
+                                <div class="text-base font-medium text-gray-700">Click to upload your logo</div>
+                                <div class="text-sm text-gray-500 mt-2">JPG, PNG, or PDF (Max 20MB)</div>
+                            </div>
+
+                            <!-- Logo Preview -->
+                            <div id="logoPreview" class="hidden mt-4">
+                                <div class="bg-white p-4 rounded-lg border-2 border-pink-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <img id="previewImage" src="" alt="Logo Preview" class="h-16 w-auto object-contain mr-4">
+                                            <div>
+                                                <p class="font-medium text-gray-700">Logo uploaded!</p>
+                                                <p id="logoFileName" class="text-sm text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 transition">
+                                            <i class="fas fa-times-circle text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Event Date -->
                         <div class="mt-6">
                             <label class="text-sm font-medium text-gray-700 mb-2 block">
@@ -795,6 +837,110 @@
                 });
             }
         });
+
+        // Logo Upload Functions
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Clear any previous file selection
+            if (window.selectedLogoFile) {
+                window.selectedLogoFile = null;
+                window.selectedLogoDataURL = null;
+            }
+
+            // Validate file type
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml', 'application/pdf'];
+            const maxSize = 20 * 1024 * 1024; // 20MB
+
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload an image (PNG, JPG, GIF, SVG) or PDF file');
+                event.target.value = '';
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert('File size must be less than 20MB');
+                event.target.value = '';
+                return;
+            }
+
+            // Store the file for upload
+            window.selectedLogoFile = file;
+
+            // Show preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    window.selectedLogoDataURL = e.target.result;
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('logoFileName').textContent = file.name;
+                    document.getElementById('logoPreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // For PDFs, just show filename
+                document.getElementById('logoPreview').innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border-2 border-pink-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 text-3xl mr-4"></i>
+                                <div>
+                                    <p class="font-medium text-gray-700">PDF uploaded!</p>
+                                    <p class="text-sm text-gray-500">${file.name}</p>
+                                </div>
+                            </div>
+                            <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 transition">
+                                <i class="fas fa-times-circle text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('logoPreview').classList.remove('hidden');
+            }
+        }
+
+        function removeLogo() {
+            document.getElementById('logoFile').value = '';
+            document.getElementById('logoPreview').classList.add('hidden');
+            document.getElementById('previewImage').src = '';
+            window.selectedLogoFile = null;
+            window.selectedLogoDataURL = null;
+        }
+
+        // Upload file to API
+        async function uploadFileToAPI(file) {
+            try {
+                // Add timestamp to filename to avoid conflicts
+                const timestamp = Date.now();
+                const nameParts = file.name.split('.');
+                const extension = nameParts.pop();
+                const baseName = nameParts.join('.');
+                const uniqueFileName = `${baseName}_${timestamp}.${extension}`;
+
+                // Create a new File object with the unique name
+                const uniqueFile = new File([file], uniqueFileName, { type: file.type });
+
+                const formData = new FormData();
+                formData.append('file', uniqueFile);
+
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                return result.externalKey;
+
+            } catch (error) {
+                console.error('Failed to upload file:', error);
+                throw error;
+            }
+        }
 
         // Product Modal Functions
         function openProductModal(imageSrc, title, description) {
@@ -1016,6 +1162,30 @@
                     <div><strong>Pickup Location:</strong> 2025 Freeman Road East, Milton, WA 98354</div>`;
             }
 
+            // Check if logo was uploaded
+            let logoHTML = '';
+            if (window.selectedLogoFile) {
+                if (window.selectedLogoDataURL) {
+                    logoHTML = `
+                        <div class="mt-4 p-3 bg-pink-50 rounded-lg">
+                            <strong>Company Logo:</strong>
+                            <img src="${window.selectedLogoDataURL}" alt="Company Logo" class="mt-2 h-16 w-auto object-contain">
+                            <p class="text-sm text-gray-600 mt-1">${window.selectedLogoFile.name}</p>
+                        </div>
+                    `;
+                } else {
+                    logoHTML = `
+                        <div class="mt-4 p-3 bg-pink-50 rounded-lg">
+                            <strong>Company Logo:</strong>
+                            <div class="flex items-center mt-2">
+                                <i class="fas fa-file-pdf text-red-500 text-2xl mr-2"></i>
+                                <p class="text-sm text-gray-600">${window.selectedLogoFile.name}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
             customerInfo.innerHTML = `
                 <div><strong>Name:</strong> ${document.getElementById('customerName').value}</div>
                 <div><strong>Company:</strong> ${document.getElementById('companyName').value || 'N/A'}</div>
@@ -1023,6 +1193,7 @@
                 <div><strong>Phone:</strong> ${document.getElementById('phone').value}</div>
                 ${deliveryInfo}
                 <div><strong>Event Date:</strong> ${document.getElementById('eventDate').value || 'Not specified'}</div>
+                ${logoHTML}
             `;
 
             // Size distribution
@@ -1141,6 +1312,18 @@
             loadingSpinner.style.display = 'flex';
 
             try {
+                // Upload logo first if present
+                let imageExternalKey = null;
+                if (window.selectedLogoFile) {
+                    try {
+                        imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
+                        console.log('Logo uploaded successfully:', imageExternalKey);
+                    } catch (uploadError) {
+                        console.error('Logo upload failed, continuing without logo:', uploadError);
+                        // Continue without logo if upload fails
+                    }
+                }
+
                 const quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
                 const totalPrice = quantity * 45;
 
@@ -1166,6 +1349,7 @@
                     zip: deliveryMethod === 'Ship' ? document.getElementById('shippingZip').value : '',
                     eventDate: document.getElementById('eventDate').value,
                     notes: document.getElementById('notes').value,
+                    imageUpload: imageExternalKey,  // Include logo reference
                     bundleCount: quantity,
                     sizeDistribution: sizeData,
                     totalShirts: quantity,
