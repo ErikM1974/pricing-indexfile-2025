@@ -484,6 +484,8 @@
                                     Phone Number <span class="text-red-500">*</span>
                                 </label>
                                 <input type="tel" id="phone" required
+                                       placeholder="(555) 123-4567"
+                                       maxlength="14"
                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
                             </div>
                         </div>
@@ -758,6 +760,41 @@
 
         // Update countdown on page load
         updateDeadlineCountdown();
+
+        // Phone number formatting
+        function formatPhoneNumber(value) {
+            // Remove all non-digits
+            const phoneNumber = value.replace(/\D/g, '');
+
+            // Format as (XXX) XXX-XXXX
+            if (phoneNumber.length === 0) {
+                return '';
+            } else if (phoneNumber.length <= 3) {
+                return `(${phoneNumber}`;
+            } else if (phoneNumber.length <= 6) {
+                return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+            } else {
+                return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+            }
+        }
+
+        // Add phone formatting to input
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    const formatted = formatPhoneNumber(e.target.value);
+                    e.target.value = formatted;
+                });
+
+                // Handle paste events
+                phoneInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    e.target.value = formatPhoneNumber(pastedText);
+                });
+            }
+        });
 
         // Product Modal Functions
         function openProductModal(imageSrc, title, description) {
@@ -1121,7 +1158,7 @@
                     customerName: document.getElementById('customerName').value,
                     companyName: document.getElementById('companyName').value,
                     email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
+                    phone: document.getElementById('phone').value.replace(/\D/g, ''),  // Strip formatting
                     deliveryMethod: deliveryMethod,
                     address: deliveryMethod === 'Ship' ? document.getElementById('shippingAddress').value : '',
                     city: deliveryMethod === 'Ship' ? document.getElementById('shippingCity').value : '',
