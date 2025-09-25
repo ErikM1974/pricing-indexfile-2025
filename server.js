@@ -236,6 +236,16 @@ app.get('/christmas-bundles.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'christmas-bundles.html'));
 });
 
+// Breast Cancer Awareness Bundle page
+app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'breast-cancer-awareness-bundle.html'));
+});
+
+// Marketing page
+app.get('/marketing.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'marketing.html'));
+});
+
 // Top Sellers Catalog page
 app.get('/top-sellers-catalog.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'top-sellers-catalog.html'));
