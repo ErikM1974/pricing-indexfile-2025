@@ -82,7 +82,6 @@ class BreastCancerBundleService {
             TotalAmount: orderData.totalAmount,
             Status: 'Active',
             ExpiresAt: formattedExpiresAt,
-            ImageExternalKey: orderData.imageUpload || '',  // Add logo reference
             Notes: this.formatNotes(orderData)
         };
 
@@ -186,7 +185,7 @@ class BreastCancerBundleService {
             Color: 'Candy Pink',
             ColorCode: 'PINK',
             SizeBreakdown: JSON.stringify(sizeBreakdown),
-            ImageExternalKey: orderData.imageUpload || '',  // Add logo reference
+            Image_Upload: orderData.imageUpload || '',  // Logo reference - matches Christmas Bundle field name
 
             // Delivery info
             DeliveryMethod: orderData.deliveryMethod || 'Ship',
