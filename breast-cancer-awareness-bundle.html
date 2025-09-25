@@ -66,6 +66,30 @@
         .step-content.active {
             display: block;
         }
+
+        /* Product image hover effect */
+        .product-image-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-image-container::after {
+            content: "🔍 Click to enlarge";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .product-image-container:hover::after {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +110,31 @@
                 </div>
             </div>
         </header>
+
+        <!-- Product Zoom Modal -->
+        <div id="productModal" class="fixed inset-0 z-50 hidden">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeProductModal()"></div>
+
+            <!-- Modal Content -->
+            <div class="relative flex items-center justify-center h-full p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+                    <!-- Close button -->
+                    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Modal Body -->
+                    <div class="p-8">
+                        <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[70vh] object-contain mx-auto">
+                        <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mt-6 text-center"></h3>
+                        <p id="modalDescription" class="text-gray-600 mt-2 text-center"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <main class="container mx-auto px-6 py-8 md:py-16">
 
@@ -184,9 +233,11 @@
                     <div class="grid md:grid-cols-2 gap-8">
                         <!-- Cap Card -->
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
-                            <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594"
-                                 alt="Port Authority Snapback Trucker Cap"
-                                 class="w-full h-64 object-contain">
+                            <div class="product-image-container" onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594', 'Port Authority Snapback Trucker Cap', 'Style: C112 - True Pink/White - One Size Fits All - Front Embroidered Logo')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594"
+                                     alt="Port Authority Snapback Trucker Cap"
+                                     class="w-full h-64 object-contain">
+                            </div>
                             <div class="p-6">
                                 <h4 class="text-xl font-bold text-gray-800">Port Authority Snapback Trucker Cap</h4>
                                 <p class="text-sm text-gray-500 mb-4">Style: C112</p>
@@ -206,9 +257,11 @@
 
                         <!-- T-Shirt Card -->
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
-                            <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130632"
-                                 alt="Core Cotton Tee"
-                                 class="w-full h-64 object-contain">
+                            <div class="product-image-container" onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130632', 'Core Cotton Tee', 'Style: PC54 - Candy Pink - Sizes S-4XL - Full Front DTG Print')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130632"
+                                     alt="Core Cotton Tee"
+                                     class="w-full h-64 object-contain">
+                            </div>
                             <div class="p-6">
                                 <h4 class="text-xl font-bold text-gray-800">Core Cotton Tee</h4>
                                 <p class="text-sm text-gray-500 mb-4">Style: PC54</p>
@@ -638,6 +691,35 @@
     <script>
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
+
+        // Product Modal Functions
+        function openProductModal(imageSrc, title, description) {
+            const modal = document.getElementById('productModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+
+            modalImage.src = imageSrc;
+            modalImage.alt = title;
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeProductModal();
+            }
+        });
 
         let currentStep = 1;
         const totalSteps = 4;
