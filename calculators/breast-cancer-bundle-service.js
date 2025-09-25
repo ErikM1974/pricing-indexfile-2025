@@ -79,7 +79,7 @@ class BreastCancerBundleService {
             SubtotalAmount: orderData.totalAmount,
             LTMFeeTotal: 0,
             TotalAmount: orderData.totalAmount,
-            Status: 'Active',
+            Status: 'Sample Request',
             ExpiresAt: formattedExpiresAt,
             Notes: this.formatNotes(orderData)
         };
