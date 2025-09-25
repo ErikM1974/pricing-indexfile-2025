@@ -5,8 +5,9 @@ class BreastCancerBundleService {
     constructor() {
         this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
         this.emailjsServiceId = 'service_1c4k67j';
-        this.emailjsTemplateId = 'template_bca_bundle'; // Will need to be created
-        this.emailjsSalesTemplateId = 'template_bca_sales'; // Sales team notification
+        // TODO: Create these templates in EmailJS
+        this.emailjsTemplateId = 'template_bca_bundle_NEEDS_CREATION'; // Will need to be created
+        this.emailjsSalesTemplateId = 'template_bca_sales_NEEDS_CREATION'; // Sales team notification
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
         this.quotePrefix = 'BCA';
     }
@@ -63,23 +64,25 @@ class BreastCancerBundleService {
 
     // Save to database
     async saveToDatabase(quoteId, orderData) {
-        const timestamp = new Date().toISOString();
+        // Calculate expiration date (30 days from now)
+        const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
 
-        // Prepare quote session data - match the working Christmas bundle format
+        // Prepare quote session data - match the actual database schema
         const sessionData = {
             SessionID: quoteId,
             QuoteID: quoteId,
-            DecorationType: 'Breast Cancer Bundle',
             CustomerName: orderData.customerName || 'Walk-in Customer',
             CustomerEmail: orderData.email || '',
-            CustomerPhone: orderData.phone || '',
-            Quantity: orderData.bundleCount,
-            ItemCount: orderData.totalShirts + orderData.totalCaps,
+            CompanyName: orderData.companyName || '',
+            Phone: orderData.phone || '',
+            TotalQuantity: orderData.bundleCount,
+            SubtotalAmount: orderData.totalAmount,
+            LTMFeeTotal: 0,
             TotalAmount: orderData.totalAmount,
             Status: 'Active',
-            Notes: this.formatNotes(orderData),
-            CreatedDate: timestamp,
-            ModifiedDate: timestamp
+            ExpiresAt: formattedExpiresAt,
+            Notes: this.formatNotes(orderData)
         };
 
         try {
@@ -102,18 +105,35 @@ class BreastCancerBundleService {
 
             // Save individual items
             const items = this.prepareLineItems(quoteId, orderData);
+            console.log('Attempting to save items:', items);
 
             for (const item of items) {
-                const itemResponse = await fetch(`${this.apiBase}/quote_items`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(item)
-                });
+                try {
+                    console.log('Saving item:', item);
+                    const itemResponse = await fetch(`${this.apiBase}/quote_items`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(item)
+                    });
 
-                if (!itemResponse.ok) {
-                    console.error('Failed to save item:', item);
+                    if (!itemResponse.ok) {
+                        const errorText = await itemResponse.text();
+                        console.error('Failed to save item:', item);
+                        console.error('Item save error response:', errorText);
+                        // Parse error if it's JSON
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            console.error('Item save error details:', errorJson);
+                        } catch (e) {
+                            // Not JSON, already logged as text
+                        }
+                    } else {
+                        console.log('Item saved successfully');
+                    }
+                } catch (itemError) {
+                    console.error('Error saving item:', itemError);
                 }
             }
 
@@ -128,83 +148,98 @@ class BreastCancerBundleService {
     // Prepare line items for database
     prepareLineItems(quoteId, orderData) {
         const items = [];
-        const timestamp = new Date().toISOString();
-        const pricePerItem = 45 / 2; // $45 bundle / 2 items = $22.50 per item
+        const pricePerBundle = 45;
+        let lineNumber = 1;
 
-        // Add t-shirt items by size
+        // Create a single bundle item instead of individual items
+        // Build size breakdown for the bundle
+        const sizeBreakdown = {};
         const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         sizes.forEach(size => {
             const quantity = orderData.sizeDistribution[size] || 0;
             if (quantity > 0) {
-                items.push({
-                    SessionID: quoteId,
-                    ItemType: 'Product',
-                    StyleNumber: 'PC54',
-                    Description: `PC54 Candy Pink T-Shirt - Size ${size}`,
-                    Quantity: quantity,
-                    Size: size,
-                    Color: 'Candy Pink',
-                    UnitPrice: pricePerItem,
-                    TotalPrice: quantity * pricePerItem,
-                    CreatedDate: timestamp
-                });
+                sizeBreakdown[size] = quantity;
             }
         });
 
-        // Add caps
+        // Add bundle as a single line item
         items.push({
-            SessionID: quoteId,
-            ItemType: 'Product',
-            StyleNumber: 'C112',
-            Description: 'C112 True Pink/White Cap - OSFA',
-            Quantity: orderData.totalCaps,
-            Size: 'OSFA',
-            Color: 'True Pink/White',
-            UnitPrice: pricePerItem,
-            TotalPrice: orderData.totalCaps * pricePerItem,
-            CreatedDate: timestamp
+            QuoteID: quoteId,
+            LineNumber: lineNumber++,
+            StyleNumber: 'BCA-BUNDLE',
+            ProductName: 'Breast Cancer Awareness Bundle',
+            Quantity: orderData.bundleCount,
+            FinalUnitPrice: pricePerBundle,
+            LineTotal: orderData.totalAmount,
+
+            // Customer info (matching Christmas bundle pattern)
+            First: orderData.customerName ? orderData.customerName.split(' ')[0] : '',
+            Last: orderData.customerName ? orderData.customerName.split(' ').slice(1).join(' ') : '',
+            Email: orderData.email || '',
+            Phone: orderData.phone || '',
+            Company: orderData.companyName || '',
+
+            // Bundle details
+            EmbellishmentType: 'bundle',
+            PrintLocation: 'Bundle Package',
+            Color: 'Candy Pink',
+            ColorCode: 'PINK',
+            SizeBreakdown: JSON.stringify(sizeBreakdown),
+
+            // Delivery info
+            DeliveryMethod: orderData.deliveryMethod || 'Ship',
+
+            // Notes about bundle contents
+            Notes: `Bundle contains: ${orderData.bundleCount} PC54 Candy Pink T-Shirts, ${orderData.bundleCount} C112 True Pink/White Caps`
         });
 
         return items;
     }
 
-    // Format notes for database
+    // Format notes for database - simplified single-line format
     formatNotes(orderData) {
-        const notes = [];
+        const noteParts = [];
 
-        notes.push('BREAST CANCER AWARENESS BUNDLE ORDER');
-        notes.push(`Bundles: ${orderData.bundleCount}`);
-        notes.push(`Total Items: ${orderData.totalShirts} shirts + ${orderData.totalCaps} caps`);
+        // Add bundle count
+        noteParts.push(`BCA Bundle: ${orderData.bundleCount} bundles`);
 
-        // Add delivery address
-        if (orderData.address || orderData.city || orderData.state || orderData.zip) {
-            notes.push('\nDELIVERY ADDRESS:');
-            if (orderData.companyName) {
-                notes.push(orderData.companyName);
-            }
-            notes.push(orderData.address || '');
-            notes.push(`${orderData.city || ''}, ${orderData.state || ''} ${orderData.zip || ''}`);
+        // Add delivery method
+        if (orderData.deliveryMethod === 'Pickup') {
+            noteParts.push('Factory Pickup');
+        } else {
+            noteParts.push('Ship to Address');
         }
 
-        if (orderData.eventDate) {
-            notes.push(`\nEvent Date: ${orderData.eventDate}`);
-        }
-
-        if (orderData.notes) {
-            notes.push(`\nSpecial Instructions: ${orderData.notes}`);
-        }
-
-        // Add size breakdown
-        notes.push('\nSIZE BREAKDOWN:');
+        // Add size breakdown in compact format
         const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        const sizeInfo = [];
         sizes.forEach(size => {
             const quantity = orderData.sizeDistribution[size] || 0;
             if (quantity > 0) {
-                notes.push(`${size}: ${quantity}`);
+                sizeInfo.push(`${size}:${quantity}`);
             }
         });
+        if (sizeInfo.length > 0) {
+            noteParts.push(`Sizes: ${sizeInfo.join(' ')}`);
+        }
 
-        return notes.join('\n');
+        // Add event date if provided
+        if (orderData.eventDate) {
+            noteParts.push(`Event: ${orderData.eventDate}`);
+        }
+
+        // Create final notes string - keep it under 255 characters
+        let notesString = noteParts.join(', ');
+
+        // Truncate if too long (leaving room for potential database limits)
+        if (notesString.length > 250) {
+            notesString = notesString.substring(0, 247) + '...';
+        }
+
+        console.log('Notes string being sent:', notesString);
+        console.log('Notes string length:', notesString.length);
+
+        return notesString;
     }
 
     // Send customer email
@@ -218,7 +253,10 @@ class BreastCancerBundleService {
             total_caps: orderData.totalCaps,
             total_amount: this.formatCurrency(orderData.totalAmount),
             size_breakdown: this.formatSizeBreakdown(orderData.sizeDistribution),
-            delivery_address: `${orderData.address}, ${orderData.city}, ${orderData.state} ${orderData.zip}`,
+            delivery_method: orderData.deliveryMethod || 'Ship',
+            delivery_address: orderData.deliveryMethod === 'Pickup'
+                ? 'Factory Pickup - 2025 Freeman Road East, Milton, WA 98354'
+                : `${orderData.address}, ${orderData.city}, ${orderData.state} ${orderData.zip}`,
             event_date: orderData.eventDate || 'Not specified',
             special_notes: orderData.notes || 'None',
             // EmailJS protection - provide all possible fields
@@ -252,7 +290,10 @@ class BreastCancerBundleService {
             bundle_count: orderData.bundleCount,
             total_amount: this.formatCurrency(orderData.totalAmount),
             size_breakdown: this.formatSizeBreakdown(orderData.sizeDistribution),
-            delivery_address: `${orderData.address}, ${orderData.city}, ${orderData.state} ${orderData.zip}`,
+            delivery_method: orderData.deliveryMethod || 'Ship',
+            delivery_address: orderData.deliveryMethod === 'Pickup'
+                ? 'Factory Pickup - 2025 Freeman Road East, Milton, WA 98354'
+                : `${orderData.address}, ${orderData.city}, ${orderData.state} ${orderData.zip}`,
             event_date: orderData.eventDate || 'Not specified',
             special_notes: orderData.notes || 'None',
             order_date: new Date().toLocaleDateString(),
@@ -296,10 +337,14 @@ class BreastCancerBundleService {
         if (!orderData.customerName) errors.push('Customer name is required');
         if (!orderData.email) errors.push('Email is required');
         if (!orderData.phone) errors.push('Phone is required');
-        if (!orderData.address) errors.push('Address is required');
-        if (!orderData.city) errors.push('City is required');
-        if (!orderData.state) errors.push('State is required');
-        if (!orderData.zip) errors.push('ZIP code is required');
+
+        // Only validate address fields if shipping
+        if (orderData.deliveryMethod === 'Ship') {
+            if (!orderData.address) errors.push('Address is required');
+            if (!orderData.city) errors.push('City is required');
+            if (!orderData.state) errors.push('State is required');
+            if (!orderData.zip) errors.push('ZIP code is required');
+        }
 
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

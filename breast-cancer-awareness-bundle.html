@@ -597,6 +597,87 @@
             margin-right: 10px;
         }
 
+        /* Delivery Options */
+        .delivery-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .delivery-option {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .delivery-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .delivery-option .option-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .delivery-option input[type="radio"]:checked + .option-content {
+            border-color: #e91e63;
+            background: #fce4ec;
+            color: #d81b60;
+            font-weight: 600;
+        }
+
+        .delivery-option:hover .option-content {
+            border-color: #f8bbd0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(233, 30, 99, 0.1);
+        }
+
+        .delivery-option .option-content i {
+            font-size: 1.25rem;
+        }
+
+        /* Pickup Info Box */
+        .pickup-info-box {
+            background: #fce4ec;
+            border: 2px solid #e91e63;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .pickup-info-box h4 {
+            color: #d81b60;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .pickup-info-box p {
+            margin-bottom: 0.75rem;
+            color: #333;
+        }
+
+        .pickup-info-box strong {
+            color: #d81b60;
+        }
+
+        .info-note {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
         /* Navigation */
         .navigation {
             position: fixed;
@@ -1017,32 +1098,69 @@
                         <input type="tel" id="phone" class="form-input" required>
                     </div>
 
+                    <!-- Delivery Method Selection -->
                     <div class="form-group full-width">
-                        <label class="form-label" for="address">
-                            Delivery Address <span class="required">*</span>
-                        </label>
-                        <input type="text" id="address" class="form-input" required>
+                        <label class="form-label">Delivery Method <span class="required">*</span></label>
+                        <div class="delivery-options">
+                            <label class="delivery-option">
+                                <input type="radio" name="deliveryMethod" value="Ship" checked onchange="toggleDeliveryFields()">
+                                <span class="option-content">
+                                    <i class="fas fa-truck"></i>
+                                    <span>Ship to Address</span>
+                                </span>
+                            </label>
+                            <label class="delivery-option">
+                                <input type="radio" name="deliveryMethod" value="Pickup" onchange="toggleDeliveryFields()">
+                                <span class="option-content">
+                                    <i class="fas fa-building"></i>
+                                    <span>Factory Pickup</span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="city">
-                            City <span class="required">*</span>
-                        </label>
-                        <input type="text" id="city" class="form-input" required>
+                    <!-- Factory Pickup Information -->
+                    <div id="pickupInfo" class="pickup-info-box full-width" style="display: none;">
+                        <h4><i class="fas fa-map-marker-alt"></i> Pickup Location</h4>
+                        <p><strong>Northwest Custom Apparel</strong><br>
+                        2025 Freeman Road East<br>
+                        Milton, WA 98354</p>
+                        <p><i class="fas fa-clock"></i> <strong>Pickup Hours:</strong><br>
+                        Monday - Friday: 8:00 AM - 4:30 PM</p>
+                        <div class="info-note">
+                            <i class="fas fa-info-circle"></i> Please allow 5-7 business days for order completion. We'll call you when your order is ready for pickup.
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="state">
-                            State <span class="required">*</span>
-                        </label>
-                        <input type="text" id="state" class="form-input" required>
-                    </div>
+                    <!-- Shipping Fields -->
+                    <div id="shippingFields" class="form-grid" style="grid-column: 1 / -1;">
+                        <div class="form-group full-width">
+                            <label class="form-label" for="shippingAddress">
+                                Delivery Address <span class="required">*</span>
+                            </label>
+                            <input type="text" id="shippingAddress" class="form-input" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="zip">
-                            ZIP Code <span class="required">*</span>
-                        </label>
-                        <input type="text" id="zip" class="form-input" required>
+                        <div class="form-group">
+                            <label class="form-label" for="shippingCity">
+                                City <span class="required">*</span>
+                            </label>
+                            <input type="text" id="shippingCity" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="shippingState">
+                                State <span class="required">*</span>
+                            </label>
+                            <input type="text" id="shippingState" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="shippingZip">
+                                ZIP Code <span class="required">*</span>
+                            </label>
+                            <input type="text" id="shippingZip" class="form-input" required>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -1258,6 +1376,33 @@
             }
         }
 
+        // Toggle between Ship and Pickup delivery methods
+        function toggleDeliveryFields() {
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const shippingFields = document.getElementById('shippingFields');
+            const pickupInfo = document.getElementById('pickupInfo');
+
+            if (deliveryMethod === 'Ship') {
+                shippingFields.style.display = 'grid';
+                pickupInfo.style.display = 'none';
+
+                // Make shipping fields required
+                document.getElementById('shippingAddress').required = true;
+                document.getElementById('shippingCity').required = true;
+                document.getElementById('shippingState').required = true;
+                document.getElementById('shippingZip').required = true;
+            } else {
+                shippingFields.style.display = 'none';
+                pickupInfo.style.display = 'block';
+
+                // Remove required from shipping fields
+                document.getElementById('shippingAddress').required = false;
+                document.getElementById('shippingCity').required = false;
+                document.getElementById('shippingState').required = false;
+                document.getElementById('shippingZip').required = false;
+            }
+        }
+
         // Validate current step
         function validateStep(step) {
             if (step === 2) {
@@ -1282,13 +1427,29 @@
                 }
             } else if (step === 3) {
                 // Validate customer form
-                const requiredFields = ['customerName', 'email', 'phone', 'address', 'city', 'state', 'zip'];
-                for (let field of requiredFields) {
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+                const basicFields = ['customerName', 'email', 'phone'];
+
+                // Validate basic fields first
+                for (let field of basicFields) {
                     const input = document.getElementById(field);
                     if (!input.value.trim()) {
                         alert(`Please fill in all required fields.`);
                         input.focus();
                         return false;
+                    }
+                }
+
+                // Only validate shipping fields if Ship is selected
+                if (deliveryMethod === 'Ship') {
+                    const shippingFields = ['shippingAddress', 'shippingCity', 'shippingState', 'shippingZip'];
+                    for (let field of shippingFields) {
+                        const input = document.getElementById(field);
+                        if (!input.value.trim()) {
+                            alert(`Please fill in all shipping address fields.`);
+                            input.focus();
+                            return false;
+                        }
                     }
                 }
 
@@ -1317,12 +1478,22 @@
 
             // Customer info
             const customerInfo = document.getElementById('reviewCustomerInfo');
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            let deliveryInfo = '';
+            if (deliveryMethod === 'Ship') {
+                deliveryInfo = `<div class="customer-detail"><strong>Delivery Method:</strong> Ship to Address</div>
+                <div class="customer-detail"><strong>Shipping Address:</strong> ${document.getElementById('shippingAddress').value}, ${document.getElementById('shippingCity').value}, ${document.getElementById('shippingState').value} ${document.getElementById('shippingZip').value}</div>`;
+            } else {
+                deliveryInfo = `<div class="customer-detail"><strong>Delivery Method:</strong> Factory Pickup</div>
+                <div class="customer-detail"><strong>Pickup Location:</strong> 2025 Freeman Road East, Milton, WA 98354</div>`;
+            }
+
             customerInfo.innerHTML = `
                 <div class="customer-detail"><strong>Name:</strong> ${document.getElementById('customerName').value}</div>
                 <div class="customer-detail"><strong>Company:</strong> ${document.getElementById('companyName').value || 'N/A'}</div>
                 <div class="customer-detail"><strong>Email:</strong> ${document.getElementById('email').value}</div>
                 <div class="customer-detail"><strong>Phone:</strong> ${document.getElementById('phone').value}</div>
-                <div class="customer-detail"><strong>Address:</strong> ${document.getElementById('address').value}, ${document.getElementById('city').value}, ${document.getElementById('state').value} ${document.getElementById('zip').value}</div>
+                ${deliveryInfo}
                 <div class="customer-detail"><strong>Event Date:</strong> ${document.getElementById('eventDate').value || 'Not specified'}</div>
             `;
 
@@ -1411,16 +1582,20 @@
                     sizeData[size] = parseInt(document.getElementById(`size-${size}`).value) || 0;
                 });
 
+                // Get delivery method
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+
                 // Prepare order data
                 const orderData = {
                     customerName: document.getElementById('customerName').value,
                     companyName: document.getElementById('companyName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
-                    address: document.getElementById('address').value,
-                    city: document.getElementById('city').value,
-                    state: document.getElementById('state').value,
-                    zip: document.getElementById('zip').value,
+                    deliveryMethod: deliveryMethod,
+                    address: deliveryMethod === 'Ship' ? document.getElementById('shippingAddress').value : '',
+                    city: deliveryMethod === 'Ship' ? document.getElementById('shippingCity').value : '',
+                    state: deliveryMethod === 'Ship' ? document.getElementById('shippingState').value : '',
+                    zip: deliveryMethod === 'Ship' ? document.getElementById('shippingZip').value : '',
                     eventDate: document.getElementById('eventDate').value,
                     notes: document.getElementById('notes').value,
                     bundleCount: quantity,
@@ -1460,6 +1635,119 @@
             updateNavigation();
             updateBundleDisplay(); // Initialize bundle display
         });
+
+        // Debug function to test order submission
+        window.debugTestBCAOrder = async function() {
+            console.log('=== DEBUG: Testing BCA Order Submission ===');
+
+            // Create minimal test data
+            const testData = {
+                customerName: 'Test User',
+                companyName: 'Test Company',
+                email: 'test@example.com',
+                phone: '253-123-4567',
+                deliveryMethod: 'Ship',
+                address: '123 Test St',
+                city: 'Tacoma',
+                state: 'WA',
+                zip: '98402',
+                eventDate: '',
+                notes: '',
+                bundleCount: 8,
+                totalShirts: 8,
+                totalCaps: 8,
+                totalAmount: 360,
+                sizeDistribution: {
+                    'S': 0,
+                    'M': 0,
+                    'L': 0,
+                    'XL': 8,
+                    '2XL': 0,
+                    '3XL': 0,
+                    '4XL': 0
+                }
+            };
+
+            console.log('Test data:', testData);
+
+            try {
+                // Test formatNotes directly
+                const service = new BreastCancerBundleService();
+                const notesString = service.formatNotes(testData);
+                console.log('Generated Notes:', notesString);
+                console.log('Notes length:', notesString.length);
+
+                // Test database save
+                console.log('Attempting to save to database...');
+                const result = await service.processOrder(testData);
+
+                if (result.success) {
+                    console.log('✅ Order saved successfully!');
+                    console.log('Quote ID:', result.quoteId);
+                    return result.quoteId;
+                } else {
+                    console.error('❌ Order failed:', result.message);
+                    return null;
+                }
+            } catch (error) {
+                console.error('❌ Debug test failed:', error);
+                return null;
+            }
+        };
+
+        // Test with minimal Notes field
+        window.debugTestMinimalNotes = async function() {
+            console.log('=== DEBUG: Testing with minimal Notes ===');
+
+            const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+            const testQuoteId = 'BCA-TEST-' + Date.now();
+
+            // Create minimal session data
+            const sessionData = {
+                SessionID: testQuoteId,
+                QuoteID: testQuoteId,
+                CustomerName: 'Test User',
+                CustomerEmail: 'test@example.com',
+                CompanyName: 'Test Co',
+                Phone: '253-123-4567',
+                TotalQuantity: 8,
+                SubtotalAmount: 360,
+                LTMFeeTotal: 0,
+                TotalAmount: 360,
+                Status: 'Active',
+                ExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, ''),
+                Notes: 'BCA Bundle Test' // Simple string
+            };
+
+            console.log('Session data to send:', sessionData);
+
+            try {
+                const response = await fetch(`${apiBase}/quote_sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sessionData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', errorText);
+                    return false;
+                }
+
+                const result = await response.json();
+                console.log('✅ Success! Session saved:', result);
+                return true;
+            } catch (error) {
+                console.error('❌ Request failed:', error);
+                return false;
+            }
+        };
+
+        console.log('Debug functions available:');
+        console.log('- debugTestBCAOrder() - Test full order submission');
+        console.log('- debugTestMinimalNotes() - Test with simple Notes field');
     </script>
 </body>
 </html>
