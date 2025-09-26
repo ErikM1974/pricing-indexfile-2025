@@ -354,6 +354,64 @@
                     </div>
                 </div>
 
+                <!-- T-Shirt Design Options Section -->
+                <div class="mt-16 md:mt-24">
+                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-3">Choose Your T-Shirt Design</h3>
+                    <p class="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+                        Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs.
+                        You'll select your preferred design in Step 3 when you upload your logo.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Design Option 1: Classic Ribbon -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="product-image-container h-80"
+                                 onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676', 'Design Option 1: Classic Ribbon', 'Features the iconic pink ribbon with your company logo. A timeless design that shows your support.')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676"
+                                     alt="Classic Ribbon Design"
+                                     class="w-full h-full object-contain p-4 bg-gray-50">
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">Option 1: Classic Ribbon</h4>
+                                <p class="text-gray-600 text-sm">
+                                    Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness.
+                                </p>
+                                <div class="mt-4 inline-block px-3 py-1 bg-pink-100 text-pink-600 text-xs font-semibold rounded-full">
+                                    Default Option
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Design Option 2: Patriotic Flag -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="product-image-container h-80"
+                                 onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677', 'Design Option 2: Patriotic Flag', 'Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic and breast cancer support.')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677"
+                                     alt="Patriotic Flag Design"
+                                     class="w-full h-full object-contain p-4 bg-gray-50">
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">Option 2: Patriotic Flag</h4>
+                                <p class="text-gray-600 text-sm">
+                                    Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support.
+                                </p>
+                                <div class="mt-4 inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">
+                                    Patriotic Theme
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 border border-pink-200 rounded-lg">
+                            <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm text-pink-700 font-medium">You'll select your design choice in Step 3</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Bonus Value Section -->
                 <div class="mt-16 md:mt-24 text-center">
                     <h3 class="text-3xl font-bold text-gray-800">
@@ -610,6 +668,57 @@
                             </div>
                         </div>
 
+                        <!-- T-Shirt Design Selection -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-palette text-pink-600 mr-2"></i>
+                                Select Your T-Shirt Design <span class="text-red-500">*</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Choose which design you'd like for your t-shirts. Our artist will incorporate your logo into the selected design.
+                            </p>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <!-- Classic Ribbon Option -->
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="designChoice" value="No Flag" checked class="sr-only peer">
+                                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition peer-checked:border-pink-500 peer-checked:bg-pink-50">
+                                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676"
+                                             alt="Classic Ribbon Design"
+                                             class="w-full h-32 object-contain mb-3 rounded">
+                                        <div class="text-center">
+                                            <div class="font-semibold text-gray-800 mb-1">Classic Ribbon</div>
+                                            <div class="text-xs text-gray-600">Pink ribbon with your logo</div>
+                                            <div class="mt-2 hidden peer-checked:block">
+                                                <span class="inline-flex items-center gap-1 text-xs text-pink-600 font-semibold">
+                                                    <i class="fas fa-check-circle"></i> Selected
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Patriotic Flag Option -->
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="designChoice" value="Flag" class="sr-only peer">
+                                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition peer-checked:border-pink-500 peer-checked:bg-pink-50">
+                                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677"
+                                             alt="Patriotic Flag Design"
+                                             class="w-full h-32 object-contain mb-3 rounded">
+                                        <div class="text-center">
+                                            <div class="font-semibold text-gray-800 mb-1">Patriotic Flag</div>
+                                            <div class="text-xs text-gray-600">American flag, ribbon & logo</div>
+                                            <div class="mt-2 hidden peer-checked:block">
+                                                <span class="inline-flex items-center gap-1 text-xs text-pink-600 font-semibold">
+                                                    <i class="fas fa-check-circle"></i> Selected
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Logo Upload Section -->
                         <div class="mt-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">
@@ -714,6 +823,14 @@
                         <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
                             <h3 class="font-bold text-gray-800 mb-4">Size Distribution</h3>
                             <div id="reviewSizeDistribution" class="grid grid-cols-4 gap-2"></div>
+                        </div>
+
+                        <!-- Design Selection -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">T-Shirt Design Selection</h3>
+                            <div id="reviewDesignChoice" class="flex items-center gap-4">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
                         </div>
 
                         <!-- Next Steps -->
@@ -1357,6 +1474,28 @@
                 }
             });
             sizeDistribution.innerHTML = sizeHTML;
+
+            // Design choice
+            const designChoice = document.querySelector('input[name="designChoice"]:checked').value;
+            const designChoiceDiv = document.getElementById('reviewDesignChoice');
+            const designImage = designChoice === 'Flag'
+                ? 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677'
+                : 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676';
+            const designName = designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon';
+            const designDescription = designChoice === 'Flag'
+                ? 'American flag with pink ribbon and company logo'
+                : 'Pink ribbon with company logo';
+
+            designChoiceDiv.innerHTML = `
+                <img src="${designImage}" alt="${designName}" class="h-20 w-auto object-contain rounded border border-gray-300">
+                <div>
+                    <div class="font-semibold text-gray-800">${designName}</div>
+                    <div class="text-sm text-gray-600">${designDescription}</div>
+                    <div class="text-xs text-pink-600 font-semibold mt-1">
+                        <i class="fas fa-check-circle"></i> Selected Design
+                    </div>
+                </div>
+            `;
         }
 
         // Change step
@@ -1481,6 +1620,12 @@
                 // Get delivery method
                 const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
 
+                // Get design choice
+                const designChoice = document.querySelector('input[name="designChoice"]:checked').value;
+                const designImageURL = designChoice === 'Flag'
+                    ? 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677'
+                    : 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676';
+
                 // Prepare order data
                 const orderData = {
                     customerName: document.getElementById('customerName').value,
@@ -1495,6 +1640,8 @@
                     eventDate: document.getElementById('eventDate').value,
                     notes: document.getElementById('notes').value,
                     imageUpload: imageExternalKey,  // Include logo reference
+                    designChoice: designChoice,  // Add design choice
+                    designImageURL: designImageURL,  // Add design image URL
                     bundleCount: quantity,
                     sizeDistribution: sizeData,
                     totalShirts: quantity,

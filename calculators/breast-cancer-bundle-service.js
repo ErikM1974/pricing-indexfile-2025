@@ -169,6 +169,7 @@ class BreastCancerBundleService {
         console.log('=== prepareLineItems START ===');
         console.log('QuoteID:', quoteId);
         console.log('Bundle Count:', orderData.bundleCount);
+        console.log('Design Choice:', orderData.designChoice);
         console.log('Order Data:', orderData);
 
         const items = [];
@@ -227,6 +228,10 @@ class BreastCancerBundleService {
                 SizeBreakdown: i === 1 ? JSON.stringify(sizeBreakdown) : '',  // Only store on first item
                 Image_Upload: orderData.imageUpload || '',  // Logo reference - matches Christmas Bundle field name
 
+                // Design choice fields
+                DesignChoice: orderData.designChoice || 'No Flag',  // Store "Flag" or "No Flag"
+                DesignImageURL: orderData.designImageURL || '',  // Store the design image URL
+
                 // Delivery info
                 DeliveryMethod: orderData.deliveryMethod || 'Ship',
                 Shipping_Address: orderData.address || '',
@@ -234,11 +239,11 @@ class BreastCancerBundleService {
                 Shipping_State: orderData.state || '',
                 Shipping_Zip: orderData.zip || '',
 
-                // Notes about bundle contents and special instructions (only on first item)
+                // Notes about bundle contents, design choice, and special instructions (only on first item)
                 Notes: i === 1 ?
                     (orderData.notes ?
-                        `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles. Special Instructions: ${orderData.notes}` :
-                        `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles.`) :
+                        `Bundle contains: 1 PC54 Candy Pink T-Shirt (${orderData.designChoice || 'No Flag'} design), 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles. Special Instructions: ${orderData.notes}` :
+                        `Bundle contains: 1 PC54 Candy Pink T-Shirt (${orderData.designChoice || 'No Flag'} design), 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles.`) :
                     `Bundle ${i} of ${orderData.bundleCount}`
             };
 
@@ -305,6 +310,12 @@ class BreastCancerBundleService {
 
     // Send customer email
     async sendCustomerEmail(quoteId, orderData) {
+        // Format design choice for email
+        const designName = orderData.designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon';
+        const designDescription = orderData.designChoice === 'Flag'
+            ? 'American flag with pink ribbon and your company logo'
+            : 'Pink ribbon with your company logo';
+
         const templateParams = {
             to_email: orderData.email,
             customer_name: orderData.customerName,
@@ -314,6 +325,8 @@ class BreastCancerBundleService {
             total_caps: orderData.totalCaps,
             total_amount: this.formatCurrency(orderData.totalAmount),
             size_breakdown: this.formatSizeBreakdown(orderData.sizeDistribution),
+            design_choice: designName,
+            design_description: designDescription,
             delivery_method: orderData.deliveryMethod || 'Ship',
             delivery_address: orderData.deliveryMethod === 'Pickup'
                 ? 'Factory Pickup - 2025 Freeman Road East, Milton, WA 98354'
@@ -341,6 +354,12 @@ class BreastCancerBundleService {
 
     // Send sales team notification
     async sendSalesTeamEmail(quoteId, orderData) {
+        // Format design choice for email
+        const designName = orderData.designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon';
+        const designDescription = orderData.designChoice === 'Flag'
+            ? 'American flag with pink ribbon and company logo'
+            : 'Pink ribbon with company logo';
+
         const templateParams = {
             to_email: 'sales@nwcustomapparel.com',
             quote_id: quoteId,
@@ -351,6 +370,9 @@ class BreastCancerBundleService {
             bundle_count: orderData.bundleCount,
             total_amount: this.formatCurrency(orderData.totalAmount),
             size_breakdown: this.formatSizeBreakdown(orderData.sizeDistribution),
+            design_choice: designName,
+            design_description: designDescription,
+            design_flag_status: orderData.designChoice || 'No Flag',  // Send raw flag status for sales team
             delivery_method: orderData.deliveryMethod || 'Ship',
             delivery_address: orderData.deliveryMethod === 'Pickup'
                 ? 'Factory Pickup - 2025 Freeman Road East, Milton, WA 98354'

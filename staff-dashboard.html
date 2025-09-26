@@ -7523,6 +7523,16 @@
                         } catch (e) {}
                     }
 
+                    // Get design choice from items
+                    let designChoice = 'No Flag';  // Default
+                    let designImageURL = 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676';
+                    if (items.length > 0 && items[0].DesignChoice) {
+                        designChoice = items[0].DesignChoice;
+                        designImageURL = items[0].DesignImageURL || (designChoice === 'Flag'
+                            ? 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677'
+                            : 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676');
+                    }
+
                     return `
                         <div style="display: grid; gap: 1.25rem;">
                             <!-- BCA Header with Pink Ribbon -->
@@ -7533,6 +7543,28 @@
                                 </h3>
                                 <div style="margin-top: 0.5rem; font-size: 1.1rem; opacity: 0.95;">
                                     Order #${request.QuoteID}
+                                </div>
+                            </div>
+
+                            <!-- T-Shirt Design Selection -->
+                            <div style="background: #fdf2f8; padding: 1rem; border-radius: 8px; border: 2px solid #fbbcdc;">
+                                <h4 style="margin: 0 0 0.75rem 0; color: #be185d; font-size: 1rem;">Selected T-Shirt Design</h4>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <img src="${designImageURL}" alt="${designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon'} Design"
+                                         style="width: 100px; height: 100px; object-fit: contain; background: white; padding: 0.5rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <div>
+                                        <div style="font-weight: bold; color: #374151; font-size: 1.125rem;">
+                                            ${designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon'}
+                                        </div>
+                                        <div style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;">
+                                            ${designChoice === 'Flag' ? 'American flag with pink ribbon and company logo' : 'Pink ribbon with company logo'}
+                                        </div>
+                                        <div style="margin-top: 0.5rem;">
+                                            <span style="background: #ec4899; color: white; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                                                ${designChoice === 'Flag' ? 'FLAG DESIGN' : 'NO FLAG DESIGN'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
