@@ -4001,7 +4001,7 @@
                             <h2 style="margin: 0; font-size: 1.5rem;">
                                 <i class="fas fa-box-open"></i> Sample Request Dashboard
                                 <span style="font-size: 0.9rem; margin-left: 0.5rem; opacity: 0.9;">
-                                    <i class="fas fa-gift" style="color: white;"></i> Including Christmas Bundles
+                                    <i class="fas fa-gift" style="color: white;"></i> Including Holiday & Awareness Bundles
                                 </span>
                             </h2>
                             <div style="display: flex; gap: 1rem; align-items: center;">
@@ -4022,6 +4022,7 @@
                                     <option value="">Active (No Archived)</option>
                                     <option value="ALL">All (Including Archived)</option>
                                     <option value="XMAS">Christmas Bundles Only</option>
+                                    <option value="BCA">Breast Cancer Bundles Only</option>
                                     <option value="SR">Sample Requests Only</option>
                                     <option value="Sample Request">Pending</option>
                                     <option value="Processed">Processed</option>
@@ -7179,8 +7180,8 @@
                         request.SalesRep = request.SalesRepName;
                     }
 
-                    // For Christmas bundles, fetch items to get delivery method
-                    if (request.QuoteID && request.QuoteID.startsWith('XMAS')) {
+                    // For Christmas and BCA bundles, fetch items to get delivery method
+                    if (request.QuoteID && (request.QuoteID.startsWith('XMAS') || request.QuoteID.startsWith('BCA'))) {
                         try {
                             const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(request.QuoteID)}`);
                             if (itemsResponse.ok) {
@@ -7194,9 +7195,9 @@
                         }
                     }
                 }
-                // Filter to sample requests (SR) and Christmas bundles (XMAS), sort by creation date
+                // Filter to sample requests (SR), Christmas bundles (XMAS), and Breast Cancer bundles (BCA), sort by creation date
                 const allSampleRequests = data
-                    .filter(request => request.QuoteID && (request.QuoteID.startsWith('SR') || request.QuoteID.startsWith('XMAS')))
+                    .filter(request => request.QuoteID && (request.QuoteID.startsWith('SR') || request.QuoteID.startsWith('XMAS') || request.QuoteID.startsWith('BCA')))
                     .sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
                 
                 // Get the current filter selection
@@ -7212,6 +7213,9 @@
                 } else if (statusFilter === 'SR') {
                     // Show only sample requests
                     currentSampleRequests = allSampleRequests.filter(request => request.QuoteID && request.QuoteID.startsWith('SR'));
+                } else if (statusFilter === 'BCA') {
+                    // Show only Breast Cancer bundles
+                    currentSampleRequests = allSampleRequests.filter(request => request.QuoteID && request.QuoteID.startsWith('BCA'));
                 } else if (statusFilter === '') {
                     // Default: Show active requests (exclude archived)
                     currentSampleRequests = allSampleRequests.filter(request => request.Status !== 'Archived');
