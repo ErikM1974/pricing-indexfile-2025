@@ -7535,7 +7535,20 @@
                                 <div><strong>Status:</strong> ${getStatusBadge(request.Status)}</div>
                                 ${/* Hide Total Amount for Christmas bundles since we show value summary */ ''}
                                 ${!(request.QuoteID && request.QuoteID.startsWith('XMAS')) ? `<div><strong>Total Amount:</strong> $${(request.TotalAmount || 0).toFixed(2)}</div>` : ''}
-                                ${items[0]?.DeliveryDate || request.DeliveryDate ? `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(items[0]?.DeliveryDate || request.DeliveryDate).toLocaleDateString()}</span></div>` : '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>'}
+                                ${(() => {
+                                    // For BCA orders, extract event date from Notes
+                                    if (request.QuoteID && request.QuoteID.startsWith('BCA') && request.Notes) {
+                                        const eventMatch = request.Notes.match(/Event:\s*([^,]+)/);
+                                        if (eventMatch) {
+                                            return `<div><strong>Event Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(eventMatch[1]).toLocaleDateString()}</span></div>`;
+                                        }
+                                    }
+                                    // For other orders, use DeliveryDate
+                                    if (items[0]?.DeliveryDate || request.DeliveryDate) {
+                                        return `<div><strong>Due Date:</strong> <span style="color: #dc2626; font-weight: 600;">${new Date(items[0]?.DeliveryDate || request.DeliveryDate).toLocaleDateString()}</span></div>`;
+                                    }
+                                    return '<div><strong>Due Date:</strong> <span style="color: #6b7280;">Not specified</span></div>';
+                                })()}
                                 ${items[0]?.DeliveryMethod || request.DeliveryMethod ? `<div><strong>Delivery:</strong> ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? 'Ship' : 'Pickup'}</div>` : ''}
                                 ${items[0]?.RushOrder || request.IsRushOrder ? `<div style="grid-column: 1 / -1;"><strong style="color: #dc2626;">⚠️ RUSH ORDER - EXPEDITED PROCESSING</strong></div>` : ''}
                                 ${/* Only show pricing details for non-Christmas sample requests */ ''}
@@ -8003,15 +8016,38 @@
                         ` : ''}
                         
                         <!-- Project Information -->
-                        ${orderDetails.projectType || request.Notes ? `
-                            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
-                                <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">Project Information</h4>
-                                ${orderDetails.projectType ? `<div><strong>Project Type:</strong> ${orderDetails.projectType}</div>` : ''}
-                                ${orderDetails.estimatedQuantity ? `<div><strong>Estimated Quantity:</strong> ${orderDetails.estimatedQuantity}</div>` : ''}
-                                ${orderDetails.timeline ? `<div><strong>Timeline:</strong> ${orderDetails.timeline}</div>` : ''}
-                                ${request.Notes ? `<div style="margin-top: 0.5rem;"><strong>Notes:</strong><br>${cleanNotesDisplay(request.Notes).replace(/\|/g, '<br>')}</div>` : ''}
-                            </div>
-                        ` : ''}
+                        ${(() => {
+                            // For BCA orders, parse event date and instructions from Notes
+                            if (request.QuoteID && request.QuoteID.startsWith('BCA') && request.Notes) {
+                                const eventMatch = request.Notes.match(/Event:\s*([^,]+)/);
+                                const instructionsMatch = request.Notes.match(/Instructions:\s*(.+)$/);
+
+                                if (eventMatch || instructionsMatch) {
+                                    return `
+                                        <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
+                                            <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">Project Information</h4>
+                                            ${eventMatch ? `<div><strong>Event Date:</strong> ${new Date(eventMatch[1]).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>` : ''}
+                                            ${instructionsMatch ? `<div style="margin-top: 0.5rem;"><strong>Special Instructions:</strong><br><span style="background: #fef3c7; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">${instructionsMatch[1]}</span></div>` : ''}
+                                        </div>
+                                    `;
+                                }
+                            }
+
+                            // For other orders, show standard project information
+                            if (orderDetails.projectType || request.Notes) {
+                                return `
+                                    <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
+                                        <h4 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">Project Information</h4>
+                                        ${orderDetails.projectType ? `<div><strong>Project Type:</strong> ${orderDetails.projectType}</div>` : ''}
+                                        ${orderDetails.estimatedQuantity ? `<div><strong>Estimated Quantity:</strong> ${orderDetails.estimatedQuantity}</div>` : ''}
+                                        ${orderDetails.timeline ? `<div><strong>Timeline:</strong> ${orderDetails.timeline}</div>` : ''}
+                                        ${request.Notes ? `<div style="margin-top: 0.5rem;"><strong>Notes:</strong><br>${cleanNotesDisplay(request.Notes).replace(/\|/g, '<br>')}</div>` : ''}
+                                    </div>
+                                `;
+                            }
+
+                            return '';
+                        })()}
                     </div>
                 `;
                 
