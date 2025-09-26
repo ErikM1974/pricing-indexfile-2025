@@ -7877,25 +7877,85 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${items.map(item => {
-                                        let size = 'N/A';
-                                        try {
-                                            const sizeData = JSON.parse(item.SizeBreakdown || '{}');
-                                            size = sizeData.size || 'N/A';
-                                        } catch (e) {}
-                                        
-                                        return `
-                                            <tr style="border-bottom: 1px solid #e5e7eb;">
-                                                <td style="padding: 0.5rem;">${item.StyleNumber}</td>
-                                                <td style="padding: 0.5rem;">${item.ProductName}</td>
-                                                <td style="padding: 0.5rem;">${item.Color || 'N/A'}</td>
-                                                <td style="padding: 0.5rem;">${size}</td>
-                                                <td style="padding: 0.5rem; text-align: right;">
-                                                    ${item.FinalUnitPrice > 0 ? `$${item.FinalUnitPrice.toFixed(2)}` : 'FREE'}
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
+                                    ${(() => {
+                                        // Check if these are BCA bundles
+                                        if (items.length > 0 && items[0].StyleNumber === 'BCA-BUNDLE') {
+                                            // Parse size breakdown from first item
+                                            let sizeBreakdown = {};
+                                            try {
+                                                sizeBreakdown = JSON.parse(items[0].SizeBreakdown || '{}');
+                                            } catch (e) {
+                                                console.log('Error parsing BCA size breakdown:', e);
+                                            }
+
+                                            // Display aggregated view for BCA bundles
+                                            const rows = [];
+
+                                            // Add header row
+                                            rows.push(`
+                                                <tr style="border-bottom: 2px solid #e5e7eb; background: #fce7f3;">
+                                                    <td colspan="5" style="padding: 0.75rem; font-weight: 600;">
+                                                        <i class="fas fa-ribbon" style="color: #ec4899;"></i>
+                                                        Breast Cancer Awareness Bundle - ${items.length} Total Bundles
+                                                    </td>
+                                                </tr>
+                                            `);
+
+                                            // Add size breakdown row
+                                            if (Object.keys(sizeBreakdown).length > 0) {
+                                                const sizeDisplay = Object.entries(sizeBreakdown)
+                                                    .map(([size, qty]) => `${size}: ${qty}`)
+                                                    .join(', ');
+
+                                                rows.push(`
+                                                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                                                        <td style="padding: 0.5rem;">BCA-BUNDLE</td>
+                                                        <td style="padding: 0.5rem;">PC54 Candy Pink T-Shirts</td>
+                                                        <td style="padding: 0.5rem;">Candy Pink</td>
+                                                        <td style="padding: 0.5rem;">${sizeDisplay}</td>
+                                                        <td style="padding: 0.5rem; text-align: right;">
+                                                            ${items.length} @ $45.00
+                                                        </td>
+                                                    </tr>
+                                                `);
+
+                                                rows.push(`
+                                                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                                                        <td style="padding: 0.5rem;">BCA-BUNDLE</td>
+                                                        <td style="padding: 0.5rem;">C112 Trucker Caps</td>
+                                                        <td style="padding: 0.5rem;">True Pink/White</td>
+                                                        <td style="padding: 0.5rem;">One Size (${items.length} caps)</td>
+                                                        <td style="padding: 0.5rem; text-align: right;">
+                                                            Included
+                                                        </td>
+                                                    </tr>
+                                                `);
+                                            }
+
+                                            return rows.join('');
+                                        } else {
+                                            // Regular items display
+                                            return items.map(item => {
+                                                let size = 'N/A';
+                                                try {
+                                                    const sizeData = JSON.parse(item.SizeBreakdown || '{}');
+                                                    size = sizeData.size || 'N/A';
+                                                } catch (e) {}
+
+                                                return `
+                                                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                                                        <td style="padding: 0.5rem;">${item.StyleNumber}</td>
+                                                        <td style="padding: 0.5rem;">${item.ProductName}</td>
+                                                        <td style="padding: 0.5rem;">${item.Color || 'N/A'}</td>
+                                                        <td style="padding: 0.5rem;">${size}</td>
+                                                        <td style="padding: 0.5rem; text-align: right;">
+                                                            ${item.FinalUnitPrice > 0 ? `$${item.FinalUnitPrice.toFixed(2)}` : 'FREE'}
+                                                        </td>
+                                                    </tr>
+                                                `;
+                                            }).join('');
+                                        }
+                                    })()}
                                 </tbody>
                             </table>
                             
