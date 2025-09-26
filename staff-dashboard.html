@@ -7479,8 +7479,175 @@
                     };
                 }
                 
-                // Build the details HTML
-                const detailsHTML = `
+                // Build the details HTML - Special layout for BCA orders
+                const detailsHTML = request.QuoteID && request.QuoteID.startsWith('BCA') ? (() => {
+                    // Parse event date and instructions from Notes
+                    let eventDate = 'Not specified';
+                    let specialInstructions = 'None';
+
+                    if (request.Notes) {
+                        const eventMatch = request.Notes.match(/Event:\s*([^,]+)/);
+                        const instructionsMatch = request.Notes.match(/Instructions:\s*(.+)$/);
+
+                        if (eventMatch) {
+                            eventDate = new Date(eventMatch[1]).toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                        }
+                        if (instructionsMatch) {
+                            specialInstructions = instructionsMatch[1];
+                        }
+                    }
+
+                    // Format phone number
+                    const formatPhone = (phone) => {
+                        if (!phone) return 'N/A';
+                        const cleaned = phone.replace(/\D/g, '');
+                        if (cleaned.length === 10) {
+                            return `(${cleaned.slice(0,3)}) ${cleaned.slice(3,6)}-${cleaned.slice(6)}`;
+                        }
+                        return phone;
+                    };
+
+                    // Parse size breakdown
+                    let sizeDisplay = 'N/A';
+                    if (items.length > 0 && items[0].SizeBreakdown) {
+                        try {
+                            const sizeBreakdown = JSON.parse(items[0].SizeBreakdown);
+                            sizeDisplay = Object.entries(sizeBreakdown)
+                                .map(([size, qty]) => `${size}(${qty})`)
+                                .join(' ');
+                        } catch (e) {}
+                    }
+
+                    return `
+                        <div style="display: grid; gap: 1.25rem;">
+                            <!-- BCA Header with Pink Ribbon -->
+                            <div style="background: linear-gradient(135deg, #ec4899, #f472b6); color: white; padding: 1.25rem; border-radius: 8px; text-align: center;">
+                                <h3 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <i class="fas fa-ribbon"></i>
+                                    Breast Cancer Awareness Bundle Order
+                                </h3>
+                                <div style="margin-top: 0.5rem; font-size: 1.1rem; opacity: 0.95;">
+                                    Order #${request.QuoteID}
+                                </div>
+                            </div>
+
+                            <!-- Customer Information -->
+                            <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #fbbcdc;">
+                                <h4 style="margin: 0 0 0.75rem 0; color: #ec4899; font-size: 1rem; font-weight: 600;">
+                                    <i class="fas fa-user" style="margin-right: 0.5rem;"></i>Customer Information
+                                </h4>
+                                <div style="display: grid; gap: 0.5rem; font-size: 0.95rem;">
+                                    <div><strong>Name:</strong> ${request.CustomerName || 'N/A'}</div>
+                                    <div><strong>Company:</strong> ${request.CompanyName || 'N/A'}</div>
+                                    <div><strong>Email:</strong> <a href="mailto:${request.CustomerEmail}" style="color: #ec4899;">${request.CustomerEmail || 'N/A'}</a></div>
+                                    <div><strong>Phone:</strong> <a href="tel:${request.Phone}" style="color: #ec4899;">${formatPhone(request.Phone)}</a></div>
+                                </div>
+                            </div>
+
+                            <!-- Bundle Order Details -->
+                            <div style="background: #fce7f3; padding: 1rem; border-radius: 8px; border: 1px solid #fbbcdc;">
+                                <h4 style="margin: 0 0 0.75rem 0; color: #ec4899; font-size: 1rem; font-weight: 600;">
+                                    <i class="fas fa-shopping-bag" style="margin-right: 0.5rem;"></i>Bundle Order Details
+                                </h4>
+                                <div style="display: grid; gap: 0.5rem; font-size: 0.95rem;">
+                                    <div><strong>Quantity:</strong> ${items.length} bundles @ $45.00 each</div>
+                                    <div><strong>Total Amount:</strong> <span style="color: #059669; font-size: 1.1rem; font-weight: 600;">$${(request.TotalAmount || 0).toFixed(2)}</span></div>
+                                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #fbbcdc;">
+                                        <strong>Size Distribution:</strong>
+                                        <div style="margin-top: 0.25rem; padding: 0.5rem; background: white; border-radius: 4px;">
+                                            <div><strong>T-Shirts:</strong> ${sizeDisplay}</div>
+                                            <div><strong>Caps:</strong> One Size (${items.length} total)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event Information -->
+                            <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #fbbcdc;">
+                                <h4 style="margin: 0 0 0.75rem 0; color: #ec4899; font-size: 1rem; font-weight: 600;">
+                                    <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>Event Information
+                                </h4>
+                                <div style="display: grid; gap: 0.5rem; font-size: 0.95rem;">
+                                    <div><strong>Event Date:</strong> <span style="color: #dc2626; font-weight: 600;">${eventDate}</span></div>
+                                    ${specialInstructions !== 'None' ? `
+                                        <div>
+                                            <strong>Special Instructions:</strong>
+                                            <div style="margin-top: 0.25rem; padding: 0.5rem; background: #fef3c7; border-radius: 4px; border: 1px solid #fde68a;">
+                                                ${specialInstructions}
+                                            </div>
+                                        </div>
+                                    ` : '<div><strong>Special Instructions:</strong> None</div>'}
+                                </div>
+                            </div>
+
+                            <!-- Custom Logo -->
+                            ${items[0]?.Image_Upload ? `
+                                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #fbbcdc;">
+                                    <h4 style="margin: 0 0 0.75rem 0; color: #ec4899; font-size: 1rem; font-weight: 600;">
+                                        <i class="fas fa-image" style="margin-right: 0.5rem;"></i>Custom Logo
+                                    </h4>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="background: #f3f4f6; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                            <img src="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/uploads/${items[0].Image_Upload}"
+                                                 style="max-width: 120px; max-height: 120px; object-fit: contain;"
+                                                 alt="Customer Logo">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="color: #059669; font-weight: 600;">
+                                                <i class="fas fa-check-circle"></i> Logo Uploaded Successfully
+                                            </div>
+                                            <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">
+                                                Ready for embroidery on caps
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Delivery Information -->
+                            ${(items[0]?.DeliveryMethod || request.DeliveryMethod || '').toLowerCase() === 'ship' ? `
+                                <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; border: 1px solid #fde68a;">
+                                    <h4 style="margin: 0 0 0.75rem 0; color: #f59e0b; font-size: 1rem; font-weight: 600;">
+                                        <i class="fas fa-truck" style="margin-right: 0.5rem;"></i>Delivery Information
+                                    </h4>
+                                    <div style="display: grid; gap: 0.5rem; font-size: 0.95rem;">
+                                        <div><strong>Method:</strong> Ship to Address</div>
+                                        <div><strong>Address:</strong> ${items[0]?.Shipping_Address || 'Not provided'}</div>
+                                        <div><strong>City:</strong> ${items[0]?.Shipping_City || 'Not provided'}</div>
+                                        <div><strong>State:</strong> ${items[0]?.Shipping_State || 'Not provided'}</div>
+                                        <div><strong>ZIP:</strong> ${items[0]?.Shipping_Zip || 'Not provided'}</div>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div style="background: #dcfce7; padding: 1rem; border-radius: 8px; border: 1px solid #bbf7d0;">
+                                    <h4 style="margin: 0 0 0.75rem 0; color: #16a34a; font-size: 1rem; font-weight: 600;">
+                                        <i class="fas fa-warehouse" style="margin-right: 0.5rem;"></i>Delivery Information
+                                    </h4>
+                                    <div style="font-size: 0.95rem;">
+                                        <strong>Method:</strong> Factory Pickup
+                                        <div style="margin-top: 0.25rem; color: #6b7280;">
+                                            2025 Freeman Road East, Milton, WA 98354
+                                        </div>
+                                    </div>
+                                </div>
+                            `}
+
+                            <!-- Order Status -->
+                            <div style="background: #f3f4f6; padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.875rem; color: #6b7280;">Order Status</div>
+                                <div style="margin-top: 0.25rem;">${getStatusBadge(request.Status)}</div>
+                                <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+                                    Created: ${new Date(request.CreatedAt).toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                })() : `
                     <div style="display: grid; gap: 1.5rem;">
                         <!-- Customer Information -->
                         <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
