@@ -26,6 +26,17 @@
         /* Scope all styles to .bca-bundle-app to prevent conflicts */
         .bca-bundle-app {
             font-family: 'Inter', sans-serif;
+            /* CSS Variables for consistent theming */
+            --pink-primary: #ec4899;
+            --pink-secondary: #f472b6;
+            --pink-light: #fce7f3;
+            --pink-lighter: #fdf2f8;
+            --pink-dark: #be185d;
+            --pink-accent: #fbbcdc;
+            --gray-primary: #666666;
+            --gray-light: #f3f4f6;
+            --error-red: #ef4444;
+            --error-bg: #fee2e2;
         }
 
         /* Ensure Tailwind only affects our app */
@@ -46,7 +57,7 @@
         /* Loading spinner */
         .spinner {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #ec4899;
+            border-top: 3px solid var(--pink-primary);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -87,8 +98,31 @@
             transition: opacity 0.3s;
         }
 
-        .product-image-container:hover::after {
+        .product-image-container:hover::after,
+        .product-image-container:focus-within::after {
             opacity: 1;
+        }
+
+        /* Form validation error states */
+        .input-error {
+            border-color: var(--error-red) !important;
+            background-color: var(--error-bg) !important;
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
         }
     </style>
 </head>
@@ -120,7 +154,7 @@
             <div class="relative flex items-center justify-center h-full p-4">
                 <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
                     <!-- Close button -->
-                    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10">
+                    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-lg p-1">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -136,7 +170,7 @@
             </div>
         </div>
 
-        <main class="container mx-auto px-6 py-8 md:py-16">
+        <main class="container mx-auto px-6 py-8 md:py-16 pb-24">
 
             <!-- Main Title Section -->
             <div class="text-center mb-12 fade-in">
@@ -164,7 +198,7 @@
                         </p>
                     </div>
                     <button onclick="this.parentElement.parentElement.style.display='none'"
-                            class="text-white hover:text-gray-200 transition p-2"
+                            class="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white rounded-lg transition p-2"
                             title="Dismiss">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -218,14 +252,14 @@
                             <label class="text-sm font-medium text-gray-700 mb-2 block">Number of Bundles</label>
                             <div class="flex items-center space-x-4">
                                 <button onclick="adjustQuantity(-1)"
-                                        class="bg-gray-200 hover:bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center transition">
+                                        class="bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-full w-10 h-10 flex items-center justify-center transition">
                                     <i class="fas fa-minus"></i>
                                 </button>
                                 <input type="number" id="bundleQuantity" value="8" min="8"
-                                       class="w-20 text-center border-2 border-gray-300 rounded-lg py-2 font-bold text-lg"
+                                       class="w-20 text-center border-2 border-gray-300 rounded-lg py-2 font-bold text-lg focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200"
                                        onchange="updateBundleDisplay()">
                                 <button onclick="adjustQuantity(1)"
-                                        class="bg-gray-200 hover:bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center transition">
+                                        class="bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-full w-10 h-10 flex items-center justify-center transition">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -610,7 +644,7 @@
                                                 <p id="logoFileName" class="text-sm text-gray-500"></p>
                                             </div>
                                         </div>
-                                        <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 transition">
+                                        <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-lg p-1 transition">
                                             <i class="fas fa-times-circle text-xl"></i>
                                         </button>
                                     </div>
@@ -722,7 +756,7 @@
                             You will receive a confirmation email shortly with your order details.
                         </p>
                         <button onclick="location.reload()"
-                                class="mt-8 bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 transition">
+                                class="mt-8 bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 transition">
                             Start New Order
                         </button>
                     </div>
@@ -734,18 +768,18 @@
                 <div class="container mx-auto px-6">
                     <div class="flex justify-between items-center max-w-4xl mx-auto">
                         <button id="prevBtn" onclick="changeStep(-1)"
-                                class="bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-full hover:bg-gray-300 transition"
+                                class="bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 transition"
                                 style="display: none;">
                             <i class="fas fa-arrow-left mr-2"></i> Previous
                         </button>
 
                         <button id="nextBtn" onclick="changeStep(1)"
-                                class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 transition ml-auto">
+                                class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 transition ml-auto">
                             Next <i class="fas fa-arrow-right ml-2"></i>
                         </button>
 
                         <button id="submitBtn" onclick="submitOrder()"
-                                class="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 transition"
+                                class="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 transition"
                                 style="display: none;">
                             <i class="fas fa-check mr-2"></i> Submit Order
                         </button>
@@ -775,27 +809,84 @@
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
 
+        // Form validation helpers
+        function showFieldError(inputId, message) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.classList.add('input-error');
+                // Check if error message element exists, if not create it
+                let errorElement = input.nextElementSibling;
+                if (!errorElement || !errorElement.classList.contains('error-message')) {
+                    errorElement = document.createElement('div');
+                    errorElement.className = 'error-message';
+                    input.parentNode.insertBefore(errorElement, input.nextSibling);
+                }
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+        }
+
+        function clearFieldError(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.classList.remove('input-error');
+                const errorElement = input.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('error-message')) {
+                    errorElement.classList.remove('show');
+                }
+            }
+        }
+
+        function clearAllErrors() {
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-message.show').forEach(el => el.classList.remove('show'));
+        }
+
         // Calculate days until deadline
         function updateDeadlineCountdown() {
-            const deadline = new Date('2025-09-30T23:59:59');
             const now = new Date();
+            const currentYear = now.getFullYear();
+
+            // Determine the deadline year
+            // If we're past September 30 of current year, use next year
+            const deadlineMonth = 8; // September (0-indexed)
+            const deadlineDay = 30;
+            let deadlineYear = currentYear;
+
+            // Check if we've passed this year's deadline
+            const thisYearDeadline = new Date(currentYear, deadlineMonth, deadlineDay, 23, 59, 59);
+            if (now > thisYearDeadline) {
+                deadlineYear = currentYear + 1;
+            }
+
+            const deadline = new Date(deadlineYear, deadlineMonth, deadlineDay, 23, 59, 59);
+
             // Set time to start of day for accurate day counting
             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const deadlineStart = new Date(2025, 8, 30); // Sept 30 (month is 0-indexed)
+            const deadlineStart = new Date(deadlineYear, deadlineMonth, deadlineDay);
             const timeDiff = deadlineStart - todayStart;
             const daysLeft = Math.round(timeDiff / (1000 * 60 * 60 * 24));
 
             const daysElement = document.getElementById('daysLeft');
-            if (daysElement) {
-                if (daysLeft > 0) {
+            const banner = document.getElementById('deadlineBanner');
+
+            if (daysElement && banner) {
+                // Show banner only from August 1st to September 30th
+                const showStartDate = new Date(deadlineYear, 7, 1); // August 1st
+
+                if (now < showStartDate) {
+                    // Too early in the year, hide banner
+                    banner.style.display = 'none';
+                } else if (daysLeft > 0) {
                     daysElement.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
+                    banner.style.display = 'block';
                 } else if (daysLeft === 0) {
                     daysElement.textContent = 'TODAY IS THE LAST DAY';
                     daysElement.style.color = '#ff0000';
+                    banner.style.display = 'block';
                 } else {
-                    // Hide banner if deadline passed
-                    const banner = document.getElementById('deadlineBanner');
-                    if (banner) banner.style.display = 'none';
+                    // Past deadline, hide banner
+                    banner.style.display = 'none';
                 }
             }
         }
@@ -820,13 +911,14 @@
             }
         }
 
-        // Add phone formatting to input
+        // Add phone formatting and validation clearing
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.getElementById('phone');
             if (phoneInput) {
                 phoneInput.addEventListener('input', function(e) {
                     const formatted = formatPhoneNumber(e.target.value);
                     e.target.value = formatted;
+                    clearFieldError('phone'); // Clear error on input
                 });
 
                 // Handle paste events
@@ -834,8 +926,20 @@
                     e.preventDefault();
                     const pastedText = (e.clipboardData || window.clipboardData).getData('text');
                     e.target.value = formatPhoneNumber(pastedText);
+                    clearFieldError('phone');
                 });
             }
+
+            // Clear errors on input for all required fields
+            const requiredFields = ['customerName', 'email', 'shippingAddress', 'shippingCity', 'shippingState', 'shippingZip'];
+            requiredFields.forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        clearFieldError(fieldId);
+                    });
+                }
+            });
         });
 
         // Logo Upload Functions
@@ -955,13 +1059,13 @@
             modalDescription.textContent = description;
 
             modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.classList.add('modal-open'); // Add class for scroll locking
         }
 
         function closeProductModal() {
             const modal = document.getElementById('productModal');
             modal.classList.add('hidden');
-            document.body.style.overflow = 'auto'; // Re-enable scrolling
+            document.body.classList.remove('modal-open'); // Remove class to restore scrolling
         }
 
         // Close modal on ESC key
@@ -987,7 +1091,7 @@
 
         // Update bundle display when quantity changes
         function updateBundleDisplay() {
-            const quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+            let quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
 
             // Enforce minimum
             if (quantity < 8) {
@@ -1006,7 +1110,15 @@
             const totalPrice = quantity * 45;
             document.getElementById('totalPrice').textContent = totalPrice.toFixed(0);
 
-            // Reset size inputs when quantity changes
+            // Reset size inputs when quantity changes to prevent confusion
+            sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                if (input) {
+                    input.value = 0;
+                }
+            });
+
+            // Update size total display
             updateSizeTotal();
         }
 
@@ -1075,6 +1187,8 @@
 
         // Validate current step
         function validateStep(step) {
+            clearAllErrors(); // Clear any existing errors
+
             if (step === 2) {
                 // Check that size distribution matches bundle quantity
                 const requiredQuantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
@@ -1086,6 +1200,9 @@
                 });
 
                 if (total !== requiredQuantity) {
+                    const validationDiv = document.getElementById('sizeValidation');
+                    validationDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
                     if (total === 0) {
                         alert('Please enter the size distribution for your t-shirts.');
                     } else if (total < requiredQuantity) {
@@ -1098,35 +1215,63 @@
             } else if (step === 3) {
                 // Validate customer form
                 const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
-                const basicFields = ['customerName', 'email', 'phone'];
+                let hasErrors = false;
 
-                // Validate basic fields first
-                for (let field of basicFields) {
-                    const input = document.getElementById(field);
-                    if (!input.value.trim()) {
-                        alert(`Please fill in all required fields.`);
-                        input.focus();
-                        return false;
-                    }
+                // Validate name
+                const nameInput = document.getElementById('customerName');
+                if (!nameInput.value.trim()) {
+                    showFieldError('customerName', 'Full name is required');
+                    hasErrors = true;
+                }
+
+                // Validate email
+                const emailInput = document.getElementById('email');
+                if (!emailInput.value.trim()) {
+                    showFieldError('email', 'Email address is required');
+                    hasErrors = true;
+                } else if (!emailInput.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                    showFieldError('email', 'Please enter a valid email address');
+                    hasErrors = true;
+                }
+
+                // Validate phone
+                const phoneInput = document.getElementById('phone');
+                const phoneDigits = phoneInput.value.replace(/\D/g, '');
+                if (!phoneInput.value.trim()) {
+                    showFieldError('phone', 'Phone number is required');
+                    hasErrors = true;
+                } else if (phoneDigits.length !== 10) {
+                    showFieldError('phone', 'Please enter a 10-digit phone number');
+                    hasErrors = true;
                 }
 
                 // Only validate shipping fields if Ship is selected
                 if (deliveryMethod === 'Ship') {
-                    const shippingFields = ['shippingAddress', 'shippingCity', 'shippingState', 'shippingZip'];
-                    for (let field of shippingFields) {
-                        const input = document.getElementById(field);
-                        if (!input.value.trim()) {
-                            alert(`Please fill in all shipping address fields.`);
-                            input.focus();
-                            return false;
-                        }
+                    if (!document.getElementById('shippingAddress').value.trim()) {
+                        showFieldError('shippingAddress', 'Delivery address is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingCity').value.trim()) {
+                        showFieldError('shippingCity', 'City is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingState').value.trim()) {
+                        showFieldError('shippingState', 'State is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingZip').value.trim()) {
+                        showFieldError('shippingZip', 'ZIP code is required');
+                        hasErrors = true;
                     }
                 }
 
-                // Validate email format
-                const email = document.getElementById('email').value;
-                if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-                    alert('Please enter a valid email address.');
+                if (hasErrors) {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.input-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
                     return false;
                 }
             }
