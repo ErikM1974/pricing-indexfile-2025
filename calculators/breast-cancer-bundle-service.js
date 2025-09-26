@@ -31,8 +31,11 @@ class BreastCancerBundleService {
 
     // Process the complete order
     async processOrder(orderData) {
+        console.log('=== processOrder START ===');
+        console.log('Received orderData:', orderData);
         try {
             const quoteId = this.generateQuoteID();
+            console.log('Generated QuoteID:', quoteId);
 
             // Save to database
             const saveResult = await this.saveToDatabase(quoteId, orderData);
@@ -63,6 +66,16 @@ class BreastCancerBundleService {
 
     // Save to database
     async saveToDatabase(quoteId, orderData) {
+        console.log('=== saveToDatabase START ===');
+        console.log('QuoteID:', quoteId);
+        console.log('Order Data Fields:');
+        console.log('  - address:', orderData.address);
+        console.log('  - city:', orderData.city);
+        console.log('  - state:', orderData.state);
+        console.log('  - zip:', orderData.zip);
+        console.log('  - notes:', orderData.notes);
+        console.log('  - imageUpload:', orderData.imageUpload);
+        console.log('  - deliveryMethod:', orderData.deliveryMethod);
         // Calculate expiration date (30 days from now)
         const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
         const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
@@ -108,11 +121,12 @@ class BreastCancerBundleService {
 
             // Save individual items
             const items = this.prepareLineItems(quoteId, orderData);
-            console.log('Attempting to save items:', items);
+            console.log(`Attempting to save ${items.length} items...`);
+            console.log('First item sample:', items[0]);
 
             for (const item of items) {
                 try {
-                    console.log('Saving item:', item);
+                    console.log(`Saving item ${item.LineNumber} of ${items.length}...`);
                     const itemResponse = await fetch(`${this.apiBase}/quote_items`, {
                         method: 'POST',
                         headers: {
@@ -133,13 +147,15 @@ class BreastCancerBundleService {
                             // Not JSON, already logged as text
                         }
                     } else {
-                        console.log('Item saved successfully');
+                        console.log(`Item ${item.LineNumber} saved successfully`);
                     }
                 } catch (itemError) {
                     console.error('Error saving item:', itemError);
                 }
             }
 
+            console.log(`All ${items.length} items saved successfully`);
+            console.log('=== saveToDatabase END ===');
             return { success: true };
 
         } catch (error) {
@@ -150,6 +166,11 @@ class BreastCancerBundleService {
 
     // Prepare line items for database
     prepareLineItems(quoteId, orderData) {
+        console.log('=== prepareLineItems START ===');
+        console.log('QuoteID:', quoteId);
+        console.log('Bundle Count:', orderData.bundleCount);
+        console.log('Order Data:', orderData);
+
         const items = [];
         const pricePerBundle = 45;
         let lineNumber = 1;
@@ -165,7 +186,9 @@ class BreastCancerBundleService {
         });
 
         // Create individual line items for each bundle to match expected "9 samples" pattern
+        console.log(`Creating ${orderData.bundleCount} individual line items...`);
         for (let i = 1; i <= orderData.bundleCount; i++) {
+            console.log(`Creating item ${i} of ${orderData.bundleCount}`);
             // Determine which size this bundle belongs to
             let currentSize = 'N/A';
             let sizeIndex = 0;
@@ -180,7 +203,7 @@ class BreastCancerBundleService {
                 }
             }
 
-            items.push({
+            const itemData = {
                 QuoteID: quoteId,
                 LineNumber: lineNumber++,
                 StyleNumber: 'BCA-BUNDLE',
@@ -218,9 +241,15 @@ class BreastCancerBundleService {
                         `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles. Special Instructions: ${orderData.notes}` :
                         `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles.`) :
                     `Bundle ${i} of ${orderData.bundleCount}`
-            });
+            };
+
+            console.log(`Item ${i} data:`, itemData);
+            items.push(itemData);
         }
 
+        console.log(`Total items created: ${items.length}`);
+        console.log('All items:', items);
+        console.log('=== prepareLineItems END ===');
         return items;
     }
 

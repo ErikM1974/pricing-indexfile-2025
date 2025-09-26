@@ -20,7 +20,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- Quote Service -->
-    <script src="calculators/breast-cancer-bundle-service.js"></script>
+    <script src="calculators/breast-cancer-bundle-service.js?v=2.0"></script>
 
     <style>
         /* Scope all styles to .bca-bundle-app to prevent conflicts */
@@ -1358,6 +1358,8 @@
                 };
 
                 // Process order
+                console.log('=== HTML: Sending orderData to service ===');
+                console.log('Order data being sent:', orderData);
                 const result = await quoteService.processOrder(orderData);
 
                 if (result.success) {
