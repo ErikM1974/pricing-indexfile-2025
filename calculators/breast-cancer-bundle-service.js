@@ -224,7 +224,6 @@ class BreastCancerBundleService {
                 PrintLocation: 'Bundle Package',
                 Color: 'Candy Pink',
                 ColorCode: 'PINK',
-                Size: currentSize,
                 SizeBreakdown: i === 1 ? JSON.stringify(sizeBreakdown) : '',  // Only store on first item
                 Image_Upload: orderData.imageUpload || '',  // Logo reference - matches Christmas Bundle field name
 
