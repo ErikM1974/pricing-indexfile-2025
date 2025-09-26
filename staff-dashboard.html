@@ -4041,8 +4041,19 @@
                                 <input type="date" id="sampleDateFrom" onchange="filterSampleRequests()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
                                 <input type="date" id="sampleDateTo" onchange="filterSampleRequests()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
                             </div>
+                            <!-- Icon Legend -->
+                            <div style="display: flex; gap: 1.5rem; margin-top: 0.75rem; padding-left: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+                                <span style="display: flex; align-items: center; gap: 0.25rem;">
+                                    <i class="fas fa-gift" style="color: #dc2626;"></i>
+                                    <span>= Christmas Bundle</span>
+                                </span>
+                                <span style="display: flex; align-items: center; gap: 0.25rem;">
+                                    <i class="fas fa-ribbon" style="color: #ec4899;"></i>
+                                    <span>= Breast Cancer Bundle</span>
+                                </span>
+                            </div>
                         </div>
-                        
+
                         <!-- Sample Requests Table -->
                         <div style="background: white; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; overflow-x: auto;">
                             <table id="sampleRequestsTable" style="width: 100%; border-collapse: collapse;">
@@ -7267,11 +7278,13 @@
                 const delivery = request.DeliveryMethod || 'Pending';
                 const statusBadge = getStatusBadge(request.Status);
                 const isChristmas = request.QuoteID && request.QuoteID.startsWith('XMAS');
+                const isBCA = request.QuoteID && request.QuoteID.startsWith('BCA');
 
                 return `
                     <tr style="border-bottom: 1px solid #e5e7eb;">
                         <td style="padding: 0.75rem; font-weight: 500;">
                             ${isChristmas ? '<i class="fas fa-gift" style="color: #dc2626; margin-right: 0.25rem;" title="Christmas Bundle"></i>' : ''}
+                            ${isBCA ? '<i class="fas fa-ribbon" style="color: #ec4899; margin-right: 0.25rem;" title="Breast Cancer Awareness Bundle"></i>' : ''}
                             ${request.QuoteID}
                             ${isChristmas ? '<span style="margin-left: 0.5rem; font-size: 0.75rem; color: #6b7280;" title="May contain uploaded logo"><i class="fas fa-camera"></i></span>' : ''}
                         </td>

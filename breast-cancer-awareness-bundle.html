@@ -328,12 +328,20 @@
                             </div>
                         </div>
 
-                        <!-- T-Shirt Card -->
+                        <!-- T-Shirt Card (Your Choice) -->
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
-                            <div class="product-image-container" onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130632', 'Core Cotton Tee', 'Style: PC54 - Candy Pink - Sizes S-4XL - Full Front DTG Print')">
-                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130632"
-                                     alt="Core Cotton Tee"
-                                     class="w-full h-64 object-contain">
+                            <div class="h-64 bg-gradient-to-br from-pink-50 to-pink-100 p-6 relative flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="mb-4">
+                                        <i class="fas fa-tshirt text-pink-300 text-6xl"></i>
+                                    </div>
+                                    <div class="bg-white rounded-lg px-6 py-3 shadow-lg border-2 border-pink-200">
+                                        <div class="text-xl font-bold text-gray-800">Your Choice of Design</div>
+                                        <div class="text-sm text-pink-600 mt-1 font-medium">
+                                            <i class="fas fa-arrow-down mr-1"></i> Select in Step 3
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="p-6">
                                 <h4 class="text-xl font-bold text-gray-800">Core Cotton Tee</h4>
@@ -346,7 +354,10 @@
                                         <span class="text-pink-500 mr-2">✓</span> Sizes S - 4XL
                                     </li>
                                     <li class="flex items-center">
-                                        <span class="text-pink-500 mr-2">✓</span> Full Front DTG Print
+                                        <span class="text-pink-500 mr-2">
+                                            <i class="fas fa-palette"></i>
+                                        </span>
+                                        <strong>Choice of 2 Designs</strong>
                                     </li>
                                 </ul>
                             </div>
@@ -356,10 +367,10 @@
 
                 <!-- T-Shirt Design Options Section -->
                 <div class="mt-16 md:mt-24">
-                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-3">Choose Your T-Shirt Design</h3>
+                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-3">Preview Your T-Shirt Design Options</h3>
                     <p class="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
                         Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs.
-                        You'll select your preferred design in Step 3 when you upload your logo.
+                        <strong class="text-pink-600">You'll make your selection in Step 3</strong> when you upload your logo.
                     </p>
 
                     <div class="grid md:grid-cols-2 gap-8">
@@ -403,11 +414,12 @@
                     </div>
 
                     <div class="mt-8 text-center">
-                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 border border-pink-200 rounded-lg">
-                            <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <div class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-50 to-pink-100 border-2 border-pink-300 rounded-full shadow-md">
+                            <span class="flex items-center justify-center w-8 h-8 bg-pink-500 text-white rounded-full font-bold text-sm">3</span>
+                            <span class="text-base text-pink-700 font-semibold">Make your selection in Step 3 below</span>
+                            <svg class="w-5 h-5 text-pink-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                             </svg>
-                            <span class="text-sm text-pink-700 font-medium">You'll select your design choice in Step 3</span>
                         </div>
                     </div>
                 </div>
@@ -670,6 +682,12 @@
 
                         <!-- T-Shirt Design Selection -->
                         <div class="mt-8">
+                            <div class="bg-pink-50 border-2 border-pink-200 rounded-lg p-3 mb-4">
+                                <p class="text-sm text-pink-700 font-medium">
+                                    <i class="fas fa-arrow-up mr-2"></i>
+                                    Remember the designs from above? Now it's time to choose!
+                                </p>
+                            </div>
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">
                                 <i class="fas fa-palette text-pink-600 mr-2"></i>
                                 Select Your T-Shirt Design <span class="text-red-500">*</span>
