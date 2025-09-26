@@ -7591,18 +7591,26 @@
                                     <h4 style="margin: 0 0 0.75rem 0; color: #ec4899; font-size: 1rem; font-weight: 600;">
                                         <i class="fas fa-image" style="margin-right: 0.5rem;"></i>Custom Logo
                                     </h4>
-                                    <div style="display: flex; align-items: center; gap: 1rem;">
-                                        <div style="background: #f3f4f6; padding: 0.5rem; border-radius: 4px; text-align: center;">
-                                            <img src="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/uploads/${items[0].Image_Upload}"
-                                                 style="max-width: 120px; max-height: 120px; object-fit: contain;"
-                                                 alt="Customer Logo">
+                                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                        <div style="border: 2px solid #fbbcdc; border-radius: 8px; padding: 0.5rem; background: white;">
+                                            <img src="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${items[0].Image_Upload}"
+                                                 alt="Customer Logo"
+                                                 style="max-width: 200px; max-height: 200px; display: block;"
+                                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22 font-family=%22sans-serif%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">
                                         </div>
-                                        <div style="flex: 1;">
-                                            <div style="color: #059669; font-weight: 600;">
-                                                <i class="fas fa-check-circle"></i> Logo Uploaded Successfully
-                                            </div>
-                                            <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">
-                                                Ready for embroidery on caps
+                                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                            <button onclick="downloadLogo('${items[0].Image_Upload}', '${request.QuoteID}')"
+                                                    class="quick-btn"
+                                                    style="background: #10b981 !important; color: white !important; display: flex; align-items: center; gap: 0.5rem;">
+                                                <i class="fas fa-download"></i> Download Original
+                                            </button>
+                                            <button onclick="viewLogoFullSize('${items[0].Image_Upload}')"
+                                                    class="quick-btn"
+                                                    style="background: #3b82f6 !important; color: white !important; display: flex; align-items: center; gap: 0.5rem;">
+                                                <i class="fas fa-expand"></i> View Full Size
+                                            </button>
+                                            <div style="font-size: 0.75rem; color: #6b7280;">
+                                                ExternalKey: ${items[0].Image_Upload.substring(0, 8)}...
                                             </div>
                                         </div>
                                     </div>
