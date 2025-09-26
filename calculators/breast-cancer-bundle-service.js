@@ -81,7 +81,11 @@ class BreastCancerBundleService {
             TotalAmount: orderData.totalAmount,
             Status: 'Sample Request',
             ExpiresAt: formattedExpiresAt,
-            Notes: this.formatNotes(orderData)
+            Notes: this.formatNotes(orderData),
+            // Add shipping address fields if they exist in the schema
+            ShippingAddress: orderData.deliveryMethod === 'Ship' ?
+                `${orderData.address}, ${orderData.city}, ${orderData.state} ${orderData.zip}` : '',
+            DeliveryMethod: orderData.deliveryMethod || 'Ship'
         };
 
         try {
@@ -150,8 +154,7 @@ class BreastCancerBundleService {
         const pricePerBundle = 45;
         let lineNumber = 1;
 
-        // Create a single bundle item instead of individual items
-        // Build size breakdown for the bundle
+        // Build size breakdown for reference
         const sizeBreakdown = {};
         const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         sizes.forEach(size => {
@@ -161,37 +164,62 @@ class BreastCancerBundleService {
             }
         });
 
-        // Add bundle as a single line item
-        items.push({
-            QuoteID: quoteId,
-            LineNumber: lineNumber++,
-            StyleNumber: 'BCA-BUNDLE',
-            ProductName: 'Breast Cancer Awareness Bundle',
-            Quantity: orderData.bundleCount,
-            FinalUnitPrice: pricePerBundle,
-            LineTotal: orderData.totalAmount,
+        // Create individual line items for each bundle to match expected "9 samples" pattern
+        for (let i = 1; i <= orderData.bundleCount; i++) {
+            // Determine which size this bundle belongs to
+            let currentSize = 'N/A';
+            let sizeIndex = 0;
+            let bundleCounter = 0;
 
-            // Customer info (matching Christmas bundle pattern)
-            First: orderData.customerName ? orderData.customerName.split(' ')[0] : '',
-            Last: orderData.customerName ? orderData.customerName.split(' ').slice(1).join(' ') : '',
-            Email: orderData.email || '',
-            Phone: orderData.phone || '',
-            Company: orderData.companyName || '',
+            for (const size of sizes) {
+                const sizeQty = orderData.sizeDistribution[size] || 0;
+                bundleCounter += sizeQty;
+                if (i <= bundleCounter) {
+                    currentSize = size;
+                    break;
+                }
+            }
 
-            // Bundle details
-            EmbellishmentType: 'bundle',
-            PrintLocation: 'Bundle Package',
-            Color: 'Candy Pink',
-            ColorCode: 'PINK',
-            SizeBreakdown: JSON.stringify(sizeBreakdown),
-            Image_Upload: orderData.imageUpload || '',  // Logo reference - matches Christmas Bundle field name
+            items.push({
+                QuoteID: quoteId,
+                LineNumber: lineNumber++,
+                StyleNumber: 'BCA-BUNDLE',
+                ProductName: `Breast Cancer Awareness Bundle - Size ${currentSize}`,
+                Quantity: 1,
+                FinalUnitPrice: pricePerBundle,
+                LineTotal: pricePerBundle,
 
-            // Delivery info
-            DeliveryMethod: orderData.deliveryMethod || 'Ship',
+                // Customer info (matching Christmas bundle pattern)
+                First: orderData.customerName ? orderData.customerName.split(' ')[0] : '',
+                Last: orderData.customerName ? orderData.customerName.split(' ').slice(1).join(' ') : '',
+                Email: orderData.email || '',
+                Phone: orderData.phone || '',
+                Company: orderData.companyName || '',
 
-            // Notes about bundle contents
-            Notes: `Bundle contains: ${orderData.bundleCount} PC54 Candy Pink T-Shirts, ${orderData.bundleCount} C112 True Pink/White Caps`
-        });
+                // Bundle details
+                EmbellishmentType: 'bundle',
+                PrintLocation: 'Bundle Package',
+                Color: 'Candy Pink',
+                ColorCode: 'PINK',
+                Size: currentSize,
+                SizeBreakdown: i === 1 ? JSON.stringify(sizeBreakdown) : '',  // Only store on first item
+                Image_Upload: orderData.imageUpload || '',  // Logo reference - matches Christmas Bundle field name
+
+                // Delivery info
+                DeliveryMethod: orderData.deliveryMethod || 'Ship',
+                Shipping_Address: orderData.address || '',
+                Shipping_City: orderData.city || '',
+                Shipping_State: orderData.state || '',
+                Shipping_Zip: orderData.zip || '',
+
+                // Notes about bundle contents and special instructions (only on first item)
+                Notes: i === 1 ?
+                    (orderData.notes ?
+                        `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles. Special Instructions: ${orderData.notes}` :
+                        `Bundle contains: 1 PC54 Candy Pink T-Shirt, 1 C112 True Pink/White Cap. Total: ${orderData.bundleCount} bundles.`) :
+                    `Bundle ${i} of ${orderData.bundleCount}`
+            });
+        }
 
         return items;
     }
@@ -226,6 +254,11 @@ class BreastCancerBundleService {
         // Add event date if provided
         if (orderData.eventDate) {
             noteParts.push(`Event: ${orderData.eventDate}`);
+        }
+
+        // Add special instructions if provided
+        if (orderData.notes) {
+            noteParts.push(`Instructions: ${orderData.notes}`);
         }
 
         // Create final notes string - keep it under 255 characters
