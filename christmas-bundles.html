@@ -795,6 +795,16 @@
             color: #10b981;
         }
 
+        .submission-step.warning {
+            color: #f59e0b;
+        }
+
+        .submission-step.warning .submission-step-icon {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+
         .submission-step-icon {
             width: 24px;
             height: 24px;
@@ -3832,7 +3842,16 @@
 
                         // Bundle details and special instructions
                         BundleConfiguration: JSON.stringify(bundleConfig),
-                        Notes: quoteData.specialInstructions || quoteData.description || 'Christmas Gift Box Bundle',
+                        Notes: (function() {
+                            let notes = quoteData.specialInstructions || quoteData.description || 'Christmas Gift Box Bundle';
+                            // Add logo failure note if applicable
+                            if (window.logoUploadFailed) {
+                                notes += ' | [LOGO PENDING] Customer needs to email logo - upload failed during submission';
+                                // Clear the flag for next submission
+                                window.logoUploadFailed = false;
+                            }
+                            return notes;
+                        })(),
 
                         // Additional Fields
                         RushOrder: quoteData.rushOrder ? true : false,
@@ -4050,12 +4069,42 @@
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 }
 
-                // Upload logo if present
+                // Upload logo if present - with timeout and error handling
                 let imageExternalKey = null;
                 if (window.selectedLogoFile) {
                     updateSubmissionProgress('logo', 'Uploading your logo...');
                     await new Promise(resolve => setTimeout(resolve, 200));
-                    imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
+
+                    // Add timeout wrapper - 30 seconds max for logo upload
+                    try {
+                        const uploadPromise = uploadFileToAPI(window.selectedLogoFile);
+                        const timeoutPromise = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Upload timeout - logo is taking too long')), 30000)
+                        );
+
+                        imageExternalKey = await Promise.race([uploadPromise, timeoutPromise]);
+
+                        if (!imageExternalKey) {
+                            console.warn('Logo upload returned null, continuing without logo');
+                            // Update UI to show warning
+                            const logoStep = document.querySelector('.submission-step[data-step="logo"]');
+                            if (logoStep) {
+                                logoStep.classList.add('warning');
+                                logoStep.querySelector('span').textContent = 'Logo skipped - send via email';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Logo upload failed or timed out:', error);
+                        // Don't fail the order - just note it and continue
+                        const logoStep = document.querySelector('.submission-step[data-step="logo"]');
+                        if (logoStep) {
+                            logoStep.classList.add('warning');
+                            logoStep.querySelector('span').textContent = 'Logo pending - send via email';
+                        }
+                        imageExternalKey = null;
+                        // Mark that logo needs to be handled separately
+                        window.logoUploadFailed = true;
+                    }
                 } else {
                     // Skip logo step if no logo
                     const logoStep = document.querySelector('.submission-step[data-step="logo"]');
@@ -6772,7 +6821,7 @@
 
             // Validate file type - INCLUDING PDF support
             const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml', 'application/pdf'];
-            const maxSize = 20 * 1024 * 1024; // 20MB
+            const maxSize = 10 * 1024 * 1024; // Reduced to 10MB for better upload reliability
 
             if (!validTypes.includes(file.type)) {
                 alert('Please upload an image (PNG, JPG, GIF, SVG) or PDF file');
@@ -6781,7 +6830,7 @@
             }
 
             if (file.size > maxSize) {
-                alert('File size must be less than 20MB');
+                alert('Logo file is too large. Please use a file under 10MB or email it separately to sales@nwcustomapparel.com');
                 event.target.value = '';
                 return;
             }
