@@ -335,6 +335,9 @@ The NWCA Pricing System is a comprehensive web application providing dynamic pri
 ```bash
 # Development & Production
 npm start          # Start Node.js Express server (port 3000) - THIS IS ALL YOU NEED!
+
+# Testing Tools (Local Development Only)
+npm install puppeteer  # Install for safety tools testing (NOT in production/Heroku)
 ```
 
 ## 🚫 IMPORTANT: No Webpack/Build System
