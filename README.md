@@ -1,5 +1,33 @@
 # NW Custom Apparel - Online Catalog & Pricing System (2025)
 
+## Quick Start
+
+```bash
+npm install  # First time only
+npm start    # Runs on http://localhost:3000
+```
+
+That's it. No build step. No webpack. Just simple static file serving.
+
+## Directory Structure
+
+- `/calculators/` - Pricing calculators and bundles (51 active files)
+- `/dashboards/` - Staff and management dashboards (11 files)
+- `/quote-builders/` - Quote generation tools (4 files)
+- `/admin/` - Administrative tools (4 files)
+- `/vendor-portals/` - Vendor integration pages (3 files)
+- `/training/` - Training materials and games (43 files)
+- `/shared_components/` - Reusable JS (60+) and CSS (30+) files
+  - `/js/` - Adapters, services, utilities
+  - `/css/` - Shared stylesheets
+- `/docs/` - Documentation and archived materials
+- `/tests/` - Test files (16 files)
+- `/logs/` - Log files (gitignored)
+- **Root directory** - Main HTML entry points and legacy JS files (documented technical debt)
+
+**To add a new feature:** Place in appropriate directory, update ACTIVE_FILES.md
+**To deploy:** `npm start` (Express serves static files - that's all!)
+
 ## 1. Project Overview
 
 This project is the online catalog and dynamic pricing system for Northwest Custom Apparel (NWCA). It allows users to browse a wide range of apparel products and view estimated pricing for various customization types, including embroidery, cap embroidery, Direct-to-Garment (DTG), Direct-to-Film (DTF), and screen printing.

@@ -1,5 +1,0 @@
-Server is running on port 3000
-Using existing Caspio API for quote functionality:
-  Quote Sessions: /api/quote_sessions
-  Quote Items: /api/quote_items
-  Quote Analytics: /api/quote_analytics
