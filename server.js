@@ -11,6 +11,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Safety monitoring system (optional - for development only)
+let monitor = null;
+let autoRecovery = null;
+
+if (process.env.ENABLE_MONITORING === 'true') {
+  console.log('🔍 Monitoring system enabled');
+  try {
+    const FileAccessMonitor = require('./scripts/safety-tools/file-access-monitor');
+    const autoRecoveryModule = require('./scripts/safety-tools/auto-recovery');
+
+    monitor = new FileAccessMonitor();
+    autoRecovery = autoRecoveryModule.autoRecovery;
+  } catch (error) {
+    console.warn('⚠️ Monitoring system files not found. Run with ENABLE_MONITORING=false or install monitoring tools.');
+    console.warn('   See MONITORING_SETUP.md for details.');
+  }
+}
+
 // CORS middleware - MUST be before other middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -39,6 +57,14 @@ app.use((req, res, next) => {
 });
 
 // Middleware
+// Add monitoring BEFORE static file serving (if enabled)
+if (monitor) {
+  app.use(monitor.middleware());
+}
+if (autoRecovery) {
+  app.use(autoRecovery.middleware());
+}
+
 // Compress all responses
 app.use(compression());
 
@@ -376,6 +402,57 @@ app.get('/api/status', (req, res) => {
     environment: process.env.NODE_ENV || 'development'
   });
 });
+
+// Monitoring API endpoints (if enabled)
+if (monitor) {
+  app.get('/api/monitor/stats', (req, res) => {
+    res.json(monitor.getStats());
+  });
+
+  app.get('/api/monitor/report', (req, res) => {
+    const report = monitor.generateReport();
+    res.json(report);
+  });
+}
+
+// Error reporting endpoint (if monitoring enabled)
+if (monitor) {
+  app.post('/api/error-report', (req, res) => {
+    const errorReport = {
+      timestamp: new Date().toISOString(),
+      page: req.body.page || 'unknown',
+      errors: req.body.errors || [],
+      userAgent: req.headers['user-agent'],
+      sessionId: req.body.sessionId
+    };
+
+    // Save error report to file
+    const errorReports = [];
+    try {
+      if (fs.existsSync('error-reports.json')) {
+        const existing = fs.readFileSync('error-reports.json', 'utf-8');
+        errorReports.push(...JSON.parse(existing));
+      }
+    } catch (e) {
+      console.error('Failed to load existing error reports:', e);
+    }
+
+    errorReports.push(errorReport);
+
+    // Keep only last 1000 reports
+    if (errorReports.length > 1000) {
+      errorReports.splice(0, errorReports.length - 1000);
+    }
+
+    try {
+      fs.writeFileSync('error-reports.json', JSON.stringify(errorReports, null, 2));
+    } catch (e) {
+      console.error('Failed to save error report:', e);
+    }
+
+    res.json({ received: true });
+  });
+}
 
 // Serve cart.html for the /cart route (shopping cart page)
 app.get('/cart', (req, res) => {

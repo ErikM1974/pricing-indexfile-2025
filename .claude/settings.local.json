@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(xargs:*)",
-      "Read(//mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/**)"
+      "Read(//mnt/c/Users/erik/OneDrive - Northwest Custom Apparel/**)",
+      "Bash(npm install:*)",
+      "Bash(PORT=3001 npm start)",
+      "Bash(ENABLE_MONITORING=false PORT=3001 npm start)",
+      "Bash(ENABLE_MONITORING=true PORT=3001 npm start)",
+      "Bash(for:*)",
+      "Bash(do echo -n \"$dir: \")",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": [],

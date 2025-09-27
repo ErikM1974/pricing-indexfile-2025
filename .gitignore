@@ -40,6 +40,7 @@ test-*.css
 *test-failures*
 
 # Log files
+logs/
 *.log
 server.log
 

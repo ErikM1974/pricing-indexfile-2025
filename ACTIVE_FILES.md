@@ -3,6 +3,28 @@
 **Total Active Files:** ~250 (after cleanup from 350+)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
+## ⚠️ Root Directory JavaScript Files (Legacy Location)
+
+**Note:** These files are still in root directory for historical reasons. They should eventually move to `/shared_components/js/` but currently index.html and cart.html depend on these paths.
+
+**⚠️ IMPORTANT:** DO NOT MOVE these files without updating all HTML references. Both index.html and cart.html have hardcoded paths to these root files.
+
+| File | Purpose | Used By | Future Action |
+|------|---------|---------|---------------|
+| `app-modern.js` | Main application logic | index.html | Move to shared_components |
+| `app-new.js` | New app version | Unknown | Verify if needed |
+| `autocomplete-new.js` | Search autocomplete | index.html | Move to shared_components |
+| `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
+| `cart.js` | Cart functionality | cart.html | Move to shared_components |
+| `cart-ui.js` | Cart UI components | cart.html | Move to shared_components |
+| `cart-price-recalculator.js` | Price recalculation | cart.html | Move to shared_components |
+| `catalog-search.js` | Catalog search | index.html | Move to shared_components |
+| `dp5-helper.js` | Helper functions | Unknown | Verify if needed |
+| `order-form-pdf.js` | PDF generation | cart.html | Move to shared_components |
+| `pricing-matrix-api.js` | Pricing API | cart.html | Move to shared_components |
+| `product-search-service.js` | Product search | index.html, multiple | Move to shared_components |
+| `utils.js` | Utility functions | Multiple pages | Move to shared_components |
+
 ## 🎯 Core Entry Points
 
 ### Main Pages
@@ -97,6 +119,15 @@
 - **5 training folder files** - .bak file, test files, duplicates
 - **11 orphaned JS files** - Unused adapters and utilities in shared_components/js/
 
+### Root Directory Organization (2025-01-27 - Third Pass)
+**Moved from root to organized folders:**
+- **6 data export files** → `/docs/data-exports/` (CSV, JSON, XML exports)
+- **2 template files** → `/docs/templates/` (EmailJS and instructions)
+- **4 guide documents** → `/docs/guides/` (API, CSS, system docs)
+- **4 log/generated files** → `/logs/` (server.log, dependency maps)
+- **1 script file** → `/scripts/` (migrate-beta.sh)
+- **Total:** 17 files moved from root, reducing clutter by ~25%
+
 ### Files Scheduled for Removal
 | File | Reason | Remove By | Status |
 |------|--------|-----------|--------|
@@ -125,6 +156,33 @@
 |------|-------|----------|
 | Various HTML files | Still have inline scripts (113 files) | Medium |
 | Multiple JS files | Hardcoded API URLs (149 instances) | High |
+
+## 📁 Additional Directories
+
+### Support & Documentation
+| Directory | Purpose | Status | Notes |
+|-----------|---------|--------|-------|
+| `/admin/` | Administrative tools and utilities | ✅ Active | Backend administration |
+| `/art-tools/` | Art department tools | ✅ Active | Design utilities |
+| `/caspio-tables/` | Caspio database configurations | ✅ Active | Database schemas |
+| `/docs/` | Documentation | ✅ Active | Organized subdirectories |
+| `/docs/archive/` | Archived/old documentation | 📦 Archive | Historical reference |
+| `/docs/data-exports/` | Data export files | 📊 Data | CSV, JSON, XML exports |
+| `/docs/guides/` | Implementation guides | 📚 Guides | Technical documentation |
+| `/docs/templates/` | Template files | 📝 Templates | EmailJS and other templates |
+| `/email-templates/` | EmailJS templates | ✅ Active | Quote email templates |
+| `/logs/` | Log and generated files | 🚫 Ignored | Not in version control |
+| `/memory/` | Claude AI memory files | ✅ Active | API specs only |
+| `/mockups/` | Design mockups | ✅ Active | UI/UX references |
+| `/node_modules/` | NPM dependencies | 🔧 Generated | Do not modify |
+| `/policies/` | Business policies | ✅ Active | Company procedures |
+| `/product/` | Product pages | ✅ Active | Product display system |
+| `/scripts/` | Utility scripts | ✅ Active | Contains safety-tools/ |
+| `/src/` | Server source code | ✅ Active | Node.js backend |
+| `/templates/` | HTML templates | ✅ Active | Reusable components |
+| `/tools/` | Development tools | ✅ Active | Build and dev utilities |
+| `/training/` | Training materials | ✅ Active | Staff training docs |
+| `/vendor-portals/` | Vendor integrations | ✅ Active | External vendor access |
 
 ## 🔄 Update Protocol
 
