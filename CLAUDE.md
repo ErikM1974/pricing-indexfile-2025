@@ -2,6 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚨 MANDATORY: Coding Standards Enforcement
+
+**CRITICAL: Before writing ANY code, you MUST read and follow:**
+- **[CLAUDE_CODING_STANDARDS.md](./CLAUDE_CODING_STANDARDS.md)** - MANDATORY rules to prevent code chaos
+- **Failure to follow these standards previously resulted in 71+ orphaned files and massive cleanup efforts**
+
+### Automatic Cleanup Triggers
+When you see these patterns, IMMEDIATELY clean them up:
+1. Files with `-backup`, `-FINAL`, `-FIXED`, `-old` suffixes → Delete
+2. Test files outside `/tests/` folder → Move immediately
+3. Inline styles or scripts in HTML → Extract to external files
+4. Duplicate files with similar names → Merge and delete redundant
+5. Hardcoded URLs in JavaScript → Move to config file
+
+### Before Creating Any New File
+✓ Check if similar file exists
+✓ Determine correct folder based on purpose
+✓ Follow kebab-case naming convention
+✓ Create external JS/CSS (no inline code)
+✓ Update ACTIVE_FILES.md immediately
+
 # Northwest Custom Apparel (NWCA) Pricing System
 
 ## Project Overview

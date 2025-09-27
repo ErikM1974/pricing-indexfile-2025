@@ -33,4 +33,25 @@ test-*.css
 
 # Local configuration
 .claude/settings.local.json
-.claude/settings.local.json
+
+# Test results and data files
+*.csv
+*test-results*
+*test-failures*
+
+# Log files
+*.log
+server.log
+
+# Backup files
+*.bak
+*-backup.*
+*-FINAL.*
+*-FIXED.*
+*-old.*
+*.backup
+
+# Temporary and debug files
+*-temp.*
+*-debug.*
+*.tmp
