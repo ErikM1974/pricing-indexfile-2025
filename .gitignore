@@ -56,3 +56,4 @@ server.log
 *-temp.*
 *-debug.*
 *.tmp
+.claude/settings.local.json
