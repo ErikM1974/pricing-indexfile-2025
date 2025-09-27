@@ -83,6 +83,15 @@ app.get('/top-sellers-showcase.html', (req, res) => {
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
+app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
+app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
+app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
+app.use('/art-tools', express.static(path.join(__dirname, 'art-tools'), staticOptions));
+app.use('/tools', express.static(path.join(__dirname, 'tools'), staticOptions));
+app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
+app.use('/email-templates', express.static(path.join(__dirname, 'email-templates'), staticOptions));
+app.use('/mockups', express.static(path.join(__dirname, 'mockups'), staticOptions));
+app.use('/tests', express.static(path.join(__dirname, 'tests'), staticOptions));
 app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
 app.use('/scripts', express.static(path.join(__dirname, 'scripts'), staticOptions));
 app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions));
@@ -104,17 +113,17 @@ app.get('/*.js', (req, res) => {
   res.sendFile(path.join(__dirname, fileName));
 });
 
-// Serve specific HTML files from root
+// Serve specific HTML files from their new directories
 app.get('/staff-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'staff-dashboard.html'));
 });
 
 app.get('/art-invoices-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-invoices-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });
 
 app.get('/art-invoice-view.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-invoice-view.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoice-view.html'));
 });
 
 app.get('/art-invoice-unified-dashboard.html', (req, res) => {
@@ -126,39 +135,39 @@ app.get('/webstore-info.html', (req, res) => {
 });
 
 app.get('/universal-records-admin.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'universal-records-admin.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'universal-records-admin.html'));
 });
 
 app.get('/art-hub-detail.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-detail.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'art-hub-detail.html'));
 });
 
 app.get('/art-hub-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-dashboard.html'));
 });
 
 app.get('/art-hub-steve.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-steve.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-steve.html'));
 });
 
 app.get('/art-hub-ruth.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-ruth.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-ruth.html'));
 });
 
 app.get('/edit-ruth-mockup.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'edit-ruth-mockup.html'));
+  res.sendFile(path.join(__dirname, 'mockups', 'edit-ruth-mockup.html'));
 });
 
 app.get('/announcements-create.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'announcements-create.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'announcements-create.html'));
 });
 
 app.get('/announcements-manage.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'announcements-manage.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'announcements-manage.html'));
 });
 
 app.get('/design-name-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'design-name-generator.html'));
+  res.sendFile(path.join(__dirname, 'tools', 'design-name-generator.html'));
 });
 
 // Serve the standardized embroidery pricing page
@@ -173,57 +182,57 @@ app.get('/embroidery-pricing-professional.html', (req, res) => {
 
 // Serve the embroidery quote builder
 app.get('/embroidery-quote-builder.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'embroidery-quote-builder.html'));
 });
 
 // Serve the cap embroidery quote builder
 app.get('/cap-embroidery-quote-builder.html', (req, res) => {
   console.log('Serving cap-embroidery-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'cap-embroidery-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'cap-embroidery-quote-builder.html'));
 });
 
 // Serve the DTG quote builder
 app.get('/dtg-quote-builder.html', (req, res) => {
   console.log('Serving dtg-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'dtg-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'dtg-quote-builder.html'));
 });
 
 // Serve the screen print quote builder
 app.get('/screenprint-quote-builder.html', (req, res) => {
   console.log('Serving screenprint-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'screenprint-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'screenprint-quote-builder.html'));
 });
 
 app.get('/ae-art-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-dashboard.html'));
 });
 
 app.get('/ae-submit-art.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-submit-art.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-submit-art.html'));
 });
 
 app.get('/ae-art-report.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-art-report.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-report.html'));
 });
 
 app.get('/ae-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'ae-dashboard.html'));
 });
 
 app.get('/art-hub-coordinator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-coordinator.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-coordinator.html'));
 });
 
 app.get('/digitizingform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'digitizingform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'digitizingform.html'));
 });
 
 app.get('/purchasingform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'purchasingform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'purchasingform.html'));
 });
 
 app.get('/monogramform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'monogramform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'monogramform.html'));
 });
 
 // Policies pages
@@ -233,12 +242,12 @@ app.get('/policies-hub.html', (req, res) => {
 
 // Christmas Bundles Calculator page
 app.get('/christmas-bundles.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'christmas-bundles.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'christmas-bundles.html'));
 });
 
 // Breast Cancer Awareness Bundle page
 app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'breast-cancer-awareness-bundle.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'breast-cancer-awareness-bundle.html'));
 });
 
 // Marketing page
@@ -256,15 +265,15 @@ app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOpti
 
 // Sanmar Vendor Management Pages
 app.get('/sanmar-invoices.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-invoices.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-invoices.html'));
 });
 
 app.get('/sanmar-credits.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-credits.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-credits.html'));
 });
 
 app.get('/sanmar-vendor-portal.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-vendor-portal.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-vendor-portal.html'));
 });
 
 // Test files for new search implementation
@@ -275,28 +284,28 @@ app.get('/index-new.html', (req, res) => {
 
 app.get('/test-api.html', (req, res) => {
   console.log('Serving test-api.html for API testing');
-  res.sendFile(path.join(__dirname, 'test-api.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-api.html'));
 });
 
 app.get('/test-catalog-layout.html', (req, res) => {
   console.log('Serving test-catalog-layout.html for layout testing');
-  res.sendFile(path.join(__dirname, 'test-catalog-layout.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-catalog-layout.html'));
 });
 
 // Phase 1 Infrastructure Test Pages
 app.get('/test-phase1-infrastructure.html', (req, res) => {
   console.log('Serving test-phase1-infrastructure.html page');
-  res.sendFile(path.join(__dirname, 'test-phase1-infrastructure.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-infrastructure.html'));
 });
 
 app.get('/test-phase1-verification.html', (req, res) => {
   console.log('Serving test-phase1-verification.html page');
-  res.sendFile(path.join(__dirname, 'test-phase1-verification.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-verification.html'));
 });
 
 app.get('/test-screenprint-sizes.html', (req, res) => {
   console.log('Serving test-screenprint-sizes.html page');
-  res.sendFile(path.join(__dirname, 'test-screenprint-sizes.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-screenprint-sizes.html'));
 });
 
 // Also serve the new JS files explicitly if needed
@@ -380,37 +389,37 @@ app.get('/inventory-details.html', (req, res) => {
 
 // Serve AI Designer iframe page
 app.get('/ai-designer.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-designer.html'));
+  res.sendFile(path.join(__dirname, 'tools', 'ai-designer.html'));
 });
 
 // Serve AI Mockup Generator iframe page
 app.get('/ai-mockup-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
+  res.sendFile(path.join(__dirname, 'tools', 'ai-mockup-generator.html'));
 });
 
 app.get('/ai-mockup-generator', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
+  res.sendFile(path.join(__dirname, 'tools', 'ai-mockup-generator.html'));
 });
 
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing.html'));
 });
 
 app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing-integrated.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'));
 });
 
 app.get('/pricing/dtg', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtg-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'dtg-pricing.html'));
 });
 
 app.get('/pricing/screen-print', (req, res) => {
-  res.sendFile(path.join(__dirname, 'screen-print-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'screen-print-pricing.html'));
 });
 
 app.get('/pricing/dtf', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtf-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'dtf-pricing.html'));
 });
 
 // Cart Sessions API

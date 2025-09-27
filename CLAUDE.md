@@ -24,6 +24,39 @@ npm analyze        # Analyze bundle size
 npm run clean      # Clean dist directory
 ```
 
+## Project Structure
+
+The codebase has been organized into logical directories for better maintainability:
+
+```
+/
+├── calculators/          # Pricing calculators and bundles
+├── dashboards/           # Staff and management dashboards
+├── quote-builders/       # Quote generation tools
+├── vendor-portals/       # Vendor management interfaces
+├── art-tools/            # Art department tools
+├── tools/                # Utility and helper tools
+├── admin/                # Administrative interfaces
+├── email-templates/      # Email template files
+├── mockups/              # UI mockups and prototypes
+├── tests/                # Test files and pages
+├── shared_components/    # Shared JS and CSS components
+│   ├── js/              # JavaScript modules and adapters
+│   └── css/             # Stylesheets
+├── images/              # Image assets
+├── scripts/             # Standalone scripts
+└── styles/              # Global stylesheets
+```
+
+### Core Files (Root Directory)
+The following files remain in the root directory as they are core to the application:
+- `index.html` - Main landing page
+- `product.html` - Product display page
+- `cart.html` - Shopping cart
+- `server.js` - Node.js Express server
+- `package.json` - Project dependencies
+- Configuration files
+
 ## High-Level Architecture
 
 ### Master Bundle Pattern
