@@ -1,0 +1,99 @@
+# MERGE NOTES - Cleanup Organization Branch
+Date: 2025-01-27
+Branch: cleanup-organization
+Commits: f7258aa, 81844ae, a2a4027, 9122e69, d3d972d
+
+## SUMMARY
+Major codebase cleanup and reorganization to improve maintainability and reduce technical debt.
+NO FUNCTIONAL CHANGES - Application logic remains unchanged.
+
+## FILES DELETED (71+ orphaned/unused files)
+- Removed duplicate JavaScript files (variations of same functionality)
+- Deleted test files from root directory (moved to /tests/)
+- Removed backup HTML files (replaced by Git version control)
+- Archived old/unused calculator files
+- Total reduction: ~16,616 lines of unnecessary code
+
+## FILES MOVED (Better Organization)
+From Root to Organized Folders:
+- 6 data export files → /docs/data-exports/
+- 2 template files → /docs/templates/
+- 4 guide documents → /docs/guides/
+- 4 log files → /logs/
+- 1 script file → /scripts/
+- Test files → /tests/
+- Dashboard files → /dashboards/
+- Quote builders → /quote-builders/
+
+## NEW FEATURES ADDED
+1. **File Monitoring System** (/scripts/safety-tools/)
+   - safe-delete.js - Quarantines files instead of deleting
+   - file-access-monitor.js - Tracks which files are actually used
+   - dependency-mapper.js - Maps file relationships
+   - comprehensive-test-suite.js - Tests all HTML pages
+   - Environment-based: Set ENABLE_MONITORING=true to activate
+
+2. **Safety Measures**
+   - 90-day quarantine period for "deleted" files
+   - Git-based recovery for all changes
+   - Monitoring disabled by default (no production impact)
+
+## CONFIGURATION CHANGES
+1. **Removed Webpack** (package.json)
+   - Deleted 18 unnecessary webpack dependencies
+   - Simplified to basic Express server
+   - No build process needed (static file serving)
+
+2. **Updated .gitignore**
+   - Added patterns for test files
+   - Added logs/ directory
+   - Better backup file exclusions
+
+## DOCUMENTATION UPDATES
+1. **CLAUDE.md**
+   - Added Pre-Flight Checklist
+   - File Organization Enforcement rules
+   - Root Directory Protection Rules
+   - Common Pitfalls section
+   - No Webpack warning
+
+2. **ACTIVE_FILES.md**
+   - Complete registry of all active files
+   - Tracks purpose and dependencies
+   - Documents files scheduled for removal
+   - Update protocol for preventing orphaned code
+
+3. **CODE_AUDIT_REPORT.md** (New)
+   - Comprehensive audit from Cline AI
+   - Claude's reality-check comments
+   - Practical recommendations for production system
+
+## TESTING PERFORMED
+✓ Server starts without errors (port 3001)
+✓ Main pages accessible (/, /calculators/*, /quote-builders/*)
+✓ DTG Quote Builder functional
+✓ Art Invoice Creator functional
+✓ No JavaScript console errors
+
+## ROLLBACK PLAN
+If issues arise after merge:
+1. Quick revert: git reset --hard backup-main-before-cleanup
+2. If already pushed: git revert -m 1 HEAD
+
+## NOTES FOR TEAM
+- This is primarily a cleanup operation
+- No business logic changes
+- All deleted files recoverable from Git history
+- Monitoring system OFF by default
+- Report any broken links or missing files immediately
+
+## COMMIT HISTORY
+- f7258aa: Add final code audit report with Claude's feedback
+- 81844ae: Major cleanup and simplification
+- a2a4027: Complete major file organization cleanup
+- 9122e69: Complete project reorganization Phase 2
+- d3d972d: Organize project structure
+
+---
+Merge performed by: Claude (AI Assistant)
+Reviewed by: Erik
