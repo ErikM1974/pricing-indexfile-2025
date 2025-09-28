@@ -21,10 +21,13 @@ training/api-test-runner.html
 training/*-v2.html
 .claude/agents/brand-guidelines-creator.md
 .claude/settings.local.json
-# Test files - do not commit
-test-*.html
-test-*.js
-test-*.css
+# CRITICAL ENFORCEMENT: Test files MUST be in /tests/ directory
+# Any test-* files in root are development mistakes
+/test-*.html
+/test-*.js
+/test-*.css
+# But allow test files in tests directory
+!tests/**
 
 # Temporary CSS experiments
 *-unified-*.css

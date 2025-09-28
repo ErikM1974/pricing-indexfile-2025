@@ -318,6 +318,35 @@ app.get('/test-catalog-layout.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'tests', 'test-catalog-layout.html'));
 });
 
+// Routes for pages moved to /pages/ directory
+app.get('/inventory-details.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'inventory-details.html'));
+});
+
+app.get('/policies-hub.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'policies-hub.html'));
+});
+
+app.get('/resources.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'resources.html'));
+});
+
+app.get('/sale.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'sale.html'));
+});
+
+app.get('/webstore-info.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'webstore-info.html'));
+});
+
+app.get('/top-sellers-showcase.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-showcase.html'));
+});
+
+app.get('/top-sellers-product.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-product.html'));
+});
+
 // Phase 1 Infrastructure Test Pages
 app.get('/test-phase1-infrastructure.html', (req, res) => {
   console.log('Serving test-phase1-infrastructure.html page');
