@@ -979,6 +979,13 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
   - EmailJS integration with required variables
   - Database patterns (quote_sessions + quote_items)
   - Testing checklist and common pitfalls
+- **@memory/PRICING_CALCULATOR_GUIDE.md** - Complete guide for creating pricing calculators
+  - Clear distinction between calculators vs quote builders
+  - Two architecture patterns: Adapter (DTG/DTF) and Service (Screen Print/Embroidery)
+  - Master bundle data structure and tier-based pricing logic
+  - Complete HTML/JavaScript templates for both patterns
+  - API integration with bundle endpoints and caching
+  - Testing utilities and debugging tools
 - **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
 - **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
