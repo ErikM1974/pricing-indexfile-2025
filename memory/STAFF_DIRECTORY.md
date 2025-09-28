@@ -11,7 +11,7 @@ This is the authoritative source for all staff contact information. Always refer
 |------|-------|------|---------|
 | General Sales | sales@nwcustomapparel.com | Sales Team | Yes |
 | Ruth Nhong | ruth@nwcustomapparel.com | Production Manager | No |
-| Taylar Hanson | taylar@nwcustomapparel.com | Account Executive | No |
+| Taylar Hanson | taylar@nwcustomapparel.com | No Longer Employed at NW Custom Apparel| No |
 | Nika Lao | nika@nwcustomapparel.com | Account Executive | No |
 | Taneisha Clark | taneisha@nwcustomapparel.com | Account Executive | No |
 | Erik Mickelson | erik@nwcustomapparel.com | Operations Manager | No |
