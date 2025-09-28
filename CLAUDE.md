@@ -994,6 +994,14 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
   - Bundle pricing strategies (fixed, tiered, dynamic)
   - Database persistence with quote generation
   - Testing utilities and common issues
+- **@memory/MANUAL_PRICING_CALCULATOR_GUIDE.md** - Complete guide for all pricing calculator types
+  - Three categories: Manual, Contract/Corporate, and Specialty calculators
+  - Manual pricing formula with margin denominators and tier logic
+  - Shared architecture with manual-calculator-styles.css
+  - Base cost input patterns and validation
+  - LTM fee calculations and minimum order enforcement
+  - Complete templates for each calculator type
+  - Testing utilities and quick reference matrix
 - **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
 - **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
