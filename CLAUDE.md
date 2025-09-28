@@ -972,17 +972,26 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 ```
 
 ### 📚 Key Memory References
+- **@memory/QUOTE_BUILDER_GUIDE.md** - Complete guide for creating new quote builders
+  - 3-phase architecture (Setup → Products → Review)
+  - Required 18+ shared components with exact load order
+  - Service class templates with business logic
+  - EmailJS integration with required variables
+  - Database patterns (quote_sessions + quote_items)
+  - Testing checklist and common pitfalls
 - **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
 - **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
 
-### 🧮 Active Calculators
+### 🧮 Active Calculators & Quote Builders
 - **DTG** - Direct-to-garment contract pricing
 - **RICH** - Richardson caps
 - **EMB** - Embroidery contract
 - **EMBC** - Customer supplied embroidery
 - **LT** - Laser tumblers
 - **PATCH** - Embroidered emblems
+
+**📘 Creating a New Quote Builder?** See @memory/QUOTE_BUILDER_GUIDE.md for complete implementation patterns including the 3-phase architecture, required files, and testing checklist.
 
 ### 🎨 Art Systems
 - **Art Invoices** - `/art-invoices-dashboard.html`, service codes (GRT-25, GRT-50, etc.)

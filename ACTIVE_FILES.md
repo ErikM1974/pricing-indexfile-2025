@@ -97,6 +97,16 @@
 | `/shared_components/css/quote-builder-unified-step1.css` | Step 1 styles | Quote builders | ✅ Active |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
 
+## 📚 Documentation & Guides
+
+### Memory/Reference Documentation
+| File | Purpose | Status |
+|------|---------|--------|
+| `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
+| `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
+| `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
+| `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
+
 ## 📂 Dashboard & Admin
 
 ### Staff Dashboards
