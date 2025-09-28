@@ -152,6 +152,7 @@ This app uses **simple static file serving** - no build step, no bundling, no we
 - **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
 - **Key Endpoints**: `/api/quote_sessions`, `/api/quote_items`
 - **Quote Pattern**: `[PREFIX][MMDD]-seq` (e.g., DTG0130-1)
+- **Full API Documentation**: @memory/CASPIO_API_TEMPLATE.md (55 endpoints, shared with API provider)
 
 ### 📍 Important Notes:
 1. **New Pages**: Must add to route config and restart server with Erik
@@ -177,6 +178,11 @@ Company Phone: 253-922-5793
 
 Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 ```
+
+### 📚 Key Memory References
+- **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
+- **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
+- **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
 
 ### 🧮 Active Calculators
 - **DTG** - Direct-to-garment contract pricing
