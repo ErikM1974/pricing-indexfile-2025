@@ -421,7 +421,7 @@ function validateForm(formElement) {
 - **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
 - **Key Endpoints**: `/api/quote_sessions`, `/api/quote_items`
 - **Quote Pattern**: `[PREFIX][MMDD]-seq` (e.g., DTG0130-1)
-- **Full API Documentation**: @memory/CASPIO_API_TEMPLATE.md (55 endpoints, shared with API provider)
+- **Full API Documentation**: @memory/CASPIO_API_CORE.md (56 endpoints, modularized in @memory/api/)
 
 ### 📍 Important Notes:
 1. **New Pages**: Must add to route config and restart server with Erik
@@ -1316,36 +1316,37 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 ```
 
 ### 📚 Key Memory References
+
+⚠️ **IMPORTANT**: Documentation has been reorganized for better performance. All files now stay under 40k character limit.
+
+**📍 Start Here**: **@memory/INDEX.md** - Master navigation for all documentation
+
+#### Core Documentation (Modularized)
+- **@memory/CASPIO_API_CORE.md** - Core API documentation and communication protocols
+  - API modules in **@memory/api/** directory:
+    - `products-api.md` - Product search & inventory endpoints
+    - `cart-pricing-api.md` - Cart sessions & pricing bundles
+    - `orders-quotes-api.md` - Order & quote management
+    - `utility-api.md` - Helper endpoints & reference data
+- **@memory/CLAUDE_ARCHITECTURE.md** - System architecture patterns
+  - Adapter pattern implementation
+  - Quote builder safety features
+  - Configuration management
+- **@memory/CLAUDE_PATTERNS.md** - Reusable code patterns
+  - API error handling templates
+  - Debug utilities
+  - Performance optimization
+- **@memory/PRICING_MANUAL_CORE.md** - Manual pricing calculator core concepts
+  - Calculator templates in **@memory/templates/** directory:
+    - `manual-calculator-template.md` - Manual pricing with base cost
+    - `contract-calculator-template.md` - Fixed contract pricing
+    - `specialty-calculator-template.md` - Product-specific calculators
+    - `calculator-components.md` - Shared components & utilities
+
+#### Complete Guides (Original)
 - **@memory/QUOTE_BUILDER_GUIDE.md** - Complete guide for creating new quote builders
-  - 3-phase architecture (Setup → Products → Review)
-  - Required 18+ shared components with exact load order
-  - Service class templates with business logic
-  - EmailJS integration with required variables
-  - Database patterns (quote_sessions + quote_items)
-  - Testing checklist and common pitfalls
 - **@memory/PRICING_CALCULATOR_GUIDE.md** - Complete guide for creating pricing calculators
-  - Clear distinction between calculators vs quote builders
-  - Two architecture patterns: Adapter (DTG/DTF) and Service (Screen Print/Embroidery)
-  - Master bundle data structure and tier-based pricing logic
-  - Complete HTML/JavaScript templates for both patterns
-  - API integration with bundle endpoints and caching
-  - Testing utilities and debugging tools
 - **@memory/BUNDLE_CALCULATOR_GUIDE.md** - Complete guide for creating promotional bundles
-  - Two bundle patterns: Simple Fixed (BCA) vs Complex Multi-Product (Christmas)
-  - Multi-step wizard implementation with validation
-  - Gift box visualization and animations
-  - Size distribution management for apparel bundles
-  - Bundle pricing strategies (fixed, tiered, dynamic)
-  - Database persistence with quote generation
-  - Testing utilities and common issues
-- **@memory/MANUAL_PRICING_CALCULATOR_GUIDE.md** - Complete guide for all pricing calculator types
-  - Three categories: Manual, Contract/Corporate, and Specialty calculators
-  - Manual pricing formula with margin denominators and tier logic
-  - Shared architecture with manual-calculator-styles.css
-  - Base cost input patterns and validation
-  - LTM fee calculations and minimum order enforcement
-  - Complete templates for each calculator type
-  - Testing utilities and quick reference matrix
 - **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
 - **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
@@ -1386,7 +1387,11 @@ node scripts/safety-tools/dependency-mapper.js
 ### 📂 Documentation Locations
 - **Root directory**: Active docs (CLAUDE.md, ACTIVE_FILES.md, README.md)
 - **/docs/archive/**: Historical/completed documentation
-- **/memory/**: API specifications only (not for general docs)
+- **/memory/**: Modularized documentation (optimized for performance)
+  - **INDEX.md**: Master navigation for all documentation
+  - **Core docs**: API, architecture, patterns, pricing (~20k chars each)
+  - **/api/**: API endpoint modules
+  - **/templates/**: Calculator templates and components
 
 ---
 
