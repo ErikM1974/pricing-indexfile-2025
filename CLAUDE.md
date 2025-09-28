@@ -126,18 +126,146 @@ npm install puppeteer  # NOT needed for production/Heroku
 ### ⚠️ No Webpack/Build System
 This app uses **simple static file serving** - no build step, no bundling, no webpack. We removed 18 webpack dependencies on 2025-01-27 because they added zero value. Keep it simple!
 
-## Project Structure
+## 📁 WHERE DOES MY FILE GO? Complete Directory Guide
 
+### Decision Tree for File Placement:
 ```
-/calculators/         # Pricing calculators
-/dashboards/          # Staff dashboards
-/quote-builders/      # Quote generation
-/tests/               # ALL test files go here
-/shared_components/   # Shared JS and CSS
-├── js/              # Adapters and modules
-└── css/             # Stylesheets
-/docs/               # Documentation
-/scripts/            # Utility scripts
+Creating a new file? Start here:
+├─ Test file? → `/tests/`
+│  ├─ UI test? → `/tests/ui/`
+│  ├─ API test? → `/tests/api/`
+│  └─ Unit test? → `/tests/unit/`
+├─ Calculator? → `/calculators/`
+├─ Quote builder? → `/quote-builders/`
+├─ Dashboard? → `/dashboards/`
+├─ Art/design tool? → `/art-tools/`
+├─ Admin interface? → `/admin/`
+├─ Vendor portal? → `/vendor-portals/`
+├─ General page? → `/pages/`
+├─ Policy document? → `/policies/`
+├─ JavaScript file?
+│  ├─ Shared/reusable? → `/shared_components/js/`
+│  ├─ Calculator-specific? → `/calculators/`
+│  └─ Page-specific? → Same folder as HTML
+├─ CSS file?
+│  ├─ Shared styles? → `/shared_components/css/`
+│  └─ Page-specific? → Same folder as HTML
+├─ Documentation? → `/docs/`
+├─ Script/utility? → `/scripts/`
+├─ Email template? → `/email-templates/`
+└─ Is it index.html, cart.html, or product.html? → Root (ONLY THESE!)
+   └─ Everything else → MUST go in a subdirectory!
+```
+
+### Directory Purpose Reference:
+| Directory | Purpose | Example Files |
+|-----------|---------|---------------|
+| `/admin/` | Administrative tools | user-management.html, reports.html |
+| `/art-tools/` | Art department tools | art-request-form.html, design-tracker.html |
+| `/calculators/` | Pricing calculators | dtg-calculator.html, embroidery-pricing.html |
+| `/dashboards/` | Staff dashboards | sales-dashboard.html, art-hub.html |
+| `/pages/` | Secondary pages | about.html, policies-hub.html, resources.html |
+| `/quote-builders/` | Quote generation | screen-print-quote.html, bundle-builder.html |
+| `/tests/` | ALL test files | test-pricing.html, test-api.js |
+| `/tools/` | Utility tools | inventory-checker.html, file-monitor.js |
+| `/vendor-portals/` | Vendor pages | sanmar-portal.html, alphabroder.html |
+| `/shared_components/` | Reusable code | adapters, common styles, utilities |
+
+## ✅ File Creation Enforcement Checklist
+
+**BEFORE creating ANY new file, complete this checklist:**
+
+```markdown
+□ 1. Is this a test file? → MUST go in /tests/ (no exceptions)
+□ 2. Check the decision tree above → Follow the path to correct directory
+□ 3. Does similar functionality exist? → Check ACTIVE_FILES.md first
+□ 4. Is it going in root? → Only allowed if it's index.html, cart.html, or product.html
+□ 5. Using proper naming? → kebab-case, no spaces, no CAPS, descriptive
+□ 6. External JS/CSS? → No inline <script> or <style> tags with content
+□ 7. Will you update ACTIVE_FILES.md? → Required immediately after creation
+```
+
+**Red flags that you're doing it wrong:**
+- ❌ Creating `test-new-feature.html` in root → Should be `/tests/ui/test-new-feature.html`
+- ❌ Creating `pricing-backup.js` → Use Git branches instead
+- ❌ Creating `temp-fix.css` → Make proper fix or don't create file
+- ❌ Adding inline styles → Create external CSS file
+- ❌ Not updating ACTIVE_FILES.md → Creates orphaned files
+
+## 🚨 Common Mistakes That Created 71+ Orphaned Files
+
+### Mistake #1: Test Files in Root
+**❌ WRONG:**
+```bash
+/test-dtg-pricing.html        # Test file in root
+/test-api-integration.js      # Another test in root
+/test-cap-summary.html        # Yet another in root
+```
+**✅ CORRECT:**
+```bash
+/tests/ui/test-dtg-pricing.html
+/tests/api/test-api-integration.js
+/tests/calculators/test-cap-summary.html
+```
+
+### Mistake #2: Version Suffixes Instead of Git
+**❌ WRONG:**
+```bash
+cart-backup.js
+cart-FINAL.js
+cart-FIXED.js
+cart-old.js
+cart-temp.js
+```
+**✅ CORRECT:**
+```bash
+# Use Git branches for versions
+git checkout -b fix/cart-calculation
+# Make changes to cart.js
+git commit -m "Fix cart calculation logic"
+```
+
+### Mistake #3: Scattered Secondary Pages
+**❌ WRONG:**
+```bash
+/inventory-details.html    # Secondary page in root
+/policies-hub.html         # Another secondary page in root
+/resources.html            # More clutter in root
+```
+**✅ CORRECT:**
+```bash
+/pages/inventory-details.html
+/pages/policies-hub.html
+/pages/resources.html
+```
+
+### Mistake #4: Not Checking Before Creating
+**❌ WRONG:**
+```javascript
+// Developer creates new pricing utility
+// without checking existing code
+function calculatePricing() { /* new code */ }
+```
+**✅ CORRECT:**
+```javascript
+// First check ACTIVE_FILES.md
+// Found: /shared_components/js/pricing-utils.js already exists
+// Use existing utility instead of creating duplicate
+```
+
+### Mistake #5: Forgetting to Update Documentation
+**❌ WRONG:**
+```bash
+# Create new file
+touch /calculators/new-calculator.html
+# Start working immediately without documentation
+```
+**✅ CORRECT:**
+```bash
+# Create new file
+touch /calculators/new-calculator.html
+# IMMEDIATELY update ACTIVE_FILES.md
+echo "- /calculators/new-calculator.html - New calculator for X" >> ACTIVE_FILES.md
 ```
 
 ## System Architecture
