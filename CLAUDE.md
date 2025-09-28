@@ -986,6 +986,14 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
   - Complete HTML/JavaScript templates for both patterns
   - API integration with bundle endpoints and caching
   - Testing utilities and debugging tools
+- **@memory/BUNDLE_CALCULATOR_GUIDE.md** - Complete guide for creating promotional bundles
+  - Two bundle patterns: Simple Fixed (BCA) vs Complex Multi-Product (Christmas)
+  - Multi-step wizard implementation with validation
+  - Gift box visualization and animations
+  - Size distribution management for apparel bundles
+  - Bundle pricing strategies (fixed, tiered, dynamic)
+  - Database persistence with quote generation
+  - Testing utilities and common issues
 - **@memory/STAFF_DIRECTORY.md** - Current staff emails and contact info for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema for quote_sessions and quote_items
 - **@memory/FILE_UPLOAD_API_REQUIREMENTS.md** - File upload API specifications
