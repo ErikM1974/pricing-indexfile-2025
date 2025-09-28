@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc2626;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        .info-section {
+            background: #fef2f2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #fca5a5;
+        }
+        .test-section {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #7dd3fc;
+        }
+        .success-section {
+            background: #d1fae5;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #6ee7b7;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+        .template-var {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎄 Christmas Bundle Email Confirmation Test</h1>
+
+        <div class="info-section">
+            <h2>📧 Email Configuration</h2>
+            <table>
+                <tr>
+                    <th>Setting</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>EmailJS Service ID</td>
+                    <td><span class="template-var">service_1c4k67j</span></td>
+                </tr>
+                <tr>
+                    <td>Template ID</td>
+                    <td><span class="template-var">template_v80ysfp</span></td>
+                </tr>
+                <tr>
+                    <td>Public Key</td>
+                    <td><span class="template-var">4qSbDO-SQs19TbP80</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Email Template Variables</h2>
+            <p>The following variables are sent to the email template:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable Name</th>
+                        <th>Description</th>
+                        <th>Example Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="template-var">to_email</span></td>
+                        <td>Customer email address</td>
+                        <td>customer@example.com</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">customer_name</span></td>
+                        <td>Full name</td>
+                        <td>John Smith</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">company_name</span></td>
+                        <td>Company</td>
+                        <td>ABC Company</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">quote_number</span></td>
+                        <td>Quote ID</td>
+                        <td>XMAS0921-44</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">quote_date</span></td>
+                        <td>Order date</td>
+                        <td>9/21/2025</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td colspan="3"><strong>Bundle Items</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">jacket_details</span></td>
+                        <td>Jacket selection</td>
+                        <td>Carhartt Duck Detroit Jacket CT103828 - Black - Size L - $161.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">hoodie_details</span></td>
+                        <td>Hoodie selection</td>
+                        <td>Carhartt Hoodie K121 - Navy - Size L - $69.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">beanie_details</span></td>
+                        <td>Beanie selection</td>
+                        <td>Carhartt Watch Cap A18 - Black - OSFA - $29.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">gloves_details</span></td>
+                        <td>Gloves selection</td>
+                        <td>Carhartt Work Gloves - Black Barley - Size L - $39.00</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td colspan="3"><strong>Customization</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">thread_color_1</span></td>
+                        <td>Primary thread color</td>
+                        <td>Red</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">thread_color_2</span></td>
+                        <td>Secondary thread color</td>
+                        <td>Green</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">thread_color_3</span></td>
+                        <td>Tertiary thread color</td>
+                        <td>White</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">embroidery_location</span></td>
+                        <td>Embroidery positions</td>
+                        <td>Jacket: Left Chest, Hoodie: Center Front</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">custom_text</span></td>
+                        <td>Custom text/name</td>
+                        <td>Happy Holidays 2025</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">logo_upload</span></td>
+                        <td>Logo status</td>
+                        <td>Logo uploaded</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td colspan="3"><strong>Delivery Information</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">delivery_type</span></td>
+                        <td>Delivery method</td>
+                        <td>Ship</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">delivery_date</span></td>
+                        <td>Expected delivery</td>
+                        <td>12/15/2025</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">address_1</span></td>
+                        <td>Street address</td>
+                        <td>123 Main St</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">city</span></td>
+                        <td>City</td>
+                        <td>Seattle</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">state</span></td>
+                        <td>State</td>
+                        <td>WA</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">zip</span></td>
+                        <td>ZIP code</td>
+                        <td>98101</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td colspan="3"><strong>Pricing</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">subtotal</span></td>
+                        <td>Items + gift box</td>
+                        <td>267.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">shipping</span></td>
+                        <td>Shipping cost</td>
+                        <td>25.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">gift_box</span></td>
+                        <td>Gift box fee</td>
+                        <td>9.00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="template-var">total</span></td>
+                        <td>Total amount</td>
+                        <td>292.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="success-section">
+            <h2>✅ Implementation Status - Outlook Compatible</h2>
+            <ul>
+                <li>✅ EmailJS library included and initialized</li>
+                <li>✅ <code>sendConfirmationEmail()</code> function created</li>
+                <li>✅ All template variables mapped with defaults</li>
+                <li>✅ Integrated with order submission flow</li>
+                <li>✅ Error handling implemented (won't block order if email fails)</li>
+                <li>✅ <strong>Outlook Compatibility:</strong> Simplified text format without special characters</li>
+                <li>✅ <strong>Sanitization:</strong> All text fields cleaned of HTML/special characters</li>
+                <li>✅ <strong>Safe Defaults:</strong> Every field has a fallback value</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h2>⚠️ Outlook Compatibility Features</h2>
+            <p><strong>To ensure emails work properly in Outlook:</strong></p>
+            <ul>
+                <li>✅ Removed currency symbols from item formatting (use "Price: 161.00" instead of "$161.00")</li>
+                <li>✅ Sanitized all text fields to remove special characters (<, >, ", ', &)</li>
+                <li>✅ Used simple pipe separators (|) instead of complex formatting</li>
+                <li>✅ Converted all numeric values to plain strings</li>
+                <li>✅ Provided default values for every field to prevent undefined/null</li>
+                <li>✅ Used simple date format (MM/DD/YYYY)</li>
+                <li>✅ Cleaned thread colors and embroidery locations</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 How It Works</h2>
+            <p>When a customer submits an order:</p>
+            <ol>
+                <li>Order is saved to database (quote_sessions + quote_items)</li>
+                <li>Email function is called with all order data</li>
+                <li>Email is sent using EmailJS template <span class="template-var">template_v80ysfp</span></li>
+                <li>Success modal is shown with Quote ID</li>
+                <li>If email fails, order still completes (logged to console)</li>
+            </ol>
+
+            <h3>Code Location</h3>
+            <p>The email functionality is in <strong>christmas-bundles.html</strong>:</p>
+            <ul>
+                <li>Lines 2390-2393: EmailJS initialization</li>
+                <li>Lines 2395-2488: <code>sendConfirmationEmail()</code> function</li>
+                <li>Lines 2939-2945: Integration with order submission</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h2>🔍 Console Output</h2>
+            <p>When an email is sent successfully, you'll see in console:</p>
+            <pre>Email sent successfully: {status: 200, text: "OK"}</pre>
+
+            <p>If email fails (but order succeeds):</p>
+            <pre>Email failed to send: [error details]</pre>
+        </div>
+
+        <div class="test-section">
+            <h2>Quick Test</h2>
+            <button onclick="window.open('christmas-bundles.html', '_blank')">
+                🎄 Open Christmas Bundle Form
+            </button>
+            <p style="margin-top: 15px;">
+                <strong>To test:</strong> Complete an order and check console for email status.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

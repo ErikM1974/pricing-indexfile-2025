@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Cap Summary - Direct Link</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-link {
+            display: inline-block;
+            background: #003f7f;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .test-link:hover {
+            background: #002c5a;
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #003f7f;
+        }
+        ul {
+            line-height: 1.8;
+        }
+        .highlight {
+            background: #e8f4f8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🧢 Cap Embroidery Quote Summary Test</h1>
+
+        <div class="instructions">
+            <strong>📋 Instructions:</strong>
+            <ol>
+                <li>Click the link below to open the cap embroidery quote builder</li>
+                <li>The page will automatically load with test data</li>
+                <li>The summary will display after a short delay (500ms)</li>
+                <li>Check that all pricing formulas display correctly</li>
+            </ol>
+        </div>
+
+        <a href="http://localhost:3000/cap-embroidery-quote-builder.html#test-summary" class="test-link" target="_blank">
+            Open Cap Quote Builder with Test Data →
+        </a>
+
+        <h2>✅ What to Check:</h2>
+        <ul>
+            <li><strong>Clean Pricing Formula:</strong> Should show:
+                <br>&nbsp;&nbsp;&nbsp;<span class="highlight">Cap with Logo: $18.00 + Small Batch $3.33 = $21.33</span>
+                <br>&nbsp;&nbsp;&nbsp;<span class="highlight">Cap Back $6.75</span>
+                <br>&nbsp;&nbsp;&nbsp;<span class="highlight">Total Per Piece: $28.08</span>
+            </li>
+            <li><strong>NO Stitch Count Details:</strong> Stitch counts should NOT appear in line items (only at top of quote)</li>
+            <li><strong>All Logos in One Formula:</strong> Additional logos (back/side) included in main pricing breakdown</li>
+            <li><strong>OSFA Badge:</strong> Gray badge showing "OSFA"</li>
+            <li><strong>Quantity Badge:</strong> Green badge showing "15 pieces total"</li>
+            <li><strong>Font Size:</strong> All pricing text should be larger (16-18px)</li>
+            <li><strong>Line Totals:</strong> Should calculate as Total Per Piece × Quantity</li>
+            <li><strong>Product Subtotal:</strong> Should be displayed at the bottom in blue box</li>
+        </ul>
+
+        <h2>📊 Test Data Loaded:</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="background: #003f7f; color: white;">
+                    <th style="padding: 10px; text-align: left;">Cap Style</th>
+                    <th style="padding: 10px;">Quantity</th>
+                    <th style="padding: 10px;">Base Price</th>
+                    <th style="padding: 10px;">Fees</th>
+                    <th style="padding: 10px;">Front Logo</th>
+                    <th style="padding: 10px;">Back Logo</th>
+                    <th style="padding: 10px;">Total/Piece</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: white; border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;">C112 - Grey Steel/Black</td>
+                    <td style="padding: 10px; text-align: center;">15</td>
+                    <td style="padding: 10px; text-align: center;">$18.00</td>
+                    <td style="padding: 10px; text-align: center;">Small Batch: $3.33</td>
+                    <td style="padding: 10px; text-align: center;">$21.33</td>
+                    <td style="padding: 10px; text-align: center;">$6.75</td>
+                    <td style="padding: 10px; text-align: center;"><strong>$28.08</strong></td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 10px;">C112 - Black/Gold</td>
+                    <td style="padding: 10px; text-align: center;">15</td>
+                    <td style="padding: 10px; text-align: center;">$18.00</td>
+                    <td style="padding: 10px; text-align: center;">Small Batch: $3.33<br>Extra Stitches: $2.00</td>
+                    <td style="padding: 10px; text-align: center;">$23.33</td>
+                    <td style="padding: 10px; text-align: center;">$6.75</td>
+                    <td style="padding: 10px; text-align: center;"><strong>$30.08</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 30px; color: #666;">
+            <strong>Note:</strong> Total per piece includes front logo + all additional logos. Line totals = Total/Piece × Quantity.
+        </p>
+    </div>
+</body>
+</html>

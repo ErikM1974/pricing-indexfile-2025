@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Quote Builder - Test Fixes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-header {
+            background: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .test-info h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .test-info li {
+            margin: 5px 0;
+        }
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+        }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>DTG Quote Builder - Layout Fix Test</h1>
+        <p>Testing the fixes applied to resolve icon and grid layout issues</p>
+    </div>
+    
+    <div class="test-info">
+        <h3>Fixes Applied:</h3>
+        <ul>
+            <li><span class="checkmark">✓</span> Changed all fa-tshirt icons to fa-shirt (Font Awesome 6.0 compatible)</li>
+            <li><span class="checkmark">✓</span> Fixed HTML structure with proper div nesting</li>
+            <li><span class="checkmark">✓</span> Added section divider between Single and Combination locations</li>
+            <li><span class="checkmark">✓</span> Added grid enforcement CSS with !important flags</li>
+            <li><span class="checkmark">✓</span> Set minimum card height and proper spacing</li>
+        </ul>
+        
+        <h3>Expected Results:</h3>
+        <ul>
+            <li>Icons should display correctly (shirt icons, not empty boxes)</li>
+            <li>Location cards should be in a grid layout (not stacked vertically)</li>
+            <li>Visual separator between Single and Combination sections</li>
+            <li>Consistent card sizes and spacing</li>
+            <li>Green hover and selection states</li>
+        </ul>
+    </div>
+    
+    <iframe src="dtg-quote-builder.html"></iframe>
+</body>
+</html>

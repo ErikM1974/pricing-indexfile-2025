@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Horizontal Layout Test</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- DTG Specific Styles -->
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css?v=test">
+    
+    <style>
+        body {
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .comparison-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .comparison-section h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .comparison-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .comparison-section li {
+            padding: 5px 0;
+            color: #666;
+        }
+        .comparison-section li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container dtg-quote-builder">
+        <h1>DTG Quote Builder - Improved Horizontal Layout</h1>
+        
+        <!-- Test the new layout -->
+        <div class="location-selector">
+            <!-- Single Locations Section -->
+            <div class="location-section single-locations">
+                <h3 class="section-header">
+                    <span class="section-number">1</span>
+                    <span class="section-title">Single Location</span>
+                    <span class="section-subtitle">Choose one print area</span>
+                </h3>
+                <div class="location-cards horizontal">
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="LC">
+                        <div class="location-card" data-price-tier="Standard">
+                            <i class="fas fa-shirt"></i>
+                            <div class="location-text">
+                                <span class="location-name">Left Chest</span>
+                                <span class="location-code">LC</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="FF">
+                        <div class="location-card" data-price-tier="Standard">
+                            <i class="fas fa-shirt"></i>
+                            <div class="location-text">
+                                <span class="location-name">Full Front</span>
+                                <span class="location-code">FF</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="FB">
+                        <div class="location-card" data-price-tier="Standard">
+                            <i class="fas fa-shirt"></i>
+                            <div class="location-text">
+                                <span class="location-name">Full Back</span>
+                                <span class="location-code">FB</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="JF">
+                        <div class="location-card" data-price-tier="Premium">
+                            <i class="fas fa-shirt"></i>
+                            <div class="location-text">
+                                <span class="location-name">Jumbo Front</span>
+                                <span class="location-code">JF</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="JB">
+                        <div class="location-card" data-price-tier="Premium">
+                            <i class="fas fa-shirt"></i>
+                            <div class="location-text">
+                                <span class="location-name">Jumbo Back</span>
+                                <span class="location-code">JB</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Combination Locations Section -->
+            <div class="location-section combo-locations">
+                <h3 class="section-header">
+                    <span class="section-number">2</span>
+                    <span class="section-title">Combination Locations</span>
+                    <span class="section-subtitle">Multiple print areas</span>
+                </h3>
+                <div class="location-cards horizontal">
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="LC_FB">
+                        <div class="location-card combo" data-price-tier="Combo">
+                            <i class="fas fa-layer-group"></i>
+                            <div class="location-text">
+                                <span class="location-name">LC + FB</span>
+                                <span class="location-code">Chest & Back</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="FF_FB">
+                        <div class="location-card combo" data-price-tier="Combo">
+                            <i class="fas fa-layer-group"></i>
+                            <div class="location-text">
+                                <span class="location-name">FF + FB</span>
+                                <span class="location-code">Front & Back</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="JF_JB">
+                        <div class="location-card combo" data-price-tier="Combo Plus">
+                            <i class="fas fa-layer-group"></i>
+                            <div class="location-text">
+                                <span class="location-name">JF + JB</span>
+                                <span class="location-code">Jumbo Both</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="location-option">
+                        <input type="radio" name="print-location" value="LC_JB">
+                        <div class="location-card combo" data-price-tier="Combo Plus">
+                            <i class="fas fa-layer-group"></i>
+                            <div class="location-text">
+                                <span class="location-name">LC + JB</span>
+                                <span class="location-code">Chest & Jumbo</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison of Old vs New -->
+        <div class="comparison">
+            <div class="comparison-section">
+                <h3>Old Layout Issues</h3>
+                <ul>
+                    <li style="color: #dc3545;">❌ Vertical cards wasted space</li>
+                    <li style="color: #dc3545;">❌ Unclear section separation</li>
+                    <li style="color: #dc3545;">❌ Confusing 3-column grid</li>
+                    <li style="color: #dc3545;">❌ No visual hierarchy</li>
+                    <li style="color: #dc3545;">❌ Labels were just floating text</li>
+                </ul>
+            </div>
+            <div class="comparison-section">
+                <h3>New Layout Benefits</h3>
+                <ul>
+                    <li>Horizontal cards save space</li>
+                    <li>Clear numbered sections</li>
+                    <li>Visual separator lines</li>
+                    <li>Price tier indicators</li>
+                    <li>Better mobile experience</li>
+                    <li>Consistent with modern UX</li>
+                    <li>Easier to scan options</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

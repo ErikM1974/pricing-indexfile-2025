@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Christmas Bundle API Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .fix-list {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .fix-list li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎄 Christmas Bundle API Fix Test</h1>
+
+        <div class="fix-list">
+            <h2>✅ Fixes Applied:</h2>
+            <ul>
+                <li><strong>Fixed API Base URL:</strong> Removed duplicate /api from base URL</li>
+                <li><strong>Corrected Endpoints:</strong>
+                    <ul>
+                        <li>Sessions: /api/quote_sessions</li>
+                        <li>Items: /api/quote_items</li>
+                    </ul>
+                </li>
+                <li><strong>Enhanced Error Logging:</strong> Better console output for debugging</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>Test API Endpoints</h2>
+            <button onclick="testEndpoints()">Test API Connections</button>
+            <div id="apiResults" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Order Submission</h2>
+            <p>Submit a new Christmas bundle order and check if items are saved:</p>
+            <button onclick="window.open('/christmas-bundles.html', '_blank')">
+                Open Christmas Bundle Page
+            </button>
+            <button onclick="checkLatestOrder()">
+                Check Latest Order Items
+            </button>
+            <div id="orderResults" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Console Output to Watch For:</h2>
+            <ul>
+                <li>✅ "Session created successfully" - Quote session saved</li>
+                <li>✅ "Item created successfully" - Bundle item saved</li>
+                <li>❌ "Item creation failed" - Problem with item save</li>
+                <li>❌ "404" or "api/api" in URL - Double API path issue</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        async function testEndpoints() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = 'Testing API endpoints...\n\n';
+
+            // Test sessions endpoint
+            try {
+                const sessionsUrl = `${API_BASE}/api/quote_sessions`;
+                resultsDiv.innerHTML += `Testing: ${sessionsUrl}\n`;
+                const sessionsResponse = await fetch(sessionsUrl);
+                if (sessionsResponse.ok) {
+                    resultsDiv.innerHTML += '<span class="success">✓ Sessions endpoint is accessible</span>\n';
+                } else {
+                    resultsDiv.innerHTML += `<span class="error">✗ Sessions endpoint returned ${sessionsResponse.status}</span>\n`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<span class="error">✗ Sessions endpoint error: ${error.message}</span>\n`;
+            }
+
+            resultsDiv.innerHTML += '\n';
+
+            // Test items endpoint
+            try {
+                const itemsUrl = `${API_BASE}/api/quote_items`;
+                resultsDiv.innerHTML += `Testing: ${itemsUrl}\n`;
+                const itemsResponse = await fetch(itemsUrl);
+                if (itemsResponse.ok) {
+                    resultsDiv.innerHTML += '<span class="success">✓ Items endpoint is accessible</span>\n';
+                } else {
+                    resultsDiv.innerHTML += `<span class="error">✗ Items endpoint returned ${itemsResponse.status}</span>\n`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<span class="error">✗ Items endpoint error: ${error.message}</span>\n`;
+            }
+
+            resultsDiv.innerHTML += '\n<strong>Endpoint test complete!</strong>';
+        }
+
+        async function checkLatestOrder() {
+            const resultsDiv = document.getElementById('orderResults');
+            const quoteID = prompt('Enter the Quote ID to check (e.g., XMAS0921-77):');
+
+            if (!quoteID) {
+                resultsDiv.innerHTML = 'No Quote ID entered';
+                return;
+            }
+
+            resultsDiv.innerHTML = `Checking order ${quoteID}...\n\n`;
+
+            try {
+                // Check session
+                const sessionResponse = await fetch(`${API_BASE}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}`);
+                const sessions = await sessionResponse.json();
+
+                if (sessions && sessions.length > 0) {
+                    resultsDiv.innerHTML += `<span class="success">✓ Session found for ${quoteID}</span>\n`;
+                    resultsDiv.innerHTML += `  Status: ${sessions[0].Status}\n`;
+                    resultsDiv.innerHTML += `  Customer: ${sessions[0].Company_Name}\n\n`;
+                } else {
+                    resultsDiv.innerHTML += `<span class="error">✗ No session found for ${quoteID}</span>\n\n`;
+                }
+
+                // Check items
+                const itemsResponse = await fetch(`${API_BASE}/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
+                const items = await itemsResponse.json();
+
+                if (items && items.length > 0) {
+                    resultsDiv.innerHTML += `<span class="success">✓ ${items.length} item(s) found for ${quoteID}</span>\n`;
+                    items.forEach((item, index) => {
+                        resultsDiv.innerHTML += `\nItem ${index + 1}:\n`;
+                        resultsDiv.innerHTML += `  StyleNumber: ${item.StyleNumber}\n`;
+                        resultsDiv.innerHTML += `  ProductName: ${item.ProductName}\n`;
+                        resultsDiv.innerHTML += `  LineNumber: ${item.LineNumber}\n`;
+                        if (item.BundleConfiguration) {
+                            resultsDiv.innerHTML += `  Has BundleConfiguration: Yes\n`;
+                        }
+                    });
+                } else {
+                    resultsDiv.innerHTML += `<span class="error">✗ No items found for ${quoteID}</span>\n`;
+                    resultsDiv.innerHTML += `This is the problem - items are not being saved!\n`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<span class="error">✗ Error checking order: ${error.message}</span>\n`;
+            }
+        }
+    </script>
+</body>
+</html>
