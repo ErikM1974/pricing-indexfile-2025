@@ -63,10 +63,11 @@
 ### Core JavaScript Services
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
+| `/config/app.config.js` | Central configuration - ALL hardcoded values | All pages | ✅ Active |
 | `/shared_components/js/base-quote-service.js` | Base quote class | All quote builders | ✅ Active |
 | `/shared_components/js/calculator-utilities.js` | Shared utilities | All calculators | ✅ Active |
 | `/shared_components/js/utils.js` | General utilities | Multiple pages | ✅ Active |
-| `/shared_components/js/app-config.js` | App configuration | DTF system | ✅ Active |
+| `/shared_components/js/app-config.js` | Legacy config (migrate to /config/) | DTF system | ⚠️ Deprecate |
 
 ### Adapters (Master Bundle Pattern)
 | File | Purpose | Used By | Status |
