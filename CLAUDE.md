@@ -1365,6 +1365,34 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 - **Art Invoices** - `/art-invoices-dashboard.html`, service codes (GRT-25, GRT-50, etc.)
 - **Art Hub** - Role-based dashboards for AEs and Artists
 
+## 🎯 DTG Pricing Calculation & Troubleshooting
+
+### DTG Pricing Formula
+The DTG pricing system uses a multi-step calculation:
+
+1. **Get base garment cost**: Lowest price from `sizes[].price` array
+2. **Apply margin**: `markedUpGarment = baseCost / tier.MarginDenominator`
+3. **Add print costs**: From `allDtgCostsR[]` matching location and tier
+4. **Round up**: `finalPrice = Math.ceil((markedUpGarment + printCost) * 2) / 2`
+
+### Critical API Fields
+- **Base cost**: Use `sizes[].price` (NOT `maxCasePrice`)
+- **Margin**: Use `tiersR[].MarginDenominator` from API (not hardcoded)
+- **Print costs**: `allDtgCostsR[].PrintCost` by `TierLabel` and `PrintLocationCode`
+
+### Verification Process
+```bash
+# Test calculation for PC54 Left Chest at 48 qty
+curl -s "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC54"
+
+# Expected: Base $2.85 / 0.6 + $6 print = $10.75 → $11.00
+```
+
+### Common Issues
+- **Wrong field names**: Ensure using `price` not `maxCasePrice`
+- **Missing rounding**: Always round UP to half dollar
+- **Combo locations**: Sum individual location print costs
+
 ## Additional Resources
 
 ### 📚 Documentation

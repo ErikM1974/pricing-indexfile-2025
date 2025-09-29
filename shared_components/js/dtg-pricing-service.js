@@ -198,7 +198,7 @@ class DTGPricingService {
         
         // Find the base garment cost (lowest valid price, excluding zeros)
         const validPrices = sizes
-            .map(s => parseFloat(s.maxCasePrice))
+            .map(s => parseFloat(s.price))
             .filter(price => !isNaN(price) && price > 0);
         
         if (validPrices.length === 0) {
@@ -221,7 +221,7 @@ class DTGPricingService {
         // Apply size-specific upcharges
         sizes.forEach(sizeInfo => {
             const size = sizeInfo.size;
-            const sizePrice = parseFloat(sizeInfo.maxCasePrice);
+            const sizePrice = parseFloat(sizeInfo.price);
             
             // If this size has no valid price ($0), mark as unavailable
             if (isNaN(sizePrice) || sizePrice <= 0) {

@@ -153,7 +153,7 @@
                             Based on 50,000+ successful DTG prints
                         </p>
                         
-                        <div class="product-tabs">
+                        <div class="dtg-rec-product-tabs">
                             <button class="tab-button active" data-category="tshirts">
                                 T-Shirts (${DTG_PRODUCTS.tshirts.length})
                             </button>
@@ -189,15 +189,15 @@
     function renderProducts(category) {
         const products = DTG_PRODUCTS[category] || [];
         return products.map(product => `
-            <div class="product-card" data-style="${product.styleNumber}">
-                <div class="product-image">
+            <div class="dtg-rec-product-card" data-style="${product.styleNumber}">
+                <div class="dtg-rec-product-image">
                     <img src="${product.image}" alt="${product.name}">
-                    ${product.rank ? `<span class="product-badge">${product.rank}</span>` : ''}
+                    ${product.rank ? `<span class="dtg-rec-product-badge">${product.rank}</span>` : ''}
                 </div>
-                <div class="product-info">
+                <div class="dtg-rec-product-info">
                     <h4>${product.styleNumber} - ${product.name}</h4>
-                    <p class="product-brand">${product.brand} | ${product.fabric}</p>
-                    ${product.salesData ? `<p class="product-sales">${product.salesData}</p>` : ''}
+                    <p class="dtg-rec-product-brand">${product.brand} | ${product.fabric}</p>
+                    ${product.salesData ? `<p class="dtg-rec-product-sales">${product.salesData}</p>` : ''}
                     ${renderStars(product.rating)}
                     ${product.bestColors ? `
                         <div class="best-colors">
@@ -205,8 +205,8 @@
                             ${product.bestColors.join(', ')}
                         </div>
                     ` : ''}
-                    ${product.warnings ? `<p class="product-warning">${product.warnings}</p>` : ''}
-                    ${product.notes ? `<p class="product-notes">${product.notes}</p>` : ''}
+                    ${product.warnings ? `<p class="dtg-rec-product-warning">${product.warnings}</p>` : ''}
+                    ${product.notes ? `<p class="dtg-rec-product-notes">${product.notes}</p>` : ''}
                     <button class="select-product-btn" onclick="window.DTGRecommendations.selectProduct('${product.styleNumber}')">
                         Select This Style
                     </button>
@@ -217,7 +217,7 @@
 
     function renderStars(rating) {
         const stars = '⭐'.repeat(rating);
-        return `<div class="product-rating">${stars}</div>`;
+        return `<div class="dtg-rec-product-rating">${stars}</div>`;
     }
 
     function setupEventListeners() {
@@ -401,7 +401,7 @@
             }
 
             /* Tabs */
-            .product-tabs {
+            .dtg-rec-product-tabs {
                 display: flex;
                 gap: 12px;
                 margin-bottom: 30px;
@@ -439,7 +439,7 @@
                 margin-bottom: 40px;
             }
 
-            .product-card {
+            .dtg-rec-product-card {
                 border: 1px solid #e0e0e0;
                 border-radius: 8px;
                 overflow: hidden;
@@ -447,13 +447,13 @@
                 background: white;
             }
 
-            .product-card:hover {
+            .dtg-rec-product-card:hover {
                 transform: translateY(-4px);
                 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
                 border-color: #2e5827;
             }
 
-            .product-image {
+            .dtg-rec-product-image {
                 position: relative;
                 height: 200px;
                 background: #f5f5f5;
@@ -463,17 +463,17 @@
                 overflow: hidden;
             }
 
-            .product-image img {
+            .dtg-rec-product-image img {
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
             }
 
-            .product-badge {
+            .dtg-rec-product-badge {
                 position: absolute;
                 top: 10px;
                 right: 10px;
-                background: #ff6b6b;
+                background: #2e7d32;
                 color: white;
                 padding: 4px 12px;
                 border-radius: 20px;
@@ -481,30 +481,30 @@
                 font-weight: 600;
             }
 
-            .product-info {
+            .dtg-rec-product-info {
                 padding: 16px;
             }
 
-            .product-info h4 {
+            .dtg-rec-product-info h4 {
                 margin: 0 0 8px;
                 color: #333;
                 font-size: 16px;
             }
 
-            .product-brand {
+            .dtg-rec-product-brand {
                 color: #666;
                 font-size: 14px;
                 margin: 0 0 8px;
             }
 
-            .product-sales {
+            .dtg-rec-product-sales {
                 color: #2e5827;
                 font-weight: 600;
                 margin: 0 0 8px;
                 font-size: 14px;
             }
 
-            .product-rating {
+            .dtg-rec-product-rating {
                 margin: 8px 0;
                 font-size: 14px;
             }
@@ -522,7 +522,7 @@
                 color: #333;
             }
 
-            .product-warning {
+            .dtg-rec-product-warning {
                 color: #e67e22;
                 font-size: 13px;
                 margin: 12px 0;
@@ -531,7 +531,7 @@
                 border-radius: 6px;
             }
 
-            .product-notes {
+            .dtg-rec-product-notes {
                 color: #666;
                 font-size: 13px;
                 font-style: italic;
@@ -601,7 +601,7 @@
                     grid-template-columns: 1fr;
                 }
 
-                .product-tabs {
+                .dtg-rec-product-tabs {
                     flex-direction: column;
                     width: 100%;
                 }

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Pricing API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .test-controls input {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .test-controls button {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .test-controls button:hover {
+            background: #0056b3;
+        }
+        .upcharge-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        .api-response {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 3px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .comparison-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .comparison-section h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Size Pricing API Test</h1>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div class="test-controls">
+            <label>Style Number:</label>
+            <input type="text" id="styleNumber" value="PC54" placeholder="e.g., PC54">
+            <button onclick="testAPI()">Test Size Pricing API</button>
+            <button onclick="testComparison()">Compare with Bundle API</button>
+        </div>
+        <div id="test-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Size Upcharge Display</h2>
+        <div class="upcharge-info" id="upcharge-display">
+            Click "Test Size Pricing API" to load upcharges
+        </div>
+    </div>
+
+    <div class="comparison-grid">
+        <div class="comparison-section">
+            <h3>Size Pricing API Response</h3>
+            <div class="api-response" id="size-api-response">
+                <pre>No data loaded yet</pre>
+            </div>
+        </div>
+        <div class="comparison-section">
+            <h3>Bundle API Response (for comparison)</h3>
+            <div class="api-response" id="bundle-api-response">
+                <pre>No data loaded yet</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    <script>
+        async function testAPI() {
+            const styleNumber = document.getElementById('styleNumber').value;
+            const statusEl = document.getElementById('test-status');
+            const responseEl = document.getElementById('size-api-response');
+            const displayEl = document.getElementById('upcharge-display');
+            const resultsEl = document.getElementById('test-results');
+
+            if (!styleNumber) {
+                statusEl.innerHTML = '<span class="status error">Please enter a style number</span>';
+                return;
+            }
+
+            statusEl.innerHTML = '<span class="status info">Testing API for ' + styleNumber + '...</span>';
+            displayEl.innerHTML = 'Loading...';
+            resultsEl.innerHTML = '';
+
+            try {
+                // Test the size-pricing API
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                const data = await response.json();
+
+                // Display raw API response
+                responseEl.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+
+                if (!response.ok) {
+                    statusEl.innerHTML = '<span class="status error">API Error: ' + (data.error || 'Unknown error') + '</span>';
+                    displayEl.innerHTML = 'Error loading data';
+                    return;
+                }
+
+                statusEl.innerHTML = '<span class="status success">API call successful!</span>';
+
+                // Use Universal Pricing Grid to display the upcharges
+                if (window.UniversalPricingGrid && data && data.length > 0) {
+                    // Get the upcharge container
+                    window.UniversalPricingGrid.upchargeContainer = displayEl;
+
+                    // Use the first color's data (they should all have the same sizes)
+                    const firstColor = data[0];
+
+                    // Extract available sizes from basePrices keys
+                    const availableSizes = Object.keys(firstColor.basePrices);
+
+                    // Update the grid with the filtered data
+                    window.UniversalPricingGrid.availableSizes = availableSizes;
+                    window.UniversalPricingGrid.upcharges = firstColor.sizeUpcharges || {};
+                    window.UniversalPricingGrid.updateUpchargeDisplay();
+
+                    // Run validation tests
+                    runValidationTests(firstColor, availableSizes);
+                } else if (!data || data.length === 0) {
+                    displayEl.innerHTML = '<span class="status error">No data returned from API</span>';
+                }
+
+            } catch (error) {
+                console.error('API test error:', error);
+                statusEl.innerHTML = '<span class="status error">Error: ' + error.message + '</span>';
+                responseEl.innerHTML = '<pre>Error: ' + error.message + '</pre>';
+                displayEl.innerHTML = 'Error loading data';
+            }
+        }
+
+        async function testComparison() {
+            const styleNumber = document.getElementById('styleNumber').value;
+            const sizeResponseEl = document.getElementById('size-api-response');
+            const bundleResponseEl = document.getElementById('bundle-api-response');
+            const statusEl = document.getElementById('test-status');
+
+            if (!styleNumber) {
+                statusEl.innerHTML = '<span class="status error">Please enter a style number</span>';
+                return;
+            }
+
+            statusEl.innerHTML = '<span class="status info">Comparing both APIs for ' + styleNumber + '...</span>';
+
+            try {
+                // Fetch from both APIs
+                const [sizeResponse, bundleResponse] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=${styleNumber}`)
+                ]);
+
+                const sizeData = await sizeResponse.json();
+                const bundleData = await bundleResponse.json();
+
+                // Display both responses
+                sizeResponseEl.innerHTML = '<pre>' + JSON.stringify(sizeData, null, 2) + '</pre>';
+                bundleResponseEl.innerHTML = '<pre>' + JSON.stringify({
+                    sizes: bundleData.sizes,
+                    sellingPriceDisplayAddOns: bundleData.sellingPriceDisplayAddOns
+                }, null, 2) + '</pre>';
+
+                statusEl.innerHTML = '<span class="status success">Comparison complete - see results below</span>';
+
+                // Compare the data
+                compareAPIResponses(sizeData, bundleData);
+
+            } catch (error) {
+                console.error('Comparison error:', error);
+                statusEl.innerHTML = '<span class="status error">Error: ' + error.message + '</span>';
+            }
+        }
+
+        function runValidationTests(colorData, availableSizes) {
+            const resultsEl = document.getElementById('test-results');
+            let resultsHTML = '<h3>Validation Results</h3>';
+
+            // Test 1: Check that sizeUpcharges only contains available sizes
+            const upcharges = colorData.sizeUpcharges || {};
+            const upchargeSizes = Object.keys(upcharges);
+            const invalidSizes = upchargeSizes.filter(size => !availableSizes.includes(size));
+
+            if (invalidSizes.length === 0) {
+                resultsHTML += '<div class="status success">✓ All upcharge sizes are valid</div>';
+            } else {
+                resultsHTML += '<div class="status error">❌ Found invalid sizes in upcharges: ' + invalidSizes.join(', ') + '</div>';
+            }
+
+            // Test 2: Check for tall sizes
+            const tallSizes = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT'];
+            const foundTallSizes = tallSizes.filter(size => availableSizes.includes(size));
+
+            if (foundTallSizes.length > 0) {
+                resultsHTML += '<div class="status info">ℹ️ This product has tall sizes: ' + foundTallSizes.join(', ') + '</div>';
+            } else {
+                resultsHTML += '<div class="status success">✓ No tall sizes (product uses standard sizing)</div>';
+            }
+
+            // Test 3: Check upcharge values
+            const nonZeroUpcharges = Object.entries(upcharges).filter(([size, value]) => value > 0);
+            if (nonZeroUpcharges.length > 0) {
+                resultsHTML += '<div class="status info">ℹ️ Sizes with upcharges: ' +
+                    nonZeroUpcharges.map(([size, value]) => `${size} (+$${value})`).join(', ') + '</div>';
+            } else {
+                resultsHTML += '<div class="status info">ℹ️ No size upcharges for this product</div>';
+            }
+
+            resultsEl.innerHTML = resultsHTML;
+        }
+
+        function compareAPIResponses(sizeData, bundleData) {
+            const resultsEl = document.getElementById('test-results');
+            let resultsHTML = '<h3>API Comparison Results</h3>';
+
+            if (!sizeData || sizeData.length === 0) {
+                resultsHTML += '<div class="status error">Size API returned no data</div>';
+                resultsEl.innerHTML = resultsHTML;
+                return;
+            }
+
+            const firstColor = sizeData[0];
+            const sizeUpcharges = firstColor.sizeUpcharges || {};
+            const bundleUpcharges = bundleData.sellingPriceDisplayAddOns || {};
+
+            // Compare the number of upcharges
+            const sizeUpchargeCount = Object.keys(sizeUpcharges).length;
+            const bundleUpchargeCount = Object.keys(bundleUpcharges).length;
+
+            resultsHTML += '<div class="status info">Size API upcharges: ' + sizeUpchargeCount + ' sizes</div>';
+            resultsHTML += '<div class="status info">Bundle API upcharges: ' + bundleUpchargeCount + ' sizes (all possible)</div>';
+
+            // Check which sizes are filtered out
+            const filteredOutSizes = Object.keys(bundleUpcharges).filter(size => !(size in sizeUpcharges));
+            if (filteredOutSizes.length > 0) {
+                resultsHTML += '<div class="status success">✓ Size API correctly filters out: ' + filteredOutSizes.join(', ') + '</div>';
+            }
+
+            // Verify the filtered upcharges match
+            let mismatch = false;
+            Object.keys(sizeUpcharges).forEach(size => {
+                if (bundleUpcharges[size] !== sizeUpcharges[size]) {
+                    resultsHTML += '<div class="status error">❌ Upcharge mismatch for ' + size +
+                        ': Bundle says $' + bundleUpcharges[size] + ', Size API says $' + sizeUpcharges[size] + '</div>';
+                    mismatch = true;
+                }
+            });
+
+            if (!mismatch) {
+                resultsHTML += '<div class="status success">✓ All upcharge values match between APIs</div>';
+            }
+
+            resultsEl.innerHTML = resultsHTML;
+        }
+
+        // Auto-run test when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can auto-test here if desired
+            // testAPI();
+        });
+    </script>
+</body>
+</html>

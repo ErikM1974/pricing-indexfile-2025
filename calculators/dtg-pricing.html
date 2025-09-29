@@ -30,11 +30,624 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        /* Enhanced Header Styles for DTG */
-        body.dtg-pricing-page {
-            padding-top: 200px; /* Space for fixed header */
+        /* DTG Pricing Table Styles */
+        .pricing-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 30px;
         }
-        
+
+        /* Import embroidery-style table design */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, #4cb354, #2d5f3f);
+            color: white;
+        }
+
+        .pricing-table thead th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .pricing-table thead th:first-child {
+            min-width: 200px;
+            text-align: left;
+        }
+
+        .pricing-table td {
+            padding: 24px 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .pricing-table tbody tr:hover {
+            background: rgba(76, 179, 84, 0.05);
+        }
+
+        .location-row.selected-location {
+            background: #e8f5e9 !important;
+        }
+
+        .location-name-cell {
+            padding: 24px 20px;
+            font-weight: 500;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .location-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .location-name {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .location-size {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .price-cell {
+            padding: 24px 20px;
+            text-align: center;
+            color: #4cb354;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .price-cell.clickable:hover {
+            background: rgba(76, 179, 84, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .price-cell.selected-cell {
+            background: #4cb354;
+            color: white;
+            font-weight: bold;
+        }
+
+        .price-cell.na-price {
+            color: #666;
+            font-style: italic;
+            cursor: default;
+            font-weight: 500;
+        }
+
+        .price-cell.na-price:hover {
+            background: transparent;
+            transform: none;
+        }
+
+        /* Location divider */
+        .location-divider-row td {
+            padding: 8px 12px;
+            background: #f0f4f1;
+            text-align: center;
+            font-weight: 600;
+            color: #2e5827;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Size upcharges table */
+        .size-upcharges-section table {
+            max-width: 400px;
+        }
+
+        .sizes-cell {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .upcharge-cell {
+            padding: 8px 12px;
+            text-align: right;
+            font-weight: 600;
+            color: #2e5827;
+        }
+
+        .upcharge-cell.base-price {
+            color: #666;
+            font-weight: normal;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .pricing-table-wrapper {
+                overflow-x: auto;
+            }
+
+            .pricing-table-scroll {
+                min-width: 600px;
+            }
+
+            .pricing-table {
+                font-size: 13px;
+            }
+
+            .pricing-table thead th,
+            .price-cell,
+            .location-name-cell {
+                padding: 8px;
+            }
+        }
+
+        /* CSS Variables */
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --warning-bg: #fef3c7;
+            --warning-border: #fbbf24;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .image-thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnail:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .image-thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.2);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* Order Information Section */
+        .order-info-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .order-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .order-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .order-info-icon {
+            background: var(--primary-color);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .order-info-content {
+            flex: 1;
+        }
+
+        .order-info-label {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .order-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 24px;
+            }
+
+            .pricing-section,
+            .order-info-section {
+                padding: 24px;
+            }
+        }
+
         .enhanced-pricing-header {
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -268,9 +881,56 @@
                 <div class="pricing-content-wrapper">
                     <!-- Quick Quote Calculator (hidden, replaced by v3) -->
                     <div id="quick-quote-container" style="display: none;"></div>
-                    
+
                     <!-- Pricing Grid Container (moved into step 3 by v3) -->
                     <div id="pricing-grid-container"></div>
+
+                    <!-- DTG Pricing Matrix Table -->
+                    <div class="pricing-section" id="dtgPricingSection" style="margin-top: 30px;">
+                        <h3 class="pricing-title" style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #24292e;">DTG Pricing Matrix</h3>
+
+                        <div class="pricing-table-wrapper">
+                            <div class="pricing-table-scroll">
+                                <table class="pricing-table" id="dtg-pricing-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Print Locations</th>
+                                            <th>24-47 pieces</th>
+                                            <th>48-71 pieces</th>
+                                            <th>72-143 pieces</th>
+                                            <th>144+ pieces</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dtg-location-tbody">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Show More Button -->
+                        <div style="text-align: center; margin: 15px 0;">
+                            <button id="show-all-locations-table" class="btn btn-secondary" style="padding: 8px 20px; font-size: 14px;">
+                                <span class="show-text">Show All Locations</span>
+                                <span class="hide-text" style="display: none;">Hide Locations</span>
+                                <i class="fas fa-chevron-down" style="margin-left: 5px;"></i>
+                            </button>
+                        </div>
+
+                        <!-- Size Upcharges Section -->
+                        <div class="size-upcharges-section" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Size Upcharges (Add to prices above)</h4>
+                            <table class="pricing-table" style="margin-bottom: 0;">
+                                <tbody id="dtg-sizes-tbody">
+                                    <!-- Populated dynamically from API -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="ltm-note" style="margin-top: 10px; font-size: 13px; color: #666; font-style: italic;">
+                            *Orders under 24 pieces add $50 LTM fee
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -309,8 +969,7 @@
     <!-- Clean Color Adapter -->
     <script src="/shared_components/js/clean-color-adapter.js"></script>
     
-    <!-- DTG Integration Layer -->
-    <script src="/shared_components/js/dtg-integration.js"></script>
+    <!-- DTG Integration Layer removed - causes UniversalQuickQuoteCalculator errors -->
     
     <!-- DTG v4 Simplified Single-Page Experience (Cleaned Version - Direct API Only) -->
     <script src="/shared_components/js/dtg-pricing-v4-cleaned.js"></script>

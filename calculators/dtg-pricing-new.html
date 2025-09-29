@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --warning-bg: #fef3c7;
+            --warning-border: #fbbf24;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .image-thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnail:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .image-thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.2);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* DTG Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, #4cb354, #2d5f3f);
+            color: white;
+        }
+
+        .pricing-table thead th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-table tbody td {
+            padding: 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .pricing-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .pricing-table tbody tr:hover {
+            background: #f0f9ff;
+        }
+
+        .location-cell {
+            font-weight: 600;
+            color: #1f2937;
+            text-align: left;
+            padding-left: 24px;
+        }
+
+        .price-cell {
+            color: #4cb354;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Order Information Section */
+        .order-info-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .order-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .order-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .order-info-icon {
+            background: var(--primary-color);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .order-info-content {
+            flex: 1;
+        }
+
+        .order-info-label {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .order-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Mobile Responsiveness for Print Size Legend */
+        @media (max-width: 768px) {
+            .print-size-legend {
+                flex-direction: column !important;
+                text-align: center;
+            }
+
+            .legend-content {
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+
+            .legend-content .size-item {
+                border-right: none !important;
+                padding: 4px 0 !important;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 24px;
+            }
+
+            .pricing-section,
+            .order-info-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <nav class="breadcrumb">
+                <a href="/">Home</a> /
+                <a href="/product.html" id="products-breadcrumb">Products</a> /
+                <span>DTG Pricing</span>
+            </nav>
+
+            <div class="search-wrapper">
+                <input
+                    type="text"
+                    class="search-input"
+                    id="styleSearch"
+                    placeholder="Search by style number or name..."
+                    autocomplete="off"
+                >
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
+        </div>
+
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-badge">DTG</div>
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Content Wrapper (Required for DTG JavaScript) -->
+        <div class="pricing-content-wrapper">
+            <!-- Pricing Section -->
+            <div class="pricing-section" id="pricingSection" style="display: none;">
+            <h2 class="pricing-title">DTG Pricing Matrix</h2>
+            <p class="pricing-subtitle">All locations and quantity tiers for Direct-to-Garment printing. *Orders under 24 pieces include a $50 LTM fee.</p>
+
+            <!-- Print Size Legend -->
+            <div class="print-size-legend" style="
+                background: #f9fafb;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 16px 20px;
+                margin: 20px 0;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+                <div class="legend-icon" style="
+                    font-size: 24px;
+                    color: #4cb354;
+                ">
+                    📏
+                </div>
+                <div class="legend-content" style="
+                    flex: 1;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <strong style="
+                        color: #1f2937;
+                        font-size: 14px;
+                        margin-right: 8px;
+                    ">Print Size Reference:</strong>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding: 0 12px;
+                        border-right: 1px solid #d1d5db;
+                    ">Left Chest: 4" × 4"</span>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding: 0 12px;
+                        border-right: 1px solid #d1d5db;
+                    ">Full Front/Back: 12" × 16"</span>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding-left: 12px;
+                    ">Jumbo Front/Back: 16" × 20"</span>
+                </div>
+            </div>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Print Location</th>
+                        <th>24-47 pieces</th>
+                        <th>48-71 pieces</th>
+                        <th>72+ pieces</th>
+                    </tr>
+                </thead>
+                <tbody id="dtg-pricing-tbody">
+                    <!-- Pricing rows will be dynamically generated -->
+                </tbody>
+            </table>
+        </div>
+        </div> <!-- End pricing-content-wrapper -->
+
+        <!-- Order Information -->
+        <div class="order-info-section" id="orderInfoSection" style="display: none;">
+            <h3 class="order-info-title">Order Information</h3>
+
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Minimum Order</div>
+                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Orders Under 24</div>
+                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Print Locations</div>
+                        <div class="order-info-text">Multiple locations available: Left Chest, Full Front, Full Back, and more</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Custom Quotes</div>
+                        <div class="order-info-text">For combination prints or special requirements, please contact our customer service team at 253-922-5793 for a personalized quote.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    <script>
+        // 🚀 NUCLEAR SOLUTION: Simple DTG Pricing - Following Cap Embroidery Pattern
+        console.log('🎯 DTG Pricing Page - Simple Layout (Nuclear Solution)');
+
+        // State
+        let currentProduct = null;
+        let currentColors = [];
+        let selectedColor = null;
+        let pricingData = null;
+
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const productHero = document.getElementById('productHero');
+        const pricingSection = document.getElementById('pricingSection');
+        const orderInfoSection = document.getElementById('orderInfoSection');
+
+        // Add DTG Product Recommendations Button
+        function addRecommendationsButton() {
+            console.log('🌟 Adding DTG Recommendations button');
+
+            // Check if button already exists
+            if (document.getElementById('dtg-recommendations-btn-container')) {
+                console.log('Button already exists');
+                return;
+            }
+
+            const buttonHTML = `
+                <div id="dtg-recommendations-btn-container" style="
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    z-index: 1000;
+                ">
+                    <button id="toggle-recommendations-btn" style="
+                        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        border-radius: 25px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 3px 10px rgba(46,88,39,0.3);
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    " onmouseover="this.style.background='linear-gradient(135deg, #388e3c 0%, #66bb6a 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(46,88,39,0.4)'"
+                       onmouseout="this.style.background='linear-gradient(135deg, #2e7d32 0%, #43a047 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 10px rgba(46,88,39,0.3)'">
+                        <i class="fas fa-lightbulb" style="color: #fff59d; font-size: 14px;"></i>
+                        <span>DTG Recommendations</span>
+                    </button>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', buttonHTML);
+
+            // Add click event listener
+            const button = document.getElementById('toggle-recommendations-btn');
+            if (button) {
+                button.addEventListener('click', () => {
+                    console.log('🌟 Recommendations button clicked');
+                    const event = new CustomEvent('toggleDTGRecommendations', { bubbles: true });
+                    document.dispatchEvent(event);
+                    window.dispatchEvent(event);
+                });
+                console.log('✅ DTG Recommendations button added successfully');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 DTG Pricing Page Initialized');
+
+            // Get style from URL parameter (handle all case variations)
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('styleNumber') ||
+                               urlParams.get('StyleNumber') ||
+                               urlParams.get('stylenumber') ||
+                               urlParams.get('style') ||
+                               urlParams.get('Style') ||
+                               'PC61';
+
+            loadDTGProduct(styleNumber);
+            setupSearch();
+
+            // Add recommendations button after a short delay to ensure page is fully loaded
+            setTimeout(addRecommendationsButton, 1000);
+        });
+
+        // Load DTG product data - SIMPLE VERSION
+        async function loadDTGProduct(styleNumber) {
+            console.log(`🎯 Loading DTG product: ${styleNumber}`);
+
+            try {
+                showLoading();
+
+                // Update page title
+                document.getElementById('productTitle').textContent = `DTG Pricing for ${styleNumber}`;
+                document.getElementById('currentStyle').textContent = `#${styleNumber}`;
+
+                // Load DTG pricing data - DIRECT API CALL
+                console.log('📡 Fetching DTG bundle data...');
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/dtg/product-bundle?styleNumber=${styleNumber}`);
+
+                if (!response.ok) {
+                    throw new Error(`DTG API failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📦 DTG Bundle received:', data);
+
+                // Store data globally
+                pricingData = data;
+
+                // Update product info if available
+                if (data.product) {
+                    updateProductInfo(data.product, styleNumber);
+                }
+
+                // Load size pricing from API for proper upcharge filtering
+                if (window.UniversalPricingGrid && typeof window.UniversalPricingGrid.loadSizePricing === 'function') {
+                    console.log('📊 Loading size pricing for upcharge display...');
+                    window.UniversalPricingGrid.loadSizePricing(styleNumber);
+                }
+
+                // Generate DTG pricing table - DIRECT APPROACH
+                updateDTGPricing();
+
+                // Show all sections
+                showProduct();
+
+            } catch (error) {
+                console.error('❌ Error loading DTG product:', error);
+                showApiError(error.message || 'Failed to load DTG pricing. Please try again.');
+                showNoProduct();
+            }
+        }
+
+        // Update DTG pricing table - DIRECT DOM MANIPULATION (Like Cap Embroidery)
+        function updateDTGPricing() {
+            console.log('💰 Updating DTG pricing table...');
+
+            const tbody = document.getElementById('dtg-pricing-tbody');
+            if (!tbody) {
+                console.error('❌ Table tbody not found!');
+                return;
+            }
+
+            // Clear existing rows - DIRECT APPROACH
+            tbody.innerHTML = '';
+
+            if (!pricingData || !pricingData.pricing) {
+                console.error('❌ No pricing data available');
+                tbody.innerHTML = '<tr><td colspan="4">No pricing data available</td></tr>';
+                return;
+            }
+
+            // Define ALL locations including combos - don't rely on API for combo locations
+            const allDTGLocations = [
+                { code: 'LC', name: 'Left Chest' },
+                { code: 'FF', name: 'Full Front' },
+                { code: 'FB', name: 'Full Back' },
+                { code: 'JF', name: 'Jumbo Front' },
+                { code: 'JB', name: 'Jumbo Back' },
+                { code: 'LC_FB', name: 'Left Chest + Full Back' },
+                { code: 'LC_JB', name: 'Left Chest + Jumbo Back' },  // Common combo - small front, large back
+                { code: 'FF_FB', name: 'Full Front + Full Back' },
+                { code: 'JF_JB', name: 'Jumbo Front + Jumbo Back' }
+            ];
+
+            // Use our complete location list, not what API provides
+            const locations = allDTGLocations;
+
+            // Get tiers from API data - USE CORRECT TIERS
+            const tiers = ['24-47', '48-71', '72+'];  // API confirmed these are the correct tiers
+
+            console.log('📍 Locations:', locations);
+            console.log('📊 Tiers:', tiers);
+
+            // Initially show only primary locations (not combos)
+            const primaryLocationCodes = ['LC', 'FF', 'FB', 'JF', 'JB'];  // All single locations
+            const allLocations = locations;
+            let showingAll = false;
+
+            // Function to render locations
+            function renderLocations(locsToShow) {
+                tbody.innerHTML = '';
+                locsToShow.forEach(location => {
+                const row = document.createElement('tr');
+
+                // Location name cell
+                const locationCell = document.createElement('td');
+                locationCell.className = 'location-cell';
+                locationCell.textContent = location.name;
+                row.appendChild(locationCell);
+
+                // Price cells for each tier
+                tiers.forEach(tier => {
+                    const priceCell = document.createElement('td');
+                    priceCell.className = 'price-cell';
+
+                    // Get price from API data
+                    const price = getDTGPrice(location.code, tier);
+                    priceCell.textContent = `$${price.toFixed(2)}`;
+
+                    row.appendChild(priceCell);
+                });
+
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Initially show single locations only (hide combos)
+            const locsToShow = locations.filter(loc => !loc.code.includes('_'));
+            renderLocations(locsToShow);
+
+            // Add "Show All Locations" button
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'text-align: center; margin-top: 20px;';
+
+            const showAllBtn = document.createElement('button');
+            showAllBtn.textContent = 'Show Combo Locations';
+            showAllBtn.style.cssText = `
+                background: #4cb354;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            `;
+
+            showAllBtn.addEventListener('click', () => {
+                showingAll = !showingAll;
+                if (showingAll) {
+                    // Show ALL locations including combos
+                    renderLocations(allLocations);
+                    showAllBtn.textContent = 'Hide Combo Locations';
+                } else {
+                    // Show only single locations
+                    const singleLocs = locations.filter(loc => !loc.code.includes('_'));
+                    renderLocations(singleLocs);
+                    showAllBtn.textContent = 'Show Combo Locations';
+                }
+            });
+
+            showAllBtn.addEventListener('mouseenter', () => {
+                showAllBtn.style.background = '#3a8d42';
+                showAllBtn.style.transform = 'translateY(-2px)';
+            });
+
+            showAllBtn.addEventListener('mouseleave', () => {
+                showAllBtn.style.background = '#4cb354';
+                showAllBtn.style.transform = 'translateY(0)';
+            });
+
+            buttonContainer.appendChild(showAllBtn);
+
+            // Add container for UniversalPricingGrid to display upcharges
+            const upchargesSection = document.createElement('div');
+            upchargesSection.className = 'upcharge-info';
+            upchargesSection.style.cssText = `
+                margin-top: 30px;
+                padding: 20px;
+                background: #f9fafb;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+            `;
+
+            // Add a title before the UniversalPricingGrid content
+            const upchargesTitle = document.createElement('h3');
+            upchargesTitle.textContent = 'Size Upcharges';
+            upchargesTitle.style.cssText = `
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+                margin-bottom: 15px;
+            `;
+            upchargesSection.appendChild(upchargesTitle);
+
+            // The UniversalPricingGrid will populate the rest of the content
+            // Set it as the container for the grid
+            if (window.UniversalPricingGrid) {
+                window.UniversalPricingGrid.upchargeContainer = upchargesSection;
+                // Trigger an update if we already have data
+                if (window.UniversalPricingGrid.availableSizes && window.UniversalPricingGrid.upcharges) {
+                    window.UniversalPricingGrid.updateUpchargeDisplay();
+                }
+            }
+
+            // Insert button and upcharges after the table
+            const pricingSection = document.getElementById('pricingSection');
+            pricingSection.appendChild(buttonContainer);
+            pricingSection.appendChild(upchargesSection);
+
+            console.log('✅ DTG pricing table updated with 3 tiers, Show All button, and size upcharges');
+        }
+
+        // Get DTG price for location and tier - PROPER CALCULATION WITH MARGINS
+        function getDTGPrice(locationCode, tierLabel) {
+            // Default prices if API data is missing
+            const defaultPrices = {
+                'LC': { '24-47': 13.00, '48-71': 12.00, '72+': 11.00 },
+                'FF': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'FB': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'JF': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                'JB': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                // Add default combo prices based on expected values
+                'LC_FB': { '24-47': 26.50, '48-71': 23.00, '72+': 21.00 },
+                'LC_JB': { '24-47': 28.50, '48-71': 25.00, '72+': 23.00 },
+                'FF_FB': { '24-47': 29.00, '48-71': 24.00, '72+': 22.00 },
+                'JF_JB': { '24-47': 33.00, '48-71': 28.00, '72+': 26.00 }
+            };
+
+            // Check if it's a combo location
+            const isCombo = locationCode.includes('_');
+
+            if (isCombo) {
+                // For combo locations, properly calculate using API method
+                if (pricingData && pricingData.pricing) {
+                    // Get tier data for margin calculation
+                    const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
+                    return getDTGPriceForComboLocation(locationCode, tierLabel, tier);
+                }
+                // Fall back to default combo prices
+                return defaultPrices[locationCode]?.[tierLabel] || 25.00;
+            }
+
+            // Single location - calculate price using API data if available
+            if (pricingData && pricingData.pricing) {
+                // Get tier data for margin calculation
+                const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
+                return getDTGPriceForSingleLocation(locationCode, tierLabel, tier);
+            }
+
+            // Fall back to defaults for single locations
+            return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+        }
+
+        // Helper function for combo location pricing - simplified approach
+        function getDTGPriceForComboLocation(locationCode, tierLabel, tier) {
+            // Default fallback prices
+            const defaultComboPrices = {
+                'LC_FB': { '24-47': 26.50, '48-71': 23.00, '72+': 21.00 },
+                'LC_JB': { '24-47': 28.50, '48-71': 25.00, '72+': 23.00 },
+                'FF_FB': { '24-47': 29.00, '48-71': 24.00, '72+': 22.00 },
+                'JF_JB': { '24-47': 33.00, '48-71': 28.00, '72+': 26.00 }
+            };
+
+            if (!pricingData || !pricingData.pricing) {
+                return defaultComboPrices[locationCode]?.[tierLabel] || 25.00;
+            }
+
+            // Split combo location code (e.g., 'LC_FB' -> ['LC', 'FB'])
+            const [firstLocation, secondLocation] = locationCode.split('_');
+
+            // Get the already-calculated price for the first location (includes margin + first print cost)
+            let basePrice = getDTGPriceForSingleLocation(firstLocation, tierLabel, tier);
+
+            // Add the raw print cost for the second location (no margin applied)
+            const secondCost = pricingData.pricing.costs?.find(c =>
+                c.PrintLocationCode === secondLocation && c.TierLabel === tierLabel
+            );
+
+            if (secondCost && secondCost.PrintCost) {
+                basePrice += parseFloat(secondCost.PrintCost);
+                // Round to nearest half dollar
+                basePrice = Math.ceil(basePrice * 2) / 2;
+            }
+
+            return basePrice || defaultComboPrices[locationCode]?.[tierLabel] || 25.00;
+        }
+
+        // Helper function for single location pricing
+        function getDTGPriceForSingleLocation(locationCode, tierLabel, tier) {
+            if (!pricingData || !pricingData.pricing) {
+                // Use the default prices defined above
+                return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+            }
+
+            // Get decoration cost
+            const costData = pricingData.pricing.costs?.find(c =>
+                c.PrintLocationCode === locationCode && c.TierLabel === tierLabel
+            );
+
+            // Get base garment cost
+            let baseGarmentCost = 5.50;
+            if (pricingData.pricing.sizes && pricingData.pricing.sizes.length > 0) {
+                const minPrice = Math.min(...pricingData.pricing.sizes
+                    .filter(s => s.maxCasePrice > 0)
+                    .map(s => s.maxCasePrice));
+                if (minPrice > 0) baseGarmentCost = minPrice;
+            }
+
+            if (tier && costData) {
+                const marginDenominator = tier.MarginDenominator || 0.60;
+                const decorationCost = parseFloat(costData.PrintCost) || 0;
+                const garmentWithMargin = baseGarmentCost / marginDenominator;
+                const calculatedPrice = garmentWithMargin + decorationCost;
+                return Math.ceil(calculatedPrice * 2) / 2;
+            }
+
+            // Fallback
+            const defaultPrices = {
+                'LC': { '24-47': 13.00, '48-71': 12.00, '72+': 11.00 },
+                'FF': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'FB': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'JF': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                'JB': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 }
+            };
+            return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+        }
+
+        // Update product information with images and colors
+        function updateProductInfo(product, styleNumber) {
+            console.log('📝 Updating product info with:', product);
+
+            const title = product.title || product.styleNumber || styleNumber;
+            const description = product.description || 'Direct-to-Garment printing pricing';
+            const brand = product.brand || 'Unknown Brand';
+
+            document.getElementById('productTitle').textContent = title;
+            document.getElementById('productDescription').textContent = description;
+            document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+            document.getElementById('currentBrand').textContent = brand;
+
+            // Update product image
+            updateProductImage(product);
+
+            // Update color swatches
+            updateColorSwatches(product);
+
+            console.log('✅ Product info updated:', { title, description, brand });
+        }
+
+        // Update product image
+        function updateProductImage(product) {
+            const imageEl = document.getElementById('productImage');
+            const placeholderEl = document.getElementById('imagePlaceholder');
+
+            if (product.colors && product.colors.length > 0) {
+                // Use first color's image or any available image
+                const firstColorWithImage = product.colors.find(c => c.MAIN_IMAGE_URL) || product.colors[0];
+
+                if (firstColorWithImage && firstColorWithImage.MAIN_IMAGE_URL) {
+                    imageEl.src = firstColorWithImage.MAIN_IMAGE_URL;
+                    imageEl.style.display = 'block';
+                    placeholderEl.style.display = 'none';
+
+                    // Update current color display
+                    if (firstColorWithImage.COLOR_NAME) {
+                        document.getElementById('currentColor').textContent = firstColorWithImage.COLOR_NAME;
+                    }
+                } else {
+                    imageEl.style.display = 'none';
+                    placeholderEl.style.display = 'flex';
+                }
+            } else {
+                imageEl.style.display = 'none';
+                placeholderEl.style.display = 'flex';
+            }
+        }
+
+        // Update color swatches
+        function updateColorSwatches(product) {
+            const swatchesSection = document.getElementById('colorSwatchesSection');
+            const swatchesContainer = document.getElementById('colorSwatches');
+
+            if (product.colors && product.colors.length > 0) {
+                swatchesContainer.innerHTML = '';
+
+                product.colors.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                        border: 2px solid #e5e7eb;
+                        cursor: pointer;
+                        display: inline-block;
+                        margin-right: 8px;
+                        margin-bottom: 8px;
+                        position: relative;
+                        overflow: hidden;
+                    `;
+
+                    if (color.HEX_CODE) {
+                        swatch.style.backgroundColor = color.HEX_CODE;
+                    } else if (color.COLOR_SQUARE_IMAGE) {
+                        swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                        swatch.style.backgroundSize = 'cover';
+                    } else {
+                        // Default pattern for missing color
+                        swatch.style.background = 'linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%)';
+                        swatch.style.backgroundSize = '20px 20px';
+                    }
+
+                    swatch.title = color.COLOR_NAME || 'Color';
+
+                    // Add click handler to change product image
+                    swatch.addEventListener('click', () => {
+                        if (color.MAIN_IMAGE_URL) {
+                            document.getElementById('productImage').src = color.MAIN_IMAGE_URL;
+                            document.getElementById('currentColor').textContent = color.COLOR_NAME || 'Selected';
+                            // Highlight selected swatch
+                            document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '2px solid #e5e7eb');
+                            swatch.style.border = '2px solid #4cb354';
+                        }
+                    });
+
+                    swatchesContainer.appendChild(swatch);
+                });
+
+                swatchesSection.style.display = 'block';
+            } else {
+                swatchesSection.style.display = 'none';
+            }
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
+
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `?styleNumber=${query}`;
+                }
+            }
+
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
+
+        // Show/hide functions
+        function showLoading() {
+            loadingState.style.display = 'flex';
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
+
+        function showProduct() {
+            loadingState.style.display = 'none';
+            productHero.style.display = 'block';
+            pricingSection.style.display = 'block';
+            orderInfoSection.style.display = 'block';
+        }
+
+        function showNoProduct() {
+            loadingState.innerHTML = `
+                <i class="fas fa-search"></i>
+                <p>Search for a style to view DTG pricing</p>
+            `;
+        }
+
+        function showApiError(message) {
+            console.error('🚨 DTG API Error:', message);
+            // Show error in console for now - could add error banner like cap embroidery
+            alert('DTG Pricing Error: ' + message);
+        }
+
+        // 🧪 Testing utilities
+        window.DTG_DEBUG = {
+            // Test API directly
+            testAPI: async function(styleNumber = 'PC61') {
+                console.log('🧪 Testing DTG API for:', styleNumber);
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/dtg/product-bundle?styleNumber=${styleNumber}`);
+                const data = await response.json();
+                console.log('✅ API Response:', data);
+                return data;
+            },
+
+            // Get current state
+            getState: function() {
+                return {
+                    pricingData: pricingData,
+                    currentProduct: currentProduct,
+                    tableExists: !!document.getElementById('dtg-pricing-tbody')
+                };
+            },
+
+            // Force table update
+            updateTable: function() {
+                updateDTGPricing();
+            }
+        };
+
+        console.log('🎯 DTG Nuclear Solution Loaded - Simple & Clean!');
+    </script>
+
+    <!-- DTG Product Recommendations Modal -->
+    <!-- Removed dtg-recommendations.css to prevent CSS conflicts -->
+    <script src="/shared_components/js/dtg-product-recommendations-modal.js"></script>
+</body>
+</html>

@@ -517,7 +517,7 @@ app.get('/pricing/cap-embroidery', (req, res) => {
 });
 
 app.get('/pricing/dtg', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'dtg-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'dtg-pricing-new.html'));
 });
 
 app.get('/pricing/screen-print', (req, res) => {

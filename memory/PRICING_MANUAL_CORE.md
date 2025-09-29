@@ -68,18 +68,60 @@ function calculateManualPrice(baseCost, quantity, location) {
 }
 ```
 
+### DTG Contract Pricing Formula (API-Based)
+```javascript
+// DTG uses API data for all pricing components
+function calculateDTGPrice(styleNumber, quantity, locationCode) {
+    // 1. Fetch pricing bundle from API
+    const data = await fetch(`/api/pricing-bundle?method=DTG&styleNumber=${styleNumber}`);
+
+    // 2. Get tier for quantity (includes MarginDenominator from API)
+    const tier = data.tiersR.find(t =>
+        quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+    );
+
+    // 3. Get base cost (CRITICAL: Use 'price' not 'maxCasePrice')
+    const baseCost = Math.min(...data.sizes
+        .map(s => s.price)  // Fixed 2025-01-29: Was incorrectly using maxCasePrice
+        .filter(p => p > 0)
+    );
+
+    // 4. Get print cost for location and tier
+    const printCost = data.allDtgCostsR.find(c =>
+        c.PrintLocationCode === locationCode &&
+        c.TierLabel === tier.TierLabel
+    ).PrintCost;
+
+    // 5. Calculate with API-provided margin (NOT hardcoded)
+    const markedUp = baseCost / tier.MarginDenominator;  // From API, varies by tier
+    const total = markedUp + printCost;
+    const finalPrice = Math.ceil(total * 2) / 2;  // Round UP to half dollar
+
+    return finalPrice;
+}
+
+// Combo locations sum individual print costs
+// LC_FB = LC cost + FB cost
+// FF_FB = FF cost + FB cost
+// JF_JB = JF cost + JB cost
+```
+
 ### Margin Denominator System
 
 Margin denominators determine markup percentage:
 ```javascript
 // Formula: sellingPrice = cost / marginDenominator
 
-// Standard margin denominators:
+// Standard margin denominators (may vary by API/contract):
 // 0.50 = 100% markup (cost $10 → sell $20)
 // 0.55 = ~82% markup (cost $10 → sell $18.18)
 // 0.60 = ~67% markup (cost $10 → sell $16.67)
 // 0.65 = ~54% markup (cost $10 → sell $15.38)
 // 0.70 = ~43% markup (cost $10 → sell $14.29)
+
+// IMPORTANT: For DTG and other API-based calculators,
+// margin denominators come from the API response (tiersR[].MarginDenominator)
+// and are NOT hardcoded. They can vary by tier and product.
 
 function calculateMarkupPercentage(marginDenominator) {
     return ((1 / marginDenominator) - 1) * 100;

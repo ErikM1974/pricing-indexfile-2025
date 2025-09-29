@@ -200,6 +200,64 @@ function hideLoading(element, content) {
 }
 ```
 
+## 🎯 DTG Pricing Calculation Pattern
+
+### Complete DTG Pricing Formula
+```javascript
+function calculateDTGPrice(styleNumber, quantity, locationCode) {
+    // 1. Fetch pricing bundle from API
+    const data = await fetch(`/api/pricing-bundle?method=DTG&styleNumber=${styleNumber}`);
+
+    // 2. Get tier for quantity
+    const tier = data.tiersR.find(t =>
+        quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+    );
+
+    // 3. Get base cost (lowest price)
+    const baseCost = Math.min(...data.sizes
+        .map(s => s.price)  // CRITICAL: Use 'price' not 'maxCasePrice'
+        .filter(p => p > 0)
+    );
+
+    // 4. Get print cost for location and tier
+    const printCost = data.allDtgCostsR.find(c =>
+        c.PrintLocationCode === locationCode &&
+        c.TierLabel === tier.TierLabel
+    ).PrintCost;
+
+    // 5. Calculate final price
+    const markedUp = baseCost / tier.MarginDenominator;  // From API, not hardcoded
+    const total = markedUp + printCost;
+    const finalPrice = Math.ceil(total * 2) / 2;  // Round UP to half dollar
+
+    return finalPrice;
+}
+```
+
+### Combo Location Calculations
+Combo locations sum the print costs of individual locations:
+- `LC_FB` = LC cost + FB cost
+- `FF_FB` = FF cost + FB cost
+- `JF_JB` = JF cost + JB cost
+- `LC_JB` = LC cost + JB cost
+
+### Field Name Mapping Issues (Fixed 2025-01-29)
+- **Problem**: Service was using `sizes[].maxCasePrice`
+- **Solution**: Changed to `sizes[].price`
+- **Impact**: ~$1 discrepancy in displayed prices
+- **Files Fixed**: `/shared_components/js/dtg-pricing-service.js` lines 201 and 224
+
+### Verification Examples
+```javascript
+// PC54 at qty 48, Left Chest
+// Base: $2.85, Margin: 0.6, Print: $6.00
+// $2.85/0.6 + $6.00 = $10.75 → $11.00 ✓
+
+// PC61 at qty 73, Left Chest
+// Base: $3.53, Margin: 0.6, Print: $5.00
+// $3.53/0.6 + $5.00 = $10.88 → $11.00 ✓
+```
+
 ## 🔄 State Management Patterns
 
 ### Where to Store State

@@ -119,7 +119,9 @@
       "Bash(for file in c112-bogo-promo.js dp5-helper.js cart-price-recalculator.js)",
       "Bash(do echo \"=== Checking $file ===\")",
       "Bash(for file in inventory-details.html policies-hub.html resources.html sale.html webstore-info.html top-sellers-showcase.html)",
-      "Bash(do echo \"=== $file ===\")"
+      "Bash(do echo \"=== $file ===\")",
+      "Read(///**)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": [],
