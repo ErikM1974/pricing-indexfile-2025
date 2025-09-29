@@ -95,17 +95,7 @@ app.get('/product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'product.html'));
 });
 
-// Serve top sellers public product page
-app.get('/top-sellers-product.html', (req, res) => {
-  console.log('Serving top-sellers-product.html page');
-  res.sendFile(path.join(__dirname, 'top-sellers-product.html'));
-});
-
-// Serve top sellers public showcase page
-app.get('/top-sellers-showcase.html', (req, res) => {
-  console.log('Serving top-sellers-showcase.html page');
-  res.sendFile(path.join(__dirname, 'top-sellers-showcase.html'));
-});
+// Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
@@ -156,9 +146,7 @@ app.get('/art-invoice-unified-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-invoice-unified-dashboard.html'));
 });
 
-app.get('/webstore-info.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'webstore-info.html'));
-});
+// Removed duplicate route - webstore-info.html is now served from /pages/ directory (see line 328)
 
 app.get('/universal-records-admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'universal-records-admin.html'));
@@ -261,10 +249,7 @@ app.get('/monogramform.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'monogramform.html'));
 });
 
-// Policies pages
-app.get('/policies-hub.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'policies-hub.html'));
-});
+// Removed duplicate route - policies-hub.html is now served from /pages/ directory (see line 314)
 
 // Christmas Bundles Calculator page
 app.get('/christmas-bundles.html', (req, res) => {
@@ -488,10 +473,7 @@ app.get('/cart', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart.html'));
 });
 
-// Serve inventory-details.html as a specific page
-app.get('/inventory-details.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'inventory-details.html'));
-});
+// Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
 
 // Serve AI Designer iframe page
 app.get('/ai-designer.html', (req, res) => {
