@@ -236,7 +236,7 @@
             // Also dispatch dtg-specific event with full bundle for universal pricing grid
             window.dispatchEvent(new CustomEvent('dtgPricingDataLoaded', {
                 detail: {
-                    bundle: masterBundle,
+                    bundle: compatBundle,
                     embellishmentType: 'dtg'
                 }
             }));

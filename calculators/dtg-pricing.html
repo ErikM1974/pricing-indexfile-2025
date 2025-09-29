@@ -4,198 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DTG Pricing | Northwest Custom Apparel</title>
-    
-    <!-- Shared CSS -->
-    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
-    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
-    
-    <!-- DTG Specific CSS -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-specific.css">
-    <link rel="stylesheet" href="/shared_components/css/clean-color-swatches.css">
-    <link rel="stylesheet" href="/shared_components/css/image-modal.css">
-    <link rel="stylesheet" href="/shared_components/css/dtg-recommendations.css">
-    
-    <!-- Modern pricing table for embroidery-style display -->
-    <link rel="stylesheet" href="/shared_components/css/modern-pricing-table.css">
-    
-    <!-- DTG specific pricing table fixes -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-pricing-table-fix.css">
-    
-    <!-- PDF Export Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* DTG Pricing Table Styles */
-        .pricing-section {
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-top: 30px;
-        }
-
-        /* Import embroidery-style table design */
-        .pricing-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-        }
-
-        .pricing-table thead {
-            background: linear-gradient(135deg, #4cb354, #2d5f3f);
-            color: white;
-        }
-
-        .pricing-table thead th {
-            padding: 20px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        .pricing-table thead th:first-child {
-            min-width: 200px;
-            text-align: left;
-        }
-
-        .pricing-table td {
-            padding: 24px 20px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .pricing-table tbody tr:hover {
-            background: rgba(76, 179, 84, 0.05);
-        }
-
-        .location-row.selected-location {
-            background: #e8f5e9 !important;
-        }
-
-        .location-name-cell {
-            padding: 24px 20px;
-            font-weight: 500;
-            text-align: left;
-            font-size: 16px;
-        }
-
-        .location-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .location-name {
-            color: #333;
-            font-size: 14px;
-        }
-
-        .location-size {
-            color: #666;
-            font-size: 12px;
-            margin-top: 2px;
-        }
-
-        .price-cell {
-            padding: 24px 20px;
-            text-align: center;
-            color: #4cb354;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .price-cell.clickable:hover {
-            background: rgba(76, 179, 84, 0.05);
-            transform: translateY(-1px);
-        }
-
-        .price-cell.selected-cell {
-            background: #4cb354;
-            color: white;
-            font-weight: bold;
-        }
-
-        .price-cell.na-price {
-            color: #666;
-            font-style: italic;
-            cursor: default;
-            font-weight: 500;
-        }
-
-        .price-cell.na-price:hover {
-            background: transparent;
-            transform: none;
-        }
-
-        /* Location divider */
-        .location-divider-row td {
-            padding: 8px 12px;
-            background: #f0f4f1;
-            text-align: center;
-            font-weight: 600;
-            color: #2e5827;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Size upcharges table */
-        .size-upcharges-section table {
-            max-width: 400px;
-        }
-
-        .sizes-cell {
-            padding: 8px 12px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .upcharge-cell {
-            padding: 8px 12px;
-            text-align: right;
-            font-weight: 600;
-            color: #2e5827;
-        }
-
-        .upcharge-cell.base-price {
-            color: #666;
-            font-weight: normal;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .pricing-table-wrapper {
-                overflow-x: auto;
-            }
-
-            .pricing-table-scroll {
-                min-width: 600px;
-            }
-
-            .pricing-table {
-                font-size: 13px;
-            }
-
-            .pricing-table thead th,
-            .price-cell,
-            .location-name-cell {
-                padding: 8px;
-            }
-        }
-
-        /* CSS Variables */
         :root {
             --primary-color: #4cb354;
             --primary-dark: #409a47;
@@ -266,6 +82,77 @@
             align-items: center;
             gap: 15px;
             position: relative;
+        }
+
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-loading {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-style {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .search-result-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 2px;
+        }
+
+        .search-results-section {
+            margin-bottom: 8px;
+        }
+
+        .search-results-title {
+            padding: 8px 12px;
+            background-color: #f3f4f6;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #4b5563;
         }
 
         .search-input {
@@ -517,7 +404,7 @@
         .color-swatches {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
         }
 
         .color-swatch {
@@ -562,6 +449,56 @@
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 32px;
+        }
+
+        /* DTG Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, #4cb354, #2d5f3f);
+            color: white;
+        }
+
+        .pricing-table thead th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-table tbody td {
+            padding: 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .pricing-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .pricing-table tbody tr:hover {
+            background: #f0f9ff;
+        }
+
+        .location-cell {
+            font-weight: 600;
+            color: #1f2937;
+            text-align: left;
+            padding-left: 24px;
+        }
+
+        .price-cell {
+            color: #4cb354;
+            font-size: 18px;
+            font-weight: 700;
         }
 
         /* Order Information Section */
@@ -627,6 +564,315 @@
             line-height: 1.5;
         }
 
+        /* Mobile Responsiveness for Print Size Legend */
+        @media (max-width: 768px) {
+            .print-size-legend {
+                flex-direction: column !important;
+                text-align: center;
+            }
+
+            .legend-content {
+                flex-direction: column !important;
+                gap: 4px !important;
+            }
+
+            .legend-content .size-item {
+                border-right: none !important;
+                padding: 4px 0 !important;
+            }
+        }
+
+        /* DTG Recommendations Section */
+        .dtg-recommendations-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin: 40px 0;
+        }
+
+        .dtg-rec-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dtg-rec-subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        /* DTG Disclaimer Styles */
+        .dtg-disclaimer {
+            display: flex;
+            gap: 20px;
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0 35px 0;
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+        }
+
+        .dtg-disclaimer-icon {
+            flex-shrink: 0;
+            font-size: 32px;
+            color: #d97706;
+        }
+
+        .dtg-disclaimer-content h4 {
+            margin: 0 0 12px 0;
+            color: #92400e;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dtg-disclaimer-content ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .dtg-disclaimer-content li {
+            margin-bottom: 8px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .dtg-disclaimer-content li:last-child {
+            margin-bottom: 0;
+        }
+
+        .dtg-recommendations-grid {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 20px;
+            margin-top: 24px;
+            padding: 10px 0 20px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dtg-product-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 0 0 280px; /* Fixed width for horizontal scroll */
+            min-height: 420px; /* Consistent height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dtg-product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: #4cb354;
+        }
+
+        .dtg-card-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #4cb354;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .dtg-card-image {
+            width: 100%;
+            height: 200px;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .dtg-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .dtg-product-card:hover .dtg-card-image img {
+            transform: scale(1.05);
+        }
+
+        /* Mobile responsiveness for DTG recommendations */
+        @media (max-width: 768px) {
+            .dtg-recommendations-section {
+                padding: 20px 15px;
+                margin: 20px 0;
+            }
+
+            .dtg-rec-title {
+                font-size: 20px;
+            }
+
+            .dtg-recommendations-grid {
+                gap: 16px;
+                padding: 10px 0 16px 0;
+            }
+
+            .dtg-product-card {
+                flex: 0 0 260px; /* Slightly smaller on tablets */
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dtg-recommendations-grid {
+                gap: 12px;
+                padding: 8px 0 12px 0;
+            }
+
+            .dtg-product-card {
+                flex: 0 0 240px; /* Smaller on phones */
+                min-height: 380px;
+            }
+
+            .dtg-product-badge {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+            }
+
+            .dtg-card-title {
+                font-size: 16px;
+            }
+
+            .dtg-card-rating {
+                font-size: 12px;
+            }
+        }
+
+        .dtg-card-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .dtg-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 4px 0;
+        }
+
+        .dtg-card-subtitle {
+            font-size: 14px;
+            color: #4b5563;
+            margin: 0 0 4px 0;
+        }
+
+        .dtg-card-brand {
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dtg-card-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .dtg-card-rating .stars {
+            color: #fbbf24;
+            letter-spacing: 2px;
+        }
+
+        .dtg-card-rating .sales {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .dtg-card-colors {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .dtg-card-colors strong {
+            color: #4b5563;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .dtg-card-warning {
+            background: #fef2f2;
+            color: #dc2626;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .dtg-card-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4cb354 0%, #5fd966 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .dtg-card-button:hover {
+            background: linear-gradient(135deg, #45a049 0%, #52c956 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .product-content {
@@ -648,505 +894,1175 @@
             }
         }
 
-        .enhanced-pricing-header {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+        /* Product Grouping Styles */
+        .dtg-product-section {
+            margin-bottom: 32px;
         }
-        
-        /* Top contact bar */
-        .header-contact-bar {
-            background: #2d5f3f;
-            color: white;
-            padding: 10px 0;
-            font-size: 14px;
-        }
-        
-        .contact-bar-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .contact-info {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
-        
-        .contact-item {
+
+        .dtg-section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        
-        .contact-item i {
-            font-size: 13px;
-            opacity: 0.9;
+
+        .dtg-section-title i {
+            color: #16a34a;
+            font-size: 20px;
         }
-        
-        .business-hours {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        /* Main navigation header */
-        .header-nav {
-            padding: 15px 0;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .nav-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
+
+        .dtg-section-grid {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 8px 0 16px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        /* Logo section */
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 40px;
+
+        .dtg-section-grid::-webkit-scrollbar {
+            height: 6px;
         }
-        
-        .logo-link {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
+
+        .dtg-section-grid::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 3px;
         }
-        
-        .logo-image {
-            height: 50px;
-            width: auto;
-            max-width: 200px;
+
+        .dtg-section-grid::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
         }
-        
-        /* Pricing context bar */
-        .pricing-context-bar {
-            background: #f8f9fa;
-            padding: 15px 0;
-            border-bottom: 2px solid #3a7c52;
+
+        @media (max-width: 768px) {
+            .dtg-section-grid {
+                gap: 14px;
+                padding: 6px 0 12px 0;
+            }
+
+            .dtg-section-title {
+                font-size: 20px;
+                padding: 10px 14px;
+            }
+
+            .dtg-product-section {
+                margin-bottom: 24px;
+            }
         }
-        
-        .context-bar-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        /* Breadcrumb and product */
-        .context-left {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-        
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        /* Live pricing in header */
-        .header-live-pricing {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 16px;
-        }
-        
-        .header-price-item {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-        
-        .header-price-label {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .header-price-value {
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .header-price-value.highlight {
-            color: #3a7c52;
-            font-size: 18px;
+
+        @media (max-width: 480px) {
+            .dtg-section-title {
+                font-size: 18px;
+                padding: 8px 12px;
+            }
+
+            .dtg-section-title i {
+                font-size: 18px;
+            }
         }
     </style>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="dtg-pricing-page">
-    <!-- Enhanced Pricing Header -->
-    <header class="enhanced-pricing-header">
-        <!-- Contact Bar -->
-        <div class="header-contact-bar">
-            <div class="contact-bar-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <span>(253) 922-5793</span>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>sales@nwcustomapparel.com</span>
-                    </div>
-                </div>
-                <div class="business-hours">
-                    <i class="fas fa-clock"></i>
-                    Monday - Friday: 8:30 AM - 5:00 PM PST
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main Navigation -->
-        <div class="header-nav">
-            <div class="nav-content">
-                <!-- Logo and Navigation -->
-                <div class="logo-section">
-                    <a href="/" class="logo-link">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                             alt="Northwest Custom Apparel" 
-                             class="logo-image">
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Pricing Context Bar -->
-        <div class="pricing-context-bar">
-            <div class="context-bar-content">
-                <div class="context-left">
-                    <!-- Breadcrumb -->
-                    <div class="breadcrumb">
-                        <span>DTG Pricing Calculator</span>
-                    </div>
-                </div>
-                
-                <!-- Live Pricing -->
-                <div class="header-live-pricing">
-                    <div class="header-price-item">
-                        <span class="header-price-label">Qty:</span>
-                        <span id="header-quantity" class="header-price-value">24</span>
-                    </div>
-                    <div class="header-price-item">
-                        <span class="header-price-label">Per Shirt:</span>
-                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
-                    </div>
-                </div>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <nav class="breadcrumb">
+                <a href="/">Home</a> /
+                <a href="/product.html" id="products-breadcrumb">Products</a> /
+                <span>DTG Pricing</span>
+            </nav>
+
+            <div class="search-wrapper">
+                <input
+                    type="text"
+                    class="search-input"
+                    id="styleSearch"
+                    placeholder="Search by style number or name..."
+                    autocomplete="off"
+                >
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
     </header>
-    
-    <!-- Universal Header (hidden now that we have the enhanced header) -->
-    <div id="universal-header-container" data-page-type="dtg" style="display: none;"></div>
-    
-    <div class="container">
-        <!-- Hidden elements for legacy compatibility -->
-        <h1 style="display: none;">DTG Pricing</h1>
-        <input type="text" id="style-search-input" style="display: none;" />
-        <button id="search-button" style="display: none;"></button>
-        
-        <!-- Two-Column Layout -->
-        <div class="product-page-columns-container">
-            
-            <!-- Left Column: Product Context -->
-            <div class="product-context-column">
-                <div id="product-display"></div>
-            </div>
-            
-            <!-- Right Column: Interactive Elements -->
-            <div class="product-interactive-column">
-                <!-- DTG v3 Visual Location Selector takes over here -->
-                <div class="pricing-content-wrapper">
-                    <!-- Quick Quote Calculator (hidden, replaced by v3) -->
-                    <div id="quick-quote-container" style="display: none;"></div>
 
-                    <!-- Pricing Grid Container (moved into step 3 by v3) -->
-                    <div id="pricing-grid-container"></div>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
+        </div>
 
-                    <!-- DTG Pricing Matrix Table -->
-                    <div class="pricing-section" id="dtgPricingSection" style="margin-top: 30px;">
-                        <h3 class="pricing-title" style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #24292e;">DTG Pricing Matrix</h3>
-
-                        <div class="pricing-table-wrapper">
-                            <div class="pricing-table-scroll">
-                                <table class="pricing-table" id="dtg-pricing-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Print Locations</th>
-                                            <th>24-47 pieces</th>
-                                            <th>48-71 pieces</th>
-                                            <th>72-143 pieces</th>
-                                            <th>144+ pieces</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="dtg-location-tbody">
-                                        <!-- Populated by JavaScript -->
-                                    </tbody>
-                                </table>
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-badge">DTG</div>
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
                             </div>
                         </div>
-
-                        <!-- Show More Button -->
-                        <div style="text-align: center; margin: 15px 0;">
-                            <button id="show-all-locations-table" class="btn btn-secondary" style="padding: 8px 20px; font-size: 14px;">
-                                <span class="show-text">Show All Locations</span>
-                                <span class="hide-text" style="display: none;">Hide Locations</span>
-                                <i class="fas fa-chevron-down" style="margin-left: 5px;"></i>
-                            </button>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Size Upcharges Section -->
-                        <div class="size-upcharges-section" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Size Upcharges (Add to prices above)</h4>
-                            <table class="pricing-table" style="margin-bottom: 0;">
-                                <tbody id="dtg-sizes-tbody">
-                                    <!-- Populated dynamically from API -->
-                                </tbody>
-                            </table>
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
                         </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
 
-                        <p class="ltm-note" style="margin-top: 10px; font-size: 13px; color: #666; font-style: italic;">
-                            *Orders under 24 pieces add $50 LTM fee
-                        </p>
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Caspio Data Source Removed - Using Direct API Only -->
-        
-        <!-- Hidden elements for quote system compatibility -->
-        <div id="size-quantity-grid-container" style="display: none;"></div>
-        <div id="quote-container" style="display: none;"></div>
+
+        <!-- Pricing Content Wrapper (Required for DTG JavaScript) -->
+        <div class="pricing-content-wrapper">
+            <!-- Pricing Section -->
+            <div class="pricing-section" id="pricingSection" style="display: none;">
+            <h2 class="pricing-title">DTG Pricing Matrix</h2>
+            <p class="pricing-subtitle">All locations and quantity tiers for Direct-to-Garment printing. *Orders under 24 pieces include a $50 LTM fee.</p>
+
+            <!-- Print Size Legend -->
+            <div class="print-size-legend" style="
+                background: #f9fafb;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 16px 20px;
+                margin: 20px 0;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+                <div class="legend-icon" style="
+                    font-size: 24px;
+                    color: #4cb354;
+                ">
+                    📏
+                </div>
+                <div class="legend-content" style="
+                    flex: 1;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 8px;
+                ">
+                    <strong style="
+                        color: #1f2937;
+                        font-size: 14px;
+                        margin-right: 8px;
+                    ">Print Size Reference:</strong>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding: 0 12px;
+                        border-right: 1px solid #d1d5db;
+                    ">Left Chest: 4" × 4"</span>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding: 0 12px;
+                        border-right: 1px solid #d1d5db;
+                    ">Full Front/Back: 12" × 16"</span>
+                    <span class="size-item" style="
+                        color: #6b7280;
+                        font-size: 14px;
+                        padding-left: 12px;
+                    ">Jumbo Front/Back: 16" × 20"</span>
+                </div>
+            </div>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Print Location</th>
+                        <th>24-47 pieces</th>
+                        <th>48-71 pieces</th>
+                        <th>72+ pieces</th>
+                    </tr>
+                </thead>
+                <tbody id="dtg-pricing-tbody">
+                    <!-- Pricing rows will be dynamically generated -->
+                </tbody>
+            </table>
+        </div>
+        </div> <!-- End pricing-content-wrapper -->
+
+        <!-- Order Information -->
+        <div class="order-info-section" id="orderInfoSection" style="display: none;">
+            <h3 class="order-info-title">Order Information</h3>
+
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Minimum Order</div>
+                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Orders Under 24</div>
+                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Print Locations</div>
+                        <div class="order-info-text">Multiple locations available: Left Chest, Full Front, Full Back, and more</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Custom Quotes</div>
+                        <div class="order-info-text">For combination prints or special requirements, please contact our customer service team at 253-922-5793 for a personalized quote.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DTG Product Recommendations Section -->
+        <div class="dtg-recommendations-section">
+            <h3 class="dtg-rec-title">
+                <i class="fas fa-star" style="color: #ffd700;"></i>
+                Best Products for DTG Printing
+            </h3>
+            <p class="dtg-rec-subtitle">Based on 50,000+ successful prints</p>
+
+            <!-- Important DTG Disclaimer -->
+            <div class="dtg-disclaimer">
+                <div class="dtg-disclaimer-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="dtg-disclaimer-content">
+                    <h4>Important DTG Printing Information</h4>
+                    <ul>
+                        <li><strong>⚠️ No Gildan Products:</strong> We cannot print on Gildan brand apparel due to fabric treatment that prevents proper ink adhesion.</li>
+                        <li><strong>✅ Best Results:</strong> We prefer 100% cotton garments for optimal print quality and durability.</li>
+                        <li><strong>💡 Pro Tip:</strong> Dark colors like black, navy, and dark heather grey provide the best contrast for vibrant DTG prints.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="dtg-recommendations-grid" class="dtg-recommendations-grid">
+                <!-- Product cards will be loaded here -->
+            </div>
+        </div>
     </div>
-    
-    <!-- Core JavaScript -->
-    <script src="/shared_components/js/utils.js"></script>
-    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
-    <script src="/shared_components/js/pricing-matrix-capture-fix.js"></script>
-    <script src="/shared_components/js/pricing-matrix-api.js"></script>
-    <script src="/shared_components/js/dp5-helper.js"></script>
-    <script src="/product-url-handler.js"></script>
-    
-    <!-- DTG Specific JavaScript -->
-    <script src="/shared_components/js/dtg-config.js"></script>
-    <script src="/shared_components/js/dtg-page-setup.js"></script>
-    
-    <!-- New Direct API Service (Phase 1 Migration) -->
-    <script src="/shared_components/js/dtg-pricing-service.js"></script>
-    
-    <!-- Legacy Master Bundle System Removed - Direct API Only -->
-    
-    <!-- Universal Components -->
-    <script src="/shared_components/js/universal-header-component.js"></script>
-    <script src="/shared_components/js/universal-product-display.js"></script>
-    <script src="/shared_components/js/universal-image-gallery.js"></script>
-    <script src="/shared_components/js/universal-quick-quote-calculator.js"></script>
+
+    <!-- JavaScript -->
     <script src="/shared_components/js/universal-pricing-grid.js"></script>
-    
-    <!-- Clean Color Adapter -->
-    <script src="/shared_components/js/clean-color-adapter.js"></script>
-    
-    <!-- DTG Integration Layer removed - causes UniversalQuickQuoteCalculator errors -->
-    
-    <!-- DTG v4 Simplified Single-Page Experience (Cleaned Version - Direct API Only) -->
-    <script src="/shared_components/js/dtg-pricing-v4-cleaned.js"></script>
-    
-    <!-- DTG Product Recommendations Modal -->
-    <script src="/shared_components/js/dtg-product-recommendations-modal.js"></script>
-    
-    <!-- Initialization Scripts -->
     <script>
-        // Bridge functions for legacy compatibility
-        window.loadProductDetails = function(styleNumber) {
-            console.log('[DTG-Bridge] Loading product:', styleNumber);
-            if (window.DTGPageSetup) {
-                window.DTGPageSetup.fetchProductDetails(styleNumber);
-            }
-        };
-        
-        window.initializeProductFromURL = function() {
-            console.log('[DTG-Bridge] Initializing from URL');
-            if (window.DTGPageSetup) {
-                window.DTGPageSetup.updateProductContext();
-            }
-        };
-        
-        // Minimal cart integration for DTG adapter
-        window.initCartIntegrationWithData = async function(caspioEventData) {
-            console.log('[DTG-Cart] Cart integration called');
-            return Promise.resolve();
-        };
-        
-        // DIRECT API ONLY - Master Bundle System Removed
-        window.USE_DIRECT_API = true; // Permanent - old system removed
-        
-        // Performance tracking
-        window.DTG_PERFORMANCE = {
-            systemUsed: 'Direct API with Bundle Support',
-            loadStartTime: performance.now(),
-            metrics: {},
-            debug: new URLSearchParams(window.location.search).get('debug') === 'true'
-        };
-        
-        // API testing utilities  
-        window.DTG_API_TEST = {
-            // Test the API endpoint
-            testAPI: async function(styleNumber) {
-                const service = new window.DTGPricingService();
-                console.log('🧪 Testing DTG API for:', styleNumber);
-                const result = await service.fetchBundledData(styleNumber || 'PC54');
-                if (result) {
-                    console.log('✅ API endpoint working!', result);
-                } else {
-                    console.log('❌ API endpoint error');
+        // 🚀 NUCLEAR SOLUTION: Simple DTG Pricing - Following Cap Embroidery Pattern
+        console.log('🎯 DTG Pricing Page - Simple Layout (Nuclear Solution)');
+
+        // State
+        let currentProduct = null;
+        let currentColors = [];
+        let selectedColor = null;
+        let pricingData = null;
+
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const productHero = document.getElementById('productHero');
+        const pricingSection = document.getElementById('pricingSection');
+        const orderInfoSection = document.getElementById('orderInfoSection');
+
+        // Load DTG Product Recommendations
+        async function loadDTGRecommendations() {
+            console.log('🌟 Loading DTG Product Recommendations');
+
+            const recommendationsData = [
+                // T-Shirts
+                { style: 'PC54', name: 'Core Cotton Tee', type: 'tshirt', brand: 'Port & Company', salesData: '18,753+ units sold', rating: 5, bestColors: ['Jet Black', 'Dk Hthr Grey', 'Navy', 'White'] },
+                { style: 'PC61', name: 'Essential Tee', type: 'tshirt', brand: 'Port & Company', salesData: '15,621+ units sold', rating: 5, bestColors: ['Jet Black', 'Navy', 'Athletic Heather'], warning: '⚠️ Avoid Red - causes staining' },
+                { style: 'PC450', name: 'Fan Favorite Tee', type: 'tshirt', brand: 'Port & Company', salesData: '10,006+ units sold', rating: 5, bestColors: ['Jet Black', 'Heather Navy', 'Dark Heather Grey'] },
+                { style: 'PC55', name: 'Core Blend Tee', type: 'tshirt', brand: 'Port & Company', salesData: '7,892+ units sold', rating: 4, bestColors: ['Jet Black', 'Navy', 'Dark Heather Grey', 'White'] },
+                { style: 'BC3001', name: 'Unisex Jersey Tee', type: 'tshirt', brand: 'BELLA+CANVAS', salesData: 'Premium soft feel', rating: 4, bestColors: ['Black', 'Navy', 'Dark Grey Heather'] },
+
+                // Hoodies
+                { style: 'PC78H', name: 'Core Fleece Pullover Hooded Sweatshirt', type: 'hoodie', brand: 'Port & Company', salesData: '5,234+ units sold', rating: 5, bestColors: ['Jet Black', 'Dark Heather Grey', 'Navy'] },
+                { style: 'PC850H', name: 'Fan Favorite Fleece Pullover Hooded Sweatshirt', type: 'hoodie', brand: 'Port & Company', salesData: '3,891+ units sold', rating: 5, bestColors: ['Black', 'Dark Heather Grey', 'Team Navy'] }
+            ];
+
+            const container = document.getElementById('dtg-recommendations-grid');
+            if (!container) return;
+
+            container.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading recommendations...</span></div></div>';
+
+            // Group products by type
+            const tshirts = recommendationsData.filter(p => p.type === 'tshirt');
+            const hoodies = recommendationsData.filter(p => p.type === 'hoodie');
+
+            let cardsHTML = '';
+
+            // Add T-Shirts section
+            if (tshirts.length > 0) {
+                cardsHTML += `
+                    <div class="dtg-product-section">
+                        <h4 class="dtg-section-title">
+                            <i class="fas fa-tshirt"></i>
+                            T-Shirts
+                        </h4>
+                        <div class="dtg-section-grid">
+                `;
+
+                for (const product of tshirts) {
+                    cardsHTML += await generateProductCard(product);
                 }
-                return result;
-            },
-            
-            // Check service status
-            checkStatus: function() {
-                const service = new window.DTGPricingService();
-                const status = service.getServiceStatus();
-                console.log('📊 DTG Service Status:', status);
-                return status;
-            },
-            
-            // Clear cache
-            clearCache: function() {
-                const service = new window.DTGPricingService();
-                service.clearCache();
-                console.log('🔄 Cache cleared successfully');
-            }
-        };
-        
-        // Log system status
-        console.log('===================================');
-        console.log('🚀 DTG Pricing System: Direct API Implementation');
-        console.log('📦 Using optimized bundle endpoint for all pricing data');
-        console.log('🧪 Test API: DTG_API_TEST.testAPI()');
-        console.log('📊 Check status: DTG_API_TEST.checkStatus()');
-        if (window.DTG_PERFORMANCE.debug) {
-            console.log('🔍 DEBUG MODE ENABLED');
-        }
-        console.log('===================================');
-        
-        // Initialize on DOM ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('[DTG] Page initialization started');
-            
-            // Initialize product from URL
-            const checkReady = setInterval(() => {
-                if (window.DTGPageSetup) {
-                    clearInterval(checkReady);
-                    window.initializeProductFromURL();
-                }
-            }, 100);
-            
-            // Setup image modal functionality
-            setupImageModal();
-        });
-        
-        // Image modal setup
-        function setupImageModal() {
-            // Create modal HTML if it doesn't exist
-            if (!document.getElementById('image-modal')) {
-                const modalHTML = `
-                    <div id="image-modal" class="modal" style="display: none;">
-                        <div class="modal-content">
-                            <span class="close-modal">&times;</span>
-                            <img id="modal-image" src="" alt="">
-                            <div id="modal-caption"></div>
+
+                cardsHTML += `
                         </div>
                     </div>
                 `;
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
             }
-            
-            const modal = document.getElementById('image-modal');
-            const modalImage = document.getElementById('modal-image');
-            const closeModal = document.querySelector('.close-modal');
-            
-            // Close modal events
-            closeModal?.addEventListener('click', () => modal.style.display = 'none');
-            modal?.addEventListener('click', (e) => {
-                if (e.target === modal) modal.style.display = 'none';
-            });
-            
-            // Open modal on main image click
-            document.addEventListener('click', (e) => {
-                if (e.target.matches('#main-product-image-dp2')) {
-                    modal.style.display = 'block';
-                    modalImage.src = e.target.src;
+
+            // Add Hoodies section
+            if (hoodies.length > 0) {
+                cardsHTML += `
+                    <div class="dtg-product-section">
+                        <h4 class="dtg-section-title">
+                            <i class="fas fa-hoodie"></i>
+                            Hoodies & Sweatshirts
+                        </h4>
+                        <div class="dtg-section-grid">
+                `;
+
+                for (const product of hoodies) {
+                    cardsHTML += await generateProductCard(product);
+                }
+
+                cardsHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = cardsHTML;
+        }
+
+        // Helper function to generate product card HTML
+        async function generateProductCard(product) {
+            try {
+                // Try to fetch real product image from API - need to get exact match
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?q=${product.style}&limit=20`);
+                let imageUrl = 'https://via.placeholder.com/300x300/f0f0f0/333?text=' + product.style;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data.products && data.data.products.length > 0) {
+                        // Find exact style match
+                        let productData = data.data.products.find(p => p.styleNumber === product.style);
+
+                        // If no exact match, use first result as fallback
+                        if (!productData) {
+                            productData = data.data.products[0];
+                            console.log(`Warning: No exact match for ${product.style}, using ${productData.styleNumber}`);
+                        }
+
+                        // Use display image or model front image
+                        imageUrl = productData.images?.display ||
+                                  productData.images?.model?.front ||
+                                  productData.images?.main ||
+                                  imageUrl;
+                    }
+                }
+
+                const stars = '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating);
+
+                return `
+                    <div class="dtg-product-card" data-style="${product.style}">
+                        <div class="dtg-card-badge">${product.rating === 5 ? '⭐ Top Seller' : '👍 Popular'}</div>
+                        <div class="dtg-card-image">
+                            <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+                        </div>
+                        <div class="dtg-card-content">
+                            <h4 class="dtg-card-title">${product.style}</h4>
+                            <p class="dtg-card-subtitle">${product.name}</p>
+                            <div class="dtg-card-rating">
+                                <span class="stars">${stars}</span>
+                            </div>
+                            ${product.bestColors ? `
+                                <div class="dtg-card-colors">
+                                    <strong>Best Colors:</strong> ${product.bestColors.slice(0, 2).join(', ')}${product.bestColors.length > 2 ? '...' : ''}
+                                </div>
+                            ` : ''}
+                            <button class="dtg-card-button" onclick="loadProductStyle('${product.style}')">
+                                <i class="fas fa-arrow-right"></i> Load This Style
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(`Error loading product ${product.style}:`, error);
+                return ''; // Return empty string on error
+            }
+        }
+
+        // Function to load a specific product style
+        function loadProductStyle(styleNumber) {
+            console.log(`Loading style: ${styleNumber}`);
+            // Direct navigation to the new product (use capital StyleNumber for consistency)
+            window.location.href = `?StyleNumber=${styleNumber}`;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 DTG Pricing Page Initialized');
+
+            // Get style from URL parameter (handle all case variations)
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('styleNumber') ||
+                               urlParams.get('StyleNumber') ||
+                               urlParams.get('stylenumber') ||
+                               urlParams.get('style') ||
+                               urlParams.get('Style') ||
+                               'PC61';
+
+            loadDTGProduct(styleNumber);
+            setupSearch();
+
+            // Load recommendations after page is ready
+            setTimeout(() => {
+                if (document.getElementById('dtg-recommendations-grid')) {
+                    loadDTGRecommendations();
+                }
+            }, 1000);
+        });
+
+        // Fetch product details including brand name
+        async function fetchProductDetails(styleNumber) {
+            try {
+                console.log('📋 Fetching product details for brand info...');
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
+
+                if (!response.ok) {
+                    console.warn('Could not fetch product details:', response.status);
+                    return null;
+                }
+
+                const details = await response.json();
+                console.log('✅ Product details received:', details);
+
+                // Return the first item if it's an array, or the object itself
+                return Array.isArray(details) && details.length > 0 ? details[0] : details;
+            } catch (error) {
+                console.warn('Error fetching product details:', error);
+                return null;
+            }
+        }
+
+        // Load DTG product data - SIMPLE VERSION
+        async function loadDTGProduct(styleNumber) {
+            console.log(`🎯 Loading DTG product: ${styleNumber}`);
+
+            try {
+                showLoading();
+
+                // Update page title
+                document.getElementById('productTitle').textContent = `DTG Pricing for ${styleNumber}`;
+                document.getElementById('currentStyle').textContent = `#${styleNumber}`;
+
+                // Load DTG pricing data and product details in parallel
+                console.log('📡 Fetching DTG bundle data and product details...');
+                const [bundleResponse, productDetails] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/dtg/product-bundle?styleNumber=${styleNumber}`),
+                    fetchProductDetails(styleNumber)
+                ]);
+
+                if (!bundleResponse.ok) {
+                    throw new Error(`DTG API failed: ${bundleResponse.status}`);
+                }
+
+                const data = await bundleResponse.json();
+                console.log('📦 DTG Bundle received:', data);
+
+                // Store data globally
+                pricingData = data;
+
+                // Merge product details with bundle data
+                const completeProduct = {
+                    ...(data.product || {}),
+                    ...(productDetails || {}),
+                    styleNumber: styleNumber
+                };
+
+                // Update product info with complete data including brand
+                updateProductInfo(completeProduct, styleNumber);
+
+                // Load size pricing from API for proper upcharge filtering
+                if (window.UniversalPricingGrid && typeof window.UniversalPricingGrid.loadSizePricing === 'function') {
+                    console.log('📊 Loading size pricing for upcharge display...');
+                    window.UniversalPricingGrid.loadSizePricing(styleNumber);
+                }
+
+                // Generate DTG pricing table - DIRECT APPROACH
+                updateDTGPricing();
+
+                // Show all sections
+                showProduct();
+
+            } catch (error) {
+                console.error('❌ Error loading DTG product:', error);
+                showApiError(error.message || 'Failed to load DTG pricing. Please try again.');
+                showNoProduct();
+            }
+        }
+
+        // Update DTG pricing table - DIRECT DOM MANIPULATION (Like Cap Embroidery)
+        function updateDTGPricing() {
+            console.log('💰 Updating DTG pricing table...');
+
+            const tbody = document.getElementById('dtg-pricing-tbody');
+            if (!tbody) {
+                console.error('❌ Table tbody not found!');
+                return;
+            }
+
+            // Clear existing rows - DIRECT APPROACH
+            tbody.innerHTML = '';
+
+            if (!pricingData || !pricingData.pricing) {
+                console.error('❌ No pricing data available');
+                tbody.innerHTML = '<tr><td colspan="4">No pricing data available</td></tr>';
+                return;
+            }
+
+            // Define ALL locations including combos - don't rely on API for combo locations
+            const allDTGLocations = [
+                { code: 'LC', name: 'Left Chest' },
+                { code: 'FF', name: 'Full Front' },
+                { code: 'FB', name: 'Full Back' },
+                { code: 'JF', name: 'Jumbo Front' },
+                { code: 'JB', name: 'Jumbo Back' },
+                { code: 'LC_FB', name: 'Left Chest + Full Back' },
+                { code: 'LC_JB', name: 'Left Chest + Jumbo Back' },  // Common combo - small front, large back
+                { code: 'FF_FB', name: 'Full Front + Full Back' },
+                { code: 'JF_JB', name: 'Jumbo Front + Jumbo Back' }
+            ];
+
+            // Use our complete location list, not what API provides
+            const locations = allDTGLocations;
+
+            // Get tiers from API data - USE CORRECT TIERS
+            const tiers = ['24-47', '48-71', '72+'];  // API confirmed these are the correct tiers
+
+            console.log('📍 Locations:', locations);
+            console.log('📊 Tiers:', tiers);
+
+            // Initially show only primary locations (not combos)
+            const primaryLocationCodes = ['LC', 'FF', 'FB', 'JF', 'JB'];  // All single locations
+            const allLocations = locations;
+            let showingAll = false;
+
+            // Function to render locations
+            function renderLocations(locsToShow) {
+                tbody.innerHTML = '';
+                locsToShow.forEach(location => {
+                const row = document.createElement('tr');
+
+                // Location name cell
+                const locationCell = document.createElement('td');
+                locationCell.className = 'location-cell';
+                locationCell.textContent = location.name;
+                row.appendChild(locationCell);
+
+                // Price cells for each tier
+                tiers.forEach(tier => {
+                    const priceCell = document.createElement('td');
+                    priceCell.className = 'price-cell';
+
+                    // Get price from API data
+                    const price = getDTGPrice(location.code, tier);
+                    priceCell.textContent = `$${price.toFixed(2)}`;
+
+                    row.appendChild(priceCell);
+                });
+
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Initially show single locations only (hide combos)
+            const locsToShow = locations.filter(loc => !loc.code.includes('_'));
+            renderLocations(locsToShow);
+
+            // Add "Show All Locations" button
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'text-align: center; margin-top: 20px;';
+
+            const showAllBtn = document.createElement('button');
+            showAllBtn.textContent = 'Show Combo Locations';
+            showAllBtn.style.cssText = `
+                background: #4cb354;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            `;
+
+            showAllBtn.addEventListener('click', () => {
+                showingAll = !showingAll;
+                if (showingAll) {
+                    // Show ALL locations including combos
+                    renderLocations(allLocations);
+                    showAllBtn.textContent = 'Hide Combo Locations';
+                } else {
+                    // Show only single locations
+                    const singleLocs = locations.filter(loc => !loc.code.includes('_'));
+                    renderLocations(singleLocs);
+                    showAllBtn.textContent = 'Show Combo Locations';
                 }
             });
+
+            showAllBtn.addEventListener('mouseenter', () => {
+                showAllBtn.style.background = '#3a8d42';
+                showAllBtn.style.transform = 'translateY(-2px)';
+            });
+
+            showAllBtn.addEventListener('mouseleave', () => {
+                showAllBtn.style.background = '#4cb354';
+                showAllBtn.style.transform = 'translateY(0)';
+            });
+
+            buttonContainer.appendChild(showAllBtn);
+
+            // Add container for UniversalPricingGrid to display upcharges
+            const upchargesSection = document.createElement('div');
+            upchargesSection.className = 'upcharge-info';
+            upchargesSection.style.cssText = `
+                margin-top: 30px;
+                padding: 20px;
+                background: #f9fafb;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+            `;
+
+            // Add a title before the UniversalPricingGrid content
+            const upchargesTitle = document.createElement('h3');
+            upchargesTitle.textContent = 'Size Upcharges';
+            upchargesTitle.style.cssText = `
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+                margin-bottom: 15px;
+            `;
+            upchargesSection.appendChild(upchargesTitle);
+
+            // The UniversalPricingGrid will populate the rest of the content
+            // Set it as the container for the grid
+            if (window.UniversalPricingGrid) {
+                window.UniversalPricingGrid.upchargeContainer = upchargesSection;
+                // Trigger an update if we already have data
+                if (window.UniversalPricingGrid.availableSizes && window.UniversalPricingGrid.upcharges) {
+                    window.UniversalPricingGrid.updateUpchargeDisplay();
+                }
+            }
+
+            // Insert button and upcharges after the table
+            const pricingSection = document.getElementById('pricingSection');
+            pricingSection.appendChild(buttonContainer);
+            pricingSection.appendChild(upchargesSection);
+
+            console.log('✅ DTG pricing table updated with 3 tiers, Show All button, and size upcharges');
         }
-        
-        // Enable debug mode for problematic styles
-        document.addEventListener('DOMContentLoaded', function() {
-            // Watch for product selection changes
-            const observer = new MutationObserver(function(mutations) {
-                const styleInput = document.getElementById('styleInput2');
-                if (styleInput && styleInput.value) {
-                    const debugStyles = ['PC78', 'S700'];
-                    const isDebugStyle = debugStyles.some(style => styleInput.value.startsWith(style));
-                    
-                    if (isDebugStyle) {
-                        // Enable debug mode
-                        window.DTG_PERFORMANCE = window.DTG_PERFORMANCE || {};
-                        window.DTG_PERFORMANCE.debug = true;
-                        console.log(`[DTG-Page] Debug mode enabled for ${styleInput.value}`);
-                        
-                        // Add debug helper button
-                        if (!document.getElementById('debug-refresh-btn')) {
-                            const container = document.querySelector('.dtg-pricing-container');
-                            if (container) {
-                                const btn = document.createElement('button');
-                                btn.id = 'debug-refresh-btn';
-                                btn.className = 'btn btn-warning';
-                                btn.style.margin = '10px';
-                                btn.textContent = 'Clear Cache & Refresh Pricing';
-                                btn.onclick = function() {
-                                    console.log('Manual refresh triggered for:', styleInput.value);
-                                    if (window.DTG_PRICING_V4?.clearStyleCache) {
-                                        window.DTG_PRICING_V4.clearStyleCache(styleInput.value);
-                                    }
-                                    if (window.DTG_PRICING_V4?.refresh) {
-                                        window.DTG_PRICING_V4.refresh(true);
-                                    }
-                                };
-                                container.appendChild(btn);
-                            }
+
+        // Get DTG price for location and tier - PROPER CALCULATION WITH MARGINS
+        function getDTGPrice(locationCode, tierLabel) {
+            // Default prices if API data is missing
+            const defaultPrices = {
+                'LC': { '24-47': 13.00, '48-71': 12.00, '72+': 11.00 },
+                'FF': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'FB': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'JF': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                'JB': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                // Add default combo prices based on expected values
+                'LC_FB': { '24-47': 26.50, '48-71': 23.00, '72+': 21.00 },
+                'LC_JB': { '24-47': 28.50, '48-71': 25.00, '72+': 23.00 },
+                'FF_FB': { '24-47': 29.00, '48-71': 24.00, '72+': 22.00 },
+                'JF_JB': { '24-47': 33.00, '48-71': 28.00, '72+': 26.00 }
+            };
+
+            // Check if it's a combo location
+            const isCombo = locationCode.includes('_');
+
+            if (isCombo) {
+                // For combo locations, properly calculate using API method
+                if (pricingData && pricingData.pricing) {
+                    // Get tier data for margin calculation
+                    const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
+                    return getDTGPriceForComboLocation(locationCode, tierLabel, tier);
+                }
+                // Fall back to default combo prices
+                return defaultPrices[locationCode]?.[tierLabel] || 25.00;
+            }
+
+            // Single location - calculate price using API data if available
+            if (pricingData && pricingData.pricing) {
+                // Get tier data for margin calculation
+                const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
+                return getDTGPriceForSingleLocation(locationCode, tierLabel, tier);
+            }
+
+            // Fall back to defaults for single locations
+            return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+        }
+
+        // Helper function for combo location pricing - simplified approach
+        function getDTGPriceForComboLocation(locationCode, tierLabel, tier) {
+            // Default fallback prices
+            const defaultComboPrices = {
+                'LC_FB': { '24-47': 26.50, '48-71': 23.00, '72+': 21.00 },
+                'LC_JB': { '24-47': 28.50, '48-71': 25.00, '72+': 23.00 },
+                'FF_FB': { '24-47': 29.00, '48-71': 24.00, '72+': 22.00 },
+                'JF_JB': { '24-47': 33.00, '48-71': 28.00, '72+': 26.00 }
+            };
+
+            if (!pricingData || !pricingData.pricing) {
+                return defaultComboPrices[locationCode]?.[tierLabel] || 25.00;
+            }
+
+            // Split combo location code (e.g., 'LC_FB' -> ['LC', 'FB'])
+            const [firstLocation, secondLocation] = locationCode.split('_');
+
+            // Get the already-calculated price for the first location (includes margin + first print cost)
+            let basePrice = getDTGPriceForSingleLocation(firstLocation, tierLabel, tier);
+
+            // Add the raw print cost for the second location (no margin applied)
+            const secondCost = pricingData.pricing.costs?.find(c =>
+                c.PrintLocationCode === secondLocation && c.TierLabel === tierLabel
+            );
+
+            if (secondCost && secondCost.PrintCost) {
+                basePrice += parseFloat(secondCost.PrintCost);
+                // Round to nearest half dollar
+                basePrice = Math.ceil(basePrice * 2) / 2;
+            }
+
+            return basePrice || defaultComboPrices[locationCode]?.[tierLabel] || 25.00;
+        }
+
+        // Helper function for single location pricing
+        function getDTGPriceForSingleLocation(locationCode, tierLabel, tier) {
+            if (!pricingData || !pricingData.pricing) {
+                // Use the default prices defined above
+                return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+            }
+
+            // Get decoration cost
+            const costData = pricingData.pricing.costs?.find(c =>
+                c.PrintLocationCode === locationCode && c.TierLabel === tierLabel
+            );
+
+            // Get base garment cost
+            let baseGarmentCost = 5.50;
+            if (pricingData.pricing.sizes && pricingData.pricing.sizes.length > 0) {
+                const minPrice = Math.min(...pricingData.pricing.sizes
+                    .filter(s => s.maxCasePrice > 0)
+                    .map(s => s.maxCasePrice));
+                if (minPrice > 0) baseGarmentCost = minPrice;
+            }
+
+            if (tier && costData) {
+                const marginDenominator = tier.MarginDenominator || 0.60;
+                const decorationCost = parseFloat(costData.PrintCost) || 0;
+                const garmentWithMargin = baseGarmentCost / marginDenominator;
+                const calculatedPrice = garmentWithMargin + decorationCost;
+                return Math.ceil(calculatedPrice * 2) / 2;
+            }
+
+            // Fallback
+            const defaultPrices = {
+                'LC': { '24-47': 13.00, '48-71': 12.00, '72+': 11.00 },
+                'FF': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'FB': { '24-47': 15.50, '48-71': 13.00, '72+': 12.50 },
+                'JF': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 },
+                'JB': { '24-47': 17.50, '48-71': 15.00, '72+': 14.50 }
+            };
+            return defaultPrices[locationCode]?.[tierLabel] || 13.00;
+        }
+
+        // Helper function to get brand from style number prefix
+        function getBrandFromStyle(styleNumber) {
+            const stylePrefix = styleNumber.toUpperCase().replace(/[0-9]/g, '');
+            const brandMap = {
+                'PC': 'Port & Company',
+                'DT': 'District',
+                'SP': 'Sport-Tek',
+                'DM': 'District Made',
+                'AA': 'Alternative Apparel',
+                'NL': 'Next Level',
+                'G': 'Gildan',
+                'ST': 'Sport-Tek',
+                'TSC': 'The Supply Chain',
+                'LST': 'Sport-Tek Ladies',
+                'YST': 'Sport-Tek Youth'
+            };
+            return brandMap[stylePrefix] || 'Premium Brand';
+        }
+
+        // Update product information with images and colors
+        function updateProductInfo(product, styleNumber) {
+            console.log('📝 Updating product info with:', product);
+
+            // Update breadcrumb Products link to include style parameter
+            const productsBreadcrumb = document.getElementById('products-breadcrumb');
+            if (productsBreadcrumb && styleNumber) {
+                productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                console.log('✅ Updated products breadcrumb with style:', styleNumber);
+            }
+
+            // Use PRODUCT_TITLE from API or fallback
+            const title = product.PRODUCT_TITLE || product.title || `${styleNumber} - DTG Pricing`;
+
+            // Use PRODUCT_DESCRIPTION from API or fallback
+            const description = product.PRODUCT_DESCRIPTION || product.description || 'Direct-to-Garment printing pricing';
+
+            // Use BRAND_NAME from API, with intelligent fallback
+            const brand = product.BRAND_NAME || product.brand || getBrandFromStyle(styleNumber);
+
+            document.getElementById('productTitle').textContent = title;
+            document.getElementById('productDescription').textContent = description;
+            document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+            document.getElementById('currentBrand').textContent = brand;
+
+            // Update product image
+            updateProductImage(product);
+
+            // Update color swatches
+            updateColorSwatches(product);
+
+            console.log('✅ Product info updated:', { title, description, brand });
+        }
+
+        // Update product image
+        function updateProductImage(product) {
+            const imageEl = document.getElementById('productImage');
+            const placeholderEl = document.getElementById('imagePlaceholder');
+
+            // Check for API product image fields first
+            let imageUrl = product.FRONT_MODEL || product.FRONT_FLAT || product.PRODUCT_IMAGE;
+
+            if (imageUrl) {
+                // Use image from product details API
+                imageEl.src = imageUrl;
+                imageEl.style.display = 'block';
+                placeholderEl.style.display = 'none';
+                console.log('✅ Product image updated from API:', imageUrl);
+
+                // Update color if available from API
+                if (product.COLOR_NAME) {
+                    document.getElementById('currentColor').textContent = product.COLOR_NAME;
+                }
+            } else if (product.colors && product.colors.length > 0) {
+                // Fallback to color images
+                const firstColorWithImage = product.colors.find(c => c.MAIN_IMAGE_URL) || product.colors[0];
+
+                if (firstColorWithImage && firstColorWithImage.MAIN_IMAGE_URL) {
+                    imageEl.src = firstColorWithImage.MAIN_IMAGE_URL;
+                    imageEl.style.display = 'block';
+                    placeholderEl.style.display = 'none';
+
+                    // Update current color display
+                    if (firstColorWithImage.COLOR_NAME) {
+                        document.getElementById('currentColor').textContent = firstColorWithImage.COLOR_NAME;
+                    }
+                } else {
+                    imageEl.style.display = 'none';
+                    placeholderEl.style.display = 'flex';
+                }
+            } else {
+                imageEl.style.display = 'none';
+                placeholderEl.style.display = 'flex';
+            }
+        }
+
+        // Update color swatches
+        function updateColorSwatches(product) {
+            const swatchesSection = document.getElementById('colorSwatchesSection');
+            const swatchesContainer = document.getElementById('colorSwatches');
+
+            if (product.colors && product.colors.length > 0) {
+                swatchesContainer.innerHTML = '';
+
+                product.colors.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                        border: 2px solid #e5e7eb;
+                        cursor: pointer;
+                        display: inline-block;
+                        margin-right: 8px;
+                        margin-bottom: 8px;
+                        position: relative;
+                        overflow: hidden;
+                    `;
+
+                    if (color.HEX_CODE) {
+                        swatch.style.backgroundColor = color.HEX_CODE;
+                    } else if (color.COLOR_SQUARE_IMAGE) {
+                        swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                        swatch.style.backgroundSize = 'cover';
+                    } else {
+                        // Default pattern for missing color
+                        swatch.style.background = 'linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%)';
+                        swatch.style.backgroundSize = '20px 20px';
+                    }
+
+                    swatch.title = color.COLOR_NAME || 'Color';
+
+                    // Add click handler to change product image
+                    swatch.addEventListener('click', () => {
+                        if (color.MAIN_IMAGE_URL) {
+                            document.getElementById('productImage').src = color.MAIN_IMAGE_URL;
+                            document.getElementById('currentColor').textContent = color.COLOR_NAME || 'Selected';
+                            // Highlight selected swatch
+                            document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '2px solid #e5e7eb');
+                            swatch.style.border = '2px solid #4cb354';
                         }
+                    });
+
+                    swatchesContainer.appendChild(swatch);
+                });
+
+                swatchesSection.style.display = 'block';
+            } else {
+                swatchesSection.style.display = 'none';
+            }
+        }
+
+        // Setup search functionality with API integration
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
+
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+
+            let searchTimeout = null;
+
+            // Perform API search
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.classList.add('active');
+
+                try {
+                    // Search using the API endpoint
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+
+                    const results = await response.json();
+
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                    } else {
+                        // Build results HTML
+                        let html = '';
+                        results.slice(0, 10).forEach(result => {
+                            html += `
+                                <div class="search-result-item" data-style="${result.style || result.value}">
+                                    <div class="search-result-style">${result.style || result.value}</div>
+                                    <div class="search-result-desc">${result.label}</div>
+                                </div>
+                            `;
+                        });
+                        resultsContainer.innerHTML = html;
+
+                        // Add click handlers to results
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+                }
+            }
+
+            // Handle search input
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(query);
+                }, 300);
+            });
+
+            // Handle enter key for direct navigation
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        // Try direct style number navigation
+                        window.location.href = `?StyleNumber=${value}`;
                     }
                 }
             });
-            
-            // Start observing
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
+
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+
+            // Handle escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    resultsContainer.classList.remove('active');
+                    searchInput.blur();
+                }
+            });
+        }
+
+        // Show/hide functions
+        function showLoading() {
+            loadingState.style.display = 'flex';
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
+
+        function showProduct() {
+            loadingState.style.display = 'none';
+            productHero.style.display = 'block';
+            pricingSection.style.display = 'block';
+            orderInfoSection.style.display = 'block';
+        }
+
+        function showNoProduct() {
+            loadingState.innerHTML = `
+                <i class="fas fa-search"></i>
+                <p>Search for a style to view DTG pricing</p>
+            `;
+        }
+
+        function showApiError(message) {
+            console.error('🚨 DTG API Error:', message);
+            // Show error in console for now - could add error banner like cap embroidery
+            alert('DTG Pricing Error: ' + message);
+        }
+
+        // 🧪 Testing utilities
+        window.DTG_DEBUG = {
+            // Test API directly
+            testAPI: async function(styleNumber = 'PC61') {
+                console.log('🧪 Testing DTG API for:', styleNumber);
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/dtg/product-bundle?styleNumber=${styleNumber}`);
+                const data = await response.json();
+                console.log('✅ API Response:', data);
+                return data;
+            },
+
+            // Get current state
+            getState: function() {
+                return {
+                    pricingData: pricingData,
+                    currentProduct: currentProduct,
+                    tableExists: !!document.getElementById('dtg-pricing-tbody')
+                };
+            },
+
+            // Force table update
+            updateTable: function() {
+                updateDTGPricing();
+            }
+        };
+
+        console.log('🎯 DTG Nuclear Solution Loaded - Simple & Clean!');
     </script>
+
+    <!-- DTG Product Recommendations (inline implementation) -->
 </body>
 </html>

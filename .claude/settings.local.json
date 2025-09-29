@@ -127,7 +127,10 @@
       "Bash(for style in PC54 PC61 PC450)",
       "Bash(do echo \"=== Checking $style ===\")",
       "Bash(lsof:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(pkill:*)",
+      "Bash(git log:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": [],
