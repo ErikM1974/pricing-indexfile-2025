@@ -84,6 +84,77 @@
             position: relative;
         }
 
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-loading {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-style {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .search-result-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 2px;
+        }
+
+        .search-results-section {
+            margin-bottom: 8px;
+        }
+
+        .search-results-title {
+            padding: 8px 12px;
+            background-color: #f3f4f6;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
         .search-input {
             padding: 12px 16px;
             border: 1px solid var(--border-color);
@@ -511,6 +582,297 @@
             }
         }
 
+        /* DTG Recommendations Section */
+        .dtg-recommendations-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+            margin: 40px 0;
+        }
+
+        .dtg-rec-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dtg-rec-subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        /* DTG Disclaimer Styles */
+        .dtg-disclaimer {
+            display: flex;
+            gap: 20px;
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0 35px 0;
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+        }
+
+        .dtg-disclaimer-icon {
+            flex-shrink: 0;
+            font-size: 32px;
+            color: #d97706;
+        }
+
+        .dtg-disclaimer-content h4 {
+            margin: 0 0 12px 0;
+            color: #92400e;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dtg-disclaimer-content ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .dtg-disclaimer-content li {
+            margin-bottom: 8px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .dtg-disclaimer-content li:last-child {
+            margin-bottom: 0;
+        }
+
+        .dtg-recommendations-grid {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 20px;
+            margin-top: 24px;
+            padding: 10px 0 20px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dtg-recommendations-grid::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dtg-product-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 0 0 280px; /* Fixed width for horizontal scroll */
+            min-height: 420px; /* Consistent height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dtg-product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: #4cb354;
+        }
+
+        .dtg-card-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #4cb354;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .dtg-card-image {
+            width: 100%;
+            height: 200px;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .dtg-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .dtg-product-card:hover .dtg-card-image img {
+            transform: scale(1.05);
+        }
+
+        /* Mobile responsiveness for DTG recommendations */
+        @media (max-width: 768px) {
+            .dtg-recommendations-section {
+                padding: 20px 15px;
+                margin: 20px 0;
+            }
+
+            .dtg-rec-title {
+                font-size: 20px;
+            }
+
+            .dtg-recommendations-grid {
+                gap: 16px;
+                padding: 10px 0 16px 0;
+            }
+
+            .dtg-product-card {
+                flex: 0 0 260px; /* Slightly smaller on tablets */
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dtg-recommendations-grid {
+                gap: 12px;
+                padding: 8px 0 12px 0;
+            }
+
+            .dtg-product-card {
+                flex: 0 0 240px; /* Smaller on phones */
+                min-height: 380px;
+            }
+
+            .dtg-product-badge {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+            }
+
+            .dtg-card-title {
+                font-size: 16px;
+            }
+
+            .dtg-card-rating {
+                font-size: 12px;
+            }
+        }
+
+        .dtg-card-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .dtg-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 4px 0;
+        }
+
+        .dtg-card-subtitle {
+            font-size: 14px;
+            color: #4b5563;
+            margin: 0 0 4px 0;
+        }
+
+        .dtg-card-brand {
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dtg-card-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .dtg-card-rating .stars {
+            color: #fbbf24;
+            letter-spacing: 2px;
+        }
+
+        .dtg-card-rating .sales {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .dtg-card-colors {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .dtg-card-colors strong {
+            color: #4b5563;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .dtg-card-warning {
+            background: #fef2f2;
+            color: #dc2626;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .dtg-card-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4cb354 0%, #5fd966 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .dtg-card-button:hover {
+            background: linear-gradient(135deg, #45a049 0%, #52c956 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .product-content {
@@ -529,6 +891,82 @@
             .pricing-section,
             .order-info-section {
                 padding: 24px;
+            }
+        }
+
+        /* Product Grouping Styles */
+        .dtg-product-section {
+            margin-bottom: 32px;
+        }
+
+        .dtg-section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 16px 0;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dtg-section-title i {
+            color: #16a34a;
+            font-size: 20px;
+        }
+
+        .dtg-section-grid {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 8px 0 16px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dtg-section-grid::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .dtg-section-grid::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 3px;
+        }
+
+        .dtg-section-grid::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .dtg-section-grid {
+                gap: 14px;
+                padding: 6px 0 12px 0;
+            }
+
+            .dtg-section-title {
+                font-size: 20px;
+                padding: 10px 14px;
+            }
+
+            .dtg-product-section {
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dtg-section-title {
+                font-size: 18px;
+                padding: 8px 12px;
+            }
+
+            .dtg-section-title i {
+                font-size: 18px;
             }
         }
     </style>
@@ -734,6 +1172,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- DTG Product Recommendations Section -->
+        <div class="dtg-recommendations-section">
+            <h3 class="dtg-rec-title">
+                <i class="fas fa-star" style="color: #ffd700;"></i>
+                Best Products for DTG Printing
+            </h3>
+            <p class="dtg-rec-subtitle">Based on 50,000+ successful prints</p>
+
+            <!-- Important DTG Disclaimer -->
+            <div class="dtg-disclaimer">
+                <div class="dtg-disclaimer-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="dtg-disclaimer-content">
+                    <h4>Important DTG Printing Information</h4>
+                    <ul>
+                        <li><strong>⚠️ No Gildan Products:</strong> We cannot print on Gildan brand apparel due to fabric treatment that prevents proper ink adhesion.</li>
+                        <li><strong>✅ Best Results:</strong> We prefer 100% cotton garments for optimal print quality and durability.</li>
+                        <li><strong>💡 Pro Tip:</strong> Dark colors like black, navy, and dark heather grey provide the best contrast for vibrant DTG prints.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="dtg-recommendations-grid" class="dtg-recommendations-grid">
+                <!-- Product cards will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript -->
@@ -754,59 +1220,142 @@
         const pricingSection = document.getElementById('pricingSection');
         const orderInfoSection = document.getElementById('orderInfoSection');
 
-        // Add DTG Product Recommendations Button
-        function addRecommendationsButton() {
-            console.log('🌟 Adding DTG Recommendations button');
+        // Load DTG Product Recommendations
+        async function loadDTGRecommendations() {
+            console.log('🌟 Loading DTG Product Recommendations');
 
-            // Check if button already exists
-            if (document.getElementById('dtg-recommendations-btn-container')) {
-                console.log('Button already exists');
-                return;
+            const recommendationsData = [
+                // T-Shirts
+                { style: 'PC54', name: 'Core Cotton Tee', type: 'tshirt', brand: 'Port & Company', salesData: '18,753+ units sold', rating: 5, bestColors: ['Jet Black', 'Dk Hthr Grey', 'Navy', 'White'] },
+                { style: 'PC61', name: 'Essential Tee', type: 'tshirt', brand: 'Port & Company', salesData: '15,621+ units sold', rating: 5, bestColors: ['Jet Black', 'Navy', 'Athletic Heather'], warning: '⚠️ Avoid Red - causes staining' },
+                { style: 'PC450', name: 'Fan Favorite Tee', type: 'tshirt', brand: 'Port & Company', salesData: '10,006+ units sold', rating: 5, bestColors: ['Jet Black', 'Heather Navy', 'Dark Heather Grey'] },
+                { style: 'PC55', name: 'Core Blend Tee', type: 'tshirt', brand: 'Port & Company', salesData: '7,892+ units sold', rating: 4, bestColors: ['Jet Black', 'Navy', 'Dark Heather Grey', 'White'] },
+                { style: 'BC3001', name: 'Unisex Jersey Tee', type: 'tshirt', brand: 'BELLA+CANVAS', salesData: 'Premium soft feel', rating: 4, bestColors: ['Black', 'Navy', 'Dark Grey Heather'] },
+
+                // Hoodies
+                { style: 'PC78H', name: 'Core Fleece Pullover Hooded Sweatshirt', type: 'hoodie', brand: 'Port & Company', salesData: '5,234+ units sold', rating: 5, bestColors: ['Jet Black', 'Dark Heather Grey', 'Navy'] },
+                { style: 'PC850H', name: 'Fan Favorite Fleece Pullover Hooded Sweatshirt', type: 'hoodie', brand: 'Port & Company', salesData: '3,891+ units sold', rating: 5, bestColors: ['Black', 'Dark Heather Grey', 'Team Navy'] }
+            ];
+
+            const container = document.getElementById('dtg-recommendations-grid');
+            if (!container) return;
+
+            container.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading recommendations...</span></div></div>';
+
+            // Group products by type
+            const tshirts = recommendationsData.filter(p => p.type === 'tshirt');
+            const hoodies = recommendationsData.filter(p => p.type === 'hoodie');
+
+            let cardsHTML = '';
+
+            // Add T-Shirts section
+            if (tshirts.length > 0) {
+                cardsHTML += `
+                    <div class="dtg-product-section">
+                        <h4 class="dtg-section-title">
+                            <i class="fas fa-tshirt"></i>
+                            T-Shirts
+                        </h4>
+                        <div class="dtg-section-grid">
+                `;
+
+                for (const product of tshirts) {
+                    cardsHTML += await generateProductCard(product);
+                }
+
+                cardsHTML += `
+                        </div>
+                    </div>
+                `;
             }
 
-            const buttonHTML = `
-                <div id="dtg-recommendations-btn-container" style="
-                    position: fixed;
-                    bottom: 30px;
-                    right: 30px;
-                    z-index: 1000;
-                ">
-                    <button id="toggle-recommendations-btn" style="
-                        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
-                        color: white;
-                        border: none;
-                        padding: 12px 20px;
-                        border-radius: 25px;
-                        font-size: 14px;
-                        font-weight: 500;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 3px 10px rgba(46,88,39,0.3);
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    " onmouseover="this.style.background='linear-gradient(135deg, #388e3c 0%, #66bb6a 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(46,88,39,0.4)'"
-                       onmouseout="this.style.background='linear-gradient(135deg, #2e7d32 0%, #43a047 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 10px rgba(46,88,39,0.3)'">
-                        <i class="fas fa-lightbulb" style="color: #fff59d; font-size: 14px;"></i>
-                        <span>DTG Recommendations</span>
-                    </button>
-                </div>
-            `;
+            // Add Hoodies section
+            if (hoodies.length > 0) {
+                cardsHTML += `
+                    <div class="dtg-product-section">
+                        <h4 class="dtg-section-title">
+                            <i class="fas fa-hoodie"></i>
+                            Hoodies & Sweatshirts
+                        </h4>
+                        <div class="dtg-section-grid">
+                `;
 
-            document.body.insertAdjacentHTML('beforeend', buttonHTML);
+                for (const product of hoodies) {
+                    cardsHTML += await generateProductCard(product);
+                }
 
-            // Add click event listener
-            const button = document.getElementById('toggle-recommendations-btn');
-            if (button) {
-                button.addEventListener('click', () => {
-                    console.log('🌟 Recommendations button clicked');
-                    const event = new CustomEvent('toggleDTGRecommendations', { bubbles: true });
-                    document.dispatchEvent(event);
-                    window.dispatchEvent(event);
-                });
-                console.log('✅ DTG Recommendations button added successfully');
+                cardsHTML += `
+                        </div>
+                    </div>
+                `;
             }
+
+            container.innerHTML = cardsHTML;
+        }
+
+        // Helper function to generate product card HTML
+        async function generateProductCard(product) {
+            try {
+                // Try to fetch real product image from API - need to get exact match
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?q=${product.style}&limit=20`);
+                let imageUrl = 'https://via.placeholder.com/300x300/f0f0f0/333?text=' + product.style;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data.products && data.data.products.length > 0) {
+                        // Find exact style match
+                        let productData = data.data.products.find(p => p.styleNumber === product.style);
+
+                        // If no exact match, use first result as fallback
+                        if (!productData) {
+                            productData = data.data.products[0];
+                            console.log(`Warning: No exact match for ${product.style}, using ${productData.styleNumber}`);
+                        }
+
+                        // Use display image or model front image
+                        imageUrl = productData.images?.display ||
+                                  productData.images?.model?.front ||
+                                  productData.images?.main ||
+                                  imageUrl;
+                    }
+                }
+
+                const stars = '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating);
+
+                return `
+                    <div class="dtg-product-card" data-style="${product.style}">
+                        <div class="dtg-card-badge">${product.rating === 5 ? '⭐ Top Seller' : '👍 Popular'}</div>
+                        <div class="dtg-card-image">
+                            <img src="${imageUrl}" alt="${product.name}" loading="lazy">
+                        </div>
+                        <div class="dtg-card-content">
+                            <h4 class="dtg-card-title">${product.style}</h4>
+                            <p class="dtg-card-subtitle">${product.name}</p>
+                            <div class="dtg-card-rating">
+                                <span class="stars">${stars}</span>
+                            </div>
+                            ${product.bestColors ? `
+                                <div class="dtg-card-colors">
+                                    <strong>Best Colors:</strong> ${product.bestColors.slice(0, 2).join(', ')}${product.bestColors.length > 2 ? '...' : ''}
+                                </div>
+                            ` : ''}
+                            <button class="dtg-card-button" onclick="loadProductStyle('${product.style}')">
+                                <i class="fas fa-arrow-right"></i> Load This Style
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(`Error loading product ${product.style}:`, error);
+                return ''; // Return empty string on error
+            }
+        }
+
+        // Function to load a specific product style
+        function loadProductStyle(styleNumber) {
+            console.log(`Loading style: ${styleNumber}`);
+            // Direct navigation to the new product (use capital StyleNumber for consistency)
+            window.location.href = `?StyleNumber=${styleNumber}`;
         }
 
         // Initialize page
@@ -825,8 +1374,12 @@
             loadDTGProduct(styleNumber);
             setupSearch();
 
-            // Add recommendations button after a short delay to ensure page is fully loaded
-            setTimeout(addRecommendationsButton, 1000);
+            // Load recommendations after page is ready
+            setTimeout(() => {
+                if (document.getElementById('dtg-recommendations-grid')) {
+                    loadDTGRecommendations();
+                }
+            }, 1000);
         });
 
         // Load DTG product data - SIMPLE VERSION
@@ -1159,6 +1712,13 @@
         function updateProductInfo(product, styleNumber) {
             console.log('📝 Updating product info with:', product);
 
+            // Update breadcrumb Products link to include style parameter
+            const productsBreadcrumb = document.getElementById('products-breadcrumb');
+            if (productsBreadcrumb && styleNumber) {
+                productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                console.log('✅ Updated products breadcrumb with style:', styleNumber);
+            }
+
             const title = product.title || product.styleNumber || styleNumber;
             const description = product.description || 'Direct-to-Garment printing pricing';
             const brand = product.brand || 'Unknown Brand';
@@ -1262,22 +1822,118 @@
             }
         }
 
-        // Setup search functionality
+        // Setup search functionality with API integration
         function setupSearch() {
             const searchInput = document.getElementById('styleSearch');
             const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
 
-            function performSearch() {
-                const query = searchInput.value.trim();
-                if (query) {
-                    window.location.href = `?styleNumber=${query}`;
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+
+            let searchTimeout = null;
+
+            // Perform API search
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.classList.add('active');
+
+                try {
+                    // Search using the API endpoint
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+
+                    const results = await response.json();
+
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                    } else {
+                        // Build results HTML
+                        let html = '';
+                        results.slice(0, 10).forEach(result => {
+                            html += `
+                                <div class="search-result-item" data-style="${result.style || result.value}">
+                                    <div class="search-result-style">${result.style || result.value}</div>
+                                    <div class="search-result-desc">${result.label}</div>
+                                </div>
+                            `;
+                        });
+                        resultsContainer.innerHTML = html;
+
+                        // Add click handlers to results
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
                 }
             }
 
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', function(e) {
+            // Handle search input
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(query);
+                }, 300);
+            });
+
+            // Handle enter key for direct navigation
+            searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    performSearch();
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        // Try direct style number navigation
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
+                }
+            });
+
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+
+            // Handle escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    resultsContainer.classList.remove('active');
+                    searchInput.blur();
                 }
             });
         }
@@ -1339,8 +1995,6 @@
         console.log('🎯 DTG Nuclear Solution Loaded - Simple & Clean!');
     </script>
 
-    <!-- DTG Product Recommendations Modal -->
-    <!-- Removed dtg-recommendations.css to prevent CSS conflicts -->
-    <script src="/shared_components/js/dtg-product-recommendations-modal.js"></script>
+    <!-- DTG Product Recommendations (inline implementation) -->
 </body>
 </html>
