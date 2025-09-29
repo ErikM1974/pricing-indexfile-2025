@@ -121,7 +121,13 @@
       "Bash(for file in inventory-details.html policies-hub.html resources.html sale.html webstore-info.html top-sellers-showcase.html)",
       "Bash(do echo \"=== $file ===\")",
       "Read(///**)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(for style in PC61 PC450 PC55)",
+      "Bash(do echo \"=== $style ===\")",
+      "Bash(for style in PC54 PC61 PC450)",
+      "Bash(do echo \"=== Checking $style ===\")",
+      "Bash(lsof:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": [],
