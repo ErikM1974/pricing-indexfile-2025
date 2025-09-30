@@ -592,6 +592,7 @@
 
         /* Live Price Display */
         .live-price-display {
+            position: relative;  /* Required for absolute-positioned tooltip */
             background: linear-gradient(135deg, #4cb354, #2d5f3f);
             color: white;
             padding: 32px;
@@ -608,10 +609,31 @@
             margin-bottom: 8px;
         }
 
+        .live-price-amount-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
         .live-price-amount {
             font-size: 48px;
             font-weight: 700;
             letter-spacing: -1px;
+        }
+
+        .upcharge-info-icon {
+            font-size: 28px;
+            color: white;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .upcharge-info-icon:hover {
+            opacity: 1;
+            transform: scale(1.15);
         }
 
         .live-price-detail {
@@ -636,6 +658,92 @@
             display: block;  /* Only show when has content */
         }
 
+        /* Upcharge Tooltip Styles */
+        .upcharge-tooltip {
+            position: absolute;
+            bottom: calc(100% + 15px);  /* Position above the price display */
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 2px solid #4cb354;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(76, 179, 84, 0.25);
+            padding: 20px;
+            min-width: 280px;
+            z-index: 1000;
+            animation: tooltipFadeIn 0.3s ease;
+        }
+
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .upcharge-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: #4cb354;
+        }
+
+        .upcharge-tooltip-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .upcharge-tooltip-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upcharge-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .upcharge-item-size {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .upcharge-item-price {
+            font-weight: 700;
+            color: #4cb354;
+        }
+
+        .upcharge-base {
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        #upcharge-info-icon {
+            transition: all 0.3s ease;
+        }
+
+        #upcharge-info-icon:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
         /* Mobile responsive */
         @media (max-width: 768px) {
             .toggle-pricing-container {
@@ -646,69 +754,24 @@
             .live-price-amount {
                 font-size: 36px;
             }
-        }
 
-        /* Order Information Section */
-        .order-info-section {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow-md);
-            padding: 32px;
-            margin-bottom: 40px;
-        }
+            .upcharge-tooltip {
+                position: fixed;
+                bottom: auto;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                max-width: 90%;
+                animation: tooltipFadeIn 0.3s ease;
+            }
 
-        .order-info-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 24px;
-        }
+            .upcharge-tooltip::after {
+                display: none;  /* Hide arrow on mobile */
+            }
 
-        .order-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .order-info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            padding: 20px;
-            background: var(--primary-light);
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .order-info-icon {
-            background: var(--primary-color);
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .order-info-content {
-            flex: 1;
-        }
-
-        .order-info-label {
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .order-info-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
+            #upcharge-info-icon {
+                font-size: 18px;
+            }
         }
 
         /* Mobile Responsiveness for Print Size Legend */
@@ -1311,59 +1374,25 @@
             <!-- Live Price Display -->
             <div class="live-price-display">
                 <div class="live-price-label">Price per shirt</div>
-                <div class="live-price-amount" id="live-price-amount">$0.00</div>
+                <div class="live-price-amount-wrapper">
+                    <span class="live-price-amount" id="live-price-amount">$0.00</span>
+                    <i class="fas fa-info-circle upcharge-info-icon" id="upcharge-info-icon"></i>
+                </div>
                 <div class="live-price-detail" id="live-price-detail">Select a location to see pricing</div>
                 <div class="live-price-fee" id="live-price-fee"></div>
+
+                <!-- Upcharge Tooltip -->
+                <div id="upcharge-tooltip" class="upcharge-tooltip" style="display: none;">
+                    <div class="upcharge-tooltip-content">
+                        <div class="upcharge-tooltip-header">Size Pricing</div>
+                        <div id="upcharge-tooltip-body" class="upcharge-tooltip-body">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         </div> <!-- End pricing-content-wrapper -->
-
-        <!-- Order Information -->
-        <div class="order-info-section" id="orderInfoSection" style="display: none;">
-            <h3 class="order-info-title">Order Information</h3>
-
-            <div class="order-info-grid">
-                <div class="order-info-item">
-                    <div class="order-info-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="order-info-content">
-                        <div class="order-info-label">Minimum Order</div>
-                        <div class="order-info-text">24 pieces required for standard pricing</div>
-                    </div>
-                </div>
-
-                <div class="order-info-item">
-                    <div class="order-info-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="order-info-content">
-                        <div class="order-info-label">Orders Under 24</div>
-                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
-                    </div>
-                </div>
-
-                <div class="order-info-item">
-                    <div class="order-info-icon">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
-                    <div class="order-info-content">
-                        <div class="order-info-label">Print Locations</div>
-                        <div class="order-info-text">Multiple locations available: Left Chest, Full Front, Full Back, and more</div>
-                    </div>
-                </div>
-
-                <div class="order-info-item">
-                    <div class="order-info-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <div class="order-info-content">
-                        <div class="order-info-label">Custom Quotes</div>
-                        <div class="order-info-text">For combination prints or special requirements, please contact our customer service team at 253-922-5793 for a personalized quote.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- DTG Product Recommendations Section -->
         <div class="dtg-recommendations-section">
@@ -1410,7 +1439,6 @@
         const loadingState = document.getElementById('loadingState');
         const productHero = document.getElementById('productHero');
         const pricingSection = document.getElementById('pricingSection');
-        const orderInfoSection = document.getElementById('orderInfoSection');
 
         // Load DTG Product Recommendations
         async function loadDTGRecommendations() {
@@ -1569,6 +1597,9 @@
             // Initialize toggle interface
             initializeToggleUI();
 
+            // Initialize upcharge tooltip
+            initializeUpchargeTooltip();
+
             // Load recommendations after page is ready
             setTimeout(() => {
                 if (document.getElementById('dtg-recommendations-grid')) {
@@ -1645,6 +1676,9 @@
 
                 // Generate DTG pricing table - DIRECT APPROACH
                 updateDTGPricing();
+
+                // Update tooltip with loaded data
+                updateUpchargeTooltipContent();
 
                 // Show all sections
                 showProduct();
@@ -1959,6 +1993,138 @@
             updateLivePriceDisplay();
 
             console.log('✅ Toggle interface initialized');
+        }
+
+        // Initialize upcharge tooltip functionality
+        function initializeUpchargeTooltip() {
+            // Prevent duplicate initialization
+            if (window.tooltipInitialized) {
+                console.log('⚠️ Tooltip already initialized, skipping');
+                return;
+            }
+            window.tooltipInitialized = true;
+
+            const infoIcon = document.getElementById('upcharge-info-icon');
+            const tooltip = document.getElementById('upcharge-tooltip');
+
+            if (!infoIcon || !tooltip) {
+                console.warn('⚠️ Tooltip elements not found');
+                return;
+            }
+
+            console.log('✅ Initializing upcharge tooltip');
+
+            // Desktop: Show on hover
+            infoIcon.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    updateUpchargeTooltipContent();
+                    tooltip.style.display = 'block';
+                }
+            });
+
+            infoIcon.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    // Small delay to allow moving to tooltip
+                    setTimeout(() => {
+                        if (!tooltip.matches(':hover')) {
+                            tooltip.style.display = 'none';
+                        }
+                    }, 100);
+                }
+            });
+
+            tooltip.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            // Mobile: Show on tap, hide on outside click
+            infoIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateUpchargeTooltipContent();
+                tooltip.style.display = tooltip.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close tooltip when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!tooltip.contains(e.target) && e.target !== infoIcon) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Update upcharge tooltip content from API data
+        function updateUpchargeTooltipContent() {
+            const tooltipBody = document.getElementById('upcharge-tooltip-body');
+            if (!tooltipBody) return;
+
+            // Get available sizes for this product
+            const availableSizes = pricingData?.pricing?.sizes?.map(s => s.size) || [];
+
+            // Get all upcharges from API
+            const allUpcharges = pricingData?.pricing?.upcharges || {};
+
+            // Filter to only show upcharges for sizes that exist for this product
+            const upcharges = {};
+            Object.entries(allUpcharges).forEach(([size, amount]) => {
+                if (availableSizes.includes(size) && amount > 0) {
+                    upcharges[size] = amount;
+                }
+            });
+
+            console.log('🎯 Tooltip updating with data:', {
+                availableSizes,
+                allUpcharges,
+                filteredUpcharges: upcharges
+            });
+
+            // Build tooltip content
+            let html = '';
+
+            // Base price info - show only sizes without upcharges
+            const baseSizes = availableSizes.filter(size => !upcharges[size]);
+            if (baseSizes.length > 0) {
+                html += '<div class="upcharge-base">';
+                html += '<div class="upcharge-item">';
+                html += `<span class="upcharge-item-size">${baseSizes.join(', ')}</span>`;
+                html += '<span class="upcharge-item-price">Base Price</span>';
+                html += '</div>';
+                html += '</div>';
+            }
+
+            // Sort upcharge sizes for display
+            const upchargeSizes = Object.keys(upcharges).sort((a, b) => {
+                // Custom sort: 2XL, 3XL, 4XL, 5XL, 6XL, then others
+                const sizeOrder = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+                const aIndex = sizeOrder.indexOf(a);
+                const bIndex = sizeOrder.indexOf(b);
+
+                if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                if (aIndex !== -1) return -1;
+                if (bIndex !== -1) return 1;
+                return a.localeCompare(b);
+            });
+
+            // Add upcharge items
+            upchargeSizes.forEach(size => {
+                const upcharge = upcharges[size];
+                if (upcharge > 0) {
+                    html += '<div class="upcharge-item">';
+                    html += `<span class="upcharge-item-size">${size}</span>`;
+                    html += `<span class="upcharge-item-price">+$${upcharge.toFixed(2)}</span>`;
+                    html += '</div>';
+                }
+            });
+
+            // If no upcharges found
+            if (upchargeSizes.length === 0) {
+                html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+                html += 'No size upcharges for this style';
+                html += '</div>';
+            }
+
+            tooltipBody.innerHTML = html;
         }
 
         // Toggle a location on/off with validation
@@ -2407,14 +2573,12 @@
             loadingState.style.display = 'flex';
             productHero.style.display = 'none';
             pricingSection.style.display = 'none';
-            orderInfoSection.style.display = 'none';
         }
 
         function showProduct() {
             loadingState.style.display = 'none';
             productHero.style.display = 'block';
             pricingSection.style.display = 'block';
-            orderInfoSection.style.display = 'block';
         }
 
         function showNoProduct() {
