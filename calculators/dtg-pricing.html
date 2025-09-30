@@ -476,27 +476,58 @@
             gap: 8px;
         }
 
+        .toggle-section-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+
+        /* 2x3 Grid for location cards */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
         .toggle-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px;
-            margin-bottom: 12px;
             background: #f9fafb;
             border-radius: 8px;
-            border: 2px solid transparent;
+            border: 2px solid #e5e7eb;
             transition: all 0.3s;
+            cursor: pointer;  /* Make entire card clickable */
+            user-select: none;  /* Prevent text selection on click */
+        }
+
+        .toggle-item:hover {
+            border-color: #4cb354;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.1);
         }
 
         .toggle-item.active {
             background: #e8f5e9;
             border-color: #4cb354;
+            border-width: 3px;
         }
 
         .toggle-item-label {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #1f2937;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .toggle-item-size {
+            font-size: 12px;
+            font-weight: 400;
+            color: #6b7280;
         }
 
         /* iOS-style toggle switch */
@@ -587,6 +618,22 @@
             font-size: 14px;
             opacity: 0.8;
             margin-top: 8px;
+        }
+
+        .live-price-fee {
+            display: none;  /* Hidden by default */
+            font-size: 18px;
+            font-weight: 600;
+            color: #856404;  /* Muted brown for subtle warning */
+            margin-top: 16px;
+            padding: 8px 16px;
+            background: #fff3cd;  /* Warning background */
+            border-left: 2px solid #ffc107;  /* Thinner yellow accent */
+            border-radius: 4px;
+        }
+
+        .live-price-fee:not(:empty) {
+            display: block;  /* Only show when has content */
         }
 
         /* Mobile responsive */
@@ -1158,57 +1205,7 @@
             <!-- Pricing Section -->
             <div class="pricing-section" id="pricingSection" style="display: none;">
             <h2 class="pricing-title">DTG Pricing Matrix</h2>
-            <p class="pricing-subtitle">All locations and quantity tiers for Direct-to-Garment printing. *Orders under 24 pieces include a $50 LTM fee.</p>
-
-            <!-- Print Size Legend -->
-            <div class="print-size-legend" style="
-                background: #f9fafb;
-                border: 1px solid #e5e7eb;
-                border-radius: 12px;
-                padding: 16px 20px;
-                margin: 20px 0;
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            ">
-                <div class="legend-icon" style="
-                    font-size: 24px;
-                    color: #4cb354;
-                ">
-                    📏
-                </div>
-                <div class="legend-content" style="
-                    flex: 1;
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    gap: 8px;
-                ">
-                    <strong style="
-                        color: #1f2937;
-                        font-size: 14px;
-                        margin-right: 8px;
-                    ">Print Size Reference:</strong>
-                    <span class="size-item" style="
-                        color: #6b7280;
-                        font-size: 14px;
-                        padding: 0 12px;
-                        border-right: 1px solid #d1d5db;
-                    ">Left Chest: 4" × 4"</span>
-                    <span class="size-item" style="
-                        color: #6b7280;
-                        font-size: 14px;
-                        padding: 0 12px;
-                        border-right: 1px solid #d1d5db;
-                    ">Full Front/Back: 12" × 16"</span>
-                    <span class="size-item" style="
-                        color: #6b7280;
-                        font-size: 14px;
-                        padding-left: 12px;
-                    ">Jumbo Front/Back: 16" × 20"</span>
-                </div>
-            </div>
+            <p class="pricing-subtitle">All locations and quantity tiers for Direct-to-Garment printing.</p>
 
             <!-- Toggle Switch Pricing Interface -->
             <div class="toggle-pricing-container">
@@ -1218,39 +1215,69 @@
                         <i class="fas fa-layer-group"></i>
                         Print Locations
                     </div>
-
-                    <div class="toggle-item" id="toggle-LC" data-location="LC">
-                        <div class="toggle-item-label">Left Chest</div>
-                        <div class="toggle-switch">
-                            <div class="toggle-switch-slider"></div>
-                        </div>
+                    <div class="toggle-section-subtitle">
+                        Select a maximum of two locations.
                     </div>
 
-                    <div class="toggle-item" id="toggle-FF" data-location="FF">
-                        <div class="toggle-item-label">Full Front</div>
-                        <div class="toggle-switch">
-                            <div class="toggle-switch-slider"></div>
+                    <div class="location-grid">
+                        <div class="toggle-item" id="toggle-LC" data-location="LC">
+                            <div class="toggle-item-label">
+                                <span>Left Chest</span>
+                                <span class="toggle-item-size">4"×4"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="toggle-item" id="toggle-JF" data-location="JF">
-                        <div class="toggle-item-label">Jumbo Front</div>
-                        <div class="toggle-switch">
-                            <div class="toggle-switch-slider"></div>
+                        <div class="toggle-item" id="toggle-BON" data-location="BON">
+                            <div class="toggle-item-label">
+                                <span>Back of Neck</span>
+                                <span class="toggle-item-size">4"×4"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="toggle-item" id="toggle-FB" data-location="FB">
-                        <div class="toggle-item-label">Full Back</div>
-                        <div class="toggle-switch">
-                            <div class="toggle-switch-slider"></div>
+                        <div class="toggle-item" id="toggle-FF" data-location="FF">
+                            <div class="toggle-item-label">
+                                <span>Full Front</span>
+                                <span class="toggle-item-size">12"×16"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="toggle-item" id="toggle-JB" data-location="JB">
-                        <div class="toggle-item-label">Jumbo Back</div>
-                        <div class="toggle-switch">
-                            <div class="toggle-switch-slider"></div>
+                        <div class="toggle-item" id="toggle-FB" data-location="FB">
+                            <div class="toggle-item-label">
+                                <span>Full Back</span>
+                                <span class="toggle-item-size">12"×16"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item" id="toggle-JF" data-location="JF">
+                            <div class="toggle-item-label">
+                                <span>Jumbo Front</span>
+                                <span class="toggle-item-size">16"×20"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item" id="toggle-JB" data-location="JB">
+                            <div class="toggle-item-label">
+                                <span>Jumbo Back</span>
+                                <span class="toggle-item-size">16"×20"</span>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1261,6 +1288,11 @@
                         <i class="fas fa-chart-bar"></i>
                         Quantity Tiers
                     </div>
+
+                    <button class="tier-button" id="tier-ltm" data-tier="1-23">
+                        Less than 24 pieces<br>
+                        <small style="font-size: 11px; opacity: 0.9;">+ $50 Small Batch Fee</small>
+                    </button>
 
                     <button class="tier-button selected" id="tier-24-47" data-tier="24-47">
                         24-47 pieces
@@ -1281,6 +1313,7 @@
                 <div class="live-price-label">Price per shirt</div>
                 <div class="live-price-amount" id="live-price-amount">$0.00</div>
                 <div class="live-price-detail" id="live-price-detail">Select a location to see pricing</div>
+                <div class="live-price-fee" id="live-price-fee"></div>
             </div>
         </div>
         </div> <!-- End pricing-content-wrapper -->
@@ -1793,23 +1826,27 @@
                 throw new Error('Pricing data not loaded. Please refresh the page.');
             }
 
+            // Map LTM tier (1-23) to actual API tier (24-47)
+            // For quantities under 24, we use 24-47 tier pricing + $50 LTM fee
+            const apiTierLabel = tierLabel === '1-23' ? '24-47' : tierLabel;
+
             // Check if it's a combo location
             const isCombo = locationCode.includes('_');
 
-            // Get tier data for margin calculation
-            const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
+            // Get tier data for margin calculation using API tier label
+            const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === apiTierLabel);
             if (!tier) {
-                console.error(`❌ Tier not found: ${tierLabel}`);
-                throw new Error(`Tier data not available for ${tierLabel}`);
+                console.error(`❌ Tier not found: ${apiTierLabel}`);
+                throw new Error(`Tier data not available for ${apiTierLabel}`);
             }
 
             if (isCombo) {
                 // For combo locations, calculate using API data
-                return getDTGPriceForComboLocation(locationCode, tierLabel, tier);
+                return getDTGPriceForComboLocation(locationCode, apiTierLabel, tier);
             }
 
             // Single location - calculate price using API data
-            return getDTGPriceForSingleLocation(locationCode, tierLabel, tier);
+            return getDTGPriceForSingleLocation(locationCode, apiTierLabel, tier);
         }
 
         // Helper function for combo location pricing - API DATA ONLY
@@ -1896,13 +1933,15 @@
         function initializeToggleUI() {
             console.log('🎚️ Initializing toggle interface...');
 
-            // Set up location toggle event listeners
+            // Set up location toggle event listeners - ENTIRE CARD CLICKABLE
             const locationToggles = document.querySelectorAll('.toggle-item');
             locationToggles.forEach(toggle => {
                 const locationCode = toggle.dataset.location;
-                const toggleSwitch = toggle.querySelector('.toggle-switch');
 
-                toggleSwitch.addEventListener('click', () => {
+                // Make entire card clickable
+                toggle.addEventListener('click', (e) => {
+                    // Prevent double-firing if switch itself is clicked
+                    e.stopPropagation();
                     toggleLocation(locationCode);
                 });
             });
@@ -1924,11 +1963,14 @@
 
         // Toggle a location on/off with validation
         function toggleLocation(locationCode) {
+            // Map BON to LC for pricing calculations
+            const pricingLocationCode = locationCode === 'BON' ? 'LC' : locationCode;
+
             const index = toggleState.selectedLocations.indexOf(locationCode);
             const isCurrentlyOn = index !== -1;
 
-            // Define front and back locations
-            const frontLocations = ['LC', 'FF', 'JF'];
+            // Define front and back locations (BON is a front location)
+            const frontLocations = ['LC', 'BON', 'FF', 'JF'];
             const backLocations = ['FB', 'JB'];
             const isFront = frontLocations.includes(locationCode);
             const isBack = backLocations.includes(locationCode);
@@ -1977,8 +2019,10 @@
 
             const toggleSwitch = toggleElement.querySelector('.toggle-switch');
             if (isOn) {
+                toggleElement.classList.add('active');  // Add to card
                 toggleSwitch.classList.add('on');
             } else {
+                toggleElement.classList.remove('active');  // Remove from card
                 toggleSwitch.classList.remove('on');
             }
         }
@@ -2007,6 +2051,7 @@
         function updateLivePriceDisplay() {
             const priceAmountElement = document.getElementById('live-price-amount');
             const priceDetailElement = document.getElementById('live-price-detail');
+            const priceFeeElement = document.getElementById('live-price-fee');
 
             if (!priceAmountElement || !priceDetailElement) {
                 console.error('❌ Live price display elements not found');
@@ -2017,6 +2062,7 @@
             if (toggleState.selectedLocations.length === 0) {
                 priceAmountElement.textContent = '$0.00';
                 priceDetailElement.textContent = 'Select a location to see pricing';
+                if (priceFeeElement) priceFeeElement.textContent = '';
                 return;
             }
 
@@ -2024,31 +2070,50 @@
                 // Calculate price based on selected locations
                 let finalPrice = 0;
 
+                // Map BON locations to LC for pricing
+                const pricingLocations = toggleState.selectedLocations.map(loc => loc === 'BON' ? 'LC' : loc);
+
+                // Format tier display text
+                const displayTier = toggleState.selectedTier === '1-23' ? 'Less than 24' : toggleState.selectedTier;
+
                 if (toggleState.selectedLocations.length === 1) {
                     // Single location: Use standard pricing
-                    const locationCode = toggleState.selectedLocations[0];
+                    const locationCode = pricingLocations[0];
                     finalPrice = getDTGPrice(locationCode, toggleState.selectedTier);
-                    const locationName = getLocationName(locationCode);
-                    priceDetailElement.textContent = `${locationName} • ${toggleState.selectedTier} pieces`;
+                    const locationName = getLocationName(toggleState.selectedLocations[0]);
+                    priceDetailElement.textContent = `${locationName} • ${displayTier} pieces`;
 
                 } else if (toggleState.selectedLocations.length === 2) {
                     // Combo location: Build combo code and get price
-                    const [loc1, loc2] = toggleState.selectedLocations.sort(); // Sort for consistent combo code
+                    const [loc1, loc2] = pricingLocations.sort(); // Sort for consistent combo code
                     const comboCode = `${loc1}_${loc2}`;
                     finalPrice = getDTGPrice(comboCode, toggleState.selectedTier);
-                    const loc1Name = getLocationName(loc1);
-                    const loc2Name = getLocationName(loc2);
-                    priceDetailElement.textContent = `${loc1Name} + ${loc2Name} • ${toggleState.selectedTier} pieces`;
+                    const loc1Name = getLocationName(toggleState.selectedLocations[0]);
+                    const loc2Name = getLocationName(toggleState.selectedLocations[1]);
+                    priceDetailElement.textContent = `${loc1Name} + ${loc2Name} • ${displayTier} pieces`;
                 }
 
-                // Update display
+                // Update price display
                 priceAmountElement.textContent = `$${finalPrice.toFixed(2)}`;
+
+                // Display LTM fee if tier is under 24 pieces
+                if (priceFeeElement) {
+                    if (toggleState.selectedTier === '1-23') {
+                        priceFeeElement.textContent = '+ $50.00 Small Batch Fee';
+                        priceFeeElement.style.display = 'block';
+                    } else {
+                        priceFeeElement.textContent = '';
+                        priceFeeElement.style.display = 'none';
+                    }
+                }
+
                 console.log(`💰 Live price updated: $${finalPrice.toFixed(2)}`);
 
             } catch (error) {
                 console.error('❌ Error calculating live price:', error);
                 priceAmountElement.textContent = 'Error';
                 priceDetailElement.textContent = error.message || 'Unable to calculate price';
+                if (priceFeeElement) priceFeeElement.textContent = '';
             }
         }
 
@@ -2056,6 +2121,7 @@
         function getLocationName(locationCode) {
             const locationNames = {
                 'LC': 'Left Chest',
+                'BON': 'Back of Neck',
                 'FF': 'Full Front',
                 'JF': 'Jumbo Front',
                 'FB': 'Full Back',
