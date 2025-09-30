@@ -343,6 +343,78 @@ window.DashboardModule = {
 
 **Architecture Benefits**: Maintainable code, lazy loading, role-specific features
 
+## 11. Progressive Disclosure UI Pattern
+
+**Pattern**: Show information contextually rather than all at once
+**Location**: DTG pricing page size upcharge tooltip (added 2025-09-30)
+**Reference**: `/calculators/dtg-pricing.html:2169-2239`
+
+**Problem**: Too much information overwhelms users and clutters clean interfaces
+
+**Solution**: Use icons with tooltips/popovers to reveal information on demand
+
+```javascript
+// Info icon triggers contextual display
+<div class="live-price-amount-wrapper">
+    <span class="live-price-amount">$15.00</span>
+    <i class="fas fa-info-circle upcharge-info-icon"></i>
+</div>
+
+// Tooltip appears on demand with filtered data
+function updateUpchargeTooltipContent() {
+    // Only show sizes that exist for this product
+    const availableSizes = pricingData?.pricing?.sizes?.map(s => s.size) || [];
+
+    const upcharges = {};
+    Object.entries(allUpcharges).forEach(([size, amount]) => {
+        if (availableSizes.includes(size) && amount > 0) {
+            upcharges[size] = amount;
+        }
+    });
+
+    // Build display with filtered data
+    // ...
+}
+```
+
+**Key Architectural Principles**:
+1. **Clean Primary Interface** - Main UI shows only essential information
+2. **Contextual Revelation** - Additional details appear when user needs them
+3. **Data Filtering** - Show only relevant information (sizes that exist)
+4. **Responsive Behavior** - Adapt to device (hover on desktop, tap on mobile)
+
+**Benefits**:
+- Cleaner initial UI reduces cognitive load
+- Information available when needed without cluttering interface
+- Scales well to mobile devices
+- Maintains focus on primary task (product selection)
+- Allows more flexible data presentation
+
+**Implementation Components**:
+- **Trigger**: Icon or subtle UI element
+- **Content**: Dynamically generated based on context
+- **Positioning**: Absolute positioning relative to trigger
+- **Dismissal**: Click outside or explicit close action
+
+**When to Use**:
+- Auxiliary information (not critical to main flow)
+- Product-specific details (sizes, options, specifications)
+- Help text and explanations
+- Secondary pricing details (upcharges, fees)
+- Technical specifications or requirements
+
+**When NOT to Use**:
+- Critical information users must see immediately
+- Primary call-to-action elements
+- Error messages or warnings
+- Legal disclaimers or required notices
+
+**Related Patterns**:
+- Tooltip positioning (CSS absolute/relative)
+- Event delegation (desktop hover vs mobile tap)
+- Data filtering (show only relevant subset)
+- Responsive design (adapt to viewport size)
+
 ## System Architecture Overview
 
 ### Key Components:

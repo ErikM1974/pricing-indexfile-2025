@@ -258,6 +258,127 @@ Combo locations sum the print costs of individual locations:
 // $3.53/0.6 + $5.00 = $10.88 → $11.00 ✓
 ```
 
+### Size Upcharge Display Pattern (Added 2025-09-30)
+
+**Problem**: How to show size upcharges without overwhelming the clean toggle UI
+
+**Solution**: Contextual tooltip with progressive disclosure
+
+**HTML Structure**:
+```html
+<div class="live-price-amount-wrapper">
+    <span class="live-price-amount">$15.00</span>
+    <i class="fas fa-info-circle upcharge-info-icon"></i>
+</div>
+
+<div id="upcharge-tooltip" class="upcharge-tooltip" style="display: none;">
+    <div class="upcharge-tooltip-content">
+        <div class="upcharge-tooltip-header">Size Pricing</div>
+        <div id="upcharge-tooltip-body">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+</div>
+```
+
+**CSS Requirements**:
+```css
+.live-price-display {
+    position: relative;  /* Required for absolute-positioned tooltip */
+}
+
+.live-price-amount-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.upcharge-tooltip {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+```
+
+**JavaScript Pattern**:
+```javascript
+function updateUpchargeTooltipContent() {
+    // 1. Get available sizes from API (key pattern!)
+    const availableSizes = pricingData?.pricing?.sizes?.map(s => s.size) || [];
+
+    // 2. Get all upcharges from API
+    const allUpcharges = pricingData?.pricing?.upcharges || {};
+
+    // 3. Filter to only show sizes that exist for this product
+    const upcharges = {};
+    Object.entries(allUpcharges).forEach(([size, amount]) => {
+        if (availableSizes.includes(size) && amount > 0) {
+            upcharges[size] = amount;
+        }
+    });
+
+    // 4. Build display with base sizes separately
+    const baseSizes = availableSizes.filter(size => !upcharges[size]);
+    let html = '';
+
+    // Show base sizes (no upcharge)
+    if (baseSizes.length > 0) {
+        html += `<div class="upcharge-item">`;
+        html += `<span class="upcharge-item-size">${baseSizes.join(', ')}</span>`;
+        html += `<span class="upcharge-item-price">Base Price</span>`;
+        html += `</div>`;
+    }
+
+    // Show upcharged sizes
+    Object.keys(upcharges).sort().forEach(size => {
+        html += `<div class="upcharge-item">`;
+        html += `<span class="upcharge-item-size">${size}</span>`;
+        html += `<span class="upcharge-item-price">+$${upcharges[size].toFixed(2)}</span>`;
+        html += `</div>`;
+    });
+
+    tooltipBody.innerHTML = html;
+}
+```
+
+**Event Listeners**:
+```javascript
+// Desktop: Show on hover
+infoIcon.addEventListener('mouseenter', () => {
+    if (window.innerWidth > 768) {
+        updateUpchargeTooltipContent();
+        tooltip.style.display = 'block';
+    }
+});
+
+// Mobile: Show on tap
+infoIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateUpchargeTooltipContent();
+    tooltip.style.display = tooltip.style.display === 'block' ? 'none' : 'block';
+});
+
+// Close when clicking outside
+document.addEventListener('click', (e) => {
+    if (!tooltip.contains(e.target) && e.target !== infoIcon) {
+        tooltip.style.display = 'none';
+    }
+});
+```
+
+**Reference Implementation**:
+- Filtering logic: `/shared_components/js/universal-pricing-grid.js:103-115`
+- Complete tooltip: `/calculators/dtg-pricing.html:2169-2239`
+
+**Key Principles**:
+1. **Filter by available sizes** - Don't show upcharges for sizes the product doesn't have
+2. **Separate base vs upcharge** - Clear distinction between standard and upcharged sizes
+3. **Progressive disclosure** - Show only when user needs it
+4. **Mobile-friendly** - Tap to show, tap outside to hide
+
 ## 🔄 State Management Patterns
 
 ### Where to Store State

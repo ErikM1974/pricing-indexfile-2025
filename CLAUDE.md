@@ -1393,6 +1393,36 @@ curl -s "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bun
 - **Missing rounding**: Always round UP to half dollar
 - **Combo locations**: Sum individual location print costs
 
+### Size Upcharge Display Pattern
+
+**UX Approach**: Progressive disclosure with info icon tooltip (added 2025-09-30)
+
+**Current UI**: Toggle switches for locations + quantity tiers (NOT old table interface). "Order Information" section removed for cleaner UX.
+
+**Implementation**:
+1. Display info icon next to live price (flexbox wrapper for positioning)
+2. Tooltip shows on hover (desktop) or tap (mobile)
+3. Filter upcharges by available sizes from API
+4. Separate display: base sizes vs upcharged sizes
+
+**Code Pattern**:
+```javascript
+// Get available sizes for filtering
+const availableSizes = pricingData?.pricing?.sizes?.map(s => s.size) || [];
+
+// Filter upcharges to only show existing sizes
+const filteredUpcharges = {};
+Object.entries(allUpcharges).forEach(([size, amount]) => {
+    if (availableSizes.includes(size) && amount > 0) {
+        filteredUpcharges[size] = amount;
+    }
+});
+```
+
+**Reference**:
+- Filtering pattern: `/shared_components/js/universal-pricing-grid.js:103-115`
+- Tooltip implementation: `/calculators/dtg-pricing.html:2169-2239`
+
 ## Additional Resources
 
 ### 📚 Documentation
