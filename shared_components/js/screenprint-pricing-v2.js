@@ -115,82 +115,133 @@ class ScreenPrintPricing {
             return;
         }
 
+        // NEW TOGGLE-BASED UI - PHASE 1
         container.innerHTML = `
             <div class="sp-calculator">
                 <h3 class="sp-title">Screen Print Pricing Calculator</h3>
-                
-                <div class="sp-layout">
-                    <!-- Controls -->
-                    <div class="sp-controls">
-                        <!-- Quantity -->
-                        <div class="sp-control-group">
-                            <label for="sp-quantity">Quantity:</label>
-                            <input type="number" id="sp-quantity" min="${this.config.minimumQuantity}" 
-                                   value="${this.state.quantity}" step="1" class="sp-input">
-                            <span class="sp-help-text">Minimum ${this.config.minimumQuantity} pieces</span>
+
+                <!-- Toggle Switch Pricing Interface -->
+                <div class="sp-toggle-pricing-container">
+                    <!-- Left Panel: Ink Colors -->
+                    <div class="sp-toggle-section">
+                        <div class="sp-workflow-step-label">Step 1: Select Colors</div>
+                        <div class="sp-toggle-section-title">
+                            <i class="fas fa-palette"></i>
+                            Front Location Ink Colors
+                        </div>
+                        <div class="sp-toggle-section-subtitle">
+                            Select the number of ink colors for your front design.
                         </div>
 
-                        <!-- Front Colors -->
-                        <div class="sp-control-group">
-                            <label for="sp-front-colors">Front Design Colors:</label>
-                            <div class="sp-color-row">
-                                <select id="sp-front-colors" class="sp-select">
-                                    ${this.config.colorOptions.map(opt => 
-                                        `<option value="${opt.value}" ${opt.value === 1 ? 'selected' : ''}>${opt.label}</option>`
-                                    ).join('')}
-                                </select>
-                                <label class="sp-safety-checkbox sp-front-safety">
-                                    <input type="checkbox" id="sp-front-safety">
-                                    <span>Safety Stripes</span> <span class="sp-safety-price">(+$${this.state.safetyStripeSurcharge.toFixed(2)})</span>
-                                    <span class="sp-safety-tooltip">4-color design: White base + 2 stripe colors + company logo</span>
-                                </label>
+                        <div class="sp-color-grid">
+                            ${[1, 2, 3, 4, 5, 6].map(colorCount => `
+                                <div class="sp-toggle-item ${colorCount === 1 ? 'active' : ''}"
+                                     id="sp-toggle-${colorCount}color"
+                                     data-colors="${colorCount}">
+                                    <div class="sp-toggle-item-label">
+                                        <span>${colorCount} Color${colorCount > 1 ? 's' : ''}</span>
+                                    </div>
+                                    <div class="sp-toggle-switch">
+                                        <div class="sp-toggle-switch-slider"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Safety Stripes Toggle -->
+                        <div class="sp-safety-stripes-toggle" id="sp-safety-stripes-toggle">
+                            <div class="sp-safety-stripes-label">
+                                <span>Safety Stripes Design</span>
+                                <span class="sp-safety-stripes-info">4-color design: +$${this.state.safetyStripeSurcharge.toFixed(2)} per piece</span>
                             </div>
-                        </div>
-
-                        <!-- Additional Locations -->
-                        <div class="sp-control-group">
-                            <label>Additional Print Locations:</label>
-                            <div id="sp-additional-locations"></div>
-                            <button type="button" id="sp-add-location" class="sp-btn sp-btn-add">
-                                + Add Location
-                            </button>
-                        </div>
-
-                        <!-- Dark Garment -->
-                        <div class="sp-control-group">
-                            <label class="sp-checkbox-label">
-                                <input type="checkbox" id="sp-dark-garment">
-                                Dark garment (needs white underbase)
-                            </label>
-                            <span class="sp-help-text">Adds 1 color per location</span>
+                            <div class="sp-toggle-switch">
+                                <div class="sp-toggle-switch-slider"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Pricing Display -->
-                    <div class="sp-pricing">
-                        <div class="sp-price-box">
-                            <div class="sp-price-main">
-                                <span class="sp-currency">$</span>
-                                <span id="sp-base-price" class="sp-price-value">0.00</span>
-                                <span class="sp-price-label">per shirt</span>
-                            </div>
-                            <div id="sp-price-subtitle-dynamic" class="sp-price-subtitle" style="font-size: 0.8em; line-height: 1.3; margin-top: 5px; text-align: center;"></div>
-                            <div id="sp-dark-garment-indicator" class="sp-help-text" style="font-size: 0.75em; text-align: center; display: none; margin-top: 3px;"></div>
-                            
-                            <!-- Setup and LTM impact lines are removed from here, will be part of subtitle -->
-                        </div>
-                        <!-- Setup Details (Separate Box) -->
-                        <div class="sp-setup-details">
-                            <div class="sp-setup-header">
-                                <span>One-time Setup:</span>
-                                <span id="sp-setup-fee">$0.00</span>
-                            </div>
-                            <div id="sp-setup-breakdown" class="sp-setup-breakdown"></div>
+                    <!-- Right Panel: Quantity Tiers -->
+                    <div class="sp-toggle-section">
+                        <div class="sp-workflow-step-label">Step 2: Select Quantity</div>
+                        <div class="sp-toggle-section-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Quantity Tiers
                         </div>
 
-                        <!-- LTM Warning (Separate Box) -->
-                        <div id="sp-ltm-warning" class="sp-ltm-warning" style="display: none;">
-                            <span>⚠️ Small order fee applies: <strong id="sp-ltm-fee">$50.00</strong></span>
+                        <button class="sp-tier-button" id="sp-tier-ltm" data-tier="1-23">
+                            Less than 24 pieces
+                            <small>+ $50 Small Batch Fee</small>
+                        </button>
+
+                        <button class="sp-tier-button selected" id="sp-tier-24-47" data-tier="24-47">
+                            24-47 pieces
+                        </button>
+
+                        <button class="sp-tier-button" id="sp-tier-48-71" data-tier="48-71">
+                            48-71 pieces
+                        </button>
+
+                        <button class="sp-tier-button" id="sp-tier-72-143" data-tier="72-143">
+                            72-143 pieces
+                        </button>
+
+                        <button class="sp-tier-button" id="sp-tier-144" data-tier="144+">
+                            144+ pieces
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Price Display (Moved Higher & More Prominent) -->
+                <div class="sp-live-price-display sp-live-price-prominent">
+                    <div class="sp-live-price-workflow-label">Step 3: Your Price</div>
+                    <div class="sp-live-price-label">Price per shirt</div>
+                    <div class="sp-live-price-amount-wrapper">
+                        <span class="sp-live-price-amount" id="sp-live-price-amount">$0.00</span>
+                        <i class="fas fa-info-circle sp-upcharge-info-icon" id="sp-upcharge-info-icon"></i>
+                    </div>
+                    <div class="sp-live-price-detail" id="sp-live-price-detail">Select colors to see pricing</div>
+                    <div class="sp-live-price-fee" id="sp-live-price-fee"></div>
+                    <div class="sp-live-price-setup" id="sp-live-price-setup">Setup: $0.00</div>
+
+                    <!-- Upcharge Tooltip -->
+                    <div id="sp-upcharge-tooltip" class="sp-upcharge-tooltip">
+                        <div class="sp-upcharge-tooltip-content">
+                            <div class="sp-upcharge-tooltip-header">Size Pricing</div>
+                            <div id="sp-upcharge-tooltip-body" class="sp-upcharge-tooltip-body">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Locations Section (Always Visible) -->
+                <div class="sp-additional-locations-section" id="sp-additional-locations-section">
+                    <div class="sp-additional-locations-header" id="sp-additional-locations-header">
+                        <div class="sp-additional-locations-title">
+                            <i class="fas fa-chevron-down"></i>
+                            Additional Print Locations
+                        </div>
+                        <div class="sp-additional-locations-subtitle">Add up to 3 additional locations</div>
+                    </div>
+                    <div class="sp-additional-locations-content" id="sp-additional-locations-container">
+                        <!-- Location slots will be inserted here -->
+                    </div>
+                    <!-- Add Location button (moved outside container to prevent deletion) -->
+                    <button type="button" id="sp-add-location" class="sp-add-location-button">
+                        <i class="fas fa-plus"></i>
+                        Add Location
+                    </button>
+                </div>
+
+                <!-- Dark Garment Toggle -->
+                <div class="sp-dark-garment-section">
+                    <div class="sp-dark-garment-toggle" id="sp-dark-garment-toggle">
+                        <div class="sp-dark-garment-label">
+                            <span>Dark Garment (requires white underbase)</span>
+                            <span class="sp-dark-garment-info">Adds 1 color per location</span>
+                        </div>
+                        <div class="sp-toggle-switch">
+                            <div class="sp-toggle-switch-slider"></div>
                         </div>
                     </div>
                 </div>
@@ -201,27 +252,12 @@ class ScreenPrintPricing {
                     <div id="sp-summary-content"></div>
                 </div>
 
-                <!-- Accordions -->
-                <div class="sp-accordions">
-                    <button type="button" class="sp-accordion-trigger" data-target="pricing-tiers">
-                        <span class="sp-accordion-icon">▶</span>
-                        View All Pricing Tiers
-                    </button>
-                    <div id="pricing-tiers" class="sp-accordion-content" style="display: none;">
-                        <div id="sp-tiers-content">Loading pricing tiers...</div>
-                    </div>
-
-                    <button type="button" class="sp-accordion-trigger" data-target="location-pricing">
-                        <span class="sp-accordion-icon">▶</span>
-                        Additional Location Pricing Guide
-                    </button>
-                    <div id="location-pricing" class="sp-accordion-content" style="display: none;">
-                        <div id="sp-location-guide">
-                            <p>Additional print locations are charged per piece based on the number of colors.</p>
-                            <p>Setup fees apply to each location and color.</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Hidden Fields for Compatibility -->
+                <input type="hidden" id="sp-quantity" value="${this.state.quantity}">
+                <input type="hidden" id="sp-front-colors" value="${this.state.frontColors}">
+                <input type="hidden" id="sp-front-safety" ${this.state.frontHasSafetyStripes ? 'checked' : ''}>
+                <div id="sp-additional-locations" style="display: none;"></div>
+                <input type="hidden" id="sp-dark-garment" ${this.state.isDarkGarment ? 'checked' : ''}>
             </div>
         `;
         // Re-cache elements that are created inside container.innerHTML
@@ -252,35 +288,42 @@ class ScreenPrintPricing {
     }
 
     bindEvents() {
-        // Quantity changes
-        this.elements.quantityInput?.addEventListener('input', (e) => {
-            const rawValue = e.target.value;
-            const parsedValue = rawValue === "" ? 0 : parseInt(rawValue); 
-            const quantityToUpdate = isNaN(parsedValue) ? 0 : parsedValue;
-            // Debug logging removed - was causing console noise
-            this.state.quantity = quantityToUpdate; 
-            this.updateDisplay(); 
-        });
-        
-        this.elements.quantityInput?.addEventListener('blur', (e) => {
-            let currentVal = parseInt(e.target.value);
-            // Debug logging removed - was causing console noise
+        // NEW: Color Toggle Switches (1-6 colors)
+        for (let colorCount = 1; colorCount <= 6; colorCount++) {
+            const toggle = document.getElementById(`sp-toggle-${colorCount}color`);
+            toggle?.addEventListener('click', () => {
+                this.selectColorCount(colorCount);
+            });
+        }
 
-            if (isNaN(currentVal) || (currentVal < this.config.minimumQuantity && currentVal !== 0) || currentVal === 0 ) {
-                 if (currentVal !== 0 || isNaN(currentVal)) { // Avoid alert if user just typed 0 and intends to type more
-                    this.showError(`Minimum quantity is ${this.config.minimumQuantity}. Resetting.`);
-                 }
-                currentVal = this.config.minimumQuantity;
-            }
-            
-            this.elements.quantityInput.value = currentVal; 
-            this.state.quantity = currentVal; 
-            this.updateDisplay(); 
+        // NEW: Tier Buttons
+        const tierButtons = [
+            { id: 'sp-tier-ltm', tier: '1-23', qty: 12 },
+            { id: 'sp-tier-24-47', tier: '24-47', qty: 24 },
+            { id: 'sp-tier-48-71', tier: '48-71', qty: 48 },
+            { id: 'sp-tier-72-143', tier: '72-143', qty: 72 },
+            { id: 'sp-tier-144', tier: '144+', qty: 144 }
+        ];
+
+        tierButtons.forEach(({id, tier, qty}) => {
+            document.getElementById(id)?.addEventListener('click', () => {
+                this.selectQuantityTier(tier, qty);
+            });
         });
 
-        // Front colors changes
-        this.elements.frontColorsSelect?.addEventListener('change', (e) => {
-            this.updateFrontColors(parseInt(e.target.value) || 0);
+        // NEW: Safety Stripes Toggle
+        document.getElementById('sp-safety-stripes-toggle')?.addEventListener('click', () => {
+            this.toggleSafetyStripes();
+        });
+
+        // NEW: Dark Garment Toggle
+        document.getElementById('sp-dark-garment-toggle')?.addEventListener('click', () => {
+            this.toggleDarkGarment();
+        });
+
+        // NEW: Additional Locations Header (Collapse/Expand)
+        document.getElementById('sp-additional-locations-header')?.addEventListener('click', () => {
+            this.toggleAdditionalLocationsSection();
         });
 
         // Add location button
@@ -288,41 +331,83 @@ class ScreenPrintPricing {
             this.addLocation();
         });
 
-        // Dark garment toggle
-        this.elements.darkGarmentCheckbox?.addEventListener('change', (e) => {
-            this.updateDarkGarment(e.target.checked);
-        });
-        
-        // Front safety stripes toggle
-        this.elements.frontSafetyCheckbox?.addEventListener('change', (e) => {
-            this.updateFrontSafetyStripes(e.target.checked);
-        });
+        // NEW: Upcharge Info Icon - Desktop hover + Mobile click
+        const upchargeIcon = document.getElementById('sp-upcharge-info-icon');
+        const upchargeTooltip = document.getElementById('sp-upcharge-tooltip');
+
+        if (upchargeIcon && upchargeTooltip) {
+            // Desktop: Show on hover
+            upchargeIcon.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    this.updateUpchargeTooltipContent();
+                    upchargeTooltip.classList.add('show');
+                }
+            });
+
+            upchargeIcon.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    // Small delay to allow moving to tooltip
+                    setTimeout(() => {
+                        if (!upchargeTooltip.matches(':hover')) {
+                            upchargeTooltip.classList.remove('show');
+                        }
+                    }, 100);
+                }
+            });
+
+            upchargeTooltip.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    upchargeTooltip.classList.remove('show');
+                }
+            });
+
+            // Mobile: Show on tap
+            upchargeIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.updateUpchargeTooltipContent();
+                upchargeTooltip.classList.toggle('show');
+            });
+
+            // Close tooltip when clicking outside (mobile)
+            document.addEventListener('click', (e) => {
+                if (!upchargeTooltip.contains(e.target) && e.target !== upchargeIcon) {
+                    upchargeTooltip.classList.remove('show');
+                }
+            });
+        }
 
         // Accordion toggles
         document.querySelectorAll('.sp-accordion-trigger').forEach(trigger => {
             trigger.addEventListener('click', () => this.toggleAccordion(trigger));
         });
 
-        // Listen for location changes (delegated)
-        this.elements.locationsContainer?.addEventListener('change', (e) => {
-            if (e.target.classList.contains('sp-location-select') || 
-                e.target.classList.contains('sp-location-colors')) {
-                this.updateLocations();
-            }
-            // Handle safety stripes checkbox for additional locations
-            if (e.target.classList.contains('sp-location-safety')) {
-                const index = parseInt(e.target.dataset.index);
-                this.updateLocationSafetyStripes(index, e.target.checked);
-            }
-        });
+        // NEW: Listen for additional location changes (delegated to container)
+        const additionalLocationsContainer = document.getElementById('sp-additional-locations-container');
+        if (additionalLocationsContainer) {
+            // Handle select changes (location and color count)
+            additionalLocationsContainer.addEventListener('change', (e) => {
+                if (e.target.classList.contains('sp-location-slot-select')) {
+                    this.updateLocations();
+                }
+                // Handle safety stripes checkbox for additional locations
+                if (e.target.classList.contains('sp-location-safety')) {
+                    const index = parseInt(e.target.dataset.index);
+                    this.updateLocationSafetyStripes(index, e.target.checked);
+                }
+            });
 
-        // Remove location buttons (delegated)
-        this.elements.locationsContainer?.addEventListener('click', (e) => {
-            if (e.target.classList.contains('sp-remove-location')) {
-                const index = parseInt(e.target.dataset.index);
-                this.removeLocation(index);
-            }
-        });
+            // Handle remove button clicks
+            additionalLocationsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('sp-location-slot-remove') ||
+                    e.target.closest('.sp-location-slot-remove')) {
+                    const button = e.target.closest('.sp-location-slot-remove') || e.target;
+                    const index = parseInt(button.dataset.index);
+                    if (!isNaN(index)) {
+                        this.removeLocation(index);
+                    }
+                }
+            });
+        }
 
         // Caspio event listener removed - using direct API only
 
@@ -338,20 +423,20 @@ class ScreenPrintPricing {
         const params = new URLSearchParams(window.location.search);
         const color = params.get('COLOR') || params.get('color');
         const styleNumber = params.get('StyleNumber') || params.get('styleNumber');
-        
+
         if (color) {
             this.updateGarmentColor(color);
         }
-        
+
         if (styleNumber) {
             this.state.styleNumber = styleNumber;
-            
+
             // Load pricing data via API if in API mode
             if (this.pricingService) {
                 try {
                     console.log(`[ScreenPrintV2] Loading pricing data via API for ${styleNumber}`);
                     const data = await this.pricingService.fetchPricingData(styleNumber);
-                    
+
                     if (data) {
                         this.handleMasterBundle(data);
                     } else {
@@ -366,8 +451,329 @@ class ScreenPrintPricing {
         }
     }
 
+    // ==================== NEW TOGGLE UI HANDLERS (Phase 2) ====================
+
+    /**
+     * Handle color count toggle selection
+     */
+    selectColorCount(count) {
+        console.log(`[ScreenPrintV2] Color count selected: ${count}`);
+
+        // Update state
+        this.state.frontColors = count;
+
+        // Update hidden field for compatibility
+        const hiddenField = document.getElementById('sp-front-colors');
+        if (hiddenField) hiddenField.value = count;
+
+        // Update visual state of toggles
+        this.updateColorToggles();
+
+        // Trigger pricing update
+        this.updateFrontColors(count);
+    }
+
+    /**
+     * Handle quantity tier button selection
+     */
+    selectQuantityTier(tier, quantity) {
+        console.log(`[ScreenPrintV2] Tier selected: ${tier}, quantity: ${quantity}`);
+
+        // Update state
+        this.state.quantity = quantity;
+        this.state.selectedTier = tier;
+
+        // Update hidden field for compatibility
+        const hiddenField = document.getElementById('sp-quantity');
+        if (hiddenField) hiddenField.value = quantity;
+
+        // Update visual state of tier buttons
+        this.updateTierButtons();
+
+        // Trigger pricing update
+        this.updateQuantity(quantity);
+    }
+
+    /**
+     * Toggle safety stripes for front location
+     */
+    toggleSafetyStripes() {
+        const toggle = document.getElementById('sp-safety-stripes-toggle');
+        if (!toggle) return;
+
+        // Toggle state
+        this.state.frontHasSafetyStripes = !this.state.frontHasSafetyStripes;
+
+        // Update visual state
+        if (this.state.frontHasSafetyStripes) {
+            toggle.classList.add('active');
+        } else {
+            toggle.classList.remove('active');
+        }
+
+        console.log(`[ScreenPrintV2] Safety stripes: ${this.state.frontHasSafetyStripes}`);
+
+        // Trigger pricing update
+        this.updateFrontSafetyStripes(this.state.frontHasSafetyStripes);
+    }
+
+    /**
+     * Toggle dark garment (requires white underbase)
+     */
+    toggleDarkGarment() {
+        const toggle = document.getElementById('sp-dark-garment-toggle');
+        if (!toggle) return;
+
+        // Toggle state
+        this.state.isDarkGarment = !this.state.isDarkGarment;
+
+        // Update visual state
+        if (this.state.isDarkGarment) {
+            toggle.classList.add('active');
+        } else {
+            toggle.classList.remove('active');
+        }
+
+        console.log(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
+
+        // Trigger pricing update
+        this.updateDarkGarment(this.state.isDarkGarment);
+    }
+
+    /**
+     * Toggle additional locations section (expand/collapse)
+     */
+    toggleAdditionalLocationsSection() {
+        const section = document.getElementById('sp-additional-locations-section');
+        if (!section) return;
+
+        section.classList.toggle('collapsed');
+
+        console.log(`[ScreenPrintV2] Additional locations section ${section.classList.contains('collapsed') ? 'collapsed' : 'expanded'}`);
+    }
+
+    // ==================== UI UPDATE METHODS (Phase 3) ====================
+
+    /**
+     * Update visual state of color toggles
+     */
+    updateColorToggles() {
+        for (let i = 1; i <= 6; i++) {
+            const toggle = document.getElementById(`sp-toggle-${i}color`);
+            if (!toggle) continue;
+
+            if (i === this.state.frontColors) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+        }
+    }
+
+    /**
+     * Update visual state of tier buttons
+     */
+    updateTierButtons() {
+        const tierButtons = document.querySelectorAll('.sp-tier-button');
+        tierButtons.forEach(btn => {
+            const btnTier = btn.dataset.tier;
+            if (btnTier === this.state.selectedTier) {
+                btn.classList.add('selected');
+            } else {
+                btn.classList.remove('selected');
+            }
+        });
+    }
+
+    /**
+     * Update upcharge tooltip content
+     */
+    updateUpchargeTooltipContent() {
+        const tooltip = document.getElementById('sp-upcharge-tooltip');
+        if (!tooltip) return;
+
+        // Get pricing data from screenPrintPricingData
+        const screenPrintData = window.screenPrintPricingData;
+        const pricingData = screenPrintData?.sellingPriceDisplayAddOns;
+        const availableSizes = screenPrintData?.sizes?.map(s => s.size) || [];
+
+        if (!pricingData || availableSizes.length === 0) {
+            tooltip.innerHTML = `
+                <div class="sp-upcharge-tooltip-header">Size Upcharges</div>
+                <div class="sp-upcharge-tooltip-body">
+                    <p>No size upcharge data available</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Filter upcharges to only show available sizes
+        const filteredUpcharges = {};
+        Object.entries(pricingData).forEach(([size, amount]) => {
+            if (availableSizes.includes(size) && amount > 0) {
+                filteredUpcharges[size] = amount;
+            }
+        });
+
+        // Group by upcharge amount
+        const groupedUpcharges = {};
+        Object.entries(filteredUpcharges).forEach(([size, amount]) => {
+            const key = amount.toFixed(2);
+            if (!groupedUpcharges[key]) {
+                groupedUpcharges[key] = [];
+            }
+            groupedUpcharges[key].push(size);
+        });
+
+        // Build tooltip HTML
+        let html = '<div class="sp-upcharge-tooltip-header">Size Upcharges</div>';
+        html += '<div class="sp-upcharge-tooltip-body">';
+
+        const sortedAmounts = Object.keys(groupedUpcharges).sort((a, b) => parseFloat(a) - parseFloat(b));
+
+        sortedAmounts.forEach(amount => {
+            const sizes = groupedUpcharges[amount].join(', ');
+            html += `
+                <div class="sp-upcharge-tooltip-row">
+                    <span class="sp-upcharge-tooltip-sizes">${sizes}:</span>
+                    <span class="sp-upcharge-tooltip-amount">+$${amount}</span>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        tooltip.innerHTML = html;
+    }
+
+    // REMOVED: populateTogglePrices() function
+    // This was displaying misleading "preview prices" on color toggle buttons
+    // that didn't account for additional locations, safety stripes, dark garments, etc.
+    // The prominent "STEP 3: YOUR PRICE" display is now the single source of truth.
+
+    /**
+     * Update additional locations UI with current state
+     */
+    updateAdditionalLocationsUI() {
+        const container = document.getElementById('sp-additional-locations-container');
+        if (!container) return;
+
+        // Clear existing location slots (but button is now outside container, so it's safe)
+        container.innerHTML = '';
+
+        // Render each additional location
+        this.state.additionalLocations.forEach((location, index) => {
+            const slot = document.createElement('div');
+            slot.className = 'sp-location-slot';
+            slot.dataset.index = index;
+
+            slot.innerHTML = `
+                <!-- Location Selector -->
+                <div class="sp-location-slot-input-group">
+                    <label class="sp-location-slot-label">Location</label>
+                    <select class="sp-location-slot-select" data-index="${index}">
+                        ${this.config.locationOptions.map(opt =>
+                            `<option value="${opt.value}" ${opt.value === location.location ? 'selected' : ''}>${opt.label}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+
+                <!-- Color Count Selector -->
+                <div class="sp-location-slot-input-group">
+                    <label class="sp-location-slot-label">Colors</label>
+                    <select class="sp-location-slot-select" data-index="${index}">
+                        ${this.config.colorOptions.slice(1).map(opt =>
+                            `<option value="${opt.value}" ${opt.value === location.colors ? 'selected' : ''}>${opt.label}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+
+                <!-- Safety Stripes Checkbox -->
+                <div class="sp-location-slot-input-group">
+                    <label class="sp-safety-checkbox">
+                        <input type="checkbox" class="sp-location-safety" data-index="${index}" ${location.hasSafetyStripes ? 'checked' : ''}>
+                        <span class="sp-safety-label">🦺 Safety (+$${this.state.safetyStripeSurcharge.toFixed(2)})</span>
+                    </label>
+                </div>
+
+                <!-- Remove Button -->
+                <button type="button" class="sp-location-slot-remove" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            container.appendChild(slot);
+        });
+
+        // Safeguard: Re-create Add Location button if it doesn't exist
+        // (in case it somehow got deleted during initialization)
+        if (!document.getElementById('sp-add-location')) {
+            console.log('[ScreenPrintV2] Recreating Add Location button');
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.id = 'sp-add-location';
+            button.className = 'sp-add-location-button';
+            button.innerHTML = '<i class="fas fa-plus"></i> Add Location';
+            button.addEventListener('click', () => this.addLocation());
+
+            // Insert button after container
+            container.parentElement.insertBefore(button, container.nextSibling);
+        }
+
+        // Update button visibility
+        this.updateLocationButtonVisibility();
+    }
+
+    /**
+     * Update live price display
+     */
+    updateLivePricing() {
+        const priceElement = document.getElementById('sp-live-price-amount');
+        if (!priceElement) return;
+
+        // Get current price from pricing data
+        if (this.state.pricingData) {
+            const price = this.calculateCurrentPrice();
+            priceElement.textContent = `$${price.toFixed(2)}`;
+        } else {
+            priceElement.textContent = '$0.00';
+        }
+
+        // Update quantity display in header if exists
+        const headerQty = document.getElementById('header-quantity');
+        if (headerQty) {
+            headerQty.textContent = this.state.quantity;
+        }
+
+        const headerPrice = document.getElementById('header-unit-price');
+        if (headerPrice && this.state.pricingData) {
+            const price = this.calculateCurrentPrice();
+            headerPrice.textContent = `$${price.toFixed(2)}`;
+        }
+    }
+
+    /**
+     * Calculate current price based on state
+     * Uses the existing calculatePricing() method which already has all the logic
+     */
+    calculateCurrentPrice() {
+        if (!this.state.pricingData) return 0;
+
+        try {
+            // Use the existing calculatePricing method (line 910)
+            // which already does all the calculations correctly
+            const pricing = this.calculatePricing();
+            return pricing.perShirtTotal;
+        } catch (error) {
+            console.error('[ScreenPrintV2] Error calculating price:', error);
+            return 0;
+        }
+    }
+
     updateQuantity(quantity) { // Renamed from previous to avoid confusion, now only updates state
         this.state.quantity = quantity;
+
+        // Toggle prices removed - only "STEP 3: YOUR PRICE" display shows pricing
+
         this.updateDisplay();
     }
 
@@ -464,79 +870,59 @@ class ScreenPrintPricing {
             return;
         }
 
-        const index = this.state.additionalLocations.length;
+        // Add to state
         this.state.additionalLocations.push({
-            location: 'back', 
+            location: 'back',
             colors: 1,
             hasSafetyStripes: false
         });
 
-        const locationDiv = document.createElement('div');
-        locationDiv.className = 'sp-location-row';
-        locationDiv.dataset.index = index;
-        locationDiv.innerHTML = `
-            <select class="sp-location-select sp-select" data-index="${index}">
-                ${this.config.locationOptions.map(opt => 
-                    `<option value="${opt.value}" ${opt.value === 'back' ? 'selected' : ''}>${opt.label}</option>`
-                ).join('')}
-            </select>
-            <div class="sp-color-row">
-                <select class="sp-location-colors sp-select" data-index="${index}">
-                    ${this.config.colorOptions.slice(1).map(opt => 
-                        `<option value="${opt.value}" ${opt.value === 1 ? 'selected' : ''}>${opt.label}</option>`
-                    ).join('')}
-                </select>
-                <label class="sp-safety-checkbox">
-                    <input type="checkbox" class="sp-location-safety" data-index="${index}">
-                    <span class="sp-safety-label">🦺 Safety</span>
-                    <span class="sp-safety-tooltip">High-visibility stripes with logo +$${this.state.safetyStripeSurcharge.toFixed(2)}</span>
-                </label>
-            </div>
-            <button type="button" class="sp-remove-location sp-btn-remove" data-index="${index}">×</button>
-        `;
+        console.log(`[ScreenPrintV2] Added location. Total locations: ${this.state.additionalLocations.length}`);
 
-        this.elements.locationsContainer.appendChild(locationDiv);
+        // Update the UI to reflect new state
+        this.updateAdditionalLocationsUI();
         this.updateLocationButtonVisibility();
         this.updateDisplay();
     }
 
     removeLocation(index) {
+        // Remove from state
         this.state.additionalLocations.splice(index, 1);
-        
-        const locationRows = this.elements.locationsContainer.querySelectorAll('.sp-location-row');
-        locationRows.forEach(row => {
-            if (parseInt(row.dataset.index) === index) {
-                row.remove();
-            }
-        });
 
-        this.reindexLocations();
+        console.log(`[ScreenPrintV2] Removed location ${index}. Remaining locations: ${this.state.additionalLocations.length}`);
+
+        // Update UI to reflect new state
+        this.updateAdditionalLocationsUI();
         this.updateLocationButtonVisibility();
         this.updateDisplay();
     }
 
     updateLocations() {
-        // Debug logging removed - was causing console noise
-        const locationRows = this.elements.locationsContainer.querySelectorAll('.sp-location-row');
-        this.state.additionalLocations = Array.from(locationRows).map(row => {
-            const locationSelect = row.querySelector('.sp-location-select');
-            const colorsSelect = row.querySelector('.sp-location-colors');
-            return {
-                location: locationSelect.value,
-                colors: parseInt(colorsSelect.value) || 0 
-            };
+        // Handle changes to additional location inputs
+        const locationSlots = document.querySelectorAll('.sp-location-slot');
+
+        locationSlots.forEach((slot, index) => {
+            const locationSelect = slot.querySelector('.sp-location-slot-select[data-index]');
+            const colorSelect = slot.querySelectorAll('.sp-location-slot-select')[1]; // Second select is colors
+            const safetyCheckbox = slot.querySelector('.sp-location-safety');
+
+            if (this.state.additionalLocations[index]) {
+                this.state.additionalLocations[index] = {
+                    location: locationSelect?.value || 'back',
+                    colors: parseInt(colorSelect?.value) || 1,
+                    hasSafetyStripes: safetyCheckbox?.checked || false
+                };
+            }
         });
+
+        console.log('[ScreenPrintV2] Updated locations from UI:', this.state.additionalLocations);
         this.updateDisplay();
     }
 
     reindexLocations() {
-        const locationRows = this.elements.locationsContainer.querySelectorAll('.sp-location-row');
-        locationRows.forEach((row, newIndex) => {
-            row.dataset.index = newIndex;
-            row.querySelector('.sp-location-select').dataset.index = newIndex;
-            row.querySelector('.sp-location-colors').dataset.index = newIndex;
-            row.querySelector('.sp-remove-location').dataset.index = newIndex;
-        });
+        // No longer needed with new state-driven UI
+        // The updateAdditionalLocationsUI() method rebuilds from state
+        console.log('[ScreenPrintV2] Reindexing not needed - UI is state-driven');
     }
 
     updateLocationButtonVisibility() {
@@ -726,10 +1112,20 @@ class ScreenPrintPricing {
 
     updateDisplay() {
         const pricing = this.calculatePricing();
-        
-        this.elements.basePrice.textContent = pricing.perShirtTotal.toFixed(2); 
+
+        // Update NEW toggle UI elements (Phase 3)
+        this.updateColorToggles();
+        this.updateTierButtons();
+        this.updateAdditionalLocationsUI();
+        this.updateLivePricing();
+
+        // Update LEGACY display elements (for compatibility during transition)
+        if (this.elements.basePrice) {
+            this.elements.basePrice.textContent = pricing.perShirtTotal.toFixed(2);
+        }
+
         this.updateDynamicSubtitle(pricing); // Pass the whole pricing object
-        
+
         // Update header pricing
         this.updateHeaderPricing(this.state.quantity, pricing.perShirtTotal);
 
@@ -754,15 +1150,15 @@ class ScreenPrintPricing {
                 ltmImpactContainer.style.display = 'none';
             }
         }
-        
+
         const darkIndicator = this.elements.darkGarmentIndicator;
         if (darkIndicator) {
             // Hide the dark garment indicator - underbase is already included in pricing
             darkIndicator.style.display = 'none';
         }
-        
-        if (this.elements.setupFee) this.elements.setupFee.textContent = `$${pricing.setupFee.toFixed(2)}`; 
-        
+
+        if (this.elements.setupFee) this.elements.setupFee.textContent = `$${pricing.setupFee.toFixed(2)}`;
+
         this.updateSetupBreakdown(pricing);
 
         if (this.elements.ltmWarning && this.elements.ltmFee) {
@@ -770,12 +1166,12 @@ class ScreenPrintPricing {
             this.elements.ltmFee.textContent = `$${pricing.ltmFee.toFixed(2)}`;
         }
         this.updateOrderSummary(pricing);
-        
+
         // Update pricing tiers if accordion is open
         if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
             this.updatePricingTiers();
         }
-        
+
         // Update additional location guide if open
         if (this.locationGuideLoaded && document.getElementById('location-pricing')?.style.display !== 'none') {
             this.updateAdditionalLocationPricingGuide();
@@ -1204,20 +1600,30 @@ class ScreenPrintPricing {
     handleMasterBundle(data) {
         // Log the pricing data
         console.log('[ScreenPrintV2] Received pricing data from API:', data);
-        
+
         this.state.masterBundle = data;
         this.state.pricingData = data;
-        
+
+        // Store pricing data globally for size upcharges display
+        window.screenPrintPricingData = data;
+
+        // Dispatch event for size upcharges display
+        window.dispatchEvent(new CustomEvent('screenPrintPricingLoaded', {
+            detail: data
+        }));
+
         // Diagnostic: Check if 6-color pricing exists
         console.log('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
-        console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?', 
+        console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?',
             !!(data.finalPrices?.PrimaryLocation?.["37-72"]?.["6"]));
-        console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?', 
+        console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?',
             !!(data.primaryLocationPricing?.["6"]));
-        
+
         if (data.styleNumber) this.state.styleNumber = data.styleNumber;
         if (data.productTitle) this.state.productTitle = data.productTitle;
-        
+
+        // Toggle prices removed - only "STEP 3: YOUR PRICE" display shows pricing
+
         this.updateDisplay();
         
         if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
