@@ -65,7 +65,7 @@ class ScreenPrintPricing {
 
     init() {
         console.log('[ScreenPrintV2] Initializing...');
-        
+
         // Initialize pricing service
         if (typeof ScreenPrintPricingService !== 'undefined') {
             this.pricingService = new ScreenPrintPricingService();
@@ -73,11 +73,16 @@ class ScreenPrintPricing {
         } else {
             console.error('[ScreenPrintV2] ScreenPrintPricingService not found!');
         }
-        
+
         this.cacheElements();
         this.createUI();
         this.bindEvents();
         this.checkUrlParams();
+
+        // Initialize UI with defaults
+        this.updateColorToggles();  // Highlight default color (1)
+        this.updateTierButtons();   // Highlight default tier (37-72)
+
         this.updateDisplay();
     }
 
@@ -118,6 +123,38 @@ class ScreenPrintPricing {
         container.innerHTML = `
             <div class="sp-calculator">
                 <h3 class="sp-title">Screen Print Pricing Calculator</h3>
+
+                <!-- Dark Garment Toggle - Positioned at Top -->
+                <div class="sp-dark-garment-section-top">
+                    <div class="sp-dark-garment-toggle" id="sp-dark-garment-toggle">
+                        <div class="sp-dark-garment-label">
+                            <span>Printing on dark garment?</span>
+                            <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon"></i>
+                            <span class="sp-dark-garment-info">(White underbase required)</span>
+                        </div>
+                        <div class="sp-toggle-switch">
+                            <div class="sp-toggle-switch-slider"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dark Garment Tooltip - Shows on hover/click -->
+                    <div id="sp-dark-tooltip" class="sp-dark-tooltip" style="display: none;">
+                        <div class="sp-dark-tooltip-content">
+                            <div class="sp-dark-tooltip-header">
+                                <i class="fas fa-tshirt"></i> Why Dark Garment Adds a Color
+                            </div>
+                            <div class="sp-dark-tooltip-body">
+                                When printing on black or dark-colored shirts, we must print a <strong>white underbase layer first</strong> so your ink colors appear vibrant and true to their intended shade.
+                                <br><br>
+                                This underbase requires an additional screen setup and counts as one color in your total.
+                                <br><br>
+                                <strong>Example:</strong> Red + Green + Yellow design on a black shirt = <strong>4 colors total</strong> (3 design colors + 1 white underbase)
+                                <br><br>
+                                <em>The underbase is applied to ALL printed locations on the garment.</em>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Toggle Switch Pricing Interface -->
                 <div class="sp-toggle-pricing-container">
@@ -187,9 +224,34 @@ class ScreenPrintPricing {
                     </div>
                 </div>
 
-                <!-- Enhanced Live Price Display -->
+                <!-- Additional Locations Section - MOVED BEFORE STEP 3 FOR LOGICAL WORKFLOW -->
+                <div class="sp-additional-locations-section" id="sp-additional-locations-section">
+                    <div class="sp-additional-locations-header" id="sp-additional-locations-header">
+                        <div class="sp-additional-locations-title">
+                            <i class="fas fa-chevron-down"></i>
+                            Additional Print Locations
+                        </div>
+                        <div class="sp-additional-locations-subtitle">Add up to 3 additional locations</div>
+                    </div>
+                    <div class="sp-additional-locations-content" id="sp-additional-locations-container">
+                        <!-- Location slots will be inserted here -->
+                    </div>
+                    <!-- Add Location button (moved outside container to prevent deletion) -->
+                    <button type="button" id="sp-add-location" class="sp-add-location-button">
+                        <i class="fas fa-plus"></i>
+                        Add Location
+                    </button>
+                </div>
+
+                <!-- Enhanced Live Price Display - NOW CALCULATES WITH ALL INPUTS -->
                 <div class="sp-live-price-display sp-live-price-prominent">
                     <div class="sp-live-price-workflow-label">Step 3: Your Price</div>
+
+                    <!-- Pricing Tier Display -->
+                    <div class="sp-pricing-tier-display" id="sp-pricing-tier-display" style="display: none;">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Pricing Tier: <strong id="sp-pricing-tier-label">—</strong></span>
+                    </div>
 
                     <!-- Primary Pricing Info -->
                     <div class="sp-pricing-primary">
@@ -260,38 +322,6 @@ class ScreenPrintPricing {
                             <i class="fas fa-chevron-down"></i>
                             <span id="sp-toggle-breakdown-text">Show Details</span>
                         </button>
-                    </div>
-                </div>
-
-                <!-- Additional Locations Section (Always Visible) -->
-                <div class="sp-additional-locations-section" id="sp-additional-locations-section">
-                    <div class="sp-additional-locations-header" id="sp-additional-locations-header">
-                        <div class="sp-additional-locations-title">
-                            <i class="fas fa-chevron-down"></i>
-                            Additional Print Locations
-                        </div>
-                        <div class="sp-additional-locations-subtitle">Add up to 3 additional locations</div>
-                    </div>
-                    <div class="sp-additional-locations-content" id="sp-additional-locations-container">
-                        <!-- Location slots will be inserted here -->
-                    </div>
-                    <!-- Add Location button (moved outside container to prevent deletion) -->
-                    <button type="button" id="sp-add-location" class="sp-add-location-button">
-                        <i class="fas fa-plus"></i>
-                        Add Location
-                    </button>
-                </div>
-
-                <!-- Dark Garment Toggle -->
-                <div class="sp-dark-garment-section">
-                    <div class="sp-dark-garment-toggle" id="sp-dark-garment-toggle">
-                        <div class="sp-dark-garment-label">
-                            <span>Dark Garment (requires white underbase)</span>
-                            <span class="sp-dark-garment-info">Adds 1 color per location</span>
-                        </div>
-                        <div class="sp-toggle-switch">
-                            <div class="sp-toggle-switch-slider"></div>
-                        </div>
                     </div>
                 </div>
 
@@ -368,6 +398,39 @@ class ScreenPrintPricing {
         document.getElementById('sp-dark-garment-toggle')?.addEventListener('click', () => {
             this.toggleDarkGarment();
         });
+
+        // NEW: Dark Garment Info Icon - Desktop hover + Mobile click
+        const darkInfoIcon = document.getElementById('sp-dark-info-icon');
+        const darkTooltip = document.getElementById('sp-dark-tooltip');
+
+        if (darkInfoIcon && darkTooltip) {
+            // Desktop: Show on hover
+            darkInfoIcon.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    darkTooltip.style.display = 'block';
+                }
+            });
+
+            darkInfoIcon.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    darkTooltip.style.display = 'none';
+                }
+            });
+
+            // Mobile: Toggle on click
+            darkInfoIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = darkTooltip.style.display === 'block';
+                darkTooltip.style.display = isVisible ? 'none' : 'block';
+            });
+
+            // Close tooltip when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!darkTooltip.contains(e.target) && e.target !== darkInfoIcon) {
+                    darkTooltip.style.display = 'none';
+                }
+            });
+        }
 
         // NEW: Additional Locations Header (Collapse/Expand)
         document.getElementById('sp-additional-locations-header')?.addEventListener('click', () => {
@@ -532,18 +595,17 @@ class ScreenPrintPricing {
     selectQuantityTier(tier, quantity) {
         console.log(`[ScreenPrintV2] Tier selected: ${tier}, quantity: ${quantity}`);
 
-        // Update state
-        this.state.quantity = quantity;
+        // Update state - store tier only, NOT specific quantity
+        // User has selected a RANGE (e.g., 73-144), not a specific number
         this.state.selectedTier = tier;
 
-        // Update hidden field for compatibility
-        const hiddenField = document.getElementById('sp-quantity');
-        if (hiddenField) hiddenField.value = quantity;
+        // DO NOT set this.state.quantity - we don't know how many they actually want
+        // The quantity parameter is just the tier minimum for pricing lookup
 
         // Update visual state of tier buttons
         this.updateTierButtons();
 
-        // Trigger pricing update
+        // Trigger pricing update using tier minimum for price calculation only
         this.updateQuantity(quantity);
     }
 
@@ -575,16 +637,19 @@ class ScreenPrintPricing {
      */
     toggleDarkGarment() {
         const toggle = document.getElementById('sp-dark-garment-toggle');
+        const section = document.querySelector('.sp-dark-garment-section-top');
         if (!toggle) return;
 
         // Toggle state
         this.state.isDarkGarment = !this.state.isDarkGarment;
 
-        // Update visual state
+        // Update visual state - apply 'active' to section (not toggle)
         if (this.state.isDarkGarment) {
             toggle.classList.add('active');
+            section?.classList.add('active');
         } else {
             toggle.classList.remove('active');
+            section?.classList.remove('active');
         }
 
         console.log(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
@@ -665,13 +730,32 @@ class ScreenPrintPricing {
     }
 
     /**
+     * Determine which tier a quantity falls into
+     * @param {number} quantity - The quantity to check
+     * @returns {string|null} Tier identifier (e.g., '24-36', '37-72') or null
+     */
+    isQuantityInTier(quantity) {
+        const tiers = [
+            { id: '24-36', min: 24, max: 36 },
+            { id: '37-72', min: 37, max: 72 },
+            { id: '73-144', min: 73, max: 144 },
+            { id: '145-576', min: 145, max: 576 }
+        ];
+
+        const tier = tiers.find(t => quantity >= t.min && quantity <= t.max);
+        return tier ? tier.id : null;
+    }
+
+    /**
      * Update visual state of tier buttons
      */
     updateTierButtons() {
+        const currentTier = this.isQuantityInTier(this.state.quantity);
         const tierButtons = document.querySelectorAll('.sp-tier-button');
+
         tierButtons.forEach(btn => {
             const btnTier = btn.dataset.tier;
-            if (btnTier === this.state.selectedTier) {
+            if (btnTier === currentTier) {
                 btn.classList.add('selected');
             } else {
                 btn.classList.remove('selected');
@@ -765,7 +849,7 @@ class ScreenPrintPricing {
                 <div class="sp-location-slot-input-group">
                     <label class="sp-location-slot-label">Location</label>
                     <select class="sp-location-slot-select" data-index="${index}">
-                        ${this.config.locationOptions.map(opt =>
+                        ${this.getAvailableLocationOptions(index).map(opt =>
                             `<option value="${opt.value}" ${opt.value === location.location ? 'selected' : ''}>${opt.label}</option>`
                         ).join('')}
                     </select>
@@ -827,6 +911,26 @@ class ScreenPrintPricing {
         // Get comprehensive pricing data
         const pricing = this.calculatePricing();
 
+        // Update pricing tier display
+        const tierDisplay = document.getElementById('sp-pricing-tier-display');
+        const tierLabel = document.getElementById('sp-pricing-tier-label');
+
+        if (this.state.selectedTier && tierDisplay && tierLabel) {
+            // selectedTier is a STRING like "24-36", "37-72", "73-144", "145-576"
+            // Parse to get min and max values
+            const [min, max] = this.state.selectedTier.split('-').map(Number);
+
+            // Format tier label (e.g., "24-36 pieces" or "145+ pieces")
+            const tierText = max >= 576
+                ? `${min}+ pieces`
+                : `${min}-${max} pieces`;
+
+            tierLabel.textContent = tierText;
+            tierDisplay.style.display = 'flex';
+        } else if (tierDisplay) {
+            tierDisplay.style.display = 'none';
+        }
+
         // Update per-shirt price
         if (this.state.pricingData) {
             priceElement.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
@@ -834,18 +938,9 @@ class ScreenPrintPricing {
             priceElement.textContent = '$0.00';
         }
 
-        // Update quantity calculation row
-        const quantityCalc = document.getElementById('sp-price-quantity-calc');
-        const calcQuantity = document.getElementById('sp-calc-quantity');
-        const calcSubtotal = document.getElementById('sp-calc-subtotal');
-
-        if (this.state.quantity > 0 && pricing.subtotal > 0) {
-            quantityCalc.style.display = 'flex';
-            calcQuantity.textContent = this.state.quantity;
-            calcSubtotal.textContent = `$${pricing.subtotal.toFixed(2)}`;
-        } else {
-            quantityCalc.style.display = 'none';
-        }
+        // REMOVED: Quantity calculation row (fake "X pieces × price = subtotal")
+        // Users select a tier RANGE, not a specific quantity
+        // We cannot show accurate calculations without knowing exact quantity they want
 
         // Update setup fees section
         const setupSection = document.getElementById('sp-pricing-setup');
@@ -859,9 +954,12 @@ class ScreenPrintPricing {
             let breakdownHTML = '';
             if (pricing.colorBreakdown.front > 0 && this.state.frontColors > 0) {
                 const frontSetup = pricing.colorBreakdown.front * this.config.setupFeePerColor;
+                const underbaseNote = (this.state.isDarkGarment && this.state.frontColors > 0)
+                    ? ` <span style="color: #6c757d; font-size: 12px;">(${this.state.frontColors} design + 1 underbase)</span>`
+                    : '';
                 breakdownHTML += `
                     <div class="sp-setup-item">
-                        <span class="sp-setup-location">Front (${pricing.colorBreakdown.front} color${pricing.colorBreakdown.front > 1 ? 's' : ''})</span>
+                        <span class="sp-setup-location">Front (${pricing.colorBreakdown.front} color${pricing.colorBreakdown.front > 1 ? 's' : ''})${underbaseNote}</span>
                         <span class="sp-setup-cost">$${frontSetup.toFixed(2)}</span>
                     </div>
                 `;
@@ -870,9 +968,12 @@ class ScreenPrintPricing {
             pricing.colorBreakdown.locations.forEach(loc => {
                 if (loc.colors > 0) {
                     const label = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                    const underbaseNote = (this.state.isDarkGarment && loc.colors > 0)
+                        ? ` <span style="color: #6c757d; font-size: 12px;">(${loc.colors} design + 1 underbase)</span>`
+                        : '';
                     breakdownHTML += `
                         <div class="sp-setup-item">
-                            <span class="sp-setup-location">${label} (${loc.totalColors} color${loc.totalColors > 1 ? 's' : ''})</span>
+                            <span class="sp-setup-location">${label} (${loc.totalColors} color${loc.totalColors > 1 ? 's' : ''})${underbaseNote}</span>
                             <span class="sp-setup-cost">$${loc.setupCost.toFixed(2)}</span>
                         </div>
                     `;
@@ -896,21 +997,10 @@ class ScreenPrintPricing {
             ltmSection.style.display = 'none';
         }
 
-        // Update order total
-        const totalSection = document.getElementById('sp-pricing-total');
-        const totalAmount = document.getElementById('sp-order-total-amount');
-        const avgPerShirt = document.getElementById('sp-avg-per-shirt');
-
-        if (this.state.quantity > 0 && pricing.grandTotal > 0) {
-            totalSection.style.display = 'block';
-            totalAmount.textContent = `$${pricing.grandTotal.toFixed(2)}`;
-
-            // Calculate average including all fees
-            const avgCost = pricing.grandTotal / this.state.quantity;
-            avgPerShirt.textContent = `$${avgCost.toFixed(2)}`;
-        } else {
-            totalSection.style.display = 'none';
-        }
+        // REMOVED: Order total and average cost displays
+        // Users select a tier range (e.g., 145-576), not a specific quantity
+        // We cannot calculate an accurate total without knowing exact quantity
+        // Keep only: price per shirt + setup fees (users calculate their own total)
 
         // Show/hide breakdown toggle button
         const breakdownToggle = document.getElementById('sp-breakdown-toggle');
@@ -920,12 +1010,9 @@ class ScreenPrintPricing {
             breakdownToggle.style.display = 'none';
         }
 
-        // Update quantity display in header if exists
-        const headerQty = document.getElementById('header-quantity');
-        if (headerQty) {
-            headerQty.textContent = this.state.quantity;
-        }
+        // REMOVED: Header quantity display (user hasn't specified exact quantity)
 
+        // Keep header price display (this is real - price per shirt for selected tier)
         const headerPrice = document.getElementById('header-unit-price');
         if (headerPrice && this.state.pricingData) {
             headerPrice.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
@@ -982,13 +1069,13 @@ class ScreenPrintPricing {
     
     updateFrontSafetyStripes(enabled) {
         this.state.frontHasSafetyStripes = enabled;
-        
+
         if (enabled) {
-            // Set to 3 colors (which becomes 4 with underbase)
-            this.elements.frontColorsSelect.value = '3';
-            this.state.frontColors = 3;
+            // Safety stripes is a 4-color design (white base, white stripe, colored stripe, logo)
+            this.elements.frontColorsSelect.value = '4';
+            this.state.frontColors = 4;
         }
-        
+
         this.updateDisplay();
     }
     
@@ -1041,8 +1128,31 @@ class ScreenPrintPricing {
                 }
             });
         }
-        
+
         modal.classList.add('show');
+    }
+
+    /**
+     * Get available location options (excludes front variants and already-selected locations)
+     * Front location selected in Step 1 - so Left Chest and Right Chest are excluded
+     * Also excludes locations already selected in OTHER additional location slots
+     * @param {number} currentIndex - Index of the current slot being edited
+     */
+    getAvailableLocationOptions(currentIndex) {
+        // Front location already selected in Step 1 - exclude front variants
+        const excludedLocations = ['left-chest', 'right-chest'];
+
+        // ALSO exclude locations already selected in OTHER slots
+        this.state.additionalLocations.forEach((loc, index) => {
+            // Only exclude if it's a DIFFERENT slot and has a location selected
+            if (index !== currentIndex && loc.location) {
+                excludedLocations.push(loc.location);
+            }
+        });
+
+        return this.config.locationOptions.filter(opt =>
+            !excludedLocations.includes(opt.value)
+        );
     }
 
     addLocation() {
@@ -1377,15 +1487,19 @@ class ScreenPrintPricing {
         window.directFixApplied = true;
     }
 
+    /**
+     * Order Summary - DISABLED
+     * Users select tier ranges (e.g., 73-144 pieces), not specific quantities
+     * Cannot show accurate totals without knowing exact quantity
+     * Section kept permanently hidden - users calculate their own totals
+     */
     updateOrderSummary(pricing) {
-        if (!this.elements.orderSummary || !this.elements.summaryContent) return;
-        const hasPrintCosts = pricing.basePrice > 0 || pricing.additionalCost > 0;
-        if (pricing.quantity === 0 || !hasPrintCosts && !(this.state.frontColors === 0 && pricing.basePrice > 0) ) { 
+        // REMOVED: Order Summary displays fake quantities and totals
+        // Keep permanently hidden - user selects tier range, not specific quantity
+        if (this.elements.orderSummary) {
             this.elements.orderSummary.style.display = 'none';
-            return;
         }
-
-        this.elements.orderSummary.style.display = 'block';
+        return;
         let html = '<table class="sp-summary-table">';
         
         let garmentLineDisplayed = false;
@@ -1570,8 +1684,13 @@ class ScreenPrintPricing {
             noteText = 'Prices shown are per shirt for garment only (no printing).';
         } else {
             const colorText = this.state.frontColors === 1 ? '1 color' : `${this.state.frontColors} colors`;
-            const underbaseNote = (this.state.isDarkGarment && this.state.frontColors > 0) ? ' (includes white underbase)' : '';
-            noteText = `Prices shown are per shirt for garment + ${colorText} front print${underbaseNote}.`;
+
+            if (this.state.isDarkGarment && this.state.frontColors > 0) {
+                const totalColors = this.state.frontColors + 1;
+                noteText = `Prices include garment + ${this.state.frontColors} design color${this.state.frontColors > 1 ? 's' : ''} + 1 white underbase (${totalColors} total colors) front print.`;
+            } else {
+                noteText = `Prices shown are per shirt for garment + ${colorText} front print.`;
+            }
         }
         html += `<p class="sp-tiers-note">${noteText}</p>`;
         html += '<p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>';

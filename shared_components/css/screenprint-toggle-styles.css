@@ -156,6 +156,13 @@
 }
 
 /* Dark Garment Toggle - Active State */
+/* CRITICAL: Override .sp-toggle-item.active styles to prevent green rectangle */
+.sp-dark-garment-toggle.active {
+    background: transparent !important;
+    border-color: inherit !important;
+    box-shadow: none !important;
+}
+
 .sp-dark-garment-toggle.active .sp-toggle-switch {
     background: #3a7c52;
 }
@@ -247,36 +254,58 @@
     font-weight: 500;
 }
 
-/* ==================== ADDITIONAL LOCATIONS SECTION ==================== */
+/* ==================== ADDITIONAL LOCATIONS SECTION (ENHANCED) ==================== */
 .sp-additional-locations-section {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f9fafb;
-    border-radius: 12px;
-    border: 2px solid #e5e7eb;
+    margin-top: 30px;
+    padding: 0;
+    background: white;
+    border-radius: 16px;
+    border: 3px solid #3a7c52;
+    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
+    overflow: visible; /* Changed from hidden - allows "Optional" badge to show fully */
 }
 
 .sp-additional-locations-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
     cursor: pointer;
     user-select: none;
+    position: relative;
+}
+
+/* Step indicator badge (matches Step 1 & 2) */
+.sp-additional-locations-header::before {
+    content: "Optional";
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: white;
+    color: #3a7c52;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 2px solid #3a7c52;
 }
 
 .sp-additional-locations-title {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
-    color: #1f2937;
+    color: white;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .sp-additional-locations-title i {
-    color: #3a7c52;
+    color: white;
     transition: transform 0.3s;
+    font-size: 16px;
 }
 
 .sp-additional-locations-section.collapsed .sp-additional-locations-title i {
@@ -285,35 +314,46 @@
 
 .sp-additional-locations-subtitle {
     font-size: 13px;
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
 }
 
 .sp-additional-locations-content {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-top: 15px;
-    max-height: 500px;
+    padding: 24px;
+    max-height: 600px;
     overflow: hidden;
-    transition: max-height 0.3s ease-out, opacity 0.3s;
+    transition: max-height 0.3s ease-out, opacity 0.3s, padding 0.3s;
+    background: #f9fafb;
 }
 
 .sp-additional-locations-section.collapsed .sp-additional-locations-content {
     max-height: 0;
     opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
-/* ==================== LOCATION SLOT ==================== */
+/* ==================== LOCATION SLOT (ENHANCED) ==================== */
 .sp-location-slot {
     background: white;
     border: 2px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 18px;
+    border-radius: 12px;
+    padding: 20px;
     display: grid;
     grid-template-columns: 1fr auto auto;
-    gap: 15px;
+    gap: 18px;
     align-items: center;
     animation: slideIn 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s;
+}
+
+.sp-location-slot:hover {
+    border-color: #3a7c52;
+    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
 }
 
 @keyframes slideIn {
@@ -330,34 +370,49 @@
 .sp-location-slot-input-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
 .sp-location-slot-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3a7c52;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }
 
+/* Enhanced dropdown styling with custom arrow */
 .sp-location-slot-input,
 .sp-location-slot-select {
-    padding: 10px 14px;
+    padding: 12px 16px;
+    padding-right: 40px;
     border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: #1f2937;
     background: white;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%233a7c52' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
     transition: all 0.2s;
+}
+
+.sp-location-slot-input:hover,
+.sp-location-slot-select:hover {
+    border-color: #3a7c52;
 }
 
 .sp-location-slot-input:focus,
 .sp-location-slot-select:focus {
     outline: none;
     border-color: #3a7c52;
-    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+    box-shadow: 0 0 0 4px rgba(58, 124, 82, 0.15);
 }
 
 .sp-location-slot-remove {
@@ -381,31 +436,44 @@
     transform: scale(1.1);
 }
 
+/* Enhanced Add Location button */
 .sp-add-location-button {
     background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 14px 20px;
+    border-radius: 12px;
+    padding: 16px 24px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 8px;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.2);
 }
 
 .sp-add-location-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 8px 20px rgba(58, 124, 82, 0.35);
+}
+
+.sp-add-location-button:active {
+    transform: translateY(0);
 }
 
 .sp-add-location-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.1);
+}
+
+.sp-add-location-button i {
+    font-size: 16px;
 }
 
 /* ==================== DARK GARMENT TOGGLE ==================== */
@@ -459,6 +527,31 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 10px;
+}
+
+/* Pricing Tier Display */
+.sp-pricing-tier-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #f0f9f4 0%, #e6f4eb 100%);
+    border: 1px solid #3a7c52;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.sp-pricing-tier-display i {
+    color: #3a7c52;
+    font-size: 16px;
+}
+
+.sp-pricing-tier-display strong {
+    color: #3a7c52;
+    font-weight: 700;
 }
 
 .sp-live-price-amount-wrapper {
@@ -575,6 +668,113 @@
 .sp-upcharge-tooltip-amount {
     font-weight: 700;
     color: #3a7c52;
+}
+
+/* ==================== DARK GARMENT SECTION (TOP) ==================== */
+.sp-dark-garment-section-top {
+    background: #f8f9fa;
+    border: 2px solid #3a7c52;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.sp-dark-garment-section-top .sp-dark-garment-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sp-dark-garment-section-top .sp-dark-garment-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.sp-dark-info-icon {
+    color: #3a7c52;
+    font-size: 18px;
+    cursor: help;
+    transition: all 0.2s;
+}
+
+.sp-dark-info-icon:hover {
+    color: #2d5f3f;
+    transform: scale(1.15);
+}
+
+.sp-dark-garment-info {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Dark Garment Tooltip */
+.sp-dark-tooltip {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #3a7c52;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    animation: tooltipFadeIn 0.3s ease;
+}
+
+.sp-dark-tooltip-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sp-dark-tooltip-header i {
+    color: #3a7c52;
+}
+
+.sp-dark-tooltip-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #4b5563;
+}
+
+.sp-dark-tooltip-body strong {
+    color: #1f2937;
+}
+
+.sp-dark-tooltip-body em {
+    color: #6b7280;
+    font-style: italic;
+    display: block;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Dark Garment Active State - Professional Look */
+.sp-dark-garment-section-top.active {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    border-color: #2d5f3f;
+    box-shadow: 0 4px 16px rgba(58, 124, 82, 0.25);
+}
+
+.sp-dark-garment-section-top.active .sp-dark-garment-label span:first-child {
+    color: #2d5f3f;
+    font-weight: 700;
 }
 
 /* ==================== RESPONSIVE ADJUSTMENTS ==================== */
