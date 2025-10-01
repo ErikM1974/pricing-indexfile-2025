@@ -699,7 +699,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             else if (src.includes('cart-integration.js') && window.cartIntegrationInitialized) alreadyLoaded = true;
             else if (src.includes('pricing-matrix-capture.js') && window.PricingMatrixCapture) alreadyLoaded = true;
             else if (src.includes('pricing-calculator.js') && window.NWCAPricingCalculator) alreadyLoaded = true;
-            else if (src.includes('product-quantity-ui.js') && window.ProductQuantityUI) alreadyLoaded = true;
+            // product-quantity-ui.js removed - file doesn't exist
             else if (src.includes('add-to-cart.js') && window.addToCartInitialized) alreadyLoaded = true;
             else if (src.includes('order-form-pdf.js') && window.NWCAOrderFormPDF) alreadyLoaded = true;
 
@@ -1070,9 +1070,9 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             } else {
                 console.log("PricingPages: Skipping pricing-matrix-capture.js for screen print page");
             }
-            
+
             await loadScript('/pricing-calculator.js');
-            await loadScript('/product-quantity-ui.js');
+            // product-quantity-ui.js removed - file doesn't exist and isn't needed
             await loadScript('/add-to-cart.js');
             await loadScript('/order-form-pdf.js'); // Load PDF script too
             console.log("PricingPages: Core scripts loaded sequentially.");
