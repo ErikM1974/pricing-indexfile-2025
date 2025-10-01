@@ -130,7 +130,10 @@
       "Bash(kill:*)",
       "Bash(pkill:*)",
       "Bash(git log:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "WebFetch(domain:www.raygunprinting.com)",
+      "WebFetch(domain:www.screenprinting.com)",
+      "WebFetch(domain:tannersinc.net)"
     ],
     "deny": [],
     "ask": [],

@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2025-01-27
-**Total Active Files:** ~250 (after cleanup from 350+)
+**Last Updated:** 2025-09-30
+**Total Active Files:** ~255 (includes Screen Print Fast Quote system)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -49,6 +49,15 @@
 | `/calculators/embroidery-pricing.html` | Embroidery calculator | embroidery-pricing-service.js | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery quotes | 7 service files | ✅ Active |
 | `/quote-builders/cap-embroidery-quote-builder.html` | Cap embroidery quotes | 6 service files | ✅ Active |
+
+### Screen Print System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
+| `/quote-builders/screenprint-fast-quote.html` | **NEW** Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
+| `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
+| `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
+| `/shared_components/js/screenprint-fast-quote-service.js` | **NEW** Fast quote service | EmailJS, Caspio API | ✅ Active |
 
 ### Special Calculators
 | File | Purpose | Dependencies | Status |
