@@ -267,37 +267,61 @@
     /* Size Grid */
     .size-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 0.75rem;
         margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
     }
 
     .size-input-group {
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
     .size-label {
         display: block;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #374151;
-        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 1rem;
+        padding: 0.375rem 0.5rem;
+        background: #e5e7eb;
+        border-radius: 6px 6px 0 0;
+        margin: 0;
     }
 
     .size-quantity {
         width: 100%;
-        padding: 0.75rem 0.5rem;
+        padding: 0.875rem 0.5rem;
         text-align: center;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border: 2px solid #e5e7eb;
-        border-radius: 6px;
-        transition: border-color 0.2s;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border: 2px solid #d1d5db;
+        border-radius: 0 0 6px 6px;
+        border-top: none;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .size-quantity:hover {
+        border-color: #9ca3af;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .size-quantity:focus {
         outline: none;
         border-color: #4cb354;
+        box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        background: #f0fdf4;
+    }
+
+    .size-quantity:not([value="0"]):not([value=""]) {
+        background: #dcfce7;
+        border-color: #4cb354;
+        color: #15803d;
     }
 
     .size-actions {
@@ -2205,19 +2229,26 @@
 
         checkMinimum() {
             const total = this.products.reduce((sum, p) => sum + p.quantity, 0);
+            const productCount = this.products.length;
             const warning = document.getElementById('minimum-warning');
 
+            // Update display totals in products list header
+            document.getElementById('products-count').textContent = productCount;
+            document.getElementById('total-pieces').textContent = total;
+
+            // Update warning total
+            document.getElementById('current-total').textContent = total;
+
             if (total > 0 && total < 36) {
-                // Show warning with current count
+                // Show warning with current count when under minimum
                 warning.style.display = 'block';
-                document.getElementById('current-total').textContent = total;
                 document.getElementById('continue-to-summary').disabled = false;
             } else if (total >= 36) {
                 // Hide warning when minimum met
                 warning.style.display = 'none';
                 document.getElementById('continue-to-summary').disabled = false;
             } else {
-                // Hide warning when no products
+                // Hide warning and disable continue when no products
                 warning.style.display = 'none';
                 document.getElementById('continue-to-summary').disabled = true;
             }
