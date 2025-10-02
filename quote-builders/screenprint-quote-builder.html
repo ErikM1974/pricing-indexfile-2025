@@ -1749,8 +1749,11 @@
                     this.searchService = new ProductSearchService();
                 }
 
-                // Use smartSearch method from ProductSearchService for intelligent filtering
-                const searchResults = await this.searchService.smartSearch(term, { limit: 10 });
+                // Use searchProducts method with query parameter (avoids method signature conflict)
+                const searchResults = await this.searchService.searchProducts({
+                    q: term,
+                    limit: 10
+                });
 
                 // Extract products from search results
                 const products = searchResults.products || [];
