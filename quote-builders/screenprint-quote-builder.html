@@ -692,21 +692,17 @@
         color: #dc2626;
     }
 
-    /* Two-Column Grid */
-    .location-grid {
-        display: grid;
-        grid-template-columns: 200px 1fr;
-        gap: 1.5rem;
-        align-items: start;
+    /* Single Column Vertical Layout (Gemini Style) */
+    .location-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
     }
 
-    /* Column containers inside grid */
-    .location-column {
-        /* Grid handles layout - no special styling needed */
-    }
-
-    .colors-column {
-        /* Grid handles layout - no special styling needed */
+    .location-section,
+    .colors-section {
+        display: flex;
+        flex-direction: column;
     }
 
     .location-label {
@@ -1520,9 +1516,9 @@
                             </button>
                         </div>
 
-                        <div class="location-grid">
-                            <!-- Left Column: Location Dropdown -->
-                            <div class="location-column">
+                        <div class="location-content">
+                            <!-- Location Section -->
+                            <div class="location-section">
                                 <label class="location-label">Location</label>
                                 <select class="location-select" onchange="screenPrintQuoteBuilder.updateLocationSelection(${index}, this.value)">
                                     <option value="">Select location...</option>
@@ -1532,8 +1528,8 @@
                                 </select>
                             </div>
 
-                            <!-- Right Column: Color Buttons -->
-                            <div class="colors-column">
+                            <!-- Colors Section -->
+                            <div class="colors-section">
                                 <label class="location-label">Colors</label>
                                 <div class="color-number-buttons">
                                     ${[1,2,3,4,5,6].map(n => {
