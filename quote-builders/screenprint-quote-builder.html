@@ -1923,11 +1923,14 @@
                 container.parentElement.insertBefore(colorCounter, container);
             }
 
-            // Create grid wrapper
-            const gridWrapper = document.createElement('div');
-            gridWrapper.className = 'color-grid' + (shouldCollapse ? ' collapsed' : '');
-            gridWrapper.id = 'color-grid-wrapper';
+            // Apply collapsed class directly to container if needed
+            if (shouldCollapse) {
+                container.classList.add('collapsed');
+            } else {
+                container.classList.remove('collapsed');
+            }
 
+            // Add swatches directly to container (no wrapper needed!)
             swatches.forEach(swatch => {
                 const swatchEl = document.createElement('div');
                 swatchEl.className = 'color-swatch';
@@ -1938,12 +1941,10 @@
                     <div class="color-swatch-name">${swatch.COLOR_NAME}</div>
                 `;
 
-                gridWrapper.appendChild(swatchEl);
+                container.appendChild(swatchEl);
             });
 
-            container.appendChild(gridWrapper);
-
-            // Add "Show More" button if needed
+            // Add "Show More" button if needed (as sibling, not child)
             if (shouldCollapse) {
                 const showMoreBtn = document.createElement('button');
                 showMoreBtn.className = 'show-more-colors-btn';
@@ -1954,10 +1955,10 @@
                 `;
 
                 showMoreBtn.onclick = () => {
-                    const isExpanded = gridWrapper.classList.toggle('collapsed');
+                    const isCollapsed = container.classList.toggle('collapsed');
                     const counter = document.getElementById('color-counter');
 
-                    if (isExpanded) {
+                    if (isCollapsed) {
                         // Now collapsed (showing less)
                         showMoreBtn.innerHTML = `
                             Show ${totalColors - initialShowCount} More Colors
@@ -1976,10 +1977,11 @@
                     }
                 };
 
-                container.appendChild(showMoreBtn);
+                // Insert button after the container
+                container.parentElement.insertBefore(showMoreBtn, container.nextSibling);
             }
 
-            container.style.display = 'block';
+            container.style.display = 'grid';
         }
 
         async selectColor(colorName, swatchElement) {
@@ -2117,9 +2119,17 @@
                 colorCounter.remove();
             }
 
+            // Clear "Show More" button if it exists
+            const showMoreBtn = document.getElementById('show-more-colors-btn');
+            if (showMoreBtn) {
+                showMoreBtn.remove();
+            }
+
             // Clear color swatches and product image
-            document.getElementById('color-swatches').innerHTML = '';
-            document.getElementById('color-swatches').style.display = 'none';
+            const colorSwatches = document.getElementById('color-swatches');
+            colorSwatches.innerHTML = '';
+            colorSwatches.classList.remove('collapsed');
+            colorSwatches.style.display = 'none';
             document.getElementById('selected-color').value = '';
 
             // Clear size inputs
