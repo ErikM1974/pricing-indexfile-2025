@@ -362,6 +362,259 @@
             position: static;
         }
     }
+
+    /* Product Summary Items - Individual Size Pricing Display */
+    .product-summary-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f9fafb;
+    }
+
+    .product-header {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1f2937;
+    }
+
+    .size-breakdown-pricing {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .size-pricing-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.9rem;
+        color: #374151;
+    }
+
+    .size-pricing-row:hover {
+        background: #f3f4f6;
+        border-radius: 4px;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .additional-locations-cost {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        background: #fef3c7;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #92400e;
+    }
+
+    .product-total-row {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+        border-top: 2px solid #2d5f3f;
+        font-size: 1.05rem;
+        color: #2d5f3f;
+    }
+
+    /* ========================================
+       ADDITIONAL LOCATIONS - GEMINI-INSPIRED CLEAN LAYOUT
+       ======================================== */
+
+    /* Global dark garment note */
+    .dark-garment-global-note {
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #92400e;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .dark-garment-global-note i {
+        color: #f59e0b;
+        font-size: 1.125rem;
+    }
+
+    /* Additional Location Cards */
+    .additional-location-card {
+        margin-bottom: 1rem;
+        padding: 1.25rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .location-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .location-header h4 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .btn-icon-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f3f4f6;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #6b7280;
+        transition: all 0.2s;
+    }
+
+    .btn-icon-close:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Two-Column Grid */
+    .location-grid {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    /* Column containers inside grid */
+    .location-column {
+        /* Grid handles layout - no special styling needed */
+    }
+
+    .colors-column {
+        /* Grid handles layout - no special styling needed */
+    }
+
+    .location-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    /* Location Dropdown */
+    .location-select {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9375rem;
+        color: #1f2937;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .location-select:focus {
+        outline: none;
+        border-color: #2d5f3f;
+    }
+
+    /* Color Number Buttons */
+    .color-number-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .color-num-btn {
+        width: 56px;
+        height: 56px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .color-num-btn.active {
+        background: #2d5f3f;
+        color: white;
+        border-color: #2d5f3f;
+    }
+
+    .color-num-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background: #f9fafb;
+    }
+
+    .color-num-btn:hover:not(.active):not(:disabled) {
+        border-color: #9ca3af;
+        background: #f9fafb;
+    }
+
+    /* Dashed Add Button */
+    .btn-add-location-dashed {
+        width: 100%;
+        padding: 1rem;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        background: white;
+        color: #2d5f3f;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9375rem;
+    }
+
+    .btn-add-location-dashed:hover {
+        border-color: #2d5f3f;
+        background: #f0fdf4;
+    }
+
+    .btn-add-location-dashed i {
+        font-size: 1rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 640px) {
+        .location-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .color-number-buttons {
+            justify-content: space-between;
+        }
+
+        .color-num-btn {
+            flex: 1;
+            min-width: 48px;
+            max-width: 60px;
+        }
+    }
     </style>
 
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -494,6 +747,22 @@
                     </div>
                 </div>
 
+                <!-- MOVED UP: Dark Garment Toggle First (Logical Flow) -->
+                <div class="dark-garment-section" style="margin-top: 1.5rem;">
+                    <div class="dark-garment-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dark-garment-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div>
+                            <strong>Dark Garments</strong>
+                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                Adds white underbase layer (+1 color to each location)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
                 <div class="color-buttons">
                     <button class="color-btn active" data-colors="1">1 Color</button>
@@ -503,21 +772,6 @@
                     <button class="color-btn" data-colors="5">5 Colors</button>
                     <button class="color-btn" data-colors="6">6 Colors</button>
                 </div>
-
-                <div class="dark-garment-section" style="margin-top: 2rem;">
-                    <div class="dark-garment-toggle">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="dark-garment-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div>
-                            <strong>Dark Garments</strong>
-                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
-                                Adds white underbase layer (+1 color)
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="setup-card" id="additional-locations-card">
@@ -526,8 +780,8 @@
                     Add up to 3 more print locations. Each location counts as a separate setup fee.
                 </p>
                 <div id="additional-locations-list"></div>
-                <button id="add-location-btn" class="btn btn-secondary">
-                    <i class="fas fa-plus"></i> Add Location
+                <button id="add-location-btn" class="btn-add-location-dashed">
+                    <i class="fas fa-plus"></i> Add Another Location
                 </button>
             </div>
 
@@ -847,22 +1101,34 @@
                 return;
             }
 
-            container.innerHTML = this.printSetup.additionalLocations.map((loc, index) => {
+            // Show global dark garment note if applicable
+            let globalNote = '';
+            if (this.printSetup.isDarkGarment) {
+                globalNote = `
+                    <div class="dark-garment-global-note">
+                        <i class="fas fa-info-circle"></i>
+                        Dark garment adds +1 underbase color to each location
+                    </div>
+                `;
+            }
+
+            container.innerHTML = globalNote + this.printSetup.additionalLocations.map((loc, index) => {
                 const availableOptions = this.getAvailableLocationOptions(index);
 
                 return `
-                    <div class="additional-location-item" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                            <h4 style="margin: 0; font-size: 1rem;">Location ${index + 1}</h4>
-                            <button class="btn-icon-danger" onclick="screenPrintQuoteBuilder.removeLocation(${index})">
-                                <i class="fas fa-times"></i>
+                    <div class="additional-location-card">
+                        <div class="location-header">
+                            <h4>Location ${index + 1}</h4>
+                            <button class="btn-icon-close" onclick="screenPrintQuoteBuilder.removeLocation(${index})">
+                                ×
                             </button>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                            <div>
-                                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Location</label>
-                                <select onchange="screenPrintQuoteBuilder.updateLocationSelection(${index}, this.value)" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <div class="location-grid">
+                            <!-- Left Column: Location Dropdown -->
+                            <div class="location-column">
+                                <label class="location-label">Location</label>
+                                <select class="location-select" onchange="screenPrintQuoteBuilder.updateLocationSelection(${index}, this.value)">
                                     <option value="">Select location...</option>
                                     ${availableOptions.map(opt => `
                                         <option value="${opt.value}" ${loc.location === opt.value ? 'selected' : ''}>${opt.label}</option>
@@ -870,21 +1136,26 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Colors</label>
-                                <select onchange="screenPrintQuoteBuilder.updateLocationColors(${index}, parseInt(this.value))" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;" ${!loc.location ? 'disabled' : ''}>
-                                    <option value="0">Select colors...</option>
+                            <!-- Right Column: Color Buttons -->
+                            <div class="colors-column">
+                                <label class="location-label">Colors</label>
+                                <div class="color-number-buttons">
                                     ${[1,2,3,4,5,6].map(n => `
-                                        <option value="${n}" ${loc.colors === n ? 'selected' : ''}>${n} Color${n > 1 ? 's' : ''}</option>
+                                        <button
+                                            class="color-num-btn ${loc.colors === n ? 'active' : ''}"
+                                            ${!loc.location ? 'disabled' : ''}
+                                            onclick="screenPrintQuoteBuilder.updateLocationColors(${index}, ${n})"
+                                        >
+                                            ${n}
+                                        </button>
                                     `).join('')}
-                                </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            // Hide add button if at max locations
             addBtn.style.display = this.printSetup.additionalLocations.length >= 3 ? 'none' : 'block';
         }
 
@@ -922,6 +1193,7 @@
 
         updateLocationColors(index, colors) {
             this.printSetup.additionalLocations[index].colors = colors;
+            this.updateAdditionalLocationsUI();  // Re-render to show active state
         }
 
         getLocationName(code) {
@@ -958,9 +1230,13 @@
                     `).join('');
                     suggestionsEl.style.display = 'block';
 
-                    // Add click handlers to suggestions
+                    // Add mousedown handlers to suggestions (prevents race condition with input event)
                     suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
-                        item.addEventListener('click', async () => {
+                        item.addEventListener('mousedown', async (e) => {
+                            // Prevent default to stop input blur and event bubbling
+                            e.preventDefault();
+                            e.stopPropagation();
+
                             const style = item.dataset.style;
 
                             // Set flag to prevent input event from firing
@@ -1338,9 +1614,33 @@
                 <div class="summary-section">
                     <h3>Products</h3>
                     ${productPricing.map(p => `
-                        <div class="summary-row">
-                            <span>${p.styleNumber} - ${p.color}</span>
-                            <span>${p.quantity} pcs × $${p.perShirtTotal.toFixed(2)} = $${p.lineTotal.toFixed(2)}</span>
+                        <div class="product-summary-item">
+                            <div class="product-header">
+                                <strong>${p.styleNumber} - ${p.color}</strong>
+                            </div>
+                            <div class="size-breakdown-pricing">
+                                ${Object.entries(p.sizesPricing)
+                                    .sort(([a], [b]) => {
+                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                                        return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+                                    })
+                                    .map(([size, pricing]) => `
+                                        <div class="size-pricing-row">
+                                            <span>${size} (${pricing.quantity} pcs):</span>
+                                            <span>${pricing.quantity} × $${pricing.unitPrice.toFixed(2)} = $${pricing.subtotal.toFixed(2)}</span>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                            ${p.totalAdditionalCost > 0 ? `
+                                <div class="additional-locations-cost">
+                                    <span>Additional Locations:</span>
+                                    <span>+ $${p.totalAdditionalCost.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="product-total-row">
+                                <span><strong>Product Total:</strong></span>
+                                <span><strong>$${p.lineTotal.toFixed(2)}</strong></span>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
@@ -1385,7 +1685,17 @@
             const frontPricingData = pricingData.primaryLocationPricing?.[frontEffectiveColors.toString()];
             if (!frontPricingData) {
                 console.error('[ScreenPrintQuote] No pricing data for', frontEffectiveColors, 'colors');
-                return { styleNumber: product.styleNumber, color: product.color, quantity: product.quantity, sizeBreakdown: product.sizeBreakdown, basePrice: 0, additionalCost: 0, perShirtTotal: 0, lineTotal: 0 };
+                return {
+                    styleNumber: product.styleNumber,
+                    color: product.color,
+                    quantity: product.quantity,
+                    sizeBreakdown: product.sizeBreakdown,
+                    sizesPricing: {},
+                    baseCostSubtotal: 0,
+                    additionalCost: 0,
+                    perShirtTotal: 0,
+                    lineTotal: 0
+                };
             }
 
             const tier = frontPricingData.tiers.find(t =>
@@ -1394,23 +1704,35 @@
 
             if (!tier || !tier.prices) {
                 console.error('[ScreenPrintQuote] No tier found for quantity', totalQuantity);
-                return { styleNumber: product.styleNumber, color: product.color, quantity: product.quantity, sizeBreakdown: product.sizeBreakdown, basePrice: 0, additionalCost: 0, perShirtTotal: 0, lineTotal: 0 };
+                return {
+                    styleNumber: product.styleNumber,
+                    color: product.color,
+                    quantity: product.quantity,
+                    sizeBreakdown: product.sizeBreakdown,
+                    sizesPricing: {},
+                    baseCostSubtotal: 0,
+                    additionalCost: 0,
+                    perShirtTotal: 0,
+                    lineTotal: 0
+                };
             }
 
-            // Calculate weighted average base price based on size breakdown
-            let totalBaseCost = 0;
-            let totalPieces = 0;
-
+            // Calculate pricing per size (NEW: individual size pricing instead of weighted average)
+            const sizesPricing = {};
             Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
                 const sizePrice = parseFloat(tier.prices[size]) || parseFloat(tier.prices['S']) || 0;
-                totalBaseCost += sizePrice * qty;
-                totalPieces += qty;
+                sizesPricing[size] = {
+                    quantity: qty,
+                    unitPrice: sizePrice,
+                    subtotal: sizePrice * qty
+                };
             });
 
-            const basePrice = totalPieces > 0 ? totalBaseCost / totalPieces : 0;
+            // Calculate base cost subtotal from individual sizes
+            const baseCostSubtotal = Object.values(sizesPricing).reduce((sum, s) => sum + s.subtotal, 0);
 
-            // Add additional locations
-            let additionalCost = 0;
+            // Add additional locations cost (per-piece, applies to all pieces)
+            let additionalCostPerPiece = 0;
             this.printSetup.additionalLocations.forEach(loc => {
                 let effectiveColors = loc.colors;
                 if (this.printSetup.isDarkGarment && loc.colors > 0) {
@@ -1424,24 +1746,26 @@
                     );
                     if (locTier) {
                         // Additional locations are per-piece, no size variation
-                        additionalCost += parseFloat(locTier.pricePerPiece) || 0;
+                        additionalCostPerPiece += parseFloat(locTier.pricePerPiece) || 0;
                     }
                 }
             });
 
-            // Per shirt total (weighted average base + additional)
-            const perShirtTotal = basePrice + additionalCost;
-            const lineTotal = perShirtTotal * product.quantity;
+            const totalAdditionalCost = additionalCostPerPiece * product.quantity;
+            const lineTotal = baseCostSubtotal + totalAdditionalCost;
+            const perShirtTotal = lineTotal / product.quantity;
 
             return {
                 styleNumber: product.styleNumber,
                 color: product.color,
                 quantity: product.quantity,
                 sizeBreakdown: product.sizeBreakdown,
-                basePrice,
-                additionalCost,
-                perShirtTotal,
-                lineTotal
+                sizesPricing: sizesPricing,  // NEW: individual size pricing
+                baseCostSubtotal: baseCostSubtotal,  // NEW: subtotal before additional locations
+                additionalCost: additionalCostPerPiece,  // Per-piece additional location cost
+                totalAdditionalCost: totalAdditionalCost,  // Total additional cost for all pieces
+                perShirtTotal: perShirtTotal,  // Average per shirt (for backward compatibility)
+                lineTotal: lineTotal
             };
         }
 
