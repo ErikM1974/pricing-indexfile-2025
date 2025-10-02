@@ -67,10 +67,10 @@ class ScreenPrintQuoteService {
                 .replace(/\.\d{3}Z$/, '');
             
             // Calculate totals
-            const subtotal = quoteData.items.reduce((sum, item) => sum + item.lineTotal, 0);
-            const ltmFeeTotal = quoteData.totalQuantity < 24 ? 50 : 0;
+            const subtotal = quoteData.subtotal || quoteData.items.reduce((sum, item) => sum + item.total, 0);
+            const ltmFeeTotal = quoteData.totalQuantity < 36 ? 50 : 0;
             const setupFees = this.calculateSetupFees(quoteData);
-            const totalAmount = subtotal + ltmFeeTotal + setupFees;
+            const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
             
             // Prepare print setup details for Notes field
             const printSetup = {
@@ -127,7 +127,7 @@ class ScreenPrintQuoteService {
                     PrintLocation: item.locations ? item.locations.join(', ') : 'Primary',
                     PrintLocationName: this.formatLocationDisplay(item),
                     Quantity: parseInt(item.quantity),
-                    HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
+                    HasLTM: quoteData.totalQuantity < 36 ? 'Yes' : 'No',
                     BaseUnitPrice: parseFloat(item.basePrice || 0),
                     LTMPerUnit: parseFloat(item.ltmPerUnit || 0),
                     FinalUnitPrice: parseFloat(item.unitPrice || 0),
@@ -176,24 +176,24 @@ class ScreenPrintQuoteService {
     }
 
     /**
-     * Calculate setup fees based on print locations
+     * Calculate setup fees based on print setup
      */
     calculateSetupFees(quoteData) {
-        const screenFeePerColor = 25; // $25 per screen/color
-        let totalScreens = 0;
-        
-        // Primary location screens
-        if (quoteData.primaryColors) {
-            totalScreens += parseInt(quoteData.primaryColors);
+        const screenFeePerColor = 30; // $30 per screen/color
+
+        // Get setup fees from quoteData if already calculated
+        if (quoteData.setupFees !== undefined) {
+            return quoteData.setupFees;
         }
-        
-        // Additional location screens
-        if (quoteData.additionalColors) {
-            Object.values(quoteData.additionalColors).forEach(colorCount => {
-                totalScreens += parseInt(colorCount || 0);
-            });
+
+        // Otherwise calculate from print setup
+        let totalScreens = quoteData.printSetup?.frontColors || 1;
+
+        // Add underbase if dark garments
+        if (quoteData.printSetup?.isDarkGarment) {
+            totalScreens += 1;
         }
-        
+
         return totalScreens * screenFeePerColor;
     }
 
@@ -222,12 +222,14 @@ class ScreenPrintQuoteService {
 
     /**
      * Get pricing tier based on quantity
+     * Must match screenprint-pricing-v2.js tiers
      */
     getPricingTier(quantity) {
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
-        return '72+';
+        if (quantity >= 13 && quantity <= 36) return '13-36';
+        if (quantity >= 37 && quantity <= 72) return '37-72';
+        if (quantity >= 73 && quantity <= 144) return '73-144';
+        if (quantity >= 145) return '145-576';
+        return '13-36'; // Default to tier 1
     }
 
     /**

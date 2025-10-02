@@ -25,6 +25,208 @@
         font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
         font-weight: 900 !important;
     }
+
+    /* E-Commerce Style Product Layout */
+
+    /* Search Section */
+    .search-section {
+        margin-bottom: 2rem;
+    }
+
+    .search-section .search-input {
+        width: 100%;
+        max-width: 600px;
+        padding: 1rem;
+        font-size: 1.1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        transition: border-color 0.2s;
+    }
+
+    .search-section .search-input:focus {
+        outline: none;
+        border-color: #4cb354;
+    }
+
+    /* Two Column Product Layout */
+    .product-layout {
+        display: grid;
+        grid-template-columns: 450px 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .product-image-col {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .product-image-col img {
+        width: 100%;
+        max-width: 450px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .product-info-col {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .product-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .product-desc {
+        color: #6b7280;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .color-selection h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+
+    /* Color Grid */
+    .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .color-swatch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.75rem 0.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+
+    .color-swatch:hover {
+        border-color: #4cb354;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(76, 179, 84, 0.2);
+    }
+
+    .color-swatch.selected {
+        border-color: #4cb354;
+        background: #e8f5e9;
+        box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+    }
+
+    .color-swatch-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        object-fit: cover;
+    }
+
+    .color-swatch-name {
+        font-size: 0.75rem;
+        text-align: center;
+        line-height: 1.2;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    /* Size Section */
+    .size-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .size-section h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+    }
+
+    /* Size Grid */
+    .size-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .size-input-group {
+        text-align: center;
+    }
+
+    .size-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+        font-size: 0.95rem;
+    }
+
+    .size-quantity {
+        width: 100%;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        transition: border-color 0.2s;
+    }
+
+    .size-quantity:focus {
+        outline: none;
+        border-color: #4cb354;
+    }
+
+    .size-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .total-display {
+        font-size: 1.1rem;
+        color: #374151;
+    }
+
+    .total-display strong {
+        color: #4cb354;
+        font-size: 1.3rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+        .product-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .product-image-col {
+            position: static;
+        }
+    }
     </style>
 
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -209,47 +411,47 @@
                 <p>Search and add products</p>
             </div>
 
-            <div class="product-search-container">
-                <div class="search-row">
-                    <div class="form-group" style="position: relative;">
-                        <label for="style-search">Style Number</label>
-                        <input type="text" id="style-search" placeholder="Enter style (e.g., PC54)" autocomplete="off">
-                        <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="color-select">Color</label>
-                        <select id="color-select" disabled>
-                            <option value="">Select style first</option>
-                        </select>
-                    </div>
-
-                    <button id="load-product-btn" class="btn btn-primary" disabled>
-                        <i class="fas fa-search"></i> Load Product
-                    </button>
+            <!-- Search Section (Full Width) -->
+            <div class="search-section">
+                <div class="form-group" style="position: relative;">
+                    <label for="style-search">Search Product Style</label>
+                    <input type="text" id="style-search" class="search-input" placeholder="Enter style number (e.g., PC54, PC61, 18500)" autocomplete="off">
+                    <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
                 </div>
             </div>
 
-            <div id="product-display" class="product-display" style="display: none;">
-                <div class="product-info">
-                    <div class="product-details">
-                        <h3 id="product-name"></h3>
-                        <p id="product-description"></p>
-                    </div>
+            <!-- Product Display (Two Column Layout) -->
+            <div id="product-display" class="product-layout" style="display: none;">
+                <!-- Left Column: Product Image -->
+                <div class="product-image-col">
+                    <img id="product-image" src="" alt="Product">
                 </div>
 
-                <div class="size-matrix">
-                    <h4>Enter Quantities by Size</h4>
-                    <div id="size-inputs" class="size-inputs"></div>
+                <!-- Right Column: Product Info & Colors -->
+                <div class="product-info-col">
+                    <h3 id="product-name" class="product-title"></h3>
+                    <p id="product-description" class="product-desc"></p>
 
-                    <div class="phase-actions" style="border-top: none; padding-top: 1rem;">
-                        <div>
-                            Total Quantity: <strong id="product-total-qty">0</strong>
-                        </div>
-                        <button id="add-to-quote-btn" class="btn btn-primary" disabled>
-                            <i class="fas fa-plus"></i> Add to Quote
-                        </button>
+                    <div class="color-selection">
+                        <h4>Select Color</h4>
+                        <div id="color-swatches" class="color-grid"></div>
+                        <input type="hidden" id="selected-color">
                     </div>
+                </div>
+            </div>
+
+            <!-- Size Selection (Full Width - Shows After Color Selected) -->
+            <div id="size-section" class="size-section" style="display: none;">
+                <h4>Select Sizes & Quantities</h4>
+                <div id="size-inputs" class="size-grid"></div>
+
+                <div class="size-actions">
+                    <div class="total-display">
+                        Total Quantity: <strong id="product-total-qty">0</strong>
+                    </div>
+                    <button id="add-to-quote-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
                 </div>
             </div>
 
@@ -373,10 +575,16 @@
             this.products = [];
             this.currentProduct = null;
 
+            // Search state
+            this.lastSearchTerm = '';  // Track last searched term to prevent re-searching
+
             // Services
             this.quoteService = new ScreenPrintQuoteService();
-            this.pricingCalculator = new ScreenPrintPricing();
             this.pricingService = new ScreenPrintPricingService();
+
+            // Search debouncing
+            this.searchDebounceTimer = null;
+            this.isSettingValue = false; // Flag to prevent input event during programmatic updates
 
             // Initialize
             emailjs.init('4qSbDO-SQs19TbP80');
@@ -392,14 +600,12 @@
                     document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
                     this.printSetup.frontColors = parseInt(e.target.dataset.colors);
-                    this.updatePricingCalculator();
                 });
             });
 
             // Dark garment toggle
             document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
                 this.printSetup.isDarkGarment = e.target.checked;
-                this.updatePricingCalculator();
             });
 
             // Navigation
@@ -413,13 +619,34 @@
             });
             document.getElementById('back-to-products').addEventListener('click', () => this.navigateToPhase(2));
 
-            // Product search
+            // Product search with debouncing
             const styleSearch = document.getElementById('style-search');
             styleSearch.addEventListener('input', (e) => {
+                // Skip if we're setting the value programmatically
+                if (this.isSettingValue) {
+                    return;
+                }
+
                 const term = e.target.value.trim();
+
+                // Skip if the term hasn't changed (prevents re-searching while scrolling dropdown)
+                if (term === this.lastSearchTerm) {
+                    return;
+                }
+
+                // Clear existing timer
+                if (this.searchDebounceTimer) {
+                    clearTimeout(this.searchDebounceTimer);
+                }
+
                 if (term.length >= 2) {
-                    this.searchProducts(term);
+                    // Debounce: wait 300ms before searching
+                    this.searchDebounceTimer = setTimeout(() => {
+                        this.lastSearchTerm = term;  // Track what we searched for
+                        this.searchProducts(term);
+                    }, 300);
                 } else {
+                    this.lastSearchTerm = '';  // Reset when clearing search
                     document.getElementById('style-suggestions').style.display = 'none';
                 }
             });
@@ -432,8 +659,18 @@
                 }
             });
 
-            // Load product
-            document.getElementById('load-product-btn').addEventListener('click', () => this.loadProductDetails());
+            // Prevent dropdown from closing when scrolling/clicking inside it
+            const suggestionsEl = document.getElementById('style-suggestions');
+            suggestionsEl.addEventListener('mousedown', (e) => {
+                // Prevent input blur and event bubbling when interacting with dropdown
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            // Prevent scroll events from affecting the input
+            suggestionsEl.addEventListener('scroll', (e) => {
+                e.stopPropagation();
+            });
 
             // Add to quote
             document.getElementById('add-to-quote-btn').addEventListener('click', () => this.addProductToQuote());
@@ -443,12 +680,6 @@
 
             // Save quote
             document.getElementById('save-quote-btn').addEventListener('click', () => this.saveQuote());
-        }
-
-        updatePricingCalculator() {
-            this.pricingCalculator.state.frontColors = this.printSetup.frontColors;
-            this.pricingCalculator.state.isDarkGarment = this.printSetup.isDarkGarment;
-            this.pricingCalculator.state.additionalLocations = this.printSetup.additionalLocations;
         }
 
         // Additional Locations Management
@@ -469,7 +700,6 @@
         removeLocation(index) {
             this.printSetup.additionalLocations.splice(index, 1);
             this.updateAdditionalLocationsUI();
-            this.updatePricingCalculator();
         }
 
         updateAdditionalLocationsUI() {
@@ -553,12 +783,10 @@
             }
 
             this.updateAdditionalLocationsUI();
-            this.updatePricingCalculator();
         }
 
         updateLocationColors(index, colors) {
             this.printSetup.additionalLocations[index].colors = colors;
-            this.updatePricingCalculator();
         }
 
         getLocationName(code) {
@@ -581,13 +809,16 @@
 
             try {
                 const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?q=${term}&limit=10`);
-                const products = await response.json();
+                const data = await response.json();
+
+                // Unwrap API response - handles both {data: {products: []}} and flat array formats
+                const products = data.data?.products || data.products || [];
 
                 if (products.length > 0) {
-                    // Show dropdown with clickable suggestions
+                    // Show dropdown with clickable suggestions - using correct camelCase field names
                     suggestionsEl.innerHTML = products.map(p => `
-                        <div class="suggestion-item" data-style="${p.STYLE_NUMBER || p.style}">
-                            <strong>${p.STYLE_NUMBER || p.style}</strong> - ${p.PRODUCT_TITLE || p.name || ''}
+                        <div class="suggestion-item" data-style="${p.styleNumber}">
+                            <strong>${p.styleNumber}</strong> - ${p.productName || ''}
                         </div>
                     `).join('');
                     suggestionsEl.style.display = 'block';
@@ -596,7 +827,16 @@
                     suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
                         item.addEventListener('click', async () => {
                             const style = item.dataset.style;
+
+                            // Set flag to prevent input event from firing
+                            this.isSettingValue = true;
                             document.getElementById('style-search').value = style;
+
+                            // Keep flag true for a bit to ensure input event is blocked
+                            setTimeout(() => {
+                                this.isSettingValue = false;
+                            }, 100); // 100ms is enough to block the input event
+
                             suggestionsEl.style.display = 'none';
                             await this.selectProductStyle(style);
                         });
@@ -607,83 +847,163 @@
                 }
             } catch (error) {
                 console.error('Search error:', error);
-                suggestionsEl.style.display = 'none';
+                suggestionsEl.innerHTML = '<div class="suggestion-item no-results">Error loading products</div>';
+                suggestionsEl.style.display = 'block';
             }
         }
 
         async selectProductStyle(styleNumber) {
             try {
-                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/${styleNumber}`);
-                const product = await response.json();
+                // Fetch product details and color swatches in parallel
+                const [detailsResponse, swatchesResponse] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`)
+                ]);
 
-                this.currentProduct = {
-                    styleNumber: styleNumber,
-                    details: product
-                };
+                const detailsData = await detailsResponse.json();
+                const swatchesData = await swatchesResponse.json();
 
-                // Load colors
-                const colorSelect = document.getElementById('color-select');
-                colorSelect.disabled = false;
-                colorSelect.innerHTML = '<option value="">Select a color...</option>';
+                // API returns an array of rows (one per color/size combination)
+                const productRows = Array.isArray(detailsData) ? detailsData : (detailsData.data || []);
 
-                if (product.colors && product.colors.length > 0) {
-                    product.colors.forEach(color => {
-                        const option = document.createElement('option');
-                        option.value = color;
-                        option.textContent = color;
-                        colorSelect.appendChild(option);
-                    });
+                if (productRows.length === 0) {
+                    throw new Error('No product data found');
                 }
 
-                document.getElementById('load-product-btn').disabled = false;
+                // Store ALL product rows and first row for easy access
+                this.currentProduct = {
+                    styleNumber: styleNumber,
+                    allRows: productRows,
+                    details: productRows[0],
+                    colorSwatches: swatchesData || []
+                };
+
+                // Display generic product image
+                const productImage = document.getElementById('product-image');
+
+                if (productRows[0].FRONT_FLAT || productRows[0].PRODUCT_IMAGE) {
+                    productImage.src = productRows[0].FRONT_FLAT || productRows[0].PRODUCT_IMAGE;
+                    productImage.alt = productRows[0].PRODUCT_TITLE || styleNumber;
+                }
+
+                // Display product info and color swatches
+                document.getElementById('product-name').textContent = `${productRows[0].PRODUCT_TITLE || styleNumber}`;
+                document.getElementById('product-description').textContent = productRows[0].PRODUCT_DESCRIPTION || 'Select a color to continue';
+
+                this.displayColorSwatches(swatchesData);
+
+                // Show the product display section
+                document.getElementById('product-display').style.display = 'grid';
+
             } catch (error) {
                 console.error('Error loading style:', error);
-                alert('Error loading product');
+                alert('Error loading product details. Please try again.');
             }
         }
 
-        async loadProductDetails() {
-            const color = document.getElementById('color-select').value;
+        displayColorSwatches(swatches) {
+            const container = document.getElementById('color-swatches');
+            container.innerHTML = '';
+
+            if (!swatches || swatches.length === 0) {
+                container.innerHTML = '<p>No color options available</p>';
+                return;
+            }
+
+            swatches.forEach(swatch => {
+                const swatchEl = document.createElement('div');
+                swatchEl.className = 'color-swatch';
+                swatchEl.onclick = () => this.selectColor(swatch.COLOR_NAME, swatchEl);
+
+                swatchEl.innerHTML = `
+                    <img class="color-swatch-image" src="${swatch.COLOR_SQUARE_IMAGE}" alt="${swatch.COLOR_NAME}">
+                    <div class="color-swatch-name">${swatch.COLOR_NAME}</div>
+                `;
+
+                container.appendChild(swatchEl);
+            });
+
+            container.style.display = 'grid';
+        }
+
+        async selectColor(colorName, swatchElement) {
+            // Update visual selection
+            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+            swatchElement.classList.add('selected');
+
+            // Store selected color
+            document.getElementById('selected-color').value = colorName;
+            this.currentProduct.color = colorName;
+
+            // Update product image to show selected color
+            const colorRow = this.currentProduct.allRows.find(row =>
+                row.COLOR_NAME === colorName || row.CATALOG_COLOR === colorName
+            );
+
+            if (colorRow && (colorRow.FRONT_FLAT || colorRow.FRONT_MODEL)) {
+                const productImage = document.getElementById('product-image');
+                productImage.src = colorRow.FRONT_FLAT || colorRow.FRONT_MODEL;
+            }
+
+            // Load sizes for this color
+            await this.loadProductDetails(colorName);
+        }
+
+        async loadProductDetails(colorName) {
+            // Color is passed from selectColor(), or get from hidden input
+            const color = colorName || document.getElementById('selected-color').value;
+
             if (!color) {
                 alert('Please select a color');
                 return;
             }
 
-            // Get pricing data
-            const pricingData = await this.pricingService.fetchPricingData(this.currentProduct.styleNumber);
+            if (!this.currentProduct) {
+                alert('Please select a product style first');
+                return;
+            }
 
-            // Update calculator with pricing data
-            this.pricingCalculator.setPricingData(pricingData);
+            try {
+                // Fetch accurate sizes from sizes-by-style-color API
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=${this.currentProduct.styleNumber}&color=${encodeURIComponent(color)}`);
+                const sizeData = await response.json();
 
-            // Display product
-            document.getElementById('product-display').style.display = 'block';
-            document.getElementById('product-name').textContent = `${this.currentProduct.styleNumber} - ${this.currentProduct.details.PRODUCT_TITLE || ''}`;
-            document.getElementById('product-description').textContent = color;
+                // Extract sizes array from response
+                const displaySizes = sizeData.sizes || ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 
-            // Create size inputs
-            const sizeInputsContainer = document.getElementById('size-inputs');
-            sizeInputsContainer.innerHTML = '';
+                // Update product description with selected color
+                document.getElementById('product-description').textContent = `Color: ${color}`;
 
-            const sizes = pricingData.sizes || ['S', 'M', 'L', 'XL', '2XL'];
-            sizes.forEach(sizeObj => {
-                const size = sizeObj.size || sizeObj;
-                const sizeGroup = document.createElement('div');
-                sizeGroup.className = 'size-input-group';
-                sizeGroup.innerHTML = `
-                    <label class="size-label">${size}</label>
-                    <input type="number"
-                           class="size-quantity"
-                           data-size="${size}"
-                           min="0"
-                           value="0"
-                           onchange="screenPrintQuoteBuilder.updateProductTotal()">
-                `;
-                sizeInputsContainer.appendChild(sizeGroup);
-            });
+                // Create size inputs
+                const sizeInputsContainer = document.getElementById('size-inputs');
+                sizeInputsContainer.innerHTML = '';
 
-            this.currentProduct.color = color;
-            this.currentProduct.sizes = sizes.map(s => s.size || s);
-            this.currentProduct.pricingData = pricingData;
+                displaySizes.forEach(size => {
+                    const sizeGroup = document.createElement('div');
+                    sizeGroup.className = 'size-input-group';
+                    sizeGroup.innerHTML = `
+                        <label class="size-label">${size}</label>
+                        <input type="number"
+                               class="size-quantity"
+                               data-size="${size}"
+                               min="0"
+                               value="0"
+                               onchange="screenPrintQuoteBuilder.updateProductTotal()">
+                    `;
+                    sizeInputsContainer.appendChild(sizeGroup);
+                });
+
+                this.currentProduct.color = color;
+                this.currentProduct.sizes = displaySizes;
+
+                // Show the size section
+                document.getElementById('size-section').style.display = 'block';
+
+                document.getElementById('add-to-quote-btn').disabled = false;
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Error loading product details. Please try again.');
+            }
         }
 
         updateProductTotal() {
@@ -709,35 +1029,41 @@
                 }
             });
 
-            // Calculate total across all products for tier
-            const grandTotal = this.products.reduce((sum, p) => sum + p.quantity, totalQuantity);
+            if (totalQuantity === 0) {
+                alert('Please enter at least one quantity');
+                return;
+            }
 
-            // Set calculator quantity to grand total
-            this.pricingCalculator.state.quantity = grandTotal;
-
-            // Calculate pricing using screenprint-pricing-v2.js
-            const pricing = this.pricingCalculator.calculatePricing();
-
+            // Store product WITHOUT pricing calculations (pricing done in summary phase)
             const product = {
                 styleNumber: this.currentProduct.styleNumber,
                 productName: this.currentProduct.details.PRODUCT_TITLE || '',
                 color: this.currentProduct.color,
                 sizeBreakdown: sizeBreakdown,
-                quantity: totalQuantity,
-                unitPrice: pricing.basePrice + pricing.additionalCost,
-                total: (pricing.basePrice + pricing.additionalCost) * totalQuantity,
-                tier: this.getTierForQuantity(grandTotal)
+                quantity: totalQuantity
             };
 
             this.products.push(product);
             this.displayProductsList();
 
-            // Reset
+            // Reset form
             document.getElementById('style-search').value = '';
-            document.getElementById('color-select').disabled = true;
-            document.getElementById('load-product-btn').disabled = true;
-            document.getElementById('product-display').style.display = 'none';
+            this.lastSearchTerm = '';  // Reset search tracking
 
+            // Clear color swatches and product image
+            document.getElementById('color-swatches').innerHTML = '';
+            document.getElementById('color-swatches').style.display = 'none';
+            document.getElementById('selected-color').value = '';
+
+            // Clear size inputs
+            document.getElementById('size-inputs').innerHTML = '';
+            document.getElementById('product-total-qty').textContent = '0';
+
+            // Hide both sections
+            document.getElementById('product-display').style.display = 'none';
+            document.getElementById('size-section').style.display = 'none';
+
+            // Show warning if under minimum, but don't block
             this.checkMinimum();
         }
 
@@ -765,8 +1091,8 @@
                 <div class="product-item">
                     <div class="product-item-info">
                         <div class="product-item-details">
-                            <h4>${product.styleNumber} - ${product.color}</h4>
-                            <p>${product.quantity} pieces @ $${product.unitPrice.toFixed(2)}/ea = $${product.total.toFixed(2)}, Tier: ${product.tier}</p>
+                            <h4>${product.styleNumber} - ${product.productName}</h4>
+                            <p>${product.color} | Quantity: ${product.quantity} pieces</p>
                         </div>
                     </div>
                     <div class="product-item-actions">
@@ -800,17 +1126,30 @@
             }
         }
 
-        generateQuoteSummary() {
+        async generateQuoteSummary() {
             const totalQuantity = this.products.reduce((sum, p) => sum + p.quantity, 0);
 
-            // Update calculator state
-            this.pricingCalculator.state.quantity = totalQuantity;
-            const pricing = this.pricingCalculator.calculatePricing();
+            // Get unique styles and fetch pricing for each
+            const uniqueStyles = [...new Set(this.products.map(p => p.styleNumber))];
+            const pricingDataByStyle = {};
 
-            const subtotal = this.products.reduce((sum, p) => sum + p.total, 0);
-            const setupFees = pricing.setupFee || 0;
-            const grandTotal = subtotal + setupFees;
+            for (const styleNumber of uniqueStyles) {
+                const data = await this.pricingService.fetchPricingData(styleNumber);
+                pricingDataByStyle[styleNumber] = data;
+            }
 
+            // Calculate pricing for each product
+            const productPricing = this.products.map(product => {
+                return this.calculateProductPricing(product, pricingDataByStyle[product.styleNumber], totalQuantity);
+            });
+
+            // Calculate totals
+            const subtotal = productPricing.reduce((sum, p) => sum + p.lineTotal, 0);
+            const setupFee = this.calculateTotalSetupFee();
+            const ltmFee = this.calculateLTMFee(totalQuantity, pricingDataByStyle);
+            const grandTotal = subtotal + setupFee + ltmFee;
+
+            // Display breakdown
             const summaryContainer = document.getElementById('quote-summary');
             summaryContainer.innerHTML = `
                 <div class="summary-section">
@@ -827,47 +1166,161 @@
                         ${this.printSetup.additionalLocations.map((loc, index) => `
                             <div class="summary-row" style="padding-left: 1rem; font-size: 0.875rem;">
                                 <span>${this.getLocationName(loc.location)}: ${loc.colors} ${loc.colors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}</span>
-                                <span>$${(loc.colors + (this.printSetup.isDarkGarment ? 1 : 0)) * 30}</span>
                             </div>
                         `).join('')}
                     ` : ''}
+                    <div class="summary-row" style="border-top: 1px solid #ddd; padding-top: 0.5rem; margin-top: 0.5rem;">
+                        <span>Setup Fee:</span>
+                        <span>$${setupFee.toFixed(2)}</span>
+                    </div>
                 </div>
 
                 <div class="summary-section">
-                    <h3>Products (${this.products.length} items, ${totalQuantity} pieces)</h3>
-                    ${this.products.map(p => `
+                    <h3>Products</h3>
+                    ${productPricing.map(p => `
                         <div class="summary-row">
-                            <span>${p.styleNumber} - ${p.color}, ${p.quantity} pieces @ $${p.unitPrice.toFixed(2)}/ea</span>
-                            <span>$${p.total.toFixed(2)}</span>
+                            <span>${p.styleNumber} - ${p.color}</span>
+                            <span>${p.quantity} pcs × $${p.perShirtTotal.toFixed(2)} = $${p.lineTotal.toFixed(2)}</span>
                         </div>
                     `).join('')}
                 </div>
 
                 <div class="summary-section">
-                    <h3>Pricing</h3>
                     <div class="summary-row">
-                        <span>Products & Printing:</span>
+                        <span>Subtotal:</span>
                         <span>$${subtotal.toFixed(2)}</span>
                     </div>
-                    <div class="summary-row">
-                        <span>Setup Fees (Screens):</span>
-                        <span>$${setupFees.toFixed(2)}</span>
-                    </div>
-                    <div class="summary-total">
+                    ${ltmFee > 0 ? `
                         <div class="summary-row">
-                            <span style="font-size: 1.125rem;">Grand Total:</span>
-                            <span>$${grandTotal.toFixed(2)}</span>
+                            <span>LTM Fee (&lt; 13 pieces):</span>
+                            <span>$${ltmFee.toFixed(2)}</span>
                         </div>
+                    ` : ''}
+                    <div class="summary-row" style="border-top: 2px solid #333; padding-top: 0.5rem; margin-top: 0.5rem; font-weight: bold; font-size: 1.25rem;">
+                        <span>Grand Total:</span>
+                        <span style="color: #2d5f3f;">$${grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
 
+            // Store pricing for quote save
             this.currentPricing = {
                 totalQuantity,
+                productPricing,
                 subtotal,
-                setupFees,
+                setupFee,
+                ltmFee,
                 grandTotal
             };
+        }
+
+        calculateProductPricing(product, pricingData, totalQuantity) {
+            // Calculate effective colors (design + underbase if dark)
+            let frontEffectiveColors = this.printSetup.frontColors;
+            if (this.printSetup.isDarkGarment && this.printSetup.frontColors > 0) {
+                frontEffectiveColors += 1;
+            }
+
+            // Get base price from primaryLocationPricing
+            const frontPricingData = pricingData.primaryLocationPricing?.[frontEffectiveColors.toString()];
+            if (!frontPricingData) {
+                console.error('[ScreenPrintQuote] No pricing data for', frontEffectiveColors, 'colors');
+                return { styleNumber: product.styleNumber, color: product.color, quantity: product.quantity, sizeBreakdown: product.sizeBreakdown, basePrice: 0, additionalCost: 0, perShirtTotal: 0, lineTotal: 0 };
+            }
+
+            const tier = frontPricingData.tiers.find(t =>
+                totalQuantity >= t.minQty && (!t.maxQty || totalQuantity <= t.maxQty)
+            );
+
+            if (!tier || !tier.prices) {
+                console.error('[ScreenPrintQuote] No tier found for quantity', totalQuantity);
+                return { styleNumber: product.styleNumber, color: product.color, quantity: product.quantity, sizeBreakdown: product.sizeBreakdown, basePrice: 0, additionalCost: 0, perShirtTotal: 0, lineTotal: 0 };
+            }
+
+            // Calculate weighted average base price based on size breakdown
+            let totalBaseCost = 0;
+            let totalPieces = 0;
+
+            Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                const sizePrice = parseFloat(tier.prices[size]) || parseFloat(tier.prices['S']) || 0;
+                totalBaseCost += sizePrice * qty;
+                totalPieces += qty;
+            });
+
+            const basePrice = totalPieces > 0 ? totalBaseCost / totalPieces : 0;
+
+            // Add additional locations
+            let additionalCost = 0;
+            this.printSetup.additionalLocations.forEach(loc => {
+                let effectiveColors = loc.colors;
+                if (this.printSetup.isDarkGarment && loc.colors > 0) {
+                    effectiveColors += 1;
+                }
+
+                const locPricingData = pricingData.additionalLocationPricing?.[effectiveColors.toString()];
+                if (locPricingData) {
+                    const locTier = locPricingData.tiers.find(t =>
+                        totalQuantity >= t.minQty && (!t.maxQty || totalQuantity <= t.maxQty)
+                    );
+                    if (locTier) {
+                        // Additional locations are per-piece, no size variation
+                        additionalCost += parseFloat(locTier.pricePerPiece) || 0;
+                    }
+                }
+            });
+
+            // Per shirt total (weighted average base + additional)
+            const perShirtTotal = basePrice + additionalCost;
+            const lineTotal = perShirtTotal * product.quantity;
+
+            return {
+                styleNumber: product.styleNumber,
+                color: product.color,
+                quantity: product.quantity,
+                sizeBreakdown: product.sizeBreakdown,
+                basePrice,
+                additionalCost,
+                perShirtTotal,
+                lineTotal
+            };
+        }
+
+        calculateTotalSetupFee() {
+            // Front setup (MATCHES screenprint-pricing-v2.js LINE 1338)
+            let frontColors = this.printSetup.frontColors;
+            if (this.printSetup.isDarkGarment && frontColors > 0) {
+                frontColors += 1; // Add underbase
+            }
+            const frontSetup = frontColors * 30;
+
+            // Additional locations setup
+            let additionalSetup = 0;
+            this.printSetup.additionalLocations.forEach(loc => {
+                let colors = loc.colors;
+                if (this.printSetup.isDarkGarment && colors > 0) {
+                    colors += 1;
+                }
+                additionalSetup += colors * 30;
+            });
+
+            return frontSetup + additionalSetup;
+        }
+
+        calculateLTMFee(totalQuantity, pricingDataByStyle) {
+            // MATCHES screenprint-pricing-v2.js LINE 1341-1360
+            if (totalQuantity >= 13) return 0;
+
+            // Get LTM fee from first product's tier data
+            const firstStyle = Object.values(pricingDataByStyle)[0];
+            if (!firstStyle?.tierData) return 0;
+
+            const tierKey = Object.keys(firstStyle.tierData).find(key => {
+                const tier = firstStyle.tierData[key];
+                return totalQuantity >= tier.MinQuantity &&
+                       (!tier.MaxQuantity || totalQuantity <= tier.MaxQuantity);
+            });
+
+            return tierKey ? parseFloat(firstStyle.tierData[tierKey].LTM_Fee || 0) : 0;
         }
 
         async saveQuote() {
