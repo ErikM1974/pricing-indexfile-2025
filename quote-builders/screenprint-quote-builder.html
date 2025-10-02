@@ -263,6 +263,95 @@
         font-size: 1.3rem;
     }
 
+    /* Product List Enhancements */
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        background: white;
+        transition: box-shadow 0.2s;
+    }
+
+    .product-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .product-item-info {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .product-color-swatch {
+        flex-shrink: 0;
+    }
+
+    .color-swatch-indicator {
+        width: 50px;
+        height: 50px;
+        border-radius: 6px;
+        border: 2px solid #e5e7eb;
+        object-fit: cover;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .product-item-details {
+        flex: 1;
+    }
+
+    .product-item-details h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .product-item-details p {
+        margin: 0 0 0.5rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .size-breakdown {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        margin-top: 0.5rem;
+    }
+
+    .size-chip {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .product-item-actions {
+        flex-shrink: 0;
+    }
+
+    .product-item-actions .btn-danger {
+        padding: 0.5rem 0.75rem;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .product-item-actions .btn-danger:hover {
+        background: #dc2626;
+    }
+
     /* Responsive */
     @media (max-width: 968px) {
         .product-layout {
@@ -977,9 +1066,13 @@
             document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
             swatchElement.classList.add('selected');
 
-            // Store selected color
+            // Store selected color and swatch image
             document.getElementById('selected-color').value = colorName;
             this.currentProduct.color = colorName;
+
+            // Store swatch image from the clicked element
+            const swatchImage = swatchElement.querySelector('.color-swatch-image');
+            this.currentProduct.colorSwatchImage = swatchImage ? swatchImage.src : '';
 
             // Update product image to show selected color
             const colorRow = this.currentProduct.allRows.find(row =>
@@ -1085,6 +1178,7 @@
                 styleNumber: this.currentProduct.styleNumber,
                 productName: this.currentProduct.details.PRODUCT_TITLE || '',
                 color: this.currentProduct.color,
+                colorSwatchImage: this.currentProduct.colorSwatchImage || '',
                 sizeBreakdown: sizeBreakdown,
                 quantity: totalQuantity
             };
@@ -1136,9 +1230,23 @@
             container.innerHTML = this.products.map((product, index) => `
                 <div class="product-item">
                     <div class="product-item-info">
+                        ${product.colorSwatchImage ? `
+                            <div class="product-color-swatch">
+                                <img src="${product.colorSwatchImage}" alt="${product.color}" class="color-swatch-indicator">
+                            </div>
+                        ` : ''}
                         <div class="product-item-details">
                             <h4>${product.styleNumber} - ${product.productName}</h4>
-                            <p>${product.color} | Quantity: ${product.quantity} pieces</p>
+                            <p><strong>${product.color}</strong> | <strong>${product.quantity} pieces</strong></p>
+                            <div class="size-breakdown">
+                                ${Object.entries(product.sizeBreakdown)
+                                    .sort(([a], [b]) => {
+                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                                        return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+                                    })
+                                    .map(([size, qty]) => `<span class="size-chip">${size}: ${qty}</span>`)
+                                    .join('')}
+                            </div>
                         </div>
                     </div>
                     <div class="product-item-actions">
@@ -1163,12 +1271,18 @@
             const warning = document.getElementById('minimum-warning');
 
             if (total > 0 && total < 36) {
+                // Show warning with current count
                 warning.style.display = 'block';
                 document.getElementById('current-total').textContent = total;
                 document.getElementById('continue-to-summary').disabled = false;
-            } else {
+            } else if (total >= 36) {
+                // Hide warning when minimum met
                 warning.style.display = 'none';
-                document.getElementById('continue-to-summary').disabled = this.products.length === 0;
+                document.getElementById('continue-to-summary').disabled = false;
+            } else {
+                // Hide warning when no products
+                warning.style.display = 'none';
+                document.getElementById('continue-to-summary').disabled = true;
             }
         }
 
