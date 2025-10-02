@@ -1209,8 +1209,7 @@
                 this.updateLiveQuoteSummary(); // Update summary
             });
 
-            // Navigation
-            document.getElementById('continue-to-products').addEventListener('click', () => this.navigateToPhase(2));
+            // Navigation (continue button is now in summary panel with onclick)
             document.getElementById('back-to-setup').addEventListener('click', () => this.navigateToPhase(1));
             document.getElementById('continue-to-summary').addEventListener('click', () => {
                 if (this.products.length > 0) {
@@ -1274,13 +1273,25 @@
             });
 
             // Add to quote
-            document.getElementById('add-to-quote-btn').addEventListener('click', () => this.addProductToQuote());
+            const addToQuoteBtn = document.getElementById('add-to-quote-btn');
+            if (addToQuoteBtn) {
+                addToQuoteBtn.addEventListener('click', () => this.addProductToQuote());
+            }
 
             // Additional locations
-            document.getElementById('add-location-btn').addEventListener('click', () => this.addLocation());
+            const addLocationBtn = document.getElementById('add-location-btn');
+            if (addLocationBtn) {
+                addLocationBtn.addEventListener('click', () => this.addLocation());
+                console.log('[Init] Add location button event listener attached');
+            } else {
+                console.error('[Init] Add location button not found!');
+            }
 
             // Save quote
-            document.getElementById('save-quote-btn').addEventListener('click', () => this.saveQuote());
+            const saveQuoteBtn = document.getElementById('save-quote-btn');
+            if (saveQuoteBtn) {
+                saveQuoteBtn.addEventListener('click', () => this.saveQuote());
+            }
         }
 
         // Additional Locations Management
