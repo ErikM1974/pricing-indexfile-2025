@@ -494,6 +494,37 @@
         font-size: 1.125rem;
     }
 
+    .summary-subrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0 0.5rem 1.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .summary-sublabel {
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .summary-subvalue {
+        color: #2d5f3f;
+        font-weight: 600;
+    }
+
+    .setup-formula {
+        display: block;
+        padding-left: 2.5rem;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-style: italic;
+        margin-top: -0.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
     .additional-locations-summary {
         margin: 0.5rem 0;
         padding-left: 0;
@@ -592,6 +623,32 @@
         font-size: 1.125rem;
     }
 
+    /* Primary Color Button Disabled State */
+    .color-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background: #f3f4f6 !important;
+        border-color: #e5e7eb !important;
+        color: #9ca3af !important;
+    }
+
+    /* Color Limit Info Message */
+    .color-limit-info {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #1e40af;
+        display: none;
+    }
+
+    .color-limit-info i {
+        margin-right: 0.5rem;
+        color: #3b82f6;
+    }
+
     /* Additional Location Cards */
     .additional-location-card {
         margin-bottom: 1rem;
@@ -682,7 +739,7 @@
     .color-number-buttons {
         display: flex;
         gap: 0.5rem;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
 
     .color-num-btn {
@@ -923,6 +980,10 @@
                             <button class="color-btn" data-colors="5">5 Colors</button>
                             <button class="color-btn" data-colors="6">6 Colors</button>
                         </div>
+                        <div id="color-limit-message" class="color-limit-info">
+                            <i class="fas fa-info-circle"></i>
+                            Maximum 5 design colors when printing on dark garments (6th color is underbase)
+                        </div>
                     </div>
 
                     <div class="setup-card" id="additional-locations-card">
@@ -950,6 +1011,7 @@
                         <span class="summary-label">Primary Location Colors:</span>
                         <span class="summary-value" id="summary-primary-colors">2</span>
                     </div>
+                    <div id="summary-primary-setup-container"></div>
 
                     <div id="summary-additional-locations-container"></div>
 
@@ -1164,32 +1226,140 @@
             // Update primary location colors
             document.getElementById('summary-primary-colors').textContent = this.printSetup.frontColors;
 
-            // Update additional locations
+            // Update primary setup fee breakdown
+            const primarySetupContainer = document.getElementById('summary-primary-setup-container');
+            if (this.printSetup.frontColors > 0) {
+                let frontEffectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffectiveColors += 1;
+                }
+                const frontSetupFee = frontEffectiveColors * 30;
+                const formula = this.printSetup.isDarkGarment
+                    ? `(${this.printSetup.frontColors} colors + 1 underbase × $30)`
+                    : `(${this.printSetup.frontColors} ${this.printSetup.frontColors === 1 ? 'color' : 'colors'} × $30)`;
+
+                primarySetupContainer.innerHTML = `
+                    <div class="summary-subrow">
+                        <span class="summary-sublabel">└─ Setup Fee:</span>
+                        <span class="summary-subvalue">$${frontSetupFee.toFixed(2)}</span>
+                    </div>
+                    <div class="setup-formula">${formula}</div>
+                `;
+            } else {
+                primarySetupContainer.innerHTML = '';
+            }
+
+            // Update additional locations with setup fee breakdown
             const additionalContainer = document.getElementById('summary-additional-locations-container');
             if (this.printSetup.additionalLocations.length > 0) {
                 const locationsHTML = this.printSetup.additionalLocations.map(loc => {
                     const locationName = this.getLocationName(loc.location) || 'Not selected';
                     const colorCount = loc.colors || 0;
-                    return `<div class="summary-row">
-                        <span class="summary-label">${locationName}:</span>
-                        <span class="summary-value">${colorCount} ${colorCount === 1 ? 'color' : 'colors'}</span>
-                    </div>`;
+
+                    // Calculate setup fee for this location
+                    let effectiveColors = colorCount;
+                    if (this.printSetup.isDarkGarment && colorCount > 0) {
+                        effectiveColors += 1;
+                    }
+                    const setupFee = effectiveColors * 30;
+                    const formula = this.printSetup.isDarkGarment && colorCount > 0
+                        ? `(${colorCount} ${colorCount === 1 ? 'color' : 'colors'} + 1 underbase × $30)`
+                        : colorCount > 0 ? `(${colorCount} ${colorCount === 1 ? 'color' : 'colors'} × $30)` : '';
+
+                    return `
+                        <div class="summary-row">
+                            <span class="summary-label">${locationName}:</span>
+                            <span class="summary-value">${colorCount} ${colorCount === 1 ? 'color' : 'colors'}</span>
+                        </div>
+                        ${colorCount > 0 ? `
+                            <div class="summary-subrow">
+                                <span class="summary-sublabel">└─ Setup Fee:</span>
+                                <span class="summary-subvalue">$${setupFee.toFixed(2)}</span>
+                            </div>
+                            <div class="setup-formula">${formula}</div>
+                        ` : ''}
+                    `;
                 }).join('');
                 additionalContainer.innerHTML = locationsHTML;
             } else {
                 additionalContainer.innerHTML = '';
             }
 
-            // Calculate total setup fees (primary + additional locations)
-            const totalSetups = 1 + this.printSetup.additionalLocations.filter(loc => loc.location && loc.colors > 0).length;
-            document.getElementById('summary-total-setups').textContent = totalSetups;
+            // Calculate setup fees based on COLORS (matches screenprint-pricing-v2.js logic)
+            let totalSetupFee = 0;
+
+            // Front location setup
+            if (this.printSetup.frontColors > 0) {
+                let frontEffectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffectiveColors += 1;  // Add white underbase
+                }
+                totalSetupFee += frontEffectiveColors * 30;  // $30 per color
+            }
+
+            // Additional locations setup
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.location && loc.colors > 0) {
+                    let effectiveColors = loc.colors;
+                    if (this.printSetup.isDarkGarment) {
+                        effectiveColors += 1;  // Add underbase
+                    }
+                    totalSetupFee += effectiveColors * 30;  // $30 per color
+                }
+            });
+
+            // Display as dollar amount
+            document.getElementById('summary-total-setups').textContent = `$${totalSetupFee.toFixed(2)}`;
 
             console.log('[Live Summary] Updated:', {
                 garmentType,
                 primaryColors: this.printSetup.frontColors,
                 additionalLocations: this.printSetup.additionalLocations.length,
-                totalSetups
+                totalSetupFee: `$${totalSetupFee.toFixed(2)}`
             });
+        }
+
+        updateColorButtonStates() {
+            // Calculate max allowed colors based on dark garment toggle
+            const maxColors = this.printSetup.isDarkGarment ? 5 : 6;
+            const colorLimitMessage = document.getElementById('color-limit-message');
+
+            // Update primary location color buttons
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                const colorCount = parseInt(btn.dataset.colors);
+
+                if (colorCount > maxColors) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                }
+            });
+
+            // Show/hide info message
+            if (this.printSetup.isDarkGarment) {
+                colorLimitMessage.style.display = 'block';
+            } else {
+                colorLimitMessage.style.display = 'none';
+            }
+
+            // Auto-reset frontColors if current selection exceeds limit
+            if (this.printSetup.frontColors > maxColors) {
+                this.printSetup.frontColors = maxColors;
+
+                // Update button active state
+                document.querySelectorAll('.color-btn').forEach(btn => {
+                    if (parseInt(btn.dataset.colors) === maxColors) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                this.updateLiveQuoteSummary();
+            }
+
+            // Update additional location color buttons
+            this.updateAdditionalLocationsUI();
         }
 
         initializeEventListeners() {
@@ -1206,6 +1376,7 @@
             // Dark garment toggle
             document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
                 this.printSetup.isDarkGarment = e.target.checked;
+                this.updateColorButtonStates(); // Update button states and limits
                 this.updateLiveQuoteSummary(); // Update summary
             });
 
@@ -1365,15 +1536,19 @@
                             <div class="colors-column">
                                 <label class="location-label">Colors</label>
                                 <div class="color-number-buttons">
-                                    ${[1,2,3,4,5,6].map(n => `
+                                    ${[1,2,3,4,5,6].map(n => {
+                                        const maxColors = this.printSetup.isDarkGarment ? 5 : 6;
+                                        const isDisabled = !loc.location || n > maxColors;
+                                        return `
                                         <button
                                             class="color-num-btn ${loc.colors === n ? 'active' : ''}"
-                                            ${!loc.location ? 'disabled' : ''}
+                                            ${isDisabled ? 'disabled' : ''}
                                             onclick="screenPrintQuoteBuilder.updateLocationColors(${index}, ${n})"
                                         >
                                             ${n}
                                         </button>
-                                    `).join('')}
+                                    `;
+                                    }).join('')}
                                 </div>
                             </div>
                         </div>
@@ -2087,6 +2262,9 @@
     }
 
     const screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+
+    // Initialize color button states on page load
+    screenPrintQuoteBuilder.updateColorButtonStates();
 
     function newQuote() {
         if (confirm('Start a new quote?')) {
