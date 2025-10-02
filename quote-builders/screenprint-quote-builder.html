@@ -105,6 +105,61 @@
         grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
         gap: 0.5rem;
         max-width: 100%;
+        position: relative;
+    }
+
+    .color-grid.collapsed {
+        max-height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .color-grid.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(to bottom, transparent, white);
+        pointer-events: none;
+    }
+
+    .color-counter {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .show-more-colors-btn {
+        margin-top: 0.75rem;
+        padding: 0.625rem 1.25rem;
+        background: #4cb354;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .show-more-colors-btn:hover {
+        background: #3d9943;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    }
+
+    .show-more-colors-btn i {
+        transition: transform 0.2s;
+    }
+
+    .show-more-colors-btn.expanded i {
+        transform: rotate(180deg);
     }
 
     .color-swatch {
@@ -1318,7 +1373,6 @@
     </div>
 
     <!-- Services -->
-    <script src="/product-search-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
@@ -1744,25 +1798,21 @@
             }
 
             try {
-                // Initialize ProductSearchService if not already done
-                if (!this.searchService) {
-                    this.searchService = new ProductSearchService();
+                // Use the WORKING /api/stylesearch endpoint (same as product page search)
+                const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(term)}`);
+
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
                 }
 
-                // Use searchProducts method with query parameter (avoids method signature conflict)
-                const searchResults = await this.searchService.searchProducts({
-                    q: term,
-                    limit: 10
-                });
+                const suggestions = await response.json();
 
-                // Extract products from search results
-                const products = searchResults.products || [];
-
-                if (products.length > 0) {
-                    // Show dropdown with clickable suggestions - using correct camelCase field names
-                    suggestionsEl.innerHTML = products.map(p => `
-                        <div class="suggestion-item" data-style="${p.styleNumber}">
-                            <strong>${p.styleNumber}</strong> - ${p.productName || ''}
+                // suggestions format: [{value: "PC54", label: "Port & Company Core Cotton Tee"}, ...]
+                if (suggestions.length > 0) {
+                    // Show dropdown with clickable suggestions
+                    suggestionsEl.innerHTML = suggestions.map(s => `
+                        <div class="suggestion-item" data-style="${s.value}">
+                            <strong>${s.value}</strong> - ${s.label}
                         </div>
                     `).join('');
                     suggestionsEl.style.display = 'block';
@@ -1858,6 +1908,26 @@
                 return;
             }
 
+            const totalColors = swatches.length;
+            const initialShowCount = 12;
+            const shouldCollapse = totalColors > initialShowCount;
+
+            // Add color counter
+            if (totalColors > 0) {
+                const colorCounter = document.createElement('div');
+                colorCounter.className = 'color-counter';
+                colorCounter.id = 'color-counter';
+                colorCounter.textContent = shouldCollapse
+                    ? `Showing ${initialShowCount} of ${totalColors} colors`
+                    : `${totalColors} color${totalColors !== 1 ? 's' : ''} available`;
+                container.parentElement.insertBefore(colorCounter, container);
+            }
+
+            // Create grid wrapper
+            const gridWrapper = document.createElement('div');
+            gridWrapper.className = 'color-grid' + (shouldCollapse ? ' collapsed' : '');
+            gridWrapper.id = 'color-grid-wrapper';
+
             swatches.forEach(swatch => {
                 const swatchEl = document.createElement('div');
                 swatchEl.className = 'color-swatch';
@@ -1868,10 +1938,48 @@
                     <div class="color-swatch-name">${swatch.COLOR_NAME}</div>
                 `;
 
-                container.appendChild(swatchEl);
+                gridWrapper.appendChild(swatchEl);
             });
 
-            container.style.display = 'grid';
+            container.appendChild(gridWrapper);
+
+            // Add "Show More" button if needed
+            if (shouldCollapse) {
+                const showMoreBtn = document.createElement('button');
+                showMoreBtn.className = 'show-more-colors-btn';
+                showMoreBtn.id = 'show-more-colors-btn';
+                showMoreBtn.innerHTML = `
+                    Show ${totalColors - initialShowCount} More Colors
+                    <i class="fas fa-chevron-down"></i>
+                `;
+
+                showMoreBtn.onclick = () => {
+                    const isExpanded = gridWrapper.classList.toggle('collapsed');
+                    const counter = document.getElementById('color-counter');
+
+                    if (isExpanded) {
+                        // Now collapsed (showing less)
+                        showMoreBtn.innerHTML = `
+                            Show ${totalColors - initialShowCount} More Colors
+                            <i class="fas fa-chevron-down"></i>
+                        `;
+                        showMoreBtn.classList.remove('expanded');
+                        counter.textContent = `Showing ${initialShowCount} of ${totalColors} colors`;
+                    } else {
+                        // Now expanded (showing all)
+                        showMoreBtn.innerHTML = `
+                            Show Less Colors
+                            <i class="fas fa-chevron-up"></i>
+                        `;
+                        showMoreBtn.classList.add('expanded');
+                        counter.textContent = `Showing all ${totalColors} colors`;
+                    }
+                };
+
+                container.appendChild(showMoreBtn);
+            }
+
+            container.style.display = 'block';
         }
 
         async selectColor(colorName, swatchElement) {
@@ -2002,6 +2110,12 @@
             // Reset form
             document.getElementById('style-search').value = '';
             this.lastSearchTerm = '';  // Reset search tracking
+
+            // Clear color counter if it exists
+            const colorCounter = document.getElementById('color-counter');
+            if (colorCounter) {
+                colorCounter.remove();
+            }
 
             // Clear color swatches and product image
             document.getElementById('color-swatches').innerHTML = '';
