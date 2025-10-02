@@ -423,6 +423,153 @@
     }
 
     /* ========================================
+       STEP 1: TWO-COLUMN LAYOUT WITH LIVE QUOTE SUMMARY
+       ======================================== */
+
+    .setup-two-column-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* Left column: Setup controls */
+    .setup-controls-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* Right column: Live Quote Summary */
+    .live-quote-summary {
+        position: sticky;
+        top: 2rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .live-quote-summary h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .live-quote-summary h3 i {
+        color: #2d5f3f;
+        font-size: 1.25rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.9375rem;
+    }
+
+    .summary-row:last-of-type {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .summary-value {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .summary-value.highlight {
+        color: #2d5f3f;
+        font-size: 1.125rem;
+    }
+
+    .additional-locations-summary {
+        margin: 0.5rem 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .additional-locations-summary li {
+        padding: 0.5rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .additional-locations-summary li span:last-child {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .summary-total-row {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .summary-total-label {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .summary-total-value {
+        color: #2d5f3f;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .summary-continue-btn {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 0.875rem 1.5rem;
+        background: #2d5f3f;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .summary-continue-btn:hover {
+        background: #1f4530;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+    }
+
+    @media (max-width: 1024px) {
+        .setup-two-column-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .live-quote-summary {
+            position: static;
+            margin-top: 2rem;
+        }
+    }
+
+    /* ========================================
        ADDITIONAL LOCATIONS - GEMINI-INSPIRED CLEAN LAYOUT
        ======================================== */
 
@@ -734,62 +881,87 @@
         <section id="setup-phase" class="phase-section active">
             <div class="phase-header">
                 <h2><span class="phase-number">1</span> Print Setup</h2>
-                <p>Select primary location and colors</p>
+                <p>Select locations, colors, and garment type.</p>
             </div>
 
-            <div class="setup-card">
-                <h3 class="setup-title">Primary Location</h3>
-                <div class="primary-location-info">
-                    <div class="location-icon"><i class="fas fa-shirt"></i></div>
-                    <div class="location-details">
-                        <div class="location-name">Front Print Location</div>
-                        <div class="location-description">Primary design area for all products</div>
-                    </div>
-                </div>
+            <!-- Two Column Layout: Setup Controls + Live Quote Summary -->
+            <div class="setup-two-column-layout">
+                <!-- LEFT COLUMN: Setup Controls -->
+                <div class="setup-controls-column">
+                    <div class="setup-card">
+                        <h3 class="setup-title"><i class="fas fa-shirt"></i> Primary Location</h3>
+                        <div class="primary-location-info">
+                            <div class="location-details">
+                                <div class="location-name">Front Print Location</div>
+                                <div class="location-description">Primary design area for all products</div>
+                            </div>
+                        </div>
 
-                <!-- MOVED UP: Dark Garment Toggle First (Logical Flow) -->
-                <div class="dark-garment-section" style="margin-top: 1.5rem;">
-                    <div class="dark-garment-toggle">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="dark-garment-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div>
-                            <strong>Dark Garments</strong>
-                            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
-                                Adds white underbase layer (+1 color to each location)
-                            </p>
+                        <!-- Garment Color Type -->
+                        <h3 class="setup-title" style="margin-top: 2rem;">Garment Color Type</h3>
+                        <div class="dark-garment-section">
+                            <div class="dark-garment-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="dark-garment-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <strong>Printing on Dark Garments?</strong>
+                                    <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                        Adds a white underbase layer (+1 color).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
+                        <div class="color-buttons">
+                            <button class="color-btn" data-colors="1">1 Color</button>
+                            <button class="color-btn active" data-colors="2">2 Colors</button>
+                            <button class="color-btn" data-colors="3">3 Colors</button>
+                            <button class="color-btn" data-colors="4">4 Colors</button>
+                            <button class="color-btn" data-colors="5">5 Colors</button>
+                            <button class="color-btn" data-colors="6">6 Colors</button>
                         </div>
                     </div>
+
+                    <div class="setup-card" id="additional-locations-card">
+                        <h3 class="setup-title"><i class="fas fa-layer-group"></i> Additional Locations</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+                            Add up to 3 more print locations. Each location counts as a separate setup fee.
+                        </p>
+                        <div id="additional-locations-list"></div>
+                        <button id="add-location-btn" class="btn-add-location-dashed">
+                            <i class="fas fa-plus"></i> Add Another Location
+                        </button>
+                    </div>
                 </div>
 
-                <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
-                <div class="color-buttons">
-                    <button class="color-btn active" data-colors="1">1 Color</button>
-                    <button class="color-btn" data-colors="2">2 Colors</button>
-                    <button class="color-btn" data-colors="3">3 Colors</button>
-                    <button class="color-btn" data-colors="4">4 Colors</button>
-                    <button class="color-btn" data-colors="5">5 Colors</button>
-                    <button class="color-btn" data-colors="6">6 Colors</button>
+                <!-- RIGHT COLUMN: Live Quote Summary -->
+                <div class="live-quote-summary">
+                    <h3><i class="fas fa-table-list"></i> Live Quote Summary</h3>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Garment Type:</span>
+                        <span class="summary-value" id="summary-garment-type">Light</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Primary Location Colors:</span>
+                        <span class="summary-value" id="summary-primary-colors">2</span>
+                    </div>
+
+                    <div id="summary-additional-locations-container"></div>
+
+                    <div class="summary-total-row">
+                        <span class="summary-total-label">Total Setup Fees:</span>
+                        <span class="summary-total-value" id="summary-total-setups">1</span>
+                    </div>
+
+                    <button class="summary-continue-btn" onclick="screenPrintQuoteBuilder.navigateToPhase(2)">
+                        Continue to Products <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
-            </div>
-
-            <div class="setup-card" id="additional-locations-card">
-                <h3 class="setup-title">Additional Locations</h3>
-                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
-                    Add up to 3 more print locations. Each location counts as a separate setup fee.
-                </p>
-                <div id="additional-locations-list"></div>
-                <button id="add-location-btn" class="btn-add-location-dashed">
-                    <i class="fas fa-plus"></i> Add Another Location
-                </button>
-            </div>
-
-            <div class="phase-actions">
-                <div></div>
-                <button id="continue-to-products" class="btn btn-primary">
-                    Continue to Products <i class="fas fa-arrow-right"></i>
-                </button>
             </div>
         </section>
 
@@ -955,7 +1127,7 @@
 
             // Print setup state
             this.printSetup = {
-                frontColors: 1,
+                frontColors: 2, // Default matches "2 Colors" button active state
                 isDarkGarment: false,
                 additionalLocations: []
             };
@@ -978,8 +1150,46 @@
             // Initialize
             emailjs.init('4qSbDO-SQs19TbP80');
             this.initializeEventListeners();
+            this.updateLiveQuoteSummary(); // Initial summary update
 
             console.log('[ScreenPrintQuoteBuilder] Initialized - using screenprint-pricing-v2.js for ALL calculations');
+        }
+
+        // Update Live Quote Summary in real-time
+        updateLiveQuoteSummary() {
+            // Update garment type
+            const garmentType = this.printSetup.isDarkGarment ? 'Dark' : 'Light';
+            document.getElementById('summary-garment-type').textContent = garmentType;
+
+            // Update primary location colors
+            document.getElementById('summary-primary-colors').textContent = this.printSetup.frontColors;
+
+            // Update additional locations
+            const additionalContainer = document.getElementById('summary-additional-locations-container');
+            if (this.printSetup.additionalLocations.length > 0) {
+                const locationsHTML = this.printSetup.additionalLocations.map(loc => {
+                    const locationName = this.getLocationName(loc.location) || 'Not selected';
+                    const colorCount = loc.colors || 0;
+                    return `<div class="summary-row">
+                        <span class="summary-label">${locationName}:</span>
+                        <span class="summary-value">${colorCount} ${colorCount === 1 ? 'color' : 'colors'}</span>
+                    </div>`;
+                }).join('');
+                additionalContainer.innerHTML = locationsHTML;
+            } else {
+                additionalContainer.innerHTML = '';
+            }
+
+            // Calculate total setup fees (primary + additional locations)
+            const totalSetups = 1 + this.printSetup.additionalLocations.filter(loc => loc.location && loc.colors > 0).length;
+            document.getElementById('summary-total-setups').textContent = totalSetups;
+
+            console.log('[Live Summary] Updated:', {
+                garmentType,
+                primaryColors: this.printSetup.frontColors,
+                additionalLocations: this.printSetup.additionalLocations.length,
+                totalSetups
+            });
         }
 
         initializeEventListeners() {
@@ -989,12 +1199,14 @@
                     document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
                     this.printSetup.frontColors = parseInt(e.target.dataset.colors);
+                    this.updateLiveQuoteSummary(); // Update summary
                 });
             });
 
             // Dark garment toggle
             document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
                 this.printSetup.isDarkGarment = e.target.checked;
+                this.updateLiveQuoteSummary(); // Update summary
             });
 
             // Navigation
@@ -1084,11 +1296,13 @@
             });
 
             this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
         }
 
         removeLocation(index) {
             this.printSetup.additionalLocations.splice(index, 1);
             this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
         }
 
         updateAdditionalLocationsUI() {
@@ -1189,11 +1403,13 @@
             }
 
             this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
         }
 
         updateLocationColors(index, colors) {
             this.printSetup.additionalLocations[index].colors = colors;
             this.updateAdditionalLocationsUI();  // Re-render to show active state
+            this.updateLiveQuoteSummary(); // Update summary
         }
 
         getLocationName(code) {
