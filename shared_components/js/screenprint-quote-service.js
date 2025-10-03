@@ -68,7 +68,8 @@ class ScreenPrintQuoteService {
             
             // Calculate totals
             const subtotal = quoteData.subtotal || quoteData.items.reduce((sum, item) => sum + item.total, 0);
-            const ltmFeeTotal = quoteData.totalQuantity < 36 ? 50 : 0;
+            // Use LTM fee from quoteData (already calculated correctly by quote builder)
+            const ltmFeeTotal = quoteData.ltmFee || 0;
             const setupFees = this.calculateSetupFees(quoteData);
             const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
             
@@ -127,7 +128,7 @@ class ScreenPrintQuoteService {
                     PrintLocation: item.locations ? item.locations.join(', ') : 'Primary',
                     PrintLocationName: this.formatLocationDisplay(item),
                     Quantity: parseInt(item.quantity),
-                    HasLTM: quoteData.totalQuantity < 36 ? 'Yes' : 'No',
+                    HasLTM: (quoteData.ltmFee && quoteData.ltmFee > 0) ? 'Yes' : 'No',
                     BaseUnitPrice: parseFloat(item.basePrice || 0),
                     LTMPerUnit: parseFloat(item.ltmPerUnit || 0),
                     FinalUnitPrice: parseFloat(item.unitPrice || 0),

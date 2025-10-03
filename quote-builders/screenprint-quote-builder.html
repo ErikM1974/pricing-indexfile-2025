@@ -45,7 +45,7 @@
 
     .search-section .search-input:focus {
         outline: none;
-        border-color: #4cb354;
+        border-color: #3a7c52;
     }
 
     /* Two Column Product Layout - Image hidden during color selection */
@@ -135,7 +135,7 @@
     .show-more-colors-btn {
         margin-top: 0.75rem;
         padding: 0.625rem 1.25rem;
-        background: #4cb354;
+        background: #3a7c52;
         color: white;
         border: none;
         border-radius: 8px;
@@ -149,9 +149,9 @@
     }
 
     .show-more-colors-btn:hover {
-        background: #3d9943;
+        background: #2d5f3f;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+        box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
     }
 
     .show-more-colors-btn i {
@@ -176,16 +176,16 @@
     }
 
     .color-swatch:hover {
-        border-color: #4cb354;
+        border-color: #3a7c52;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+        box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
         z-index: 10;
     }
 
     .color-swatch.selected {
-        border-color: #4cb354;
+        border-color: #3a7c52;
         background: #e8f5e9;
-        box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.2);
+        box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
     }
 
     .color-swatch.selected::after {
@@ -193,7 +193,7 @@
         position: absolute;
         top: 2px;
         right: 2px;
-        background: #4cb354;
+        background: #3a7c52;
         color: white;
         border-radius: 50%;
         width: 18px;
@@ -313,14 +313,14 @@
 
     .size-quantity:focus {
         outline: none;
-        border-color: #4cb354;
-        box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        border-color: #3a7c52;
+        box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
         background: #f0fdf4;
     }
 
     .size-quantity:not([value="0"]):not([value=""]) {
         background: #dcfce7;
-        border-color: #4cb354;
+        border-color: #3a7c52;
         color: #15803d;
     }
 
@@ -338,7 +338,7 @@
     }
 
     .total-display strong {
-        color: #4cb354;
+        color: #3a7c52;
         font-size: 1.3rem;
     }
 
@@ -1618,19 +1618,9 @@
                 safetyStripesContainer.innerHTML = '';
             }
 
-            // Calculate LTM fee based on total quantity
-            let ltmFee = 0;
+            // Get LTM fee from current pricing (calculated correctly by calculateLTMFee method)
+            const ltmFee = this.currentPricing?.ltmFee || 0;
             const totalQty = this.currentPricing?.totalQuantity || 0;
-
-            // LTM fee based on API tier data:
-            // 13-36 tier: $75
-            // 37-72 tier: $50
-            // 73+ tier: $0
-            if (totalQty > 0 && totalQty <= 36) {
-                ltmFee = 75;
-            } else if (totalQty > 36 && totalQty <= 72) {
-                ltmFee = 50;
-            }
 
             // Display LTM fee if applicable
             const ltmContainer = document.getElementById('summary-ltm-fee-container');
