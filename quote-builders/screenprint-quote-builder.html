@@ -1408,7 +1408,7 @@
 
             // Print setup state
             this.printSetup = {
-                frontColors: 2, // Default matches "2 Colors" button active state
+                frontColors: 1, // Default to 1 color for cleaner starting point
                 isDarkGarment: false,
                 additionalLocations: []
             };
@@ -2314,22 +2314,51 @@
                                 <strong>${p.styleNumber} - ${p.color}</strong>
                             </div>
                             <div class="size-breakdown-pricing">
-                                ${Object.entries(p.sizesPricing)
-                                    .sort(([a], [b]) => {
-                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
-                                        return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
-                                    })
-                                    .map(([size, pricing]) => `
-                                        <div class="size-pricing-row">
-                                            <span>${size} (${pricing.quantity} pcs):</span>
-                                            <span>${pricing.quantity} × $${pricing.unitPrice.toFixed(2)} = $${pricing.subtotal.toFixed(2)}</span>
-                                        </div>
-                                    `).join('')}
+                                ${(() => {
+                                    // Group sizes by same unit price
+                                    const priceGroups = {};
+                                    const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+
+                                    Object.entries(p.sizesPricing).forEach(([size, pricing]) => {
+                                        const priceKey = pricing.unitPrice.toFixed(2);
+                                        if (!priceGroups[priceKey]) {
+                                            priceGroups[priceKey] = {
+                                                sizes: [],
+                                                quantity: 0,
+                                                unitPrice: pricing.unitPrice,
+                                                subtotal: 0
+                                            };
+                                        }
+                                        priceGroups[priceKey].sizes.push(size);
+                                        priceGroups[priceKey].quantity += pricing.quantity;
+                                        priceGroups[priceKey].subtotal += pricing.subtotal;
+                                    });
+
+                                    // Sort groups by price and display
+                                    return Object.values(priceGroups)
+                                        .sort((a, b) => a.unitPrice - b.unitPrice)
+                                        .map(group => {
+                                            // Sort sizes within group
+                                            group.sizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+
+                                            // Create size range display (e.g., "S-XL" or "3XL")
+                                            const sizeDisplay = group.sizes.length > 1
+                                                ? `${group.sizes[0]}-${group.sizes[group.sizes.length - 1]}`
+                                                : group.sizes[0];
+
+                                            return `
+                                                <div class="size-pricing-row">
+                                                    <span><strong>${sizeDisplay}</strong> (${group.quantity} pcs):</span>
+                                                    <span>$${group.unitPrice.toFixed(2)} each = $${group.subtotal.toFixed(2)}</span>
+                                                </div>
+                                            `;
+                                        }).join('');
+                                })()}
                             </div>
                             ${p.totalAdditionalCost > 0 ? `
                                 <div class="additional-locations-cost">
-                                    <span>Additional Locations:</span>
-                                    <span>+ $${p.totalAdditionalCost.toFixed(2)}</span>
+                                    <span>Additional Locations (${this.printSetup.additionalLocations.length}):</span>
+                                    <span>${p.quantity} pcs × $${p.additionalCost.toFixed(2)} = $${p.totalAdditionalCost.toFixed(2)}</span>
                                 </div>
                             ` : ''}
                             <div class="product-total-row">
@@ -2340,10 +2369,15 @@
                     `).join('')}
                 </div>
 
-                <div class="summary-section">
+                <div class="summary-section summary-totals">
+                    <h3 style="margin-bottom: 1rem;">Quote Total</h3>
                     <div class="summary-row">
-                        <span>Subtotal:</span>
+                        <span>Products Subtotal:</span>
                         <span>$${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Setup Fees:</span>
+                        <span>$${setupFee.toFixed(2)}</span>
                     </div>
                     ${ltmFee > 0 ? `
                         <div class="summary-row">
@@ -2351,8 +2385,8 @@
                             <span>$${ltmFee.toFixed(2)}</span>
                         </div>
                     ` : ''}
-                    <div class="summary-row" style="border-top: 2px solid #333; padding-top: 0.5rem; margin-top: 0.5rem; font-weight: bold; font-size: 1.25rem;">
-                        <span>Grand Total:</span>
+                    <div class="summary-row grand-total-row" style="border-top: 3px double #2d5f3f; padding-top: 1rem; margin-top: 1rem; font-weight: 900; font-size: 1.5rem;">
+                        <span>GRAND TOTAL:</span>
                         <span style="color: #2d5f3f;">$${grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
