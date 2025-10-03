@@ -1281,6 +1281,12 @@
                         <span class="summary-total-value" id="summary-total-setups">1</span>
                     </div>
 
+                    <!-- Safety Stripes Surcharge (if applicable) -->
+                    <div id="summary-safety-stripes-container"></div>
+
+                    <!-- LTM Fee (if applicable) -->
+                    <div id="summary-ltm-fee-container"></div>
+
                     <button class="summary-continue-btn" onclick="screenPrintQuoteBuilder.navigateToPhase(2)">
                         Continue to Products <i class="fas fa-arrow-right"></i>
                     </button>
@@ -1584,11 +1590,69 @@
             // Display as dollar amount
             document.getElementById('summary-total-setups').textContent = `$${totalSetupFee.toFixed(2)}`;
 
+            // Calculate safety stripes surcharge (per piece)
+            let safetyStripeSurchargePerPiece = 0;
+
+            // Add surcharge for front if has safety stripes and printing
+            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
+                safetyStripeSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+            }
+
+            // Add surcharge for each additional location with safety stripes and printing
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.hasSafetyStripes && loc.colors > 0) {
+                    safetyStripeSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+                }
+            });
+
+            // Display safety stripes surcharge if applicable
+            const safetyStripesContainer = document.getElementById('summary-safety-stripes-container');
+            if (safetyStripeSurchargePerPiece > 0) {
+                safetyStripesContainer.innerHTML = `
+                    <div class="summary-row" style="margin-top: 0.75rem; color: var(--primary-color);">
+                        <span class="summary-label">Safety Stripes Surcharge:</span>
+                        <span class="summary-value">+$${safetyStripeSurchargePerPiece.toFixed(2)}/piece</span>
+                    </div>
+                `;
+            } else {
+                safetyStripesContainer.innerHTML = '';
+            }
+
+            // Calculate LTM fee based on total quantity
+            let ltmFee = 0;
+            const totalQty = this.currentPricing?.totalQuantity || 0;
+
+            // LTM fee based on API tier data:
+            // 13-36 tier: $75
+            // 37-72 tier: $50
+            // 73+ tier: $0
+            if (totalQty > 0 && totalQty <= 36) {
+                ltmFee = 75;
+            } else if (totalQty > 36 && totalQty <= 72) {
+                ltmFee = 50;
+            }
+
+            // Display LTM fee if applicable
+            const ltmContainer = document.getElementById('summary-ltm-fee-container');
+            if (ltmFee > 0) {
+                ltmContainer.innerHTML = `
+                    <div class="summary-row" style="margin-top: 0.5rem; color: #ff9800;">
+                        <span class="summary-label">Less Than Minimum Fee:</span>
+                        <span class="summary-value">$${ltmFee.toFixed(2)}</span>
+                    </div>
+                `;
+            } else {
+                ltmContainer.innerHTML = '';
+            }
+
             console.log('[Live Summary] Updated:', {
                 garmentType,
                 primaryColors: this.printSetup.frontColors,
                 additionalLocations: this.printSetup.additionalLocations.length,
-                totalSetupFee: `$${totalSetupFee.toFixed(2)}`
+                totalSetupFee: `$${totalSetupFee.toFixed(2)}`,
+                safetyStripeSurcharge: safetyStripeSurchargePerPiece > 0 ? `+$${safetyStripeSurchargePerPiece.toFixed(2)}/piece` : 'None',
+                ltmFee: ltmFee > 0 ? `$${ltmFee.toFixed(2)}` : 'None',
+                totalQuantity: totalQty
             });
         }
 
