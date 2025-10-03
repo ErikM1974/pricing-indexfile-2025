@@ -1019,6 +1019,32 @@
         font-size: 1rem;
     }
 
+    /* Modal Close Button */
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #666;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
+    }
+
+    .modal-header.success {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     /* Mobile Responsive */
     @media (max-width: 640px) {
         .location-grid {
@@ -1196,8 +1222,8 @@
 
                         <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
                         <div class="color-buttons">
-                            <button class="color-btn" data-colors="1">1 Color</button>
-                            <button class="color-btn active" data-colors="2">2 Colors</button>
+                            <button class="color-btn active" data-colors="1">1 Color</button>
+                            <button class="color-btn" data-colors="2">2 Colors</button>
                             <button class="color-btn" data-colors="3">3 Colors</button>
                             <button class="color-btn" data-colors="4">4 Colors</button>
                             <button class="color-btn" data-colors="5">5 Colors</button>
@@ -1298,7 +1324,12 @@
             </div>
 
             <div class="products-list">
-                <h3>Products in Quote (<span id="products-count">0</span> items, <span id="total-pieces">0</span> pieces)</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Products in Quote (<span id="products-count">0</span> items, <span id="total-pieces">0</span> pieces)</h3>
+                    <button id="add-another-product-btn" class="btn btn-secondary" style="display: none;" onclick="screenPrintQuoteBuilder.addAnotherProduct()">
+                        <i class="fas fa-plus"></i> Add Another Product
+                    </button>
+                </div>
                 <div id="products-container">
                     <p style="color: var(--text-secondary);">No products added yet.</p>
                 </div>
@@ -1381,8 +1412,13 @@
     <div id="success-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header success">
-                <i class="fas fa-check-circle"></i>
-                <h2>Quote Saved Successfully!</h2>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <h2 style="margin: 0;">Quote Saved Successfully!</h2>
+                </div>
+                <button class="modal-close" onclick="document.getElementById('success-modal').style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <p>Your quote has been created.</p>
@@ -2179,9 +2215,15 @@
         displayProductsList() {
             const container = document.getElementById('products-container');
             const totalPieces = this.products.reduce((sum, p) => sum + p.quantity, 0);
+            const addAnotherBtn = document.getElementById('add-another-product-btn');
 
             document.getElementById('products-count').textContent = this.products.length;
             document.getElementById('total-pieces').textContent = totalPieces;
+
+            // Show "Add Another Product" button when there's at least 1 product
+            if (addAnotherBtn) {
+                addAnotherBtn.style.display = this.products.length > 0 ? 'inline-flex' : 'none';
+            }
 
             if (this.products.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-secondary);">No products added yet.</p>';
@@ -2228,6 +2270,21 @@
                 this.displayProductsList();
                 this.checkMinimum();
             }
+        }
+
+        addAnotherProduct() {
+            // Scroll to search box smoothly
+            const searchBox = document.getElementById('style-search');
+            searchBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Focus the search input after scroll completes
+            setTimeout(() => {
+                searchBox.focus();
+                // Clear any existing value and suggestions
+                searchBox.value = '';
+                document.getElementById('style-suggestions').style.display = 'none';
+                document.getElementById('product-display').innerHTML = '';
+            }, 500);
         }
 
         checkMinimum() {
