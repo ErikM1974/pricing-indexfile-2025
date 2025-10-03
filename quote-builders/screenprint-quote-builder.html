@@ -2283,7 +2283,9 @@
                 // Clear any existing value and suggestions
                 searchBox.value = '';
                 document.getElementById('style-suggestions').style.display = 'none';
-                document.getElementById('product-display').innerHTML = '';
+                // Hide product display instead of clearing innerHTML to preserve DOM elements
+                document.getElementById('product-display').style.display = 'none';
+                document.getElementById('size-section').style.display = 'none';
             }, 500);
         }
 
