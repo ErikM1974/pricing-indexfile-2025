@@ -654,6 +654,17 @@ class ScreenPrintPricing {
 
         console.log(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
 
+        // Auto-reset frontColors if exceeds new limit (6 → 5 when dark garment ON)
+        // Dark garments use white underbase screen, limiting design colors to 5
+        const maxColors = this.state.isDarkGarment ? 5 : 6;
+        if (this.state.frontColors > maxColors) {
+            this.state.frontColors = maxColors;
+            console.log(`[ScreenPrintV2] Auto-reset frontColors to ${maxColors} (dark garment limit)`);
+        }
+
+        // Update color button states (will disable/enable 6-color based on dark garment)
+        this.updateColorToggles();
+
         // Trigger pricing update
         this.updateDarkGarment(this.state.isDarkGarment);
     }
@@ -717,10 +728,26 @@ class ScreenPrintPricing {
      * Update visual state of color toggles
      */
     updateColorToggles() {
+        // Calculate max allowed colors based on dark garment setting
+        // Dark garments require white underbase (uses 1 screen), so only 5 design colors available
+        const maxColors = this.state.isDarkGarment ? 5 : 6;
+
         for (let i = 1; i <= 6; i++) {
             const toggle = document.getElementById(`sp-toggle-${i}color`);
             if (!toggle) continue;
 
+            // Check if this color count exceeds max allowed
+            if (i > maxColors) {
+                toggle.disabled = true;
+                toggle.classList.add('disabled');
+                toggle.setAttribute('title', 'Available only on light garments');
+            } else {
+                toggle.disabled = false;
+                toggle.classList.remove('disabled');
+                toggle.removeAttribute('title');
+            }
+
+            // Update active state
             if (i === this.state.frontColors) {
                 toggle.classList.add('active');
             } else {
