@@ -1229,6 +1229,22 @@
                             <button class="color-btn" data-colors="5">5 Colors</button>
                             <button class="color-btn" data-colors="6">6 Colors</button>
                         </div>
+
+                        <h3 class="setup-title" style="margin-top: 2rem;">Special Design Options</h3>
+                        <div class="dark-garment-section">
+                            <div class="dark-garment-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="safety-stripes-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <strong>Safety Stripes Design</strong>
+                                    <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                        4-color high-visibility design: +$2.00 per piece
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="setup-card" id="additional-locations-card">
@@ -1446,6 +1462,8 @@
             this.printSetup = {
                 frontColors: 1, // Default to 1 color for cleaner starting point
                 isDarkGarment: false,
+                frontHasSafetyStripes: false,
+                safetyStripeSurcharge: 2.00, // $2.00 per location per piece
                 additionalLocations: []
             };
 
@@ -1629,6 +1647,12 @@
                 this.updateLiveQuoteSummary(); // Update summary
             });
 
+            // Safety stripes toggle
+            document.getElementById('safety-stripes-toggle').addEventListener('change', (e) => {
+                this.printSetup.frontHasSafetyStripes = e.target.checked;
+                this.updateLiveQuoteSummary(); // Update summary
+            });
+
             // Navigation (continue button is now in summary panel with onclick)
             document.getElementById('back-to-setup').addEventListener('click', () => this.navigateToPhase(1));
             document.getElementById('continue-to-summary').addEventListener('click', () => {
@@ -1723,7 +1747,8 @@
 
             this.printSetup.additionalLocations.push({
                 location: '',
-                colors: 0
+                colors: 0,
+                hasSafetyStripes: false
             });
 
             this.updateAdditionalLocationsUI();
@@ -1792,6 +1817,24 @@
                                     }).join('')}
                                 </div>
                             </div>
+
+                            <!-- Safety Stripes Toggle -->
+                            <div class="dark-garment-section" style="margin-top: 1rem;">
+                                <div class="dark-garment-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="safety-stripes-loc-${index}"
+                                               ${loc.hasSafetyStripes ? 'checked' : ''}
+                                               onchange="screenPrintQuoteBuilder.updateLocationSafetyStripes(${index}, this.checked)">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <div>
+                                        <strong>Safety Stripes</strong>
+                                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                            +$2.00 per piece
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1836,6 +1879,11 @@
         updateLocationColors(index, colors) {
             this.printSetup.additionalLocations[index].colors = colors;
             this.updateAdditionalLocationsUI();  // Re-render to show active state
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        updateLocationSafetyStripes(index, enabled) {
+            this.printSetup.additionalLocations[index].hasSafetyStripes = enabled;
             this.updateLiveQuoteSummary(); // Update summary
         }
 
@@ -2346,7 +2394,7 @@
                     <h3>Print Setup</h3>
                     <div class="summary-row">
                         <span>Front Colors:</span>
-                        <span>${this.printSetup.frontColors} ${this.printSetup.frontColors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}</span>
+                        <span>${this.printSetup.frontColors} ${this.printSetup.frontColors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}${this.printSetup.frontHasSafetyStripes ? ' + Safety Stripes' : ''}</span>
                     </div>
                     ${this.printSetup.additionalLocations.length > 0 ? `
                         <div class="summary-row">
@@ -2355,7 +2403,7 @@
                         </div>
                         ${this.printSetup.additionalLocations.map((loc, index) => `
                             <div class="summary-row" style="padding-left: 1rem; font-size: 0.875rem;">
-                                <span>${this.getLocationName(loc.location)}: ${loc.colors} ${loc.colors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}</span>
+                                <span>${this.getLocationName(loc.location)}: ${loc.colors} ${loc.colors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}${loc.hasSafetyStripes ? ' + Safety Stripes' : ''}</span>
                             </div>
                         `).join('')}
                     ` : ''}
@@ -2418,6 +2466,12 @@
                                 <div class="additional-locations-cost">
                                     <span>Additional Locations (${this.printSetup.additionalLocations.length}):</span>
                                     <span>${p.quantity} pcs × $${p.additionalCost.toFixed(2)} = $${p.totalAdditionalCost.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            ${p.totalSafetyStripesCost > 0 ? `
+                                <div class="additional-locations-cost">
+                                    <span>Safety Stripes Surcharge:</span>
+                                    <span>${p.quantity} pcs × $${p.safetyStripesCostPerPiece.toFixed(2)} = $${p.totalSafetyStripesCost.toFixed(2)}</span>
                                 </div>
                             ` : ''}
                             <div class="product-total-row">
@@ -2539,8 +2593,24 @@
                 }
             });
 
+            // Calculate safety stripes surcharge per piece
+            let safetyStripesSurchargePerPiece = 0;
+
+            // Add surcharge for front if has safety stripes and printing
+            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
+                safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+            }
+
+            // Add surcharge for each additional location with safety stripes and printing
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.hasSafetyStripes && loc.colors > 0) {
+                    safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+                }
+            });
+
             const totalAdditionalCost = additionalCostPerPiece * product.quantity;
-            const lineTotal = baseCostSubtotal + totalAdditionalCost;
+            const totalSafetyStripesCost = safetyStripesSurchargePerPiece * product.quantity;
+            const lineTotal = baseCostSubtotal + totalAdditionalCost + totalSafetyStripesCost;
             const perShirtTotal = lineTotal / product.quantity;
 
             return {
@@ -2552,6 +2622,8 @@
                 baseCostSubtotal: baseCostSubtotal,  // NEW: subtotal before additional locations
                 additionalCost: additionalCostPerPiece,  // Per-piece additional location cost
                 totalAdditionalCost: totalAdditionalCost,  // Total additional cost for all pieces
+                safetyStripesCostPerPiece: safetyStripesSurchargePerPiece,  // Safety stripes per piece
+                totalSafetyStripesCost: totalSafetyStripesCost,  // Total safety stripes cost
                 perShirtTotal: perShirtTotal,  // Average per shirt (for backward compatibility)
                 lineTotal: lineTotal
             };
