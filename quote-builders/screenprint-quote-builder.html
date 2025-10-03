@@ -2244,15 +2244,15 @@
 
             if (total > 0 && total < 36) {
                 // Show warning with current count when under minimum
-                warning.style.display = 'block';
+                warning.style.setProperty('display', 'block', 'important');
                 document.getElementById('continue-to-summary').disabled = false;
             } else if (total >= 36) {
-                // Hide warning when minimum met
-                warning.style.display = 'none';
+                // Hide warning when minimum met (use !important to override Bootstrap)
+                warning.style.setProperty('display', 'none', 'important');
                 document.getElementById('continue-to-summary').disabled = false;
             } else {
                 // Hide warning and disable continue when no products
-                warning.style.display = 'none';
+                warning.style.setProperty('display', 'none', 'important');
                 document.getElementById('continue-to-summary').disabled = true;
             }
         }
