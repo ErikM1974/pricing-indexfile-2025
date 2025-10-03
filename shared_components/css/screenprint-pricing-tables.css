@@ -236,14 +236,132 @@
         box-shadow: none;
         border: 1px solid #d1d5db;
     }
-    
+
     .sp-current-tier {
         background-color: #f3f4f6 !important;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
-    
+
     .sp-current-tier::before {
         display: none;
+    }
+}
+
+/* ===== Detailed Pricing Breakdown Styles ===== */
+.sp-pricing-details-breakdown {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.sp-breakdown-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sp-breakdown-section {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.sp-breakdown-header {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.95em;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sp-breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.9em;
+    color: #374151;
+}
+
+.sp-breakdown-item span:first-child {
+    color: #6b7280;
+}
+
+.sp-breakdown-item span:last-child {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-weight: 500;
+    color: #111827;
+}
+
+.sp-breakdown-addon {
+    padding-left: 12px;
+    border-left: 2px solid #fbbf24;
+    background-color: #fffbeb;
+    margin: 4px 0;
+    border-radius: 4px;
+}
+
+.sp-breakdown-addon-price {
+    color: #b45309 !important;
+    font-weight: 600 !important;
+}
+
+.sp-breakdown-subtotal {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.sp-breakdown-subtotal span {
+    color: #111827 !important;
+}
+
+.sp-breakdown-grand-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: linear-gradient(to bottom, #3a7c52, #2d6342);
+    color: white;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.05em;
+    margin-top: 8px;
+}
+
+.sp-breakdown-grand-total span {
+    color: white !important;
+}
+
+.sp-breakdown-grand-total span:last-child {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 1.15em;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .sp-pricing-details-breakdown {
+        padding: 12px;
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+
+    .sp-breakdown-section {
+        padding: 10px;
+    }
+
+    .sp-breakdown-item {
+        font-size: 0.85em;
+    }
+
+    .sp-breakdown-grand-total {
+        font-size: 0.95em;
+        padding: 12px;
     }
 }

@@ -746,24 +746,30 @@ class ScreenPrintManualPricing {
     togglePriceBreakdown() {
         const setupSection = document.getElementById('sp-pricing-setup');
         const ltmSection = document.getElementById('sp-pricing-ltm');
+        const detailsBreakdown = document.getElementById('sp-pricing-details-breakdown');
         const toggleBtn = document.getElementById('sp-toggle-breakdown-btn');
         const toggleText = document.getElementById('sp-toggle-breakdown-text');
         const toggleIcon = toggleBtn?.querySelector('.fas');
 
-        if (!setupSection || !toggleBtn) return;
+        if (!toggleBtn) return;
 
-        // Check current visibility state
-        const isHidden = setupSection.style.display === 'none';
+        // Check current visibility state (use details breakdown if it exists, otherwise setup)
+        const checkElement = detailsBreakdown || setupSection;
+        const isHidden = !checkElement || checkElement.style.display === 'none';
 
         // Get pricing to determine what should be shown
         const pricing = this.calculatePricing();
 
         if (isHidden) {
-            // Expand - show sections that have values
-            if (pricing.setupFee > 0) {
+            // Expand - show pricing details breakdown
+            if (detailsBreakdown) {
+                detailsBreakdown.style.display = 'block';
+            }
+            // Also show setup/ltm sections if they have values
+            if (setupSection && pricing.setupFee > 0) {
                 setupSection.style.display = 'block';
             }
-            if (pricing.ltmFee > 0) {
+            if (ltmSection && pricing.ltmFee > 0) {
                 ltmSection.style.display = 'block';
             }
             toggleText.textContent = 'Hide Details';
@@ -771,8 +777,15 @@ class ScreenPrintManualPricing {
             toggleIcon?.classList.add('fa-chevron-up');
         } else {
             // Collapse - hide all detail sections
-            setupSection.style.display = 'none';
-            ltmSection.style.display = 'none';
+            if (detailsBreakdown) {
+                detailsBreakdown.style.display = 'none';
+            }
+            if (setupSection) {
+                setupSection.style.display = 'none';
+            }
+            if (ltmSection) {
+                ltmSection.style.display = 'none';
+            }
             toggleText.textContent = 'Show Details';
             toggleIcon?.classList.remove('fa-chevron-up');
             toggleIcon?.classList.add('fa-chevron-down');
@@ -1372,8 +1385,15 @@ class ScreenPrintManualPricing {
                 // Apply flash charge from API if needed
                 const flashCharge = (effectiveFrontPrintColors > 1) ? parseFloat(pricingData.rulesR?.FlashCharge || 0) : 0;
 
+                // Apply margin to primary location print cost (matches quote builder logic)
+                const printCostWithMargin = (printCost + flashCharge) / tier.MarginDenominator;
+
+                // Store separate components for detailed breakdown
+                pricing.garmentCost = Math.ceil(garmentWithMargin * 2) / 2;  // Rounded garment cost
+                pricing.frontPrintCost = Math.ceil(printCostWithMargin * 2) / 2;  // Rounded print cost
+
                 // Calculate base price
-                const subtotal = garmentWithMargin + printCost + flashCharge;
+                const subtotal = garmentWithMargin + printCostWithMargin;
 
                 // Round using API rounding rule (HalfDollarCeil_Final)
                 pricing.basePrice = Math.ceil(subtotal * 2) / 2;
@@ -1384,14 +1404,32 @@ class ScreenPrintManualPricing {
                     garmentWithMargin: garmentWithMargin.toFixed(2),
                     printCost,
                     flashCharge,
+                    printCostWithMargin: printCostWithMargin.toFixed(2),
                     subtotal: subtotal.toFixed(2),
+                    garmentCost: pricing.garmentCost,
+                    frontPrintCost: pricing.frontPrintCost,
                     finalPrice: pricing.basePrice
                 });
             } else {
                 pricing.basePrice = 0;
+                pricing.garmentCost = 0;
+                pricing.frontPrintCost = 0;
             }
         } else {
             // AUTOMATED MODE: Use product API prices
+            // Get garment-only price (0 colors) for breakdown
+            let garmentOnlyPrice = 0;
+            const garmentOnlyPricingData = pricingData.primaryLocationPricing?.["0"];
+            if (garmentOnlyPricingData?.tiers) {
+                const tier = garmentOnlyPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                if (tier?.prices) {
+                    const sizes = Object.keys(tier.prices);
+                    if (sizes.length > 0) {
+                        garmentOnlyPrice = parseFloat(tier.prices[sizes[0]]) || 0;
+                    }
+                }
+            }
+
             if (frontColors > 0) {
                 const frontPricingData = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()];
                 if (frontPricingData?.tiers) {
@@ -1400,28 +1438,32 @@ class ScreenPrintManualPricing {
                         const sizes = Object.keys(tier.prices);
                         if (sizes.length > 0) {
                             pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
+                            // Calculate breakdown: total - garment = print cost
+                            pricing.garmentCost = garmentOnlyPrice;
+                            pricing.frontPrintCost = pricing.basePrice - garmentOnlyPrice;
                         }
                     }
                 }
             } else {
-                const garmentOnlyPricingData = pricingData.primaryLocationPricing?.["0"];
-                if (garmentOnlyPricingData?.tiers) {
-                     const tier = garmentOnlyPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
-                     if (tier?.prices) {
-                         const sizes = Object.keys(tier.prices);
-                         if (sizes.length > 0) {
-                             pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
-                         }
-                     }
-                } else {
-                    pricing.basePrice = 0;
-                }
+                // No print, just garment
+                pricing.basePrice = garmentOnlyPrice;
+                pricing.garmentCost = garmentOnlyPrice;
+                pricing.frontPrintCost = 0;
             }
         }
 
         let totalSetupForAdditionalLocations = 0;
-        if (pricingData.additionalLocationPricing) {
-            const additionalPricingMaster = pricingData.additionalLocationPricing;
+
+        // Process additional locations
+        console.log('[Manual] Additional locations check:', {
+            additionalLocations: additionalLocations,
+            length: additionalLocations?.length,
+            isManualMode: this.config.isManualMode
+        });
+
+        if (additionalLocations && additionalLocations.length > 0) {
+            console.log('[Manual] Processing additional locations:', additionalLocations.length);
+
             additionalLocations.forEach(loc => {
                 let costPerPieceForThisLoc = 0;
                 let designColorsThisLoc = loc.colors;
@@ -1431,33 +1473,64 @@ class ScreenPrintManualPricing {
                     if (isDarkGarment) {
                         effectiveColorsForThisLoc += 1;
                     }
-                    
-                    // Cap effective colors at the maximum available in additional location pricing data
-                    const maxAvailableAddlColors = Math.max(...Object.keys(additionalPricingMaster || {})
-                        .filter(key => !isNaN(parseInt(key)))
-                        .map(key => parseInt(key)));
-                    
-                    if (effectiveColorsForThisLoc > maxAvailableAddlColors) {
-                        console.log(`[ScreenPrintV2] Capping additional location effective colors from ${effectiveColorsForThisLoc} to ${maxAvailableAddlColors} (max available in pricing data)`);
-                        effectiveColorsForThisLoc = maxAvailableAddlColors;
-                    }
-                    
-                    const locPricingData = additionalPricingMaster[effectiveColorsForThisLoc.toString()];
-                    if (locPricingData?.tiers) {
-                        const tier = locPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
-                        if (tier?.pricePerPiece !== undefined) {
-                            costPerPieceForThisLoc = parseFloat(tier.pricePerPiece) || 0;
+
+                    // MANUAL MODE: Calculate additional location cost using API BasePrintCost
+                    if (this.config.isManualMode) {
+                        const tier = this.findTierForQuantity(quantity, pricingData.tierData);
+                        if (tier) {
+                            // Get BasePrintCost for additional location from API
+                            const additionalPrintCost = this.getPrintCostFromAPI(
+                                pricingData,
+                                tier.TierLabel,
+                                effectiveColorsForThisLoc,
+                                'AdditionalLocation'
+                            );
+
+                            // Additional locations already have margin built in (use as-is)
+                            costPerPieceForThisLoc = additionalPrintCost;
+
+                            console.log('[Manual] Additional Location:', {
+                                location: loc.location,
+                                designColors: designColorsThisLoc,
+                                effectiveColors: effectiveColorsForThisLoc,
+                                printCost: additionalPrintCost,
+                                tierLabel: tier.TierLabel
+                            });
+                        }
+                    } else {
+                        // AUTOMATED MODE: Use pre-calculated prices
+                        if (pricingData.additionalLocationPricing) {
+                            const additionalPricingMaster = pricingData.additionalLocationPricing;
+
+                            // Cap effective colors at the maximum available in additional location pricing data
+                            const maxAvailableAddlColors = Math.max(...Object.keys(additionalPricingMaster || {})
+                                .filter(key => !isNaN(parseInt(key)))
+                                .map(key => parseInt(key)));
+
+                            if (effectiveColorsForThisLoc > maxAvailableAddlColors) {
+                                console.log(`[ScreenPrintV2] Capping additional location effective colors from ${effectiveColorsForThisLoc} to ${maxAvailableAddlColors} (max available in pricing data)`);
+                                effectiveColorsForThisLoc = maxAvailableAddlColors;
+                            }
+
+                            const locPricingData = additionalPricingMaster[effectiveColorsForThisLoc.toString()];
+                            if (locPricingData?.tiers) {
+                                const tier = locPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                                if (tier?.pricePerPiece !== undefined) {
+                                    costPerPieceForThisLoc = parseFloat(tier.pricePerPiece) || 0;
+                                }
+                            }
                         }
                     }
                 }
+
                 pricing.additionalCost += costPerPieceForThisLoc;
                 const setupForThisLoc = effectiveColorsForThisLoc * this.config.setupFeePerColor;
                 totalSetupForAdditionalLocations += setupForThisLoc;
                 pricing.colorBreakdown.locations.push({
-                    ...loc, 
-                    totalColors: effectiveColorsForThisLoc, 
+                    ...loc,
+                    totalColors: effectiveColorsForThisLoc,
                     setupCost: setupForThisLoc,
-                    costPerPiece: costPerPieceForThisLoc 
+                    costPerPiece: costPerPieceForThisLoc
                 });
             });
         }
@@ -1559,12 +1632,20 @@ class ScreenPrintManualPricing {
 
         this.updateSetupBreakdown(pricing);
 
+        // Debug: Log pricing breakdown
+        console.log('[Manual] Pricing breakdown:', {
+            additionalCost: pricing.additionalCost,
+            locations: pricing.colorBreakdown.locations,
+            locationsCount: pricing.colorBreakdown.locations.length
+        });
+
         if (this.elements.ltmWarning && this.elements.ltmFee) {
             // Show LTM warning when fee exists (tier-based, no threshold check)
             this.elements.ltmWarning.style.display = pricing.ltmFee > 0 ? 'block' : 'none';
             this.elements.ltmFee.textContent = `$${pricing.ltmFee.toFixed(2)}`;
         }
         this.updateOrderSummary(pricing);
+        this.updatePricingDetailsBreakdown(pricing);
 
         // Update pricing tiers if accordion is open
         if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
@@ -1723,6 +1804,128 @@ class ScreenPrintManualPricing {
         this.elements.summaryContent.innerHTML = html;
     }
 
+    /**
+     * Update detailed pricing breakdown (shows under "Show Details")
+     */
+    updatePricingDetailsBreakdown(pricing) {
+        // Find or create breakdown container
+        let breakdownContainer = document.getElementById('sp-pricing-details-breakdown');
+        let wasVisible = false; // Track if breakdown was open
+
+        if (!breakdownContainer) {
+            // Create the container if it doesn't exist
+            const priceDisplay = document.querySelector('.sp-live-price-display');
+            if (priceDisplay) {
+                breakdownContainer = document.createElement('div');
+                breakdownContainer.id = 'sp-pricing-details-breakdown';
+                breakdownContainer.className = 'sp-pricing-details-breakdown';
+                breakdownContainer.style.display = 'none'; // Hidden by default
+                priceDisplay.appendChild(breakdownContainer);
+            } else {
+                return; // Can't find where to put it
+            }
+        } else {
+            // Store current visibility state
+            wasVisible = breakdownContainer.style.display !== 'none';
+        }
+
+        let html = '<div class="sp-breakdown-content">';
+
+        // Front location breakdown
+        if (this.state.frontColors > 0 && pricing.basePrice > 0) {
+            const frontPrintCost = this.state.frontHasSafetyStripes ? pricing.basePrice : pricing.basePrice;
+
+            html += '<div class="sp-breakdown-section">';
+            html += '<div class="sp-breakdown-header">Front Location</div>';
+
+            if (pricing.garmentCost && pricing.frontPrintCost) {
+                html += `<div class="sp-breakdown-item">`;
+                html += `<span>Shirt:</span><span>$${pricing.garmentCost.toFixed(2)}</span>`;
+                html += `</div>`;
+
+                // Determine print label - show design colors + underbase if dark garment
+                let printLabel;
+                if (this.state.isDarkGarment && this.state.frontColors > 0) {
+                    printLabel = `Print (${this.state.frontColors} design + 1 underbase)`;
+                } else {
+                    printLabel = `Print (${pricing.colorBreakdown.front} color${pricing.colorBreakdown.front !== 1 ? 's' : ''})`;
+                }
+
+                html += `<div class="sp-breakdown-item">`;
+                html += `<span>${printLabel}:</span><span>$${pricing.frontPrintCost.toFixed(2)}</span>`;
+                html += `</div>`;
+            }
+
+            if (this.state.frontHasSafetyStripes) {
+                html += `<div class="sp-breakdown-item sp-breakdown-addon">`;
+                html += `<span>Safety Stripes:</span><span class="sp-breakdown-addon-price">+$${this.state.safetyStripeSurcharge.toFixed(2)}</span>`;
+                html += `</div>`;
+            }
+
+            const frontTotal = this.state.frontHasSafetyStripes ?
+                pricing.basePrice + this.state.safetyStripeSurcharge :
+                pricing.basePrice;
+
+            html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
+            html += `<span>Front Total:</span><span>$${frontTotal.toFixed(2)}</span>`;
+            html += `</div>`;
+            html += '</div>'; // Close section
+        }
+
+        // Additional locations breakdown
+        if (pricing.colorBreakdown.locations && pricing.colorBreakdown.locations.length > 0) {
+            pricing.colorBreakdown.locations.forEach(loc => {
+                if (loc.colors > 0) {
+                    const locLabel = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+
+                    html += '<div class="sp-breakdown-section">';
+                    html += `<div class="sp-breakdown-header">${locLabel}</div>`;
+
+                    // Determine print label for additional location
+                    let locPrintLabel;
+                    if (this.state.isDarkGarment && loc.colors > 0) {
+                        locPrintLabel = `Print (${loc.colors} design + 1 underbase)`;
+                    } else {
+                        locPrintLabel = `Print (${loc.totalColors} color${loc.totalColors !== 1 ? 's' : ''})`;
+                    }
+
+                    html += `<div class="sp-breakdown-item">`;
+                    html += `<span>${locPrintLabel}:</span><span>$${loc.costPerPiece.toFixed(2)}</span>`;
+                    html += `</div>`;
+
+                    if (loc.hasSafetyStripes) {
+                        html += `<div class="sp-breakdown-item sp-breakdown-addon">`;
+                        html += `<span>Safety Stripes:</span><span class="sp-breakdown-addon-price">+$${this.state.safetyStripeSurcharge.toFixed(2)}</span>`;
+                        html += `</div>`;
+                    }
+
+                    const locTotal = loc.hasSafetyStripes ?
+                        loc.costPerPiece + this.state.safetyStripeSurcharge :
+                        loc.costPerPiece;
+
+                    html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
+                    html += `<span>${locLabel} Total:</span><span>$${locTotal.toFixed(2)}</span>`;
+                    html += `</div>`;
+                    html += '</div>'; // Close section
+                }
+            });
+        }
+
+        // Grand total per shirt
+        html += '<div class="sp-breakdown-grand-total">';
+        html += `<span>Price per Shirt:</span><span>$${pricing.perShirtTotal.toFixed(2)}</span>`;
+        html += '</div>';
+
+        html += '</div>'; // Close content
+
+        breakdownContainer.innerHTML = html;
+
+        // Restore visibility state if it was open
+        if (wasVisible) {
+            breakdownContainer.style.display = 'block';
+        }
+    }
+
     updatePricingTiers() {
         if (!this.elements.tiersContent) return;
         if (!this.state.pricingData?.primaryLocationPricing) {
@@ -1862,12 +2065,22 @@ class ScreenPrintManualPricing {
             pricing.colorBreakdown.locations.some(loc => loc.hasSafetyStripes);
         
         // Front print part - uses effective colors for label
-        if (this.state.frontColors > 0 && pricing.basePrice >= 0) { 
+        if (this.state.frontColors > 0 && pricing.basePrice >= 0) {
             // pricing.basePrice is garment + front print (incl. its underbase)
-            const displayPrice = this.state.frontHasSafetyStripes ? 
-                pricing.basePrice + this.state.safetyStripeSurcharge : 
+            const displayPrice = this.state.frontHasSafetyStripes ?
+                pricing.basePrice + this.state.safetyStripeSurcharge :
                 pricing.basePrice;
-            subtitleParts.push(`${pricing.colorBreakdown.front} Color Front $${displayPrice.toFixed(2)}`);
+
+            // Show breakdown: Shirt + Print with individual costs
+            if (pricing.garmentCost && pricing.frontPrintCost) {
+                subtitleParts.push(
+                    `Shirt + ${pricing.colorBreakdown.front} Color Front: $${displayPrice.toFixed(2)} ` +
+                    `<span style="color: #666; font-size: 0.9em;">(Shirt: $${pricing.garmentCost.toFixed(2)} + Print: $${pricing.frontPrintCost.toFixed(2)})</span>`
+                );
+            } else {
+                // Fallback if breakdown not available
+                subtitleParts.push(`${pricing.colorBreakdown.front} Color Front $${displayPrice.toFixed(2)}`);
+            }
         }
     
         // Additional locations part - uses effective colors for label

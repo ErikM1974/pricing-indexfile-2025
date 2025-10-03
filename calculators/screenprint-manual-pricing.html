@@ -44,7 +44,7 @@
     <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
 
     <!-- Screen Print Pricing Tables - Modern styling -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-tables.css">
+    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-tables.css?v=20251003c">
 
     <!-- Screen Print Safety Stripes - Safety Orange Theme -->
     <link rel="stylesheet" href="/shared_components/css/screenprint-safety-stripes.css">
@@ -209,17 +209,17 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
 
     <!-- Manual Calculator (Modified V2) -->
-    <script src="/shared_components/js/screenprint-manual-pricing.js"></script>
+    <script src="/shared_components/js/screenprint-manual-pricing.js?v=20251003c"></script>
 
     <!-- Initialize Calculator -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize calculator with slight delay to ensure all scripts loaded
             setTimeout(() => {
-                if (typeof ScreenPrintPricing !== 'undefined') {
-                    window.screenPrintManualCalculator = new ScreenPrintPricing();
+                if (typeof ScreenPrintManualPricing !== 'undefined') {
+                    window.screenPrintManualCalculator = new ScreenPrintManualPricing();
                 } else {
-                    console.error('[Manual Calculator] ScreenPrintPricing class not found!');
+                    console.error('[Manual Calculator] ScreenPrintManualPricing class not found!');
                 }
             }, 100);
         });
