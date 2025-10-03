@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen Print Quote Builder | Northwest Custom Apparel</title>
 
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Create professional screen print quotes with our advanced quote builder. Multi-product quotes, automatic pricing, database storage, and email delivery. Northwest Custom Apparel.">
+    <meta name="keywords" content="screen print quotes, quote builder, multi-product quotes, screen printing estimates, custom apparel quotes">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.nwcustomapparel.com/quote-builders/screenprint-quote-builder.html">
+    <meta property="og:title" content="Screen Print Quote Builder | Northwest Custom Apparel">
+    <meta property="og:description" content="Build comprehensive screen print quotes with multiple products, automatic calculations, and professional delivery.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Screen Print Quote Builder | Northwest Custom Apparel">
+    <meta name="twitter:description" content="Professional quote builder for screen printing projects with multi-product support.">
+    <meta name="twitter:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
     <!-- NWCA Favicon -->
     <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
 
@@ -46,6 +63,19 @@
     .search-section .search-input:focus {
         outline: none;
         border-color: #3a7c52;
+    }
+
+    /* Screen reader only utility class for accessibility */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
     }
 
     /* Two Column Product Layout - Image hidden during color selection */
@@ -1132,8 +1162,8 @@
                 </div>
 
                 <div class="nav-actions">
-                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'" aria-label="Go back to staff dashboard">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
                     </button>
                 </div>
             </div>
@@ -1221,20 +1251,22 @@
                         </div>
 
                         <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
-                        <div class="color-buttons">
-                            <button class="color-btn active" data-colors="1">1 Color</button>
-                            <button class="color-btn" data-colors="2">2 Colors</button>
-                            <button class="color-btn" data-colors="3">3 Colors</button>
-                            <button class="color-btn" data-colors="4">4 Colors</button>
-                            <button class="color-btn" data-colors="5">5 Colors</button>
-                            <button class="color-btn" data-colors="6">6 Colors</button>
+                        <div class="color-buttons" role="group" aria-label="Select number of print colors">
+                            <button class="color-btn active" data-colors="1" aria-pressed="true" aria-label="1 color printing">1 Color</button>
+                            <button class="color-btn" data-colors="2" aria-pressed="false" aria-label="2 colors printing">2 Colors</button>
+                            <button class="color-btn" data-colors="3" aria-pressed="false" aria-label="3 colors printing">3 Colors</button>
+                            <button class="color-btn" data-colors="4" aria-pressed="false" aria-label="4 colors printing">4 Colors</button>
+                            <button class="color-btn" data-colors="5" aria-pressed="false" aria-label="5 colors printing">5 Colors</button>
+                            <button class="color-btn" data-colors="6" aria-pressed="false" aria-label="6 colors printing">6 Colors</button>
                         </div>
 
                         <h3 class="setup-title" style="margin-top: 2rem;">Special Design Options</h3>
                         <div class="dark-garment-section">
                             <div class="dark-garment-toggle">
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="safety-stripes-toggle">
+                                    <input type="checkbox"
+                                           id="safety-stripes-toggle"
+                                           aria-label="Enable safety stripes design, adds $2.00 per piece">
                                     <span class="toggle-slider"></span>
                                 </label>
                                 <div>
@@ -1253,8 +1285,8 @@
                             Add up to 3 more print locations. Each location counts as a separate setup fee.
                         </p>
                         <div id="additional-locations-list"></div>
-                        <button id="add-location-btn" class="btn-add-location-dashed">
-                            <i class="fas fa-plus"></i> Add Another Location
+                        <button id="add-location-btn" class="btn-add-location-dashed" aria-label="Add another print location, up to 3 additional locations">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Another Location
                         </button>
                     </div>
                 </div>
@@ -1287,8 +1319,8 @@
                     <!-- LTM Fee (if applicable) -->
                     <div id="summary-ltm-fee-container"></div>
 
-                    <button class="summary-continue-btn" onclick="screenPrintQuoteBuilder.navigateToPhase(2)">
-                        Continue to Products <i class="fas fa-arrow-right"></i>
+                    <button class="summary-continue-btn" onclick="screenPrintQuoteBuilder.navigateToPhase(2)" aria-label="Continue to adding products">
+                        Continue to Products <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -1305,8 +1337,23 @@
             <div class="search-section">
                 <div class="form-group" style="position: relative;">
                     <label for="style-search">Search Product Style</label>
-                    <input type="text" id="style-search" class="search-input" placeholder="Enter style number (e.g., PC54, PC61, 18500)" autocomplete="off">
-                    <div id="style-suggestions" class="suggestions-dropdown" style="display: none;"></div>
+                    <input type="text"
+                           id="style-search"
+                           class="search-input"
+                           placeholder="Enter style number (e.g., PC54, PC61, 18500)"
+                           autocomplete="off"
+                           aria-label="Search for product by style number"
+                           aria-describedby="style-search-help"
+                           aria-controls="style-suggestions"
+                           aria-autocomplete="list"
+                           role="combobox"
+                           aria-expanded="false">
+                    <div id="style-suggestions"
+                         class="suggestions-dropdown"
+                         style="display: none;"
+                         role="listbox"
+                         aria-label="Product suggestions"></div>
+                    <div id="style-search-help" class="sr-only">Type a style number to search for products</div>
                 </div>
             </div>
 
@@ -1314,7 +1361,7 @@
             <div id="product-display" class="product-layout" style="display: none;">
                 <!-- Left Column: Product Image -->
                 <div class="product-image-col">
-                    <img id="product-image" src="" alt="Product">
+                    <img id="product-image" src="" alt="" aria-describedby="product-name">
                 </div>
 
                 <!-- Right Column: Product Info & Colors -->

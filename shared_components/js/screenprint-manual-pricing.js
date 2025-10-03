@@ -4,7 +4,7 @@
  * Uses API for all pricing rules, margins, LTM fees
  */
 
-class ScreenPrintPricing {
+class ScreenPrintManualPricing {
     constructor() {
         // Configuration
         this.config = {
@@ -1493,28 +1493,18 @@ class ScreenPrintPricing {
         
         // Store safety stripes info
         pricing.safetyStripesSurcharge = safetyStripesSurcharge;
-        
-        // Prices are always pre-calculated in the new format
-        if (pricingData.embellishmentType === 'screenprint') {
-            // Prices already include garment, print, and margin
-            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost + safetyStripesSurcharge;
-            pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost;
-            
-            // Setup and LTM are separate one-time fees
-            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
-            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
-            pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
-        } else {
-            // Legacy calculation where basePrice needs margin applied
-            pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
-            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
-            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
-            pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
-            pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.setupPerShirt + pricing.ltmImpactPerShirt : 0;
-        }
-        
+
+        // Calculate final prices (works for both manual and automated modes)
+        // Prices already include garment, print, and margin
+        pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost + safetyStripesSurcharge;
+        pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost;
+
+        // Setup and LTM are separate one-time fees
+        pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
+        pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
+        pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
+        pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
+
         return pricing;
     }
 

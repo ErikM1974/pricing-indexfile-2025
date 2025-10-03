@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Calculator Test Runner | NWCA</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d5f3f 0%, #1a3d2b 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #3a7c52;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #2d5f3f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h3 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3a7c52;
+        }
+
+        .summary-value.failed {
+            color: #dc3545;
+        }
+
+        .summary-value.rate {
+            color: #3a7c52;
+        }
+
+        .results-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .results-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-header h2 {
+            color: #2d5f3f;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab.active {
+            background: #3a7c52;
+            color: white;
+            border-color: #3a7c52;
+        }
+
+        .results-body {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .test-result {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s;
+        }
+
+        .test-result:hover {
+            background: #f8f9fa;
+        }
+
+        .test-result.passed {
+            border-left: 4px solid #28a745;
+        }
+
+        .test-result.failed {
+            border-left: 4px solid #dc3545;
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .test-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .test-status.passed {
+            color: #28a745;
+        }
+
+        .test-status.failed {
+            color: #dc3545;
+        }
+
+        .test-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e9ecef;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .test-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            color: #721c24;
+        }
+
+        .test-details {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        .test-details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .test-details-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .test-details-value {
+            color: #333;
+        }
+
+        .fixes-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .fixes-header {
+            background: #fff3cd;
+            padding: 20px;
+            border-bottom: 1px solid #ffeeba;
+        }
+
+        .fixes-header h2 {
+            color: #856404;
+        }
+
+        .fix-item {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .fix-item:last-child {
+            border-bottom: none;
+        }
+
+        .fix-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .fix-problem {
+            color: #dc3545;
+            margin-bottom: 8px;
+        }
+
+        .fix-file {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+        }
+
+        .fix-code {
+            background: #f8f9fa;
+            border-left: 3px solid #3a7c52;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3a7c52;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Screen Print Calculator Test Suite</h1>
+            <p class="subtitle">Automated testing & validation for all screen print calculators</p>
+        </header>
+
+        <div class="controls">
+            <button id="runAllTests" onclick="runAllTests()">
+                <span class="icon">▶️</span> Run All Tests
+            </button>
+            <button class="secondary" onclick="clearResults()">
+                <span class="icon">🗑️</span> Clear Results
+            </button>
+            <button class="secondary" onclick="exportJSON()">
+                <span class="icon">💾</span> Export JSON
+            </button>
+            <button class="secondary" onclick="exportHTML()">
+                <span class="icon">📄</span> Export HTML
+            </button>
+        </div>
+
+        <div id="summary" class="summary" style="display: none;">
+            <div class="summary-card">
+                <h3>Total Tests</h3>
+                <div class="summary-value" id="totalTests">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Passed</h3>
+                <div class="summary-value" id="passedTests">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Failed</h3>
+                <div class="summary-value failed" id="failedTests">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Pass Rate</h3>
+                <div class="summary-value rate" id="passRate">0%</div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Running tests...</p>
+        </div>
+
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <div class="results-header">
+                <h2>Test Results</h2>
+                <div class="filter-tabs">
+                    <div class="filter-tab active" onclick="filterResults('all')">All</div>
+                    <div class="filter-tab" onclick="filterResults('passed')">Passed</div>
+                    <div class="filter-tab" onclick="filterResults('failed')">Failed</div>
+                </div>
+            </div>
+            <div class="results-body" id="resultsBody"></div>
+        </div>
+
+        <div id="fixesSection" class="fixes-section" style="display: none;">
+            <div class="fixes-header">
+                <h2>⚠️ Suggested Fixes</h2>
+                <p>Issues detected and recommended solutions</p>
+            </div>
+            <div id="fixesBody"></div>
+        </div>
+    </div>
+
+    <!-- Calculator Dependencies (Required for Testing) -->
+    <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
+    <script src="/shared_components/js/screenprint-manual-pricing.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+
+    <!-- Test Suite Framework -->
+    <script src="screenprint-calculator-test-suite.js"></script>
+
+    <!-- Test Cases -->
+    <script src="screenprint-test-cases.js"></script>
+
+    <!-- Test Runner Logic -->
+    <script>
+        let testSuite = null;
+        let currentFilter = 'all';
+        let testReport = null;
+
+        // Initialize test suite
+        function initializeTestSuite() {
+            testSuite = new ScreenPrintTestSuite();
+
+            // Load all test cases
+            if (typeof ScreenPrintTestCases !== 'undefined') {
+                ScreenPrintTestCases.forEach(testCase => {
+                    testSuite.addTest(testCase);
+                });
+                console.log(`[TestRunner] Loaded ${testSuite.tests.length} test cases`);
+            } else {
+                console.error('[TestRunner] Test cases not loaded!');
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            if (!testSuite) {
+                initializeTestSuite();
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('fixesSection').style.display = 'none';
+
+            // Disable run button
+            document.getElementById('runAllTests').disabled = true;
+
+            try {
+                // Run tests
+                testReport = await testSuite.runAllTests();
+
+                // Print to console
+                testSuite.printReport(testReport);
+
+                // Update UI
+                displaySummary(testReport);
+                displayResults(testReport);
+                displayFixes(testReport);
+
+            } catch (error) {
+                console.error('[TestRunner] Error running tests:', error);
+                alert('Error running tests. Check console for details.');
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+
+                // Re-enable run button
+                document.getElementById('runAllTests').disabled = false;
+            }
+        }
+
+        // Display summary
+        function displaySummary(report) {
+            document.getElementById('summary').style.display = 'grid';
+            document.getElementById('totalTests').textContent = report.summary.total;
+            document.getElementById('passedTests').textContent = report.summary.passed;
+            document.getElementById('failedTests').textContent = report.summary.failed;
+            document.getElementById('passRate').textContent = report.summary.passRate;
+        }
+
+        // Display results
+        function displayResults(report) {
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            if (report.results.length === 0) {
+                resultsBody.innerHTML = '<div class="no-results">No test results yet. Click "Run All Tests" to begin.</div>';
+                return;
+            }
+
+            report.results.forEach(result => {
+                const resultEl = createResultElement(result);
+                resultsBody.appendChild(resultEl);
+            });
+
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        // Create result element
+        function createResultElement(result) {
+            const div = document.createElement('div');
+            div.className = `test-result ${result.passed ? 'passed' : 'failed'}`;
+            div.dataset.status = result.passed ? 'passed' : 'failed';
+
+            const statusIcon = result.passed ? '✅' : '❌';
+            const statusText = result.passed ? 'PASSED' : 'FAILED';
+
+            let html = `
+                <div class="test-header">
+                    <div>
+                        <div class="test-category">${result.category}</div>
+                        <div class="test-name">${result.testName}</div>
+                        <div class="timestamp">${new Date(result.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="test-status ${result.passed ? 'passed' : 'failed'}">
+                        <span class="icon">${statusIcon}</span>
+                        ${statusText}
+                    </div>
+                </div>
+            `;
+
+            if (!result.passed && result.error) {
+                html += `
+                    <div class="test-error">
+                        <strong>Error:</strong> ${result.error}
+                    </div>
+                `;
+            }
+
+            // Show actual values
+            if (result.actual) {
+                html += `<div class="test-details">`;
+
+                if (result.actual.automated && result.actual.manual) {
+                    html += `<strong>Automated Calculator:</strong><br/>`;
+                    html += formatPricingData(result.actual.automated);
+                    html += `<br/><strong>Manual Calculator:</strong><br/>`;
+                    html += formatPricingData(result.actual.manual);
+                } else {
+                    html += formatPricingData(result.actual);
+                }
+
+                html += `</div>`;
+            }
+
+            div.innerHTML = html;
+            return div;
+        }
+
+        // Format pricing data
+        function formatPricingData(data) {
+            return `
+                <div class="test-details-row">
+                    <span class="test-details-label">Price:</span>
+                    <span class="test-details-value">$${data.price?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div class="test-details-row">
+                    <span class="test-details-label">Base Price:</span>
+                    <span class="test-details-value">$${data.basePrice?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div class="test-details-row">
+                    <span class="test-details-label">Safety Stripes:</span>
+                    <span class="test-details-value">$${data.safetyStripeSurcharge?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div class="test-details-row">
+                    <span class="test-details-label">Setup Fee:</span>
+                    <span class="test-details-value">$${data.setupFee?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div class="test-details-row">
+                    <span class="test-details-label">LTM Fee:</span>
+                    <span class="test-details-value">$${data.ltmFee?.toFixed(2) || '0.00'}</span>
+                </div>
+            `;
+        }
+
+        // Display fixes
+        function displayFixes(report) {
+            if (report.fixes.length === 0) {
+                document.getElementById('fixesSection').style.display = 'none';
+                return;
+            }
+
+            const fixesBody = document.getElementById('fixesBody');
+            fixesBody.innerHTML = '';
+
+            report.fixes.forEach((fix, index) => {
+                const fixEl = document.createElement('div');
+                fixEl.className = 'fix-item';
+                fixEl.innerHTML = `
+                    <div class="fix-title">${index + 1}. ${fix.issue}</div>
+                    <div class="fix-problem"><strong>Problem:</strong> ${fix.problem}</div>
+                    <div class="fix-file"><strong>File:</strong> ${fix.file} (${fix.line})</div>
+                    <div><strong>Fix:</strong> ${fix.fix}</div>
+                    <div class="fix-code">${fix.code}</div>
+                `;
+                fixesBody.appendChild(fixEl);
+            });
+
+            document.getElementById('fixesSection').style.display = 'block';
+        }
+
+        // Filter results
+        function filterResults(filter) {
+            currentFilter = filter;
+
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter test results
+            const results = document.querySelectorAll('.test-result');
+            results.forEach(result => {
+                if (filter === 'all') {
+                    result.style.display = 'block';
+                } else {
+                    result.style.display = result.dataset.status === filter ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Clear results
+        function clearResults() {
+            document.getElementById('resultsBody').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('fixesSection').style.display = 'none';
+            testReport = null;
+        }
+
+        // Export JSON
+        function exportJSON() {
+            if (!testReport) {
+                alert('No test results to export. Run tests first.');
+                return;
+            }
+
+            const json = testSuite.exportReport(testReport);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `screenprint-test-results-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Export HTML
+        function exportHTML() {
+            if (!testReport) {
+                alert('No test results to export. Run tests first.');
+                return;
+            }
+
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `screenprint-test-results-${Date.now()}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[TestRunner] Initializing...');
+
+            // Initialize calculator instances for testing
+            console.log('[TestRunner] Creating calculator instances...');
+
+            // Check if ScreenPrintPricing is available (automated calculator)
+            if (typeof ScreenPrintPricing !== 'undefined') {
+                window.screenPrintCalculator = new ScreenPrintPricing();
+                console.log('[TestRunner] ✓ Automated calculator initialized');
+            } else {
+                console.warn('[TestRunner] ⚠ ScreenPrintPricing class not found');
+            }
+
+            // Check if ScreenPrintManualPricing is available (manual calculator)
+            if (typeof ScreenPrintManualPricing !== 'undefined') {
+                window.screenPrintManualCalculator = new ScreenPrintManualPricing();
+                console.log('[TestRunner] ✓ Manual calculator initialized');
+            } else {
+                console.warn('[TestRunner] ⚠ ScreenPrintManualPricing class not found');
+            }
+
+            // Initialize test suite
+            initializeTestSuite();
+        });
+    </script>
+</body>
+</html>

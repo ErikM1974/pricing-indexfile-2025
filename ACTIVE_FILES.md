@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2025-09-30
-**Total Active Files:** ~255 (includes Screen Print Fast Quote system)
+**Last Updated:** 2025-10-03
+**Total Active Files:** ~259 (includes Screen Print systems + Automated Testing Suite)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -200,9 +200,41 @@
 | `/scripts/` | Utility scripts | ✅ Active | Contains safety-tools/ |
 | `/src/` | Server source code | ✅ Active | Node.js backend |
 | `/templates/` | HTML templates | ✅ Active | Reusable components |
+| `/tests/` | **Automated Testing Suite** | ✅ Active | **Screen print calculator validation** |
 | `/tools/` | Development tools | ✅ Active | Build and dev utilities |
 | `/training/` | Training materials | ✅ Active | Staff training docs |
 | `/vendor-portals/` | Vendor integrations | ✅ Active | External vendor access |
+
+## 🧪 Automated Testing System
+
+**Created:** 2025-10-03
+**Purpose:** Comprehensive automated testing for all screen print calculators
+
+### Test Suite Files
+| File | Purpose | Status |
+|------|---------|--------|
+| `/tests/screenprint-calculator-test-suite.js` | Core testing framework | ✅ Active |
+| `/tests/screenprint-test-cases.js` | 17 comprehensive test cases | ✅ Active |
+| `/tests/screenprint-test-runner.html` | Visual test interface | ✅ Active |
+| `/tests/README-TESTING.md` | Testing documentation | ✅ Active |
+
+### Features
+- ✅ Automated pricing validation across all calculators
+- ✅ Safety stripes functionality testing
+- ✅ Dark garment toggle verification
+- ✅ Cross-calculator consistency checks
+- ✅ Auto-fix suggestions for detected issues
+- ✅ Visual test results with export options
+- ✅ 17 test cases covering all scenarios
+
+### Test Categories
+1. **Basic Pricing** (3 tests) - Fundamental pricing calculations
+2. **Safety Stripes** (4 tests) - $2.00 surcharge validation
+3. **Dark Garment** (2 tests) - Underbase color addition
+4. **LTM Fee** (2 tests) - Minimum order fee logic
+5. **Additional Locations** (2 tests) - Multi-location pricing
+6. **Color Count** (2 tests) - 1-6 color validation
+7. **Complex Scenarios** (2 tests) - Combined features testing
 
 ## 🔄 Update Protocol
 

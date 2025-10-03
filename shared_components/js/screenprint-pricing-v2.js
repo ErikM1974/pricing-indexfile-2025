@@ -64,12 +64,9 @@ class ScreenPrintPricing {
     }
 
     init() {
-        console.log('[ScreenPrintV2] Initializing...');
-
         // Initialize pricing service
         if (typeof ScreenPrintPricingService !== 'undefined') {
             this.pricingService = new ScreenPrintPricingService();
-            console.log('[ScreenPrintV2] API service initialized');
         } else {
             console.error('[ScreenPrintV2] ScreenPrintPricingService not found!');
         }
@@ -360,10 +357,6 @@ class ScreenPrintPricing {
         
         // Diagnostic: Check DOM after creation
         const frontColorOptions = document.querySelectorAll('#sp-front-colors option');
-        console.log('[ScreenPrintV2] Front color options in DOM:', frontColorOptions.length);
-        frontColorOptions.forEach((opt, i) => {
-            console.log(`[ScreenPrintV2] Option ${i}: value="${opt.value}", text="${opt.text}"`);
-        });
     }
 
     bindEvents() {
@@ -550,16 +543,23 @@ class ScreenPrintPricing {
             // Load pricing data via API if in API mode
             if (this.pricingService) {
                 try {
-                    console.log(`[ScreenPrintV2] Loading pricing data via API for ${styleNumber}`);
+                    // Show loading state
+                    this.showLoading();
+
                     const data = await this.pricingService.fetchPricingData(styleNumber);
 
                     if (data) {
                         this.handleMasterBundle(data);
                     } else {
+                        this.showError('No pricing data available for this product');
                         console.error('[ScreenPrintV2] API returned null - no pricing data available');
                     }
                 } catch (error) {
+                    this.showError('Failed to load pricing data. Please refresh the page.');
                     console.error('[ScreenPrintV2] Error loading pricing data:', error);
+                } finally {
+                    // Hide loading state
+                    this.hideLoading();
                 }
             } else {
                 console.error('[ScreenPrintV2] Pricing service not initialized');
@@ -573,8 +573,6 @@ class ScreenPrintPricing {
      * Handle color count toggle selection
      */
     selectColorCount(count) {
-        console.log(`[ScreenPrintV2] Color count selected: ${count}`);
-
         // Update state
         this.state.frontColors = count;
 
@@ -593,7 +591,6 @@ class ScreenPrintPricing {
      * Handle quantity tier button selection
      */
     selectQuantityTier(tier, quantity) {
-        console.log(`[ScreenPrintV2] Tier selected: ${tier}, quantity: ${quantity}`);
 
         // Update state - store tier only, NOT specific quantity
         // User has selected a RANGE (e.g., 73-144), not a specific number
@@ -626,7 +623,6 @@ class ScreenPrintPricing {
             toggle.classList.remove('active');
         }
 
-        console.log(`[ScreenPrintV2] Safety stripes: ${this.state.frontHasSafetyStripes}`);
 
         // Trigger pricing update
         this.updateFrontSafetyStripes(this.state.frontHasSafetyStripes);
@@ -652,14 +648,12 @@ class ScreenPrintPricing {
             section?.classList.remove('active');
         }
 
-        console.log(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
 
         // Auto-reset frontColors if exceeds new limit (6 → 5 when dark garment ON)
         // Dark garments use white underbase screen, limiting design colors to 5
         const maxColors = this.state.isDarkGarment ? 5 : 6;
         if (this.state.frontColors > maxColors) {
             this.state.frontColors = maxColors;
-            console.log(`[ScreenPrintV2] Auto-reset frontColors to ${maxColors} (dark garment limit)`);
         }
 
         // Update color button states (will disable/enable 6-color based on dark garment)
@@ -678,7 +672,6 @@ class ScreenPrintPricing {
 
         section.classList.toggle('collapsed');
 
-        console.log(`[ScreenPrintV2] Additional locations section ${section.classList.contains('collapsed') ? 'collapsed' : 'expanded'}`);
     }
 
     /**
@@ -719,7 +712,6 @@ class ScreenPrintPricing {
             toggleIcon?.classList.add('fa-chevron-down');
         }
 
-        console.log(`[ScreenPrintV2] Price breakdown ${isHidden ? 'expanded' : 'collapsed'}`);
     }
 
     // ==================== UI UPDATE METHODS (Phase 3) ====================
@@ -912,7 +904,6 @@ class ScreenPrintPricing {
         // Safeguard: Re-create Add Location button if it doesn't exist
         // (in case it somehow got deleted during initialization)
         if (!document.getElementById('sp-add-location')) {
-            console.log('[ScreenPrintV2] Recreating Add Location button');
             const button = document.createElement('button');
             button.type = 'button';
             button.id = 'sp-add-location';
@@ -1195,7 +1186,6 @@ class ScreenPrintPricing {
             hasSafetyStripes: false
         });
 
-        console.log(`[ScreenPrintV2] Added location. Total locations: ${this.state.additionalLocations.length}`);
 
         // Update the UI to reflect new state
         this.updateAdditionalLocationsUI();
@@ -1207,7 +1197,6 @@ class ScreenPrintPricing {
         // Remove from state
         this.state.additionalLocations.splice(index, 1);
 
-        console.log(`[ScreenPrintV2] Removed location ${index}. Remaining locations: ${this.state.additionalLocations.length}`);
 
         // Update UI to reflect new state
         this.updateAdditionalLocationsUI();
@@ -1233,14 +1222,12 @@ class ScreenPrintPricing {
             }
         });
 
-        console.log('[ScreenPrintV2] Updated locations from UI:', this.state.additionalLocations);
         this.updateDisplay();
     }
 
     reindexLocations() {
         // No longer needed with new state-driven UI
         // The updateAdditionalLocationsUI() method rebuilds from state
-        console.log('[ScreenPrintV2] Reindexing not needed - UI is state-driven');
     }
 
     updateLocationButtonVisibility() {
@@ -1289,7 +1276,6 @@ class ScreenPrintPricing {
             .map(key => parseInt(key)));
         
         if (effectiveFrontPrintColors > maxAvailableColors) {
-            console.log(`[ScreenPrintV2] Capping effective colors from ${effectiveFrontPrintColors} to ${maxAvailableColors} (max available in pricing data)`);
             effectiveFrontPrintColors = maxAvailableColors;
         }
 
@@ -1338,7 +1324,6 @@ class ScreenPrintPricing {
                         .map(key => parseInt(key)));
                     
                     if (effectiveColorsForThisLoc > maxAvailableAddlColors) {
-                        console.log(`[ScreenPrintV2] Capping additional location effective colors from ${effectiveColorsForThisLoc} to ${maxAvailableAddlColors} (max available in pricing data)`);
                         effectiveColorsForThisLoc = maxAvailableAddlColors;
                     }
                     
@@ -1372,7 +1357,6 @@ class ScreenPrintPricing {
 
             if (currentTier && currentTier.LTM_Fee > 0) {
                 pricing.ltmFee = parseFloat(currentTier.LTM_Fee);
-                console.log(`[ScreenPrintV2] LTM Fee applied for tier ${currentTier.TierLabel}: $${pricing.ltmFee}`);
             }
         }
 
@@ -1917,7 +1901,6 @@ class ScreenPrintPricing {
 
     handleMasterBundle(data) {
         // Log the pricing data
-        console.log('[ScreenPrintV2] Received pricing data from API:', data);
 
         this.state.masterBundle = data;
         this.state.pricingData = data;
@@ -1929,13 +1912,6 @@ class ScreenPrintPricing {
         window.dispatchEvent(new CustomEvent('screenPrintPricingLoaded', {
             detail: data
         }));
-
-        // Diagnostic: Check if 6-color pricing exists
-        console.log('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
-        console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?',
-            !!(data.finalPrices?.PrimaryLocation?.["37-72"]?.["6"]));
-        console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?',
-            !!(data.primaryLocationPricing?.["6"]));
 
         if (data.styleNumber) this.state.styleNumber = data.styleNumber;
         if (data.productTitle) this.state.productTitle = data.productTitle;
@@ -1959,12 +1935,105 @@ class ScreenPrintPricing {
 
         for (const tier of tiers) {
             if (quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity) {
-                console.log(`[ScreenPrintV2] Found tier for qty ${quantity}:`, tier.TierLabel);
                 return tier;
             }
         }
         console.warn(`[ScreenPrintV2] No tier found for quantity ${quantity}`);
         return null;
+    }
+
+    // ==================== LOADING & ERROR STATES ====================
+
+    /**
+     * Show loading indicator
+     */
+    showLoading() {
+        const container = this.elements.container;
+        if (!container) return;
+
+        // Create loading overlay if it doesn't exist
+        let loadingOverlay = document.getElementById('sp-loading-overlay');
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'sp-loading-overlay';
+            loadingOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            loadingOverlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #3a7c52; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <p style="margin-top: 1rem; color: #666;">Loading pricing data...</p>
+                </div>
+            `;
+            container.style.position = 'relative';
+            container.appendChild(loadingOverlay);
+
+            // Add CSS animation
+            if (!document.getElementById('sp-loading-styles')) {
+                const style = document.createElement('style');
+                style.id = 'sp-loading-styles';
+                style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+        }
+        loadingOverlay.style.display = 'flex';
+    }
+
+    /**
+     * Hide loading indicator
+     */
+    hideLoading() {
+        const loadingOverlay = document.getElementById('sp-loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    /**
+     * Show error message
+     */
+    showError(message) {
+        const container = this.elements.container;
+        if (!container) return;
+
+        // Create or update error banner
+        let errorBanner = document.getElementById('sp-error-banner');
+        if (!errorBanner) {
+            errorBanner = document.createElement('div');
+            errorBanner.id = 'sp-error-banner';
+            errorBanner.style.cssText = `
+                background: #fee2e2;
+                border: 1px solid #ef4444;
+                color: #991b1b;
+                padding: 1rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            container.insertBefore(errorBanner, container.firstChild);
+        }
+        errorBanner.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${message}</span>
+            <button onclick="document.getElementById('sp-error-banner').remove()" style="margin-left: auto; background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1.25rem;">&times;</button>
+        `;
+        errorBanner.style.display = 'flex';
+
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (errorBanner) errorBanner.style.display = 'none';
+        }, 10000);
     }
 }
 

@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manual Screen Print Pricing Calculator | Northwest Custom Apparel</title>
 
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Calculate screen print pricing on customer-supplied garments. Instant quotes with quantity discounts, setup fees, and LTM fees. Northwest Custom Apparel's manual pricing calculator.">
+    <meta name="keywords" content="screen print pricing, manual calculator, custom apparel, screen printing quotes, garment decoration">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.nwcustomapparel.com/calculators/screenprint-manual-pricing.html">
+    <meta property="og:title" content="Manual Screen Print Pricing Calculator | Northwest Custom Apparel">
+    <meta property="og:description" content="Get instant screen print pricing on your custom garments. Professional calculator with quantity discounts and setup fees.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Manual Screen Print Pricing Calculator | Northwest Custom Apparel">
+    <meta name="twitter:description" content="Calculate screen print pricing on customer-supplied garments instantly.">
+    <meta name="twitter:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
     <!-- Universal Pricing CSS - Load FIRST for proper theming -->
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
@@ -161,17 +181,19 @@
             <p>Enter the cost of the blank garment (what you paid for the shirt, hoodie, etc.)</p>
 
             <div class="manual-cost-input-wrapper">
-                <span class="dollar-sign">$</span>
+                <span class="dollar-sign" aria-hidden="true">$</span>
                 <input type="number"
                        id="manual-base-cost"
                        class="manual-cost-input"
                        step="0.01"
                        min="0"
-                       placeholder="Enter cost (e.g., 4.75)">
+                       placeholder="Enter cost (e.g., 4.75)"
+                       aria-label="Base garment cost in dollars"
+                       aria-describedby="manual-cost-help">
             </div>
 
-            <div class="manual-cost-help">
-                <i class="fas fa-info-circle"></i> Example: If you bought a blank t-shirt for $4.75, enter 4.75
+            <div id="manual-cost-help" class="manual-cost-help">
+                <i class="fas fa-info-circle" aria-hidden="true"></i> Example: If you bought a blank t-shirt for $4.75, enter 4.75
             </div>
         </div>
 
@@ -192,18 +214,10 @@
     <!-- Initialize Calculator -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[Manual Calculator] Page loaded, initializing...');
-
             // Initialize calculator with slight delay to ensure all scripts loaded
             setTimeout(() => {
                 if (typeof ScreenPrintPricing !== 'undefined') {
                     window.screenPrintManualCalculator = new ScreenPrintPricing();
-                    console.log('===================================');
-                    console.log('🚀 Manual Screen Print Calculator: READY');
-                    console.log('📦 Mode: Manual base cost input');
-                    console.log('📊 API endpoint: /api/pricing-bundle?method=ScreenPrint');
-                    console.log('✅ Type in the base cost above to see pricing');
-                    console.log('===================================');
                 } else {
                     console.error('[Manual Calculator] ScreenPrintPricing class not found!');
                 }
