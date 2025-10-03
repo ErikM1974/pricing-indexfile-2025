@@ -2557,8 +2557,8 @@
                         <span>$${setupFee.toFixed(2)}</span>
                     </div>
                     ${ltmFee > 0 ? `
-                        <div class="summary-row">
-                            <span>LTM Fee (&lt; 13 pieces):</span>
+                        <div class="summary-row" style="color: #ff9800;">
+                            <span>Small Batch Fee (${totalQuantity} ${totalQuantity === 1 ? 'piece' : 'pieces'}):</span>
                             <span>$${ltmFee.toFixed(2)}</span>
                         </div>
                     ` : ''}
@@ -2715,20 +2715,29 @@
         }
 
         calculateLTMFee(totalQuantity, pricingDataByStyle) {
-            // MATCHES screenprint-pricing-v2.js LINE 1341-1360
-            if (totalQuantity >= 13) return 0;
+            // Calculate LTM (Less Than Minimum) fee based on quantity tier
+            // 13-36 pieces: $75
+            // 37-72 pieces: $50
+            // 73+ pieces: $0
 
-            // Get LTM fee from first product's tier data
             const firstStyle = Object.values(pricingDataByStyle)[0];
             if (!firstStyle?.tierData) return 0;
 
+            // Find the tier that matches this quantity
             const tierKey = Object.keys(firstStyle.tierData).find(key => {
                 const tier = firstStyle.tierData[key];
                 return totalQuantity >= tier.MinQuantity &&
                        (!tier.MaxQuantity || totalQuantity <= tier.MaxQuantity);
             });
 
-            return tierKey ? parseFloat(firstStyle.tierData[tierKey].LTM_Fee || 0) : 0;
+            if (!tierKey) return 0;
+
+            const ltmFee = parseFloat(firstStyle.tierData[tierKey].LTM_Fee || 0);
+
+            // Log for debugging
+            console.log(`[LTM Fee] Quantity: ${totalQuantity}, Tier: ${tierKey}, Fee: $${ltmFee}`);
+
+            return ltmFee;
         }
 
         async saveQuote() {
