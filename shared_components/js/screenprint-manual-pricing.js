@@ -1,13 +1,14 @@
 /**
- * Screen Print Pricing V2 - Complete Refactor
- * Single file handling all UI and calculations
- * Clear, maintainable, no legacy code
+ * Screen Print Manual Pricing - Based on V2
+ * Modified for manual base cost input
+ * Uses API for all pricing rules, margins, LTM fees
  */
 
 class ScreenPrintPricing {
     constructor() {
         // Configuration
         this.config = {
+            isManualMode: true, // FLAG: Manual calculator mode
             minimumQuantity: 24,
             standardQuantity: 37, // Updated to match tier 2 default
             // ltmThreshold and ltmFee removed - now comes from API tiers
@@ -63,7 +64,7 @@ class ScreenPrintPricing {
         }
     }
 
-    init() {
+    async init() {
         console.log('[ScreenPrintV2] Initializing...');
 
         // Initialize pricing service
@@ -77,7 +78,54 @@ class ScreenPrintPricing {
         this.cacheElements();
         this.createUI();
         this.bindEvents();
-        this.checkUrlParams();
+
+        // MANUAL MODE: Load raw API data (bypass service calculation that needs sizes)
+        if (this.config.isManualMode) {
+            console.log('[Manual] Loading raw API pricing data...');
+            try {
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=ScreenPrint');
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const rawData = await response.json();
+
+                // Validate required fields
+                if (!rawData.tiersR || !rawData.allScreenprintCostsR || !rawData.rulesR) {
+                    throw new Error('Invalid API response - missing required fields');
+                }
+
+                console.log('[Manual] Raw API data loaded:', {
+                    tiers: rawData.tiersR?.length,
+                    printCosts: rawData.allScreenprintCostsR?.length,
+                    flashCharge: rawData.rulesR?.FlashCharge,
+                    roundingMethod: rawData.rulesR?.RoundingMethod
+                });
+
+                // Transform raw data to expected calculator structure
+                const transformedData = this.transformRawAPIData(rawData);
+
+                // Store transformed data
+                this.state.pricingData = transformedData;
+                this.state.masterBundle = transformedData;
+
+                // Make globally available
+                window.screenPrintPricingData = transformedData;
+
+                console.log('[Manual] Transformed data ready for calculations');
+
+                // Dispatch event for compatibility
+                window.dispatchEvent(new CustomEvent('screenPrintPricingLoaded', {
+                    detail: transformedData
+                }));
+
+            } catch (error) {
+                console.error('[Manual] Error loading API data:', error);
+                alert('Failed to load pricing data. Please refresh the page or contact support.');
+            }
+        } else {
+            this.checkUrlParams();
+        }
 
         // Initialize UI with defaults
         this.updateColorToggles();  // Highlight default color (1)
@@ -367,6 +415,17 @@ class ScreenPrintPricing {
     }
 
     bindEvents() {
+        // MANUAL MODE: Listen for base cost input changes
+        if (this.config.isManualMode) {
+            const manualCostInput = document.getElementById('manual-base-cost');
+            if (manualCostInput) {
+                manualCostInput.addEventListener('input', () => {
+                    console.log('[Manual] Base cost changed:', manualCostInput.value);
+                    this.updateDisplay();
+                });
+            }
+        }
+
         // NEW: Color Toggle Switches (1-6 colors)
         for (let colorCount = 1; colorCount <= 6; colorCount++) {
             const toggle = document.getElementById(`sp-toggle-${colorCount}color`);
@@ -1266,29 +1325,70 @@ class ScreenPrintPricing {
             effectiveFrontPrintColors = maxAvailableColors;
         }
 
-        if (frontColors > 0) {
-            const frontPricingData = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()];
-            if (frontPricingData?.tiers) {
-                const tier = frontPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
-                if (tier?.prices) {
-                    const sizes = Object.keys(tier.prices);
-                    if (sizes.length > 0) {
-                        pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
-                    }
+        // MANUAL MODE: Calculate price using manual base cost + API pricing rules
+        if (this.config.isManualMode) {
+            const manualBaseCost = parseFloat(document.getElementById('manual-base-cost')?.value) || 0;
+
+            // Find the tier for this quantity from API
+            const tier = this.findTierForQuantity(quantity, pricingData.tierData);
+
+            if (tier && manualBaseCost > 0) {
+                // Apply margin from API
+                const garmentWithMargin = manualBaseCost / tier.MarginDenominator;
+
+                // Get print cost from API
+                let printCost = 0;
+                if (frontColors > 0) {
+                    printCost = this.getPrintCostFromAPI(pricingData, tier.TierLabel, effectiveFrontPrintColors, 'PrimaryLocation');
                 }
+
+                // Apply flash charge from API if needed
+                const flashCharge = (effectiveFrontPrintColors > 1) ? parseFloat(pricingData.rulesR?.FlashCharge || 0) : 0;
+
+                // Calculate base price
+                const subtotal = garmentWithMargin + printCost + flashCharge;
+
+                // Round using API rounding rule (HalfDollarCeil_Final)
+                pricing.basePrice = Math.ceil(subtotal * 2) / 2;
+
+                console.log('[Manual] Calculated:', {
+                    baseCost: manualBaseCost,
+                    margin: tier.MarginDenominator,
+                    garmentWithMargin: garmentWithMargin.toFixed(2),
+                    printCost,
+                    flashCharge,
+                    subtotal: subtotal.toFixed(2),
+                    finalPrice: pricing.basePrice
+                });
+            } else {
+                pricing.basePrice = 0;
             }
         } else {
-            const garmentOnlyPricingData = pricingData.primaryLocationPricing?.["0"];
-            if (garmentOnlyPricingData?.tiers) {
-                 const tier = garmentOnlyPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
-                 if (tier?.prices) {
-                     const sizes = Object.keys(tier.prices);
-                     if (sizes.length > 0) {
-                         pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
-                     }
-                 }
+            // AUTOMATED MODE: Use product API prices
+            if (frontColors > 0) {
+                const frontPricingData = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()];
+                if (frontPricingData?.tiers) {
+                    const tier = frontPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                    if (tier?.prices) {
+                        const sizes = Object.keys(tier.prices);
+                        if (sizes.length > 0) {
+                            pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
+                        }
+                    }
+                }
             } else {
-                pricing.basePrice = 0; 
+                const garmentOnlyPricingData = pricingData.primaryLocationPricing?.["0"];
+                if (garmentOnlyPricingData?.tiers) {
+                     const tier = garmentOnlyPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
+                     if (tier?.prices) {
+                         const sizes = Object.keys(tier.prices);
+                         if (sizes.length > 0) {
+                             pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
+                         }
+                     }
+                } else {
+                    pricing.basePrice = 0;
+                }
             }
         }
 
@@ -1916,7 +2016,7 @@ class ScreenPrintPricing {
         // Toggle prices removed - only "STEP 3: YOUR PRICE" display shows pricing
 
         this.updateDisplay();
-        
+
         if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
             this.updatePricingTiers();
         }
@@ -1925,19 +2025,91 @@ class ScreenPrintPricing {
         }
     }
 
-    // Helper: Find tier for given quantity
+    /**
+     * MANUAL MODE: Transform raw API data to expected calculator structure
+     * Raw API returns arrays (tiersR, allScreenprintCostsR)
+     * Calculator expects objects (tierData, primaryLocationPricing)
+     */
+    transformRawAPIData(rawData) {
+        console.log('[Manual] Transforming raw API data...');
+
+        // Convert tiersR array to tierData object keyed by TierLabel
+        const tierData = {};
+        if (rawData.tiersR && Array.isArray(rawData.tiersR)) {
+            rawData.tiersR.forEach(tier => {
+                tierData[tier.TierLabel] = tier;
+            });
+        }
+
+        // Determine available color counts from allScreenprintCostsR
+        const colorCounts = new Set();
+        if (rawData.allScreenprintCostsR && Array.isArray(rawData.allScreenprintCostsR)) {
+            rawData.allScreenprintCostsR.forEach(cost => {
+                if (cost.CostType === 'PrimaryLocation') {
+                    colorCounts.add(cost.ColorCount);
+                }
+            });
+        }
+        const availableColorCounts = Array.from(colorCounts).sort((a, b) => a - b);
+
+        // Create primaryLocationPricing structure for color detection
+        const primaryLocationPricing = {};
+        availableColorCounts.forEach(count => {
+            primaryLocationPricing[count] = true;
+        });
+
+        console.log('[Manual] Transformation complete:', {
+            tierCount: Object.keys(tierData).length,
+            availableColors: availableColorCounts,
+            maxColors: Math.max(...availableColorCounts)
+        });
+
+        // Return transformed data with both raw and processed structures
+        return {
+            ...rawData,
+            tierData: tierData,
+            availableColorCounts: availableColorCounts,
+            primaryLocationPricing: primaryLocationPricing
+        };
+    }
+
+    // MANUAL MODE HELPER: Find tier for given quantity
     findTierForQuantity(quantity, tierData) {
         // Handle both array (tiersR) and object (tierData) formats
         const tiers = Array.isArray(tierData) ? tierData : Object.values(tierData);
 
         for (const tier of tiers) {
             if (quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity) {
-                console.log(`[ScreenPrintV2] Found tier for qty ${quantity}:`, tier.TierLabel);
+                console.log(`[Manual] Found tier for qty ${quantity}:`, tier.TierLabel);
                 return tier;
             }
         }
-        console.warn(`[ScreenPrintV2] No tier found for quantity ${quantity}`);
+        console.warn(`[Manual] No tier found for quantity ${quantity}`);
         return null;
+    }
+
+    // MANUAL MODE HELPER: Get print cost from API data
+    getPrintCostFromAPI(pricingData, tierLabel, colorCount, locationType) {
+        // Find print cost from allScreenprintCostsR array
+        const printCosts = pricingData.allScreenprintCostsR;
+        if (!printCosts) {
+            console.warn('[Manual] No print costs available in API data');
+            return 0;
+        }
+
+        const cost = printCosts.find(c =>
+            c.TierLabel === tierLabel &&
+            c.ColorCount === colorCount &&
+            c.CostType === locationType
+        );
+
+        if (cost) {
+            console.log(`[Manual] Print cost for ${tierLabel}, ${colorCount} colors, ${locationType}:`, cost.BasePrintCost);
+            return parseFloat(cost.BasePrintCost);
+        } else {
+            console.warn(`[Manual] No print cost found for ${tierLabel}, ${colorCount} colors, ${locationType}`);
+            return 0;
+        }
     }
 }
 
