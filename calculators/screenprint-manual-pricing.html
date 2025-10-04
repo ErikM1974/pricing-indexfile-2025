@@ -52,6 +52,9 @@
     <!-- Screen Print Toggle Styles - NEW for Phase 1 -->
     <link rel="stylesheet" href="/shared_components/css/screenprint-toggle-styles.css">
 
+    <!-- Manual Calculator Shared Styles (includes header, breadcrumb, logo styles) -->
+    <link rel="stylesheet" href="manual-calculator-styles.css">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -161,19 +164,49 @@
             opacity: 0.9;
             margin: 0;
         }
+
+        /* Breadcrumb text needs to be white on green background - ONLY for this page */
+        body.screenprint-manual-pricing .header .breadcrumb {
+            color: white !important;
+        }
+
+        body.screenprint-manual-pricing .header .breadcrumb a {
+            color: white !important;
+        }
+
+        body.screenprint-manual-pricing .header .breadcrumb a:hover {
+            color: #e0e0e0 !important;
+            text-decoration: underline;
+        }
+
+        body.screenprint-manual-pricing .header .breadcrumb span {
+            color: white !important;
+        }
     </style>
 </head>
-<body>
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
+<body class="screenprint-manual-pricing">
+    <!-- Header with Breadcrumb Navigation -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Manual Screen Print Pricing</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Title -->
+        <div class="calculator-title text-center mb-4">
             <h1><i class="fas fa-calculator"></i> Manual Screen Print Pricing Calculator</h1>
             <p>Calculate pricing for screen printing on customer-supplied items</p>
         </div>
-    </div>
-
-    <!-- Main Container -->
-    <div class="container mb-5">
 
         <!-- Manual Cost Input Section -->
         <div class="manual-cost-section">
