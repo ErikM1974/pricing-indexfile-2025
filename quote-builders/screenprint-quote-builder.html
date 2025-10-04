@@ -521,14 +521,191 @@
         color: #92400e;
     }
 
+    /* Product Total Row - DOMINANT */
     .product-total-row {
         display: flex;
         justify-content: space-between;
-        padding-top: 0.75rem;
-        margin-top: 0.75rem;
-        border-top: 2px solid #2d5f3f;
-        font-size: 1.05rem;
-        color: #2d5f3f;
+        align-items: center;
+        padding: 1rem 0.75rem;
+        margin-top: 1.25rem;
+        border-top: 3px solid #047857;
+        font-size: 1.25rem;
+        color: #065f46;
+        background: linear-gradient(to right, #d1fae5, transparent);
+        border-radius: 8px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    /* Transparent Pricing Breakdown Styles - A+ PREMIUM QUALITY */
+
+    /* Product Quantity Badge - Premium Gradient */
+    .product-qty-badge {
+        background: linear-gradient(135deg, #047857, #059669);
+        color: white;
+        padding: 0.375rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-left: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        box-shadow: 0 2px 4px rgba(4, 120, 87, 0.3);
+    }
+
+    /* Breakdown Section - Premium Container */
+    .pricing-breakdown-section {
+        background: #f0fdf4;
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.25rem 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Breakdown Header - Professional */
+    .breakdown-header {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #065f46;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #10b981;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .size-breakdown-transparent {
+        margin-bottom: 1rem;
+    }
+
+    /* Size Pricing Detail - Professional Spacing */
+    .size-pricing-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        padding: 0.875rem;
+        margin-bottom: 0.875rem;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #d1fae5;
+        transition: all 0.15s ease;
+    }
+
+    .size-pricing-detail:hover {
+        background: #ecfdf5;
+        border-color: #6ee7b7;
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Size Label - BOLD & DARK */
+    .size-label {
+        font-weight: 700;
+        color: #065f46;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.375rem;
+    }
+
+    /* Price Calculation - Better Alignment */
+    .price-calculation {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.625rem;
+        font-size: 0.9rem;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    /* Base Price - LIGHTER (less important) */
+    .base-price {
+        font-weight: 500;
+        color: #4b5563;
+        font-size: 0.9rem;
+    }
+
+    /* Plus/Equals Signs - DARKER */
+    .price-plus, .price-equals {
+        color: #6b7280;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Safety Stripes - STRONGER RED */
+    .safety-stripes {
+        color: #b91c1c;
+        font-weight: 600;
+        background: #fecaca;
+        padding: 0.25rem 0.625rem;
+        border-radius: 6px;
+        border: 1px solid #fca5a5;
+    }
+
+    /* Additional Locations - STRONGER ORANGE */
+    .additional-loc {
+        color: #c2410c;
+        font-weight: 600;
+        background: #fed7aa;
+        padding: 0.25rem 0.625rem;
+        border-radius: 6px;
+        border: 1px solid #fdba74;
+    }
+
+    /* Unit Total (Green Pill) - WHITE TEXT, DARK GREEN */
+    .unit-total {
+        font-weight: 700;
+        color: white;
+        background: #059669;
+        padding: 0.375rem 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3);
+    }
+
+    /* Subtotal Arrow - DOMINANT */
+    .size-subtotal {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #047857;
+        letter-spacing: -0.025em;
+        margin-left: auto;
+    }
+
+    /* Mobile Responsive Adjustments for Premium Pricing */
+    @media (max-width: 768px) {
+        .price-calculation {
+            font-size: 0.825rem;
+            gap: 0.5rem;
+        }
+
+        .size-label {
+            font-size: 0.9rem;
+        }
+
+        .size-subtotal {
+            font-size: 1rem;
+        }
+
+        .unit-total {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .breakdown-header {
+            font-size: 1rem;
+        }
+
+        .product-total-row {
+            font-size: 1.125rem;
+            padding: 0.875rem 0.625rem;
+        }
+
+        .size-pricing-detail:hover {
+            transform: none; /* Disable slide on mobile */
+        }
     }
 
     /* ========================================
@@ -2520,63 +2697,82 @@
                         <div class="product-summary-item">
                             <div class="product-header">
                                 <strong>${p.styleNumber} - ${p.color}</strong>
+                                <span class="product-qty-badge">${p.quantity} pieces</span>
                             </div>
-                            <div class="size-breakdown-pricing">
-                                ${(() => {
-                                    // Group sizes by same unit price
-                                    const priceGroups = {};
-                                    const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
 
-                                    Object.entries(p.sizesPricing).forEach(([size, pricing]) => {
-                                        const priceKey = pricing.unitPrice.toFixed(2);
-                                        if (!priceGroups[priceKey]) {
-                                            priceGroups[priceKey] = {
-                                                sizes: [],
-                                                quantity: 0,
-                                                unitPrice: pricing.unitPrice,
-                                                subtotal: 0
-                                            };
-                                        }
-                                        priceGroups[priceKey].sizes.push(size);
-                                        priceGroups[priceKey].quantity += pricing.quantity;
-                                        priceGroups[priceKey].subtotal += pricing.subtotal;
-                                    });
+                            <div class="pricing-breakdown-section">
+                                <div class="breakdown-header">💰 Pricing Breakdown</div>
 
-                                    // Sort groups by price and display
-                                    return Object.values(priceGroups)
-                                        .sort((a, b) => a.unitPrice - b.unitPrice)
-                                        .map(group => {
-                                            // Sort sizes within group
-                                            group.sizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+                                <!-- Size Distribution with Transparent Pricing -->
+                                <div class="size-breakdown-transparent">
+                                    <strong style="color: #2d5f3f; display: block; margin-bottom: 8px;">Size Distribution:</strong>
+                                    ${(() => {
+                                        // Group sizes by their total unit price (base + safety + additional)
+                                        const priceGroups = {};
+                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
 
-                                            // Create size range display (e.g., "S-XL" or "3XL")
-                                            const sizeDisplay = group.sizes.length > 1
-                                                ? `${group.sizes[0]}-${group.sizes[group.sizes.length - 1]}`
-                                                : group.sizes[0];
+                                        Object.entries(p.sizesPricing).forEach(([size, pricing]) => {
+                                            const totalUnitPrice = pricing.basePrice + pricing.safetyStripesPerPiece + p.additionalCost;
+                                            const priceKey = totalUnitPrice.toFixed(2);
 
-                                            return `
-                                                <div class="size-pricing-row">
-                                                    <span><strong>${sizeDisplay}</strong> (${group.quantity} pcs):</span>
-                                                    <span>$${group.unitPrice.toFixed(2)} each = $${group.subtotal.toFixed(2)}</span>
-                                                </div>
-                                            `;
-                                        }).join('');
-                                })()}
+                                            if (!priceGroups[priceKey]) {
+                                                priceGroups[priceKey] = {
+                                                    sizes: [],
+                                                    quantity: 0,
+                                                    basePrice: pricing.basePrice,
+                                                    safetyStripes: pricing.safetyStripesPerPiece,
+                                                    additionalCost: p.additionalCost,
+                                                    totalUnitPrice: totalUnitPrice,
+                                                    subtotal: 0
+                                                };
+                                            }
+                                            priceGroups[priceKey].sizes.push(size);
+                                            priceGroups[priceKey].quantity += pricing.quantity;
+                                            priceGroups[priceKey].subtotal += pricing.quantity * totalUnitPrice;
+                                        });
+
+                                        // Display grouped sizes
+                                        return Object.values(priceGroups)
+                                            .sort((a, b) => a.totalUnitPrice - b.totalUnitPrice)
+                                            .map(group => {
+                                                // Sort sizes within group
+                                                group.sizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+
+                                                // Create size range display (e.g., "S-XL" or "3XL")
+                                                const sizeDisplay = group.sizes.length > 1
+                                                    ? `${group.sizes[0]}-${group.sizes[group.sizes.length - 1]}`
+                                                    : group.sizes[0];
+
+                                                const hasSafetyStripes = group.safetyStripes > 0;
+                                                const hasAdditional = group.additionalCost > 0;
+
+                                                return `
+                                                    <div class="size-pricing-detail">
+                                                        <div class="size-label">${sizeDisplay} (${group.quantity} pcs)</div>
+                                                        <div class="price-calculation">
+                                                            <span class="base-price">$${group.basePrice.toFixed(2)}</span>
+                                                            ${hasSafetyStripes ? `
+                                                                <span class="price-plus">+</span>
+                                                                <span class="safety-stripes">$${group.safetyStripes.toFixed(2)} safety stripes</span>
+                                                            ` : ''}
+                                                            ${hasAdditional ? `
+                                                                <span class="price-plus">+</span>
+                                                                <span class="additional-loc">$${group.additionalCost.toFixed(2)} add'l locations</span>
+                                                            ` : ''}
+                                                            <span class="price-equals">=</span>
+                                                            <span class="unit-total">$${group.totalUnitPrice.toFixed(2)}/pc</span>
+                                                            <span class="size-subtotal">→ $${group.subtotal.toFixed(2)}</span>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }).join('');
+                                    })()}
+                                </div>
+
                             </div>
-                            ${p.totalAdditionalCost > 0 ? `
-                                <div class="additional-locations-cost">
-                                    <span>Additional Locations (${this.printSetup.additionalLocations.length}):</span>
-                                    <span>${p.quantity} pcs × $${p.additionalCost.toFixed(2)} = $${p.totalAdditionalCost.toFixed(2)}</span>
-                                </div>
-                            ` : ''}
-                            ${p.totalSafetyStripesCost > 0 ? `
-                                <div class="additional-locations-cost">
-                                    <span>Safety Stripes Surcharge:</span>
-                                    <span>${p.quantity} pcs × $${p.safetyStripesCostPerPiece.toFixed(2)} = $${p.totalSafetyStripesCost.toFixed(2)}</span>
-                                </div>
-                            ` : ''}
+
                             <div class="product-total-row">
-                                <span><strong>Product Total:</strong></span>
+                                <span><strong>Product Subtotal:</strong></span>
                                 <span><strong>$${p.lineTotal.toFixed(2)}</strong></span>
                             </div>
                         </div>
@@ -2660,18 +2856,36 @@
                 };
             }
 
-            // Calculate pricing per size (NEW: individual size pricing instead of weighted average)
+            // Calculate safety stripes surcharge per piece FIRST (so we can include it in unit prices)
+            let safetyStripesSurchargePerPiece = 0;
+
+            // Add surcharge for front if has safety stripes and printing
+            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
+                safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+            }
+
+            // Add surcharge for each additional location with safety stripes and printing
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.hasSafetyStripes && loc.colors > 0) {
+                    safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+                }
+            });
+
+            // Calculate pricing per size - store base price and safety stripes separately for transparent display
             const sizesPricing = {};
             Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
-                const sizePrice = parseFloat(tier.prices[size]) || parseFloat(tier.prices['S']) || 0;
+                const baseSizePrice = parseFloat(tier.prices[size]) || parseFloat(tier.prices['S']) || 0;
+                const unitPriceWithSafetyStripes = baseSizePrice + safetyStripesSurchargePerPiece;
                 sizesPricing[size] = {
                     quantity: qty,
-                    unitPrice: sizePrice,
-                    subtotal: sizePrice * qty
+                    basePrice: baseSizePrice,  // Store base garment price
+                    safetyStripesPerPiece: safetyStripesSurchargePerPiece,  // Store safety stripes amount
+                    unitPrice: unitPriceWithSafetyStripes,  // Total per piece (base + safety)
+                    subtotal: unitPriceWithSafetyStripes * qty
                 };
             });
 
-            // Calculate base cost subtotal from individual sizes
+            // Calculate base cost subtotal from individual sizes (already includes safety stripes)
             const baseCostSubtotal = Object.values(sizesPricing).reduce((sum, s) => sum + s.subtotal, 0);
 
             // Add additional locations cost (per-piece, applies to all pieces)
@@ -2694,24 +2908,10 @@
                 }
             });
 
-            // Calculate safety stripes surcharge per piece
-            let safetyStripesSurchargePerPiece = 0;
-
-            // Add surcharge for front if has safety stripes and printing
-            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
-                safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
-            }
-
-            // Add surcharge for each additional location with safety stripes and printing
-            this.printSetup.additionalLocations.forEach(loc => {
-                if (loc.hasSafetyStripes && loc.colors > 0) {
-                    safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
-                }
-            });
-
             const totalAdditionalCost = additionalCostPerPiece * product.quantity;
             const totalSafetyStripesCost = safetyStripesSurchargePerPiece * product.quantity;
-            const lineTotal = baseCostSubtotal + totalAdditionalCost + totalSafetyStripesCost;
+            // baseCostSubtotal now includes safety stripes, so don't add totalSafetyStripesCost again
+            const lineTotal = baseCostSubtotal + totalAdditionalCost;
             const perShirtTotal = lineTotal / product.quantity;
 
             return {
