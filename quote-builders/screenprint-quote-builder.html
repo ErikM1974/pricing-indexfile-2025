@@ -1238,7 +1238,7 @@
                         <div class="dark-garment-section">
                             <div class="dark-garment-toggle">
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="dark-garment-toggle">
+                                    <input type="checkbox" id="dark-garment-toggle" checked>
                                     <span class="toggle-slider"></span>
                                 </label>
                                 <div>
@@ -1514,7 +1514,7 @@
             // Print setup state
             this.printSetup = {
                 frontColors: 1, // Default to 1 color for cleaner starting point
-                isDarkGarment: false,
+                isDarkGarment: true,  // Default to dark garment (most common use case)
                 frontHasSafetyStripes: false,
                 safetyStripeSurcharge: 2.00, // $2.00 per location per piece
                 additionalLocations: []

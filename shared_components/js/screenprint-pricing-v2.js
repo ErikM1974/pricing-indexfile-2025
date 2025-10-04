@@ -2,6 +2,25 @@
  * Screen Print Pricing V2 - Complete Refactor
  * Single file handling all UI and calculations
  * Clear, maintainable, no legacy code
+ *
+ * ⚠️ CRITICAL: PRICING SYNCHRONIZATION REQUIRED
+ *
+ * This file is the SOURCE OF TRUTH for Screen Print pricing calculations.
+ *
+ * If you modify pricing logic here, you MUST update:
+ * - /shared_components/js/screenprint-manual-pricing.js (Manual Calculator)
+ *
+ * Key areas that must stay synchronized:
+ * 1. Flash charge application (per color, to ALL colors)
+ * 2. Dark garment toggle default (defaults to ON/true)
+ * 3. Primary location pricing (flash + margin calculation)
+ * 4. Additional location pricing (use BasePrintCost as-is, margin included)
+ * 5. Order summary (currently disabled)
+ * 6. Setup fee calculations
+ * 7. LTM fee logic
+ * 8. Safety stripes implementation
+ *
+ * Last synchronized: 2025-10-04
  */
 
 class ScreenPrintPricing {

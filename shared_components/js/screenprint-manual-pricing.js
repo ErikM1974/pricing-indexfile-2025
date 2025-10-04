@@ -2,6 +2,27 @@
  * Screen Print Manual Pricing - Based on V2
  * Modified for manual base cost input
  * Uses API for all pricing rules, margins, LTM fees
+ *
+ * ⚠️ CRITICAL: PRICING SYNCHRONIZATION REQUIRED
+ *
+ * This file MUST stay synchronized with the Screen Print pricing source of truth.
+ *
+ * Source of Truth: /shared_components/js/screenprint-pricing-v2.js
+ *
+ * Before modifying pricing logic, check if changes exist in source file.
+ * After modifying source file, update this file to match.
+ *
+ * Key areas that must stay synchronized:
+ * 1. Flash charge application (per color, to ALL colors)
+ * 2. Dark garment toggle default (defaults to ON/true)
+ * 3. Primary location pricing (flash + margin calculation)
+ * 4. Additional location pricing (use BasePrintCost as-is, margin included)
+ * 5. Order summary (currently disabled)
+ * 6. Setup fee calculations
+ * 7. LTM fee logic
+ * 8. Safety stripes implementation
+ *
+ * Last synchronized: 2025-10-04
  */
 
 class ScreenPrintManualPricing {
@@ -40,7 +61,7 @@ class ScreenPrintManualPricing {
             frontColors: 1,
             frontHasSafetyStripes: false,
             additionalLocations: [], // [{location: 'back', colors: 2, hasSafetyStripes: false}, ...]
-            isDarkGarment: false,
+            isDarkGarment: true,  // Default to dark garment (most common use case)
             garmentColor: '',
             styleNumber: '',
             productTitle: '',
@@ -78,6 +99,7 @@ class ScreenPrintManualPricing {
         this.cacheElements();
         this.createUI();
         this.bindEvents();
+        this.updateDarkGarmentToggleUI();  // Ensure toggle shows active state on load
 
         // MANUAL MODE: Load raw API data (bypass service calculation that needs sizes)
         if (this.config.isManualMode) {
@@ -173,8 +195,8 @@ class ScreenPrintManualPricing {
                 <h3 class="sp-title">Screen Print Pricing Calculator</h3>
 
                 <!-- Dark Garment Toggle - Positioned at Top -->
-                <div class="sp-dark-garment-section-top">
-                    <div class="sp-dark-garment-toggle" id="sp-dark-garment-toggle">
+                <div class="sp-dark-garment-section-top${this.state.isDarkGarment ? ' active' : ''}">
+                    <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
                             <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon"></i>
@@ -1155,14 +1177,9 @@ class ScreenPrintManualPricing {
     }
 
     updateGarmentColor(color) {
+        // Simply store the color name without affecting dark garment state
+        // Dark garment toggle always defaults to ON (user can manually change it)
         this.state.garmentColor = color;
-        const isDark = this.config.darkColors.some(dark => 
-            color.toLowerCase().includes(dark.toLowerCase())
-        );
-        this.state.isDarkGarment = isDark;
-        if (this.elements.darkGarmentCheckbox) {
-            this.elements.darkGarmentCheckbox.checked = isDark;
-        }
         this.updateDisplay();
     }
     
@@ -1382,11 +1399,12 @@ class ScreenPrintManualPricing {
                     printCost = this.getPrintCostFromAPI(pricingData, tier.TierLabel, effectiveFrontPrintColors, 'PrimaryLocation');
                 }
 
-                // Apply flash charge from API if needed
-                const flashCharge = (effectiveFrontPrintColors > 1) ? parseFloat(pricingData.rulesR?.FlashCharge || 0) : 0;
+                // Apply flash charge PER COLOR (applies to ALL colors, including 1-color)
+                const flashChargePerColor = parseFloat(pricingData.rulesR?.FlashCharge || 0);
+                const flashChargeTotal = flashChargePerColor * effectiveFrontPrintColors;
 
-                // Apply margin to primary location print cost (matches quote builder logic)
-                const printCostWithMargin = (printCost + flashCharge) / tier.MarginDenominator;
+                // Apply margin to primary location print cost (matches pricing-v2.js logic)
+                const printCostWithMargin = (printCost + flashChargeTotal) / tier.MarginDenominator;
 
                 // Store separate components for detailed breakdown
                 pricing.garmentCost = Math.ceil(garmentWithMargin * 2) / 2;  // Rounded garment cost
@@ -1403,7 +1421,7 @@ class ScreenPrintManualPricing {
                     margin: tier.MarginDenominator,
                     garmentWithMargin: garmentWithMargin.toFixed(2),
                     printCost,
-                    flashCharge,
+                    flashChargeTotal,
                     printCostWithMargin: printCostWithMargin.toFixed(2),
                     subtotal: subtotal.toFixed(2),
                     garmentCost: pricing.garmentCost,
@@ -1579,6 +1597,21 @@ class ScreenPrintManualPricing {
         pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
 
         return pricing;
+    }
+
+    updateDarkGarmentToggleUI() {
+        const toggle = document.getElementById('sp-dark-garment-toggle');
+        const section = document.querySelector('.sp-dark-garment-section-top');
+
+        if (!toggle) return;
+
+        if (this.state.isDarkGarment) {
+            toggle.classList.add('active');
+            section?.classList.add('active');
+        } else {
+            toggle.classList.remove('active');
+            section?.classList.remove('active');
+        }
     }
 
     updateDisplay() {

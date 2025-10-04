@@ -2,6 +2,20 @@
  * Screen Print Pricing Service
  * Direct API implementation for screen print pricing
  * Implements exact pricing logic from XML specifications
+ *
+ * ⚠️ SHARED SERVICE - Used by Multiple Pages
+ *
+ * This service is used by BOTH:
+ * - /calculators/screen-print-pricing.html (Source of Truth)
+ * - /calculators/screenprint-manual-pricing.html (Manual Calculator)
+ *
+ * Changes to pricing calculations here affect both pages.
+ *
+ * Key pricing logic implemented here:
+ * - Flash charge per color calculation (ALL colors)
+ * - Primary location: base cost + flash, then apply margin
+ * - Additional location: use BasePrintCost as-is (margin included)
+ * - Rounding: HalfDollarCeil_Final (round UP to $0.50)
  */
 
 class ScreenPrintPricingService {
