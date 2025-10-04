@@ -1358,6 +1358,14 @@
                 // Show the product hero section
                 document.querySelector('.product-hero-section').style.display = 'block';
             });
+
+            // Initialize Screen Print Calculator
+            if (typeof ScreenPrintPricing !== 'undefined') {
+                window.screenPrintCalculator = new ScreenPrintPricing();
+                console.log('[ScreenPrintV2] Calculator initialized');
+            } else {
+                console.error('[ScreenPrintV2] ScreenPrintPricing class not found!');
+            }
         });
 
         // Extract brand name from product title
@@ -1753,7 +1761,185 @@
                 }
             }
         };
-        
+
+        // Pricing Report Generator for Testing/Verification
+        window.SCREENPRINT_DEBUG = {
+            getPricingReport: function() {
+                const calculator = window.screenPrintCalculator;
+                if (!calculator) {
+                    console.error('❌ Calculator not initialized');
+                    return 'ERROR: Calculator not initialized';
+                }
+
+                const state = calculator.state;
+                const pricing = calculator.calculatePricing();
+                const pricingData = state.pricingData || state.masterBundle;
+
+                // Build comprehensive report
+                let report = '\n';
+                report += '═══════════════════════════════════════════════════════════\n';
+                report += '          SCREEN PRINT PRICING CALCULATION REPORT          \n';
+                report += '═══════════════════════════════════════════════════════════\n\n';
+
+                // Product Information
+                report += '📦 PRODUCT DETAILS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Style Number: ${state.styleNumber || 'Not set'}\n`;
+                report += `Product Title: ${state.productTitle || 'Not set'}\n`;
+                report += `Color: ${state.productColor || 'Not set'}\n`;
+                report += `Garment Type: ${state.garmentType || 'Not set'}\n\n`;
+
+                // Selection Details
+                report += '🎨 SELECTIONS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Quantity: ${state.quantity}\n`;
+                report += `Front Colors: ${state.frontColors}\n`;
+                report += `Back Colors: ${state.backColors}\n`;
+                report += `Primary Location: ${state.primaryLocation || 'Front'}\n`;
+                if (state.hasAdditionalLocations) {
+                    report += `Additional Locations: ${JSON.stringify(state.additionalLocations || [])}\n`;
+                }
+                report += `Safety Stripes: ${state.hasSafetyStripes ? 'Yes' : 'No'}\n\n`;
+
+                // Base Pricing Data
+                report += '💰 BASE PRICING DATA (from API):\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                if (pricingData && pricingData.sizes) {
+                    const sizes = pricingData.sizes;
+                    const baseCost = Math.min(...sizes.map(s => s.price).filter(p => p > 0));
+                    report += `Garment Sizes Available: ${sizes.map(s => s.size).join(', ')}\n`;
+                    report += `Base Garment Cost (lowest): $${baseCost.toFixed(2)}\n`;
+                }
+                if (pricingData && pricingData.tiersR) {
+                    const currentTier = pricingData.tiersR.find(t =>
+                        state.quantity >= t.MinQuantity && state.quantity <= t.MaxQuantity
+                    );
+                    if (currentTier) {
+                        report += `Current Tier: ${currentTier.TierLabel}\n`;
+                        report += `Margin Denominator: ${currentTier.MarginDenominator}\n`;
+                        report += `LTM Fee: $${currentTier.LTM_Fee || 0}\n`;
+                    }
+                }
+                report += '\n';
+
+                // Print Costs
+                report += '🖨️ PRINT COSTS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                if (pricing.frontPrintCost) {
+                    report += `Front Print (${state.frontColors} color${state.frontColors !== 1 ? 's' : ''}): $${pricing.frontPrintCost.toFixed(2)}\n`;
+                }
+                if (pricing.backPrintCost) {
+                    report += `Back Print (${state.backColors} color${state.backColors !== 1 ? 's' : ''}): $${pricing.backPrintCost.toFixed(2)}\n`;
+                }
+                if (pricing.additionalLocationsCost && pricing.additionalLocationsCost > 0) {
+                    report += `Additional Locations: $${pricing.additionalLocationsCost.toFixed(2)}\n`;
+                }
+                if (pricing.safetyStripesCost && pricing.safetyStripesCost > 0) {
+                    report += `Safety Stripes: $${pricing.safetyStripesCost.toFixed(2)}\n`;
+                }
+                report += '\n';
+
+                // Calculation Breakdown - Enhanced with raw API values
+                report += '🧮 CALCULATION BREAKDOWN:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+
+                // Get debug data if available
+                const debugData = pricingData?.debug || {};
+                const currentTier = this.findTierForQuantity(state.quantity, pricingData?.tierData);
+
+                if (currentTier) {
+                    const marginDenom = currentTier.MarginDenominator;
+                    const markupPercent = ((1 / marginDenom - 1) * 100).toFixed(0);
+                    report += `Quantity Tier: ${currentTier.TierLabel}\n`;
+                    report += `Margin Denominator: ${marginDenom}\n`;
+                    report += `Markup: ${markupPercent}%\n\n`;
+                }
+
+                // Garment calculation breakdown
+                if (pricing.garmentCost !== undefined) {
+                    const baseGarmentCost = debugData.baseGarmentCost || 0;
+                    const marginDenom = currentTier?.MarginDenominator || 0.5;
+                    const beforeRounding = baseGarmentCost / marginDenom;
+
+                    report += 'GARMENT CALCULATION:\n';
+                    report += `  1. Base Cost (from API): $${baseGarmentCost.toFixed(2)}\n`;
+                    report += `  2. Apply Margin (÷ ${marginDenom}): $${beforeRounding.toFixed(2)}\n`;
+                    report += `  3. Round Up to $0.50: $${pricing.garmentCost.toFixed(2)}\n\n`;
+                }
+
+                // Print calculation breakdown
+                if (pricing.frontPrintCost !== undefined && state.frontColors > 0) {
+                    // Find base print cost from debug data
+                    const basePrintEntry = debugData.basePrintCosts?.find(c =>
+                        c.TierLabel === currentTier?.TierLabel &&
+                        c.ColorCount === state.frontColors &&
+                        c.CostType === 'PrimaryLocation'
+                    );
+
+                    const basePrintCost = basePrintEntry?.BasePrintCost || 0;
+                    // Flash charge is now PER COLOR (simplified - applied to all garments)
+                    const flashChargePerColor = debugData.flashCharge || 0;
+                    const flashChargeTotal = flashChargePerColor * state.frontColors;
+                    const totalCost = basePrintCost + flashChargeTotal;
+                    const marginDenom = currentTier?.MarginDenominator || 0.5;
+                    const beforeRounding = totalCost / marginDenom;
+
+                    report += `PRINT CALCULATION (Front ${state.frontColors} color${state.frontColors !== 1 ? 's' : ''}):\n`;
+                    report += `  1. Base Print Cost (from API): $${basePrintCost.toFixed(2)}\n`;
+                    report += `  2. Flash Charge ($${flashChargePerColor.toFixed(2)} × ${state.frontColors} colors): $${flashChargeTotal.toFixed(2)}\n`;
+                    report += `  3. Total Cost: $${totalCost.toFixed(2)}\n`;
+                    report += `  4. Apply Margin (÷ ${marginDenom}): $${beforeRounding.toFixed(2)}\n`;
+                    report += `  5. Round Up to $0.50: $${pricing.frontPrintCost.toFixed(2)}\n\n`;
+                }
+
+                report += `Rounding Method: ${debugData.roundingMethod || 'HalfDollarCeil_Final'} (always round UP)\n`;
+                report += '\n';
+
+                // Final Totals
+                report += '💵 FINAL TOTALS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Unit Price: $${pricing.perShirtTotal ? pricing.perShirtTotal.toFixed(2) : '0.00'}\n`;
+                report += `Subtotal (${state.quantity} × $${pricing.perShirtTotal ? pricing.perShirtTotal.toFixed(2) : '0.00'}): $${pricing.subtotal ? pricing.subtotal.toFixed(2) : '0.00'}\n`;
+                if (pricing.ltmFee && pricing.ltmFee > 0) {
+                    report += `LTM Fee: $${pricing.ltmFee.toFixed(2)}\n`;
+                }
+                report += `GRAND TOTAL: $${pricing.total ? pricing.total.toFixed(2) : '0.00'}\n`;
+                report += '\n';
+
+                // Pricing Tier Table (if available)
+                if (pricingData && pricingData.tiersR) {
+                    report += '📊 PRICING TIERS (for reference):\n';
+                    report += '─────────────────────────────────────────────────────────\n';
+                    pricingData.tiersR.forEach(tier => {
+                        const isCurrent = state.quantity >= tier.MinQuantity && state.quantity <= tier.MaxQuantity;
+                        const marker = isCurrent ? '→ ' : '  ';
+                        report += `${marker}${tier.TierLabel}: ${tier.MinQuantity}-${tier.MaxQuantity} qty, Margin: ${tier.MarginDenominator}\n`;
+                    });
+                    report += '\n';
+                }
+
+                report += '═══════════════════════════════════════════════════════════\n';
+                report += '✅ Copy the above report to share with Claude for verification\n';
+                report += '═══════════════════════════════════════════════════════════\n';
+
+                console.log(report);
+                return report;
+            },
+
+            // Helper method to find tier for quantity
+            findTierForQuantity: function(quantity, tierData) {
+                if (!tierData) return null;
+
+                for (const tierLabel in tierData) {
+                    const tier = tierData[tierLabel];
+                    if (quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity) {
+                        return tier;
+                    }
+                }
+                return null;
+            }
+        };
+
         // Setup search functionality with API integration
         function setupSearch() {
             const searchInput = document.getElementById('styleSearch');
@@ -1869,39 +2055,28 @@
             console.log('✅ Search functionality initialized');
         }
 
-        // Update products breadcrumb with current style
-        function updateProductsBreadcrumb(styleNumber) {
-            const productsBreadcrumb = document.getElementById('products-breadcrumb');
-            if (productsBreadcrumb && styleNumber) {
-                productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
-                console.log('✅ Updated products breadcrumb with style:', styleNumber);
-            }
-        }
-
         // Store calculator reference when initialized
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize search functionality
             setupSearch();
 
-            // Update breadcrumb with current style from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const styleNumber = urlParams.get('StyleNumber') ||
-                               urlParams.get('styleNumber') ||
-                               urlParams.get('style');
-            if (styleNumber) {
-                updateProductsBreadcrumb(styleNumber);
-            }
-
             setTimeout(() => {
                 if (typeof ScreenPrintPricing !== 'undefined') {
                     window.screenPrintCalculator = new ScreenPrintPricing();
-                    console.log('===================================');
+                    console.log('═══════════════════════════════════════════════════════════');
                     console.log('🚀 Screen Print Pricing System: Direct API Mode');
+                    console.log('═══════════════════════════════════════════════════════════');
                     console.log('📦 API endpoint: /api/pricing-bundle?method=ScreenPrint');
-                    console.log('🧪 Test API: SCREENPRINT_API_TEST.testAPI()');
-                    console.log('📊 Check status: SCREENPRINT_API_TEST.checkStatus()');
-                    console.log('🗑️ Clear cache: SCREENPRINT_API_TEST.clearCache()');
-                    console.log('===================================');
+                    console.log('');
+                    console.log('🧪 Testing Commands:');
+                    console.log('  • SCREENPRINT_API_TEST.testAPI() - Test API endpoint');
+                    console.log('  • SCREENPRINT_API_TEST.checkStatus() - Check service status');
+                    console.log('  • SCREENPRINT_API_TEST.clearCache() - Clear price cache');
+                    console.log('');
+                    console.log('📋 Pricing Report:');
+                    console.log('  • SCREENPRINT_DEBUG.getPricingReport() - Get detailed pricing report');
+                    console.log('    (Select your options first, then run this to copy/paste results)');
+                    console.log('═══════════════════════════════════════════════════════════');
                 }
             }, 100);
         });

@@ -125,43 +125,49 @@ class ScreenPrintPricingService {
         });
         
         // PART 2: Calculate PRINT costs with proper margins
-        const flashCharge = rulesData.FlashCharge ? parseFloat(rulesData.FlashCharge) : 0;
-        console.log('[ScreenPrintPricingService] Flash charge:', flashCharge);
-        
+        // FLASH CHARGE LOGIC:
+        // Flash charge is applied PER COLOR for ALL garments (light or dark)
+        // This simplifies pricing - no need to detect garment color
+        // Formula: flashCharge × colorCount
+        // Example: 3 colors × $0.35 = $1.05 flash charge
+        const flashChargePerColor = rulesData.FlashCharge ? parseFloat(rulesData.FlashCharge) : 0;
+        console.log('[ScreenPrintPricingService] Flash charge per color:', flashChargePerColor);
+
         const printCosts = { PrimaryLocation: {}, AdditionalLocation: {} };
-        
+
         allScreenprintCostsR.forEach(costEntry => {
             const costType = costEntry.CostType;
             const tierLabel = costEntry.TierLabel;
             const colorCount = costEntry.ColorCount;
             const basePrintCost = parseFloat(costEntry.BasePrintCost);
-            
+
             if (!printCosts[costType]) {
                 console.warn('[ScreenPrintPricingService] Unknown cost type:', costType);
                 return;
             }
-            
+
             if (!printCosts[costType][tierLabel]) {
                 printCosts[costType][tierLabel] = {};
             }
-            
+
             let finalPrintCost;
-            
+
             if (costType === 'PrimaryLocation') {
                 // Find the margin denominator for this tier
                 const tier = tiersR.find(t => t.TierLabel === tierLabel);
                 const marginDenom = tier ? parseFloat(tier.MarginDenominator) : 0.5;
-                
-                // Apply margin to primary location (cost + flash charge)
-                const totalCost = basePrintCost + flashCharge;
+
+                // Apply flash charge per color, then margin
+                const flashChargeTotal = flashChargePerColor * colorCount;
+                const totalCost = basePrintCost + flashChargeTotal;
                 finalPrintCost = totalCost / marginDenom;
-                
-                console.log(`[ScreenPrintPricingService] Primary ${tierLabel} ${colorCount}-color: Cost $${totalCost.toFixed(2)} → Sell $${finalPrintCost.toFixed(2)}`);
+
+                console.log(`[ScreenPrintPricingService] Primary ${tierLabel} ${colorCount}-color: Base $${basePrintCost.toFixed(2)} + Flash ($${flashChargePerColor} × ${colorCount}) = $${totalCost.toFixed(2)} → Sell $${finalPrintCost.toFixed(2)}`);
             } else {
                 // Additional locations already have margin built in - use as is
                 finalPrintCost = basePrintCost;
             }
-            
+
             printCosts[costType][tierLabel][colorCount] = finalPrintCost;
         });
         
@@ -296,24 +302,35 @@ class ScreenPrintPricingService {
             styleNumber: apiData.styleNumber || '',
             embellishmentType: 'screenprint',
             timestamp: new Date().toISOString(),
-            
+
             // Raw data
             tierData: tierData,
             rulesData: apiData.rulesR || apiData.rulesData,
             sizes: apiData.sizes,
             sellingPriceDisplayAddOns: apiData.sellingPriceDisplayAddOns,
             printLocationMeta: apiData.locations || [],
-            
+
             // Calculated data
             uniqueSizes: calculatedData.uniqueSizes,
             availableColorCounts: calculatedData.availableColorCounts,
             garmentSellingPrices: calculatedData.garmentSellingPrices,
             printCosts: calculatedData.printCosts,
             finalPrices: calculatedData.finalPrices,
-            
+
             // Transformed for compatibility
             primaryLocationPricing: primaryLocationPricing,
-            additionalLocationPricing: additionalLocationPricing
+            additionalLocationPricing: additionalLocationPricing,
+
+            // Debug information - raw API values before calculations
+            debug: {
+                baseGarmentCost: apiData.sizes?.find(s => s.size.toUpperCase() === 'S')?.price || apiData.sizes?.[0]?.price || 0,
+                basePrintCosts: apiData.allScreenprintCostsR || [],
+                flashCharge: apiData.rulesR?.FlashCharge || apiData.rulesData?.FlashCharge || 0,
+                roundingMethod: apiData.rulesR?.RoundingMethod || apiData.rulesData?.RoundingMethod || 'HalfDollarCeil_Final',
+                marginDenominators: Object.fromEntries(
+                    apiData.tiersR?.map(t => [t.TierLabel, t.MarginDenominator]) || []
+                )
+            }
         };
 
         console.log('[ScreenPrintPricingService] Bundle transformed for compatibility');

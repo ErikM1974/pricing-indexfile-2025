@@ -39,7 +39,7 @@ class ScreenPrintPricing {
             frontColors: 1,
             frontHasSafetyStripes: false,
             additionalLocations: [], // [{location: 'back', colors: 2, hasSafetyStripes: false}, ...]
-            isDarkGarment: false,
+            isDarkGarment: true,  // Default to dark garment (most common use case)
             garmentColor: '',
             styleNumber: '',
             productTitle: '',
@@ -79,6 +79,7 @@ class ScreenPrintPricing {
         // Initialize UI with defaults
         this.updateColorToggles();  // Highlight default color (1)
         this.updateTierButtons();   // Highlight default tier (37-72)
+        this.updateDarkGarmentToggleUI();  // Set initial dark garment toggle state
 
         this.updateDisplay();
     }
@@ -122,8 +123,8 @@ class ScreenPrintPricing {
                 <h3 class="sp-title">Screen Print Pricing Calculator</h3>
 
                 <!-- Dark Garment Toggle - Positioned at Top -->
-                <div class="sp-dark-garment-section-top">
-                    <div class="sp-dark-garment-toggle" id="sp-dark-garment-toggle">
+                <div class="sp-dark-garment-section-top${this.state.isDarkGarment ? ' active' : ''}">
+                    <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
                             <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon"></i>
@@ -760,6 +761,26 @@ class ScreenPrintPricing {
     }
 
     /**
+     * Update dark garment toggle UI to match state
+     * Called on initialization to set correct visual state
+     */
+    updateDarkGarmentToggleUI() {
+        const toggle = document.getElementById('sp-dark-garment-toggle');
+        const section = document.querySelector('.sp-dark-garment-section-top');
+
+        if (!toggle) return;
+
+        // Set visual state based on current isDarkGarment state
+        if (this.state.isDarkGarment) {
+            toggle.classList.add('active');
+            section?.classList.add('active');
+        } else {
+            toggle.classList.remove('active');
+            section?.classList.remove('active');
+        }
+    }
+
+    /**
      * Determine which tier a quantity falls into
      * @param {number} quantity - The quantity to check
      * @returns {string|null} Tier identifier (e.g., '24-36', '37-72') or null
@@ -1085,14 +1106,9 @@ class ScreenPrintPricing {
     }
 
     updateGarmentColor(color) {
+        // Simply store the color name without affecting dark garment state
+        // Dark garment toggle always defaults to ON (user can manually change it)
         this.state.garmentColor = color;
-        const isDark = this.config.darkColors.some(dark => 
-            color.toLowerCase().includes(dark.toLowerCase())
-        );
-        this.state.isDarkGarment = isDark;
-        if (this.elements.darkGarmentCheckbox) {
-            this.elements.darkGarmentCheckbox.checked = isDark;
-        }
         this.updateDisplay();
     }
     
@@ -2063,6 +2079,13 @@ class ScreenPrintPricing {
 
         if (data.styleNumber) this.state.styleNumber = data.styleNumber;
         if (data.productTitle) this.state.productTitle = data.productTitle;
+
+        // Update breadcrumb Products link with current style (matches DTG behavior)
+        const productsBreadcrumb = document.getElementById('products-breadcrumb');
+        if (productsBreadcrumb && this.state.styleNumber) {
+            productsBreadcrumb.href = `/product.html?style=${this.state.styleNumber}`;
+            console.log('✅ Updated products breadcrumb with style:', this.state.styleNumber);
+        }
 
         // Toggle prices removed - only "STEP 3: YOUR PRICE" display shows pricing
 
