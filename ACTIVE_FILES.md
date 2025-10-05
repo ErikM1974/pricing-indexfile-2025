@@ -106,6 +106,77 @@
 | `/shared_components/css/quote-builder-unified-step1.css` | Step 1 styles | Quote builders | ✅ Active |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
 
+### 🧮 Manual Calculator CSS Architecture
+
+**Shared Foundation:** `/calculators/manual-calculator-styles.css` (655 lines)
+- Provides: Headers, breadcrumbs, forms, buttons, alerts, pricing displays, responsive design, print styles
+- Color Theme: NWCA Green (#4cb354)
+- Used by: DTG, DTF, Embroidery, Laser manual calculators
+
+**⚠️ IMPORTANT:** These calculators were built independently over time. Each works correctly but uses different CSS approaches. **Leave as-is unless broken.**
+
+| Calculator | CSS Pattern | External Files | Inline CSS | Notes |
+|------------|-------------|----------------|------------|-------|
+| **DTG Manual** | ✅ Standard | 1 (shared) | ~100 lines | Product showcase, hero section |
+| **DTF Manual** | ✅ Standard | 1 (shared) | ~150 lines | Product showcase, DTF features |
+| **Embroidery Manual** | ✅ Standard | 1 (shared) | ~200 lines | Product showcase, stitch displays |
+| **Laser Manual** | ✅ Standard | 1 (shared) | ~150 lines | Product showcase, laser features |
+| **Screen Print Manual** | 🔶 Complex | **16 files** | ~200 lines | Copied from contract page, never refactored. Uses universal-pricing-* files + manual-calculator-styles.css. **Looks great, leave it alone.** |
+| **Cap Embroidery Manual** | 🔶 Standalone | 1 (cap-fix) | ~550 lines | Built independently, doesn't use shared CSS. **Works fine as-is.** |
+| **Sticker Manual** | 🔶 Standalone | 0 | ~686 lines | Complete CSS framework inline. **Built standalone, functions correctly.** |
+
+#### CSS Files Detail
+
+**Screen Print Manual (16 files):**
+```
+manual-calculator-styles.css (shared)
+universal-pricing-header.css
+universal-pricing-layout.css
+universal-calculator-theme.css
+universal-pricing-components.css
+shared-pricing-styles.css
+modern-enhancements.css
+universal-header.css
+universal-image-gallery.css
+universal-quick-quote.css
+universal-pricing-grid.css
+image-modal.css
+force-green-theme.css
+screenprint-pricing-tables.css
+screenprint-safety-stripes.css
+screenprint-toggle-styles.css
+```
+
+**Cap Embroidery Manual:**
+```
+cap-embroidery-fix.css
++ 550 lines of inline CSS
+```
+
+**Sticker Manual:**
+```
+686 lines of inline CSS (complete framework)
+```
+
+#### Guidance for NEW Manual Calculators
+
+**Standard Pattern (Recommended):**
+```html
+<link href="manual-calculator-styles.css" rel="stylesheet">
+
+<style>
+    /* ONLY calculator-specific features */
+    /* Product showcase, unique animations, method-specific UI */
+    /* Keep under 200 lines */
+</style>
+```
+
+**What Goes Where:**
+- **Shared CSS:** Headers, breadcrumbs, forms, buttons, pricing displays
+- **Inline CSS:** Product showcases, unique features, method-specific animations
+
+**DO NOT:** Try to "fix" existing calculators unless there's a bug. They work.
+
 ## 📚 Documentation & Guides
 
 ### Memory/Reference Documentation
