@@ -1582,7 +1582,7 @@
 
                 <div id="minimum-warning" class="alert alert-warning" style="display: none; margin-top: 1rem;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Minimum 36 pieces required. Current total: <span id="current-total">0</span> pieces.
+                    Minimum 24 pieces required. Current total: <span id="current-total">0</span> pieces.
                 </div>
             </div>
 
@@ -2627,11 +2627,11 @@
             // Update warning total
             document.getElementById('current-total').textContent = total;
 
-            if (total > 0 && total < 36) {
+            if (total > 0 && total < 24) {
                 // Show warning with current count when under minimum
                 warning.style.setProperty('display', 'block', 'important');
                 document.getElementById('continue-to-summary').disabled = false;
-            } else if (total >= 36) {
+            } else if (total >= 24) {
                 // Hide warning when minimum met (use !important to override Bootstrap)
                 warning.style.setProperty('display', 'none', 'important');
                 document.getElementById('continue-to-summary').disabled = false;
@@ -2717,7 +2717,7 @@
 
                                             if (!priceGroups[priceKey]) {
                                                 priceGroups[priceKey] = {
-                                                    sizes: [],
+                                                    sizes: {},  // Changed to object to store individual quantities
                                                     quantity: 0,
                                                     basePrice: pricing.basePrice,
                                                     safetyStripes: pricing.safetyStripesPerPiece,
@@ -2726,29 +2726,32 @@
                                                     subtotal: 0
                                                 };
                                             }
-                                            priceGroups[priceKey].sizes.push(size);
+                                            priceGroups[priceKey].sizes[size] = pricing.quantity;  // Store individual size quantity
                                             priceGroups[priceKey].quantity += pricing.quantity;
                                             priceGroups[priceKey].subtotal += pricing.quantity * totalUnitPrice;
                                         });
 
-                                        // Display grouped sizes
+                                        // Display grouped sizes with individual quantities on one line
                                         return Object.values(priceGroups)
                                             .sort((a, b) => a.totalUnitPrice - b.totalUnitPrice)
                                             .map(group => {
                                                 // Sort sizes within group
-                                                group.sizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+                                                const sortedSizes = Object.entries(group.sizes)
+                                                    .sort(([sizeA], [sizeB]) => sizeOrder.indexOf(sizeA) - sizeOrder.indexOf(sizeB));
 
-                                                // Create size range display (e.g., "S-XL" or "3XL")
-                                                const sizeDisplay = group.sizes.length > 1
-                                                    ? `${group.sizes[0]}-${group.sizes[group.sizes.length - 1]}`
-                                                    : group.sizes[0];
+                                                // Create individual size breakdown (e.g., "S: 10, M: 10, L: 10, XL: 8")
+                                                const sizeBreakdownList = sortedSizes
+                                                    .map(([size, qty]) => `${size}: ${qty}`)
+                                                    .join(', ');
 
                                                 const hasSafetyStripes = group.safetyStripes > 0;
                                                 const hasAdditional = group.additionalCost > 0;
 
                                                 return `
                                                     <div class="size-pricing-detail">
-                                                        <div class="size-label">${sizeDisplay} (${group.quantity} pcs)</div>
+                                                        <div class="size-label" style="font-weight: 600; margin-bottom: 4px;">
+                                                            ${sizeBreakdownList} <span style="color: #666; font-weight: 400;">(${group.quantity} total)</span>
+                                                        </div>
                                                         <div class="price-calculation">
                                                             <span class="base-price">$${group.basePrice.toFixed(2)}</span>
                                                             ${hasSafetyStripes ? `
@@ -2952,29 +2955,34 @@
         }
 
         calculateLTMFee(totalQuantity, pricingDataByStyle) {
-            // Calculate LTM (Less Than Minimum) fee based on quantity tier
-            // 13-36 pieces: $75
-            // 37-72 pieces: $50
-            // 73+ pieces: $0
+            // API-DRIVEN LTM Fee: Pull from tier data (matches screenprint-manual-pricing.js)
+            // No hardcoded values - uses API tier data for flexibility
 
-            const firstStyle = Object.values(pricingDataByStyle)[0];
-            if (!firstStyle?.tierData) return 0;
+            if (!pricingDataByStyle?.tierData) {
+                console.warn('[LTM Fee] No tier data available, defaulting to $0');
+                return 0;
+            }
 
-            // Find the tier that matches this quantity
-            const tierKey = Object.keys(firstStyle.tierData).find(key => {
-                const tier = firstStyle.tierData[key];
-                return totalQuantity >= tier.MinQuantity &&
-                       (!tier.MaxQuantity || totalQuantity <= tier.MaxQuantity);
-            });
+            // Find the current tier for this quantity
+            const tierData = pricingDataByStyle.tierData;
 
-            if (!tierKey) return 0;
+            for (const tierLabel in tierData) {
+                const tier = tierData[tierLabel];
+                const minQty = parseInt(tier.MinQuantity || 0);
+                const maxQty = tier.MaxQuantity ? parseInt(tier.MaxQuantity) : Infinity;
 
-            const ltmFee = parseFloat(firstStyle.tierData[tierKey].LTM_Fee || 0);
+                if (totalQuantity >= minQty && totalQuantity <= maxQty) {
+                    const ltmFee = parseFloat(tier.LTM_Fee || 0);
+                    console.log(`[LTM Fee] Quantity: ${totalQuantity} - Tier: ${tierLabel} - Fee: $${ltmFee.toFixed(2)} (from API)`);
+                    return ltmFee;
+                }
+            }
 
-            // Log for debugging
-            console.log(`[LTM Fee] Quantity: ${totalQuantity}, Tier: ${tierKey}, Fee: $${ltmFee}`);
-
-            return ltmFee;
+            // No matching tier found - default to first tier's LTM fee
+            const firstTier = Object.values(tierData)[0];
+            const defaultFee = firstTier ? parseFloat(firstTier.LTM_Fee || 0) : 0;
+            console.warn(`[LTM Fee] No tier match for quantity ${totalQuantity}, using default: $${defaultFee.toFixed(2)}`);
+            return defaultFee;
         }
 
         async saveQuote() {
