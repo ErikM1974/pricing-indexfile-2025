@@ -15,7 +15,9 @@ class DTGQuoteBuilder {
         
         // State management
         this.currentPhase = 1;
-        this.selectedLocation = null;
+        this.highestPhaseReached = 1; // Track highest phase user has reached
+        this.selectedLocations = []; // Array to track multiple selected locations
+        this.selectedLocation = null; // Legacy - will be computed from selectedLocations
         this.selectedLocationName = null;
         this.currentQuoteData = null;
         
@@ -45,18 +47,15 @@ class DTGQuoteBuilder {
         this.connector1 = document.getElementById('connector-1');
         this.connector2 = document.getElementById('connector-2');
         
-        // Location selection
-        this.locationRadios = document.querySelectorAll('input[name="print-location"]');
-        this.selectedLocationDisplay = document.getElementById('selected-location-display');
-        this.selectedLocationText = document.getElementById('selected-location-text');
+        // Location selection (toggle-based, no separate display element)
+        this.locationRadios = document.querySelectorAll('input[name="print-location"]'); // Legacy, kept for compatibility
         this.continueToProductsBtn = document.getElementById('continue-to-products');
         
         // Product phase
         this.phase2Location = document.getElementById('phase2-location');
         this.styleSearch = document.getElementById('style-search');
         this.styleSuggestions = document.getElementById('style-suggestions');
-        this.colorSelect = document.getElementById('color-select');
-        this.loadProductBtn = document.getElementById('load-product-btn');
+        // Note: No color-select or load-product-btn - using color swatches instead
         this.productDisplay = document.getElementById('product-display');
         this.productImage = document.getElementById('product-image');
         this.productName = document.getElementById('product-name');
@@ -100,19 +99,52 @@ class DTGQuoteBuilder {
         this.modalCustomer = document.getElementById('modal-customer');
         this.modalTotal = document.getElementById('modal-total');
         this.loadingOverlay = document.getElementById('loading-overlay');
+
+        // 🔍 Enhanced Debugging: Log critical element status
+        console.log('🔍 [DTGQuoteBuilder] Element Initialization Status:');
+        console.log('✅ Phase sections:', {
+            location: !!this.locationPhase,
+            product: !!this.productPhase,
+            review: !!this.reviewPhase
+        });
+        console.log('✅ Navigation:', {
+            phase1Nav: !!this.phase1Nav,
+            phase2Nav: !!this.phase2Nav,
+            phase3Nav: !!this.phase3Nav
+        });
+        console.log('✅ Toggle switches found:', document.querySelectorAll('.toggle-item').length);
+        console.log('✅ Continue button:', !!this.continueToProductsBtn);
+        console.log('✅ Product elements:', {
+            styleSearch: !!this.styleSearch,
+            productDisplay: !!this.productDisplay,
+            addToQuoteBtn: !!this.addToQuoteBtn
+        });
+        console.log('✅ Review elements:', {
+            customerName: !!this.customerName,
+            saveQuoteBtn: !!this.saveQuoteBtn
+        });
     }
     
     /**
      * Bind event listeners
      */
     bindEvents() {
-        // Location selection
-        this.locationRadios.forEach(radio => {
-            radio.addEventListener('change', () => this.handleLocationSelection());
+        // Phase navigation - make steps clickable
+        this.phase1Nav.addEventListener('click', () => this.navigateToPhase(1));
+        this.phase2Nav.addEventListener('click', () => this.navigateToPhase(2));
+        this.phase3Nav.addEventListener('click', () => this.navigateToPhase(3));
+
+        // Location selection - toggle switches
+        const toggleItems = document.querySelectorAll('.toggle-item');
+        toggleItems.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const locationCode = toggle.dataset.location;
+                this.handleToggleLocation(locationCode, toggle);
+            });
         });
-        
+
         this.continueToProductsBtn.addEventListener('click', () => this.moveToPhase(2));
-        
+
         // Product phase
         this.styleSearch.addEventListener('input', (e) => this.handleStyleSearch(e));
         this.styleSearch.addEventListener('focus', () => this.styleSuggestions.style.display = 'block');
@@ -121,8 +153,8 @@ class DTGQuoteBuilder {
                 this.styleSuggestions.style.display = 'none';
             }
         });
-        
-        this.loadProductBtn.addEventListener('click', () => this.loadProduct());
+
+        // Note: loadProductBtn removed - color swatches auto-load product
         this.addToQuoteBtn.addEventListener('click', () => this.addProductToQuote());
         this.backToLocationBtn.addEventListener('click', () => this.moveToPhase(1));
         this.continueToReviewBtn.addEventListener('click', () => this.moveToPhase(3));
@@ -140,13 +172,166 @@ class DTGQuoteBuilder {
     }
     
     /**
-     * Handle location selection
+     * Handle toggle location selection - Supports multiple locations (DTG Pricing Page Pattern)
+     */
+    handleToggleLocation(locationCode, toggleElement) {
+        console.log(`🎯 [handleToggleLocation] Called with code: ${locationCode}`);
+
+        // Location names map
+        const locationNames = {
+            'LC': 'Left Chest',
+            'BON': 'Back of Neck',
+            'FF': 'Full Front',
+            'FB': 'Full Back',
+            'JF': 'Jumbo Front',
+            'JB': 'Jumbo Back'
+        };
+
+        const index = this.selectedLocations.indexOf(locationCode);
+        const isCurrentlyOn = index !== -1;
+        console.log(`   Current state: ${isCurrentlyOn ? 'ON' : 'OFF'}, Array before:`, [...this.selectedLocations]);
+
+        // Define front and back locations (BON is a front location)
+        const frontLocations = ['LC', 'BON', 'FF', 'JF'];
+        const backLocations = ['FB', 'JB'];
+        const isFront = frontLocations.includes(locationCode);
+        const isBack = backLocations.includes(locationCode);
+        console.log(`   Location type: ${isFront ? 'FRONT' : isBack ? 'BACK' : 'UNKNOWN'}`);
+
+        if (isCurrentlyOn) {
+            // Turn OFF: Remove from selected locations
+            this.selectedLocations.splice(index, 1);
+            this.updateToggleUI(locationCode, false);
+            console.log(`🔴 Toggled OFF: ${locationCode}, Array after:`, [...this.selectedLocations]);
+        } else {
+            // Turn ON: Check constraints
+            const currentFrontCount = this.selectedLocations.filter(loc => frontLocations.includes(loc)).length;
+            const currentBackCount = this.selectedLocations.filter(loc => backLocations.includes(loc)).length;
+            console.log(`   Constraint check: ${currentFrontCount} front, ${currentBackCount} back`);
+
+            // Validation: Max 1 front + Max 1 back = Max 2 total
+            if (isFront && currentFrontCount >= 1) {
+                // Already have a front location - turn off the old one first
+                const oldFrontLocation = this.selectedLocations.find(loc => frontLocations.includes(loc));
+                this.selectedLocations = this.selectedLocations.filter(loc => loc !== oldFrontLocation);
+                this.updateToggleUI(oldFrontLocation, false);
+                console.log(`🔄 Replacing front location ${oldFrontLocation} with ${locationCode}`);
+            }
+
+            if (isBack && currentBackCount >= 1) {
+                // Already have a back location - turn off the old one first
+                const oldBackLocation = this.selectedLocations.find(loc => backLocations.includes(loc));
+                this.selectedLocations = this.selectedLocations.filter(loc => loc !== oldBackLocation);
+                this.updateToggleUI(oldBackLocation, false);
+                console.log(`🔄 Replacing back location ${oldBackLocation} with ${locationCode}`);
+            }
+
+            // Add the new location
+            this.selectedLocations.push(locationCode);
+            this.updateToggleUI(locationCode, true);
+            console.log(`🟢 Toggled ON: ${locationCode}, Array after:`, [...this.selectedLocations]);
+        }
+
+        // Update display and compute legacy values
+        this.updateLocationDisplay();
+    }
+
+    /**
+     * Update toggle UI visual state
+     */
+    updateToggleUI(locationCode, isOn) {
+        const toggleElement = document.getElementById(`toggle-${locationCode}`);
+        if (!toggleElement) return;
+
+        const toggleSwitch = toggleElement.querySelector('.toggle-switch');
+        if (isOn) {
+            toggleElement.classList.add('active');
+            toggleSwitch.classList.add('on');
+        } else {
+            toggleElement.classList.remove('active');
+            toggleSwitch.classList.remove('on');
+        }
+    }
+
+    /**
+     * Update location display and compute combined location code
+     */
+    updateLocationDisplay() {
+        const locationNames = {
+            'LC': 'Left Chest',
+            'BON': 'Back of Neck',
+            'FF': 'Full Front',
+            'FB': 'Full Back',
+            'JF': 'Jumbo Front',
+            'JB': 'Jumbo Back'
+        };
+
+        if (this.selectedLocations.length === 0) {
+            // No locations selected
+            this.continueToProductsBtn.disabled = true;
+            this.selectedLocation = null;
+            this.selectedLocationName = null;
+            console.log('📍 [DTGQuoteBuilder] No locations selected - button disabled');
+        } else if (this.selectedLocations.length === 1) {
+            // Single location
+            const locationCode = this.selectedLocations[0];
+            this.selectedLocation = locationCode;
+            this.selectedLocationName = locationNames[locationCode];
+            this.continueToProductsBtn.disabled = false;
+            console.log('📍 [DTGQuoteBuilder] Single location selected:', {
+                code: this.selectedLocation,
+                display: this.selectedLocationName
+            });
+        } else if (this.selectedLocations.length === 2) {
+            // Combo location: Build combo code
+            // Map BON to LC for pricing
+            const pricingLocations = this.selectedLocations.map(loc => loc === 'BON' ? 'LC' : loc);
+
+            // Sort by type: FRONT locations first, then BACK locations
+            // This ensures LC_FB (not FB_LC), FF_FB, JF_JB, LC_JB
+            const frontLocations = ['LC', 'FF', 'JF'];
+            const backLocations = ['FB', 'JB'];
+
+            const sorted = pricingLocations.sort((a, b) => {
+                const aIsFront = frontLocations.includes(a);
+                const bIsFront = frontLocations.includes(b);
+                if (aIsFront && !bIsFront) return -1; // a (front) comes before b (back)
+                if (!aIsFront && bIsFront) return 1;  // b (front) comes before a (back)
+                return a.localeCompare(b); // Same type, sort alphabetically
+            });
+
+            const [loc1, loc2] = sorted;
+            this.selectedLocation = `${loc1}_${loc2}`;
+
+            const loc1Name = locationNames[this.selectedLocations[0]];
+            const loc2Name = locationNames[this.selectedLocations[1]];
+            this.selectedLocationName = `${loc1Name} + ${loc2Name}`;
+            this.continueToProductsBtn.disabled = false;
+            console.log('📍 [DTGQuoteBuilder] Combo location selected:', {
+                codes: this.selectedLocations,
+                pricingCode: this.selectedLocation,
+                display: this.selectedLocationName
+            });
+        }
+
+        console.log('[DTGQuoteBuilder] Location state:', {
+            selectedLocations: this.selectedLocations,
+            computedCode: this.selectedLocation,
+            displayName: this.selectedLocationName,
+            buttonDisabled: this.continueToProductsBtn.disabled
+        });
+    }
+
+    /**
+     * Handle location selection (legacy method for compatibility)
      */
     handleLocationSelection() {
+        // This method is kept for backward compatibility but no longer used
+        // Toggle switches now use handleToggleLocation instead
         const selected = document.querySelector('input[name="print-location"]:checked');
         if (selected) {
             this.selectedLocation = selected.value;
-            
+
             // Map location codes to display names
             const locationNames = {
                 'LC': 'Left Chest',
@@ -159,14 +344,14 @@ class DTGQuoteBuilder {
                 'JF_JB': 'Jumbo Front & Jumbo Back',
                 'LC_JB': 'Left Chest & Jumbo Back'
             };
-            
+
             this.selectedLocationName = locationNames[this.selectedLocation];
-            
+
             // Update display
             this.selectedLocationText.textContent = this.selectedLocationName;
             this.selectedLocationDisplay.style.display = 'block';
             this.continueToProductsBtn.disabled = false;
-            
+
             console.log('[DTGQuoteBuilder] Location selected:', this.selectedLocation, this.selectedLocationName);
         }
     }
@@ -213,39 +398,76 @@ class DTGQuoteBuilder {
     }
     
     /**
-     * Load product colors
+     * Load product colors and display swatches
      */
     async loadProductColors(styleNumber) {
         try {
+            // Fetch color swatches from API
+            const swatchesResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
+            const swatches = await swatchesResponse.json();
+
+            // Also load product details
             const product = await this.productsManager.loadProductDetails(styleNumber);
-            
-            if (product && product.colors) {
-                this.colorSelect.innerHTML = '<option value="">Select a color...</option>';
-                product.colors.forEach(color => {
-                    const option = document.createElement('option');
-                    option.value = color.COLOR_NAME || color;
-                    option.textContent = color.COLOR_NAME || color;
-                    this.colorSelect.appendChild(option);
+
+            if (swatches && swatches.length > 0) {
+                // Show color selection container
+                const colorContainer = document.getElementById('color-selection-container');
+                const colorSwatchesGrid = document.getElementById('color-swatches');
+
+                colorSwatchesGrid.innerHTML = '';
+
+                swatches.forEach(swatch => {
+                    const swatchEl = document.createElement('div');
+                    swatchEl.className = 'color-swatch';
+                    swatchEl.dataset.colorName = swatch.COLOR_NAME;
+                    swatchEl.dataset.colorImage = swatch.COLOR_SQUARE_IMAGE;
+
+                    swatchEl.innerHTML = `
+                        <img class="color-swatch-image" src="${swatch.COLOR_SQUARE_IMAGE}" alt="${swatch.COLOR_NAME}">
+                        <div class="color-swatch-name">${swatch.COLOR_NAME}</div>
+                    `;
+
+                    swatchEl.addEventListener('click', () => this.selectColor(swatch.COLOR_NAME, swatchEl));
+
+                    colorSwatchesGrid.appendChild(swatchEl);
                 });
-                
-                this.colorSelect.disabled = false;
-                this.loadProductBtn.disabled = false;
-                
+
+                colorContainer.style.display = 'block';
+
                 // Store current product data
                 this.currentProductData = product;
+            } else {
+                console.error('[DTGQuoteBuilder] No color swatches found for', styleNumber);
             }
         } catch (error) {
             console.error('[DTGQuoteBuilder] Error loading colors:', error);
         }
     }
+
+    /**
+     * Select a color swatch
+     */
+    async selectColor(colorName, swatchElement) {
+        // Update visual selection
+        document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+        swatchElement.classList.add('selected');
+
+        // Store selected color
+        document.getElementById('selected-color').value = colorName;
+
+        console.log('[DTGQuoteBuilder] Color selected:', colorName);
+
+        // Auto-load the product with this color
+        await this.loadProduct(this.styleSearch.value, colorName);
+    }
     
     /**
      * Load product details and display
      */
-    async loadProduct() {
-        const styleNumber = this.styleSearch.value.trim();
-        const color = this.colorSelect.value;
-        
+    async loadProduct(styleNumberParam, colorParam) {
+        const styleNumber = styleNumberParam || this.styleSearch.value.trim();
+        const color = colorParam || document.getElementById('selected-color').value;
+
         if (!styleNumber || !color) {
             alert('Please select both style and color');
             return;
@@ -264,13 +486,37 @@ class DTGQuoteBuilder {
             this.productColor.textContent = color;
             
             // Set product image
-            const colorData = this.currentProductData.colors.find(c => 
-                (c.COLOR_NAME || c) === color
+            // Set product image
+            console.log('[DTGQuoteBuilder] Looking for color:', color);
+            console.log('[DTGQuoteBuilder] Available colors:', this.currentProductData?.colors);
+
+            const colorData = this.currentProductData?.colors?.find(c =>
+                (c.COLOR_NAME === color || c.colorName === color || c.name === color || c === color)
             );
-            if (colorData && colorData.MAIN_IMAGE_URL) {
-                this.productImage.src = colorData.MAIN_IMAGE_URL;
+
+            console.log('[DTGQuoteBuilder] Found color data:', colorData);
+
+            if (colorData) {
+                // Try multiple possible image field names
+                const imageUrl = colorData.MAIN_IMAGE_URL ||
+                                colorData.mainImageUrl ||
+                                colorData.imageUrl ||
+                                colorData.image_url ||
+                                colorData.image;
+
+                if (imageUrl) {
+                    this.productImage.src = imageUrl;
+                    this.productImage.style.display = 'block';
+                    console.log('[DTGQuoteBuilder] ✅ Image loaded:', imageUrl);
+                } else {
+                    console.warn('[DTGQuoteBuilder] ⚠️ No image URL found in color data');
+                    this.productImage.src = '/assets/placeholder-product.png';
+                    this.productImage.style.display = 'block';
+                }
             } else {
+                console.warn('[DTGQuoteBuilder] ⚠️ Color not found:', color);
                 this.productImage.src = '/assets/placeholder-product.png';
+                this.productImage.style.display = 'block';
             }
             
             // Build size inputs
@@ -334,7 +580,7 @@ class DTGQuoteBuilder {
      */
     async addProductToQuote() {
         const styleNumber = this.styleSearch.value.trim();
-        const color = this.colorSelect.value;
+        const color = document.getElementById('selected-color').value;
         
         // Collect size quantities
         const sizeQuantities = {};
@@ -415,23 +661,47 @@ class DTGQuoteBuilder {
      */
     resetProductForm() {
         this.styleSearch.value = '';
-        this.colorSelect.innerHTML = '<option value="">Select style first</option>';
-        this.colorSelect.disabled = true;
-        this.loadProductBtn.disabled = true;
+
+        // Reset color selection (swatches-based, not a select element)
+        const colorContainer = document.getElementById('color-selection-container');
+        const colorSwatchesGrid = document.getElementById('color-swatches');
+        const selectedColorInput = document.getElementById('selected-color');
+
+        if (colorContainer) colorContainer.style.display = 'none';
+        if (colorSwatchesGrid) colorSwatchesGrid.innerHTML = '';
+        if (selectedColorInput) selectedColorInput.value = '';
+
+        if (this.loadProductBtn) this.loadProductBtn.disabled = true;
         this.productDisplay.style.display = 'none';
     }
     
+    /**
+     * Navigate to phase via clicking step indicators
+     * Only allows navigation to phases that have been visited
+     */
+    navigateToPhase(phase) {
+        // Only allow navigation to phases that have been reached
+        if (phase <= this.highestPhaseReached) {
+            this.moveToPhase(phase);
+        }
+    }
+
     /**
      * Move to specific phase
      */
     moveToPhase(phase) {
         this.currentPhase = phase;
-        
+
+        // Track highest phase reached
+        if (phase > this.highestPhaseReached) {
+            this.highestPhaseReached = phase;
+        }
+
         // Hide all phases
         [this.locationPhase, this.productPhase, this.reviewPhase].forEach(p => {
             p.style.display = 'none';
         });
-        
+
         // Show current phase
         switch (phase) {
             case 1:
@@ -446,10 +716,10 @@ class DTGQuoteBuilder {
                 this.prepareQuoteSummary();
                 break;
         }
-        
+
         // Update navigation
         this.updatePhaseNavigation();
-        
+
         // Scroll to top
         window.scrollTo(0, 0);
     }
@@ -460,96 +730,177 @@ class DTGQuoteBuilder {
     updatePhaseNavigation() {
         // Reset all phases
         [this.phase1Nav, this.phase2Nav, this.phase3Nav].forEach((nav, index) => {
-            nav.classList.remove('active', 'completed');
-            if (index + 1 < this.currentPhase) {
-                nav.classList.add('completed');
-            } else if (index + 1 === this.currentPhase) {
+            const phaseNumber = index + 1;
+            nav.classList.remove('active', 'completed', 'clickable', 'disabled');
+
+            if (phaseNumber < this.currentPhase) {
+                nav.classList.add('completed', 'clickable');
+            } else if (phaseNumber === this.currentPhase) {
                 nav.classList.add('active');
+            } else if (phaseNumber <= this.highestPhaseReached) {
+                nav.classList.add('clickable');
+            } else {
+                nav.classList.add('disabled');
             }
         });
-        
+
         // Update connectors
         this.connector1.classList.toggle('active', this.currentPhase > 1);
         this.connector2.classList.toggle('active', this.currentPhase > 2);
     }
     
     /**
-     * Prepare quote summary for review
+     * Prepare quote summary for review (Detailed Breakdown)
      */
     async prepareQuoteSummary() {
         const products = this.productsManager.getAllProducts();
         const totalQuantity = this.productsManager.getTotalQuantity();
-        
+
         // Generate quote ID preview
         const quoteId = this.quoteService.generateQuoteID();
         this.previewQuoteId.textContent = quoteId;
-        
+
         // Set expiry date
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 30);
         this.expiryDate.textContent = expiryDate.toLocaleDateString();
-        
+
         // Set location
         this.summaryLocation.textContent = this.selectedLocationName;
-        
+
         // Calculate pricing for all products
         const quoteTotals = await this.pricingCalculator.calculateQuoteTotals(
             products,
             this.selectedLocation,
             totalQuantity
         );
-        
-        // Build items summary HTML
-        let summaryHTML = '';
-        quoteTotals.products.forEach(product => {
-            summaryHTML += `
-                <div class="quote-item-summary">
-                    <div class="item-header">
-                        <strong>${product.styleNumber} - ${product.productName}</strong>
-                        <span class="item-color">${product.color}</span>
-                    </div>
-                    <div class="item-sizes">
-            `;
-            
-            // Group sizes by price
-            product.sizeGroups.forEach(group => {
-                const sizeList = Object.entries(group.sizes || {})
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
-                
-                let priceDisplay;
-                if (group.ltmPerUnit > 0) {
-                    // Show LTM breakdown as requested
-                    const basePrice = group.basePrice.toFixed(2);
-                    const ltmFee = group.ltmPerUnit.toFixed(2);
-                    const finalPrice = group.unitPrice.toFixed(2);
-                    priceDisplay = `$${basePrice} + $${ltmFee} small batch fee = $${finalPrice}`;
-                } else {
-                    priceDisplay = `$${group.unitPrice.toFixed(2)}`;
-                }
-                
-                summaryHTML += `
-                    <div class="size-group-line">
-                        <span class="sizes">${sizeList}</span>
-                        <span class="price">${priceDisplay}</span>
-                        <span class="total">$${group.total.toFixed(2)}</span>
-                    </div>
-                `;
+
+        console.log('[DTGQuoteBuilder] Quote totals calculated:', quoteTotals);
+
+        // Debug: Log each product's structure in detail
+        console.log('🔍 [DTGQuoteBuilder] Detailed Product Analysis:');
+        quoteTotals.products.forEach((product, index) => {
+            console.log(`📦 Product ${index + 1}/${quoteTotals.products.length}:`, {
+                styleNumber: product.styleNumber,
+                productName: product.productName,
+                color: product.color,
+                quantity: product.quantity,
+                subtotal: product.subtotal,
+                sizeGroups: product.sizeGroups,
+                sizeGroupCount: product.sizeGroups?.length || 0
             });
-            
+
+            // Log each size group
+            if (product.sizeGroups) {
+                product.sizeGroups.forEach((group, gIndex) => {
+                    console.log(`  📏 Size Group ${gIndex + 1}:`, {
+                        sizes: group.sizes,
+                        basePrice: group.basePrice,
+                        ltmPerUnit: group.ltmPerUnit,
+                        unitPrice: group.unitPrice,
+                        total: group.total
+                    });
+                });
+            } else {
+                console.error('  ❌ NO SIZE GROUPS FOUND for product:', product.styleNumber);
+            }
+        });
+
+        // Build detailed product summary HTML (like screenprint)
+        let summaryHTML = '';
+        quoteTotals.products.forEach((product, productIndex) => {
+            console.log(`[DTGQuoteBuilder] Building HTML for product ${productIndex}:`, product.styleNumber);
+
+            // Safety check for required fields
+            if (!product.sizeGroups || !Array.isArray(product.sizeGroups)) {
+                console.error(`❌ Product ${product.styleNumber} has no sizeGroups array!`, product);
+                return; // Skip this product
+            }
+
+            if (product.subtotal === undefined || product.subtotal === null) {
+                console.error(`❌ Product ${product.styleNumber} has undefined subtotal!`, product);
+                // Try to calculate it from size groups
+                product.subtotal = product.sizeGroups.reduce((sum, g) => sum + (g.total || 0), 0);
+                console.log(`  ✅ Calculated subtotal: $${product.subtotal.toFixed(2)}`);
+            }
             summaryHTML += `
+                <div class="product-summary-item" style="background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e5e7eb;">
+                    <div class="product-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                        <strong style="font-size: 1.1rem; color: #1f2937;">${product.styleNumber} - ${product.productName}</strong>
+                        <span class="product-qty-badge" style="background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">${product.quantity} pieces</span>
+                    </div>
+
+                    <div style="margin-bottom: 0.5rem;">
+                        <strong style="color: #6b7280; font-size: 0.875rem;">Color:</strong>
+                        <span style="color: #1f2937;">${product.color}</span>
+                    </div>
+
+                    <div class="pricing-breakdown-section" style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                        <div class="breakdown-header" style="font-weight: 600; color: #2d5f3f; margin-bottom: 0.75rem;">💰 Pricing Breakdown</div>
+
+                        <!-- Size Distribution with Transparent Pricing -->
+                        <div class="size-breakdown-transparent" style="margin-bottom: 1rem;">
+                            <strong style="color: #2d5f3f; display: block; margin-bottom: 8px;">Size Distribution:</strong>
+                            ${product.sizeGroups.map((group, gIndex) => {
+                                console.log(`[DTGQuoteBuilder] 🎨 Rendering size group ${gIndex + 1}:`, {
+                                    hasSizes: !!group.sizes,
+                                    sizesType: typeof group.sizes,
+                                    sizes: group.sizes,
+                                    sizeKeys: group.sizes ? Object.keys(group.sizes) : [],
+                                    basePrice: group.basePrice,
+                                    unitPrice: group.unitPrice,
+                                    total: group.total
+                                });
+
+                                // Safety check
+                                if (!group.sizes || typeof group.sizes !== 'object') {
+                                    console.error(`❌ Size group ${gIndex} has invalid sizes property!`, group);
+                                    return '<div style="color: red;">Error: Invalid size data</div>';
+                                }
+
+                                const sizeList = Object.entries(group.sizes || {})
+                                    .map(([size, qty]) => `${size}: ${qty}`)
+                                    .join(', ');
+
+                                const totalQty = Object.values(group.sizes || {}).reduce((sum, q) => sum + q, 0);
+                                const hasLTM = group.ltmPerUnit > 0;
+
+                                return `
+                                    <div class="size-pricing-detail" style="margin-bottom: 0.75rem; padding: 0.5rem; background: white; border-radius: 4px;">
+                                        <div class="size-label" style="font-weight: 600; margin-bottom: 4px;">
+                                            ${sizeList} <span style="color: #666; font-weight: 400;">(${totalQty} total)</span>
+                                        </div>
+                                        <div class="price-calculation" style="font-size: 0.875rem; color: #4b5563; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                            <span class="base-price" style="color: #1f2937; font-weight: 500;">$${group.basePrice.toFixed(2)}</span>
+                                            ${hasLTM ? `
+                                                <span class="price-plus" style="color: #9ca3af;">+</span>
+                                                <span class="ltm-fee" style="color: #f59e0b;">$${group.ltmPerUnit.toFixed(2)} small batch fee</span>
+                                            ` : ''}
+                                            <span class="price-equals" style="color: #9ca3af;">=</span>
+                                            <span class="unit-total" style="color: #059669; font-weight: 600;">$${group.unitPrice.toFixed(2)}/pc</span>
+                                            <span class="size-subtotal" style="margin-left: auto; color: #1f2937; font-weight: 600;">→ $${group.total.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="product-total-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: #1f2937; font-size: 1.1rem;">Product Subtotal:</span>
+                        <span style="font-weight: 700; color: #2d5f3f; font-size: 1.25rem;">$${product.subtotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
         });
-        
+
         this.quoteItemsSummary.innerHTML = summaryHTML;
-        
-        // Update totals
+
+        // Update totals section
         this.summaryQuantity.textContent = `${totalQuantity} pieces`;
-        this.summaryTier.textContent = quoteTotals.tier;
+        this.summaryTier.textContent = quoteTotals.tier || 'Calculating...';
         this.summaryTotal.textContent = `$${quoteTotals.total.toFixed(2)}`;
-        
+
         // Show LTM note if applicable
         if (quoteTotals.hasLTM) {
             this.summaryLtmNote.style.display = 'block';
@@ -608,22 +959,20 @@ class DTGQuoteBuilder {
                 // Don't override products - use the ones from currentQuoteData which have sizeGroups
             };
             
-            // Save to database
-            const saveResult = await this.quoteService.saveQuote(quoteData);
-            
-            if (saveResult.success) {
-                console.log('[DTGQuoteBuilder] Quote saved successfully:', saveResult.quoteID);
-                
-                // Show success modal
-                this.showSuccessModal(saveResult.quoteID, quoteData);
-                
-                // Store for print functionality
-                this.lastSavedQuote = quoteData;
-                this.lastSavedQuote.quoteId = saveResult.quoteID;
-                
-            } else {
-                throw new Error(saveResult.error || 'Failed to save quote');
-            }
+            // ⚠️ DATABASE SAVE TEMPORARILY DISABLED - Perfecting UI first
+            // const saveResult = await this.quoteService.saveQuote(quoteData);
+
+            // Simulate successful save for now
+            const tempQuoteID = `DTG${new Date().getMonth()+1}${new Date().getDate()}-TEMP`;
+            console.log('[DTGQuoteBuilder] 🚧 TEMP MODE: Quote would be saved as:', tempQuoteID);
+            console.log('[DTGQuoteBuilder] Quote data prepared:', quoteData);
+
+            // Show success modal with temp ID
+            this.showSuccessModal(tempQuoteID, quoteData);
+
+            // Store for print functionality
+            this.lastSavedQuote = quoteData;
+            this.lastSavedQuote.quoteId = tempQuoteID;
             
         } catch (error) {
             console.error('[DTGQuoteBuilder] Error saving quote:', error);

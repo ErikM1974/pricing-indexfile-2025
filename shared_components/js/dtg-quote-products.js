@@ -121,17 +121,20 @@ class DTGQuoteProducts {
             const response = await fetch(
                 `${this.apiBase}/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color)}`
             );
-            
+
             if (!response.ok) {
-                throw new Error('Failed to load sizes');
+                console.warn('[DTGQuoteProducts] Sizes API returned', response.status, '- using default sizes');
+                return ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
             }
-            
+
             const data = await response.json();
-            return data.sizes || [];
-            
+            const sizes = data.sizes || [];
+            console.log('[DTGQuoteProducts] Loaded sizes for', styleNumber, color, ':', sizes);
+            return sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+
         } catch (error) {
-            console.error('[DTGQuoteProducts] Error loading sizes:', error);
-            // Return default sizes if API fails
+            console.warn('[DTGQuoteProducts] Using default sizes due to API error:', error.message);
+            // Return default sizes if API fails - don't throw error
             return ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         }
     }
