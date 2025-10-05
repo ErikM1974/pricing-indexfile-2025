@@ -1926,9 +1926,10 @@
                 throw new Error('Size pricing data missing from API');
             }
 
+            // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
             const validPrices = pricingData.pricing.sizes
-                .filter(s => s.maxCasePrice > 0)
-                .map(s => s.maxCasePrice);
+                .filter(s => s.price > 0)
+                .map(s => s.price);
 
             if (validPrices.length === 0) {
                 console.error('❌ No valid garment prices found');
