@@ -315,6 +315,208 @@
             50% { transform: translateY(-10px); }
         }
 
+        /* Christmas Countdown Timer */
+        .christmas-countdown-container {
+            background: linear-gradient(135deg, #c41e3a 0%, #165b33 100%);
+            padding: 30px 20px;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-top: 3px solid #ffd700;
+            border-bottom: 3px solid #ffd700;
+        }
+
+        .christmas-countdown-container::before {
+            content: '🎄';
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.1;
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .christmas-countdown-container::after {
+            content: '🎄';
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.1;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .snowflake {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 24px;
+            animation: snowfall linear infinite;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .snowflake:nth-child(1) {
+            left: 10%;
+            animation-duration: 8s;
+            animation-delay: 0s;
+        }
+
+        .snowflake:nth-child(2) {
+            left: 50%;
+            animation-duration: 10s;
+            animation-delay: 2s;
+        }
+
+        .snowflake:nth-child(3) {
+            left: 80%;
+            animation-duration: 12s;
+            animation-delay: 4s;
+        }
+
+        @keyframes snowfall {
+            0% {
+                top: -10%;
+                transform: translateX(0) rotate(0deg);
+            }
+            50% {
+                transform: translateX(20px) rotate(180deg);
+            }
+            100% {
+                top: 110%;
+                transform: translateX(0) rotate(360deg);
+            }
+        }
+
+        .countdown-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .countdown-title {
+            text-align: center;
+            color: #ffd700;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .time-unit {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 15px 20px;
+            min-width: 100px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid #ffd700;
+            transition: transform 0.3s ease;
+        }
+
+        .time-unit:hover {
+            transform: scale(1.1);
+        }
+
+        .time-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: #c41e3a;
+            text-align: center;
+            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .time-label {
+            font-size: 13px;
+            color: #165b33;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .time-separator {
+            font-size: 36px;
+            color: #ffd700;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0.3; }
+        }
+
+        .countdown-message {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            animation: messageBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes messageBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .countdown-title {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .countdown-timer {
+                gap: 5px;
+            }
+
+            .time-unit {
+                padding: 10px 12px;
+                min-width: 70px;
+            }
+
+            .time-value {
+                font-size: 28px;
+            }
+
+            .time-label {
+                font-size: 10px;
+            }
+
+            .time-separator {
+                font-size: 24px;
+            }
+
+            .countdown-message {
+                font-size: 14px;
+            }
+
+            .christmas-countdown-container::before,
+            .christmas-countdown-container::after {
+                font-size: 60px;
+            }
+        }
+
         /* Progress Bar */
         .progress-container {
             background: white;
@@ -2687,11 +2889,47 @@
         <div class="deadline-content">
             <span class="deadline-icon">⏰</span>
             <span class="deadline-text">
-                Special Free Bundle Deal Ends
-                <span class="deadline-date">OCTOBER 1ST, 2025</span>
-                - Place Your Bundle Order Today!
+                🔥 EXTENDED OFFER! Free Bundle Deal Ends
+                <span class="deadline-date">OCTOBER 11TH, 2025</span>
+                - Final Days! Order Now Before It's Gone! 🔥
             </span>
             <span class="deadline-icon">🎁</span>
+        </div>
+    </div>
+
+    <!-- Christmas Countdown Timer -->
+    <div class="christmas-countdown-container">
+        <div class="snowflake">❄</div>
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+        <div class="countdown-wrapper">
+            <div class="countdown-title">
+                🎅 Offer Expires In 🎅
+            </div>
+            <div class="countdown-timer" id="christmasCountdown">
+                <div class="time-unit">
+                    <div class="time-value" id="days">00</div>
+                    <div class="time-label">Days</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                    <div class="time-value" id="hours">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                    <div class="time-value" id="minutes">00</div>
+                    <div class="time-label">Minutes</div>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                    <div class="time-value" id="seconds">00</div>
+                    <div class="time-label">Seconds</div>
+                </div>
+            </div>
+            <div class="countdown-message">
+                🎁 Don't Miss Out on Your FREE Gift Box! 🎁
+            </div>
         </div>
     </div>
 
@@ -3334,6 +3572,59 @@
         (function() {
             // Initialize EmailJS with your public key
             emailjs.init("4qSbDO-SQs19TbP80");
+        })();
+
+        // Christmas Countdown Timer
+        (function() {
+            // Set the deadline date - October 11th, 2025 at 11:59:59 PM PST
+            const deadline = new Date('October 11, 2025 23:59:59 PST').getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const timeRemaining = deadline - now;
+
+                // If deadline has passed
+                if (timeRemaining < 0) {
+                    document.getElementById('days').textContent = '00';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                    document.querySelector('.countdown-message').innerHTML = '🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅';
+                    return;
+                }
+
+                // Calculate time units
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                // Update the display with leading zeros
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+
+                // Add urgency messages based on time remaining
+                const messageEl = document.querySelector('.countdown-message');
+                if (days === 0 && hours < 6) {
+                    messageEl.innerHTML = '🚨 FINAL HOURS! Order Now - Offer Ends Tonight! 🚨';
+                } else if (days === 0) {
+                    messageEl.innerHTML = '⚡ LAST DAY! Order Today Before It\'s Too Late! ⚡';
+                } else if (days === 1) {
+                    messageEl.innerHTML = '🔥 Only 1 Day Left! Don\'t Miss Your FREE Gift Box! 🔥';
+                } else if (days <= 3) {
+                    messageEl.innerHTML = '⏰ Only ' + days + ' Days Left! Order Now! ⏰';
+                } else {
+                    messageEl.innerHTML = '🎁 Don\'t Miss Out on Your FREE Gift Box! 🎁';
+                }
+            }
+
+            // Update countdown immediately
+            updateCountdown();
+
+            // Update every second
+            setInterval(updateCountdown, 1000);
         })();
 
         // Send confirmation email function
