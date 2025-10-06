@@ -134,6 +134,10 @@ app.get('/staff-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'staff-dashboard.html'));
 });
 
+app.get('/bundle-orders-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
+});
+
 app.get('/art-invoices-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bundle Orders Dashboard - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f9fbf8;
+            padding-top: 210px; /* Space for fixed header */
+        }
+
+        /* Enhanced Header Styles */
+        .enhanced-bundle-header {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        /* Contact Bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .contact-item i {
+            font-size: 12px;
+        }
+
+        /* Navigation Bar */
+        .header-nav {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-image {
+            height: 50px;
+            width: auto;
+        }
+
+        .main-nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .main-nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .main-nav-links a:hover {
+            color: #2f661e;
+        }
+
+        /* Context Bar */
+        .bundle-context-bar {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex: 1;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .breadcrumb i {
+            opacity: 0.8;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            color: #10b981;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: #f0fdf4;
+            transform: translateX(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 25px;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-header .subtitle {
+            font-size: 1rem;
+            margin-left: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .quick-btn {
+            background: white;
+            color: #10b981;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #f0fdf4;
+            transform: translateY(-1px);
+        }
+
+        .quick-btn i {
+            font-size: 14px;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            padding: 1.25rem;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-input {
+            padding: 0.625rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .icon-legend {
+            display: flex;
+            gap: 1.5rem;
+            padding-left: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+        }
+
+        #sampleRequestsTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #sampleRequestsTable thead tr {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        #sampleRequestsTable th {
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        #sampleRequestsTable td {
+            padding: 0.875rem;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+        }
+
+        #sampleRequestsTable tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Modal Styles */
+        #sampleDetailsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        #sampleDetailsModal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fafb;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #111827;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            background: #f9fafb;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .filters-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 180px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .quick-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Header -->
+    <header class="enhanced-bundle-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context Bar -->
+        <div class="bundle-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Bundle Orders</span>
+                    </div>
+                    <div class="page-title">
+                        <i class="fas fa-box-open"></i>
+                        Bundle Orders Dashboard
+                        <span class="subtitle">🎄 Christmas & 🎀 BCA Bundles</span>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <a href="/staff-dashboard.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Card -->
+        <div class="dashboard-card">
+            <div class="dashboard-header">
+                <h1>
+                    <i class="fas fa-box-open"></i>
+                    Bundle Orders
+                </h1>
+                <div class="header-actions">
+                    <button onclick="refreshSampleRequests()" class="quick-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <input type="text" id="sampleSearchInput" placeholder="Search by name, email, or ID..." class="filter-input">
+                    <select id="sampleStatusFilter" onchange="filterSampleRequests()" class="filter-input">
+                        <option value="">Active (No Archived)</option>
+                        <option value="ALL">All (Including Archived)</option>
+                        <option value="XMAS">Christmas Bundles Only</option>
+                        <option value="BCA">Breast Cancer Bundles Only</option>
+                        <option value="SR">Sample Requests Only</option>
+                        <option value="Sample Request">Pending</option>
+                        <option value="Processed">Processed</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Archived">Archived</option>
+                    </select>
+                    <select id="salesRepFilter" onchange="filterSampleRequests()" class="filter-input">
+                        <option value="">All Sales Reps</option>
+                        <option value="unassigned">Unassigned</option>
+                        <option value="Nika">Nika</option>
+                        <option value="Taneisha">Taneisha</option>
+                        <option value="Ruth">Ruth</option>
+                        <option value="Erik">Erik</option>
+                        <option value="Adriyella">Adriyella</option>
+                    </select>
+                    <input type="date" id="sampleDateFrom" onchange="filterSampleRequests()" class="filter-input">
+                    <input type="date" id="sampleDateTo" onchange="filterSampleRequests()" class="filter-input">
+                </div>
+
+                <!-- Icon Legend -->
+                <div class="icon-legend">
+                    <span class="legend-item">
+                        <i class="fas fa-gift" style="color: #dc2626;"></i>
+                        <span>= Christmas Bundle</span>
+                    </span>
+                    <span class="legend-item">
+                        <i class="fas fa-ribbon" style="color: #ec4899;"></i>
+                        <span>= Breast Cancer Bundle</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Bundle Orders Table -->
+            <div class="table-container">
+                <table id="sampleRequestsTable">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Samples</th>
+                            <th>Total</th>
+                            <th>Delivery</th>
+                            <th>Status</th>
+                            <th>Sales Rep</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleRequestsBody">
+                        <tr>
+                            <td colspan="10" style="padding: 2rem; text-align: center; color: #6b7280;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading bundle orders...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Request Details Modal -->
+    <div id="sampleDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Bundle Order Details</h3>
+                <button onclick="closeSampleDetails()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="sampleDetailsContent">
+                <!-- Details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <div class="modal-actions">
+                    <button onclick="archiveRequest()" class="quick-btn" style="background: #6b7280; color: white;">
+                        <i class="fas fa-archive"></i> Archive
+                    </button>
+                    <button onclick="downloadOrderPDF()" class="quick-btn" style="background: #dc2626; color: white;">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="closeSampleDetails()" class="quick-btn">Close</button>
+                    <button id="markProcessedBtn" onclick="markAsProcessed()" class="quick-btn" style="background: #10b981; color: white;">
+                        <i class="fas fa-check"></i> Mark as Processed
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bundle Orders Dashboard JavaScript -->
+    <script src="/dashboards/bundle-orders.js"></script>
+</body>
+</html>
