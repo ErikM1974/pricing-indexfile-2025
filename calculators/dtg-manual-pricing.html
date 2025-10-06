@@ -461,6 +461,466 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Small Batch Options Panel */
+        .small-batch-panel {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 16px;  /* Reduced from 24px for compactness */
+            margin-bottom: 16px;  /* Reduced from 24px */
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.15);
+            transition: all 0.3s ease;
+            max-height: none;  /* Remove scroll constraint - let content breathe */
+            overflow-y: visible;  /* No forced scrolling */
+        }
+
+        .small-batch-panel.show {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* Sticky live price display at top of panel - COMPACT HERO STYLE */
+        .small-batch-panel .live-price-display.sticky-price {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            margin: -16px -16px 12px -16px;  /* Adjusted for new panel padding */
+            padding: 16px 20px;  /* Reduced from 32px 24px */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .small-batch-panel .live-price-label {
+            font-size: 11px;  /* Reduced from 14px */
+            text-transform: uppercase;
+            letter-spacing: 1.5px;  /* Reduced from 2px */
+            opacity: 0.95;
+            font-weight: 600;
+            margin-bottom: 6px;  /* Reduced from 12px */
+        }
+
+        .small-batch-panel .live-price-amount {
+            font-size: 40px !important;  /* Reduced from 56px */
+            font-weight: 900 !important;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            margin: 6px 0;  /* Reduced from 12px */
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .small-batch-panel .live-price-note {
+            font-size: 13px;  /* Reduced from 15px */
+            opacity: 0.9;
+            margin-top: 4px;  /* Reduced from 8px */
+            font-weight: 500;
+        }
+
+        .small-batch-panel .live-price-fee {
+            margin-top: 10px;  /* Reduced from 16px */
+            padding-top: 10px;  /* Reduced from 16px */
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-size: 12px;  /* Reduced from 13px */
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;  /* Reduced from 20px */
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .panel-subtitle {
+            font-size: 12px;  /* Reduced from 14px */
+            font-weight: 400;
+            color: #6b7280;
+            margin-left: auto;
+        }
+
+        .panel-section {
+            margin-top: 16px;  /* Reduced from 24px */
+            padding-top: 16px;  /* Reduced from 24px */
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .panel-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;  /* Reduced from 16px */
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;  /* Reduced from 16px */
+        }
+
+        .section-label i {
+            color: var(--primary-color);
+        }
+
+        /* Quantity Stepper */
+        .quantity-stepper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 250px;
+        }
+
+        .stepper-btn {
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            border-radius: 8px;
+            color: var(--primary-color);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stepper-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .quantity-input {
+            flex: 1;
+            height: 44px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Size Distribution Grid - 7 Columns (one per size) */
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));  /* Prevents overflow */
+            gap: 8px;  /* Reduced from 12px */
+            margin-bottom: 12px;  /* Reduced from 16px */
+        }
+
+        .size-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;  /* Reduced from 6px */
+        }
+
+        .size-input-group label {
+            font-size: 11px;  /* Reduced from 13px */
+            font-weight: 600;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .size-input {
+            height: 36px;  /* Reduced from 40px */
+            border: 1px solid #e5e7eb;  /* Thinner border */
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;  /* Reduced from 16px */
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .size-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .size-input.has-value {
+            border-color: var(--primary-color);
+            background: #e8f5e9;
+        }
+
+        /* Keyboard Focus Indicators - Accessibility */
+        .size-input:focus-visible,
+        .quantity-input:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
+        }
+
+        .stepper-btn:focus-visible,
+        .quick-fill-btn:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
+        }
+
+        .fee-checkbox:focus-within {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Size Validation - COMPACT */
+        .size-validation {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 10px 12px;  /* Reduced from 16px */
+            margin-bottom: 12px;
+        }
+
+        .validation-row {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .validation-message {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .size-validation.valid {
+            background: #e8f5e9;
+            border: 2px solid var(--primary-color);
+        }
+
+        .size-validation.valid .validation-message {
+            color: var(--primary-color);
+        }
+
+        .size-validation.invalid {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+
+        .size-validation.invalid .validation-message {
+            color: #dc2626;
+        }
+
+        .size-validation.warning {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+        }
+
+        .size-validation.warning .validation-message {
+            color: #92400e;
+        }
+
+        /* Quick Fill Buttons */
+        .quick-fill-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quick-fill-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .quick-fill-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f9fafb;
+        }
+
+        /* Fee Options */
+        .fee-option {
+            margin-bottom: 16px;
+        }
+
+        .fee-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .fee-checkbox:hover {
+            background: #f3f4f6;
+        }
+
+        .fee-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .fee-label {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .fee-note {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 400;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .fee-mode-options {
+            margin-left: 30px;
+            margin-top: 8px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .fee-mode {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .fee-mode input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .fee-mode span {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        /* Display Mode Toggle */
+        .display-mode-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .display-mode-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .display-mode-option:hover {
+            border-color: var(--primary-color);
+            background: #f3f4f6;
+        }
+
+        .display-mode-option input[type="radio"] {
+            display: none;
+        }
+
+        .display-mode-option input[type="radio"]:checked + .mode-icon {
+            color: white;
+            background: var(--primary-color);
+        }
+
+        .display-mode-option input[type="radio"]:checked ~ .mode-label,
+        .display-mode-option input[type="radio"]:checked ~ .mode-desc {
+            color: var(--primary-color);
+        }
+
+        .display-mode-option:has(input[type="radio"]:checked) {
+            border-color: var(--primary-color);
+            background: #e8f5e9;
+        }
+
+        .mode-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .mode-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        /* Update mobile responsive section to include new elements */
+        @media (max-width: 768px) {
+            .size-grid {
+                grid-template-columns: repeat(4, 1fr);  /* 4 columns on mobile/tablet */
+            }
+
+            .display-mode-toggle {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-fill-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Small mobile - 3 columns */
+        @media (max-width: 480px) {
+            .size-grid {
+                grid-template-columns: repeat(3, 1fr);  /* 3 columns on small phones */
+            }
+        }
         
         .price-breakdown {
             margin-top: 20px;
@@ -784,15 +1244,15 @@
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .hero-price {
                 font-size: 28px;
             }
-            
+
             .cta-buttons {
                 flex-direction: column;
             }
-            
+
             .sticky-hero {
                 position: sticky;
                 top: 0;
@@ -802,6 +1262,286 @@
                 box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
         }
+
+        /* ===== NEW REDESIGNED STYLES ===== */
+
+        /* Price Breakdown Card - COMPACT */
+        .price-breakdown-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;  /* Reduced from 20px */
+            margin: 12px 0;  /* Reduced from 20px */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table td {
+            padding: 6px 0;  /* Reduced from 10px */
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;  /* Reduced from 14px */
+        }
+
+        .breakdown-table td:first-child {
+            color: #4b5563;
+        }
+
+        .breakdown-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .breakdown-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .breakdown-table tr.total-row {
+            border-top: 2px solid #3a7c52;
+        }
+
+        .breakdown-table tr.total-row td {
+            padding-top: 10px;  /* Reduced from 12px */
+            font-size: 15px;  /* Reduced from 16px */
+            font-weight: 700;
+            color: #3a7c52;
+        }
+
+        /* Size Upcharge Badges */
+        .upcharge-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .size-input-group label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        /* Compact Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;  /* Reduced from 24px */
+            margin: 16px 0;  /* Reduced from 24px */
+        }
+
+        .options-column {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;  /* Reduced from 20px */
+        }
+
+        .options-column-title {
+            margin: 0 0 12px 0;  /* Reduced from 16px */
+            font-size: 14px;  /* Reduced from 16px */
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Fee Option Cards - COMPACT */
+        .fee-option-card {
+            background: white;
+            border: 1px solid #e5e7eb;  /* Thinner border */
+            border-radius: 6px;  /* Smaller radius */
+            padding: 10px 12px;  /* Reduced from 16px */
+            margin-bottom: 8px;  /* Reduced from 12px */
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+        }
+
+        .fee-option-card:hover {
+            border-color: #3a7c52;
+            background: #f0f9f4;
+        }
+
+        .fee-option-card.automatic {
+            cursor: default;
+            background: #f0f9f4;
+            border-color: #3a7c52;
+        }
+
+        .fee-option-card.automatic:hover {
+            background: #f0f9f4;
+        }
+
+        .fee-info-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;  /* Reduced from 12px */
+            align-items: start;
+        }
+
+        .fee-checkbox-area {
+            display: flex;
+            align-items: center;
+            padding-top: 1px;  /* Reduced from 2px */
+        }
+
+        .fee-checkbox-area input[type="checkbox"] {
+            width: 16px;  /* Reduced from 18px */
+            height: 16px;  /* Reduced from 18px */
+            cursor: pointer;
+            accent-color: #3a7c52;
+        }
+
+        .fee-details {
+            flex: 1;
+        }
+
+        .fee-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 13px;  /* Reduced from 14px */
+            margin-bottom: 2px;  /* Reduced from 4px */
+        }
+
+        .fee-note {
+            font-size: 11px;  /* Reduced from 12px */
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .fee-price {
+            font-weight: 700;
+            color: #3a7c52;
+            font-size: 14px;  /* Reduced from 15px */
+            white-space: nowrap;
+        }
+
+        /* Shipping Section */
+        .shipping-section {
+            margin-bottom: 16px;
+        }
+
+        .shipping-label {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #3a7c52;
+            background: #f0f9f4;
+        }
+
+        .radio-option:has(input:checked) {
+            border-color: #3a7c52;
+            background: #f0f9f4;
+            border-width: 3px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3a7c52;
+        }
+
+        .radio-label {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .radio-price {
+            font-weight: 700;
+            color: #3a7c52;
+            font-size: 14px;
+        }
+
+        /* Order Summary Card - COMPACT */
+        .order-summary-card {
+            background: #f9fafb;
+            border: 2px solid #3a7c52;
+            border-radius: 8px;
+            padding: 12px 16px;  /* Reduced from 20px */
+            margin: 16px 0;  /* Reduced from 24px */
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table td {
+            padding: 6px 0;  /* Reduced from 8px */
+            font-size: 13px;  /* Reduced from 14px */
+        }
+
+        .summary-table td:first-child {
+            color: #4b5563;
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .summary-table tr.total-row {
+            border-top: 2px solid #3a7c52;
+            padding-top: 12px;
+        }
+
+        .summary-table tr.total-row td {
+            padding-top: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #3a7c52;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fee-info-row {
+                grid-template-columns: auto 1fr;
+            }
+
+            .fee-price {
+                grid-column: 2;
+                text-align: right;
+                margin-top: 8px;
+            }
+        }
+
+        /* ===== END NEW REDESIGNED STYLES ===== */
     </style>
 </head>
 <body class="dtg-manual-pricing">
@@ -878,12 +1618,208 @@
             </div>
         </div>
 
-        <!-- Live Price Display -->
-        <div class="live-price-display" id="live-price-display">
+        <!-- Small Batch Options Panel (shown only for 1-23 tier) -->
+        <div class="small-batch-panel" id="small-batch-panel" style="display: none;">
+            <!-- Panel header hidden for cleaner look - sticky price header serves as title -->
+            <div class="panel-header" style="display: none;">
+                <i class="fas fa-cog"></i> Small Batch Options
+                <span class="panel-subtitle">For orders under 24 pieces</span>
+            </div>
+
+            <!-- Clean Hero Price Display (Sticky at top of panel) -->
+            <div class="live-price-display sticky-price" id="live-price-display">
+                <div class="live-price-label">PRICE PER SHIRT</div>
+                <div class="live-price-amount" id="live-price-amount">$0.00</div>
+                <div class="live-price-note" id="live-price-note">For <span id="live-price-qty">12</span> total shirts</div>
+            </div>
+
+            <!-- Price Breakdown Table -->
+            <div class="price-breakdown-card">
+                <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">
+                    <i class="fas fa-list-ul"></i> Price Breakdown
+                </h4>
+                <table class="breakdown-table" id="breakdown-table">
+                    <tbody id="breakdown-body">
+                        <tr><td colspan="2" style="text-align: center; color: #9ca3af; padding: 20px;">Enter sizes below to see pricing</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Helper Text Box -->
+            <div class="panel-helper-box" style="margin: 12px 0 8px 0; padding: 10px; background: #e8f4f8; border-left: 4px solid #3a7c52; border-radius: 4px; font-size: 12px; line-height: 1.5;">
+                <i class="fas fa-info-circle" style="color: #3a7c52; margin-right: 8px;"></i>
+                <strong>Enter Sizes:</strong> Enter the quantity you need for each size below. Total must be between 1-23 shirts.
+            </div>
+
+            <!-- Size Distribution Grid -->
+            <div class="panel-section">
+                <label class="section-label">
+                    <i class="fas fa-tshirt"></i> Size Distribution
+                </label>
+                <div class="size-grid">
+                    <div class="size-input-group">
+                        <label for="size-S">S</label>
+                        <input type="number" id="size-S" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-M">M</label>
+                        <input type="number" id="size-M" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-L">L</label>
+                        <input type="number" id="size-L" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-XL">XL</label>
+                        <input type="number" id="size-XL" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-2XL">
+                            2XL
+                            <span class="upcharge-badge">+$2.00</span>
+                        </label>
+                        <input type="number" id="size-2XL" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-3XL">
+                            3XL
+                            <span class="upcharge-badge">+$3.00</span>
+                        </label>
+                        <input type="number" id="size-3XL" class="size-input" value="0" min="0">
+                    </div>
+                    <div class="size-input-group">
+                        <label for="size-4XL">
+                            4XL
+                            <span class="upcharge-badge">+$4.00</span>
+                        </label>
+                        <input type="number" id="size-4XL" class="size-input" value="0" min="0">
+                    </div>
+                </div>
+
+                <!-- Size Validation Display -->
+                <div id="size-validation" class="size-validation">
+                    <div class="validation-row">
+                        <span>Total: <strong id="current-size-total">0</strong> shirts (1-23 required)</span>
+                    </div>
+                    <div id="validation-message" class="validation-message"></div>
+                </div>
+
+                <!-- Quick Fill Buttons -->
+                <div class="quick-fill-buttons">
+                    <button type="button" class="quick-fill-btn" onclick="clearSizes()">
+                        <i class="fas fa-eraser"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Compact Options Grid -->
+            <div class="options-grid">
+                <!-- Left Column: Production Options -->
+                <div class="options-column">
+                    <h4 class="options-column-title">
+                        <i class="fas fa-bolt"></i> Production Options
+                    </h4>
+
+                    <!-- Small Batch Fee (Automatic) -->
+                    <div class="fee-option-card automatic">
+                        <div class="fee-info-row">
+                            <div class="fee-checkbox-area">
+                                <i class="fas fa-info-circle" style="color: #3a7c52;"></i>
+                            </div>
+                            <div class="fee-details">
+                                <div class="fee-name">Small Batch Fee <span style="color: #6b7280; font-weight: 400;">(Automatic)</span></div>
+                                <div class="fee-note">Applied to orders under 24 pieces</div>
+                            </div>
+                            <div class="fee-price">+$50.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Rush Production -->
+                    <label class="fee-option-card">
+                        <div class="fee-info-row">
+                            <div class="fee-checkbox-area">
+                                <input type="checkbox" id="toggle-rush-fee">
+                            </div>
+                            <div class="fee-details">
+                                <div class="fee-name">Rush Production</div>
+                                <div class="fee-note">25% of subtotal • 5-7 days → 2-3 days</div>
+                                <div class="fee-note" id="rush-per-unit-display" style="display: none; color: #3a7c52; font-weight: 600; margin-top: 4px;"></div>
+                            </div>
+                            <div class="fee-price" id="rush-price-display">+25%</div>
+                        </div>
+                    </label>
+
+                    <!-- Art/Mock-up Fee -->
+                    <label class="fee-option-card">
+                        <div class="fee-info-row">
+                            <div class="fee-checkbox-area">
+                                <input type="checkbox" id="toggle-art-fee">
+                            </div>
+                            <div class="fee-details">
+                                <div class="fee-name">Art/Mock-up (GRT-50)</div>
+                                <div class="fee-note">Professional design review</div>
+                                <div class="fee-note" id="art-per-unit-display" style="display: none; color: #3a7c52; font-weight: 600; margin-top: 4px;"></div>
+                            </div>
+                            <div class="fee-price">+$50.00</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Right Column: Shipping & Tax -->
+                <div class="options-column">
+                    <h4 class="options-column-title">
+                        <i class="fas fa-truck"></i> Shipping & Tax
+                    </h4>
+
+                    <!-- Shipping -->
+                    <label class="fee-option-card">
+                        <div class="fee-info-row">
+                            <div class="fee-checkbox-area">
+                                <input type="checkbox" id="toggle-shipping">
+                            </div>
+                            <div class="fee-details">
+                                <div class="fee-name">Shipping</div>
+                                <div class="fee-note">UPS Ground - Flat Rate</div>
+                            </div>
+                            <div class="fee-price" id="shipping-amount-display">$25.00</div>
+                        </div>
+                    </label>
+
+                    <!-- Sales Tax -->
+                    <label class="fee-option-card">
+                        <div class="fee-info-row">
+                            <div class="fee-checkbox-area">
+                                <input type="checkbox" id="toggle-tax">
+                            </div>
+                            <div class="fee-details">
+                                <div class="fee-name">Sales Tax</div>
+                                <div class="fee-note">Milton, WA: 10.1%</div>
+                            </div>
+                            <div class="fee-price" id="tax-amount-display">10.1%</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Order Summary Card -->
+            <div class="order-summary-card">
+                <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">
+                    <i class="fas fa-receipt"></i> Order Summary
+                </h4>
+                <table class="summary-table">
+                    <tbody id="order-summary-body">
+                        <tr><td colspan="2" style="text-align: center; color: #9ca3af; padding: 20px;">Configure options above to see summary</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Live Price Display for Regular Tiers (24-47, 48-71, 72+) - Shown when panel is hidden -->
+        <div class="live-price-display" id="regular-tier-price-display" style="display: block;">
             <div class="live-price-label">Price per shirt</div>
-            <div class="live-price-amount" id="live-price-amount">$0.00</div>
-            <div class="live-price-note" id="live-price-note">Select a location to see pricing</div>
-            <div class="live-price-fee" id="live-price-fee"></div>
+            <div class="live-price-amount" id="live-price-amount-regular">$0.00</div>
+            <div class="live-price-note" id="live-price-note-regular">Select a location to see pricing</div>
+            <div class="live-price-fee" id="live-price-fee-regular"></div>
         </div>
 
         <!-- Hidden stub elements for backward compatibility -->
@@ -1331,6 +2267,20 @@
             }
         };
 
+        // Small Batch Panel Constants
+        const STANDARD_UPCHARGES = {
+            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
+        };
+
+        const FEE_CONSTANTS = {
+            LTM_FEE: 50.00,
+            RUSH_PERCENT: 0.25,
+            ART_FEE: 50.00,
+            TAX_RATE: 0.101,  // Milton, WA
+            SHIPPING_FLAT: 25.00
+        };
+
         // API data storage
         let apiData = {
             tiersR: [],
@@ -1347,11 +2297,395 @@
             basePrice: 0,
             selectedLocations: [],  // Array of selected location codes (max 2: 1 front + 1 back)
             selectedTier: '24-47',  // Default tier
-            isLoading: true
+            isLoading: true,
+            smallBatchPanel: {
+                show: false,
+                exactQuantity: 0,  // Auto-calculated from sizeDistribution
+                sizeDistribution: {
+                    'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+                    '2XL': 0, '3XL': 0, '4XL': 0
+                },
+                fees: {
+                    ltm: { enabled: false },
+                    rush: { enabled: false },
+                    art: { enabled: false },
+                    tax: { enabled: false },
+                    shipping: { enabled: false }
+                }
+            }
         };
         
         // Debounce timer
         let updatePricingTimeout;
+
+        // ===== SMALL BATCH PANEL FUNCTIONS =====
+
+        // Toggle small batch panel visibility
+        function toggleSmallBatchPanel(show) {
+            const panel = document.getElementById('small-batch-panel');
+            const regularPriceDisplay = document.getElementById('regular-tier-price-display');
+            if (!panel) return;
+
+            if (show) {
+                // Show small batch panel (with its internal live price)
+                panel.style.display = 'block';
+                panel.classList.add('show');
+                state.smallBatchPanel.show = true;
+
+                // Hide regular tier price display
+                if (regularPriceDisplay) regularPriceDisplay.style.display = 'none';
+            } else {
+                // Hide small batch panel
+                panel.style.display = 'none';
+                panel.classList.remove('show');
+                state.smallBatchPanel.show = false;
+
+                // Show regular tier price display
+                if (regularPriceDisplay) regularPriceDisplay.style.display = 'block';
+            }
+        }
+
+        // Update size total and validation
+        function updateSizeTotal() {
+            const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            let total = 0;
+
+            sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                const val = parseInt(input.value) || 0;
+                state.smallBatchPanel.sizeDistribution[size] = val;
+                total += val;
+
+                // Toggle visual state class for inputs with values
+                if (val > 0) {
+                    input.classList.add('has-value');
+                } else {
+                    input.classList.remove('has-value');
+                }
+            });
+
+            // Auto-update exactQuantity from size distribution
+            state.smallBatchPanel.exactQuantity = total;
+
+            // Update display
+            document.getElementById('current-size-total').textContent = total;
+
+            // Update validation styling
+            const validation = document.getElementById('size-validation');
+            const message = document.getElementById('validation-message');
+
+            validation.className = 'size-validation'; // Reset
+
+            if (total >= 1 && total <= 23) {
+                validation.classList.add('valid');
+                message.innerHTML = '<i class="fas fa-check-circle"></i> Valid quantity for small batch pricing.';
+            } else if (total > 23) {
+                validation.classList.add('invalid');
+                message.innerHTML = '<i class="fas fa-times-circle"></i> Too many! Maximum 23 shirts for small batch pricing.';
+            } else if (total === 0) {
+                validation.classList.add('warning');
+                message.innerHTML = '<i class="fas fa-info-circle"></i> Enter quantities for each size you need.';
+            }
+
+            // Trigger pricing update
+            updateLivePriceWithSmallBatch();
+        }
+
+        // Distribute sizes evenly - now prompts for total quantity
+        function distributeEvenly() {
+            // Prompt user for how many shirts they want
+            const totalShirts = prompt('How many shirts do you need? (1-23)', '12');
+
+            if (!totalShirts || isNaN(totalShirts)) {
+                return; // User cancelled or invalid input
+            }
+
+            const total = parseInt(totalShirts);
+
+            if (total < 1 || total > 23) {
+                alert('Please enter a number between 1 and 23.');
+                return;
+            }
+
+            const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            const base = Math.floor(total / sizes.length);
+            const remainder = total % sizes.length;
+
+            sizes.forEach((size, index) => {
+                const input = document.getElementById(`size-${size}`);
+                const qty = base + (index < remainder ? 1 : 0);
+                input.value = qty;
+                state.smallBatchPanel.sizeDistribution[size] = qty;
+            });
+
+            updateSizeTotal();
+        }
+
+        // Clear all sizes
+        function clearSizes() {
+            const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                input.value = 0;
+                state.smallBatchPanel.sizeDistribution[size] = 0;
+            });
+            updateSizeTotal();
+        }
+
+        // Calculate small batch pricing with all fees
+        function calculateSmallBatchPricing() {
+            // Only calculate if panel is shown and we have valid data
+            if (!state.smallBatchPanel.show || state.basePrice <= 0 || state.selectedLocations.length === 0) {
+                return null;
+            }
+
+            const quantity = state.smallBatchPanel.exactQuantity;
+            const sizeDistribution = state.smallBatchPanel.sizeDistribution;
+
+            // Get base price for single location
+            let baseUnitPrice = 0;
+            const pricingLocations = state.selectedLocations.map(loc => loc === 'BON' ? 'LC' : loc);
+
+            if (state.selectedLocations.length === 1) {
+                baseUnitPrice = getDTGPrice(pricingLocations[0], state.selectedTier, state.basePrice);
+            } else if (state.selectedLocations.length === 2) {
+                const [loc1, loc2] = pricingLocations.sort();
+                const comboCode = `${loc1}_${loc2}`;
+                baseUnitPrice = getDTGPrice(comboCode, state.selectedTier, state.basePrice);
+            }
+
+            // Calculate production fees
+            const productionFees = {
+                ltm: { total: FEE_CONSTANTS.LTM_FEE, perUnit: FEE_CONSTANTS.LTM_FEE / quantity },
+                rush: { total: 0, perUnit: 0 },  // Calculated after subtotal
+                art: { total: FEE_CONSTANTS.ART_FEE, perUnit: FEE_CONSTANTS.ART_FEE / quantity }
+            };
+
+            // Add all enabled fees to base price (always distributed per-shirt)
+            let priceWithIncludedFees = baseUnitPrice;
+
+            // LTM fee is automatic for small batches
+            priceWithIncludedFees += productionFees.ltm.perUnit;
+
+            // Art fee if enabled
+            if (state.smallBatchPanel.fees.art.enabled) {
+                priceWithIncludedFees += productionFees.art.perUnit;
+            }
+
+            // Calculate size-specific pricing (before rush)
+            const sizeBreakdown = [];
+            let productSubtotal = 0;
+
+            Object.entries(sizeDistribution).forEach(([size, qty]) => {
+                if (qty > 0) {
+                    const upcharge = STANDARD_UPCHARGES[size] || 0;
+                    const sizeUnitPrice = priceWithIncludedFees + upcharge;
+                    const sizeTotal = sizeUnitPrice * qty;
+                    productSubtotal += sizeTotal;
+
+                    sizeBreakdown.push({
+                        size,
+                        quantity: qty,
+                        unitPrice: sizeUnitPrice,
+                        subtotal: sizeTotal
+                    });
+                }
+            });
+
+            // Calculate rush fee (25% of product subtotal) and recalculate if enabled
+            if (state.smallBatchPanel.fees.rush.enabled) {
+                productionFees.rush.total = productSubtotal * FEE_CONSTANTS.RUSH_PERCENT;
+                productionFees.rush.perUnit = productionFees.rush.total / quantity;
+
+                // Recalculate with rush included
+                priceWithIncludedFees += productionFees.rush.perUnit;
+                sizeBreakdown.length = 0;
+                productSubtotal = 0;
+
+                Object.entries(sizeDistribution).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        const upcharge = STANDARD_UPCHARGES[size] || 0;
+                        const sizeUnitPrice = priceWithIncludedFees + upcharge;
+                        const sizeTotal = sizeUnitPrice * qty;
+                        productSubtotal += sizeTotal;
+
+                        sizeBreakdown.push({
+                            size,
+                            quantity: qty,
+                            unitPrice: sizeUnitPrice,
+                            subtotal: sizeTotal
+                        });
+                    }
+                });
+            }
+
+            // Subtotal is just product subtotal (fees already included in per-unit price)
+            const subtotal = productSubtotal;
+
+            // Calculate tax (only on BASE product cost, not fees)
+            let tax = 0;
+            if (state.smallBatchPanel.fees.tax.enabled) {
+                // Tax only on base garment + printing, NOT on fees
+                let taxableAmount = 0;
+                Object.entries(sizeDistribution).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        const upcharge = STANDARD_UPCHARGES[size] || 0;
+                        taxableAmount += (baseUnitPrice + upcharge) * qty;
+                    }
+                });
+                tax = taxableAmount * FEE_CONSTANTS.TAX_RATE;
+            }
+
+            // Add shipping if enabled
+            const shipping = state.smallBatchPanel.fees.shipping.enabled ? FEE_CONSTANTS.SHIPPING_FLAT : 0;
+
+            // Calculate grand total
+            const grandTotal = subtotal + tax + shipping;
+
+            // Calculate weighted average for simple mode
+            const weightedAverage = grandTotal / quantity;
+
+            // Update per-unit displays in NEW fee option cards
+            const rushPerUnitDisplay = document.getElementById('rush-per-unit-display');
+            const rushPriceDisplay = document.getElementById('rush-price-display');
+            if (rushPerUnitDisplay && state.smallBatchPanel.fees.rush.enabled) {
+                rushPerUnitDisplay.textContent = `$${productionFees.rush.perUnit.toFixed(2)}/shirt distributed`;
+                rushPerUnitDisplay.style.display = 'block';
+                rushPriceDisplay.textContent = `+$${productionFees.rush.total.toFixed(2)}`;
+            } else if (rushPerUnitDisplay) {
+                rushPerUnitDisplay.style.display = 'none';
+                rushPriceDisplay.textContent = '+25%';
+            }
+
+            const artPerUnitDisplay = document.getElementById('art-per-unit-display');
+            if (artPerUnitDisplay && state.smallBatchPanel.fees.art.enabled) {
+                artPerUnitDisplay.textContent = `$${productionFees.art.perUnit.toFixed(2)}/shirt distributed`;
+                artPerUnitDisplay.style.display = 'block';
+            } else if (artPerUnitDisplay) {
+                artPerUnitDisplay.style.display = 'none';
+            }
+
+            const taxAmountDisplay = document.getElementById('tax-amount-display');
+            if (taxAmountDisplay && state.smallBatchPanel.fees.tax.enabled) {
+                taxAmountDisplay.textContent = `+$${tax.toFixed(2)}`;
+            } else if (taxAmountDisplay) {
+                taxAmountDisplay.textContent = '10.1%';
+            }
+
+            return {
+                baseUnitPrice,
+                priceWithIncludedFees,
+                sizeBreakdown,
+                productSubtotal,
+                subtotal,
+                tax,
+                shipping,
+                grandTotal,
+                weightedAverage,
+                quantity,
+                productionFees
+            };
+        }
+
+        // Update price breakdown table
+        function updatePriceBreakdownTable(pricing) {
+            const breakdownBody = document.getElementById('breakdown-body');
+            if (!breakdownBody || !pricing) {
+                if (breakdownBody) {
+                    breakdownBody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #9ca3af; padding: 20px;">Enter sizes below to see pricing</td></tr>';
+                }
+                return;
+            }
+
+            let html = '';
+
+            // Get location names for display
+            const locationNames = state.selectedLocations.map(loc => DTG_LOCATIONS[loc]?.name || loc).join(' + ');
+
+            // Show the actual tier price being used (this is the rounded amount)
+            html += `<tr><td>24-47 tier price</td><td>$${pricing.baseUnitPrice.toFixed(2)} <span style="color: #6b7280; font-size: 0.9em;">(base: $${state.basePrice.toFixed(2)}, ${locationNames})</span></td></tr>`;
+
+            // Small batch fee (always included for <24)
+            html += `<tr><td>Small batch fee</td><td>+$${pricing.productionFees.ltm.perUnit.toFixed(2)}</td></tr>`;
+
+            // Rush production (if enabled)
+            if (state.smallBatchPanel.fees.rush.enabled) {
+                html += `<tr><td>Rush production (25%)</td><td>+$${pricing.productionFees.rush.perUnit.toFixed(2)}</td></tr>`;
+            }
+
+            // Art/mock-up (if enabled)
+            if (state.smallBatchPanel.fees.art.enabled) {
+                html += `<tr><td>Art/mock-up (GRT-50)</td><td>+$${pricing.productionFees.art.perUnit.toFixed(2)}</td></tr>`;
+            }
+
+            // Total row
+            html += `<tr class="total-row"><td>Price per shirt</td><td>$${pricing.priceWithIncludedFees.toFixed(2)}</td></tr>`;
+
+            breakdownBody.innerHTML = html;
+        }
+
+        // Update order summary table
+        function updateOrderSummaryTable(pricing) {
+            const summaryBody = document.getElementById('order-summary-body');
+            if (!summaryBody || !pricing) {
+                if (summaryBody) {
+                    summaryBody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #9ca3af; padding: 20px;">Configure options above to see summary</td></tr>';
+                }
+                return;
+            }
+
+            let html = '';
+
+            // Subtotal (quantity × price per shirt)
+            html += `<tr><td>Subtotal (${pricing.quantity} × $${pricing.priceWithIncludedFees.toFixed(2)})</td><td>$${pricing.subtotal.toFixed(2)}</td></tr>`;
+
+            // Sales tax (if enabled)
+            if (state.smallBatchPanel.fees.tax.enabled && pricing.tax > 0) {
+                html += `<tr><td>Sales tax (Milton, WA 10.1%)</td><td>+$${pricing.tax.toFixed(2)}</td></tr>`;
+            }
+
+            // Shipping (if enabled)
+            if (pricing.shipping > 0) {
+                html += `<tr><td>Shipping (UPS Ground)</td><td>+$${pricing.shipping.toFixed(2)}</td></tr>`;
+            }
+
+            // Total row
+            html += `<tr class="total-row"><td>ORDER TOTAL</td><td>$${pricing.grandTotal.toFixed(2)}</td></tr>`;
+
+            summaryBody.innerHTML = html;
+        }
+
+        // Update live price display with small batch pricing
+        function updateLivePriceWithSmallBatch() {
+            const livePriceAmount = document.getElementById('live-price-amount');
+            const livePriceNote = document.getElementById('live-price-note');
+            const livePriceQty = document.getElementById('live-price-qty');
+
+            if (!livePriceAmount || !livePriceNote) return;
+
+            // Check if small batch panel is active
+            if (state.smallBatchPanel.show) {
+                const pricing = calculateSmallBatchPricing();
+
+                if (!pricing) {
+                    livePriceAmount.textContent = '$0.00';
+                    livePriceNote.innerHTML = 'For <span id="live-price-qty">0</span> total shirts';
+                    updatePriceBreakdownTable(null);
+                    updateOrderSummaryTable(null);
+                    return;
+                }
+
+                // Update hero price
+                livePriceAmount.textContent = `$${pricing.priceWithIncludedFees.toFixed(2)}`;
+                if (livePriceQty) {
+                    livePriceQty.textContent = pricing.quantity;
+                }
+
+                // Update breakdown table and order summary
+                updatePriceBreakdownTable(pricing);
+                updateOrderSummaryTable(pricing);
+            }
+        }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
@@ -1377,7 +2711,10 @@
                 // Setup CTA buttons
                 setupCTAButtons();
 
-                // Initialize with default values
+                // Ensure panel visibility matches default tier selection FIRST
+                toggleSmallBatchPanel(state.selectedTier === '1-23');
+
+                // THEN initialize with default values
                 updatePricing();
 
                 // Hide loading state
@@ -1529,9 +2866,69 @@
                     state.selectedTier = tierRange;
                     console.log(`📊 Tier selected: ${tierRange}`);
 
+                    // Show/hide small batch panel based on tier selection
+                    if (tierRange === '1-23') {
+                        toggleSmallBatchPanel(true);
+                    } else {
+                        toggleSmallBatchPanel(false);
+                    }
+
                     updatePricing();
                 });
             });
+
+            // === Small Batch Panel Event Listeners ===
+
+            // No longer needed - exact quantity is now auto-calculated from size distribution
+
+            // Size inputs
+            const sizeInputs = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            sizeInputs.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        const value = parseInt(this.value) || 0;
+                        state.smallBatchPanel.sizeDistribution[size] = Math.max(0, value);
+                        updateSizeTotal();
+                        if (state.smallBatchPanel.show) updateLivePriceWithSmallBatch();
+                    });
+                }
+            });
+
+            // Fee toggles (simplified - no mode radio buttons)
+            const rushToggle = document.getElementById('toggle-rush-fee');
+            if (rushToggle) {
+                rushToggle.addEventListener('change', function() {
+                    state.smallBatchPanel.fees.rush.enabled = this.checked;
+                    if (state.smallBatchPanel.show) updateLivePriceWithSmallBatch();
+                });
+            }
+
+            const artToggle = document.getElementById('toggle-art-fee');
+            if (artToggle) {
+                artToggle.addEventListener('change', function() {
+                    state.smallBatchPanel.fees.art.enabled = this.checked;
+                    if (state.smallBatchPanel.show) updateLivePriceWithSmallBatch();
+                });
+            }
+
+            // Tax toggle
+            const taxToggle = document.getElementById('toggle-tax');
+            if (taxToggle) {
+                taxToggle.addEventListener('change', function() {
+                    state.smallBatchPanel.fees.tax.enabled = this.checked;
+                    if (state.smallBatchPanel.show) updateLivePriceWithSmallBatch();
+                });
+            }
+
+            // Shipping toggle
+            const shippingToggle = document.getElementById('toggle-shipping');
+            if (shippingToggle) {
+                shippingToggle.addEventListener('change', function() {
+                    state.smallBatchPanel.fees.shipping.enabled = this.checked;
+                    if (state.smallBatchPanel.show) updateLivePriceWithSmallBatch();
+                });
+            }
         }
 
         // Toggle a location on/off with front/back validation
@@ -1965,10 +3362,16 @@
         
         // Update pricing display
         function updatePricing() {
-            // Update live price display
-            const livePriceAmount = document.getElementById('live-price-amount');
-            const livePriceNote = document.getElementById('live-price-note');
-            const livePriceFee = document.getElementById('live-price-fee');
+            // Check if small batch panel is active - use special pricing logic
+            if (state.smallBatchPanel.show) {
+                updateLivePriceWithSmallBatch();
+                return;
+            }
+
+            // Update live price display (use regular tier IDs since panel is hidden)
+            const livePriceAmount = document.getElementById('live-price-amount-regular');
+            const livePriceNote = document.getElementById('live-price-note-regular');
+            const livePriceFee = document.getElementById('live-price-fee-regular');
 
             try {
                 // Check if base price is entered
