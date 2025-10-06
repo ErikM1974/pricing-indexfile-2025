@@ -1674,8 +1674,19 @@
                     window.UniversalPricingGrid.loadSizePricing(styleNumber);
                 }
 
-                // Generate DTG pricing table - DIRECT APPROACH
-                updateDTGPricing();
+
+                // DEBUG: Log API structure to understand field names
+                console.log('🔍 DEBUG - API Response Structure:');
+                console.log('  - pricingData.pricing:', pricingData.pricing);
+                console.log('  - pricingData.pricing.sizes:', pricingData.pricing?.sizes);
+                console.log('  - pricingData.pricing.costs:', pricingData.pricing?.costs);
+                console.log('  - pricingData.pricing.tiers:', pricingData.pricing?.tiers);
+                if (pricingData.pricing?.sizes?.[0]) {
+                    console.log('  - First size object:', pricingData.pricing.sizes[0]);
+                    console.log('  - Available fields:', Object.keys(pricingData.pricing.sizes[0]));
+                }
+// REMOVED:                 // Generate DTG pricing table - DIRECT APPROACH
+// REMOVED:                 updateDTGPricing();
 
                 // Update tooltip with loaded data
                 updateUpchargeTooltipContent();
@@ -1926,10 +1937,10 @@
                 throw new Error('Size pricing data missing from API');
             }
 
-            // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
+            // CRITICAL: DTG product-bundle uses 'maxCasePrice' field (fixed 2025-10-06)
             const validPrices = pricingData.pricing.sizes
-                .filter(s => s.price > 0)
-                .map(s => s.price);
+                .filter(s => s.maxCasePrice > 0)
+                .map(s => s.maxCasePrice);
 
             if (validPrices.length === 0) {
                 console.error('❌ No valid garment prices found');
