@@ -87,19 +87,20 @@ class DTGQuoteProducts {
             const bundleData = await bundleResponse.json();
             
             // Extract product info and pricing
+            // Note: Bundle API returns pricing data at top level, not nested
             const product = {
                 styleNumber: styleNumber,
                 title: bundleData.product?.title || '',
                 description: bundleData.product?.description || '',
                 brand: bundleData.product?.brand || '',
                 colors: bundleData.product?.colors || [],
-                pricingData: bundleData.pricing || null,
+                pricingData: bundleData || null,  // Bundle data IS the pricing data
                 availableSizes: []
             };
-            
+
             // Extract available sizes from pricing data
-            if (bundleData.pricing && bundleData.pricing.sizes) {
-                product.availableSizes = bundleData.pricing.sizes.map(s => s.size);
+            if (bundleData && bundleData.sizes) {
+                product.availableSizes = bundleData.sizes.map(s => s.size);
             }
             
             this.currentProduct = product;
@@ -144,14 +145,13 @@ class DTGQuoteProducts {
      */
     async addProduct(productData) {
         try {
-            // Load pricing data if not already loaded
-            if (!productData.pricingData) {
-                const pricingData = await this.pricingCalculator.loadProductPricing(
-                    productData.styleNumber,
-                    productData.color
-                );
-                productData.pricingData = pricingData;
-            }
+            // ALWAYS reload pricing data to ensure correct structure for calculations
+            // The bundleData from loadProductDetails() has different structure than what calculations expect
+            console.log('[DTGQuoteProducts] Loading transformed pricing data for calculations...');
+            const pricingData = await this.pricingCalculator.loadProductPricing(
+                productData.styleNumber,
+                productData.color
+            );
             
             // Create product entry
             const product = {
@@ -162,13 +162,35 @@ class DTGQuoteProducts {
                 colorCode: productData.colorCode || '',
                 imageUrl: productData.imageUrl || '',
                 sizeQuantities: productData.sizeQuantities || {},
-                pricingData: productData.pricingData,
+                pricingData: pricingData, // Use transformed data for calculations
                 totalQuantity: this.calculateProductQuantity(productData.sizeQuantities)
             };
             
             this.products.push(product);
-            console.log('[DTGQuoteProducts] Product added:', product);
-            
+            console.log('[DTGQuoteProducts] Product added with transformed pricing data:', {
+                styleNumber: product.styleNumber,
+                color: product.color,
+                hasTiers: !!product.pricingData?.tiers,
+                hasCosts: !!product.pricingData?.costs,
+                hasSizes: !!product.pricingData?.sizes
+            });
+
+            // 🔍 DETAILED DEBUG: Log exact pricing data structure
+            console.log('🔍 [DTGQuoteProducts] DETAILED pricingData structure:', {
+                tiersType: typeof product.pricingData?.tiers,
+                tiersIsArray: Array.isArray(product.pricingData?.tiers),
+                tiersLength: product.pricingData?.tiers?.length,
+                tiersFirstItem: product.pricingData?.tiers?.[0],
+                costsType: typeof product.pricingData?.costs,
+                costsIsArray: Array.isArray(product.pricingData?.costs),
+                costsLength: product.pricingData?.costs?.length,
+                sizesType: typeof product.pricingData?.sizes,
+                sizesIsArray: Array.isArray(product.pricingData?.sizes),
+                sizesLength: product.pricingData?.sizes?.length,
+                sizesFirstItem: product.pricingData?.sizes?.[0],
+                allKeys: Object.keys(product.pricingData || {})
+            });
+
             return product;
             
         } catch (error) {

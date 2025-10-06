@@ -227,8 +227,13 @@ class QuoteBuilderBase {
      * Update unsaved changes indicator
      */
     updateUnsavedIndicator() {
+        // Don't show indicator if there's nothing to save yet
+        if (!this.isDirty && this.products.length === 0) {
+            return;
+        }
+
         let indicator = document.getElementById('unsaved-indicator');
-        
+
         if (!indicator) {
             // Create indicator if doesn't exist
             indicator = document.createElement('div');
@@ -237,7 +242,7 @@ class QuoteBuilderBase {
             indicator.innerHTML = '<span>Unsaved changes</span>';
             document.body.appendChild(indicator);
         }
-        
+
         if (this.isDirty) {
             indicator.classList.add('show');
         } else {

@@ -90,6 +90,7 @@ class DTGQuotePricing {
             // Get tier based on aggregate quantity
             const tier = this.getTierForQuantity(aggregateQuantity);
             const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
+// 🔍 DEBUG: Log pricingData structure BEFORE passing to service            console.log('🔍 [DTGQuotePricing] BEFORE calculateAllLocationPrices:', {                productStyleNumber: product.styleNumber,                hasPricingData: !!product.pricingData,                pricingDataType: typeof product.pricingData,                pricingDataKeys: product.pricingData ? Object.keys(product.pricingData) : [],                tiersType: typeof product.pricingData?.tiers,                tiersIsArray: Array.isArray(product.pricingData?.tiers),                tiersLength: product.pricingData?.tiers?.length,                costsLength: product.pricingData?.costs?.length,                sizesLength: product.pricingData?.sizes?.length            });
             
             // Calculate all location prices using DTGPricingService
             const allPrices = this.pricingService.calculateAllLocationPrices(
@@ -157,14 +158,16 @@ class DTGQuotePricing {
      */
     groupSizesByPrice(sizeQuantities, locationPrices, tier, ltmPerUnit) {
         const groups = new Map();
-        
+
         Object.entries(sizeQuantities).forEach(([size, quantity]) => {
             if (quantity > 0) {
                 // Get base price for this size
-                const basePrice = locationPrices[size]?.[tier] || 0;
-                
+                // DTGPricingService returns prices nested by tier label
+                const tierLabel = typeof tier === 'string' ? tier : tier.TierLabel || tier;
+                const basePrice = locationPrices[size]?.[tierLabel] || 0;
+
                 if (basePrice === 'N/A' || basePrice === 0) {
-                    console.warn(`[DTGQuotePricing] No price for size ${size}`);
+                    console.warn(`[DTGQuotePricing] No price for size ${size}, tier ${tierLabel}`);
                     return;
                 }
                 

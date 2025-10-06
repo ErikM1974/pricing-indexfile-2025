@@ -486,36 +486,60 @@ class DTGQuoteBuilder {
             this.productColor.textContent = color;
             
             // Set product image
-            // Set product image
             console.log('[DTGQuoteBuilder] Looking for color:', color);
             console.log('[DTGQuoteBuilder] Available colors:', this.currentProductData?.colors);
+            console.log('[DTGQuoteBuilder] Colors type:', typeof this.currentProductData?.colors);
+            console.log('[DTGQuoteBuilder] First color sample:', this.currentProductData?.colors?.[0]);
 
-            const colorData = this.currentProductData?.colors?.find(c =>
-                (c.COLOR_NAME === color || c.colorName === color || c.name === color || c === color)
-            );
+            // Handle multiple color data formats
+            let colorData = null;
+            if (this.currentProductData?.colors) {
+                const colors = this.currentProductData.colors;
+                
+                // Try different matching strategies
+                colorData = colors.find(c => {
+                    if (typeof c === 'string') return c === color;
+                    return (c.COLOR_NAME === color || 
+                            c.colorName === color || 
+                            c.name === color ||
+                            c.color === color);
+                });
+            }
 
             console.log('[DTGQuoteBuilder] Found color data:', colorData);
 
             if (colorData) {
                 // Try multiple possible image field names
-                const imageUrl = colorData.MAIN_IMAGE_URL ||
-                                colorData.mainImageUrl ||
-                                colorData.imageUrl ||
-                                colorData.image_url ||
-                                colorData.image;
+                const imageUrl = (typeof colorData === 'object') ? (
+                    colorData.MAIN_IMAGE_URL ||
+                    colorData.mainImageUrl ||
+                    colorData.imageUrl ||
+                    colorData.image_url ||
+                    colorData.image
+                ) : null;
+
+                console.log('[DTGQuoteBuilder] Image URL extracted:', imageUrl);
 
                 if (imageUrl) {
                     this.productImage.src = imageUrl;
                     this.productImage.style.display = 'block';
-                    console.log('[DTGQuoteBuilder] ✅ Image loaded:', imageUrl);
+
+                    // Add error handler for failed image loads
+                    this.productImage.onerror = () => {
+                        console.warn('[DTGQuoteBuilder] Image failed to load, using placeholder:', imageUrl);
+                        this.productImage.src = 'https://via.placeholder.com/120x120/f9fafb/4b5563?text=No+Image';
+                        this.productImage.onerror = null; // Prevent infinite loop
+                    };
+
+                    console.log('[DTGQuoteBuilder] ✅ Image set successfully:', imageUrl);
                 } else {
-                    console.warn('[DTGQuoteBuilder] ⚠️ No image URL found in color data');
-                    this.productImage.src = '/assets/placeholder-product.png';
+                    console.warn('[DTGQuoteBuilder] No image URL found in color data, using placeholder');
+                    this.productImage.src = 'https://via.placeholder.com/120x120/f9fafb/4b5563?text=No+Image';
                     this.productImage.style.display = 'block';
                 }
             } else {
-                console.warn('[DTGQuoteBuilder] ⚠️ Color not found:', color);
-                this.productImage.src = '/assets/placeholder-product.png';
+                console.warn('[DTGQuoteBuilder] Color not found:', color, '- using placeholder');
+                this.productImage.src = 'https://via.placeholder.com/120x120/f9fafb/4b5563?text=No+Image';
                 this.productImage.style.display = 'block';
             }
             
@@ -765,8 +789,10 @@ class DTGQuoteBuilder {
         expiryDate.setDate(expiryDate.getDate() + 30);
         this.expiryDate.textContent = expiryDate.toLocaleDateString();
 
-        // Set location
-        this.summaryLocation.textContent = this.selectedLocationName;
+        // Set location (with fallback and debug)
+        const locationToDisplay = this.selectedLocationName || 'Not Set';
+        this.summaryLocation.textContent = locationToDisplay;
+        console.log('[DTGQuoteBuilder] Setting summary location:', locationToDisplay, 'from:', this.selectedLocationName);
 
         // Calculate pricing for all products
         const quoteTotals = await this.pricingCalculator.calculateQuoteTotals(
@@ -823,72 +849,49 @@ class DTGQuoteBuilder {
                 product.subtotal = product.sizeGroups.reduce((sum, g) => sum + (g.total || 0), 0);
                 console.log(`  ✅ Calculated subtotal: $${product.subtotal.toFixed(2)}`);
             }
+            // Get product image with fallback
+            const productImageUrl = product.imageUrl || product.MAIN_IMAGE_URL || '/assets/placeholder-product.png';
+
             summaryHTML += `
-                <div class="product-summary-item" style="background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e5e7eb;">
-                    <div class="product-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-                        <strong style="font-size: 1.1rem; color: #1f2937;">${product.styleNumber} - ${product.productName}</strong>
-                        <span class="product-qty-badge" style="background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">${product.quantity} pieces</span>
+                <div class="product-summary-item">
+                    <div class="product-image-container">
+                        <img src="${productImageUrl}" alt="${product.styleNumber}" class="product-summary-image">
                     </div>
-
-                    <div style="margin-bottom: 0.5rem;">
-                        <strong style="color: #6b7280; font-size: 0.875rem;">Color:</strong>
-                        <span style="color: #1f2937;">${product.color}</span>
-                    </div>
-
-                    <div class="pricing-breakdown-section" style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-                        <div class="breakdown-header" style="font-weight: 600; color: #2d5f3f; margin-bottom: 0.75rem;">💰 Pricing Breakdown</div>
-
-                        <!-- Size Distribution with Transparent Pricing -->
-                        <div class="size-breakdown-transparent" style="margin-bottom: 1rem;">
-                            <strong style="color: #2d5f3f; display: block; margin-bottom: 8px;">Size Distribution:</strong>
-                            ${product.sizeGroups.map((group, gIndex) => {
-                                console.log(`[DTGQuoteBuilder] 🎨 Rendering size group ${gIndex + 1}:`, {
-                                    hasSizes: !!group.sizes,
-                                    sizesType: typeof group.sizes,
-                                    sizes: group.sizes,
-                                    sizeKeys: group.sizes ? Object.keys(group.sizes) : [],
-                                    basePrice: group.basePrice,
-                                    unitPrice: group.unitPrice,
-                                    total: group.total
-                                });
-
-                                // Safety check
-                                if (!group.sizes || typeof group.sizes !== 'object') {
-                                    console.error(`❌ Size group ${gIndex} has invalid sizes property!`, group);
-                                    return '<div style="color: red;">Error: Invalid size data</div>';
-                                }
-
-                                const sizeList = Object.entries(group.sizes || {})
-                                    .map(([size, qty]) => `${size}: ${qty}`)
-                                    .join(', ');
-
-                                const totalQty = Object.values(group.sizes || {}).reduce((sum, q) => sum + q, 0);
-                                const hasLTM = group.ltmPerUnit > 0;
-
-                                return `
-                                    <div class="size-pricing-detail" style="margin-bottom: 0.75rem; padding: 0.5rem; background: white; border-radius: 4px;">
-                                        <div class="size-label" style="font-weight: 600; margin-bottom: 4px;">
-                                            ${sizeList} <span style="color: #666; font-weight: 400;">(${totalQty} total)</span>
-                                        </div>
-                                        <div class="price-calculation" style="font-size: 0.875rem; color: #4b5563; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                                            <span class="base-price" style="color: #1f2937; font-weight: 500;">$${group.basePrice.toFixed(2)}</span>
-                                            ${hasLTM ? `
-                                                <span class="price-plus" style="color: #9ca3af;">+</span>
-                                                <span class="ltm-fee" style="color: #f59e0b;">$${group.ltmPerUnit.toFixed(2)} small batch fee</span>
-                                            ` : ''}
-                                            <span class="price-equals" style="color: #9ca3af;">=</span>
-                                            <span class="unit-total" style="color: #059669; font-weight: 600;">$${group.unitPrice.toFixed(2)}/pc</span>
-                                            <span class="size-subtotal" style="margin-left: auto; color: #1f2937; font-weight: 600;">→ $${group.total.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
+                    <div class="product-content">
+                        <div class="product-header">
+                            <div class="product-title">
+                                <strong>${product.styleNumber} - ${product.productName}</strong>
+                                <span class="product-color">${product.color}</span>
+                            </div>
+                            <span class="product-qty-badge">${product.quantity} pcs</span>
                         </div>
-                    </div>
 
-                    <div class="product-total-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600; color: #1f2937; font-size: 1.1rem;">Product Subtotal:</span>
-                        <span style="font-weight: 700; color: #2d5f3f; font-size: 1.25rem;">$${product.subtotal.toFixed(2)}</span>
+                        <div class="size-breakdown-compact">
+                        ${product.sizeGroups.map((group, gIndex) => {
+                            // Safety check
+                            if (!group.sizes || typeof group.sizes !== 'object') {
+                                console.error(`❌ Size group ${gIndex} has invalid sizes property!`, group);
+                                return '';
+                            }
+
+                            const sizeList = Object.entries(group.sizes || {})
+                                .map(([size, qty]) => `${size}:${qty}`)
+                                .join(', ');
+
+                            const totalQty = Object.values(group.sizes || {}).reduce((sum, q) => sum + q, 0);
+                            const hasLTM = group.ltmPerUnit > 0;
+
+                            return `
+                                <div class="size-group-row">
+                                    <span class="sizes">${sizeList}</span>
+                                    <span class="pricing">
+                                        $${group.unitPrice.toFixed(2)}/pc${hasLTM ? ' <span class="ltm-tag">+LTM</span>' : ''}
+                                        <strong>→ $${group.total.toFixed(2)}</strong>
+                                    </span>
+                                </div>
+                            `;
+                        }).join('')}
+                        </div>
                     </div>
                 </div>
             `;
@@ -940,9 +943,9 @@ class DTGQuoteBuilder {
         if (!this.validateForm()) {
             return;
         }
-        
+
         this.showLoading();
-        
+
         try {
             // Build complete quote data
             // Use products from currentQuoteData which have the sizeGroups from pricing calculation
@@ -958,25 +961,26 @@ class DTGQuoteBuilder {
                 salesRepName: this.getSalesRepName(this.salesRep.value)
                 // Don't override products - use the ones from currentQuoteData which have sizeGroups
             };
-            
-            // ⚠️ DATABASE SAVE TEMPORARILY DISABLED - Perfecting UI first
-            // const saveResult = await this.quoteService.saveQuote(quoteData);
 
-            // Simulate successful save for now
-            const tempQuoteID = `DTG${new Date().getMonth()+1}${new Date().getDate()}-TEMP`;
-            console.log('[DTGQuoteBuilder] 🚧 TEMP MODE: Quote would be saved as:', tempQuoteID);
-            console.log('[DTGQuoteBuilder] Quote data prepared:', quoteData);
+            // Save to database
+            const saveResult = await this.quoteService.saveQuote(quoteData);
 
-            // Show success modal with temp ID
-            this.showSuccessModal(tempQuoteID, quoteData);
+            if (saveResult.success) {
+                console.log('[DTGQuoteBuilder] ✅ Quote saved successfully:', saveResult.quoteID);
 
-            // Store for print functionality
-            this.lastSavedQuote = quoteData;
-            this.lastSavedQuote.quoteId = tempQuoteID;
-            
+                // Show success modal with real quote ID
+                this.showSuccessModal(saveResult.quoteID, quoteData);
+
+                // Store for print functionality
+                this.lastSavedQuote = quoteData;
+                this.lastSavedQuote.quoteId = saveResult.quoteID;
+            } else {
+                throw new Error(saveResult.error || 'Failed to save quote');
+            }
+
         } catch (error) {
             console.error('[DTGQuoteBuilder] Error saving quote:', error);
-            alert('Error saving quote. Please try again.');
+            alert('Error saving quote: ' + (error.message || 'Please try again.'));
         } finally {
             this.hideLoading();
         }

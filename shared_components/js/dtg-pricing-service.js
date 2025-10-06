@@ -54,16 +54,25 @@ class DTGPricingService {
             
             const data = await response.json();
             console.log('[DTGPricingService] Bundle data received successfully');
-            
+
             // Transform bundle data to match existing format
+            // NEW API structure (Oct 2025): { product: {...}, pricing: { tiers, costs, sizes, upcharges } }
+            const pricing = data.pricing || data; // Try new structure first, fallback to old
+
+            // Transform sizes array to use 'price' field name (code expects 'price' not 'maxCasePrice')
+            const transformedSizes = (pricing.sizes || data.sizes || []).map(s => ({
+                ...s,
+                price: s.price || s.maxCasePrice // Support both field names
+            }));
+
             return {
-                tiers: data.pricing?.tiers || [],
-                costs: data.pricing?.costs || [],
-                sizes: data.pricing?.sizes || [],
-                upcharges: data.pricing?.upcharges || {},
-                styleNumber: data.product?.styleNumber || styleNumber,
+                tiers: pricing.tiers || data.tiersR || [],
+                costs: pricing.costs || data.allDtgCostsR || [],
+                sizes: transformedSizes,
+                upcharges: pricing.upcharges || data.sellingPriceDisplayAddOns || {},
+                styleNumber: data.product?.styleNumber || data.styleNumber || styleNumber,
                 color: color,
-                locations: data.pricing?.locations || this.locations,
+                locations: pricing.locations || data.locations || this.locations,
                 productInfo: data.product || {},
                 timestamp: Date.now(),
                 source: 'bundle'
@@ -146,6 +155,7 @@ class DTGPricingService {
      * @returns {Object} Price matrix for all locations and sizes
      */
     calculateAllLocationPrices(data, quantity) {
+// 🔍 DEBUG: Log what data parameter looks like when received        console.log('🔍 [DTGPricingService] calculateAllLocationPrices RECEIVED:', {            dataType: typeof data,            dataKeys: data ? Object.keys(data) : [],            tiersType: typeof data?.tiers,            tiersIsArray: Array.isArray(data?.tiers),            tiersLength: data?.tiers?.length,            costsLength: data?.costs?.length,            sizesLength: data?.sizes?.length,            upchargesLength: data?.upcharges ? Object.keys(data.upcharges).length : 0        });
         console.log('[DTGPricingService] Calculating prices for quantity:', quantity);
         
         const { tiers, costs, sizes, upcharges } = data;
@@ -245,6 +255,19 @@ class DTGPricingService {
      * @private
      */
     getTierForQuantity(tiers, quantity) {
+        // Defensive null checking - prevent crash if tiers is undefined
+        if (!tiers || !Array.isArray(tiers) || tiers.length === 0) {
+            console.error('[DTGPricingService] ERROR: Invalid tiers parameter:', tiers);
+            // Return a safe fallback tier
+            return {
+                TierLabel: '24-47',
+                MinQuantity: 1,
+                MaxQuantity: 47,
+                MarginDenominator: 0.6,
+                Note: 'Fallback tier - tiers parameter was invalid'
+            };
+        }
+
         // Debug logging for specific problematic cases
         if ((quantity === 166 || quantity < 24) && window.DTG_PERFORMANCE?.debug) {
             console.log('[DTGPricingService DEBUG] Finding tier for quantity ' + quantity + ':', {
@@ -256,7 +279,7 @@ class DTGPricingService {
                 }))
             });
         }
-        
+
         // For quantities under 24, use the 24-47 tier (with LTM fee applied elsewhere)
         if (quantity < 24) {
             const tier2447 = tiers.find(t => t.TierLabel === '24-47');

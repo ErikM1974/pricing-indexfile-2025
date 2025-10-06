@@ -47,24 +47,15 @@
     <!-- DTG Specific Overrides (highest priority - must load AFTER unified CSS) -->
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css?v=20251110c">
     
-    <!-- Phase 1 Infrastructure - v20250911 -->
+    <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
     
-    <!-- Phase 2 Persistence - v20250911 -->
-    <script src="/shared_components/js/quote-persistence.js?v=20250911"></script>
-    <script src="/shared_components/js/quote-session.js?v=20250911"></script>
-    
-    <!-- Phase 3 Advanced Features - v20250911 -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-phase3.css?v=20250911">
-    <script src="/shared_components/js/quote-validation.js?v=20250911"></script>
-    <script src="/shared_components/js/quote-ui-feedback.js?v=20250911"></script>
-    
     <!-- Verify files are loading -->
     <script>
-        console.log('🔍 DTG Quote Builder: Loading Phase 1 Infrastructure...');
+        console.log('🔍 DTG Quote Builder: Loading shared components...');
         
         // Debug Font Awesome loading
         window.addEventListener('load', function() {
@@ -121,12 +112,7 @@
             <div class="loading-text">Processing...</div>
         </div>
     </div>
-    
-    <!-- Auto-Save Indicator -->
-    <div id="save-indicator" class="unsaved-indicator">
-        <span id="save-status">Draft saved</span>
-    </div>
-    
+
     <!-- Professional Header with Logo and Navigation -->
     <header class="embroidery-header">
         <!-- Contact Bar -->
@@ -417,10 +403,13 @@
                 </div>
                 
                 <!-- Print Location Info -->
-                <div class="summary-info-card">
-                    <div class="summary-row">
-                        <span class="summary-label"><i class="fas fa-map-marker-alt"></i> Print Location:</span>
-                        <span class="summary-value" id="summary-location">-</span>
+                <div class="summary-location-card">
+                    <div class="summary-location-row">
+                        <span class="location-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        <div class="location-details">
+                            <div class="location-label">Print Location</div>
+                            <div class="location-value" id="summary-location">-</div>
+                        </div>
                     </div>
                 </div>
 
@@ -513,12 +502,6 @@
                 <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back
                 </button>
-                <div class="form-check save-option" style="display: inline-block; margin: 0 15px;">
-                    <input type="checkbox" class="form-check-input" id="save-to-db" checked>
-                    <label class="form-check-label" for="save-to-db">
-                        Save quote to database
-                    </label>
-                </div>
                 <button id="save-quote-btn" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Quote
                 </button>
@@ -576,7 +559,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/dtg-pricing-service.js"></script>
+    <script src="/shared_components/js/dtg-pricing-service.js?v=20251005c"></script>
     <script src="/shared_components/js/dtg-quote-service.js"></script>
     <script src="/shared_components/js/dtg-quote-pricing.js"></script>
     <script src="/shared_components/js/dtg-quote-products.js"></script>
@@ -584,73 +567,48 @@
     
     <script>
         // Initialize Phase 1 Infrastructure
-        let quoteBuilderBase;
         let quoteFormatter;
         let lastQuoteData = null;
-        
-        // Initialize base classes with inline fallback
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DTG Quote Builder Phase 1 initializing...');
-            
-            // Check if external files loaded, provide fallback if not
-            if (typeof QuoteBuilderBase === 'undefined') {
-                console.warn('⚠️ External QuoteBuilderBase not loaded, creating inline fallback');
-                
-                // Inline fallback for QuoteBuilderBase
-                window.QuoteBuilderBase = class {
-                    constructor(config) {
-                        this.config = config;
-                        console.log('✅ Fallback QuoteBuilderBase initialized');
-                    }
-                    showSuccess(msg) { 
-                        const toast = document.createElement('div');
-                        toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
-                        toast.textContent = msg;
-                        document.body.appendChild(toast);
-                        setTimeout(() => toast.remove(), 3000);
-                    }
-                    showError(msg) { 
-                        const toast = document.createElement('div');
-                        toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#dc3545;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
-                        toast.textContent = msg;
-                        document.body.appendChild(toast);
-                        setTimeout(() => toast.remove(), 3000);
-                    }
-                    showInfo(msg) { 
-                        const toast = document.createElement('div');
-                        toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#17a2b8;color:white;padding:15px 20px;border-radius:5px;z-index:10000';
-                        toast.textContent = msg;
-                        document.body.appendChild(toast);
-                        setTimeout(() => toast.remove(), 3000);
-                    }
-                    showLoading(show, msg) { 
-                        let overlay = document.getElementById('loading-overlay-fallback');
-                        if (show) {
-                            if (!overlay) {
-                                overlay = document.createElement('div');
-                                overlay.id = 'loading-overlay-fallback';
-                                overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999';
-                                overlay.innerHTML = '<div style="background:white;padding:20px;border-radius:5px"><div>' + (msg || 'Loading...') + '</div></div>';
-                                document.body.appendChild(overlay);
-                            }
-                        } else if (overlay) {
-                            overlay.remove();
-                        }
-                    }
-                    markDirty() { /* Auto-save tracking */ }
-                    validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-                    debounce(func, wait) { 
-                        let timeout;
-                        return function(...args) {
-                            clearTimeout(timeout);
-                            timeout = setTimeout(() => func.apply(this, args), wait);
-                        };
-                    }
+
+        // Simple utility functions (no auto-save or dirty tracking)
+        const utils = {
+            showSuccess(msg) {
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:5px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            },
+            showError(msg) {
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#dc3545;color:white;padding:15px 20px;border-radius:5px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            },
+            showInfo(msg) {
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#17a2b8;color:white;padding:15px 20px;border-radius:5px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            },
+            validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+            debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
                 };
-            } else {
-                console.log('✅ External QuoteBuilderBase loaded successfully');
             }
-            
+        };
+
+        // Initialize formatter classes
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DTG Quote Builder initializing...');
+
             if (typeof QuoteFormatter === 'undefined') {
                 console.warn('⚠️ External QuoteFormatter not loaded, creating inline fallback');
                 
@@ -792,23 +750,10 @@
             } else {
                 console.log('✅ External QuoteFormatter loaded successfully');
             }
-            
-            // Initialize with either real or fallback classes
-            quoteBuilderBase = new QuoteBuilderBase({
-                prefix: 'DTG',
-                autoSaveInterval: 30000
-            });
-            
-            // Initialize formatter
+
+            // Initialize formatter only
             quoteFormatter = new QuoteFormatter();
-            
-            // Add input event listeners for auto-save
-            const inputs = document.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('change', () => quoteBuilderBase.markDirty());
-                input.addEventListener('input', quoteBuilderBase.debounce(() => quoteBuilderBase.markDirty(), 500));
-            });
-            
+
             // Add phone formatting
             document.getElementById('customer-phone')?.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/\D/g, '');
@@ -831,8 +776,8 @@
             // Add email validation
             document.getElementById('customer-email')?.addEventListener('blur', function(e) {
                 const email = e.target.value;
-                const isValid = quoteBuilderBase.validateEmail(email);
-                
+                const isValid = utils.validateEmail(email);
+
                 if (isValid) {
                     e.target.classList.remove('is-invalid');
                     e.target.classList.add('is-valid');
@@ -846,39 +791,39 @@
         // Global functions for modal buttons
         function printQuote() {
             if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+                utils.showError('No quote data available');
                 return;
             }
             quoteFormatter.openPrintDialog(lastQuoteData);
         }
-        
+
         function copyQuote() {
             if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+                utils.showError('No quote data available');
                 return;
             }
-            
+
             quoteFormatter.copyToClipboard(lastQuoteData).then(success => {
                 if (success) {
-                    quoteBuilderBase.showSuccess('Quote copied to clipboard!');
+                    utils.showSuccess('Quote copied to clipboard!');
                 } else {
-                    quoteBuilderBase.showError('Failed to copy quote');
+                    utils.showError('Failed to copy quote');
                 }
             });
         }
-        
+
         function emailQuote() {
             if (!lastQuoteData) {
-                quoteBuilderBase.showError('No quote data available');
+                utils.showError('No quote data available');
                 return;
             }
             quoteFormatter.openEmailClient(lastQuoteData);
         }
-        
+
         function copyQuoteId() {
             const quoteId = document.getElementById('modal-quote-id').textContent;
             navigator.clipboard.writeText(quoteId).then(() => {
-                quoteBuilderBase.showSuccess('Quote ID copied!');
+                utils.showSuccess('Quote ID copied!');
             });
         }
         
@@ -898,170 +843,6 @@
             document.getElementById('success-modal').style.display = 'none';
         }
         
-        // ========================================
-        // PHASE 2: PERSISTENCE INITIALIZATION
-        // This is SEPARATE from calculations
-        // Only saves/restores form data
-        // ========================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📁 Initializing DTG Persistence (Phase 2)...');
-            
-            // Only proceed if persistence classes are available
-            if (typeof QuotePersistence === 'undefined' || typeof QuoteSession === 'undefined') {
-                console.log('⚠️ Persistence not available, skipping auto-save features');
-                return;
-            }
-            
-            // Initialize persistence
-            const persistence = new QuotePersistence({
-                prefix: 'DTG',
-                autoSave: true,
-                autoSaveInterval: 30000, // 30 seconds
-                debug: true
-            });
-            
-            // Initialize session
-            const session = new QuoteSession({
-                prefix: 'DTG',
-                persistence: persistence,
-                debug: true
-            });
-            
-            // Phase 3: Initialize validation and UI feedback
-            console.log('🚀 Phase 3: Initializing advanced features...');
-            
-            // Initialize validation system
-            const validation = new QuoteValidation({
-                requiredFields: ['customer-name', 'customer-email', 'sales-rep'],
-                autoFormat: true,
-                realTimeValidation: true
-            });
-            
-            // Initialize UI feedback system
-            const uiFeedback = new QuoteUIFeedback({
-                toastDuration: 3000,
-                toastPosition: 'bottom-right',
-                loadingText: 'Processing...'
-            });
-            
-            // Make UI feedback globally available
-            window.validation = validation;
-            window.uiFeedback = uiFeedback;
-            
-            // Function to collect form data (READ ONLY - doesn't affect calculations)
-            function collectFormDataForSave() {
-                const data = {
-                    // Customer info
-                    customerName: document.getElementById('customer-name')?.value || '',
-                    customerEmail: document.getElementById('customer-email')?.value || '',
-                    customerPhone: document.getElementById('customer-phone')?.value || '',
-                    companyName: document.getElementById('company-name')?.value || '',
-                    projectName: document.getElementById('project-name')?.value || '',
-                    salesRep: document.getElementById('sales-rep')?.value || '',
-                    specialNotes: document.getElementById('special-notes')?.value || '',
-                    
-                    // Current selections (just saving state, not changing calculations)
-                    currentPhase: document.querySelector('.phase-section.active')?.id || '',
-                    selectedLocation: document.querySelector('input[name="print-location"]:checked')?.value || '',
-                    
-                    // Products (if any are loaded)
-                    products: window.dtgQuoteBuilder?.products || [],
-                    
-                    // Timestamp
-                    lastModified: new Date().toISOString()
-                };
-                
-                return data;
-            }
-            
-            // Function to restore form data (just fills in fields, calculations run normally)
-            function restoreFormDataFromSave(data) {
-                console.log('📂 Restoring saved draft...');
-                
-                // Restore customer info
-                if (data.customerName) document.getElementById('customer-name').value = data.customerName;
-                if (data.customerEmail) document.getElementById('customer-email').value = data.customerEmail;
-                if (data.customerPhone) document.getElementById('customer-phone').value = data.customerPhone;
-                if (data.companyName) document.getElementById('company-name').value = data.companyName;
-                if (data.projectName) document.getElementById('project-name').value = data.projectName;
-                if (data.salesRep) document.getElementById('sales-rep').value = data.salesRep;
-                if (data.specialNotes) document.getElementById('special-notes').value = data.specialNotes;
-                
-                // Note: We're not restoring products/location to avoid interfering with pricing
-                // User can manually reselect if needed
-                
-                console.log('✅ Draft restored (customer info only)');
-            }
-            
-            // Show save indicator
-            function showSaveIndicator(message = 'Draft saved') {
-                const indicator = document.getElementById('save-indicator');
-                const status = document.getElementById('save-status');
-                if (indicator && status) {
-                    status.textContent = message;
-                    indicator.classList.add('show');
-                    setTimeout(() => {
-                        indicator.classList.remove('show');
-                    }, 3000);
-                }
-            }
-            
-            // Set up auto-save
-            persistence.onAutoSave = function() {
-                const data = collectFormDataForSave();
-                if (persistence.save(data)) {
-                    showSaveIndicator('Draft saved');
-                    console.log('💾 Auto-save completed');
-                }
-            };
-            
-            // Mark as dirty when inputs change
-            document.querySelectorAll('#customer-name, #customer-email, #customer-phone, #company-name, #project-name, #sales-rep, #special-notes').forEach(input => {
-                input.addEventListener('input', () => {
-                    persistence.markDirty();
-                });
-                input.addEventListener('change', () => {
-                    persistence.markDirty();
-                });
-            });
-            
-            // Check for recovery on page load
-            setTimeout(() => {
-                if (session.shouldShowRecovery()) {
-                    session.showRecoveryDialog(
-                        (draft) => {
-                            restoreFormDataFromSave(draft);
-                            showSaveIndicator('Draft restored');
-                        },
-                        () => {
-                            console.log('Starting fresh quote');
-                            showSaveIndicator('Starting new quote');
-                        }
-                    );
-                }
-            }, 1000); // Small delay to let page fully load
-            
-            // Save completed quote to history (when quote is generated)
-            const originalGenerateQuote = window.generateQuote;
-            if (originalGenerateQuote) {
-                window.generateQuote = function() {
-                    // Call original function (calculations unchanged)
-                    const result = originalGenerateQuote.apply(this, arguments);
-                    
-                    // After successful generation, save to history
-                    const data = collectFormDataForSave();
-                    data.quoteId = document.getElementById('preview-quote-id')?.textContent || '';
-                    persistence.save(data, { completed: true });
-                    session.addToRecent(data);
-                    
-                    return result;
-                };
-            }
-            
-            console.log('✅ DTG Persistence initialized (auto-save enabled)');
-            console.log('ℹ️ Your pricing calculations remain completely unchanged');
-        });
     </script>
 </body>
 </html>
