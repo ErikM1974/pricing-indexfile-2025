@@ -60,3 +60,7 @@ server.log
 *-debug.*
 *.tmp
 .claude/settings.local.json
+temp/verify-dtg-pricing.js
+temp/DTG-Pricing-Formula-Verification.md
+temp/readonly/Claude's Plan.md
+temp/
