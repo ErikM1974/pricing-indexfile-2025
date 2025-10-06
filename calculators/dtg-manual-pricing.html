@@ -2434,12 +2434,12 @@
 
         // Calculate small batch pricing with all fees
         function calculateSmallBatchPricing() {
+            const quantity = state.smallBatchPanel.exactQuantity;
+
             // Only calculate if panel is shown and we have valid data
-            if (!state.smallBatchPanel.show || state.basePrice <= 0 || state.selectedLocations.length === 0) {
+            if (!state.smallBatchPanel.show || state.basePrice <= 0 || state.selectedLocations.length === 0 || quantity === 0) {
                 return null;
             }
-
-            const quantity = state.smallBatchPanel.exactQuantity;
             const sizeDistribution = state.smallBatchPanel.sizeDistribution;
 
             // Get base price for single location
@@ -2668,8 +2668,18 @@
                 const pricing = calculateSmallBatchPricing();
 
                 if (!pricing) {
-                    livePriceAmount.textContent = '$0.00';
-                    livePriceNote.innerHTML = 'For <span id="live-price-qty">0</span> total shirts';
+                    const quantity = state.smallBatchPanel.exactQuantity;
+
+                    // Show helpful message when no sizes entered
+                    if (quantity === 0) {
+                        livePriceAmount.innerHTML = '<span style="font-size: 28px; font-weight: 700; color: #FFD700; letter-spacing: 0;">Enter Sizes Below</span>';
+                        livePriceNote.innerHTML = 'Add shirt quantities to see pricing';
+                    } else {
+                        // No base price or location selected
+                        livePriceAmount.textContent = '$0.00';
+                        livePriceNote.innerHTML = 'Select base price and location above';
+                    }
+
                     updatePriceBreakdownTable(null);
                     updateOrderSummaryTable(null);
                     return;
