@@ -826,23 +826,53 @@
             console.log('📊 Using live pricing data from Caspio tables');
             console.log('✅ Labor cost, freight, and transfer prices from API');
             console.log('===================================');
-            
-            // Initialize product context from URL parameters
-            if (window.initializeProductFromURL) {
-                window.initializeProductFromURL();
-            }
 
-            // Fetch and display product information on page load
+            // Listen for product data from existing pricing-pages.js system
             const urlParams = new URLSearchParams(window.location.search);
             const styleNumber = urlParams.get('StyleNumber');
+            console.log('🚀 [DTF] Initial URL check - StyleNumber:', styleNumber);
 
-            if (styleNumber) {
-                fetchAndDisplayProduct(styleNumber);
-            } else {
-                // Hide loading, show empty state
+            // Listen for the productColorsReady event that's already working
+            window.addEventListener('productColorsReady', function(e) {
+                console.log('✅ [DTF] Received productColorsReady event:', e.detail);
+
+                // Extract data from event - now includes top-level fields
+                const productData = {
+                    productTitle: e.detail.productTitle,
+                    PRODUCT_DESCRIPTION: e.detail.productDescription,
+                    BRAND_NAME: e.detail.brandName,
+                    colors: e.detail.colors,
+                    selectedColor: e.detail.selectedColor
+                };
+
+                // Use the working data to update our UI
+                updateProductInfo(productData, e.detail.styleNumber || styleNumber);
+
+                // Hide loading, show product
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('productHero').style.display = 'block';
-            }
+                console.log('✨ [DTF] Product display complete from event');
+            });
+
+            // Fallback: Show product hero after 3 seconds even if event doesn't fire
+            setTimeout(function() {
+                const loadingState = document.getElementById('loadingState');
+                const productHero = document.getElementById('productHero');
+
+                if (loadingState && loadingState.style.display !== 'none') {
+                    console.log('⏱️ [DTF] Fallback timer: Showing product hero after 3s');
+                    loadingState.style.display = 'none';
+                    productHero.style.display = 'block';
+
+                    // Set basic fallback info if we don't have product data yet
+                    if (styleNumber) {
+                        document.getElementById('productTitle').textContent = `${styleNumber} - DTF Pricing`;
+                        document.getElementById('productDescription').textContent = 'Direct-to-Film transfer printing';
+                        document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+                        document.getElementById('currentBrand').textContent = getBrandFromStyle(styleNumber);
+                    }
+                }
+            }, 3000);
 
             // Setup search functionality
             setupSearch();
@@ -1017,7 +1047,7 @@
             });
             
             // Check for initial URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
+            // urlParams already declared above, reusing it
             const initialData = {};
             let hasData = false;
             
@@ -1142,51 +1172,46 @@
                 return brandMap[stylePrefix] || 'Premium Brand';
             }
 
-            // Fetch and display product information
-            async function fetchAndDisplayProduct(styleNumber) {
-                try {
-                    console.log('📦 Fetching product:', styleNumber);
-
-                    // Fetch from product details API
-                    const response = await fetch(`/api/product-details?styleNumber=${styleNumber}`);
-                    if (!response.ok) {
-                        throw new Error('Product not found');
-                    }
-
-                    const product = await response.json();
-                    console.log('✅ Product data received:', product);
-
-                    // Update product information
-                    updateProductInfo(product, styleNumber);
-
-                    // Hide loading, show product
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('productHero').style.display = 'block';
-
-                } catch (error) {
-                    console.error('❌ Error fetching product:', error);
-
-                    // Hide loading, show product with fallback
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('productHero').style.display = 'block';
-
-                    // Set fallback info
-                    document.getElementById('productTitle').textContent = `${styleNumber} - DTF Pricing`;
-                    document.getElementById('productDescription').textContent = 'Direct-to-Film transfer printing';
-                    document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
-                    document.getElementById('currentBrand').textContent = getBrandFromStyle(styleNumber);
-                }
-            }
+            // REMOVED: fetchAndDisplayProduct() - This function tried to fetch from /api/product-details which doesn't exist
+            // Instead, we now listen for the 'productColorsReady' event dispatched by pricing-pages.js
+            // which successfully fetches from /api/product-colors and provides all the data we need.
+            // The working event listener is in the initialization code below.
 
             // Update product information with images and colors
             function updateProductInfo(product, styleNumber) {
-                console.log('📝 Updating product info with:', product);
+                console.log('📝 [DTF] updateProductInfo called');
+                console.log('📦 [DTF] Product data:', product);
+                console.log('🏷️ [DTF] Style number:', styleNumber);
 
-                // Update breadcrumb Products link to include style parameter
+                // DIAGNOSTIC: Log exact structure to identify field names
+                console.log('🔍 [DTF] DIAGNOSTIC - Full product object:', JSON.stringify(product, null, 2));
+                console.log('🔍 [DTF] DIAGNOSTIC - Product keys:', Object.keys(product));
+                console.log('🔍 [DTF] DIAGNOSTIC - Checking image fields:');
+                console.log('  - FRONT_MODEL:', product.FRONT_MODEL);
+                console.log('  - FRONT_FLAT:', product.FRONT_FLAT);
+                console.log('  - PRODUCT_IMAGE:', product.PRODUCT_IMAGE);
+                console.log('  - front_model:', product.front_model);
+                console.log('  - frontModel:', product.frontModel);
+                console.log('  - image:', product.image);
+                console.log('  - imageUrl:', product.imageUrl);
+                console.log('🔍 [DTF] DIAGNOSTIC - Colors data:', product.colors);
+                if (product.colors) {
+                    console.log('🔍 [DTF] DIAGNOSTIC - Colors array length:', product.colors.length);
+                    if (product.colors.length > 0) {
+                        console.log('🔍 [DTF] DIAGNOSTIC - First color object:', product.colors[0]);
+                        console.log('🔍 [DTF] DIAGNOSTIC - First color keys:', Object.keys(product.colors[0]));
+                    }
+                }
+
+                // Update breadcrumb Products link - link back to specific product page
                 const productsBreadcrumb = document.getElementById('products-breadcrumb');
                 if (productsBreadcrumb && styleNumber) {
-                    productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
-                    console.log('✅ Updated products breadcrumb with style:', styleNumber);
+                    productsBreadcrumb.href = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}`;
+                    console.log('✅ Updated breadcrumb to product page:', styleNumber);
+                } else if (productsBreadcrumb) {
+                    // Fallback to main catalog if no style number
+                    productsBreadcrumb.href = '/';
+                    console.log('⚠️ No style number, breadcrumb links to main catalog');
                 }
 
                 // Use PRODUCT_TITLE from API or fallback
@@ -1202,116 +1227,130 @@
                 document.getElementById('productDescription').textContent = description;
                 document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
                 document.getElementById('currentBrand').textContent = brand;
+                console.log('✏️ [DTF] Text fields updated:', { title, description, brand });
 
                 // Update product image
+                console.log('🖼️ [DTF] Calling updateProductImage...');
                 updateProductImage(product);
 
                 // Update color swatches
+                console.log('🎨 [DTF] Calling updateColorSwatches...');
                 updateColorSwatches(product);
 
-                console.log('✅ Product info updated:', { title, description, brand });
+                console.log('✅ [DTF] Product info update complete');
             }
 
             // Update product image
             function updateProductImage(product) {
+                console.log('🖼️ [DTF] updateProductImage called');
                 const imageEl = document.getElementById('productImage');
                 const placeholderEl = document.getElementById('imagePlaceholder');
 
-                // Check for API product image fields first
-                let imageUrl = product.FRONT_MODEL || product.FRONT_FLAT || product.PRODUCT_IMAGE;
+                // Try selectedColor first (most reliable source)
+                const selectedColor = product.selectedColor || (product.colors && product.colors[0]);
 
-                if (imageUrl) {
-                    // Use image from product details API
-                    imageEl.src = imageUrl;
-                    imageEl.style.display = 'block';
-                    placeholderEl.style.display = 'none';
-                    console.log('✅ Product image updated from API:', imageUrl);
-
-                    // Update color if available from API
-                    if (product.COLOR_NAME) {
-                        document.getElementById('currentColor').textContent = product.COLOR_NAME;
-                    }
-                } else if (product.colors && product.colors.length > 0) {
-                    // Fallback to color images
-                    const firstColorWithImage = product.colors.find(c => c.MAIN_IMAGE_URL) || product.colors[0];
-
-                    if (firstColorWithImage && firstColorWithImage.MAIN_IMAGE_URL) {
-                        imageEl.src = firstColorWithImage.MAIN_IMAGE_URL;
+                if (selectedColor) {
+                    const imageUrl = selectedColor.MAIN_IMAGE_URL || selectedColor.FRONT_MODEL || selectedColor.FRONT_FLAT;
+                    if (imageUrl) {
+                        imageEl.src = imageUrl;
                         imageEl.style.display = 'block';
                         placeholderEl.style.display = 'none';
+                        console.log('✅ [DTF] Image displayed:', imageUrl);
 
-                        // Update current color display
-                        if (firstColorWithImage.COLOR_NAME) {
-                            document.getElementById('currentColor').textContent = firstColorWithImage.COLOR_NAME;
-                        }
-                    } else {
-                        imageEl.style.display = 'none';
-                        placeholderEl.style.display = 'flex';
+                        // Update current color
+                        const colorName = selectedColor.COLOR_NAME || 'Color';
+                        document.getElementById('currentColor').textContent = colorName;
+                        return;
                     }
-                } else {
-                    imageEl.style.display = 'none';
-                    placeholderEl.style.display = 'flex';
                 }
+
+                // Fallback: show placeholder
+                console.warn('⚠️ [DTF] No image found');
+                imageEl.style.display = 'none';
+                placeholderEl.style.display = 'flex';
+                placeholderEl.innerHTML = '<i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i><div>Image Not Available</div>';
             }
 
             // Update color swatches
             function updateColorSwatches(product) {
+                console.log('🎨 [DTF] updateColorSwatches called');
                 const swatchesSection = document.getElementById('colorSwatchesSection');
                 const swatchesContainer = document.getElementById('colorSwatches');
 
-                if (product.colors && product.colors.length > 0) {
-                    swatchesContainer.innerHTML = '';
+                const colors = product.colors;
+                if (!colors || colors.length === 0) {
+                    console.warn('⚠️ [DTF] No colors array found');
+                    swatchesSection.style.display = 'none';
+                    return;
+                }
 
-                    product.colors.forEach(color => {
-                        const swatch = document.createElement('div');
-                        swatch.className = 'color-swatch';
-                        swatch.style.cssText = `
-                            width: 40px;
-                            height: 40px;
-                            border-radius: 8px;
-                            border: 2px solid #e5e7eb;
-                            cursor: pointer;
-                            display: inline-block;
-                            margin-right: 8px;
-                            margin-bottom: 8px;
-                            position: relative;
-                            overflow: hidden;
-                        `;
+                console.log(`🎨 [DTF] Creating ${colors.length} color swatches`);
+                swatchesContainer.innerHTML = '';
 
-                        if (color.HEX_CODE) {
-                            swatch.style.backgroundColor = color.HEX_CODE;
-                        } else if (color.COLOR_SQUARE_IMAGE) {
-                            swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
-                            swatch.style.backgroundSize = 'cover';
-                        } else {
-                            // Default pattern for missing color
-                            swatch.style.background = 'linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%)';
-                            swatch.style.backgroundSize = '20px 20px';
-                        }
+                colors.forEach((color) => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                        border: 2px solid #e5e7eb;
+                        cursor: pointer;
+                        display: inline-block;
+                        margin-right: 8px;
+                        margin-bottom: 8px;
+                        position: relative;
+                        overflow: hidden;
+                        transition: all 0.2s;
+                    `;
 
-                        swatch.title = color.COLOR_NAME || 'Color';
+                    // Use color square image or hex code
+                    if (color.COLOR_SQUARE_IMAGE) {
+                        swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                        swatch.style.backgroundSize = 'cover';
+                    } else if (color.HEX_CODE) {
+                        swatch.style.backgroundColor = color.HEX_CODE;
+                    } else {
+                        swatch.style.background = 'linear-gradient(135deg, #f0f0f0, #e0e0e0)';
+                    }
 
-                        // Add click handler to change product image
-                        swatch.addEventListener('click', () => {
-                            if (color.MAIN_IMAGE_URL) {
-                                document.getElementById('productImage').src = color.MAIN_IMAGE_URL;
-                                document.getElementById('productImage').style.display = 'block';
-                                document.getElementById('imagePlaceholder').style.display = 'none';
-                            }
+                    swatch.title = color.COLOR_NAME || 'Color';
 
-                            // Update current color display
-                            if (color.COLOR_NAME) {
-                                document.getElementById('currentColor').textContent = color.COLOR_NAME;
-                            }
-                        });
-
-                        swatchesContainer.appendChild(swatch);
+                    // Hover effect
+                    swatch.addEventListener('mouseenter', () => {
+                        swatch.style.transform = 'scale(1.1)';
+                        swatch.style.borderColor = '#3a7c52';
+                    });
+                    swatch.addEventListener('mouseleave', () => {
+                        swatch.style.transform = 'scale(1)';
+                        swatch.style.borderColor = '#e5e7eb';
                     });
 
-                    swatchesSection.style.display = 'block';
-                } else {
-                    swatchesSection.style.display = 'none';
-                }
+                    // Click to change image
+                    swatch.addEventListener('click', () => {
+                        const imageUrl = color.MAIN_IMAGE_URL || color.FRONT_MODEL || color.FRONT_FLAT;
+                        if (imageUrl) {
+                            document.getElementById('productImage').src = imageUrl;
+                            document.getElementById('productImage').style.display = 'block';
+                            document.getElementById('imagePlaceholder').style.display = 'none';
+                            document.getElementById('currentColor').textContent = color.COLOR_NAME || 'Color';
+                            console.log(`✅ [DTF] Changed to ${color.COLOR_NAME}`);
+
+                            // Highlight selected swatch
+                            document.querySelectorAll('.color-swatch').forEach(s => {
+                                s.style.borderColor = '#e5e7eb';
+                                s.style.borderWidth = '2px';
+                            });
+                            swatch.style.borderColor = '#3a7c52';
+                            swatch.style.borderWidth = '3px';
+                        }
+                    });
+
+                    swatchesContainer.appendChild(swatch);
+                });
+
+                swatchesSection.style.display = 'block';
+                console.log('✅ [DTF] Color swatches displayed');
             }
 
             // Setup search functionality with API integration
