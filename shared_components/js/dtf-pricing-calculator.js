@@ -1,54 +1,54 @@
 /**
- * DTF Pricing Calculator Component
- * Main calculator logic for DTF transfer pricing
+ * DTF Pricing Calculator Component - Toggle Interface
+ * Implements Location = Size model with iOS-style toggle switches
+ * 100% API-driven pricing with HalfDollarCeil rounding
  */
 class DTFPricingCalculator {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.pricingService = new DTFPricingService();
         this.apiDataLoaded = false;
-        this.isRendered = false;  // Track if render() has completed
-        this.pendingUpdates = [];  // Queue for updates that arrive before render
+        this.isRendered = false;
+        this.pendingUpdates = [];
+        this.apiData = null;
+
         this.currentData = {
             garmentCost: 0,
             quantity: DTFConfig.settings.defaultQuantity,
-            transfers: [],
-            freight: 0,
-            ltmFee: 0,
-            autoCalculateLTM: true  // Automatically calculate LTM based on quantity
+            selectedTier: '24-47', // Default tier
+            selectedLocations: new Set(), // Set of location values
+            autoCalculateLTM: true
         };
+
         this.init();
     }
 
     async init() {
-        // Show loading state initially
         this.showLoadingState();
-        
+
         try {
-            // Load API data
             await this.loadApiData();
             this.apiDataLoaded = true;
             console.log('[DTF Calculator] API data loaded successfully');
         } catch (error) {
             console.error('[DTF Calculator] Failed to load API data:', error);
-            // Will fall back to hardcoded values in DTFConfig
+            this.showError('Unable to load pricing data. Please call 253-922-5793');
+            return;
         }
-        
+
         this.render();
         this.attachEventListeners();
         this.checkStaffViewStatus();
-        this.addTransferLocation(); // Start with one location
-        
-        // Mark as rendered and process any pending updates
+
         this.isRendered = true;
         this.processPendingUpdates();
-        
+
         // Dispatch ready event
-        window.dispatchEvent(new CustomEvent('dtfCalculatorReady', { 
-            detail: { calculator: this } 
+        window.dispatchEvent(new CustomEvent('dtfCalculatorReady', {
+            detail: { calculator: this }
         }));
     }
-    
+
     processPendingUpdates() {
         while (this.pendingUpdates.length > 0) {
             const update = this.pendingUpdates.shift();
@@ -57,47 +57,79 @@ class DTFPricingCalculator {
     }
 
     async loadApiData() {
+        // Fetch from pricing-bundle endpoint
         const apiData = await this.pricingService.fetchPricingData();
-        
-        // Update DTFConfig with API data if available
-        if (apiData && apiData.transferSizes) {
-            // Merge API data into existing config while keeping UI elements
-            this.mergeApiDataIntoConfig(apiData);
+
+        if (!apiData) {
+            throw new Error('No API data received');
         }
-        
+
+        this.apiData = apiData;
+
+        // Update DTFConfig with API data
+        this.mergeApiDataIntoConfig(apiData);
+
         return apiData;
     }
 
     mergeApiDataIntoConfig(apiData) {
-        // Update transfer pricing from API
-        if (apiData.transferSizes) {
-            Object.keys(apiData.transferSizes).forEach(sizeKey => {
+        // Update transfer sizes and pricing from API
+        if (apiData.allDtfCostsR && Array.isArray(apiData.allDtfCostsR)) {
+            // Build pricing tiers from allDtfCostsR
+            const tierMap = {};
+
+            apiData.allDtfCostsR.forEach(cost => {
+                const priceType = cost.price_type; // 'Small', 'Medium', 'Large'
+                const quantityRange = cost.quantity_range; // '10-23', '24-47', etc.
+                const unitPrice = parseFloat(cost.unit_price);
+
+                const sizeKey = priceType.toLowerCase();
+
+                if (!tierMap[sizeKey]) {
+                    tierMap[sizeKey] = [];
+                }
+
+                // Parse quantity range
+                const [minQty, maxQty] = this.parseQuantityRange(quantityRange);
+
+                tierMap[sizeKey].push({
+                    minQty,
+                    maxQty,
+                    unitPrice,
+                    range: quantityRange
+                });
+            });
+
+            // Update DTFConfig with parsed tiers
+            Object.keys(tierMap).forEach(sizeKey => {
                 if (DTFConfig.transferSizes[sizeKey]) {
-                    DTFConfig.transferSizes[sizeKey].pricingTiers = apiData.transferSizes[sizeKey].pricingTiers;
+                    DTFConfig.transferSizes[sizeKey].pricingTiers = tierMap[sizeKey];
                 }
             });
         }
-        
+
         // Update freight costs from API
-        if (apiData.freightTiers) {
-            DTFConfig.freightCost.tiers = apiData.freightTiers;
+        if (apiData.freightR && Array.isArray(apiData.freightR)) {
+            DTFConfig.freightCost.tiers = apiData.freightR.map(freight => {
+                const [minQty, maxQty] = this.parseQuantityRange(freight.quantity_range);
+                return {
+                    minQty,
+                    maxQty,
+                    costPerTransfer: parseFloat(freight.cost_per_transfer)
+                };
+            });
         }
-        
-        // Update labor cost from API
-        if (apiData.laborCostPerLocation) {
-            DTFConfig.laborCost.costPerLocation = apiData.laborCostPerLocation;
-        }
-        
-        // Update LTM fee from API
-        if (apiData.pricingTiers && apiData.pricingTiers.length > 0) {
-            const ltmTier = apiData.pricingTiers.find(t => t.ltmFee > 0);
-            if (ltmTier) {
-                DTFConfig.settings.ltmFeeAmount = ltmTier.ltmFee;
-                DTFConfig.settings.ltmFeeThreshold = ltmTier.maxQuantity + 1;
-            }
-        }
-        
+
         console.log('[DTF Calculator] Config updated with API data');
+    }
+
+    parseQuantityRange(range) {
+        // Parse "10-23", "24-47", "72+" etc.
+        if (range.includes('+')) {
+            return [parseInt(range), 999999];
+        }
+        const parts = range.split('-');
+        return [parseInt(parts[0]), parseInt(parts[1] || parts[0])];
     }
 
     showLoadingState() {
@@ -113,369 +145,352 @@ class DTFPricingCalculator {
         }
     }
 
+    showError(message) {
+        if (this.container) {
+            this.container.innerHTML = `
+                <div class="alert alert-danger">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="window.location.href='tel:+12539225793'">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+            `;
+        }
+    }
+
     render() {
         this.container.innerHTML = `
-            <div class="dtf-calculator-wrapper">
-                <div class="dtf-calculator-main">
-                    <div class="quantity-section">
-                        <h3>Quantity</h3>
-                        <div class="quantity-input-group">
-                            <label for="dtf-quantity">Number of Garments:</label>
-                            <input type="number" id="dtf-quantity" class="form-control" 
-                                   value="${this.currentData.quantity}" 
-                                   min="${DTFConfig.settings.minQuantity}" 
-                                   step="1">
-                        </div>
-                        <div class="alert alert-info mt-2">
-                            <i class="fas fa-info-circle"></i> Minimum order: ${DTFConfig.settings.minQuantity} pieces
-                        </div>
-                    </div>
-
-                    <div class="transfers-section">
-                        <h3>Transfer Locations</h3>
-                        <div id="transfer-locations-container"></div>
-                        <button class="btn btn-secondary add-transfer-btn" id="add-transfer-btn">
-                            <i class="fas fa-plus"></i> Add Transfer Location
-                        </button>
-                    </div>
-
-                    <div class="accordion-section">
-                        <div class="accordion" id="dtfAccordion">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingOne">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                        <i class="fas fa-ruler"></i> Size Guide
-                                    </button>
-                                </h2>
-                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" 
-                                     data-bs-parent="#dtfAccordion">
-                                    <div class="accordion-body">
-                                        <div class="size-guide">
-                                            <p><strong>Small (Up to 5" x 5")</strong><br>
-                                            Perfect for logos, small designs, pocket prints, and sleeve designs.</p>
-                                            
-                                            <p><strong>Medium (Up to 9" x 12")</strong><br>
-                                            Ideal for standard front/back designs and larger graphics.</p>
-                                            
-                                            <p><strong>Large (Up to 12" x 16.5")</strong><br>
-                                            Maximum size for full coverage designs and oversized prints.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item internal-only">
-                                <h2 class="accordion-header" id="headingTwo">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        <i class="fas fa-dollar-sign"></i> Pricing Tiers
-                                    </button>
-                                </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" 
-                                     data-bs-parent="#dtfAccordion">
-                                    <div class="accordion-body">
-                                        ${this.generatePricingTiersHTML()}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="accordion-item internal-only">
-                                <h2 class="accordion-header" id="headingThree">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                        <i class="fas fa-calculator"></i> Pricing Formula
-                                    </button>
-                                </h2>
-                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" 
-                                     data-bs-parent="#dtfAccordion">
-                                    <div class="accordion-body">
-                                        <div class="formula-explanation">
-                                            <h5>Total Price Per Shirt = </h5>
-                                            <p>Garment Cost (with 40% margin) +<br>
-                                            Transfer Costs (based on size and quantity) +<br>
-                                            Labor Cost ($2 per location) +<br>
-                                            Freight (tiered by quantity) + LTM Fee</p>
-                                            
-                                            <div class="alert alert-info mt-3">
-                                                <i class="fas fa-info-circle"></i> 
-                                                Freight is calculated per transfer based on order quantity.
-                                            </div>
-                                            
-                                            <h6 class="mt-3">Freight Tiers:</h6>
-                                            <table class="table table-sm">
-                                                <tbody>
-                                                    <tr><td>10-49 qty:</td><td>$0.50 per transfer</td></tr>
-                                                    <tr><td>50-99 qty:</td><td>$0.35 per transfer</td></tr>
-                                                    <tr><td>100-199 qty:</td><td>$0.25 per transfer</td></tr>
-                                                    <tr><td>200+ qty:</td><td>$0.15 per transfer</td></tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="dtf-toggle-pricing-container">
+                <!-- Left Column: Print Locations -->
+                <div class="dtf-locations-column">
+                    <h3 class="dtf-column-header">Print Locations</h3>
+                    <div id="dtf-location-toggles"></div>
+                    <div class="dtf-info-box mt-4">
+                        <i class="fas fa-info-circle"></i>
+                        Transfer sizes are automatically determined by location selection
                     </div>
                 </div>
 
-                <div class="dtf-calculator-summary">
-                    <h3>Order Summary</h3>
-                    <div id="order-summary-content">
-                        <!-- Summary will be populated here -->
-                    </div>
-                    <div class="staff-view-toggle">
-                        <a href="#" id="staff-view-link" class="text-muted">
-                            <i class="fas fa-chart-bar"></i> Internal View
-                        </a>
+                <!-- Right Column: Quantity Tiers -->
+                <div class="dtf-tiers-column">
+                    <h3 class="dtf-column-header">Quantity Tiers</h3>
+                    <div id="dtf-tier-buttons"></div>
+                </div>
+            </div>
+
+            <!-- Live Price Display -->
+            <div class="dtf-live-price-display">
+                <div class="dtf-price-amount">$<span id="dtf-live-price">0.00</span></div>
+                <div class="dtf-price-details" id="dtf-price-details">
+                    <span id="dtf-quantity-display">0</span> pieces + <span id="dtf-locations-display">0</span> location(s)
+                </div>
+                <div id="dtf-ltm-warning" class="dtf-ltm-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Orders under 24 pieces include a $50.00 setup fee
+                </div>
+            </div>
+
+            <!-- Accordions for additional info -->
+            <div class="accordion-section mt-4">
+                <div class="accordion" id="dtfAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseGuide">
+                                <i class="fas fa-ruler"></i> Size Guide
+                            </button>
+                        </h2>
+                        <div id="collapseGuide" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <p><strong>Small (Up to 5" x 5")</strong><br>
+                                Perfect for logos, small designs, pocket prints, and sleeve designs.</p>
+
+                                <p><strong>Medium (Up to 9" x 12")</strong><br>
+                                Ideal for standard front/back designs and larger graphics.</p>
+
+                                <p><strong>Large (Up to 12" x 16.5")</strong><br>
+                                Maximum size for full coverage designs and oversized prints.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+
+        // Render toggles and tiers
+        this.renderLocationToggles();
+        this.renderTierButtons();
+        this.updatePricingDisplay();
     }
 
-    generatePricingTiersHTML() {
-        let html = '<div class="pricing-tiers-grid">';
-        
-        Object.entries(DTFConfig.transferSizes).forEach(([key, size]) => {
+    renderLocationToggles() {
+        const container = document.getElementById('dtf-location-toggles');
+
+        // Group locations by size
+        const locationsBySize = {
+            small: DTFConfig.helpers.getLocationsBySize('small'),
+            medium: DTFConfig.helpers.getLocationsBySize('medium'),
+            large: DTFConfig.helpers.getLocationsBySize('large')
+        };
+
+        let html = '';
+
+        // Render each size category
+        Object.entries(locationsBySize).forEach(([sizeKey, locations]) => {
+            if (locations.length === 0) return;
+
+            const sizeInfo = DTFConfig.transferSizes[sizeKey];
+
             html += `
-                <div class="size-tier-section">
-                    <h5>${size.displayName} (${size.name})</h5>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Quantity</th>
-                                <th>Price/Transfer</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div class="dtf-size-category">
+                    <div class="dtf-size-category-header">
+                        <span class="dtf-size-badge">${sizeInfo.name}</span>
+                        ${sizeKey.charAt(0).toUpperCase() + sizeKey.slice(1)}
+                    </div>
+                    <div class="dtf-location-list">
             `;
-            
-            size.pricingTiers.forEach(tier => {
+
+            locations.forEach(location => {
+                const isActive = this.currentData.selectedLocations.has(location.value);
+
                 html += `
-                    <tr>
-                        <td>${tier.range}</td>
-                        <td>$${tier.unitPrice.toFixed(2)}</td>
-                    </tr>
+                    <div class="dtf-toggle-item ${isActive ? 'active' : ''}" data-location="${location.value}">
+                        <span class="dtf-toggle-label">${location.label}</span>
+                        <div class="dtf-toggle-switch">
+                            <div class="dtf-toggle-switch-slider"></div>
+                        </div>
+                    </div>
                 `;
             });
-            
+
             html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        });
-        
-        html += '</div>';
-        return html;
-    }
-
-    addTransferLocation() {
-        if (this.currentData.transfers.length >= DTFConfig.settings.maxTransferLocations) {
-            alert(`Maximum ${DTFConfig.settings.maxTransferLocations} transfer locations allowed.`);
-            return;
-        }
-
-        const transferId = Date.now();
-        const transferNumber = this.currentData.transfers.length + 1;
-        
-        this.currentData.transfers.push({
-            id: transferId,
-            location: '',
-            size: '',
-            number: transferNumber
-        });
-
-        this.renderTransferLocations();
-        this.updateSummary();
-    }
-
-    renderTransferLocations() {
-        const container = document.getElementById('transfer-locations-container');
-        container.innerHTML = '';
-
-        this.currentData.transfers.forEach((transfer, index) => {
-            const locationOptions = DTFConfig.transferLocations.map(loc => 
-                `<option value="${loc.value}" ${transfer.location === loc.value ? 'selected' : ''}>${loc.label}</option>`
-            ).join('');
-
-            const allowedSizes = transfer.location ? 
-                DTFConfig.helpers.getAllowedSizesForLocation(transfer.location) : [];
-            
-            const sizeOptions = allowedSizes.map(sizeKey => {
-                const size = DTFConfig.transferSizes[sizeKey];
-                return `<option value="${sizeKey}" ${transfer.size === sizeKey ? 'selected' : ''}>${size.displayName}</option>`;
-            }).join('');
-
-            const transferHTML = `
-                <div class="transfer-location-item" data-transfer-id="${transfer.id}">
-                    <div class="transfer-header">
-                        <span class="transfer-number">${transfer.number}</span>
-                        <h4>Transfer Location ${transfer.number}</h4>
-                        ${index > 0 ? `<button class="btn-remove-transfer" data-transfer-id="${transfer.id}">
-                            <i class="fas fa-times"></i>
-                        </button>` : ''}
-                    </div>
-                    <div class="transfer-inputs">
-                        <div class="form-group">
-                            <label>Location:</label>
-                            <select class="form-control transfer-location-select" data-transfer-id="${transfer.id}">
-                                <option value="">Select Location</option>
-                                ${locationOptions}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Size:</label>
-                            <select class="form-control transfer-size-select" data-transfer-id="${transfer.id}" 
-                                    ${!transfer.location ? 'disabled' : ''}>
-                                <option value="">Select Size</option>
-                                ${sizeOptions}
-                            </select>
-                        </div>
                     </div>
                 </div>
             `;
-
-            container.insertAdjacentHTML('beforeend', transferHTML);
         });
 
-        // Update add button state
-        const addBtn = document.getElementById('add-transfer-btn');
-        if (this.currentData.transfers.length >= DTFConfig.settings.maxTransferLocations) {
-            addBtn.disabled = true;
-            addBtn.innerHTML = `<i class="fas fa-times"></i> Maximum Locations Reached`;
+        container.innerHTML = html;
+    }
+
+    renderTierButtons() {
+        const container = document.getElementById('dtf-tier-buttons');
+
+        const tiers = [
+            { value: '10-23', label: '10-23 pieces' },
+            { value: '24-47', label: '24-47 pieces' },
+            { value: '48-71', label: '48-71 pieces' },
+            { value: '72+', label: '72+ pieces' }
+        ];
+
+        let html = '';
+
+        tiers.forEach(tier => {
+            const isSelected = this.currentData.selectedTier === tier.value;
+
+            html += `
+                <button class="dtf-tier-button ${isSelected ? 'selected' : ''}" data-tier="${tier.value}">
+                    ${tier.label}
+                </button>
+            `;
+        });
+
+        // Add conditional quantity input for 10-23 tier
+        const showInput = this.currentData.selectedTier === '10-23';
+
+        html += `
+            <div class="dtf-quantity-input-container ${showInput ? 'show' : ''}">
+                <label class="dtf-quantity-input-label">Enter Exact Quantity (10-23):</label>
+                <input type="number" id="dtf-exact-quantity" class="dtf-quantity-input"
+                       min="10" max="23" value="${this.currentData.quantity}" />
+                <small class="dtf-quantity-hint">
+                    <i class="fas fa-info-circle"></i> Required for accurate LTM fee calculation
+                </small>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    handleToggleClick(locationValue) {
+        const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
+        if (!location) return;
+
+        // Check if location is currently active
+        const wasActive = this.currentData.selectedLocations.has(locationValue);
+
+        if (wasActive) {
+            // Deactivate
+            this.currentData.selectedLocations.delete(locationValue);
         } else {
-            addBtn.disabled = false;
-            addBtn.innerHTML = `<i class="fas fa-plus"></i> Add Transfer Location`;
-        }
-    }
+            // Get conflicting locations and deactivate them
+            const conflicts = DTFConfig.helpers.getConflictingLocations(locationValue);
+            conflicts.forEach(conflictLoc => {
+                this.currentData.selectedLocations.delete(conflictLoc);
+            });
 
-    removeTransferLocation(transferId) {
-        this.currentData.transfers = this.currentData.transfers.filter(t => t.id !== transferId);
-        
-        // Renumber remaining transfers
-        this.currentData.transfers.forEach((transfer, index) => {
-            transfer.number = index + 1;
-        });
-
-        this.renderTransferLocations();
-        this.updateSummary();
-    }
-
-    updateTransferLocation(transferId, field, value) {
-        const transfer = this.currentData.transfers.find(t => t.id === transferId);
-        if (!transfer) return;
-
-        transfer[field] = value;
-
-        if (field === 'location') {
-            // Reset size when location changes
-            transfer.size = '';
-            this.renderTransferLocations();
+            // Activate this location
+            this.currentData.selectedLocations.add(locationValue);
         }
 
-        // Force immediate recalculation to ensure pricing is current
-        // This ensures that any API pricing changes are reflected immediately
-        this.calculatePricing();
-        this.updateSummary();
+        // Re-render toggles to update UI
+        this.renderLocationToggles();
+        this.updatePricingDisplay();
+    }
+
+    handleTierSelection(tierValue) {
+        this.currentData.selectedTier = tierValue;
+
+        // Set quantity based on tier
+        if (tierValue === '10-23') {
+            // Keep current quantity if in range, otherwise set to 10
+            if (this.currentData.quantity < 10 || this.currentData.quantity > 23) {
+                this.currentData.quantity = 10;
+            }
+        } else if (tierValue === '24-47') {
+            this.currentData.quantity = 24;
+        } else if (tierValue === '48-71') {
+            this.currentData.quantity = 48;
+        } else if (tierValue === '72+') {
+            this.currentData.quantity = 72;
+        }
+
+        // Re-render tier buttons
+        this.renderTierButtons();
+        this.updatePricingDisplay();
     }
 
     calculatePricing() {
         const quantity = this.currentData.quantity;
-        
-        // Get margin denominator from API if available, otherwise use default
-        const marginDenominator = this.apiDataLoaded && this.pricingService.apiData 
-            ? this.pricingService.getMarginDenominator(quantity)
-            : DTFConfig.settings.garmentMargin;
-        
-        const garmentCost = this.currentData.garmentCost / marginDenominator; // Apply margin
-        
-        // Calculate transfer costs
+        const garmentCost = this.currentData.garmentCost;
+
+        // Check for missing garment cost
+        if (!garmentCost || garmentCost === 0) {
+            return {
+                error: 'No garment cost',
+                unitPrice: 0,
+                totalOrder: 0
+            };
+        }
+
+        // Step 1: Garment cost with margin
+        const marginDenominator = DTFConfig.settings.garmentMargin; // 0.6
+        const markedUpGarment = garmentCost / marginDenominator;
+
+        // Step 2: Calculate transfer costs for all selected locations
         let totalTransferCost = 0;
         const transferDetails = [];
 
-        this.currentData.transfers.forEach(transfer => {
-            if (transfer.location && transfer.size) {
-                // Use API service if available, otherwise fall back to config
-                const price = this.apiDataLoaded && this.pricingService.apiData
-                    ? this.pricingService.getTransferPrice(transfer.size, quantity)
-                    : DTFConfig.helpers.getTransferPrice(transfer.size, quantity);
-                    
-                totalTransferCost += price;
-                
-                const location = DTFConfig.transferLocations.find(l => l.value === transfer.location);
-                const size = DTFConfig.transferSizes[transfer.size];
-                
-                transferDetails.push({
-                    number: transfer.number,
-                    location: location.label,
-                    size: size.displayName.split(' (')[0], // Just show "Small", "Medium", or "Large" in summary
-                    price: price
-                });
-            }
+        this.currentData.selectedLocations.forEach(locationValue => {
+            const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
+            if (!location) return;
+
+            const sizeKey = location.size;
+            const transferPrice = DTFConfig.helpers.getTransferPrice(sizeKey, quantity);
+
+            totalTransferCost += transferPrice;
+            transferDetails.push({
+                location: location.label,
+                size: sizeKey,
+                price: transferPrice
+            });
         });
 
-        // Calculate labor cost from API if available
-        const locationCount = this.currentData.transfers.filter(t => t.location && t.size).length;
-        const laborCostPerLocation = this.apiDataLoaded && this.pricingService.apiData
-            ? this.pricingService.getLaborCostPerLocation()
-            : DTFConfig.laborCost.costPerLocation;
-        const laborCost = locationCount > 0 ? laborCostPerLocation * locationCount : 0;
+        // Step 3: Labor cost ($2 per location)
+        const locationCount = this.currentData.selectedLocations.size;
+        const laborCost = locationCount * DTFConfig.laborCost.costPerLocation;
 
-        // Calculate freight based on quantity and number of transfers
-        let freightCost = 0;
-        if (DTFConfig.settings.includeFreightInTransfers && locationCount > 0) {
-            // Use API service for freight if available
-            const freightPerTransfer = this.apiDataLoaded && this.pricingService.apiData
-                ? this.pricingService.getFreightPerTransfer(quantity)
-                : DTFConfig.freightCost.getFreightPerTransfer(quantity);
-            freightCost = freightPerTransfer * locationCount;
-        } else {
-            freightCost = this.currentData.freight;
+        // Step 4: Freight (cost per transfer × number of locations)
+        const freightPerTransfer = DTFConfig.freightCost.getFreightPerTransfer(quantity);
+        const freightCost = freightPerTransfer * locationCount;
+
+        // Step 5: Subtotal (before LTM)
+        const subtotal = markedUpGarment + totalTransferCost + laborCost + freightCost;
+
+        // Step 6: LTM Fee (only for quantities under 24)
+        let ltmFee = 0;
+        let ltmFeePerUnit = 0;
+        if (quantity < DTFConfig.settings.ltmFeeThreshold) {
+            ltmFee = DTFConfig.settings.ltmFeeAmount; // $50
+            ltmFeePerUnit = ltmFee / quantity;
         }
 
-        // Calculate LTM fee if auto-calculate is on
-        let ltmFee = this.currentData.ltmFee;
-        if (this.currentData.autoCalculateLTM && DTFConfig.settings.showLTMFee) {
-            // Use API service for LTM if available
-            ltmFee = this.apiDataLoaded && this.pricingService.apiData
-                ? this.pricingService.getLTMFee(quantity)
-                : (quantity < DTFConfig.settings.ltmFeeThreshold ? DTFConfig.settings.ltmFeeAmount : 0);
-        }
+        // Step 7: Total per unit (subtotal + LTM fee per unit)
+        const totalPerUnit = subtotal + ltmFeePerUnit;
 
-        // Total per shirt
-        const totalPerShirt = garmentCost + totalTransferCost + laborCost + 
-                            freightCost + (ltmFee / quantity);  // Distribute LTM across all pieces
+        // Step 8: Round UP to nearest $0.50 (HalfDollarCeil)
+        const finalUnitPrice = this.roundHalfDollarCeil(totalPerUnit);
+
+        // Total order calculation
+        const totalOrder = (finalUnitPrice * quantity);
 
         return {
             quantity,
-            garmentCost,
+            garmentCost: markedUpGarment,
             transferDetails,
             totalTransferCost,
             laborCost,
             locationCount,
-            freight: freightCost,
-            freightPerTransfer: locationCount > 0 
-                ? (this.apiDataLoaded && this.pricingService.apiData
-                    ? this.pricingService.getFreightPerTransfer(quantity)
-                    : DTFConfig.freightCost.getFreightPerTransfer(quantity))
-                : 0,
-            ltmFee: ltmFee,
-            ltmFeePerShirt: ltmFee / quantity,
-            totalPerShirt,
-            totalOrder: (garmentCost + totalTransferCost + laborCost + freightCost) * quantity + ltmFee
+            freightPerTransfer,
+            freightCost,
+            ltmFee,
+            ltmFeePerUnit,
+            subtotal,
+            finalUnitPrice,
+            totalOrder
         };
+    }
+
+    roundHalfDollarCeil(amount) {
+        // Round UP to nearest $0.50
+        return Math.ceil(amount * 2) / 2;
+    }
+
+    updatePricingDisplay() {
+        const pricing = this.calculatePricing();
+
+        // Update live price display
+        const priceElement = document.getElementById('dtf-live-price');
+        const quantityDisplay = document.getElementById('dtf-quantity-display');
+        const locationsDisplay = document.getElementById('dtf-locations-display');
+        const ltmWarning = document.getElementById('dtf-ltm-warning');
+
+        if (pricing.error) {
+            priceElement.textContent = '0.00';
+            quantityDisplay.textContent = this.currentData.quantity;
+            locationsDisplay.textContent = this.currentData.selectedLocations.size;
+            return;
+        }
+
+        priceElement.textContent = pricing.finalUnitPrice.toFixed(2);
+        quantityDisplay.textContent = pricing.quantity;
+        locationsDisplay.textContent = pricing.locationCount;
+
+        // Show/hide LTM warning
+        if (pricing.ltmFee > 0) {
+            ltmWarning.style.display = 'block';
+        } else {
+            ltmWarning.style.display = 'none';
+        }
+
+        // Update header pricing
+        this.updateHeaderPricing(pricing.quantity, pricing.finalUnitPrice);
+
+        // Dispatch pricing update event
+        this.container.dispatchEvent(new CustomEvent('dtfPricingUpdated', {
+            detail: pricing,
+            bubbles: true
+        }));
     }
 
     updateHeaderPricing(quantity, unitPrice) {
         const headerQty = document.getElementById('header-quantity');
         const headerPrice = document.getElementById('header-unit-price');
-        
+
         if (headerQty) {
             headerQty.textContent = quantity;
         }
-        
+
         if (headerPrice) {
             if (typeof unitPrice === 'number' && !isNaN(unitPrice) && unitPrice > 0) {
                 headerPrice.textContent = `$${unitPrice.toFixed(2)}`;
@@ -485,221 +500,50 @@ class DTFPricingCalculator {
         }
     }
 
-    updateSummary() {
-        // If not rendered yet, queue this update for later
-        if (!this.isRendered) {
-            this.pendingUpdates.push(() => this.updateSummary());
-            return;
-        }
-        
-        const pricing = this.calculatePricing();
-        const summaryContainer = document.getElementById('order-summary-content');
-        
-        // Safety check - element might not exist yet
-        if (!summaryContainer) {
-            console.warn('[DTF Calculator] order-summary-content element not found, skipping update');
-            return;
-        }
-
-        // Check if garment cost is missing or zero
-        if (!this.currentData.garmentCost || this.currentData.garmentCost === 0) {
-            summaryContainer.innerHTML = `
-                <div class="pricing-error-container">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h4>Pricing Unavailable</h4>
-                        <p>Unable to retrieve garment pricing at this time.</p>
-                        <p><strong>Please call for a quote: 253-922-5793</strong></p>
-                        <button class="btn btn-primary mt-2" onclick="window.location.href='tel:+12539225793'">
-                            <i class="fas fa-phone"></i> Call Now
-                        </button>
-                    </div>
-                </div>
-            `;
-            // Update header with current quantity but $0.00 price
-            this.updateHeaderPricing(this.currentData.quantity, 0);
-            return;
-        }
-
-        // Check if no transfers are selected
-        if (pricing.transferDetails.length === 0) {
-            summaryContainer.innerHTML = `
-                <div class="pricing-placeholder">
-                    <div class="text-center text-muted p-4">
-                        <i class="fas fa-hand-point-up fa-3x mb-3"></i>
-                        <h5>Select Transfer Locations</h5>
-                        <p>Add at least one transfer location to see pricing</p>
-                    </div>
-                </div>
-            `;
-            // Update header with current quantity but $0.00 price
-            this.updateHeaderPricing(this.currentData.quantity, 0);
-            return;
-        }
-
-        let transfersHTML = '';
-        if (pricing.transferDetails.length > 0) {
-            transfersHTML = pricing.transferDetails.map(detail => `
-                <div class="summary-line-item">
-                    <span>Transfer ${detail.number}: ${detail.location} (${detail.size})</span>
-                    <span>$${detail.price.toFixed(2)}</span>
-                </div>
-            `).join('');
-        } else {
-            transfersHTML = '<div class="summary-line-item text-muted">No transfers selected</div>';
-        }
-
-        summaryContainer.innerHTML = `
-            <div class="summary-section">
-                <div class="summary-line-item">
-                    <span>Quantity:</span>
-                    <span>${pricing.quantity} garments</span>
-                </div>
-            </div>
-
-            <div class="summary-section internal-only">
-                <h5>Garment Cost</h5>
-                <div class="summary-line-item">
-                    <span>Base Garment (with 40% margin)</span>
-                    <span>$${pricing.garmentCost.toFixed(2)}</span>
-                </div>
-            </div>
-
-            <div class="summary-section internal-only">
-                <h5>Transfer Costs</h5>
-                ${transfersHTML}
-                ${pricing.transferDetails.length > 0 ? `
-                    <div class="summary-line-item summary-subtotal">
-                        <span>Total Transfers:</span>
-                        <span>$${pricing.totalTransferCost.toFixed(2)}</span>
-                    </div>
-                ` : ''}
-            </div>
-
-            <div class="summary-section internal-only">
-                <h5>Labor Cost</h5>
-                <div class="summary-line-item">
-                    <span>Pressing (${pricing.locationCount} location${pricing.locationCount !== 1 ? 's' : ''} × $2)</span>
-                    <span>$${pricing.laborCost.toFixed(2)}</span>
-                </div>
-            </div>
-
-            ${DTFConfig.settings.showFreight || DTFConfig.settings.showLTMFee ? `
-                <div class="summary-section internal-only">
-                    <h5>Additional Fees</h5>
-                    ${DTFConfig.settings.showFreight && DTFConfig.settings.includeFreightInTransfers && pricing.locationCount > 0 ? `
-                        <div class="summary-line-item">
-                            <span>Freight (${pricing.locationCount} × $${pricing.freightPerTransfer.toFixed(2)})</span>
-                            <span>$${pricing.freight.toFixed(2)}</span>
-                        </div>
-                        <div class="summary-note">
-                            <i class="fas fa-info-circle"></i> $${pricing.freightPerTransfer.toFixed(2)} per transfer at ${pricing.quantity} qty
-                        </div>
-                    ` : DTFConfig.settings.showFreight ? `
-                        <div class="summary-line-item">
-                            <span>Freight</span>
-                            <span>$${pricing.freight.toFixed(2)}</span>
-                        </div>
-                    ` : ''}
-                    ${DTFConfig.settings.showLTMFee && pricing.ltmFee > 0 ? `
-                        <div class="summary-line-item">
-                            <span>LTM Fee (under ${DTFConfig.settings.ltmFeeThreshold} pcs)</span>
-                            <span>$${pricing.ltmFee.toFixed(2)}</span>
-                        </div>
-                        <div class="summary-note">
-                            <i class="fas fa-info-circle"></i> $${pricing.ltmFee.toFixed(2)} ÷ ${pricing.quantity} shirts = $${pricing.ltmFeePerShirt.toFixed(2)} per shirt
-                        </div>
-                    ` : ''}
-                </div>
-            ` : ''}
-
-            ${pricing.ltmFee > 0 ? `
-                <div class="summary-section">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Minimum Order Information</strong><br>
-                        Orders under ${DTFConfig.settings.ltmFeeThreshold} pieces include a $${pricing.ltmFee.toFixed(2)} setup fee<br>
-                        <small>This adds $${pricing.ltmFeePerShirt.toFixed(2)} per shirt to your order</small>
-                    </div>
-                </div>
-            ` : ''}
-
-            <div class="summary-section summary-total">
-                <div class="summary-line-item">
-                    <span><strong>Price Per Shirt:</strong></span>
-                    <span class="price-highlight">$${pricing.totalPerShirt.toFixed(2)}</span>
-                </div>
-                <div class="summary-line-item">
-                    <span><strong>Total Order:</strong></span>
-                    <span class="price-highlight">$${pricing.totalOrder.toFixed(2)}</span>
-                </div>
-            </div>
-        `;
-
-        // Update header pricing
-        this.updateHeaderPricing(pricing.quantity, pricing.totalPerShirt);
-        
-        // Dispatch pricing update event
-        this.container.dispatchEvent(new CustomEvent('dtfPricingUpdated', {
-            detail: pricing,
-            bubbles: true
-        }));
-    }
-
     attachEventListeners() {
-        // Quantity input
-        this.container.addEventListener('input', (e) => {
-            if (e.target.id === 'dtf-quantity') {
-                const value = parseInt(e.target.value);
-                if (!isNaN(value) && value > 0) {
-                    this.currentData.quantity = value;
-                    this.updateSummary();
-                }
-            }
-        });
-
-        // Quantity blur - enforce minimum on blur
-        this.container.addEventListener('blur', (e) => {
-            if (e.target.id === 'dtf-quantity') {
-                if (parseInt(e.target.value) < DTFConfig.settings.minQuantity) {
-                    e.target.value = DTFConfig.settings.minQuantity;
-                    this.currentData.quantity = DTFConfig.settings.minQuantity;
-                    this.updateSummary();
-                }
-            }
-        });
-
-        // Add transfer button
+        // Toggle click handlers
         this.container.addEventListener('click', (e) => {
-            if (e.target.closest('#add-transfer-btn')) {
-                this.addTransferLocation();
+            const toggleItem = e.target.closest('.dtf-toggle-item');
+            if (toggleItem) {
+                const location = toggleItem.dataset.location;
+                this.handleToggleClick(location);
+                return;
             }
 
-            // Remove transfer button
-            if (e.target.closest('.btn-remove-transfer')) {
-                const transferId = parseInt(e.target.closest('.btn-remove-transfer').dataset.transferId);
-                this.removeTransferLocation(transferId);
-            }
-            
-            // Staff view toggle
-            if (e.target.closest('#staff-view-link')) {
-                e.preventDefault();
-                this.handleStaffViewToggle();
+            // Tier button click handlers
+            const tierButton = e.target.closest('.dtf-tier-button');
+            if (tierButton) {
+                const tier = tierButton.dataset.tier;
+                this.handleTierSelection(tier);
+                return;
             }
         });
 
-        // Transfer location and size selects
-        this.container.addEventListener('change', (e) => {
-            if (e.target.classList.contains('transfer-location-select')) {
-                const transferId = parseInt(e.target.dataset.transferId);
-                this.updateTransferLocation(transferId, 'location', e.target.value);
-            }
-
-            if (e.target.classList.contains('transfer-size-select')) {
-                const transferId = parseInt(e.target.dataset.transferId);
-                this.updateTransferLocation(transferId, 'size', e.target.value);
+        // Exact quantity input for 10-23 tier
+        this.container.addEventListener('input', (e) => {
+            if (e.target.id === 'dtf-exact-quantity') {
+                const value = parseInt(e.target.value);
+                if (!isNaN(value) && value >= 10 && value <= 23) {
+                    this.currentData.quantity = value;
+                    this.updatePricingDisplay();
+                }
             }
         });
+
+        // Blur validation for quantity input
+        this.container.addEventListener('blur', (e) => {
+            if (e.target.id === 'dtf-exact-quantity') {
+                let value = parseInt(e.target.value);
+                if (isNaN(value) || value < 10) {
+                    value = 10;
+                } else if (value > 23) {
+                    value = 23;
+                }
+                e.target.value = value;
+                this.currentData.quantity = value;
+                this.updatePricingDisplay();
+            }
+        }, true);
     }
 
     // Public methods for external data updates
@@ -707,107 +551,41 @@ class DTFPricingCalculator {
         const previousCost = this.currentData.garmentCost;
         this.currentData.garmentCost = parseFloat(cost) || 0;
 
-        // Queue update if not rendered yet
         if (!this.isRendered) {
-            this.pendingUpdates.push(() => this.updateSummary());
+            this.pendingUpdates.push(() => this.updatePricingDisplay());
             return;
         }
 
-        // Force immediate recalculation if cost changed significantly
         if (Math.abs(previousCost - this.currentData.garmentCost) > 0.01) {
-            this.refreshTransferPricing();
+            console.log('[DTF Calculator] Garment cost updated:', this.currentData.garmentCost);
         }
 
-        this.updateSummary();
-    }
-
-    // Force recalculation of transfer pricing - useful when style changes
-    refreshTransferPricing() {
-        console.log('[DTF Calculator] Refreshing transfer pricing with new garment cost:', this.currentData.garmentCost);
-
-        // Re-render transfer locations to ensure all dropdowns are updated
-        if (this.currentData.transfers.length > 0) {
-            this.renderTransferLocations();
-        }
-
-        // Force immediate summary update
-        this.updateSummary();
-    }
-
-    updateFreight(freight) {
-        this.currentData.freight = parseFloat(freight) || 0;
-        
-        // Queue update if not rendered yet
-        if (!this.isRendered) {
-            this.pendingUpdates.push(() => this.updateSummary());
-            return;
-        }
-        
-        this.updateSummary();
-    }
-
-    updateLTMFee(fee) {
-        this.currentData.ltmFee = parseFloat(fee) || 0;
-        
-        // Queue update if not rendered yet
-        if (!this.isRendered) {
-            this.pendingUpdates.push(() => this.updateSummary());
-            return;
-        }
-        
-        this.updateSummary();
+        this.updatePricingDisplay();
     }
 
     updateQuantity(qty) {
         const previousQty = this.currentData.quantity;
         this.currentData.quantity = Math.max(parseInt(qty) || DTFConfig.settings.minQuantity, DTFConfig.settings.minQuantity);
 
-        // Only update DOM element if it exists
-        const quantityInput = document.getElementById('dtf-quantity');
-        if (quantityInput) {
+        // Update input if it exists
+        const quantityInput = document.getElementById('dtf-exact-quantity');
+        if (quantityInput && this.currentData.selectedTier === '10-23') {
             quantityInput.value = this.currentData.quantity;
         }
 
-        // Queue update if not rendered yet
         if (!this.isRendered) {
-            this.pendingUpdates.push(() => this.updateSummary());
+            this.pendingUpdates.push(() => this.updatePricingDisplay());
             return;
         }
 
-        // Force recalculation if quantity changed (affects tier pricing)
         if (previousQty !== this.currentData.quantity) {
-            console.log('[DTF Calculator] Quantity changed, refreshing pricing');
-            // Transfer prices may change based on quantity tiers
-            this.refreshTransferPricing();
+            console.log('[DTF Calculator] Quantity changed:', this.currentData.quantity);
         }
 
-        this.updateSummary();
+        this.updatePricingDisplay();
     }
-    
-    handleStaffViewToggle() {
-        // Check if already in staff view
-        if (document.body.classList.contains('show-internal')) {
-            // Toggle off
-            document.body.classList.remove('show-internal');
-            sessionStorage.removeItem('dtfStaffView');
-            return;
-        }
-        
-        // Prompt for password
-        const password = prompt('Enter password for internal view:');
-        
-        if (password === '1977') {
-            // Enable staff view
-            document.body.classList.add('show-internal');
-            sessionStorage.setItem('dtfStaffView', 'true');
-        } else if (password !== null) {
-            // Wrong password (but not cancelled)
-            alert('Incorrect password');
-        }
-    }
-    
+
     checkStaffViewStatus() {
-        // Check if staff view was previously enabled in this session
         if (sessionStorage.getItem('dtfStaffView') === 'true') {
             document.body.classList.add('show-internal');
         }

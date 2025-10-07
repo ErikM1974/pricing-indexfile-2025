@@ -43,17 +43,30 @@ const DTFConfig = {
         }
     },
 
-    // Transfer location options
+    // Transfer location options - Location = Size model (each location locked to one size)
     transferLocations: [
-        { value: 'front-center', label: 'Front Center', allowedSizes: ['small', 'medium', 'large'] },
-        { value: 'back-center', label: 'Back Center', allowedSizes: ['medium', 'large'] },
-        { value: 'left-chest', label: 'Left Chest', allowedSizes: ['small'] },
-        { value: 'right-chest', label: 'Right Chest', allowedSizes: ['small'] },
-        { value: 'left-sleeve', label: 'Left Sleeve', allowedSizes: ['small'] },
-        { value: 'right-sleeve', label: 'Right Sleeve', allowedSizes: ['small'] },
-        { value: 'neck-label', label: 'Neck Label', allowedSizes: ['small'] },
-        { value: 'bottom-hem', label: 'Bottom Hem', allowedSizes: ['small', 'medium'] }
+        // Small locations (5" x 5")
+        { value: 'left-chest', label: 'Left Chest', size: 'small', zone: 'front' },
+        { value: 'right-chest', label: 'Right Chest', size: 'small', zone: 'front' },
+        { value: 'left-sleeve', label: 'Left Sleeve', size: 'small', zone: 'sleeve-left' },
+        { value: 'right-sleeve', label: 'Right Sleeve', size: 'small', zone: 'sleeve-right' },
+        { value: 'back-of-neck', label: 'Back of Neck', size: 'small', zone: 'back' },
+
+        // Medium locations (9" x 12")
+        { value: 'center-front', label: 'Center Front', size: 'medium', zone: 'front' },
+        { value: 'center-back', label: 'Center Back', size: 'medium', zone: 'back' },
+
+        // Large locations (12" x 16.5")
+        { value: 'full-front', label: 'Full Front', size: 'large', zone: 'front' },
+        { value: 'full-back', label: 'Full Back', size: 'large', zone: 'back' }
     ],
+
+    // Conflict zones for mutually exclusive locations
+    conflictZones: {
+        front: ['left-chest', 'right-chest', 'center-front', 'full-front'],
+        back: ['back-of-neck', 'center-back', 'full-back'],
+        // Sleeves are independent - no conflicts
+    },
 
     // Labor costs
     laborCost: {
@@ -98,14 +111,30 @@ const DTFConfig = {
         getTransferPrice: function(sizeKey, quantity) {
             const size = DTFConfig.transferSizes[sizeKey];
             if (!size) return 0;
-            
+
             const tier = size.pricingTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
             return tier ? tier.unitPrice : 0;
         },
-        
-        getAllowedSizesForLocation: function(locationValue) {
+
+        getSizeForLocation: function(locationValue) {
             const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
-            return location ? location.allowedSizes : [];
+            return location ? location.size : null;
+        },
+
+        getConflictingLocations: function(locationValue) {
+            const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
+            if (!location || !location.zone) return [];
+
+            // Get all locations in the same conflict zone
+            const zone = location.zone;
+            if (!DTFConfig.conflictZones[zone]) return [];
+
+            // Return all locations in that zone except the clicked one
+            return DTFConfig.conflictZones[zone].filter(loc => loc !== locationValue);
+        },
+
+        getLocationsBySize: function(sizeKey) {
+            return DTFConfig.transferLocations.filter(l => l.size === sizeKey);
         }
     }
 };

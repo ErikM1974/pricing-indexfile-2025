@@ -1,0 +1,325 @@
+/**
+ * DTF Toggle Pricing Interface Styles
+ * Two-column layout: Print Locations (left) | Quantity Tiers (right)
+ * iOS-style toggle switches with green theme
+ */
+
+/* Main Container - Two Column Grid */
+.dtf-toggle-pricing-container {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr; /* Left column 65%, right 35% - fixes whitespace */
+    gap: 40px;
+    margin: 30px 0;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* Column Headers */
+.dtf-column-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* Print Locations Column */
+.dtf-locations-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Size Category Groups */
+.dtf-size-category {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dtf-size-category-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3a7c52;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8f5e9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dtf-size-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2d5f3f;
+}
+
+/* Toggle Items */
+.dtf-location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dtf-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.dtf-toggle-item:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    transform: translateX(2px);
+}
+
+.dtf-toggle-item.active {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    border-color: #2d5f3f;
+    color: white;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+}
+
+.dtf-toggle-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    flex: 1;
+}
+
+.dtf-toggle-item.active .dtf-toggle-label {
+    color: white;
+    font-weight: 600;
+}
+
+/* iOS Toggle Switch */
+.dtf-toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    background: #cbd5e0;
+    border-radius: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.dtf-toggle-item.active .dtf-toggle-switch {
+    background: #4ade80;
+}
+
+.dtf-toggle-switch-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dtf-toggle-item.active .dtf-toggle-switch-slider {
+    transform: translateX(24px);
+}
+
+/* Quantity Tiers Column */
+.dtf-tiers-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tier Buttons */
+.dtf-tier-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dtf-tier-button {
+    padding: 16px 20px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.dtf-tier-button:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+.dtf-tier-button.selected {
+    background: linear-gradient(135deg, #3a7c52, #2d5f3f);
+    border-color: #2d5f3f;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+}
+
+/* Conditional Quantity Input for 10-23 Tier */
+.dtf-quantity-input-container {
+    display: none;
+    margin-top: 12px;
+    padding: 16px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+}
+
+.dtf-quantity-input-container.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dtf-quantity-input-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.dtf-quantity-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    background: white;
+    color: #1f2937;
+}
+
+.dtf-quantity-input:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+}
+
+.dtf-quantity-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #92400e;
+}
+
+/* Info Box Below Tiers */
+.dtf-info-box {
+    padding: 16px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    color: #1e3a8a;
+    line-height: 1.5;
+}
+
+.dtf-info-box i {
+    margin-right: 8px;
+    color: #3b82f6;
+}
+
+/* Live Price Display */
+.dtf-live-price-display {
+    margin-top: 30px;
+    padding: 24px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 3px solid #22c55e;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.dtf-price-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.dtf-price-details {
+    font-size: 0.95rem;
+    color: #166534;
+    font-weight: 500;
+}
+
+.dtf-ltm-warning {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .dtf-toggle-pricing-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 15px;
+    }
+
+    .dtf-price-amount {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .dtf-toggle-pricing-container {
+        padding: 10px;
+        margin: 20px 0;
+    }
+
+    .dtf-toggle-item {
+        padding: 12px 14px;
+    }
+
+    .dtf-tier-button {
+        padding: 14px 16px;
+    }
+
+    .dtf-price-amount {
+        font-size: 2rem;
+    }
+
+    .dtf-column-header {
+        font-size: 1.1rem;
+    }
+}
