@@ -728,6 +728,81 @@
             color: #4cb354;
         }
 
+        /* Setup Fee Badge Styles */
+        .setup-fee-badge {
+            font-size: 24px;
+            color: #f59e0b;  /* Amber color */
+            opacity: 0.85;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        .setup-fee-badge:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        /* Setup Fee Tooltip Styles */
+        .setup-fee-tooltip {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+            padding: 20px;
+            min-width: 300px;
+            z-index: 1000;
+            animation: tooltipFadeIn 0.3s ease;
+        }
+
+        .setup-fee-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: #f59e0b;
+        }
+
+        .setup-fee-tooltip-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fef3c7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setup-fee-tooltip-body {
+            font-size: 14px;
+            color: #78350f;
+            line-height: 1.6;
+        }
+
+        .setup-fee-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f59e0b;
+            margin: 8px 0;
+        }
+
+        .setup-fee-details {
+            font-size: 13px;
+            color: #92400e;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #fef3c7;
+        }
+
         .upcharge-base {
             background: #f3f4f6;
             padding: 8px 12px;
@@ -1377,6 +1452,7 @@
                 <div class="live-price-amount-wrapper">
                     <span class="live-price-amount" id="live-price-amount">$0.00</span>
                     <i class="fas fa-info-circle upcharge-info-icon" id="upcharge-info-icon"></i>
+                    <i class="fas fa-palette setup-fee-badge" id="setup-fee-badge"></i>
                 </div>
                 <div class="live-price-detail" id="live-price-detail">Select a location to see pricing</div>
                 <div class="live-price-fee" id="live-price-fee"></div>
@@ -1387,6 +1463,29 @@
                         <div class="upcharge-tooltip-header">Size Pricing</div>
                         <div id="upcharge-tooltip-body" class="upcharge-tooltip-body">
                             <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Fee Tooltip -->
+                <div id="setup-fee-tooltip" class="setup-fee-tooltip" style="display: none;">
+                    <div class="setup-fee-tooltip-content">
+                        <div class="setup-fee-tooltip-header">
+                            <i class="fas fa-palette"></i>
+                            Art Setup Fee
+                        </div>
+                        <div class="setup-fee-tooltip-body">
+                            <div class="setup-fee-amount">$50.00 (GRT-50)</div>
+                            <p><strong>Included with your order:</strong></p>
+                            <ul style="margin: 8px 0; padding-left: 20px;">
+                                <li>Logo mockup on your products</li>
+                                <li>Print readiness check for clarity & sizing</li>
+                                <li>Up to 2 revisions included</li>
+                            </ul>
+                            <div class="setup-fee-details">
+                                <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
+                                One-time fee for new orders
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2064,6 +2163,50 @@
                     tooltip.style.display = 'none';
                 }
             });
+
+            // Setup Fee Tooltip - Similar interaction pattern
+            const setupFeeBadge = document.getElementById('setup-fee-badge');
+            const setupFeeTooltip = document.getElementById('setup-fee-tooltip');
+
+            if (setupFeeBadge && setupFeeTooltip) {
+                console.log('✅ Initializing setup fee tooltip');
+
+                // Desktop: Show on hover
+                setupFeeBadge.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        setupFeeTooltip.style.display = 'block';
+                    }
+                });
+
+                setupFeeBadge.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        setTimeout(() => {
+                            if (!setupFeeTooltip.matches(':hover')) {
+                                setupFeeTooltip.style.display = 'none';
+                            }
+                        }, 100);
+                    }
+                });
+
+                setupFeeTooltip.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        setupFeeTooltip.style.display = 'none';
+                    }
+                });
+
+                // Mobile: Show on tap
+                setupFeeBadge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setupFeeTooltip.style.display = setupFeeTooltip.style.display === 'block' ? 'none' : 'block';
+                });
+
+                // Close when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!setupFeeTooltip.contains(e.target) && e.target !== setupFeeBadge) {
+                        setupFeeTooltip.style.display = 'none';
+                    }
+                });
+            }
         }
 
         // Update upcharge tooltip content from API data

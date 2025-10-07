@@ -12,6 +12,10 @@ class DTFPricingCalculator {
         this.pendingUpdates = [];
         this.apiData = null;
 
+        // Product upcharge data (populated from productColorsReady event)
+        this.productUpcharges = {};
+        this.productSizes = [];
+
         this.currentData = {
             garmentCost: 0,
             quantity: DTFConfig.settings.defaultQuantity,
@@ -38,6 +42,7 @@ class DTFPricingCalculator {
 
         this.render();
         this.attachEventListeners();
+        this.setupProductDataListener();
         this.checkStaffViewStatus();
 
         this.isRendered = true;
@@ -193,13 +198,50 @@ class DTFPricingCalculator {
 
             <!-- Live Price Display -->
             <div class="dtf-live-price-display">
-                <div class="dtf-price-amount">$<span id="dtf-live-price">0.00</span></div>
+                <div class="dtf-price-amount">
+                    $<span id="dtf-live-price">0.00</span>
+                    <i class="fas fa-info-circle dtf-upcharge-info-icon" id="dtf-upcharge-info-icon"></i>
+                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 24px; color: #f59e0b; opacity: 0.85; cursor: pointer;"></i>
+                </div>
                 <div class="dtf-price-details" id="dtf-price-details">
                     <span id="dtf-quantity-display">0</span> pieces + <span id="dtf-locations-display">0</span> location(s)
                 </div>
                 <div id="dtf-ltm-warning" class="dtf-ltm-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     Orders under 24 pieces include a $50.00 setup fee
+                </div>
+
+                <!-- Setup Fee Tooltip -->
+                <div id="dtf-setup-fee-tooltip" class="setup-fee-tooltip" style="display: none; position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%); background: white; border: 2px solid #f59e0b; border-radius: 12px; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25); padding: 20px; min-width: 300px; z-index: 1000;">
+                    <div style="font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #fef3c7; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-palette"></i>
+                        Art Setup Fee
+                    </div>
+                    <div style="font-size: 14px; color: #78350f; line-height: 1.6;">
+                        <div style="font-size: 18px; font-weight: 700; color: #f59e0b; margin: 8px 0;">$50.00 (GRT-50)</div>
+                        <p><strong>Included with your order:</strong></p>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>Logo mockup on your products</li>
+                            <li>Print readiness check for clarity & sizing</li>
+                            <li>Up to 2 revisions included</li>
+                        </ul>
+                        <div style="font-size: 13px; color: #92400e; margin-top: 8px; padding-top: 8px; border-top: 1px solid #fef3c7;">
+                            <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
+                            One-time fee for new orders
+                        </div>
+                    </div>
+                    <!-- Tooltip arrow -->
+                    <div style="content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #f59e0b;"></div>
+                </div>
+
+                <!-- Size Upcharge Tooltip -->
+                <div id="dtf-upcharge-tooltip" class="dtf-upcharge-tooltip" style="display: none;">
+                    <div class="dtf-upcharge-tooltip-content">
+                        <div class="dtf-upcharge-tooltip-header">Size Pricing</div>
+                        <div id="dtf-upcharge-tooltip-body" class="dtf-upcharge-tooltip-body">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -567,6 +609,194 @@ class DTFPricingCalculator {
                 this.updatePricingDisplay();
             }
         }, true);
+
+        // Setup Fee Tooltip - Similar to DTG implementation
+        const dtfSetupFeeBadge = document.getElementById('dtf-setup-fee-badge');
+        const dtfSetupFeeTooltip = document.getElementById('dtf-setup-fee-tooltip');
+
+        if (dtfSetupFeeBadge && dtfSetupFeeTooltip) {
+            console.log('✅ [DTF Calculator] Initializing setup fee tooltip');
+
+            // Desktop: Show on hover
+            dtfSetupFeeBadge.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    dtfSetupFeeTooltip.style.display = 'block';
+                }
+            });
+
+            dtfSetupFeeBadge.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    setTimeout(() => {
+                        if (!dtfSetupFeeTooltip.matches(':hover')) {
+                            dtfSetupFeeTooltip.style.display = 'none';
+                        }
+                    }, 100);
+                }
+            });
+
+            dtfSetupFeeTooltip.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    dtfSetupFeeTooltip.style.display = 'none';
+                }
+            });
+
+            // Mobile: Show on tap
+            dtfSetupFeeBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dtfSetupFeeTooltip.style.display = dtfSetupFeeTooltip.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dtfSetupFeeTooltip.contains(e.target) && e.target !== dtfSetupFeeBadge) {
+                    dtfSetupFeeTooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Size Upcharge Tooltip - Add event listeners for upcharge tooltip
+        const dtfUpchargeIcon = document.getElementById('dtf-upcharge-info-icon');
+        const dtfUpchargeTooltip = document.getElementById('dtf-upcharge-tooltip');
+
+        if (dtfUpchargeIcon && dtfUpchargeTooltip) {
+            console.log('✅ [DTF Calculator] Initializing size upcharge tooltip');
+
+            // Desktop: Show on hover
+            dtfUpchargeIcon.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    this.updateUpchargeTooltipContent();
+                    dtfUpchargeTooltip.style.display = 'block';
+                }
+            });
+
+            dtfUpchargeIcon.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    setTimeout(() => {
+                        if (!dtfUpchargeTooltip.matches(':hover')) {
+                            dtfUpchargeTooltip.style.display = 'none';
+                        }
+                    }, 100);
+                }
+            });
+
+            dtfUpchargeTooltip.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    dtfUpchargeTooltip.style.display = 'none';
+                }
+            });
+
+            // Mobile: Show on tap, hide on outside click
+            dtfUpchargeIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.updateUpchargeTooltipContent();
+                dtfUpchargeTooltip.style.display = dtfUpchargeTooltip.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close tooltip when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dtfUpchargeTooltip.contains(e.target) && e.target !== dtfUpchargeIcon) {
+                    dtfUpchargeTooltip.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    setupProductDataListener() {
+        // Listen for productColorsReady event to get upcharge data
+        document.addEventListener('productColorsReady', (e) => {
+            console.log('🎯 [DTF Calculator] Product data received:', e.detail);
+
+            if (e.detail && e.detail.product) {
+                const product = e.detail.product;
+
+                // Extract upcharges from product data
+                if (product.sellingPriceDisplayAddOns || product.upcharges) {
+                    this.productUpcharges = product.sellingPriceDisplayAddOns || product.upcharges || {};
+                    console.log('✅ [DTF Calculator] Upcharges loaded:', this.productUpcharges);
+                }
+
+                // Extract available sizes
+                if (product.sizes && Array.isArray(product.sizes)) {
+                    this.productSizes = product.sizes.map(s => s.size || s);
+                    console.log('✅ [DTF Calculator] Sizes loaded:', this.productSizes);
+                }
+
+                // Update tooltip content if it's currently visible
+                const tooltip = document.getElementById('dtf-upcharge-tooltip');
+                if (tooltip && tooltip.style.display === 'block') {
+                    this.updateUpchargeTooltipContent();
+                }
+            }
+        });
+    }
+
+    updateUpchargeTooltipContent() {
+        const tooltipBody = document.getElementById('dtf-upcharge-tooltip-body');
+        if (!tooltipBody) return;
+
+        console.log('🎯 [DTF Calculator] Updating upcharge tooltip with:', {
+            sizes: this.productSizes,
+            upcharges: this.productUpcharges
+        });
+
+        // Filter to only show upcharges for sizes that exist for this product
+        const upcharges = {};
+        Object.entries(this.productUpcharges).forEach(([size, amount]) => {
+            if (this.productSizes.includes(size) && amount > 0) {
+                upcharges[size] = amount;
+            }
+        });
+
+        // Build tooltip content
+        let html = '';
+
+        // Base price info - show only sizes without upcharges
+        const baseSizes = this.productSizes.filter(size => !upcharges[size]);
+        if (baseSizes.length > 0) {
+            html += '<div class="dtf-upcharge-base">';
+            html += '<div class="dtf-upcharge-item">';
+            html += `<span class="dtf-upcharge-item-size">${baseSizes.join(', ')}</span>`;
+            html += '<span class="dtf-upcharge-item-price">Base Price</span>';
+            html += '</div>';
+            html += '</div>';
+        }
+
+        // Sort upcharge sizes for display
+        const upchargeSizes = Object.keys(upcharges).sort((a, b) => {
+            // Custom sort: 2XL, 3XL, 4XL, 5XL, 6XL, then others
+            const sizeOrder = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+            const aIndex = sizeOrder.indexOf(a);
+            const bIndex = sizeOrder.indexOf(b);
+
+            if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+            if (aIndex !== -1) return -1;
+            if (bIndex !== -1) return 1;
+            return a.localeCompare(b);
+        });
+
+        // Add upcharge items
+        upchargeSizes.forEach(size => {
+            const upcharge = upcharges[size];
+            if (upcharge > 0) {
+                html += '<div class="dtf-upcharge-item">';
+                html += `<span class="dtf-upcharge-item-size">${size}</span>`;
+                html += `<span class="dtf-upcharge-item-price">+$${upcharge.toFixed(2)}</span>`;
+                html += '</div>';
+            }
+        });
+
+        // If no upcharges found
+        if (upchargeSizes.length === 0 && baseSizes.length === 0) {
+            html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+            html += 'Size information loading...';
+            html += '</div>';
+        } else if (upchargeSizes.length === 0) {
+            html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+            html += 'No size upcharges for this style';
+            html += '</div>';
+        }
+
+        tooltipBody.innerHTML = html;
     }
 
     // Public methods for external data updates
