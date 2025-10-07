@@ -228,8 +228,12 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             // --- Dispatch event or call function in dp5-helper.js ---
             console.log("[fetchProductDetails] Dispatching productColorsReady event.");
             const eventDetail = {
+                productTitle: productData.productTitle,
+                productDescription: productData.PRODUCT_DESCRIPTION,
+                brandName: productData.BRAND_NAME,
                 colors: productData.colors,
-                selectedColor: selectedColorObject
+                selectedColor: selectedColorObject,
+                styleNumber: styleNumber
             };
             window.dispatchEvent(new CustomEvent('productColorsReady', { detail: eventDetail }));
 
