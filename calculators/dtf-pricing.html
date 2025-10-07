@@ -327,6 +327,331 @@
                 font-size: 2rem;
             }
         }
+        /* Breadcrumb Links */
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Search Wrapper */
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-loading {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-style {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .search-result-desc {
+            color: #666;
+            font-size: 0.875rem;
+            margin-top: 2px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.3);
+        }
+
+        /* Responsive adjustments for product hero */
+        @media (max-width: 768px) {
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body class="dtf-pricing-page">
@@ -370,22 +695,21 @@
         <div class="pricing-context-bar">
             <div class="context-bar-content">
                 <div class="context-left">
-                    <!-- Breadcrumb -->
-                    <div class="breadcrumb">
-                        <span>DTF Pricing Calculator</span>
-                    </div>
+                    <!-- Breadcrumb Navigation -->
+                    <nav class="breadcrumb">
+                        <a href="/">Home</a> /
+                        <a href="/product.html" id="products-breadcrumb">Products</a> /
+                        <span>DTF Pricing</span>
+                    </nav>
                 </div>
-                
-                <!-- Live Pricing -->
-                <div class="header-live-pricing">
-                    <div class="header-price-item">
-                        <span class="header-price-label">Qty:</span>
-                        <span id="header-quantity" class="header-price-value">12</span>
-                    </div>
-                    <div class="header-price-item">
-                        <span class="header-price-label">Per Shirt:</span>
-                        <span id="header-unit-price" class="header-price-value highlight">$0.00</span>
-                    </div>
+
+                <!-- Search Bar -->
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" id="styleSearch"
+                           placeholder="Search by style number or name..." autocomplete="off">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -393,13 +717,62 @@
     
     <!-- Main Content Container -->
     <div class="container">
-        <div class="product-page-columns-container">
-            <!-- Left Column: Product Context -->
-            <div class="product-context-column">
-                <!-- Universal Product Display Component will render here -->
-                <div id="product-display"></div>
-            </div>
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
+        </div>
 
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-badge">DTF</div>
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-page-columns-container">
             <!-- Right Column: DTF Calculator -->
             <div class="product-interactive-column">
                 <!-- DTF Calculator Container -->
@@ -458,20 +831,21 @@
             if (window.initializeProductFromURL) {
                 window.initializeProductFromURL();
             }
-            
-            // Initialize Universal Product Display
-            let productDisplay = new UniversalProductDisplay({
-                containerId: 'product-display',
-                pageType: 'dtf',
-                showBackButton: true,
-                showInfoBox: true,
-                showSelectedColor: true,
-                sticky: false,
-                infoBoxContent: 'DTF Transfer Printing: Vibrant, full-color designs with excellent durability and stretch. Perfect for both light and dark garments.'
-            });
-            
-            // Store reference globally for debugging
-            window.productDisplay = productDisplay;
+
+            // Fetch and display product information on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('StyleNumber');
+
+            if (styleNumber) {
+                fetchAndDisplayProduct(styleNumber);
+            } else {
+                // Hide loading, show empty state
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('productHero').style.display = 'block';
+            }
+
+            // Setup search functionality
+            setupSearch();
             
             // Handle calculator ready state
             setTimeout(function() {
@@ -744,6 +1118,313 @@
                     }
                 }
             }, 2000); // Wait 2 seconds for normal data flow
+
+            // ========================================
+            // PRODUCT DATA FUNCTIONS
+            // ========================================
+
+            // Helper function to get brand from style number prefix
+            function getBrandFromStyle(styleNumber) {
+                const stylePrefix = styleNumber.toUpperCase().replace(/[0-9]/g, '');
+                const brandMap = {
+                    'PC': 'Port & Company',
+                    'DT': 'District',
+                    'SP': 'Sport-Tek',
+                    'DM': 'District Made',
+                    'AA': 'Alternative Apparel',
+                    'NL': 'Next Level',
+                    'G': 'Gildan',
+                    'ST': 'Sport-Tek',
+                    'TSC': 'The Supply Chain',
+                    'LST': 'Sport-Tek Ladies',
+                    'YST': 'Sport-Tek Youth'
+                };
+                return brandMap[stylePrefix] || 'Premium Brand';
+            }
+
+            // Fetch and display product information
+            async function fetchAndDisplayProduct(styleNumber) {
+                try {
+                    console.log('📦 Fetching product:', styleNumber);
+
+                    // Fetch from product details API
+                    const response = await fetch(`/api/product-details?styleNumber=${styleNumber}`);
+                    if (!response.ok) {
+                        throw new Error('Product not found');
+                    }
+
+                    const product = await response.json();
+                    console.log('✅ Product data received:', product);
+
+                    // Update product information
+                    updateProductInfo(product, styleNumber);
+
+                    // Hide loading, show product
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('productHero').style.display = 'block';
+
+                } catch (error) {
+                    console.error('❌ Error fetching product:', error);
+
+                    // Hide loading, show product with fallback
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('productHero').style.display = 'block';
+
+                    // Set fallback info
+                    document.getElementById('productTitle').textContent = `${styleNumber} - DTF Pricing`;
+                    document.getElementById('productDescription').textContent = 'Direct-to-Film transfer printing';
+                    document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+                    document.getElementById('currentBrand').textContent = getBrandFromStyle(styleNumber);
+                }
+            }
+
+            // Update product information with images and colors
+            function updateProductInfo(product, styleNumber) {
+                console.log('📝 Updating product info with:', product);
+
+                // Update breadcrumb Products link to include style parameter
+                const productsBreadcrumb = document.getElementById('products-breadcrumb');
+                if (productsBreadcrumb && styleNumber) {
+                    productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                    console.log('✅ Updated products breadcrumb with style:', styleNumber);
+                }
+
+                // Use PRODUCT_TITLE from API or fallback
+                const title = product.PRODUCT_TITLE || product.title || `${styleNumber} - DTF Pricing`;
+
+                // Use PRODUCT_DESCRIPTION from API or fallback
+                const description = product.PRODUCT_DESCRIPTION || product.description || 'Direct-to-Film transfer printing';
+
+                // Use BRAND_NAME from API, with intelligent fallback
+                const brand = product.BRAND_NAME || product.brand || getBrandFromStyle(styleNumber);
+
+                document.getElementById('productTitle').textContent = title;
+                document.getElementById('productDescription').textContent = description;
+                document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+                document.getElementById('currentBrand').textContent = brand;
+
+                // Update product image
+                updateProductImage(product);
+
+                // Update color swatches
+                updateColorSwatches(product);
+
+                console.log('✅ Product info updated:', { title, description, brand });
+            }
+
+            // Update product image
+            function updateProductImage(product) {
+                const imageEl = document.getElementById('productImage');
+                const placeholderEl = document.getElementById('imagePlaceholder');
+
+                // Check for API product image fields first
+                let imageUrl = product.FRONT_MODEL || product.FRONT_FLAT || product.PRODUCT_IMAGE;
+
+                if (imageUrl) {
+                    // Use image from product details API
+                    imageEl.src = imageUrl;
+                    imageEl.style.display = 'block';
+                    placeholderEl.style.display = 'none';
+                    console.log('✅ Product image updated from API:', imageUrl);
+
+                    // Update color if available from API
+                    if (product.COLOR_NAME) {
+                        document.getElementById('currentColor').textContent = product.COLOR_NAME;
+                    }
+                } else if (product.colors && product.colors.length > 0) {
+                    // Fallback to color images
+                    const firstColorWithImage = product.colors.find(c => c.MAIN_IMAGE_URL) || product.colors[0];
+
+                    if (firstColorWithImage && firstColorWithImage.MAIN_IMAGE_URL) {
+                        imageEl.src = firstColorWithImage.MAIN_IMAGE_URL;
+                        imageEl.style.display = 'block';
+                        placeholderEl.style.display = 'none';
+
+                        // Update current color display
+                        if (firstColorWithImage.COLOR_NAME) {
+                            document.getElementById('currentColor').textContent = firstColorWithImage.COLOR_NAME;
+                        }
+                    } else {
+                        imageEl.style.display = 'none';
+                        placeholderEl.style.display = 'flex';
+                    }
+                } else {
+                    imageEl.style.display = 'none';
+                    placeholderEl.style.display = 'flex';
+                }
+            }
+
+            // Update color swatches
+            function updateColorSwatches(product) {
+                const swatchesSection = document.getElementById('colorSwatchesSection');
+                const swatchesContainer = document.getElementById('colorSwatches');
+
+                if (product.colors && product.colors.length > 0) {
+                    swatchesContainer.innerHTML = '';
+
+                    product.colors.forEach(color => {
+                        const swatch = document.createElement('div');
+                        swatch.className = 'color-swatch';
+                        swatch.style.cssText = `
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            border: 2px solid #e5e7eb;
+                            cursor: pointer;
+                            display: inline-block;
+                            margin-right: 8px;
+                            margin-bottom: 8px;
+                            position: relative;
+                            overflow: hidden;
+                        `;
+
+                        if (color.HEX_CODE) {
+                            swatch.style.backgroundColor = color.HEX_CODE;
+                        } else if (color.COLOR_SQUARE_IMAGE) {
+                            swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                            swatch.style.backgroundSize = 'cover';
+                        } else {
+                            // Default pattern for missing color
+                            swatch.style.background = 'linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%)';
+                            swatch.style.backgroundSize = '20px 20px';
+                        }
+
+                        swatch.title = color.COLOR_NAME || 'Color';
+
+                        // Add click handler to change product image
+                        swatch.addEventListener('click', () => {
+                            if (color.MAIN_IMAGE_URL) {
+                                document.getElementById('productImage').src = color.MAIN_IMAGE_URL;
+                                document.getElementById('productImage').style.display = 'block';
+                                document.getElementById('imagePlaceholder').style.display = 'none';
+                            }
+
+                            // Update current color display
+                            if (color.COLOR_NAME) {
+                                document.getElementById('currentColor').textContent = color.COLOR_NAME;
+                            }
+                        });
+
+                        swatchesContainer.appendChild(swatch);
+                    });
+
+                    swatchesSection.style.display = 'block';
+                } else {
+                    swatchesSection.style.display = 'none';
+                }
+            }
+
+            // Setup search functionality with API integration
+            function setupSearch() {
+                const searchInput = document.getElementById('styleSearch');
+                const searchBtn = document.getElementById('searchBtn');
+                const searchWrapper = document.querySelector('.search-wrapper');
+
+                // Create search results dropdown
+                const resultsContainer = document.createElement('div');
+                resultsContainer.className = 'search-results';
+                searchWrapper.appendChild(resultsContainer);
+
+                let searchTimeout = null;
+
+                // Perform API search
+                async function performAPISearch(query) {
+                    if (query.length < 2) {
+                        resultsContainer.classList.remove('active');
+                        return;
+                    }
+
+                    // Show loading state
+                    resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    resultsContainer.classList.add('active');
+
+                    try {
+                        // Search using the API endpoint
+                        const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+
+                        if (!response.ok) {
+                            throw new Error('Search failed');
+                        }
+
+                        const results = await response.json();
+
+                        if (results.length === 0) {
+                            resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                        } else {
+                            // Build results HTML
+                            let html = '';
+                            results.slice(0, 10).forEach(result => {
+                                html += `
+                                    <div class="search-result-item" data-style="${result.style || result.value}">
+                                        <div class="search-result-style">${result.style || result.value}</div>
+                                        <div class="search-result-desc">${result.label}</div>
+                                    </div>
+                                `;
+                            });
+                            resultsContainer.innerHTML = html;
+
+                            // Add click handlers to results
+                            resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                                item.addEventListener('click', () => {
+                                    const style = item.dataset.style;
+                                    window.location.href = `?StyleNumber=${style}`;
+                                });
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+                    }
+                }
+
+                // Handle search input
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+
+                    // Clear previous timeout
+                    clearTimeout(searchTimeout);
+
+                    if (query.length < 2) {
+                        resultsContainer.classList.remove('active');
+                        return;
+                    }
+
+                    // Debounce search
+                    searchTimeout = setTimeout(() => {
+                        performAPISearch(query);
+                    }, 300);
+                });
+
+                // Handle enter key for direct navigation
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const value = searchInput.value.trim();
+                        if (value) {
+                            // Try direct style number navigation
+                            window.location.href = `?StyleNumber=${value}`;
+                        }
+                    }
+                });
+
+                // Handle search button click
+                searchBtn.addEventListener('click', () => {
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
+                });
+
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!searchWrapper.contains(e.target)) {
+                        resultsContainer.classList.remove('active');
+                    }
+                });
+            }
+
+            // ========================================
+            // END PRODUCT DATA FUNCTIONS
+            // ========================================
         });
         
         // Handle messages from parent window (iframe scenarios)
