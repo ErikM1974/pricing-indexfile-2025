@@ -133,7 +133,8 @@
       "Bash(cp:*)",
       "WebFetch(domain:www.raygunprinting.com)",
       "WebFetch(domain:www.screenprinting.com)",
-      "WebFetch(domain:tannersinc.net)"
+      "WebFetch(domain:tannersinc.net)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": [],
