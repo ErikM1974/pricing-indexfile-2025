@@ -1057,14 +1057,25 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         updateProductContext();
         updateTabNavigation();
 
-        // Load dependent scripts sequentially
+        // Detect modern calculator pages (DTF) that have their own script systems
+        const currentPage = window.location.pathname.toLowerCase();
+        const isDTF = currentPage.includes('dtf');
+        const isScreenPrint = currentPage.includes('screen-print');
+
+        // Modern pages (DTF) skip legacy script loading - they have their own systems
+        if (isDTF) {
+            console.log("PricingPages: DTF page detected - skipping legacy script loading (uses DTF V2 system)");
+            // DTF pages only need product context initialization (already done above)
+            // They handle their own calculator, adapter, and integration scripts
+            return;
+        }
+
+        // Load dependent scripts sequentially for legacy pages
         try {
             await loadScript('/cart.js');
             await loadScript('/cart-integration.js');
-            
+
             // Skip pricing-matrix-capture for screen print pages (they use master bundle)
-            const currentPage = window.location.pathname.toLowerCase();
-            const isScreenPrint = currentPage.includes('screen-print');
             if (!isScreenPrint) {
                 await loadScript('/pricing-matrix-capture.js');
             } else {
