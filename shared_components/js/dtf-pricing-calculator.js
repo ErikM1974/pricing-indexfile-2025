@@ -120,6 +120,18 @@ class DTFPricingCalculator {
             });
         }
 
+        // Update labor cost from API
+        if (apiData.allDtfCostsR && apiData.allDtfCostsR[0] && apiData.allDtfCostsR[0].PressingLaborCost) {
+            DTFConfig.laborCost.costPerLocation = parseFloat(apiData.allDtfCostsR[0].PressingLaborCost);
+            console.log('[DTF Calculator] Labor cost updated from API:', DTFConfig.laborCost.costPerLocation);
+        }
+
+        // Update margin denominator from API tier data
+        if (apiData.tiersR && apiData.tiersR[0] && apiData.tiersR[0].MarginDenominator) {
+            DTFConfig.settings.garmentMargin = parseFloat(apiData.tiersR[0].MarginDenominator);
+            console.log('[DTF Calculator] Margin denominator updated from API:', DTFConfig.settings.garmentMargin);
+        }
+
         console.log('[DTF Calculator] Config updated with API data');
     }
 
@@ -363,6 +375,17 @@ class DTFPricingCalculator {
     calculatePricing() {
         const quantity = this.currentData.quantity;
         const garmentCost = this.currentData.garmentCost;
+
+        // Check if any locations are selected - must select at least one location
+        if (this.currentData.selectedLocations.size === 0) {
+            return {
+                error: 'No locations selected',
+                unitPrice: 0,
+                totalOrder: 0,
+                quantity: quantity,
+                locationCount: 0
+            };
+        }
 
         // Check for missing garment cost
         if (!garmentCost || garmentCost === 0) {

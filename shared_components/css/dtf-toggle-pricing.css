@@ -61,11 +61,12 @@
     color: #2d5f3f;
 }
 
-/* Toggle Items */
+/* Toggle Items - 2 Column Layout */
 .dtf-location-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
     gap: 12px;
+    column-gap: 16px; /* Slightly wider gap between columns */
 }
 
 .dtf-toggle-item {
@@ -143,10 +144,14 @@
     gap: 20px;
 }
 
-/* Tier Buttons */
-.dtf-tier-buttons {
-    display: flex;
-    flex-direction: column;
+/* Tier Buttons - Vertical Stack */
+/* Override any grid layouts (including .pricing-tiers-grid from dtf-calculator-fix.css) */
+#dtf-tier-buttons,
+.dtf-tier-buttons,
+.dtf-tiers-column .dtf-tier-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
     gap: 12px;
     background: white;
     border-radius: 12px;
