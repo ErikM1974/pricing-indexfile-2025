@@ -16,11 +16,11 @@ class DTFPricingService {
     /**
      * Main entry point - fetches DTF pricing data from API
      */
-    async fetchPricingData(options = {}) {
-        console.log('[DTFPricingService] Fetching DTF pricing data');
-        
-        // Check cache first
-        const cacheKey = `${this.cachePrefix}-bundle`;
+    async fetchPricingData(styleNumber = null, options = {}) {
+        console.log('[DTFPricingService] Fetching DTF pricing data', styleNumber ? `for style: ${styleNumber}` : '(generic)');
+
+        // Build cache key based on style number
+        const cacheKey = styleNumber ? `${this.cachePrefix}-${styleNumber}` : `${this.cachePrefix}-bundle`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
             console.log('[DTFPricingService] Returning cached data');
@@ -29,8 +29,14 @@ class DTFPricingService {
         }
 
         try {
+            // Build API URL with optional style number
+            let apiUrl = `${this.baseURL}/api/pricing-bundle?method=DTF`;
+            if (styleNumber) {
+                apiUrl += `&styleNumber=${encodeURIComponent(styleNumber)}`;
+            }
+
             // Fetch from API
-            const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=DTF`);
+            const response = await fetch(apiUrl);
             
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);

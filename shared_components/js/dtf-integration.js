@@ -35,6 +35,10 @@ class DTFIntegration {
         this.calculator = new DTFPricingCalculator('dtf-calculator-container');
         this.isInitialized = true;
 
+        // Make calculator globally accessible for compatibility
+        window.dtfCalculator = this.calculator;
+        console.log('DTF Integration: Calculator exposed globally as window.dtfCalculator');
+
         // Listen for Caspio data events
         this.listenForCaspioData();
 
@@ -94,10 +98,11 @@ class DTFIntegration {
             this.calculator.updateFreight(data.freight);
         }
 
-        // Update LTM fee
-        if (data.ltmFee !== undefined) {
-            this.calculator.updateLTMFee(data.ltmFee);
-        }
+        // Update LTM fee - commented out as updateLTMFee method doesn't exist
+        // The calculator handles LTM fee internally based on quantity
+        // if (data.ltmFee !== undefined) {
+        //     this.calculator.updateLTMFee(data.ltmFee);
+        // }
 
         // Handle any additional product data
         if (data.productInfo) {

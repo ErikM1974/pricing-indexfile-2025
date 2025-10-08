@@ -854,22 +854,33 @@
                 updateProductInfo(productData, e.detail.styleNumber || styleNumber);
 
                 // Update DTF calculator with full product data for upcharge tooltip
-                if (window.dtfCalculator && e.detail) {
+                // Check both possible calculator locations
+                const calculator = window.dtfCalculator || window.dtfIntegration?.calculator;
+                if (calculator && e.detail) {
                     console.log('🎯 [DTF] Updating calculator with product upcharges and sizes');
+                    console.log('📍 [DTF] Calculator found at:', window.dtfCalculator ? 'window.dtfCalculator' : 'window.dtfIntegration.calculator');
 
                     // Set upcharges data
                     if (e.detail.sellingPriceDisplayAddOns || e.detail.upcharges) {
-                        window.dtfCalculator.productUpcharges = e.detail.sellingPriceDisplayAddOns || e.detail.upcharges || {};
-                        console.log('✅ [DTF] Upcharges set:', window.dtfCalculator.productUpcharges);
+                        calculator.productUpcharges = e.detail.sellingPriceDisplayAddOns || e.detail.upcharges || {};
+                        console.log('✅ [DTF] Upcharges set:', calculator.productUpcharges);
                     }
 
                     // Set sizes data
                     if (e.detail.sizes) {
-                        window.dtfCalculator.productSizes = Array.isArray(e.detail.sizes)
+                        calculator.productSizes = Array.isArray(e.detail.sizes)
                             ? e.detail.sizes.map(s => s.size || s)
                             : [];
-                        console.log('✅ [DTF] Sizes set:', window.dtfCalculator.productSizes);
+                        console.log('✅ [DTF] Sizes set:', calculator.productSizes);
                     }
+
+                    // Force tooltip update if it's visible
+                    if (calculator.updateUpchargeTooltipContent && typeof calculator.updateUpchargeTooltipContent === 'function') {
+                        console.log('🔄 [DTF] Forcing tooltip content update');
+                        calculator.updateUpchargeTooltipContent();
+                    }
+                } else {
+                    console.warn('⚠️ [DTF] Calculator not found yet, data may be picked up by event listener');
                 }
 
                 // Hide loading, show product

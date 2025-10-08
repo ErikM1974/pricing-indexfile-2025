@@ -35,14 +35,24 @@ class DTFPricingCalculator {
             this.apiDataLoaded = true;
             console.log('[DTF Calculator] API data loaded successfully');
 
-            // Populate tooltip data from loaded API response
+            // The DTF pricing bundle API should include sizes and upcharges
             if (this.apiData) {
-                this.productSizes = this.apiData.sizes?.map(s => s.size) || [];
-                this.productUpcharges = this.apiData.sellingPriceDisplayAddOns || {};
-                console.log('✅ [DTF Calculator] Tooltip data loaded from API:', {
-                    sizes: this.productSizes,
-                    upcharges: this.productUpcharges
-                });
+                // Extract sizes
+                if (this.apiData.sizes && Array.isArray(this.apiData.sizes)) {
+                    this.productSizes = this.apiData.sizes.map(s => s.size);
+                    console.log('✅ [DTF Calculator] Sizes loaded from API:', this.productSizes);
+                }
+
+                // Extract upcharges
+                if (this.apiData.sellingPriceDisplayAddOns) {
+                    this.productUpcharges = this.apiData.sellingPriceDisplayAddOns;
+                    console.log('✅ [DTF Calculator] Upcharges loaded from API:', this.productUpcharges);
+                }
+
+                // If we don't have upcharges yet, we'll get them later from product event
+                if (!this.productUpcharges || Object.keys(this.productUpcharges).length === 0) {
+                    console.log('⏳ [DTF Calculator] No upcharges in initial load, waiting for product data...');
+                }
             }
         } catch (error) {
             console.error('[DTF Calculator] Failed to load API data:', error);
@@ -53,6 +63,15 @@ class DTFPricingCalculator {
         this.render();
         this.attachEventListeners();
         this.setupProductDataListener();
+
+        // Also try to fetch upcharge data immediately if we have a style number
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber') || urlParams.get('styleNumber');
+        if (styleNumber) {
+            console.log('🚀 [DTF Calculator] Style number found in URL, fetching upcharge data immediately:', styleNumber);
+            this.fetchUpchargeData(styleNumber);
+        }
+
         this.checkStaffViewStatus();
 
         this.isRendered = true;
@@ -72,8 +91,12 @@ class DTFPricingCalculator {
     }
 
     async loadApiData() {
-        // Fetch from pricing-bundle endpoint
-        const apiData = await this.pricingService.fetchPricingData();
+        // Get style number from URL if available
+        const urlParams = new URLSearchParams(window.location.search);
+        const styleNumber = urlParams.get('StyleNumber') || urlParams.get('styleNumber');
+
+        // Fetch from pricing-bundle endpoint with style number
+        const apiData = await this.pricingService.fetchPricingData(styleNumber);
 
         if (!apiData) {
             throw new Error('No API data received');
@@ -711,32 +734,76 @@ class DTFPricingCalculator {
         }
     }
 
-    setupProductDataListener() {
-        // Listen for productColorsReady event to get upcharge data
-        document.addEventListener('productColorsReady', (e) => {
-            console.log('🎯 [DTF Calculator] Product data received:', e.detail);
+    async fetchUpchargeData(styleNumber) {
+        try {
+            // Fetch max prices and upcharges data
+            console.log('📡 [DTF Calculator] Fetching max prices for style:', styleNumber);
+            const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/max-prices-by-style?styleNumber=${styleNumber}`);
 
-            if (e.detail && e.detail.product) {
-                const product = e.detail.product;
-
-                // Extract upcharges from product data
-                if (product.sellingPriceDisplayAddOns || product.upcharges) {
-                    this.productUpcharges = product.sellingPriceDisplayAddOns || product.upcharges || {};
-                    console.log('✅ [DTF Calculator] Upcharges loaded:', this.productUpcharges);
-                }
-
-                // Extract available sizes
-                if (product.sizes && Array.isArray(product.sizes)) {
-                    this.productSizes = product.sizes.map(s => s.size || s);
-                    console.log('✅ [DTF Calculator] Sizes loaded:', this.productSizes);
-                }
-
-                // Update tooltip content if it's currently visible
-                const tooltip = document.getElementById('dtf-upcharge-tooltip');
-                if (tooltip && tooltip.style.display === 'block') {
-                    this.updateUpchargeTooltipContent();
-                }
+            if (!response.ok) {
+                throw new Error(`Failed to fetch max prices: ${response.status}`);
             }
+
+            const data = await response.json();
+            console.log('✅ [DTF Calculator] Max prices data received:', data);
+
+            // Extract sizes from the response
+            if (data.sizes && Array.isArray(data.sizes)) {
+                this.productSizes = data.sizes.map(s => s.size);
+                console.log('✅ [DTF Calculator] Sizes loaded:', this.productSizes);
+            }
+
+            // Extract upcharges directly from sellingPriceDisplayAddOns
+            if (data.sellingPriceDisplayAddOns) {
+                this.productUpcharges = data.sellingPriceDisplayAddOns;
+                console.log('✅ [DTF Calculator] Upcharges loaded:', this.productUpcharges);
+            }
+
+            // Update tooltip content immediately
+            this.updateUpchargeTooltipContent();
+
+            // Update tooltip if it's currently visible
+            const tooltip = document.getElementById('dtf-upcharge-tooltip');
+            if (tooltip && tooltip.style.display === 'block') {
+                this.updateUpchargeTooltipContent();
+            }
+
+            console.log('📊 [DTF Calculator] Tooltip data updated:', {
+                sizes: this.productSizes,
+                upcharges: this.productUpcharges
+            });
+
+        } catch (error) {
+            console.error('❌ [DTF Calculator] Failed to fetch max prices:', error);
+
+            // No fallback needed - this endpoint should work for all styles
+            console.warn('⚠️ [DTF Calculator] Unable to load size upcharge data');
+        }
+    }
+
+    setupProductDataListener() {
+        console.log('🔧 [DTF Calculator] Setting up product data listener...');
+
+        // Listen for productColorsReady event - but we need to fetch our own sizing data
+        document.addEventListener('productColorsReady', async (e) => {
+            console.log('🎯 [DTF Calculator] Product colors event received, fetching size/upcharge data...');
+            console.log('📦 [DTF Calculator] Event detail:', e.detail);
+
+            // Try to get style number from multiple possible locations
+            const styleNumber = e.detail?.styleNumber ||
+                               e.detail?.style ||
+                               window.selectedStyleNumber ||
+                               new URLSearchParams(window.location.search).get('StyleNumber');
+
+            console.log('🏷️ [DTF Calculator] Style number resolved to:', styleNumber);
+
+            if (!styleNumber) {
+                console.warn('⚠️ [DTF Calculator] No style number found in event or globals');
+                return;
+            }
+
+            // Call the shared method
+            await this.fetchUpchargeData(styleNumber);
         });
     }
 

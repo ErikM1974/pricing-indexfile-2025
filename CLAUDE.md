@@ -636,6 +636,17 @@ Object.entries(allUpcharges).forEach(([size, amount]) => {
 - Filtering pattern: `/shared_components/js/universal-pricing-grid.js:103-115`
 - Tooltip implementation: `/calculators/dtg-pricing.html:2169-2239`
 
+## 🐛 Debugging & Communication
+
+For effective debugging communication and API troubleshooting:
+→ **See [memory/DEBUGGING_COMMUNICATION.md](memory/DEBUGGING_COMMUNICATION.md)**
+
+Key points:
+- Always provide working examples with API endpoints
+- Include actual data structures, not just descriptions
+- Check data layer first (most "UI bugs" are data/API issues)
+- Use Network tab to see actual API calls and responses
+
 ## Additional Resources
 
 ### 📚 Documentation
