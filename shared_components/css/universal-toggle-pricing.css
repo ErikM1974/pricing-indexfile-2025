@@ -203,15 +203,30 @@
 
 /* Info icon for upcharges */
 .universal-upcharge-info-icon {
-    font-size: 28px;
+    font-size: 20px;
     color: white;
-    opacity: 0.7;
+    opacity: 0.85;
     cursor: pointer;
     transition: opacity 0.3s ease;
 }
 
 .universal-upcharge-info-icon:hover {
     opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Art setup fee badge */
+.universal-setup-fee-badge {
+    font-size: 20px;
+    color: white;
+    opacity: 0.85;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.universal-setup-fee-badge:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 /* ===================================

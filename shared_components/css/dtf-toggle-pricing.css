@@ -4,6 +4,28 @@
  * iOS-style toggle switches with green theme
  */
 
+/* Pricing Matrix Header - Matches DTG style */
+.dtf-pricing-matrix-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dtf-matrix-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.dtf-matrix-subtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 400;
+}
+
 /* Main Container - Two Column Grid */
 .dtf-toggle-pricing-container {
     display: grid;
@@ -14,14 +36,39 @@
     padding: 20px;
 }
 
+/* Section Headers with Icons - Matches DTG style */
+.dtf-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dtf-section-icon {
+    font-size: 1.5rem;
+    color: #4cb354;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
 /* Column Headers */
 .dtf-column-header {
     font-size: 1.25rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+    margin-top: 0;
+}
+
+.dtf-column-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 400;
 }
 
 /* Print Locations Column */
@@ -263,21 +310,32 @@
     color: #3b82f6;
 }
 
-/* Live Price Display */
+/* Live Price Display - Matches DTG style */
 .dtf-live-price-display {
-    margin-top: 30px;
-    padding: 24px;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border: 3px solid #22c55e;
+    margin-top: 32px;
+    padding: 32px;
+    background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    border: none;
     border-radius: 12px;
     text-align: center;
     position: relative; /* CRITICAL: Allows absolutely positioned tooltips to be positioned relative to this container */
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+}
+
+/* Price label - matches DTG "Price per shirt" */
+.dtf-price-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: white;
+    opacity: 0.95;
+    margin-bottom: 12px;
+    text-transform: none;
 }
 
 .dtf-price-amount {
     font-size: 3rem;
     font-weight: 700;
-    color: #15803d;
+    color: white;
     margin-bottom: 8px;
     line-height: 1;
     display: flex;
@@ -289,7 +347,8 @@
 
 .dtf-price-details {
     font-size: 0.95rem;
-    color: #166534;
+    color: white;
+    opacity: 0.9;
     font-weight: 500;
 }
 
@@ -309,6 +368,26 @@
         grid-template-columns: 1fr;
         gap: 30px;
         padding: 15px;
+    }
+
+    .dtf-matrix-title {
+        font-size: 1.75rem;
+    }
+
+    .dtf-matrix-subtitle {
+        font-size: 1rem;
+    }
+
+    .dtf-section-header {
+        padding: 12px;
+    }
+
+    .dtf-section-icon {
+        font-size: 1.25rem;
+    }
+
+    .dtf-column-header {
+        font-size: 1.125rem;
     }
 
     .dtf-price-amount {
@@ -344,9 +423,9 @@
    ======================================== */
 
 .dtf-upcharge-info-icon {
-    font-size: 28px;
-    color: #15803d;
-    opacity: 0.9;
+    font-size: 20px;
+    color: white;
+    opacity: 0.85;
     cursor: pointer;
     transition: all 0.3s ease;
     flex-shrink: 0;

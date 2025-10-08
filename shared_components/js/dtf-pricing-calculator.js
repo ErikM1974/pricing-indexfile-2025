@@ -211,10 +211,22 @@ class DTFPricingCalculator {
 
     render() {
         this.container.innerHTML = `
+            <!-- DTF Pricing Matrix Header Section -->
+            <div class="dtf-pricing-matrix-header">
+                <h2 class="dtf-matrix-title">DTF Pricing Matrix</h2>
+                <p class="dtf-matrix-subtitle">All locations and quantity tiers for Direct-to-Film transfers.</p>
+            </div>
+
             <div class="dtf-toggle-pricing-container">
                 <!-- Left Column: Print Locations -->
                 <div class="dtf-locations-column">
-                    <h3 class="dtf-column-header">Print Locations</h3>
+                    <div class="dtf-section-header">
+                        <i class="fas fa-layer-group dtf-section-icon"></i>
+                        <div>
+                            <h3 class="dtf-column-header">Print Locations</h3>
+                            <p class="dtf-column-subtitle">Select a maximum of two locations.</p>
+                        </div>
+                    </div>
                     <div id="dtf-location-toggles"></div>
                     <div class="dtf-info-box mt-4">
                         <i class="fas fa-info-circle"></i>
@@ -224,17 +236,24 @@ class DTFPricingCalculator {
 
                 <!-- Right Column: Quantity Tiers -->
                 <div class="dtf-tiers-column">
-                    <h3 class="dtf-column-header">Quantity Tiers</h3>
+                    <div class="dtf-section-header">
+                        <i class="fas fa-list-ol dtf-section-icon"></i>
+                        <div>
+                            <h3 class="dtf-column-header">Quantity Tiers</h3>
+                            <p class="dtf-column-subtitle">Choose your order quantity.</p>
+                        </div>
+                    </div>
                     <div id="dtf-tier-buttons"></div>
                 </div>
             </div>
 
             <!-- Live Price Display -->
             <div class="dtf-live-price-display">
+                <div class="dtf-price-label">Price per transfer</div>
                 <div class="dtf-price-amount">
                     $<span id="dtf-live-price">0.00</span>
                     <i class="fas fa-info-circle dtf-upcharge-info-icon" id="dtf-upcharge-info-icon"></i>
-                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 24px; color: #f59e0b; opacity: 0.85; cursor: pointer;"></i>
+                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 20px; color: white; opacity: 0.85; cursor: pointer;"></i>
                 </div>
                 <div class="dtf-price-details" id="dtf-price-details">
                     <span id="dtf-quantity-display">0</span> pieces + <span id="dtf-locations-display">0</span> location(s)
