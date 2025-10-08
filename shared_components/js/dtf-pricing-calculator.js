@@ -34,6 +34,16 @@ class DTFPricingCalculator {
             await this.loadApiData();
             this.apiDataLoaded = true;
             console.log('[DTF Calculator] API data loaded successfully');
+
+            // Populate tooltip data from loaded API response
+            if (this.apiData) {
+                this.productSizes = this.apiData.sizes?.map(s => s.size) || [];
+                this.productUpcharges = this.apiData.sellingPriceDisplayAddOns || {};
+                console.log('✅ [DTF Calculator] Tooltip data loaded from API:', {
+                    sizes: this.productSizes,
+                    upcharges: this.productUpcharges
+                });
+            }
         } catch (error) {
             console.error('[DTF Calculator] Failed to load API data:', error);
             this.showError('Unable to load pricing data. Please call 253-922-5793');
