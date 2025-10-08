@@ -1112,3 +1112,203 @@
         font-size: 14px;
     }
 }
+
+/* ==================== QUANTITY INPUT FOR LTM TIERS ==================== */
+.sp-tier-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Tier Fee Display */
+.sp-tier-fee {
+    font-size: 13px;
+    color: #dc2626;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Hint Text */
+.sp-tier-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 6px;
+    opacity: 0.8;
+    transition: opacity 0.3s, color 0.3s;
+}
+
+.sp-tier-hint i {
+    color: #4cb354;
+    font-size: 13px;
+}
+
+.sp-tier-button:hover .sp-tier-hint {
+    opacity: 1;
+    color: #4cb354;
+}
+
+.sp-tier-button:hover .sp-tier-hint i {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}
+
+/* Expanded State */
+.sp-tier-button.expanded {
+    background: #f0fdf4 !important;
+    border-color: #4cb354 !important;
+    border-width: 3px !important;
+}
+
+/* Smooth Slide-In Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sp-tier-button.expanded .sp-tier-qty-input-wrapper {
+    animation: slideDown 0.3s ease-out;
+}
+
+.sp-tier-qty-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.sp-tier-button.selected .sp-tier-qty-input-wrapper {
+    background: #f0fdf4;
+    border-color: #4cb354;
+}
+
+.sp-qty-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0;
+}
+
+.sp-tier-button.selected .sp-qty-label {
+    color: #4cb354;
+}
+
+.sp-qty-input {
+    width: 70px;
+    padding: 6px 10px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    color: #1f2937;
+    transition: all 0.3s;
+}
+
+.sp-qty-input:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+}
+
+.sp-qty-unit {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.sp-ltm-calc {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.sp-tier-button.selected .sp-ltm-calc {
+    color: #4cb354;
+}
+
+/* LTM Fee Included Note */
+.sp-ltm-included-note {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Breakdown Sections */
+.sp-breakdown-ltm-section {
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+}
+
+.sp-breakdown-note {
+    font-size: 12px;
+    color: #78350f;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fef9e7;
+    border-radius: 6px;
+    border-left: 3px solid #fbbf24;
+    line-height: 1.5;
+}
+
+.sp-breakdown-note i {
+    color: #d97706;
+    margin-right: 6px;
+}
+
+.sp-breakdown-total-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 15px;
+}
+
+.sp-breakdown-total-divider {
+    height: 2px;
+    background: #e5e7eb;
+    margin: 10px 0;
+}
+
+.sp-breakdown-final-total {
+    font-weight: 800;
+    font-size: 18px;
+    color: #4cb354;
+    padding-top: 12px;
+    border-top: 3px solid #4cb354;
+}
+
+.sp-breakdown-final-total span:last-child {
+    font-size: 24px;
+}
+
+/* Mobile Responsive for Quantity Inputs */
+@media (max-width: 640px) {
+    .sp-tier-qty-input-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .sp-qty-input {
+        width: 100%;
+    }
+}

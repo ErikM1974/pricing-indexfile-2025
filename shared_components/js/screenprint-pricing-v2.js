@@ -64,7 +64,8 @@ class ScreenPrintPricing {
             productTitle: '',
             pricingData: null,
             masterBundle: null,
-            safetyStripeSurcharge: 2.00
+            safetyStripeSurcharge: 2.00,
+            expandedLTMTier: null  // Track which LTM tier is expanded ('24-36' or '37-72')
         };
 
         // DOM elements cache
@@ -222,13 +223,45 @@ class ScreenPrintPricing {
                         </div>
 
                         <button class="sp-tier-button" id="sp-tier-24-36" data-tier="24-36">
-                            24-36 pieces
-                            <small>+ $75 Small Batch Fee</small>
+                            <div class="sp-tier-label">24-36 pieces</div>
+                            <div class="sp-tier-fee">$75 Small Batch Fee</div>
+                            <div class="sp-tier-hint">
+                                <i class="fas fa-calculator"></i>
+                                Click to set exact quantity
+                            </div>
+
+                            <!-- Hidden until expanded -->
+                            <div class="sp-tier-qty-input-wrapper" style="display: none;">
+                                <label class="sp-qty-label">Exact Qty:</label>
+                                <input type="number" min="24" max="36" value="24"
+                                       id="sp-qty-tier-1" class="sp-qty-input"
+                                       onclick="event.stopPropagation()">
+                                <span class="sp-qty-unit">shirts</span>
+                            </div>
+                            <small class="sp-ltm-calc" style="display: none;">
+                                $75 fee = $<span id="sp-ltm-calc-1">3.13</span>/shirt
+                            </small>
                         </button>
 
                         <button class="sp-tier-button selected" id="sp-tier-37-72" data-tier="37-72">
-                            37-72 pieces
-                            <small>+ $50 Small Batch Fee</small>
+                            <div class="sp-tier-label">37-72 pieces</div>
+                            <div class="sp-tier-fee">$50 Small Batch Fee</div>
+                            <div class="sp-tier-hint">
+                                <i class="fas fa-calculator"></i>
+                                Click to set exact quantity
+                            </div>
+
+                            <!-- Hidden until expanded -->
+                            <div class="sp-tier-qty-input-wrapper" style="display: none;">
+                                <label class="sp-qty-label">Exact Qty:</label>
+                                <input type="number" min="37" max="72" value="37"
+                                       id="sp-qty-tier-2" class="sp-qty-input"
+                                       onclick="event.stopPropagation()">
+                                <span class="sp-qty-unit">shirts</span>
+                            </div>
+                            <small class="sp-ltm-calc" style="display: none;">
+                                $50 fee = $<span id="sp-ltm-calc-2">1.35</span>/shirt
+                            </small>
                         </button>
 
                         <button class="sp-tier-button" id="sp-tier-73-144" data-tier="73-144">
@@ -298,29 +331,8 @@ class ScreenPrintPricing {
                         </div>
                     </div>
 
-                    <!-- Setup Fees Section -->
-                    <div class="sp-pricing-setup" id="sp-pricing-setup" style="display: none;">
-                        <div class="sp-setup-header">
-                            <i class="fas fa-palette"></i> Setup Fees
-                        </div>
-                        <div class="sp-setup-breakdown" id="sp-setup-breakdown-live">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                        <div class="sp-price-row sp-setup-total">
-                            <span class="sp-price-label">Setup Total</span>
-                            <span class="sp-price-amount" id="sp-setup-total-amount">$0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- LTM Fee Section -->
-                    <div class="sp-pricing-ltm" id="sp-pricing-ltm" style="display: none;">
-                        <div class="sp-price-row sp-ltm-fee">
-                            <span class="sp-price-label">
-                                <i class="fas fa-exclamation-triangle"></i> Small Batch Fee
-                            </span>
-                            <span class="sp-price-amount" id="sp-ltm-fee-amount">$0.00</span>
-                        </div>
-                    </div>
+                    <!-- Setup Fees Section - REMOVED: Now shown only in detailed breakdown -->
+                    <!-- LTM Fee Section - REMOVED: Already included in per-shirt price -->
 
                     <!-- Order Total -->
                     <div class="sp-pricing-total" id="sp-pricing-total" style="display: none;">
@@ -337,7 +349,7 @@ class ScreenPrintPricing {
                     <div class="sp-breakdown-toggle" id="sp-breakdown-toggle" style="display: none;">
                         <button type="button" class="sp-toggle-breakdown-btn" id="sp-toggle-breakdown-btn">
                             <i class="fas fa-chevron-down"></i>
-                            <span id="sp-toggle-breakdown-text">Show Details</span>
+                            <span id="sp-toggle-breakdown-text">View Detailed Breakdown</span>
                         </button>
                     </div>
                 </div>
@@ -397,10 +409,72 @@ class ScreenPrintPricing {
         ];
 
         tierButtons.forEach(({id, tier, qty}) => {
-            document.getElementById(id)?.addEventListener('click', () => {
+            document.getElementById(id)?.addEventListener('click', (e) => {
+                // Don't re-trigger if clicking inside input field
+                if (e.target.tagName === 'INPUT') return;
+
+                // Collapse other LTM tiers first
+                this.collapseLTMTiers();
+
+                // Select this tier
                 this.selectQuantityTier(tier, qty);
+
+                // Expand if it's an LTM tier
+                if (tier === '24-36' || tier === '37-72') {
+                    this.expandLTMTier(tier, qty);
+                }
             });
         });
+
+        // NEW: Quantity input handlers for LTM tiers
+        const qtyInput1 = document.getElementById('sp-qty-tier-1');
+        const qtyInput2 = document.getElementById('sp-qty-tier-2');
+
+        if (qtyInput1) {
+            qtyInput1.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value) || 24;
+                const clamped = Math.max(24, Math.min(36, value));
+                if (value !== clamped) {
+                    e.target.value = clamped;
+                }
+                // Update LTM calculation display
+                const ltmPerShirt = (75 / clamped).toFixed(2);
+                document.getElementById('sp-ltm-calc-1').textContent = ltmPerShirt;
+
+                // Update state and recalculate
+                this.state.quantity = clamped;
+                this.updateDisplay();
+            });
+
+            qtyInput1.addEventListener('change', (e) => {
+                const value = parseInt(e.target.value) || 24;
+                const clamped = Math.max(24, Math.min(36, value));
+                e.target.value = clamped;
+            });
+        }
+
+        if (qtyInput2) {
+            qtyInput2.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value) || 37;
+                const clamped = Math.max(37, Math.min(72, value));
+                if (value !== clamped) {
+                    e.target.value = clamped;
+                }
+                // Update LTM calculation display
+                const ltmPerShirt = (50 / clamped).toFixed(2);
+                document.getElementById('sp-ltm-calc-2').textContent = ltmPerShirt;
+
+                // Update state and recalculate
+                this.state.quantity = clamped;
+                this.updateDisplay();
+            });
+
+            qtyInput2.addEventListener('change', (e) => {
+                const value = parseInt(e.target.value) || 37;
+                const clamped = Math.max(37, Math.min(72, value));
+                e.target.value = clamped;
+            });
+        }
 
         // NEW: Safety Stripes Toggle
         document.getElementById('sp-safety-stripes-toggle')?.addEventListener('click', () => {
@@ -684,6 +758,69 @@ class ScreenPrintPricing {
     }
 
     /**
+     * Collapse all LTM tier input fields
+     */
+    collapseLTMTiers() {
+        const ltmTiers = ['24-36', '37-72'];
+
+        ltmTiers.forEach(tier => {
+            const button = document.getElementById(`sp-tier-${tier}`);
+            if (!button) return;
+
+            // Remove expanded class
+            button.classList.remove('expanded');
+
+            // Hide input wrapper, calculation, and show hint
+            const wrapper = button.querySelector('.sp-tier-qty-input-wrapper');
+            const calc = button.querySelector('.sp-ltm-calc');
+            const hint = button.querySelector('.sp-tier-hint');
+
+            if (wrapper) wrapper.style.display = 'none';
+            if (calc) calc.style.display = 'none';
+            if (hint) hint.style.display = 'flex';
+        });
+
+        this.state.expandedLTMTier = null;
+    }
+
+    /**
+     * Expand a specific LTM tier to show quantity input
+     */
+    expandLTMTier(tier, defaultQty) {
+        const button = document.getElementById(`sp-tier-${tier}`);
+        if (!button) return;
+
+        // Add expanded class for styling
+        button.classList.add('expanded');
+
+        // Show input wrapper and calculation, hide hint
+        const wrapper = button.querySelector('.sp-tier-qty-input-wrapper');
+        const calc = button.querySelector('.sp-ltm-calc');
+        const hint = button.querySelector('.sp-tier-hint');
+
+        if (wrapper) wrapper.style.display = 'flex';
+        if (calc) calc.style.display = 'block';
+        if (hint) hint.style.display = 'none';
+
+        // Set default quantity if input is empty
+        const input = button.querySelector('.sp-qty-input');
+        if (input && !input.value) {
+            input.value = defaultQty;
+        }
+
+        // Focus and select the input for immediate editing
+        setTimeout(() => {
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 100);
+
+        // Track expanded state
+        this.state.expandedLTMTier = tier;
+    }
+
+    /**
      * Toggle additional locations section (expand/collapse)
      */
     toggleAdditionalLocationsSection() {
@@ -724,7 +861,7 @@ class ScreenPrintPricing {
             if (ltmSection && pricing.ltmFee > 0) {
                 ltmSection.style.display = 'block';
             }
-            toggleText.textContent = 'Hide Details';
+            toggleText.textContent = 'Hide Breakdown';
             toggleIcon?.classList.remove('fa-chevron-down');
             toggleIcon?.classList.add('fa-chevron-up');
         } else {
@@ -738,7 +875,7 @@ class ScreenPrintPricing {
             if (ltmSection) {
                 ltmSection.style.display = 'none';
             }
-            toggleText.textContent = 'Show Details';
+            toggleText.textContent = 'View Detailed Breakdown';
             toggleIcon?.classList.remove('fa-chevron-up');
             toggleIcon?.classList.add('fa-chevron-down');
         }
@@ -989,10 +1126,15 @@ class ScreenPrintPricing {
             // Parse to get min and max values
             const [min, max] = this.state.selectedTier.split('-').map(Number);
 
-            // Format tier label (e.g., "24-36 pieces" or "145+ pieces")
-            const tierText = max >= 576
-                ? `${min}+ pieces`
-                : `${min}-${max} pieces`;
+            // For LTM tiers with quantity input, show exact quantity
+            let tierText;
+            if (this.state.selectedTier === '24-36' || this.state.selectedTier === '37-72') {
+                tierText = `${this.state.selectedTier} pieces (${this.state.quantity} selected)`;
+            } else {
+                tierText = max >= 576
+                    ? `${min}+ pieces`
+                    : `${min}-${max} pieces`;
+            }
 
             tierLabel.textContent = tierText;
             tierDisplay.style.display = 'flex';
@@ -1000,80 +1142,43 @@ class ScreenPrintPricing {
             tierDisplay.style.display = 'none';
         }
 
-        // Update per-shirt price
+        // Update per-shirt price (now includes LTM fee)
         if (this.state.pricingData) {
             priceElement.textContent = `$${pricing.perShirtTotal.toFixed(2)}`;
+
+            // Add simple "all fees included" note instead of showing math
+            const priceRow = priceElement.closest('.sp-price-per-shirt');
+            let existingSubtitle = priceRow?.querySelector('.sp-ltm-included-note');
+
+            if (pricing.ltmImpactPerShirt > 0 || pricing.setupFee > 0) {
+                const subtitleText = '(all fees included)';
+
+                if (existingSubtitle) {
+                    existingSubtitle.textContent = subtitleText;
+                } else if (priceRow) {
+                    const subtitle = document.createElement('div');
+                    subtitle.className = 'sp-ltm-included-note';
+                    subtitle.textContent = subtitleText;
+                    priceRow.appendChild(subtitle);
+                }
+            } else if (existingSubtitle) {
+                existingSubtitle.remove();
+            }
         } else {
             priceElement.textContent = '$0.00';
         }
 
-        // REMOVED: Quantity calculation row (fake "X pieces × price = subtotal")
-        // Users select a tier RANGE, not a specific quantity
-        // We cannot show accurate calculations without knowing exact quantity they want
+        // REMOVED: Quantity calculation row
+        // REMOVED: Setup fees section (now only in detailed breakdown)
+        // REMOVED: LTM fee section (already included in per-shirt price)
+        // REMOVED: Order total displays (users calculate from tier ranges)
 
-        // Update setup fees section
-        const setupSection = document.getElementById('sp-pricing-setup');
-        const setupBreakdown = document.getElementById('sp-setup-breakdown-live');
-        const setupTotal = document.getElementById('sp-setup-total-amount');
-
-        if (pricing.setupFee > 0) {
-            setupSection.style.display = 'block';
-
-            // Build setup breakdown HTML
-            let breakdownHTML = '';
-            if (pricing.colorBreakdown.front > 0 && this.state.frontColors > 0) {
-                const frontSetup = pricing.colorBreakdown.front * this.config.setupFeePerColor;
-                const underbaseNote = (this.state.isDarkGarment && this.state.frontColors > 0)
-                    ? ` <span style="color: #6c757d; font-size: 12px;">(${this.state.frontColors} design + 1 underbase)</span>`
-                    : '';
-                breakdownHTML += `
-                    <div class="sp-setup-item">
-                        <span class="sp-setup-location">Front (${pricing.colorBreakdown.front} color${pricing.colorBreakdown.front > 1 ? 's' : ''})${underbaseNote}</span>
-                        <span class="sp-setup-cost">$${frontSetup.toFixed(2)}</span>
-                    </div>
-                `;
-            }
-
-            pricing.colorBreakdown.locations.forEach(loc => {
-                if (loc.colors > 0) {
-                    const label = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
-                    const underbaseNote = (this.state.isDarkGarment && loc.colors > 0)
-                        ? ` <span style="color: #6c757d; font-size: 12px;">(${loc.colors} design + 1 underbase)</span>`
-                        : '';
-                    breakdownHTML += `
-                        <div class="sp-setup-item">
-                            <span class="sp-setup-location">${label} (${loc.totalColors} color${loc.totalColors > 1 ? 's' : ''})${underbaseNote}</span>
-                            <span class="sp-setup-cost">$${loc.setupCost.toFixed(2)}</span>
-                        </div>
-                    `;
-                }
-            });
-
-            setupBreakdown.innerHTML = breakdownHTML;
-            setupTotal.textContent = `$${pricing.setupFee.toFixed(2)}`;
-        } else {
-            setupSection.style.display = 'none';
-        }
-
-        // Update LTM fee section
-        const ltmSection = document.getElementById('sp-pricing-ltm');
-        const ltmAmount = document.getElementById('sp-ltm-fee-amount');
-
-        if (pricing.ltmFee > 0) {
-            ltmSection.style.display = 'block';
-            ltmAmount.textContent = `$${pricing.ltmFee.toFixed(2)}`;
-        } else {
-            ltmSection.style.display = 'none';
-        }
-
-        // REMOVED: Order total and average cost displays
-        // Users select a tier range (e.g., 145-576), not a specific quantity
-        // We cannot calculate an accurate total without knowing exact quantity
-        // Keep only: price per shirt + setup fees (users calculate their own total)
+        // All detailed pricing is now shown only in the expandable breakdown section
 
         // Show/hide breakdown toggle button
         const breakdownToggle = document.getElementById('sp-breakdown-toggle');
-        if (pricing.setupFee > 0 || pricing.ltmFee > 0) {
+        // Show breakdown if there's setup fee OR LTM fee to explain
+        if (pricing.setupFee > 0 || pricing.ltmImpactPerShirt > 0) {
             breakdownToggle.style.display = 'block';
         } else {
             breakdownToggle.style.display = 'none';
@@ -1436,21 +1541,28 @@ class ScreenPrintPricing {
         if (pricingData.embellishmentType === 'screenprint') {
             // Prices already include garment, print, and margin
             pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost + safetyStripesSurcharge;
-            pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost;
-            
-            // Setup and LTM are separate one-time fees
-            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
-            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
+
+            // Calculate LTM per shirt impact
             pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
+
+            // CRITICAL CHANGE: Include LTM fee in the per-shirt price (all-in price)
+            pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost + pricing.ltmImpactPerShirt;
+
+            // Setup is separate (one-time cost)
+            pricing.subtotal = pricing.perShirtTotal * quantity;
+            pricing.grandTotal = pricing.subtotal + pricing.setupFee;
+            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
         } else {
             // Legacy calculation where basePrice needs margin applied
             pricing.totalPerShirtPrintOnlyCost = pricing.basePrice + pricing.additionalCost;
-            pricing.subtotal = pricing.totalPerShirtPrintOnlyCost * quantity;
-            pricing.grandTotal = pricing.subtotal + pricing.setupFee + pricing.ltmFee;
-            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
             pricing.ltmImpactPerShirt = (pricing.ltmFee > 0 && quantity > 0) ? pricing.ltmFee / quantity : 0;
-            pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.setupPerShirt + pricing.ltmImpactPerShirt : 0;
+
+            // Include LTM in per-shirt price
+            pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.ltmImpactPerShirt : 0;
+
+            pricing.subtotal = pricing.perShirtTotal * quantity;
+            pricing.grandTotal = pricing.subtotal + pricing.setupFee;
+            pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
         }
         
         return pricing;
@@ -1648,14 +1760,8 @@ class ScreenPrintPricing {
             `;
         }
 
-        if (pricing.ltmFee > 0) {
-            html += `
-                <tr>
-                    <td colspan="2">Small Order Fee:</td>
-                    <td class="sp-summary-total">$${pricing.ltmFee.toFixed(2)}</td>
-                </tr>
-            `;
-        }
+        // REMOVED: LTM fee from summary - already included in per-shirt price
+        // Details shown in breakdown section if user clicks "View Detailed Breakdown"
 
         html += `
             <tr class="sp-summary-grand-total">
@@ -1776,9 +1882,90 @@ class ScreenPrintPricing {
             });
         }
 
-        // Grand total per shirt
+        // Add Setup Fees breakdown
+        if (pricing.setupFee > 0) {
+            html += '<div class="sp-breakdown-section">';
+            html += '<div class="sp-breakdown-header">Setup Fees (One-Time Charge)</div>';
+
+            // Front setup
+            if (pricing.colorBreakdown.front > 0) {
+                const frontSetup = pricing.colorBreakdown.front * this.config.setupFeePerColor;
+                const underbaseNote = (this.state.isDarkGarment && this.state.frontColors > 0)
+                    ? ` (${this.state.frontColors} design + 1 underbase)`
+                    : '';
+                html += `<div class="sp-breakdown-item">`;
+                html += `<span>Front${underbaseNote}:</span><span>${pricing.colorBreakdown.front} colors × $${this.config.setupFeePerColor.toFixed(2)}</span>`;
+                html += `</div>`;
+                html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
+                html += `<span>Front Setup:</span><span>$${frontSetup.toFixed(2)}</span>`;
+                html += `</div>`;
+            }
+
+            // Additional locations setup
+            if (pricing.colorBreakdown.locations && pricing.colorBreakdown.locations.length > 0) {
+                pricing.colorBreakdown.locations.forEach(loc => {
+                    if (loc.colors > 0 && loc.setupCost > 0) {
+                        const locLabel = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
+                        const underbaseNote = (this.state.isDarkGarment && loc.colors > 0)
+                            ? ` (${loc.colors} design + 1 underbase)`
+                            : '';
+                        html += `<div class="sp-breakdown-item">`;
+                        html += `<span>${locLabel}${underbaseNote}:</span><span>${loc.totalColors} colors × $${this.config.setupFeePerColor.toFixed(2)}</span>`;
+                        html += `</div>`;
+                        html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
+                        html += `<span>${locLabel} Setup:</span><span>$${loc.setupCost.toFixed(2)}</span>`;
+                        html += `</div>`;
+                    }
+                });
+            }
+
+            // Total setup
+            html += `<div class="sp-breakdown-item sp-breakdown-subtotal" style="margin-top: 12px; border-top: 2px solid #f3f4f6; padding-top: 12px;">`;
+            html += `<span>Total Setup:</span><span>$${pricing.setupFee.toFixed(2)}</span>`;
+            html += `</div>`;
+
+            // Note
+            html += `<div class="sp-breakdown-note">`;
+            html += `<i class="fas fa-info-circle"></i> Setup fees are charged once per order, not per shirt`;
+            html += `</div>`;
+
+            html += '</div>';
+        }
+
+        // Add LTM fee breakdown if applicable
+        if (pricing.ltmImpactPerShirt > 0) {
+            html += '<div class="sp-breakdown-section sp-breakdown-ltm-section">';
+            html += '<div class="sp-breakdown-header">Small Batch Fee</div>';
+            html += `<div class="sp-breakdown-item">`;
+            html += `<span>Fee Amount:</span><span>$${pricing.ltmFee.toFixed(2)}</span>`;
+            html += `</div>`;
+            html += `<div class="sp-breakdown-item">`;
+            html += `<span>Quantity:</span><span>${pricing.quantity} shirts</span>`;
+            html += `</div>`;
+            html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
+            html += `<span>Fee per Shirt:</span><span>$${pricing.ltmImpactPerShirt.toFixed(2)}</span>`;
+            html += `</div>`;
+            html += `<div class="sp-breakdown-note">`;
+            html += `<i class="fas fa-info-circle"></i> The $${pricing.ltmFee.toFixed(2)} small batch fee is divided across all ${pricing.quantity} shirts`;
+            html += `</div>`;
+            html += '</div>';
+        }
+
+        // Grand total per shirt (now includes LTM if applicable)
         html += '<div class="sp-breakdown-grand-total">';
+        if (pricing.ltmImpactPerShirt > 0) {
+            const baseWithoutLTM = pricing.perShirtTotal - pricing.ltmImpactPerShirt;
+            html += '<div class="sp-breakdown-total-item">';
+            html += `<span>Subtotal:</span><span>$${baseWithoutLTM.toFixed(2)}</span>`;
+            html += '</div>';
+            html += '<div class="sp-breakdown-total-item">';
+            html += `<span>Small Batch Fee:</span><span>+$${pricing.ltmImpactPerShirt.toFixed(2)}</span>`;
+            html += '</div>';
+            html += '<div class="sp-breakdown-total-divider"></div>';
+        }
+        html += '<div class="sp-breakdown-total-item sp-breakdown-final-total">';
         html += `<span>Price per Shirt:</span><span>$${pricing.perShirtTotal.toFixed(2)}</span>`;
+        html += '</div>';
         html += '</div>';
 
         html += '</div>';
