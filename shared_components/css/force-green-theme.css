@@ -6,13 +6,13 @@
 
 /* Force CSS variables */
 :root {
-    --primary-color: #3a7c52 !important;
-    --primary: #3a7c52 !important;
-    --primary-dark: #2d5f3f !important;
-    --primary-light: #4a9c62 !important;
-    --nwca-primary: #3a7c52 !important;
-    --nwca-primary-dark: #2d5f3f !important;
-    --nwca-primary-light: #4a9c62 !important;
+    --primary-color: #4cb354 !important;
+    --primary: #4cb354 !important;
+    --primary-dark: #409a47 !important;
+    --primary-light: #e8f5e9 !important;
+    --nwca-primary: #4cb354 !important;
+    --nwca-primary-dark: #409a47 !important;
+    --nwca-primary-light: #e8f5e9 !important;
 }
 
 /* Force header backgrounds */
@@ -26,13 +26,13 @@
 .header-main,
 .header-container,
 .page-header {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
-    background-color: #3a7c52 !important;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    background-color: #4cb354 !important;
 }
 
 /* Remove any blue gradients */
 .page-header {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
 }
 
 /* Force button colors */
@@ -44,9 +44,9 @@
 button[type="submit"],
 .add-location-btn,
 .calculate-btn {
-    background: #3a7c52 !important;
-    background-color: #3a7c52 !important;
-    border-color: #3a7c52 !important;
+    background: #4cb354 !important;
+    background-color: #4cb354 !important;
+    border-color: #4cb354 !important;
     color: white !important;
 }
 
@@ -58,33 +58,33 @@ button[type="submit"],
 button[type="submit"]:hover,
 .add-location-btn:hover,
 .calculate-btn:hover {
-    background: #2d5f3f !important;
-    background-color: #2d5f3f !important;
-    border-color: #2d5f3f !important;
+    background: #409a47 !important;
+    background-color: #409a47 !important;
+    border-color: #409a47 !important;
 }
 
 /* Force link colors */
 a:not(.universal-header-contact-item):not(.universal-header-nav-link):not(.universal-header-btn) {
-    color: #3a7c52 !important;
+    color: #4cb354 !important;
 }
 
 a:not(.universal-header-contact-item):not(.universal-header-nav-link):not(.universal-header-btn):hover {
-    color: #2d5f3f !important;
+    color: #409a47 !important;
 }
 
 /* DTF specific overrides */
 .dtf-calculator-header,
 .dtf-header,
 .dtf-title {
-    background: #3a7c52 !important;
+    background: #4cb354 !important;
     color: white !important;
 }
 
 .dtf-price-display,
 .dtf-price,
 .dtf-total {
-    color: #3a7c52 !important;
-    border-color: #3a7c52 !important;
+    color: #4cb354 !important;
+    border-color: #4cb354 !important;
 }
 
 /* Screenprint specific overrides */
@@ -93,26 +93,26 @@ a:not(.universal-header-contact-item):not(.universal-header-nav-link):not(.unive
 .sp-price-value,
 .sp-savings,
 .sp-accordion-trigger {
-    color: #3a7c52 !important;
+    color: #4cb354 !important;
 }
 
 .sp-price-box {
-    border: 2px solid #3a7c52 !important;
+    border: 2px solid #4cb354 !important;
 }
 
 .sp-input:focus,
 .sp-select:focus {
-    border-color: #3a7c52 !important;
-    box-shadow: 0 0 0 0.2rem rgba(58, 124, 82, 0.25) !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 0.2rem rgba(76, 179, 84, 0.25) !important;
 }
 
 .sp-total span:last-child,
 .sp-summary-grand-total .sp-summary-total {
-    color: #3a7c52 !important;
+    color: #4cb354 !important;
 }
 
 .sp-summary-grand-total td {
-    border-top-color: #3a7c52 !important;
+    border-top-color: #4cb354 !important;
 }
 
 /* Form control focus states */
@@ -121,27 +121,27 @@ select:focus,
 textarea:focus,
 .form-control:focus,
 .quantity-input:focus {
-    border-color: #3a7c52 !important;
-    box-shadow: 0 0 0 0.2rem rgba(58, 124, 82, 0.25) !important;
+    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 0.2rem rgba(76, 179, 84, 0.25) !important;
 }
 
 /* Progress bars and active states */
 .progress-bar,
 .active,
 .selected {
-    background-color: #3a7c52 !important;
+    background-color: #4cb354 !important;
 }
 
 /* Tabs and nav items */
 .nav-link.active,
 .nav-tabs .nav-link.active {
-    color: #3a7c52 !important;
-    border-bottom-color: #3a7c52 !important;
+    color: #4cb354 !important;
+    border-bottom-color: #4cb354 !important;
 }
 
 /* Cards and panels */
 .card-header {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
     color: white !important;
 }
 
@@ -149,24 +149,24 @@ textarea:focus,
 .price-display,
 .total-price,
 .unit-price {
-    color: #3a7c52 !important;
+    color: #4cb354 !important;
 }
 
 /* Override Bootstrap primary color */
 .bg-primary {
-    background-color: #3a7c52 !important;
+    background-color: #4cb354 !important;
 }
 
 .text-primary {
-    color: #3a7c52 !important;
+    color: #4cb354 !important;
 }
 
 .border-primary {
-    border-color: #3a7c52 !important;
+    border-color: #4cb354 !important;
 }
 
 /* Make sure this overrides everything */
 * {
-    --bs-primary: #3a7c52 !important;
-    --bs-primary-rgb: 58, 124, 82 !important;
+    --bs-primary: #4cb354 !important;
+    --bs-primary-rgb: 76, 179, 84 !important;
 }

@@ -50,10 +50,11 @@
     <style>
         /* CRITICAL: Override blue theme with green - MUST be inline to override JS */
         :root {
-            --primary-color: #3a7c52 !important;
-            --primary: #3a7c52 !important;
-            --primary-dark: #2d5f3f !important;
-            --nwca-primary: #3a7c52 !important;
+            --primary-color: #4cb354 !important;  /* Updated to match DTG green */
+            --primary: #4cb354 !important;
+            --primary-dark: #409a47 !important;  /* Updated to match DTG dark green */
+            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
+            --nwca-primary: #4cb354 !important;
         }
         
         /* Enhanced Header Styles for DTF */
@@ -73,7 +74,7 @@
         
         /* Top contact bar */
         .header-contact-bar {
-            background: #2d5f3f;
+            background: #409a47;  /* Updated to match DTG dark green */
             color: white;
             padding: 10px 0;
             font-size: 14px;
@@ -143,7 +144,7 @@
         /* Pricing Context Bar */
         .pricing-context-bar {
             background: #f8f9fa;
-            border-bottom: 2px solid #3a7c52;
+            border-bottom: 2px solid #4cb354;  /* Updated to match DTG green */
             padding: 15px 0;
         }
         
@@ -159,7 +160,7 @@
         .breadcrumb {
             font-size: 18px;
             font-weight: 600;
-            color: #3a7c52;
+            color: #4cb354;  /* Updated to match DTG green */
         }
         
         /* Live Pricing Display */
@@ -188,7 +189,7 @@
         }
         
         .header-price-value.highlight {
-            color: #3a7c52;
+            color: #4cb354;  /* Updated to match DTG green */
             font-size: 24px;
         }
         
@@ -231,7 +232,7 @@
         .universal-header,
         .pricing-header,
         .header-container {
-            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%) !important;
+            background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;  /* Updated to match DTG gradient */
         }
         
         /* Override any blue colors in buttons and links */
@@ -239,30 +240,30 @@
         .action-btn,
         .dtf-btn,
         button[type="submit"] {
-            background-color: #3a7c52 !important;
-            border-color: #3a7c52 !important;
+            background-color: #4cb354 !important;  /* Updated to match DTG green */
+            border-color: #4cb354 !important;
         }
-        
+
         .btn-primary:hover,
         .action-btn:hover,
         .dtf-btn:hover,
         button[type="submit"]:hover {
-            background-color: #2d5f3f !important;
-            border-color: #2d5f3f !important;
+            background-color: #409a47 !important;  /* Updated to match DTG dark green */
+            border-color: #409a47 !important;
         }
         
         a {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;  /* Updated to match DTG green */
         }
         
         /* DTF Calculator specific overrides */
         .dtf-calculator-header {
-            background: #3a7c52 !important;
+            background: #4cb354 !important;  /* Updated to match DTG green */
         }
-        
+
         .dtf-price-display {
-            color: #3a7c52 !important;
-            border-color: #3a7c52 !important;
+            color: #4cb354 !important;  /* Updated to match DTG green */
+            border-color: #4cb354 !important;
         }
         
         /* Critical internal-only hiding styles - must be inline for immediate effect */
@@ -1360,7 +1361,7 @@
                     // Hover effect
                     swatch.addEventListener('mouseenter', () => {
                         swatch.style.transform = 'scale(1.1)';
-                        swatch.style.borderColor = '#3a7c52';
+                        swatch.style.borderColor = '#4cb354';  // Updated to match DTG green
                     });
                     swatch.addEventListener('mouseleave', () => {
                         swatch.style.transform = 'scale(1)';
@@ -1381,7 +1382,7 @@
                             document.querySelectorAll('.color-swatch').forEach(s => {
                                 s.style.border = '2px solid #e5e7eb';
                             });
-                            swatch.style.border = '3px solid #3a7c52';
+                            swatch.style.border = '3px solid #4cb354';  // Updated to match DTG green
                         }
                     });
 
@@ -1544,11 +1545,11 @@
     <!-- CRITICAL: Inline styles to force outline style for DTF page -->
     <!-- This must be at the END to override all other CSS -->
     <style>
-        /* Force DTF toggle items to use outline style like DTG */
+        /* DTF toggle items styling to match DTG */
         body.dtf-pricing-page .dtf-toggle-item.active,
         .dtf-toggle-item.active {
-            background: white !important;
-            background-color: white !important;
+            background: #e8f5e9 !important;  /* Light green background like DTG */
+            background-color: #e8f5e9 !important;
             background-image: none !important;
             border: 3px solid #4cb354 !important;
             color: #4cb354 !important;
@@ -1593,10 +1594,15 @@
             transform: translateX(20px);
         }
 
-        /* Override any hover states that might add backgrounds */
-        .dtf-toggle-item.active:hover,
+        /* Override hover states to maintain proper backgrounds */
+        .dtf-toggle-item.active:hover {
+            background: #e8f5e9 !important;  /* Keep light green on hover */
+            background-color: #e8f5e9 !important;
+            border-color: #4cb354 !important;
+        }
+
         .dtf-tier-button.selected:hover {
-            background: white !important;
+            background: white !important;  /* Keep tier buttons white as per DTG */
             background-color: white !important;
             border-color: #4cb354 !important;
         }

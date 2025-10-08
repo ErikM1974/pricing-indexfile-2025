@@ -54,18 +54,19 @@
     <link rel="stylesheet" href="/shared_components/css/screenprint-safety-stripes.css">
 
     <!-- Screen Print Toggle Styles - NEW for Phase 1 -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-toggle-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/screenprint-toggle-styles.css?v=20251210-fix">
 
     <!-- Font Awesome for header icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <!-- Screen Print V2 Styles -->
     <style>
-        /* CRITICAL: Force green theme colors */
+        /* CRITICAL: Force green theme colors - Updated to match DTG/DTF */
         :root {
-            --primary-color: #3a7c52 !important;
-            --primary: #3a7c52 !important;
-            --primary-dark: #2d5f3f !important;
+            --primary-color: #4cb354 !important;  /* Updated to match DTG/DTF green */
+            --primary: #4cb354 !important;
+            --primary-dark: #409a47 !important;  /* Updated to match DTG/DTF dark green */
+            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
         }
 
         /* Screen reader only utility class for accessibility */
@@ -107,7 +108,7 @@
         }
 
         .breadcrumb a {
-            color: #3a7c52;
+            color: #4cb354;  /* Updated to match DTG/DTF green */
             text-decoration: none;
             transition: color 0.3s ease;
         }
@@ -195,12 +196,12 @@
 
         .search-input:focus {
             outline: none;
-            border-color: #3a7c52;
-            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+            border-color: #4cb354;  /* Updated to match DTG/DTF green */
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);  /* Updated shadow color */
         }
 
         .search-btn {
-            background: #3a7c52;
+            background: #4cb354;  /* Updated to match DTG/DTF green */
             color: white;
             border: none;
             padding: 12px 16px;
@@ -267,7 +268,7 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background: #2d5f3f;
+            background: #409a47;
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
@@ -345,12 +346,12 @@
         }
 
         .image-thumbnail:hover {
-            border-color: #2d5f3f;
+            border-color: #409a47;
             transform: scale(1.05);
         }
 
         .image-thumbnail.active {
-            border-color: #2d5f3f;
+            border-color: #409a47;
             box-shadow: 0 0 0 2px rgba(45, 95, 63, 0.3);
         }
 
@@ -400,7 +401,7 @@
         }
 
         .product-detail-item i {
-            color: #2d5f3f;
+            color: #409a47;
             font-size: 16px;
         }
 
@@ -440,11 +441,11 @@
 
         .color-swatch:hover {
             transform: scale(1.1);
-            border-color: #2d5f3f;
+            border-color: #409a47;
         }
 
         .color-swatch.active {
-            border-color: #2d5f3f;
+            border-color: #409a47;
             box-shadow: 0 0 0 2px rgba(45, 95, 63, 0.3);
         }
 
@@ -477,7 +478,7 @@
         }
 
         .sp-title {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             font-size: 1.5em;
             margin: 0 0 20px 0;
             font-weight: 600;
@@ -518,7 +519,7 @@
 
         .sp-input:focus, .sp-select:focus {
             outline: none;
-            border-color: #3a7c52 !important;
+            border-color: #4cb354 !important;
         }
 
         .sp-help-text {
@@ -553,12 +554,12 @@
         }
 
         .sp-btn-add {
-            background: #3a7c52 !important;
+            background: #4cb354 !important;
             color: white;
         }
 
         .sp-btn-add:hover {
-            background: #2d5f3f !important;
+            background: #409a47 !important;
         }
 
         .sp-btn-remove {
@@ -604,7 +605,7 @@
 
         .sp-price-box {
             background: white;
-            border: 2px solid #3a7c52 !important;
+            border: 2px solid #4cb354 !important;
             border-radius: 8px;
             padding: 25px;
             text-align: center;
@@ -622,13 +623,13 @@
         .sp-currency {
             font-size: 28px;
             font-weight: 600;
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
         }
 
         .sp-price-value {
             font-size: 42px;
             font-weight: bold;
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             line-height: 1;
         }
 
@@ -681,7 +682,7 @@
         }
 
         .sp-total span:last-child {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
         }
 
         .sp-order-total {
@@ -743,7 +744,7 @@
         }
 
         .sp-order-summary h4 {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             margin: 0 0 15px 0;
             font-size: 1.2em;
         }
@@ -784,13 +785,13 @@
 
         .sp-summary-grand-total td {
             padding-top: 10px;
-            border-top: 2px solid #3a7c52 !important;
+            border-top: 2px solid #4cb354 !important;
             font-size: 1.1em;
             font-weight: 600;
         }
 
         .sp-summary-grand-total .sp-summary-total {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
         }
 
         .sp-summary-per-item {
@@ -817,7 +818,7 @@
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -873,7 +874,7 @@
         }
 
         .sp-savings {
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             font-weight: 600;
         }
 
@@ -910,7 +911,7 @@
         }
         
         .sp-safety-price {
-            color: #3a7c52;
+            color: #4cb354;
             font-weight: normal;
         }
         
@@ -1012,7 +1013,7 @@
         .sp-size-title {
             font-size: 1.1em;
             font-weight: 600;
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
         }
 
         .sp-size-upcharge-grid {
@@ -1031,7 +1032,7 @@
         }
 
         .sp-size-item:hover {
-            border-color: #3a7c52 !important;
+            border-color: #4cb354 !important;
             box-shadow: 0 2px 6px rgba(46, 88, 39, 0.1);
             transform: translateY(-1px);
         }
@@ -1046,7 +1047,7 @@
 
         .sp-size-price {
             display: block;
-            color: #3a7c52 !important;
+            color: #4cb354 !important;
             font-weight: 500;
             font-size: 1.05em;
         }
@@ -1577,7 +1578,7 @@
             // Build HTML
             let html = '<div class="sp-size-upcharge-info">';
             html += '<div class="sp-size-upcharge-header">';
-            html += '<i class="fas fa-ruler-combined" style="color: #2d5f3f;"></i>';
+            html += '<i class="fas fa-ruler-combined" style="color: #409a47;"></i>';
             html += '<span class="sp-size-title">Size Upcharges</span>';
             html += '</div>';
 

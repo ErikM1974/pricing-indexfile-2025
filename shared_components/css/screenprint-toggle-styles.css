@@ -42,7 +42,7 @@
 }
 
 .sp-toggle-section-title i {
-    color: #3a7c52;
+    color: #4cb354;  /* Updated to match DTG/DTF green */
     font-size: 22px;
 }
 
@@ -82,13 +82,14 @@
     background: #f3f4f6;
     border-color: #d1d5db;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.15);
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.15);
 }
 
 .sp-toggle-item.active {
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-    border-color: #3a7c52;
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+    background: #e8f5e9 !important;  /* Solid light green to match DTG/DTF */
+    border-color: #4cb354 !important;  /* Updated to match DTG/DTF green */
+    border-width: 3px !important;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2) !important;
 }
 
 .sp-toggle-item.active:hover {
@@ -109,7 +110,7 @@
 }
 
 .sp-toggle-item.active .sp-toggle-item-label > span {
-    color: #2d5f3f;
+    color: #4cb354;  /* Updated to match DTG/DTF green */
     font-weight: 700;
 }
 
@@ -139,7 +140,7 @@
 }
 
 .sp-toggle-item.active .sp-toggle-switch {
-    background: #3a7c52;
+    background: #4cb354;  /* Updated to match DTG/DTF green */
 }
 
 .sp-toggle-item.active .sp-toggle-switch-slider {
@@ -148,7 +149,7 @@
 
 /* Safety Stripes Toggle - Active State */
 .sp-safety-stripes-toggle.active .sp-toggle-switch {
-    background: #3a7c52;
+    background: #4cb354;  /* Updated to match DTG/DTF green */
 }
 
 .sp-safety-stripes-toggle.active .sp-toggle-switch-slider {
@@ -164,7 +165,7 @@
 }
 
 .sp-dark-garment-toggle.active .sp-toggle-switch {
-    background: #3a7c52;
+    background: #4cb354;  /* Updated to match DTG/DTF green */
 }
 
 .sp-dark-garment-toggle.active .sp-toggle-switch-slider {
@@ -191,9 +192,9 @@
 }
 
 .sp-safety-stripes-toggle.active {
-    background: linear-gradient(135deg, #ffe5d9 0%, #fff5f0 100%);
-    border-color: #ff6b35;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+    background: #e8f5e9 !important;  /* Light green to match DTG/DTF */
+    border-color: #4cb354 !important;  /* Green border to match DTG/DTF */
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2) !important;
 }
 
 .sp-safety-stripes-label {
@@ -238,10 +239,11 @@
 }
 
 .sp-tier-button.selected {
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-    border-color: #3a7c52;
-    color: #1f2937;
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+    background: white !important;  /* White background to match DTG/DTF */
+    border-color: #4cb354 !important;  /* Updated to match DTG/DTF green */
+    border-width: 3px !important;
+    color: #4cb354 !important;  /* Green text to match DTG/DTF */
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
 }
 
 .sp-tier-button.selected:hover {
@@ -260,8 +262,8 @@
     padding: 0;
     background: white;
     border-radius: 16px;
-    border: 3px solid #3a7c52;
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
+    border: 3px solid #4cb354;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.1);
     overflow: visible; /* Changed from hidden - allows "Optional" badge to show fully */
 }
 
@@ -270,7 +272,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    background: #4cb354;  /* Solid green to match DTG/DTF */
     cursor: pointer;
     user-select: none;
     position: relative;
@@ -283,14 +285,14 @@
     top: -12px;
     left: 20px;
     background: white;
-    color: #3a7c52;
+    color: #4cb354;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 4px 12px;
     border-radius: 12px;
-    border: 2px solid #3a7c52;
+    border: 2px solid #4cb354;
 }
 
 .sp-additional-locations-title {
@@ -352,8 +354,8 @@
 }
 
 .sp-location-slot:hover {
-    border-color: #3a7c52;
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.1);
+    border-color: #4cb354;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.1);
 }
 
 @keyframes slideIn {
@@ -376,7 +378,7 @@
 .sp-location-slot-label {
     font-size: 12px;
     font-weight: 700;
-    color: #3a7c52;
+    color: #4cb354;
     text-transform: uppercase;
     letter-spacing: 0.8px;
 }
@@ -405,14 +407,14 @@
 
 .sp-location-slot-input:hover,
 .sp-location-slot-select:hover {
-    border-color: #3a7c52;
+    border-color: #4cb354;
 }
 
 .sp-location-slot-input:focus,
 .sp-location-slot-select:focus {
     outline: none;
-    border-color: #3a7c52;
-    box-shadow: 0 0 0 4px rgba(58, 124, 82, 0.15);
+    border-color: #4cb354;
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.15);
 }
 
 .sp-location-slot-remove {
@@ -438,7 +440,7 @@
 
 /* Enhanced Add Location button */
 .sp-add-location-button {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    background: #4cb354;  /* Solid green to match DTG/DTF */
     color: white;
     border: none;
     border-radius: 12px;
@@ -453,12 +455,12 @@
     gap: 10px;
     margin-top: 8px;
     width: 100%;
-    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.2);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.2);
 }
 
 .sp-add-location-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(58, 124, 82, 0.35);
+    box-shadow: 0 8px 20px rgba(76, 179, 84, 0.35);
 }
 
 .sp-add-location-button:active {
@@ -469,7 +471,7 @@
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
-    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.1);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
 }
 
 .sp-add-location-button i {
@@ -512,12 +514,12 @@
 /* ==================== LIVE PRICE DISPLAY ==================== */
 .sp-live-price-display {
     background: white;
-    border: 2px solid #3a7c52;
+    border: 2px solid #4cb354;
     border-radius: 16px;
     padding: 30px;
     text-align: center;
     margin: 30px 0;
-    box-shadow: 0 8px 24px rgba(58, 124, 82, 0.15);
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.15);
 }
 
 .sp-live-price-label {
@@ -535,8 +537,8 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #f0f9f4 0%, #e6f4eb 100%);
-    border: 1px solid #3a7c52;
+    background: #e8f5e9;  /* Solid light green to match DTG/DTF */
+    border: 1px solid #4cb354;
     border-radius: 8px;
     padding: 10px 20px;
     margin-bottom: 20px;
@@ -545,12 +547,12 @@
 }
 
 .sp-pricing-tier-display i {
-    color: #3a7c52;
+    color: #4cb354;
     font-size: 16px;
 }
 
 .sp-pricing-tier-display strong {
-    color: #3a7c52;
+    color: #4cb354;
     font-weight: 700;
 }
 
@@ -565,7 +567,7 @@
 .sp-live-price-amount {
     font-size: 52px;
     font-weight: 800;
-    color: #3a7c52;
+    color: #4cb354;
     line-height: 1;
 }
 
@@ -577,7 +579,7 @@
 }
 
 .sp-upcharge-info-icon:hover {
-    color: #3a7c52;
+    color: #4cb354;
     transform: scale(1.2);
 }
 
@@ -596,7 +598,7 @@
 
 .sp-live-price-setup {
     font-size: 14px;
-    color: #3a7c52;
+    color: #4cb354;
     font-weight: 600;
     margin-top: 10px;
     padding-top: 12px;
@@ -610,7 +612,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 2px solid #3a7c52;
+    border: 2px solid #4cb354;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
@@ -667,13 +669,13 @@
 
 .sp-upcharge-tooltip-amount {
     font-weight: 700;
-    color: #3a7c52;
+    color: #4cb354;
 }
 
 /* ==================== DARK GARMENT SECTION (TOP) ==================== */
 .sp-dark-garment-section-top {
     background: #f8f9fa;
-    border: 2px solid #3a7c52;
+    border: 2px solid #4cb354;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 24px;
@@ -698,14 +700,14 @@
 }
 
 .sp-dark-info-icon {
-    color: #3a7c52;
+    color: #4cb354;
     font-size: 18px;
     cursor: help;
     transition: all 0.2s;
 }
 
 .sp-dark-info-icon:hover {
-    color: #2d5f3f;
+    color: #409a47;
     transform: scale(1.15);
 }
 
@@ -722,7 +724,7 @@
     left: 0;
     right: 0;
     background: white;
-    border: 2px solid #3a7c52;
+    border: 2px solid #4cb354;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
@@ -743,7 +745,7 @@
 }
 
 .sp-dark-tooltip-header i {
-    color: #3a7c52;
+    color: #4cb354;
 }
 
 .sp-dark-tooltip-body {
@@ -767,13 +769,13 @@
 
 /* Dark Garment Active State - Professional Look */
 .sp-dark-garment-section-top.active {
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-    border-color: #2d5f3f;
-    box-shadow: 0 4px 16px rgba(58, 124, 82, 0.25);
+    background: #e8f5e9 !important;  /* Solid light green to match DTG/DTF */
+    border-color: #4cb354 !important;  /* Match DTG/DTF green */
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.25) !important;
 }
 
 .sp-dark-garment-section-top.active .sp-dark-garment-label span:first-child {
-    color: #2d5f3f;
+    color: #409a47;
     font-weight: 700;
 }
 
@@ -810,7 +812,7 @@
 /* ==================== WORKFLOW STEP LABELS ==================== */
 .sp-workflow-step-label {
     display: inline-block;
-    background: linear-gradient(135deg, #3a7c52 0%, #2d6342 100%);
+    background: #4cb354;  /* Solid green to match DTG/DTF */
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
@@ -819,12 +821,12 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
 }
 
 .sp-live-price-workflow-label {
     display: inline-block;
-    background: linear-gradient(135deg, #3a7c52 0%, #2d6342 100%);
+    background: #4cb354;  /* Solid green to match DTG/DTF */
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
@@ -833,17 +835,17 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
 }
 
 /* ==================== PROMINENT PRICE DISPLAY ==================== */
 .sp-live-price-prominent {
     margin: 25px 0;
     padding: 35px;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border: 3px solid #3a7c52;
+    background: white;  /* White background to match DTG/DTF */
+    border: 3px solid #4cb354;
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(58, 124, 82, 0.15);
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.15);
 }
 
 .sp-live-price-prominent .sp-live-price-label {
@@ -856,8 +858,8 @@
 .sp-live-price-prominent .sp-live-price-amount {
     font-size: 64px;
     font-weight: 900;
-    color: #3a7c52;
-    text-shadow: 2px 2px 4px rgba(58, 124, 82, 0.1);
+    color: #4cb354;
+    text-shadow: 2px 2px 4px rgba(76, 179, 84, 0.1);
 }
 
 /* Mobile adjustments for prominent display */
@@ -906,7 +908,7 @@
 .sp-price-amount {
     font-size: 24px;
     font-weight: 700;
-    color: #3a7c52;
+    color: #4cb354;
 }
 
 .sp-price-amount-wrapper {
@@ -1017,8 +1019,8 @@
 
 /* Order Total Section */
 .sp-pricing-total {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    border: 3px solid #3a7c52;
+    background: #e8f5e9;  /* Light green to match DTG/DTF */
+    border: 3px solid #4cb354;
     border-radius: 12px;
     padding: 20px;
     margin-top: 15px;
@@ -1035,8 +1037,8 @@
 .sp-total-highlight {
     font-size: 32px !important;
     font-weight: 900 !important;
-    color: #2d5f3f !important;
-    text-shadow: 2px 2px 4px rgba(45, 95, 63, 0.1);
+    color: #409a47 !important;
+    text-shadow: 2px 2px 4px rgba(64, 154, 71, 0.1);
 }
 
 .sp-price-average {
@@ -1048,7 +1050,7 @@
 
 .sp-price-average span {
     font-weight: 700;
-    color: #3a7c52;
+    color: #4cb354;
 }
 
 /* Breakdown Toggle Button */
