@@ -34,6 +34,18 @@
 | `/cart.html` | Shopping cart | cart.js, cart-ui.js, cart-price-recalculator.js, order-form-pdf.js, pricing-matrix-api.js, utils.js | ✅ Active |
 | `/product.html` | Product display | /product/app.js | ✅ Active |
 
+### Secondary Pages (/pages/ directory)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/policies-hub.html` | Policy documentation hub | dashboard-styles.css | ✅ Active |
+| `/pages/pricing-negotiation-policy.html` | Pricing strategy & negotiation guide | Bootstrap, Font Awesome | ✅ Active |
+| `/pages/inventory-details.html` | Inventory details page | Various | ✅ Active |
+| `/pages/resources.html` | Resources page | Various | ✅ Active |
+| `/pages/sale.html` | Sale page | Various | ✅ Active |
+| `/pages/webstore-info.html` | Webstore information | Various | ✅ Active |
+| `/pages/top-sellers-showcase.html` | Top sellers showcase | Various | ✅ Active |
+| `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
+
 ## 📊 Calculators & Quote Builders
 
 ### DTG System

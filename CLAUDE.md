@@ -288,6 +288,9 @@ For reusable code templates including API fetch patterns, Quote service template
 
 ### 📍 Important Notes:
 1. **New Pages**: Must add to route config and restart server with Erik
+   - Pages in `/pages/` directory need explicit routes in server.js
+   - Add route like: `app.get('/page-name.html', (req, res) => { res.sendFile(path.join(__dirname, 'pages', 'page-name.html')); });`
+   - Server restart required after adding route
 2. **API Failures**: Always visible - never silent (see API Error Handling above)
 
 ## 🏗️ Advanced Architecture Patterns

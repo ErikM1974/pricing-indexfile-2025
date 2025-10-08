@@ -336,6 +336,10 @@ app.get('/top-sellers-product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'top-sellers-product.html'));
 });
 
+app.get('/pricing-negotiation-policy.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'pricing-negotiation-policy.html'));
+});
+
 // Phase 1 Infrastructure Test Pages
 app.get('/test-phase1-infrastructure.html', (req, res) => {
   console.log('Serving test-phase1-infrastructure.html page');
