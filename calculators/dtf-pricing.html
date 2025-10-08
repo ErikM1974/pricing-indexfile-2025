@@ -845,11 +845,32 @@
                     PRODUCT_DESCRIPTION: e.detail.productDescription,
                     BRAND_NAME: e.detail.brandName,
                     colors: e.detail.colors,
-                    selectedColor: e.detail.selectedColor
+                    selectedColor: e.detail.selectedColor,
+                    // Pass through full product data for calculator
+                    product: e.detail
                 };
 
                 // Use the working data to update our UI
                 updateProductInfo(productData, e.detail.styleNumber || styleNumber);
+
+                // Update DTF calculator with full product data for upcharge tooltip
+                if (window.dtfCalculator && e.detail) {
+                    console.log('🎯 [DTF] Updating calculator with product upcharges and sizes');
+
+                    // Set upcharges data
+                    if (e.detail.sellingPriceDisplayAddOns || e.detail.upcharges) {
+                        window.dtfCalculator.productUpcharges = e.detail.sellingPriceDisplayAddOns || e.detail.upcharges || {};
+                        console.log('✅ [DTF] Upcharges set:', window.dtfCalculator.productUpcharges);
+                    }
+
+                    // Set sizes data
+                    if (e.detail.sizes) {
+                        window.dtfCalculator.productSizes = Array.isArray(e.detail.sizes)
+                            ? e.detail.sizes.map(s => s.size || s)
+                            : [];
+                        console.log('✅ [DTF] Sizes set:', window.dtfCalculator.productSizes);
+                    }
+                }
 
                 // Hide loading, show product
                 document.getElementById('loadingState').style.display = 'none';
