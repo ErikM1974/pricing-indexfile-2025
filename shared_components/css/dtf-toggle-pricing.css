@@ -89,11 +89,13 @@
 }
 
 .dtf-toggle-item.active {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
-    border-color: #2d5f3f;
-    color: white;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
     transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
 }
 
 .dtf-toggle-label {
@@ -103,7 +105,7 @@
 }
 
 .dtf-toggle-item.active .dtf-toggle-label {
-    color: white;
+    color: #4cb354 !important;
     font-weight: 600;
 }
 
@@ -179,11 +181,13 @@
 }
 
 .dtf-tier-button.selected {
-    background: linear-gradient(135deg, #3a7c52, #2d5f3f);
-    border-color: #2d5f3f;
-    color: white;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
 }
 
 /* Conditional Quantity Input for 10-23 Tier */

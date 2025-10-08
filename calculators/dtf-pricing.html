@@ -32,11 +32,17 @@
     <link rel="stylesheet" href="/shared_components/css/dtf-calculator-fix.css">
 
     <!-- DTF Toggle Pricing Interface -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-toggle-pricing.css">
-    
+    <link rel="stylesheet" href="/shared_components/css/dtf-toggle-pricing.css?v=20251008-fix">
+
+    <!-- Universal Toggle Pricing CSS for consistency across all calculators -->
+    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008-fix2">
+
     <!-- FORCE GREEN THEME - Load LAST to override everything -->
-    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
-    
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css?v=20251008">
+
+    <!-- DTF Outline Override - Load AFTER force-green-theme to ensure outline style -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-outline-override.css?v=20251008-fix2">
+
     <!-- jsPDF Libraries for PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -1534,5 +1540,66 @@
             }
         });
     </script>
+
+    <!-- CRITICAL: Inline styles to force outline style for DTF page -->
+    <!-- This must be at the END to override all other CSS -->
+    <style>
+        /* Force DTF toggle items to use outline style like DTG */
+        body.dtf-pricing-page .dtf-toggle-item.active,
+        .dtf-toggle-item.active {
+            background: white !important;
+            background-color: white !important;
+            background-image: none !important;
+            border: 3px solid #4cb354 !important;
+            color: #4cb354 !important;
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+        }
+
+        /* Ensure toggle label text is green, not white */
+        body.dtf-pricing-page .dtf-toggle-item.active .dtf-toggle-label,
+        .dtf-toggle-item.active .dtf-toggle-label {
+            color: #4cb354 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Force DTF tier buttons to use outline style */
+        body.dtf-pricing-page .dtf-tier-button.selected,
+        .dtf-tier-button.selected {
+            background: white !important;
+            background-color: white !important;
+            background-image: none !important;
+            border: 3px solid #4cb354 !important;
+            border-width: 3px !important;
+            color: #4cb354 !important;
+            font-weight: 600 !important;
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+        }
+
+        /* Prevent any pseudo-elements from adding backgrounds */
+        .dtf-toggle-item.active::before,
+        .dtf-toggle-item.active::after,
+        .dtf-tier-button.selected::before,
+        .dtf-tier-button.selected::after {
+            background: none !important;
+            background-image: none !important;
+        }
+
+        /* Keep the toggle switch slider green when active */
+        .dtf-toggle-item.active .dtf-toggle-switch {
+            background: #4cb354 !important;
+        }
+
+        .dtf-toggle-item.active .dtf-toggle-switch .dtf-toggle-slider {
+            transform: translateX(20px);
+        }
+
+        /* Override any hover states that might add backgrounds */
+        .dtf-toggle-item.active:hover,
+        .dtf-tier-button.selected:hover {
+            background: white !important;
+            background-color: white !important;
+            border-color: #4cb354 !important;
+        }
+    </style>
 </body>
 </html>

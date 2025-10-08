@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Universal Toggle Pricing CSS -->
+    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008">
 
     <style>
         :root {
@@ -1363,8 +1365,8 @@
                                 <span>Left Chest</span>
                                 <span class="toggle-item-size">4"×4"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
 
@@ -1373,8 +1375,8 @@
                                 <span>Back of Neck</span>
                                 <span class="toggle-item-size">4"×4"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
 
@@ -1383,8 +1385,8 @@
                                 <span>Full Front</span>
                                 <span class="toggle-item-size">12"×16"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
 
@@ -1393,8 +1395,8 @@
                                 <span>Full Back</span>
                                 <span class="toggle-item-size">12"×16"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
 
@@ -1403,8 +1405,8 @@
                                 <span>Jumbo Front</span>
                                 <span class="toggle-item-size">16"×20"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
 
@@ -1413,8 +1415,8 @@
                                 <span>Jumbo Back</span>
                                 <span class="toggle-item-size">16"×20"</span>
                             </div>
-                            <div class="toggle-switch">
-                                <div class="toggle-switch-slider"></div>
+                            <div class="toggle-switch universal-toggle-switch">
+                                <div class="toggle-switch-slider universal-toggle-switch-slider"></div>
                             </div>
                         </div>
                     </div>
@@ -1427,35 +1429,35 @@
                         Quantity Tiers
                     </div>
 
-                    <button class="tier-button" id="tier-ltm" data-tier="1-23">
+                    <button class="tier-button universal-tier-button" id="tier-ltm" data-tier="1-23">
                         Less than 24 pieces<br>
                         <small style="font-size: 11px; opacity: 0.9;">+ $50 Small Batch Fee</small>
                     </button>
 
-                    <button class="tier-button selected" id="tier-24-47" data-tier="24-47">
+                    <button class="tier-button universal-tier-button selected" id="tier-24-47" data-tier="24-47">
                         24-47 pieces
                     </button>
 
-                    <button class="tier-button" id="tier-48-71" data-tier="48-71">
+                    <button class="tier-button universal-tier-button" id="tier-48-71" data-tier="48-71">
                         48-71 pieces
                     </button>
 
-                    <button class="tier-button" id="tier-72" data-tier="72+">
+                    <button class="tier-button universal-tier-button" id="tier-72" data-tier="72+">
                         72+ pieces
                     </button>
                 </div>
             </div>
 
             <!-- Live Price Display -->
-            <div class="live-price-display">
-                <div class="live-price-label">Price per shirt</div>
-                <div class="live-price-amount-wrapper">
-                    <span class="live-price-amount" id="live-price-amount">$0.00</span>
-                    <i class="fas fa-info-circle upcharge-info-icon" id="upcharge-info-icon"></i>
+            <div class="live-price-display universal-price-display">
+                <div class="live-price-label universal-price-label">Price per shirt</div>
+                <div class="live-price-amount-wrapper universal-price-amount-wrapper">
+                    <span class="live-price-amount universal-price-amount" id="live-price-amount">$0.00</span>
+                    <i class="fas fa-info-circle upcharge-info-icon universal-upcharge-info-icon" id="upcharge-info-icon"></i>
                     <i class="fas fa-palette setup-fee-badge" id="setup-fee-badge"></i>
                 </div>
-                <div class="live-price-detail" id="live-price-detail">Select a location to see pricing</div>
-                <div class="live-price-fee" id="live-price-fee"></div>
+                <div class="live-price-detail universal-price-detail" id="live-price-detail">Select a location to see pricing</div>
+                <div class="live-price-fee universal-price-fee" id="live-price-fee"></div>
 
                 <!-- Upcharge Tooltip -->
                 <div id="upcharge-tooltip" class="upcharge-tooltip" style="display: none;">

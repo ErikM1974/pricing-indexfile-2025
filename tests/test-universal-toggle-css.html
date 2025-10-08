@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Toggle CSS Test | NWCA</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Universal Toggle Pricing CSS -->
+    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #4cb354;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4cb354;
+            padding-bottom: 10px;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .section-divider {
+            margin: 40px 0;
+            border-bottom: 3px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Universal Toggle Pricing CSS Test - Outline Style</h1>
+    <p class="description">
+        This page demonstrates the unified CSS styles that work consistently across DTG, DTF, and Screen Print calculators.
+        Now featuring the clean DTG outline style - white backgrounds with green borders for selected items.
+    </p>
+
+    <!-- Toggle Switches Demo -->
+    <div class="test-section">
+        <h2>Toggle Switches (iOS-Style with Outline Selection)</h2>
+        <p>These toggles now use the DTG outline style - white background with green border when active:</p>
+
+        <div class="universal-toggle-container">
+            <div class="universal-toggle-item active" onclick="toggleSwitch(this)">
+                <div class="universal-toggle-label">
+                    <i class="fas fa-vest"></i>
+                    <span>Left Chest (4"×4")</span>
+                </div>
+                <div class="universal-toggle-switch on">
+                    <div class="universal-toggle-switch-slider"></div>
+                </div>
+            </div>
+
+            <div class="universal-toggle-item" onclick="toggleSwitch(this)">
+                <div class="universal-toggle-label">
+                    <i class="fas fa-tshirt"></i>
+                    <span>Full Front (12"×16")</span>
+                </div>
+                <div class="universal-toggle-switch">
+                    <div class="universal-toggle-switch-slider"></div>
+                </div>
+            </div>
+
+            <div class="universal-toggle-item" onclick="toggleSwitch(this)">
+                <div class="universal-toggle-label">
+                    <i class="fas fa-shirt"></i>
+                    <span>Full Back (12"×16")</span>
+                </div>
+                <div class="universal-toggle-switch">
+                    <div class="universal-toggle-switch-slider"></div>
+                </div>
+            </div>
+
+            <div class="universal-toggle-item" onclick="toggleSwitch(this)">
+                <div class="universal-toggle-label">
+                    <i class="fas fa-expand"></i>
+                    <span>Jumbo Front (16"×20")</span>
+                </div>
+                <div class="universal-toggle-switch">
+                    <div class="universal-toggle-switch-slider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tier Buttons Demo -->
+    <div class="test-section">
+        <h2>Quantity Tier Buttons (Outline Style)</h2>
+        <p>These buttons now consistently use white background with green border when selected:</p>
+
+        <div class="universal-tier-container">
+            <button class="universal-tier-button" onclick="selectTier(this)">
+                <span class="universal-tier-label">1-23</span>
+                <span class="universal-tier-detail">+ $50 Small Batch Fee</span>
+            </button>
+
+            <button class="universal-tier-button selected" onclick="selectTier(this)">
+                <span class="universal-tier-label">24-47</span>
+                <span class="universal-tier-detail">Standard Pricing</span>
+            </button>
+
+            <button class="universal-tier-button" onclick="selectTier(this)">
+                <span class="universal-tier-label">48-71</span>
+                <span class="universal-tier-detail">Volume Discount</span>
+            </button>
+
+            <button class="universal-tier-button" onclick="selectTier(this)">
+                <span class="universal-tier-label">72+</span>
+                <span class="universal-tier-detail">Best Pricing</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Price Display Demo -->
+    <div class="test-section">
+        <h2>Primary Price Display (Gradient Style)</h2>
+        <p>Main pricing display with green gradient background:</p>
+
+        <div class="universal-price-display">
+            <div class="universal-price-label">Price per shirt</div>
+            <div class="universal-price-amount-wrapper">
+                <span class="universal-price-currency">$</span>
+                <span class="universal-price-amount">11.50</span>
+                <i class="fas fa-info-circle universal-upcharge-info-icon" title="Size upcharges may apply"></i>
+            </div>
+            <div class="universal-price-detail">Left Chest at 48 pieces</div>
+            <div class="universal-price-fee">Setup Fee: $45 per color</div>
+        </div>
+    </div>
+
+    <!-- Alternative Price Display -->
+    <div class="test-section">
+        <h2>Secondary Price Display (White Box Style)</h2>
+        <p>Alternative pricing display with green border:</p>
+
+        <div class="universal-price-box">
+            <div class="universal-price-main">
+                <span class="universal-price-currency">$</span>
+                <span class="universal-price-value">625</span>
+                <span class="universal-price-label">total</span>
+            </div>
+            <div class="universal-price-subtitle">50 shirts × $12.50 each</div>
+            <div class="universal-divider"></div>
+            <div class="universal-breakdown">
+                <div class="universal-breakdown-row">
+                    <span>Garment Cost:</span>
+                    <span>$250.00</span>
+                </div>
+                <div class="universal-breakdown-row">
+                    <span>Decoration:</span>
+                    <span>$325.00</span>
+                </div>
+                <div class="universal-breakdown-row">
+                    <span>Setup Fees:</span>
+                    <span>$50.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Responsive Test -->
+    <div class="test-section">
+        <h2>📱 Mobile Responsive</h2>
+        <p>Resize your browser window to see how these components adapt to mobile screens. The CSS includes:</p>
+        <ul>
+            <li>✅ Responsive grid layouts</li>
+            <li>✅ Smaller toggle switches on mobile</li>
+            <li>✅ Adjusted font sizes</li>
+            <li>✅ Stacked layouts for narrow screens</li>
+            <li>✅ Touch-friendly tap targets</li>
+        </ul>
+    </div>
+
+    <!-- Color Reference -->
+    <div class="test-section">
+        <h2>🎨 Color Palette</h2>
+        <p>Consistent green theme across all calculators:</p>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="text-align: center;">
+                <div style="width: 100px; height: 100px; background: #4cb354; border-radius: 8px;"></div>
+                <p>Primary Green<br>#4cb354</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 100px; height: 100px; background: #2d5f3f; border-radius: 8px;"></div>
+                <p>Dark Green<br>#2d5f3f</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 100px; height: 100px; background: #cbd5e1; border-radius: 8px;"></div>
+                <p>Gray (Inactive)<br>#cbd5e1</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="width: 100px; height: 100px; background: #f0f9ff; border-radius: 8px; border: 1px solid #ddd;"></div>
+                <p>Hover Blue<br>#f0f9ff</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle switch functionality
+        function toggleSwitch(element) {
+            const toggle = element.querySelector('.universal-toggle-switch');
+            const isOn = toggle.classList.contains('on');
+
+            if (isOn) {
+                toggle.classList.remove('on');
+                element.classList.remove('active');
+            } else {
+                toggle.classList.add('on');
+                element.classList.add('active');
+            }
+        }
+
+        // Tier selection functionality
+        function selectTier(button) {
+            // Remove selected from all
+            document.querySelectorAll('.universal-tier-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Add selected to clicked button
+            button.classList.add('selected');
+
+            // Update price display (demo)
+            const tierLabel = button.querySelector('.universal-tier-label').textContent;
+            document.querySelector('.universal-price-detail').textContent = `Pricing for ${tierLabel} pieces`;
+        }
+    </script>
+</body>
+</html>
