@@ -44,6 +44,16 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- Page Initialization Functions ---
 
     function updateProductContext() {
+        // CHECK FOR MANUAL COST OVERRIDE FIRST - Skip validation if in manual mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+        if (manualCost && !isNaN(parseFloat(manualCost))) {
+            console.log('PricingPages: 🔧 Manual pricing mode detected, skipping product context validation');
+            return; // Exit early, let page-specific manual handler take over
+        }
+
+        // NORMAL FLOW: Get and validate product parameters
         const styleNumber = NWCAUtils.getUrlParameter('StyleNumber');
         const colorFromUrl = NWCAUtils.getUrlParameter('COLOR');
 
