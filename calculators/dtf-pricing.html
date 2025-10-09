@@ -1267,14 +1267,29 @@
                     document.getElementById('loadingState').style.display = 'none';
                     document.getElementById('productHero').style.display = 'block';
 
-                    // Use the service's manual data generation
-                    const dtfService = window.dtfService || window.DTFPricingService;
-                    if (dtfService && typeof dtfService.generateManualPricingData === 'function') {
-                        const pricingData = await dtfService.generateManualPricingData(manualCost);
-                        console.log('✅ Manual DTF pricing data generated:', pricingData);
-                    } else {
-                        console.warn('⚠️ DTFPricingService not available, using basic manual mode');
-                    }
+                    // Instantiate the DTF service
+                    console.log('📡 Creating DTF service instance...');
+                    const dtfService = new DTFPricingService();
+
+                    // Generate manual pricing data from API
+                    console.log('📡 Fetching DTF pricing data from API...');
+                    const pricingData = await dtfService.generateManualPricingData(manualCost);
+                    console.log('✅ Manual DTF pricing data generated:', {
+                        totalTiers: pricingData.tiersR?.length || pricingData.tiers?.length,
+                        totalCosts: pricingData.allDtfCostsR?.length,
+                        manualCost: pricingData.manualCost,
+                        sampleCosts: pricingData.allDtfCostsR?.slice(0, 4).map(c =>
+                            `${c.size} ${c.quantity_range}: $${c.unit_price}`)
+                    });
+
+                    // Store in the service for calculator access
+                    dtfService.apiData = pricingData;
+                    window.dtfService = dtfService;
+
+                    // Dispatch event so DTF calculator can pick up the data
+                    window.dispatchEvent(new CustomEvent('dtfManualPricingLoaded', {
+                        detail: pricingData
+                    }));
 
                     // Update product info for manual mode
                     const manualProduct = {
