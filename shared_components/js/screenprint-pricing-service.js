@@ -64,22 +64,45 @@ class ScreenPrintPricingService {
      * @throws {Error} If API request fails
      */
     async fetchPricingBundle() {
-        const url = `${this.baseURL}/api/pricing-bundle?method=SCREENPRINT&styleNumber=PC61`;
-        console.log('[ScreenPrintPricingService] Fetching complete pricing bundle from API...');
+        const url = `${this.baseURL}/api/pricing-bundle?method=ScreenPrint&styleNumber=PC61`;
+        console.log('[ScreenPrintPricingService] 📡 Fetching complete pricing bundle from API...');
+        console.log('[ScreenPrintPricingService] 🔗 URL:', url);
 
         const response = await fetch(url);
+        console.log('[ScreenPrintPricingService] 📊 API Response Status:', response.status, response.statusText);
+
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[ScreenPrintPricingService] ❌ API Error Response:', errorText);
             throw new Error(`Failed to fetch Screen Print pricing bundle from API: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('[ScreenPrintPricingService] 📦 API Data Structure:', {
+            totalTiers: data.tiersR?.length,
+            totalCosts: data.allScreenprintCostsR?.length,
+            hasSizes: !!data.sizes,
+            hasRules: !!data.rulesR
+        });
 
         // Validate required fields
         if (!data.tiersR || !data.allScreenprintCostsR) {
+            console.error('[ScreenPrintPricingService] ❌ Missing required fields:', {
+                tiersR: !!data.tiersR,
+                allScreenprintCostsR: !!data.allScreenprintCostsR
+            });
             throw new Error('Invalid API response: missing required Screen Print pricing data');
         }
 
-        console.log('[ScreenPrintPricingService] Successfully fetched complete pricing bundle from API');
+        // Log sample tier and cost data for debugging
+        if (data.tiersR && data.tiersR.length > 0) {
+            console.log('[ScreenPrintPricingService] 📊 Sample Tier:', data.tiersR[0]);
+        }
+        if (data.allScreenprintCostsR && data.allScreenprintCostsR.length > 0) {
+            console.log('[ScreenPrintPricingService] 💰 Sample Cost:', data.allScreenprintCostsR[0]);
+        }
+
+        console.log('[ScreenPrintPricingService] ✅ Successfully fetched complete pricing bundle from API');
         return data;
     }
 
@@ -90,10 +113,12 @@ class ScreenPrintPricingService {
      * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
-        console.log('[ScreenPrintPricingService] Generating manual pricing data with base cost:', manualCost);
+        console.log('[ScreenPrintPricingService] 🔧 Generating manual pricing data with base cost:', manualCost);
 
         // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        console.log('[ScreenPrintPricingService] 📡 Fetching pricing rules from API...');
         const apiBundle = await this.fetchPricingBundle();
+        console.log('[ScreenPrintPricingService] ✅ API bundle received, building manual pricing data...');
 
         // Build sizes array using manual cost
         const manualSizes = [
@@ -128,6 +153,15 @@ class ScreenPrintPricingService {
         transformedData.manualMode = true;
         transformedData.manualCost = manualCost;
         transformedData.source = 'manual';
+
+        console.log('[ScreenPrintPricingService] ✅ Manual pricing data generated:', {
+            tierCount: Object.keys(transformedData.tierData || {}).length,
+            locationCount: transformedData.printLocationMeta?.length || 0,
+            colorCounts: transformedData.availableColorCounts || [],
+            hasPrimaryPricing: !!transformedData.primaryLocationPricing,
+            hasAdditionalPricing: !!transformedData.additionalLocationPricing,
+            manualCost: manualCost
+        });
 
         return transformedData;
     }
@@ -325,6 +359,43 @@ class ScreenPrintPricingService {
                             const rawTotal = garmentPrice + printPrice;
                             const roundedTotal = applyRounding(rawTotal, roundingMethod);
                             finalPrices[locationType][tierLabel][colorCount][sizeInfo.size] = roundedTotal;
+
+                            // 🔍 DETAILED TRACE: Log one complete example to verify full calculation
+                            if (tierLabel === '37-72' && colorCount === '2' && sizeInfo.size === 'M') {
+                                console.log('\n🔍 ═══════════════════════════════════════════════════════════');
+                                console.log('🔍 COMPLETE CALCULATION TRACE (37-72 tier, 2 colors, size M):');
+                                console.log('🔍 ═══════════════════════════════════════════════════════════');
+                                console.log('🔍 Step 1 - Input Values:');
+                                console.log('🔍   • Base garment cost: $' + standardGarmentCost.toFixed(2));
+                                console.log('🔍   • Tier: ' + tierLabel);
+                                console.log('🔍   • Colors: ' + colorCount);
+                                console.log('🔍   • Size: ' + sizeInfo.size);
+
+                                const tier = tiersR.find(t => t.TierLabel === tierLabel);
+                                console.log('🔍\nStep 2 - Garment with Margin:');
+                                console.log('🔍   • Margin denominator: ' + tier.MarginDenominator);
+                                console.log('🔍   • Garment selling price: $' + standardGarmentCost.toFixed(2) + ' ÷ ' + tier.MarginDenominator + ' = $' + garmentPrice.toFixed(2));
+
+                                console.log('🔍\nStep 3 - Print Cost Components:');
+                                const costEntry = allScreenprintCostsR.find(c =>
+                                    c.TierLabel === tierLabel && c.ColorCount === parseInt(colorCount) && c.CostType === 'PrimaryLocation'
+                                );
+                                if (costEntry) {
+                                    const flashTotal = flashChargePerColor * parseInt(colorCount);
+                                    console.log('🔍   • Base print cost (from API): $' + costEntry.BasePrintCost.toFixed(2));
+                                    console.log('🔍   • Flash charge: $' + flashChargePerColor.toFixed(2) + ' × ' + colorCount + ' = $' + flashTotal.toFixed(2));
+                                    console.log('🔍   • Total print cost: $' + costEntry.BasePrintCost.toFixed(2) + ' + $' + flashTotal.toFixed(2) + ' = $' + (costEntry.BasePrintCost + flashTotal).toFixed(2));
+                                    console.log('🔍   • Print with margin: $' + (costEntry.BasePrintCost + flashTotal).toFixed(2) + ' ÷ ' + tier.MarginDenominator + ' = $' + printPrice.toFixed(2));
+                                }
+
+                                console.log('🔍\nStep 4 - Combine & Round:');
+                                console.log('🔍   • Garment: $' + garmentPrice.toFixed(2));
+                                console.log('🔍   • Print: $' + printPrice.toFixed(2));
+                                console.log('🔍   • Raw total: $' + garmentPrice.toFixed(2) + ' + $' + printPrice.toFixed(2) + ' = $' + rawTotal.toFixed(2));
+                                console.log('🔍   • Rounding method: ' + roundingMethod);
+                                console.log('🔍   • FINAL PRICE (what customer sees): $' + roundedTotal.toFixed(2));
+                                console.log('🔍 ═══════════════════════════════════════════════════════════\n');
+                            }
                         }
                     });
                 });
