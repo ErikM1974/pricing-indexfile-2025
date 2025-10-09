@@ -51,7 +51,7 @@ class DTFPricingService {
      * @throws {Error} If API request fails
      */
     async fetchPricingBundle() {
-        const url = `${this.apiBase}/pricing-bundle?method=DTF&styleNumber=PC61`;
+        const url = `${this.baseURL}/api/pricing-bundle?method=DTF&styleNumber=PC61`;
         console.log('[DTFPricingService] Fetching complete pricing bundle from API...');
 
         const response = await fetch(url);
