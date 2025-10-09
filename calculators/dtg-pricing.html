@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <!-- Universal Toggle Pricing CSS -->
     <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008">
+    <!-- DTG LTM Quantity Input CSS -->
+    <link rel="stylesheet" href="/shared_components/css/dtg-ltm-quantity-input.css?v=20251008">
 
     <style>
         :root {
@@ -1445,6 +1447,25 @@
                     <button class="tier-button universal-tier-button" id="tier-72" data-tier="72+">
                         72+ pieces
                     </button>
+
+                    <!-- DTG Quantity Input for LTM Tier (1-23 pieces) -->
+                    <div class="dtg-quantity-input-container" id="dtg-ltm-quantity-container" style="display: none;">
+                        <label class="dtg-quantity-input-label">
+                            <i class="fas fa-calculator"></i> Enter Exact Quantity (1-23 pieces):
+                        </label>
+                        <input type="number"
+                               id="dtg-ltm-quantity-input"
+                               class="dtg-quantity-input"
+                               min="1"
+                               max="23"
+                               value="12"
+                               placeholder="Enter 1-23">
+                        <small class="dtg-quantity-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Required for accurate $50 fee distribution:
+                            <strong id="dtg-ltm-fee-calc">$50 ÷ 12 = $4.17/shirt</strong>
+                        </small>
+                    </div>
                 </div>
             </div>
 
@@ -2102,6 +2123,18 @@
                 });
             });
 
+            // Set up LTM quantity input event listeners
+            const ltmQuantityInput = document.getElementById('dtg-ltm-quantity-input');
+            if (ltmQuantityInput) {
+                // Real-time updates as user types
+                ltmQuantityInput.addEventListener('input', handleLTMQuantityInput);
+
+                // Validation when user leaves the field
+                ltmQuantityInput.addEventListener('blur', validateLTMQuantityInput);
+
+                console.log('✅ LTM quantity input listeners attached');
+            }
+
             // Initialize with default tier selected
             updateLivePriceDisplay();
 
@@ -2366,8 +2399,82 @@
                 }
             });
 
+            // Show/hide LTM quantity input container
+            updateLTMQuantityInput(tierLabel);
+
             // Update live price display
             updateLivePriceDisplay();
+        }
+
+        // ==================== LTM QUANTITY INPUT FUNCTIONS ====================
+
+        // Show/hide LTM quantity input container based on selected tier
+        function updateLTMQuantityInput(tierLabel) {
+            const container = document.getElementById('dtg-ltm-quantity-container');
+            if (!container) return;
+
+            if (tierLabel === '1-23') {
+                // Show the input container
+                container.style.display = 'flex';
+                container.classList.add('show');
+
+                // Update the fee calculation display
+                const input = document.getElementById('dtg-ltm-quantity-input');
+                if (input) {
+                    updateLTMFeeDisplay(parseInt(input.value) || 12);
+                }
+
+                console.log('✅ LTM quantity input shown');
+            } else {
+                // Hide the input container
+                container.style.display = 'none';
+                container.classList.remove('show');
+
+                console.log('❌ LTM quantity input hidden');
+            }
+        }
+
+        // Update the LTM fee calculation display
+        function updateLTMFeeDisplay(quantity) {
+            const feeCalc = document.getElementById('dtg-ltm-fee-calc');
+            if (!feeCalc) return;
+
+            const ltmFee = 50.00;
+            const feePerShirt = ltmFee / quantity;
+
+            feeCalc.innerHTML = `$${ltmFee.toFixed(2)} ÷ ${quantity} = <span style="color: #4cb354;">$${feePerShirt.toFixed(2)}/shirt</span>`;
+
+            console.log(`💰 LTM fee updated: $${feePerShirt.toFixed(2)}/shirt for ${quantity} pieces`);
+        }
+
+        // Handle LTM quantity input changes (real-time)
+        function handleLTMQuantityInput(e) {
+            const value = parseInt(e.target.value);
+
+            if (!isNaN(value) && value >= 1 && value <= 23) {
+                updateLTMFeeDisplay(value);
+                // Update the live price display to include LTM fee
+                updateLivePriceDisplay();
+            }
+        }
+
+        // Validate LTM quantity input on blur
+        function validateLTMQuantityInput(e) {
+            let value = parseInt(e.target.value);
+
+            // Enforce min/max bounds
+            if (isNaN(value) || value < 1) {
+                value = 1;
+            } else if (value > 23) {
+                value = 23;
+            }
+
+            e.target.value = value;
+            updateLTMFeeDisplay(value);
+            // Update the live price display to include LTM fee
+            updateLivePriceDisplay();
+
+            console.log(`✓ LTM quantity validated: ${value}`);
         }
 
         // Calculate and update live price display
@@ -2416,18 +2523,29 @@
                     priceDetailElement.textContent = `${loc1Name} + ${loc2Name} • ${displayTier} pieces`;
                 }
 
+                // Add LTM fee to price if tier is under 24 pieces
+                if (toggleState.selectedTier === '1-23') {
+                    // Get the quantity from the input field
+                    const ltmQuantityInput = document.getElementById('dtg-ltm-quantity-input');
+                    const quantity = ltmQuantityInput ? parseInt(ltmQuantityInput.value) || 12 : 12;
+
+                    // Calculate LTM fee per shirt
+                    const ltmFee = 50.00;
+                    const ltmFeePerShirt = ltmFee / quantity;
+
+                    // Add LTM fee to the final price
+                    finalPrice += ltmFeePerShirt;
+
+                    console.log(`💰 LTM fee per shirt: $${ltmFeePerShirt.toFixed(2)} (${quantity} pieces)`);
+                }
+
                 // Update price display
                 priceAmountElement.textContent = `$${finalPrice.toFixed(2)}`;
 
-                // Display LTM fee if tier is under 24 pieces
+                // Hide the yellow LTM fee box since fee is now included in the price
                 if (priceFeeElement) {
-                    if (toggleState.selectedTier === '1-23') {
-                        priceFeeElement.textContent = '+ $50.00 Small Batch Fee';
-                        priceFeeElement.style.display = 'block';
-                    } else {
-                        priceFeeElement.textContent = '';
-                        priceFeeElement.style.display = 'none';
-                    }
+                    priceFeeElement.textContent = '';
+                    priceFeeElement.style.display = 'none';
                 }
 
                 console.log(`💰 Live price updated: $${finalPrice.toFixed(2)}`);
