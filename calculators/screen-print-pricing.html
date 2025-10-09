@@ -1405,15 +1405,53 @@
                 const productImage = document.querySelector('.product-image-main');
                 if (productImage) productImage.style.display = 'none';
 
-                // Initialize screen print calculator with manual mode
+                // Initialize screen print calculator
                 if (typeof ScreenPrintPricing !== 'undefined') {
+                    console.log('🔍 DEBUG CHECKPOINT 1: Creating ScreenPrintPricing instance');
                     window.screenPrintCalculator = new ScreenPrintPricing();
 
-                    // Manually trigger pricing load with synthetic data
-                    // The service will detect manual cost and generate synthetic data
-                    console.log('[ScreenPrintV2] Calculator initialized in manual mode');
+                    // KEY FIX: Generate manual pricing data and load it into calculator
+                    if (window.screenPrintCalculator.pricingService) {
+                        console.log('🔍 DEBUG CHECKPOINT 2: Pricing service exists, generating manual data...');
+                        console.log('  → Manual cost:', manualCost);
+                        console.log('  → Service object:', window.screenPrintCalculator.pricingService);
+
+                        const manualPricingData = await window.screenPrintCalculator.pricingService.generateManualPricingData(manualCost);
+
+                        console.log('🔍 DEBUG CHECKPOINT 3: Manual pricing data generated');
+                        console.log('  → Data object:', manualPricingData);
+                        console.log('  → Has primaryLocationPricing?', !!manualPricingData?.primaryLocationPricing);
+                        console.log('  → Has additionalLocationPricing?', !!manualPricingData?.additionalLocationPricing);
+                        if (manualPricingData?.primaryLocationPricing) {
+                            console.log('  → Primary location color counts:', Object.keys(manualPricingData.primaryLocationPricing));
+                            console.log('  → Sample tier (1 color):', manualPricingData.primaryLocationPricing['1']);
+                        }
+
+                        console.log('🔍 DEBUG CHECKPOINT 4: Loading data into calculator via handleMasterBundle()');
+                        console.log('  → Calculator state before:', window.screenPrintCalculator.state);
+
+                        // Load the data into the calculator
+                        window.screenPrintCalculator.handleMasterBundle(manualPricingData);
+
+                        console.log('🔍 DEBUG CHECKPOINT 5: Calculator loaded with manual pricing data');
+                        console.log('  → Calculator state after:', window.screenPrintCalculator.state);
+                        console.log('  → state.pricingData exists?', !!window.screenPrintCalculator.state.pricingData);
+                        console.log('  → state.pricingData.primaryLocationPricing exists?', !!window.screenPrintCalculator.state.pricingData?.primaryLocationPricing);
+
+                        // Force a price calculation to see what happens
+                        console.log('🔍 DEBUG CHECKPOINT 6: Forcing price calculation test');
+                        const testPricing = window.screenPrintCalculator.calculatePricing();
+                        console.log('  → Test pricing result:', testPricing);
+                        console.log('  → Base price:', testPricing.basePrice);
+                        console.log('  → Grand total:', testPricing.grandTotal);
+                    } else {
+                        console.error('❌ DEBUG ERROR: Pricing service does not exist on calculator!');
+                        console.log('  → Calculator object:', window.screenPrintCalculator);
+                    }
+
+                    console.log('✅ [ScreenPrintV2] Calculator initialized in manual mode');
                 } else {
-                    console.error('[ScreenPrintV2] ScreenPrintPricing class not found!');
+                    console.error('❌ [ScreenPrintV2] ScreenPrintPricing class not found!');
                 }
 
                 console.log('✅ Manual screen print pricing loaded successfully');

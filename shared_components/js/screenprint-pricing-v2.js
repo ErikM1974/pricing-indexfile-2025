@@ -1463,30 +1463,51 @@ class ScreenPrintPricing {
     }
 
     calculatePricing() {
+        console.log('🔍 calculatePricing() DEBUG START');
         const { quantity, frontColors, additionalLocations, isDarkGarment, pricingData } = this.state;
+
+        console.log('  → State values:');
+        console.log('    - quantity:', quantity);
+        console.log('    - frontColors:', frontColors);
+        console.log('    - additionalLocations:', additionalLocations);
+        console.log('    - isDarkGarment:', isDarkGarment);
+        console.log('    - pricingData exists?', !!pricingData);
 
         const pricing = {
             quantity: quantity,
-            frontColors: frontColors, 
-            additionalLocations: additionalLocations, 
+            frontColors: frontColors,
+            additionalLocations: additionalLocations,
             isDarkGarment: isDarkGarment,
-            basePrice: 0,           
-            additionalCost: 0,      
-            totalPerShirtPrintOnlyCost: 0, 
+            basePrice: 0,
+            additionalCost: 0,
+            totalPerShirtPrintOnlyCost: 0,
             setupFee: 0,
             ltmFee: 0,
-            ltmImpactPerShirt: 0, 
-            subtotal: 0,            
-            grandTotal: 0,          
-            perShirtTotal: 0,       
+            ltmImpactPerShirt: 0,
+            subtotal: 0,
+            grandTotal: 0,
+            perShirtTotal: 0,
             setupPerShirt: 0,
-            colorBreakdown: {       
-                front: 0,           
-                locations: []       
+            colorBreakdown: {
+                front: 0,
+                locations: []
             }
         };
 
-        if (!pricingData || quantity === 0) return pricing;
+        if (!pricingData || quantity === 0) {
+            console.log('🔍 calculatePricing() EARLY RETURN - No data or zero quantity');
+            console.log('  → pricingData:', pricingData);
+            console.log('  → quantity:', quantity);
+            console.log('  → Returning empty pricing object');
+            return pricing;
+        }
+
+        console.log('  → pricingData structure:');
+        console.log('    - primaryLocationPricing exists?', !!pricingData.primaryLocationPricing);
+        console.log('    - additionalLocationPricing exists?', !!pricingData.additionalLocationPricing);
+        if (pricingData.primaryLocationPricing) {
+            console.log('    - primaryLocationPricing keys:', Object.keys(pricingData.primaryLocationPricing));
+        }
 
         let effectiveFrontPrintColors = frontColors;
         if (isDarkGarment && frontColors > 0) {
@@ -2343,10 +2364,17 @@ class ScreenPrintPricing {
     }
 
     handleMasterBundle(data) {
-        // Log the pricing data
+        console.log('🔍 handleMasterBundle() DEBUG START');
+        console.log('  → Received data:', data);
+        console.log('  → Data has primaryLocationPricing?', !!data?.primaryLocationPricing);
+        console.log('  → Data has additionalLocationPricing?', !!data?.additionalLocationPricing);
 
         this.state.masterBundle = data;
         this.state.pricingData = data;
+
+        console.log('  → State assigned');
+        console.log('  → this.state.pricingData:', this.state.pricingData);
+        console.log('  → this.state.pricingData === data?', this.state.pricingData === data);
 
         // Store pricing data globally for size upcharges display
         window.screenPrintPricingData = data;
@@ -2368,6 +2396,7 @@ class ScreenPrintPricing {
 
         // Toggle prices removed - only "STEP 3: YOUR PRICE" display shows pricing
 
+        console.log('  → Calling updateDisplay()');
         this.updateDisplay();
         
         if (this.tiersLoaded && document.getElementById('pricing-tiers')?.style.display !== 'none') {
