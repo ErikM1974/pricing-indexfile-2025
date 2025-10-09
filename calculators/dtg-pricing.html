@@ -1928,9 +1928,59 @@
             try {
                 showLoading();
 
-                // Use service to generate manual pricing with real API data
-                // This fetches tier-specific print costs from the API
-                const manualData = await dtgPricingService.generateManualPricingData(manualCost);
+                // Fetch pricing bundle from API (same endpoint as DTGPricingService)
+                console.log('📡 Fetching DTG pricing bundle from API...');
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC61');
+
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status}`);
+                }
+
+                const apiBundle = await response.json();
+                console.log('📦 Manual pricing API bundle received:', {
+                    totalTiers: apiBundle.tiersR?.length,
+                    totalCosts: apiBundle.allDtgCostsR?.length,
+                    lcCosts: apiBundle.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC')
+                });
+
+                // Build sizes array with manual cost (all sizes use the same manual cost)
+                const manualSizes = [
+                    { size: 'S', price: manualCost, sortOrder: 1 },
+                    { size: 'M', price: manualCost, sortOrder: 2 },
+                    { size: 'L', price: manualCost, sortOrder: 3 },
+                    { size: 'XL', price: manualCost, sortOrder: 4 },
+                    { size: '2XL', price: manualCost, sortOrder: 5 },
+                    { size: '3XL', price: manualCost, sortOrder: 6 },
+                    { size: '4XL', price: manualCost, sortOrder: 7 },
+                    { size: '5XL', price: manualCost, sortOrder: 8 },
+                    { size: '6XL', price: manualCost, sortOrder: 9 }
+                ];
+
+                // Create pricing data structure using API data + manual sizes
+                const manualData = {
+                    styleNumber: 'MANUAL',
+                    product: {
+                        styleNumber: 'MANUAL',
+                        brand: 'Manual Entry',
+                        description: 'Manual Pricing Mode',
+                        image_url: ''
+                    },
+                    pricing: {
+                        tiers: apiBundle.tiersR,                          // From API
+                        costs: apiBundle.allDtgCostsR,                   // From API (tier-specific costs!)
+                        upcharges: apiBundle.sellingPriceDisplayAddOns,   // From API
+                        sizes: manualSizes,                               // Manual cost
+                        locations: apiBundle.locations                    // From API
+                    },
+                    manualMode: true,
+                    manualCost: manualCost
+                };
+
+                console.log('✅ Manual pricing data structure created:', {
+                    totalCosts: manualData.pricing.costs?.length,
+                    lcCosts: manualData.pricing.costs?.filter(c => c.PrintLocationCode === 'LC')?.length,
+                    lcCostsDetails: manualData.pricing.costs?.filter(c => c.PrintLocationCode === 'LC')?.map(c => `${c.TierLabel}: $${c.PrintCost}`)
+                });
 
                 // Store data globally
                 pricingData = manualData;
