@@ -1376,11 +1376,69 @@
             };
         }
 
+        // Load manual screen print pricing (when ?manualCost parameter is provided)
+        async function loadManualScreenPrintPricing(manualCost) {
+            console.log(`🔧 Loading manual screen print pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            try {
+                // Show product hero section with manual info
+                const productHero = document.querySelector('.product-hero-section');
+                if (productHero) {
+                    productHero.style.display = 'block';
+                }
+
+                // Update product display for manual mode
+                const manualProductData = {
+                    title: 'Manual Pricing Mode',
+                    description: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`,
+                    styleNumber: 'MANUAL',
+                    brand: 'Manual Entry',
+                    color: 'N/A',
+                    imageUrl: '',
+                    images: {},
+                    colors: []
+                };
+
+                populateProductDisplay(manualProductData);
+
+                // Hide the product image
+                const productImage = document.querySelector('.product-image-main');
+                if (productImage) productImage.style.display = 'none';
+
+                // Initialize screen print calculator with manual mode
+                if (typeof ScreenPrintPricing !== 'undefined') {
+                    window.screenPrintCalculator = new ScreenPrintPricing();
+
+                    // Manually trigger pricing load with synthetic data
+                    // The service will detect manual cost and generate synthetic data
+                    console.log('[ScreenPrintV2] Calculator initialized in manual mode');
+                } else {
+                    console.error('[ScreenPrintV2] ScreenPrintPricing class not found!');
+                }
+
+                console.log('✅ Manual screen print pricing loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading manual screen print pricing:', error);
+                alert('Failed to load manual pricing mode');
+            }
+        }
+
         // Initialize Product Display (Custom HTML, NOT UniversalProductDisplay)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('[ScreenPrintV2] DOM Ready - Initializing Product Display');
 
-            // CRITICAL FIX: Check if data already exists (race condition fix)
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const urlParams = new URLSearchParams(window.location.search);
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualScreenPrintPricing(parseFloat(manualCost));
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Check if data already exists (race condition fix)
             // The productColorsReady event may have already fired before this listener registered
             if (window.productColorsData || window.productColors) {
                 console.log('[ScreenPrintV2] Using pre-loaded product data (event already fired)');
@@ -1731,6 +1789,7 @@
 
     <!-- Screen Print V2 Scripts -->
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <!-- Using original v2 with ALL functionality -->
     <script src="/shared_components/js/screenprint-pricing-v2.js?v=20251003c"></script>
     

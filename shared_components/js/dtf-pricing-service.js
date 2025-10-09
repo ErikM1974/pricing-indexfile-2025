@@ -14,9 +14,117 @@ class DTFPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[DTFPricingService] Manual cost from URL:', cost);
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[DTFPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[DTFPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Generate synthetic pricing data using manual cost
+     * DTF uses garment cost + transfer cost + labor + freight
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Synthetic API-compatible data
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[DTFPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Default tiers
+        const defaultTiers = [
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6, LTM_Fee: 0 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6, LTM_Fee: 0 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6, LTM_Fee: 0 }
+        ];
+
+        // Default DTF transfer costs by size
+        const defaultDTFCosts = [];
+        const transferSizes = ['Small (up to 5x7")', 'Medium (up to 11x17")', 'Large (up to 13x19")', 'XL (up to 16x20")'];
+        const transferCosts = [1.25, 2.50, 3.75, 5.00];
+
+        defaultTiers.forEach(tier => {
+            transferSizes.forEach((size, idx) => {
+                defaultDTFCosts.push({
+                    TierLabel: tier.TierLabel,
+                    TransferSizeName: size,
+                    TransferCost: transferCosts[idx],
+                    PressingLaborCost: 2.00 // Standard labor cost
+                });
+            });
+        });
+
+        // Default freight tiers
+        const defaultFreight = [
+            { MinQuantity: 24, MaxQuantity: 47, FreightCost: 2.00 },
+            { MinQuantity: 48, MaxQuantity: 71, FreightCost: 1.50 },
+            { MinQuantity: 72, MaxQuantity: 99999, FreightCost: 1.00 }
+        ];
+
+        // Default rules
+        const defaultRules = {
+            RoundingMethod: 'HalfDollarCeil_Final'
+        };
+
+        // Create synthetic API data
+        const syntheticAPIData = {
+            styleNumber: 'MANUAL',
+            tiersR: defaultTiers,
+            allDtfCostsR: defaultDTFCosts,
+            freightR: defaultFreight,
+            rulesR: defaultRules,
+            locations: [{ code: 'FRONT', name: 'Front' }, { code: 'BACK', name: 'Back' }],
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // Transform using existing method
+        const transformedData = this.transformApiData(syntheticAPIData);
+
+        // Mark as manual mode
+        transformedData.manualMode = true;
+        transformedData.manualCost = manualCost;
+        transformedData.source = 'manual';
+
+        return transformedData;
+    }
+
+    /**
      * Main entry point - fetches DTF pricing data from API
      */
     async fetchPricingData(styleNumber = null, options = {}) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[DTFPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            const manualData = await this.generateManualPricingData(manualCost);
+            this.apiData = manualData;
+            return manualData;
+        }
+
         console.log('[DTFPricingService] Fetching DTF pricing data', styleNumber ? `for style: ${styleNumber}` : '(generic)');
 
         // Build cache key based on style number
@@ -37,26 +145,26 @@ class DTFPricingService {
 
             // Fetch from API
             const response = await fetch(apiUrl);
-            
+
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('[DTFPricingService] API data received:', data);
-            
+
             // Validate required fields
             if (!data.tiersR || !data.allDtfCostsR || !data.freightR) {
                 throw new Error('Invalid API response - missing required fields');
             }
-            
+
             // Transform to usable format
             const transformedData = this.transformApiData(data);
-            
+
             // Cache the result
             this.saveToCache(cacheKey, transformedData);
             this.apiData = transformedData;
-            
+
             return transformedData;
         } catch (error) {
             console.error('[DTFPricingService] Error:', error);

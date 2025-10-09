@@ -1089,6 +1089,7 @@
 
     <!-- JavaScript -->
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <script>
         // Initialize embroidery pricing service
         const embroideryService = new EmbroideryPricingService();
@@ -1107,11 +1108,22 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🎨 Embroidery Pricing Page - Professional Layout');
-            
-            // Get style from URL parameter
+
+            // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualEmbroideryPricing(parseFloat(manualCost));
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Get style from URL parameter
             const styleNumber = urlParams.get('StyleNumber') || urlParams.get('STYLE_No') || urlParams.get('style');
-            
+
             if (styleNumber) {
                 loadProduct(styleNumber);
             } else {
@@ -1354,7 +1366,46 @@
                 showNoProduct();
             }
         }
-        
+
+        // Load manual embroidery pricing (when ?manualCost parameter is provided)
+        async function loadManualEmbroideryPricing(manualCost) {
+            console.log(`🔧 Loading manual embroidery pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            try {
+                showLoading();
+
+                // Use the service's manual data generation
+                const pricingData = await embroideryService.generateManualPricingData(manualCost);
+
+                // Update product info for manual mode
+                const manualProduct = {
+                    PRODUCT_TITLE: 'Manual Pricing Mode',
+                    BRAND_NAME: 'Manual Entry',
+                    PRODUCT_DESCRIPTION: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`
+                };
+
+                currentProduct = manualProduct;
+                updateProductInfo(manualProduct, 'MANUAL');
+
+                // Hide product image
+                const productImage = document.querySelector('.product-image-main');
+                if (productImage) productImage.style.display = 'none';
+
+                // Update pricing display
+                updatePricing(pricingData);
+
+                // Show product sections
+                showProduct();
+
+                console.log('✅ Manual embroidery pricing loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading manual embroidery pricing:', error);
+                showApiError('Failed to load manual pricing mode');
+                showNoProduct();
+            }
+        }
+
         // Update product information
         function updateProductInfo(product, styleNumber) {
             console.log('📝 Updating product info with:', product);

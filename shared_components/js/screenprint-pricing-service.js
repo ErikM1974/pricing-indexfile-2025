@@ -27,11 +27,135 @@ class ScreenPrintPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[ScreenPrintPricingService] Manual cost from URL:', cost);
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[ScreenPrintPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[ScreenPrintPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Generate synthetic pricing data using manual cost
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Synthetic API-compatible data
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[ScreenPrintPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Default tiers
+        const defaultTiers = [
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+        ];
+
+        // Default screen print costs (per color count and tier)
+        const defaultScreenprintCosts = [];
+        for (let colors = 1; colors <= 6; colors++) {
+            defaultTiers.forEach(tier => {
+                // Primary location costs (base + per color)
+                defaultScreenprintCosts.push({
+                    ColorCount: colors,
+                    TierLabel: tier.TierLabel,
+                    LocationType: 'PrimaryLocation',
+                    BasePrintCost: 2.00 + (colors * 1.50)
+                });
+                // Additional location costs
+                defaultScreenprintCosts.push({
+                    ColorCount: colors,
+                    TierLabel: tier.TierLabel,
+                    LocationType: 'AdditionalLocation',
+                    BasePrintCost: 1.50 + (colors * 1.00)
+                });
+            });
+        }
+
+        // Standard sizes
+        const defaultSizes = [
+            { size: 'S', price: manualCost, sortOrder: 1 },
+            { size: 'M', price: manualCost, sortOrder: 2 },
+            { size: 'L', price: manualCost, sortOrder: 3 },
+            { size: 'XL', price: manualCost, sortOrder: 4 },
+            { size: '2XL', price: manualCost, sortOrder: 5 },
+            { size: '3XL', price: manualCost, sortOrder: 6 },
+            { size: '4XL', price: manualCost, sortOrder: 7 }
+        ];
+
+        // Standard upcharges
+        const defaultUpcharges = {
+            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
+        };
+
+        // Default rules
+        const defaultRules = {
+            RoundingMethod: 'HalfDollarCeil_Final',
+            FlashCharge: 0.35
+        };
+
+        // Create synthetic API data
+        const syntheticAPIData = {
+            styleNumber: 'MANUAL',
+            tiersR: defaultTiers,
+            allScreenprintCostsR: defaultScreenprintCosts,
+            sizes: defaultSizes,
+            sellingPriceDisplayAddOns: defaultUpcharges,
+            rulesR: defaultRules,
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // Use existing calculatePricing method
+        const calculatedData = this.calculatePricing(syntheticAPIData);
+
+        // Transform using existing method
+        const transformedData = this.transformToExistingFormat(calculatedData, syntheticAPIData);
+
+        // Mark as manual mode
+        transformedData.manualMode = true;
+        transformedData.manualCost = manualCost;
+        transformedData.source = 'manual';
+
+        return transformedData;
+    }
+
+    /**
      * Main entry point - fetches and calculates pricing data
      */
     async fetchPricingData(styleNumber, options = {}) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[ScreenPrintPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            return await this.generateManualPricingData(manualCost);
+        }
+
         console.log(`[ScreenPrintPricingService] Fetching pricing data for ${styleNumber}`);
-        
+
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
@@ -43,20 +167,20 @@ class ScreenPrintPricingService {
         try {
             // Fetch from API
             const apiData = await this.fetchFromAPI(styleNumber);
-            
+
             // Calculate pricing using exact logic
             const calculatedData = this.calculatePricing(apiData);
-            
+
             // Transform to match existing format expected by screenprint-pricing-v2.js
             const transformedData = this.transformToExistingFormat(calculatedData, apiData);
-            
+
             // Cache the result
             this.saveToCache(cacheKey, transformedData);
-            
+
             return transformedData;
         } catch (error) {
             console.error('[ScreenPrintPricingService] Error:', error);
-            
+
             throw error;
         }
     }

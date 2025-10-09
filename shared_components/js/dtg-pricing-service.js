@@ -85,18 +85,132 @@ class DTGPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        // Check URL parameter first (priority)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[DTGPricingService] Manual cost from URL:', cost);
+            // Store in sessionStorage for persistence during navigation
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        // Check sessionStorage (persistent within session)
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[DTGPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[DTGPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Generate synthetic pricing data using manual cost
+     * Creates API-compatible data structure without requiring actual API call
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Synthetic pricing data
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Default tiers matching API structure
+        const defaultTiers = [
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+        ];
+
+        // Default DTG print costs (single location, per tier)
+        const defaultPrintCosts = [
+            { PrintLocationCode: 'LC', TierLabel: '24-47', PrintCost: 6.00 },
+            { PrintLocationCode: 'LC', TierLabel: '48-71', PrintCost: 5.00 },
+            { PrintLocationCode: 'LC', TierLabel: '72+', PrintCost: 4.50 },
+            { PrintLocationCode: 'FF', TierLabel: '24-47', PrintCost: 8.00 },
+            { PrintLocationCode: 'FF', TierLabel: '48-71', PrintCost: 7.00 },
+            { PrintLocationCode: 'FF', TierLabel: '72+', PrintCost: 6.50 },
+            { PrintLocationCode: 'FB', TierLabel: '24-47', PrintCost: 8.00 },
+            { PrintLocationCode: 'FB', TierLabel: '48-71', PrintCost: 7.00 },
+            { PrintLocationCode: 'FB', TierLabel: '72+', PrintCost: 6.50 },
+            { PrintLocationCode: 'JF', TierLabel: '24-47', PrintCost: 10.00 },
+            { PrintLocationCode: 'JF', TierLabel: '48-71', PrintCost: 9.00 },
+            { PrintLocationCode: 'JF', TierLabel: '72+', PrintCost: 8.50 },
+            { PrintLocationCode: 'JB', TierLabel: '24-47', PrintCost: 10.00 },
+            { PrintLocationCode: 'JB', TierLabel: '48-71', PrintCost: 9.00 },
+            { PrintLocationCode: 'JB', TierLabel: '72+', PrintCost: 8.50 }
+        ];
+
+        // Standard sizes with manual cost
+        const defaultSizes = [
+            { size: 'S', price: manualCost, sortOrder: 1 },
+            { size: 'M', price: manualCost, sortOrder: 2 },
+            { size: 'L', price: manualCost, sortOrder: 3 },
+            { size: 'XL', price: manualCost, sortOrder: 4 },
+            { size: '2XL', price: manualCost, sortOrder: 5 },
+            { size: '3XL', price: manualCost, sortOrder: 6 },
+            { size: '4XL', price: manualCost, sortOrder: 7 }
+        ];
+
+        // Standard upcharges
+        const defaultUpcharges = {
+            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
+        };
+
+        return {
+            tiers: defaultTiers,
+            costs: defaultPrintCosts,
+            sizes: defaultSizes,
+            upcharges: defaultUpcharges,
+            styleNumber: 'MANUAL',
+            color: null,
+            locations: this.locations,
+            productInfo: {
+                name: 'Manual Pricing (Non-SanMar Product)',
+                styleNumber: 'MANUAL',
+                brand: 'Various'
+            },
+            timestamp: Date.now(),
+            source: 'manual',
+            manualMode: true,
+            manualCost: manualCost
+        };
+    }
+
+    /**
      * Fetch all pricing data from APIs (with bundle endpoint support)
      * @param {string} styleNumber - Product style number (e.g., 'PC61')
      * @param {string} color - Color name (optional, for inventory filtering)
      * @returns {Object} Combined pricing data
      */
     async fetchPricingData(styleNumber, color = null, forceRefresh = false) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[DTGPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            return await this.generateManualPricingData(manualCost);
+        }
+
         const cacheKey = `${styleNumber}-${color || 'all'}`;
-        
+
         // Special debug logging for problematic styles
         const debugStyles = ['PC78ZH', 'PC78', 'S700'];
         const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
-        
+
         if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
             console.log(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
                 styleNumber: styleNumber,
@@ -105,7 +219,7 @@ class DTGPricingService {
                 forceRefresh: forceRefresh
             });
         }
-        
+
         // Check cache first (unless force refresh)
         if (!forceRefresh && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
@@ -123,23 +237,23 @@ class DTGPricingService {
 
         // Use bundle endpoint only - no fallback to individual endpoints
         console.log('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
-        
+
         try {
             const bundleData = await this.fetchBundledData(styleNumber, color);
-            
+
             // Bundle endpoint is required - no fallback
             if (!bundleData) {
                 throw new Error(`Failed to fetch DTG pricing data for ${styleNumber}. API bundle endpoint is required.`);
             }
-            
+
             console.log('[DTGPricingService] Bundle endpoint data received successfully');
-            
+
             // Cache the bundled data
             this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
             console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
-            
+
             return bundleData;
-            
+
         } catch (error) {
             console.error('[DTGPricingService] Error fetching bundle data:', error);
             // Clear cache on error to prevent stale data

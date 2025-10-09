@@ -1068,6 +1068,7 @@
 
     <!-- JavaScript -->
     <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <script>
         // Initialize cap pricing service
         const capService = new CapEmbroideryPricingService();
@@ -1088,11 +1089,23 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🧢 Cap Embroidery Pricing Page - Simple Layout');
-            
-            // Get style from URL parameter
+
+            // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualCapPricing(parseFloat(manualCost));
+                setupSearch();
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Get style from URL parameter
             const styleNumber = urlParams.get('StyleNumber') || urlParams.get('STYLE_No') || urlParams.get('style') || 'C112';
-            
+
             loadCapProduct(styleNumber);
             setupSearch();
         });
@@ -1330,7 +1343,49 @@
                 showNoProduct();
             }
         }
-        
+
+        // Load manual cap pricing (when ?manualCost parameter is provided)
+        async function loadManualCapPricing(manualCost) {
+            console.log(`🔧 Loading manual cap pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            try {
+                showLoading();
+
+                // Use the service's manual data generation
+                pricingData = await capService.generateManualPricingData(manualCost);
+
+                // Update product info for manual mode
+                const manualProduct = {
+                    PRODUCT_TITLE: 'Manual Cap Pricing Mode',
+                    BRAND_NAME: 'Manual Entry',
+                    PRODUCT_DESCRIPTION: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`
+                };
+
+                currentProduct = manualProduct;
+                updateProductInfo(manualProduct, 'MANUAL');
+
+                // Hide product image
+                const productImage = document.querySelector('.product-image-main');
+                if (productImage) productImage.style.display = 'none';
+
+                // Set sizes to OSFA (One Size Fits All)
+                currentSizes = [{ size: 'OSFA', available: true }];
+
+                // Update pricing display
+                updateCapPricing();
+
+                // Show product sections
+                showProduct();
+
+                console.log('✅ Manual cap pricing loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading manual cap pricing:', error);
+                showApiError('Failed to load manual pricing mode');
+                showNoProduct();
+            }
+        }
+
         // Load available sizes from API
         async function loadSizes(styleNumber) {
             console.log('📏 Loading cap sizes...');

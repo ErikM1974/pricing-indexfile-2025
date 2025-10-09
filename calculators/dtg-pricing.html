@@ -1630,6 +1630,7 @@
 
     <!-- JavaScript -->
     <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <script>
         // 🚀 NUCLEAR SOLUTION: Simple DTG Pricing - Following Cap Embroidery Pattern
         console.log('🎯 DTG Pricing Page - Simple Layout (Nuclear Solution)');
@@ -1787,8 +1788,22 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🎯 DTG Pricing Page Initialized');
 
-            // Get style from URL parameter (handle all case variations)
+            // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualDTGPricing(parseFloat(manualCost));
+                setupSearch();
+                initializeToggleUI();
+                initializeUpchargeTooltip();
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Get style from URL parameter (handle all case variations)
             const styleNumber = urlParams.get('styleNumber') ||
                                urlParams.get('StyleNumber') ||
                                urlParams.get('stylenumber') ||
@@ -1902,6 +1917,117 @@
             } catch (error) {
                 console.error('❌ Error loading DTG product:', error);
                 showApiError(error.message || 'Failed to load DTG pricing. Please try again.');
+                showNoProduct();
+            }
+        }
+
+        // Load manual DTG pricing (when ?manualCost parameter is provided)
+        async function loadManualDTGPricing(manualCost) {
+            console.log(`🔧 Loading manual DTG pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            try {
+                showLoading();
+
+                // Generate synthetic API data structure (same as DTGPricingService)
+                const defaultTiers = [
+                    { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6, LTM_Fee: 50 },
+                    { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6, LTM_Fee: 0 },
+                    { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 999999, MarginDenominator: 0.6, LTM_Fee: 0 }
+                ];
+
+                const defaultLocations = [
+                    { code: 'LC', name: 'Left Chest', PrintCost: 6.00 },
+                    { code: 'FF', name: 'Full Front', PrintCost: 8.00 },
+                    { code: 'FB', name: 'Full Back', PrintCost: 8.00 },
+                    { code: 'JF', name: 'Jumbo Front', PrintCost: 10.00 },
+                    { code: 'JB', name: 'Jumbo Back', PrintCost: 10.00 },
+                    { code: 'SLV', name: 'Sleeve', PrintCost: 5.00 }
+                ];
+
+                const defaultSizes = [
+                    { size: 'S', price: manualCost, maxCasePrice: manualCost, sortOrder: 1 },
+                    { size: 'M', price: manualCost, maxCasePrice: manualCost, sortOrder: 2 },
+                    { size: 'L', price: manualCost, maxCasePrice: manualCost, sortOrder: 3 },
+                    { size: 'XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 4 },
+                    { size: '2XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 5 },
+                    { size: '3XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 6 },
+                    { size: '4XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 7 },
+                    { size: '5XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 8 },
+                    { size: '6XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 9 }
+                ];
+
+                const defaultUpcharges = {
+                    'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+                    '2XL': 2.00, '3XL': 3.00, '4XL': 4.00,
+                    '5XL': 5.00, '6XL': 6.00
+                };
+
+                // Build DTG costs array
+                const defaultDTGCosts = [];
+                defaultTiers.forEach(tier => {
+                    defaultLocations.forEach(location => {
+                        defaultDTGCosts.push({
+                            TierLabel: tier.TierLabel,
+                            PrintLocationCode: location.code,
+                            PrintLocationName: location.name,
+                            PrintCost: location.PrintCost
+                        });
+                    });
+                });
+
+                // Create synthetic API response
+                const syntheticData = {
+                    styleNumber: 'MANUAL',
+                    product: {
+                        styleNumber: 'MANUAL',
+                        brand: 'Manual Entry',
+                        description: 'Manual Pricing Mode',
+                        image_url: ''
+                    },
+                    pricing: {
+                        tiers: defaultTiers,
+                        costs: defaultDTGCosts,
+                        sizes: defaultSizes,
+                        upcharges: defaultUpcharges
+                    },
+                    manualMode: true,
+                    manualCost: manualCost
+                };
+
+                // Store data globally
+                pricingData = syntheticData;
+
+                // Update page title for manual mode
+                document.getElementById('productTitle').textContent = `DTG Manual Pricing ($${manualCost.toFixed(2)} Base Cost)`;
+                document.getElementById('currentStyle').textContent = `Manual Mode`;
+
+                // Update product info section (show manual mode indicator)
+                const productInfoSection = document.querySelector('.product-hero');
+                if (productInfoSection) {
+                    const brandElement = productInfoSection.querySelector('.product-brand');
+                    const nameElement = productInfoSection.querySelector('.product-name');
+                    const descElement = productInfoSection.querySelector('.product-description');
+
+                    if (brandElement) brandElement.textContent = 'Manual Entry';
+                    if (nameElement) nameElement.textContent = 'Non-Catalog Product';
+                    if (descElement) descElement.textContent = `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`;
+
+                    // Hide image if present
+                    const imageElement = productInfoSection.querySelector('.product-image-main');
+                    if (imageElement) imageElement.style.display = 'none';
+                }
+
+                // Update tooltip with manual data
+                updateUpchargeTooltipContent();
+
+                // Show product sections
+                showProduct();
+
+                console.log('✅ Manual DTG pricing loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading manual DTG pricing:', error);
+                showApiError('Failed to load manual pricing mode');
                 showNoProduct();
             }
         }
