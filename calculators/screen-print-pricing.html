@@ -1380,6 +1380,10 @@
         async function loadManualScreenPrintPricing(manualCost) {
             console.log(`🔧 Loading manual screen print pricing with base cost: $${manualCost.toFixed(2)}`);
 
+            // Set flag to prevent duplicate calculator initialization
+            window.screenPrintManualMode = true;
+            console.log('🔧 Manual mode flag set - will prevent duplicate calculator initialization');
+
             try {
                 // Show product hero section with manual info
                 const productHero = document.querySelector('.product-hero-section');
@@ -1515,8 +1519,10 @@
                 document.querySelector('.product-hero-section').style.display = 'block';
             });
 
-            // Initialize Screen Print Calculator
-            if (typeof ScreenPrintPricing !== 'undefined') {
+            // Initialize Screen Print Calculator (skip if manual mode already initialized)
+            if (window.screenPrintManualMode) {
+                console.log('[ScreenPrintV2] Skipping normal calculator initialization - manual mode active');
+            } else if (typeof ScreenPrintPricing !== 'undefined') {
                 window.screenPrintCalculator = new ScreenPrintPricing();
                 console.log('[ScreenPrintV2] Calculator initialized');
             } else {
