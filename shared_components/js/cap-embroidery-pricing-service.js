@@ -45,6 +45,29 @@ class CapEmbroideryPricingService {
     }
 
     /**
+     * Fetch cap embroidery costs from API using reference product
+     * @returns {Array} Embroidery costs from API
+     * @throws {Error} If API request fails
+     */
+    async fetchEmbroideryCosts() {
+        const url = `${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`;
+        console.log('[CapEmbroideryPricingService] Fetching cap embroidery costs from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch cap embroidery costs from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.allEmbroideryCostsR) {
+            throw new Error('Invalid API response: missing cap embroidery costs');
+        }
+
+        console.log('[CapEmbroideryPricingService] Successfully fetched cap embroidery costs from API');
+        return data.allEmbroideryCostsR;
+    }
+
+    /**
      * Generate synthetic pricing data using manual cost
      * @param {number} manualCost - Base cap cost
      * @returns {Object} Synthetic API-compatible data
@@ -59,12 +82,8 @@ class CapEmbroideryPricingService {
             { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
         ];
 
-        // Default embroidery costs for caps
-        const defaultEmbroideryCosts = [
-            { TierLabel: '24-47', EmbroideryCost: 5.00 },
-            { TierLabel: '48-71', EmbroideryCost: 4.50 },
-            { TierLabel: '72+', EmbroideryCost: 4.00 }
-        ];
+        // Fetch current cap embroidery costs from API (throws error if fails - no silent fallback)
+        const defaultEmbroideryCosts = await this.fetchEmbroideryCosts();
 
         // Caps typically have OSFA (One Size Fits All)
         const defaultSizes = [

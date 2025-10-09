@@ -120,42 +120,56 @@ class DTGPricingService {
     }
 
     /**
-     * Generate synthetic pricing data using manual cost
-     * Creates API-compatible data structure without requiring actual API call
+     * Fetch DTG pricing bundle from API using reference product
+     * @returns {Object} Complete pricing bundle from API
+     * @throws {Error} If API request fails
+     */
+    async fetchPricingBundle() {
+        const url = `${this.apiBase}/pricing-bundle?method=DTG&styleNumber=PC61`;
+        console.log('[DTGPricingService] Fetching complete pricing bundle from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch DTG pricing bundle from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate required fields
+        if (!data.tiersR || !data.allDtgCostsR) {
+            throw new Error('Invalid API response: missing required DTG pricing data');
+        }
+
+        // DEBUG: Log complete API response to investigate tier-specific costs
+        console.log('[DTGPricingService] 🔍 DEBUG: Complete API response:', {
+            totalTiers: data.tiersR?.length,
+            totalCosts: data.allDtgCostsR?.length,
+            tiers: data.tiersR,
+            allCosts: data.allDtgCostsR
+        });
+
+        // DEBUG: Show LC costs specifically
+        const lcCosts = data.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
+        console.log('[DTGPricingService] 🔍 DEBUG: LC costs from API:', lcCosts);
+
+        console.log('[DTGPricingService] Successfully fetched complete pricing bundle from API');
+        return data;
+    }
+
+    /**
+     * Generate pricing data using manual cost + API pricing rules
+     * Fetches everything from API except garment base cost
      * @param {number} manualCost - Base garment cost
-     * @returns {Object} Synthetic pricing data
+     * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
         console.log('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
 
-        // Default tiers matching API structure
-        const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
-        ];
+        // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        const apiBundle = await this.fetchPricingBundle();
 
-        // Default DTG print costs (single location, per tier)
-        const defaultPrintCosts = [
-            { PrintLocationCode: 'LC', TierLabel: '24-47', PrintCost: 6.00 },
-            { PrintLocationCode: 'LC', TierLabel: '48-71', PrintCost: 5.00 },
-            { PrintLocationCode: 'LC', TierLabel: '72+', PrintCost: 4.50 },
-            { PrintLocationCode: 'FF', TierLabel: '24-47', PrintCost: 8.00 },
-            { PrintLocationCode: 'FF', TierLabel: '48-71', PrintCost: 7.00 },
-            { PrintLocationCode: 'FF', TierLabel: '72+', PrintCost: 6.50 },
-            { PrintLocationCode: 'FB', TierLabel: '24-47', PrintCost: 8.00 },
-            { PrintLocationCode: 'FB', TierLabel: '48-71', PrintCost: 7.00 },
-            { PrintLocationCode: 'FB', TierLabel: '72+', PrintCost: 6.50 },
-            { PrintLocationCode: 'JF', TierLabel: '24-47', PrintCost: 10.00 },
-            { PrintLocationCode: 'JF', TierLabel: '48-71', PrintCost: 9.00 },
-            { PrintLocationCode: 'JF', TierLabel: '72+', PrintCost: 8.50 },
-            { PrintLocationCode: 'JB', TierLabel: '24-47', PrintCost: 10.00 },
-            { PrintLocationCode: 'JB', TierLabel: '48-71', PrintCost: 9.00 },
-            { PrintLocationCode: 'JB', TierLabel: '72+', PrintCost: 8.50 }
-        ];
-
-        // Standard sizes with manual cost
-        const defaultSizes = [
+        // Build sizes array using manual cost
+        const manualSizes = [
             { size: 'S', price: manualCost, sortOrder: 1 },
             { size: 'M', price: manualCost, sortOrder: 2 },
             { size: 'L', price: manualCost, sortOrder: 3 },
@@ -165,20 +179,18 @@ class DTGPricingService {
             { size: '4XL', price: manualCost, sortOrder: 7 }
         ];
 
-        // Standard upcharges
-        const defaultUpcharges = {
-            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
-            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
-        };
-
+        // Return API data with manual cost substituted into sizes
+        // Wrapped in 'pricing' object to match regular DTG product-bundle API structure
         return {
-            tiers: defaultTiers,
-            costs: defaultPrintCosts,
-            sizes: defaultSizes,
-            upcharges: defaultUpcharges,
+            pricing: {
+                tiers: apiBundle.tiersR,                          // From API
+                costs: apiBundle.allDtgCostsR,                   // From API
+                upcharges: apiBundle.sellingPriceDisplayAddOns,   // From API
+                sizes: manualSizes,                               // Manual cost here
+                locations: apiBundle.locations || this.locations  // From API with fallback
+            },
             styleNumber: 'MANUAL',
             color: null,
-            locations: this.locations,
             productInfo: {
                 name: 'Manual Pricing (Non-SanMar Product)',
                 styleNumber: 'MANUAL',

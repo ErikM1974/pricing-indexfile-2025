@@ -3627,25 +3627,25 @@
                             <span class="chevron">▼</span>
                         </div>
                         <div class="nav-section-content">
-                            <a href="/calculators/dtg-manual-pricing.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('dtg')" class="nav-link">
                                 <span>Manual DTG</span>
                             </a>
-                            <a href="/calculators/dtf-manual-pricing.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('dtf')" class="nav-link">
                                 <span>Manual DTF</span>
                             </a>
-                            <a href="/calculators/embroidery-manual-pricing.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('embroidery')" class="nav-link">
                                 <span>Manual Embroidery</span>
                             </a>
-                            <a href="/calculators/cap-embroidery-manual.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('cap-embroidery')" class="nav-link">
                                 <span>Manual Cap Embroidery</span>
                             </a>
-                            <a href="/calculators/screenprint-manual-pricing.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('screen-print')" class="nav-link">
                                 <span>Manual Screen Print</span>
                             </a>
-                            <a href="/calculators/sticker-manual-pricing.html" class="nav-link">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('stickers')" class="nav-link">
                                 <span>Manual Stickers</span>
                             </a>
-                            <a href="/calculators/laser-manual-pricing.html" class="nav-link coming-soon">
+                            <a href="javascript:void(0)" onclick="openManualPricingModal('laser')" class="nav-link coming-soon">
                                 <span>Manual Laser</span>
                             </a>
                         </div>
@@ -3931,16 +3931,92 @@
                         <div class="quick-access-row">
                             <div class="row-label" title="For non-catalog items and specialty products">MANUAL PRICING</div>
                             <div class="button-group">
-                                <a href="/calculators/dtg-manual-pricing.html" class="quick-btn">
-                                    Manual DTG
-                                    <span class="update-badge">New Layout 10-6</span>
-                                </a>
-                                <a href="/calculators/dtf-manual-pricing.html" class="quick-btn">Manual DTF</a>
-                                <a href="/calculators/embroidery-manual-pricing.html" class="quick-btn">Manual Embroidery</a>
-                                <a href="/calculators/cap-embroidery-manual.html" class="quick-btn">Manual Cap Embroidery</a>
-                                <a href="/calculators/screenprint-manual-pricing.html" class="quick-btn">Manual Screen Print<span class="update-badge">Updated 10-5</span></a>
-                                <a href="/calculators/sticker-manual-pricing.html" class="quick-btn">Manual Stickers</a>
-                                <a href="/calculators/laser-manual-pricing.html" class="quick-btn">Manual Laser - Coming Soon</a>
+                                <!-- Manual Pricing Dropdown -->
+                                <div class="manual-pricing-dropdown-wrapper">
+                                    <!-- Trigger Button -->
+                                    <button
+                                        class="quick-btn manual-pricing-trigger"
+                                        onclick="toggleManualPricingDropdown()"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                        id="manualPricingButton"
+                                    >
+                                        <i class="fas fa-calculator"></i>
+                                        <span>Manual Pricing Calculator</span>
+                                        <i class="fas fa-chevron-down chevron-icon"></i>
+                                    </button>
+
+                                    <!-- Dropdown Menu -->
+                                    <div
+                                        class="manual-pricing-dropdown-menu"
+                                        id="manualPricingDropdownMenu"
+                                        role="menu"
+                                        style="display: none;"
+                                    >
+                                        <!-- Available Calculators -->
+                                        <a href="javascript:void(0)"
+                                           onclick="selectManualCalculator('dtg')"
+                                           class="dropdown-item"
+                                           role="menuitem">
+                                            <i class="fas fa-tshirt"></i>
+                                            <span>Manual DTG</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)"
+                                           onclick="selectManualCalculator('dtf')"
+                                           class="dropdown-item"
+                                           role="menuitem">
+                                            <i class="fas fa-palette"></i>
+                                            <span>Manual DTF</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)"
+                                           onclick="selectManualCalculator('embroidery')"
+                                           class="dropdown-item"
+                                           role="menuitem">
+                                            <i class="fas fa-scissors"></i>
+                                            <span>Manual Embroidery</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)"
+                                           onclick="selectManualCalculator('cap-embroidery')"
+                                           class="dropdown-item"
+                                           role="menuitem">
+                                            <i class="fas fa-hat-cowboy"></i>
+                                            <span>Manual Cap Embroidery</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)"
+                                           onclick="selectManualCalculator('screen-print')"
+                                           class="dropdown-item"
+                                           role="menuitem">
+                                            <i class="fas fa-print"></i>
+                                            <span>Manual Screen Print</span>
+                                        </a>
+
+                                        <!-- Separator -->
+                                        <div class="dropdown-divider"></div>
+
+                                        <!-- Coming Soon (Disabled) -->
+                                        <a href="javascript:void(0)"
+                                           onclick="showComingSoon('Stickers')"
+                                           class="dropdown-item disabled"
+                                           role="menuitem">
+                                            <i class="fas fa-tag"></i>
+                                            <span>Manual Stickers</span>
+                                            <span class="coming-soon-badge">Coming Soon</span>
+                                        </a>
+
+                                        <a href="javascript:void(0)"
+                                           onclick="showComingSoon('Laser')"
+                                           class="dropdown-item disabled"
+                                           role="menuitem">
+                                            <i class="fas fa-bolt"></i>
+                                            <span>Manual Laser</span>
+                                            <span class="coming-soon-badge">Coming Soon</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -9198,6 +9274,544 @@
             <!-- This will be populated with the sales metrics content -->
         </div>
     </div>
-    
+
+    <!-- Manual Pricing Cost Input Modal -->
+    <div id="manualPricingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calculator"></i> Manual Pricing - <span id="modalCalculatorName">DTG</span></h3>
+                <span class="close" onclick="closeManualPricingModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem; color: #666;">Enter the base garment cost to calculate manual pricing.</p>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="manualCostInput" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                        Base Garment Cost ($)
+                    </label>
+                    <input
+                        type="number"
+                        id="manualCostInput"
+                        step="0.01"
+                        min="0.01"
+                        placeholder="Example: 6.25"
+                        style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box;"
+                        onkeypress="if(event.key === 'Enter') openManualPricingWithCost()"
+                    />
+                    <small style="display: block; margin-top: 0.5rem; color: #666;">
+                        <i class="fas fa-info-circle"></i> Common costs: T-Shirts $6-8, Hoodies $15-20, Caps $4-6
+                    </small>
+                </div>
+
+                <div id="manualCostError" style="display: none; padding: 10px; background: #fee; border: 1px solid #fcc; border-radius: 4px; color: #c00; margin-bottom: 1rem;">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="manualCostErrorText">Please enter a valid cost</span>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="closeManualPricingModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Cancel
+                    </button>
+                    <button onclick="openManualPricingWithCost()" style="padding: 10px 20px; background: #981e32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-arrow-right"></i> Calculate Pricing
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* ================================
+       MANUAL PRICING DROPDOWN STYLES
+       ================================ */
+
+    /* Dropdown Wrapper */
+    .manual-pricing-dropdown-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Trigger Button */
+    .manual-pricing-trigger {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 300px;
+        padding: 10px 16px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333333;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .manual-pricing-trigger:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .manual-pricing-trigger.active {
+        background: #f3f4f6;
+        border-color: #981e32;
+        box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+    }
+
+    .manual-pricing-trigger:focus {
+        outline: 2px solid #981e32;
+        outline-offset: 2px;
+    }
+
+    /* Calculator Icon (Left) */
+    .manual-pricing-trigger .fa-calculator {
+        color: #6b7280;
+        font-size: 16px;
+    }
+
+    /* Chevron Icon (Right) */
+    .chevron-icon {
+        color: #6b7280;
+        font-size: 12px;
+        margin-left: auto;
+        transition: transform 0.2s ease;
+    }
+
+    .manual-pricing-trigger.active .chevron-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown Menu Container */
+    .manual-pricing-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 300px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(-10px);
+        pointer-events: none;
+        transition: all 0.2s ease-out;
+    }
+
+    .manual-pricing-dropdown-menu.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    /* Dropdown Item */
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #1f2937;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s ease-out;
+    }
+
+    .dropdown-item:hover {
+        background: #f3f4f6;
+        color: #111827;
+        transform: scale(1.02);
+    }
+
+    .dropdown-item:active {
+        background: #e5e7eb;
+    }
+
+    /* Item Icon */
+    .dropdown-item i {
+        color: #6b7280;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Disabled Items (Coming Soon) */
+    .dropdown-item.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        position: relative;
+    }
+
+    .dropdown-item.disabled:hover {
+        background: transparent;
+        transform: none;
+    }
+
+    .dropdown-item.disabled i {
+        color: #9ca3af;
+    }
+
+    /* Coming Soon Badge */
+    .coming-soon-badge {
+        margin-left: auto;
+        padding: 2px 8px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Divider */
+    .dropdown-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 4px 0;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .manual-pricing-trigger,
+        .manual-pricing-dropdown-menu {
+            width: 100%;
+        }
+
+        .dropdown-item {
+            padding: 14px 16px;
+            font-size: 15px;
+            min-height: 48px;
+        }
+
+        .dropdown-item i {
+            font-size: 20px;
+        }
+    }
+
+    /* Manual Pricing Modal Styles */
+    #manualPricingModal.modal {
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    #manualPricingModal .modal-content {
+        background-color: #fefefe;
+        padding: 0;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #manualPricingModal .modal-header {
+        padding: 20px;
+        background-color: #981e32;
+        color: white;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #manualPricingModal .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #manualPricingModal .modal-body {
+        padding: 24px;
+    }
+
+    #manualPricingModal .close {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        line-height: 1;
+        transition: opacity 0.2s;
+    }
+
+    #manualPricingModal .close:hover {
+        opacity: 0.8;
+    }
+
+    #manualCostInput:focus {
+        outline: none;
+        border-color: #981e32;
+        box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        #manualPricingModal .modal-content {
+            width: 95%;
+            margin: 20px;
+        }
+
+        #manualPricingModal .modal-body {
+            padding: 20px;
+        }
+    }
+    </style>
+
+    <script>
+    /* ================================
+       MANUAL PRICING DROPDOWN LOGIC
+       ================================ */
+
+    let manualPricingDropdownOpen = false;
+
+    /**
+     * Toggle dropdown open/closed
+     */
+    function toggleManualPricingDropdown() {
+        const button = document.getElementById('manualPricingButton');
+        const menu = document.getElementById('manualPricingDropdownMenu');
+
+        manualPricingDropdownOpen = !manualPricingDropdownOpen;
+
+        if (manualPricingDropdownOpen) {
+            // Open dropdown
+            button.classList.add('active');
+            button.setAttribute('aria-expanded', 'true');
+            menu.classList.add('show');
+            menu.style.display = 'block';
+        } else {
+            // Close dropdown
+            button.classList.remove('active');
+            button.setAttribute('aria-expanded', 'false');
+            menu.classList.remove('show');
+
+            // Wait for animation before hiding
+            setTimeout(() => {
+                if (!menu.classList.contains('show')) {
+                    menu.style.display = 'none';
+                }
+            }, 200);
+        }
+    }
+
+    /**
+     * Select a calculator type and open modal
+     */
+    function selectManualCalculator(calculatorType) {
+        console.log('Selected calculator:', calculatorType);
+
+        // Close dropdown
+        toggleManualPricingDropdown();
+
+        // Small delay before opening modal (smoother UX)
+        setTimeout(() => {
+            // Call existing modal function
+            openManualPricingModal(calculatorType);
+        }, 150);
+    }
+
+    /**
+     * Show coming soon alert
+     */
+    function showComingSoon(calculatorName) {
+        alert(`${calculatorName} manual pricing is coming soon!\n\nContact 253-922-5793 for assistance.`);
+    }
+
+    /**
+     * Close dropdown when clicking outside
+     */
+    document.addEventListener('click', function(event) {
+        const wrapper = document.querySelector('.manual-pricing-dropdown-wrapper');
+
+        if (wrapper && !wrapper.contains(event.target) && manualPricingDropdownOpen) {
+            toggleManualPricingDropdown();
+        }
+    });
+
+    /**
+     * Close dropdown with Escape key
+     */
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && manualPricingDropdownOpen) {
+            toggleManualPricingDropdown();
+
+            // Return focus to button
+            document.getElementById('manualPricingButton').focus();
+        }
+    });
+
+    /* ================================
+       MANUAL PRICING MODAL FUNCTIONS
+       ================================ */
+
+    // Manual Pricing Modal Functions
+    let currentManualCalculatorType = '';
+    let currentManualCalculatorUrl = '';
+
+    const MANUAL_PRICING_CALCULATORS = {
+        'dtg': {
+            name: 'DTG (Direct-to-Garment)',
+            url: '/pricing/dtg',
+            available: true
+        },
+        'dtf': {
+            name: 'DTF (Direct-to-Film)',
+            url: '/pricing/dtf',
+            available: true
+        },
+        'embroidery': {
+            name: 'Embroidery',
+            url: '/pricing/embroidery',
+            available: true
+        },
+        'cap-embroidery': {
+            name: 'Cap Embroidery',
+            url: '/pricing/cap-embroidery',
+            available: true
+        },
+        'screen-print': {
+            name: 'Screen Print',
+            url: '/pricing/screen-print',
+            available: true
+        },
+        'stickers': {
+            name: 'Stickers',
+            url: '/pricing/stickers',
+            available: false
+        },
+        'laser': {
+            name: 'Laser',
+            url: '/pricing/laser',
+            available: false
+        }
+    };
+
+    function openManualPricingModal(calculatorType) {
+        const calculator = MANUAL_PRICING_CALCULATORS[calculatorType];
+
+        if (!calculator) {
+            console.error('Unknown calculator type:', calculatorType);
+            return;
+        }
+
+        // Check if calculator is available
+        if (!calculator.available) {
+            alert(`${calculator.name} manual pricing is coming soon!`);
+            return;
+        }
+
+        currentManualCalculatorType = calculatorType;
+        currentManualCalculatorUrl = calculator.url;
+
+        // Update modal title
+        document.getElementById('modalCalculatorName').textContent = calculator.name;
+
+        // Clear previous input and errors
+        document.getElementById('manualCostInput').value = '';
+        document.getElementById('manualCostError').style.display = 'none';
+
+        // Show modal
+        document.getElementById('manualPricingModal').style.display = 'flex';
+
+        // Focus input after a brief delay to ensure modal is visible
+        setTimeout(() => {
+            document.getElementById('manualCostInput').focus();
+        }, 100);
+    }
+
+    function closeManualPricingModal() {
+        document.getElementById('manualPricingModal').style.display = 'none';
+        currentManualCalculatorType = '';
+        currentManualCalculatorUrl = '';
+    }
+
+    function openManualPricingWithCost() {
+        const costInput = document.getElementById('manualCostInput');
+        const cost = parseFloat(costInput.value);
+        const errorDiv = document.getElementById('manualCostError');
+        const errorText = document.getElementById('manualCostErrorText');
+
+        // Validation
+        if (isNaN(cost) || cost <= 0) {
+            errorText.textContent = 'Please enter a valid cost greater than $0';
+            errorDiv.style.display = 'block';
+            costInput.focus();
+            return;
+        }
+
+        if (cost > 1000) {
+            errorText.textContent = 'Cost seems unusually high. Please verify the amount.';
+            errorDiv.style.display = 'block';
+            costInput.focus();
+            return;
+        }
+
+        // Generate URL with manualCost parameter
+        const url = `${currentManualCalculatorUrl}?manualCost=${cost.toFixed(2)}`;
+
+        console.log(`Opening manual pricing for ${currentManualCalculatorType} with cost $${cost.toFixed(2)}`);
+        console.log('URL:', url);
+
+        // Open in current window
+        window.location.href = url;
+
+        // Close modal
+        closeManualPricingModal();
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('manualPricingModal');
+        if (event.target === modal) {
+            closeManualPricingModal();
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('manualPricingModal');
+            if (modal.style.display === 'flex') {
+                closeManualPricingModal();
+            }
+        }
+    });
+    </script>
+
 </body>
 </html>

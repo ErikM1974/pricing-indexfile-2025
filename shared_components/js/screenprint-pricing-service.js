@@ -59,43 +59,44 @@ class ScreenPrintPricingService {
     }
 
     /**
-     * Generate synthetic pricing data using manual cost
+     * Fetch Screen Print pricing bundle from API using reference product
+     * @returns {Object} Complete pricing bundle from API
+     * @throws {Error} If API request fails
+     */
+    async fetchPricingBundle() {
+        const url = `${this.baseURL}/api/pricing-bundle?method=SCREENPRINT&styleNumber=PC61`;
+        console.log('[ScreenPrintPricingService] Fetching complete pricing bundle from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch Screen Print pricing bundle from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate required fields
+        if (!data.tiersR || !data.allScreenprintCostsR) {
+            throw new Error('Invalid API response: missing required Screen Print pricing data');
+        }
+
+        console.log('[ScreenPrintPricingService] Successfully fetched complete pricing bundle from API');
+        return data;
+    }
+
+    /**
+     * Generate pricing data using manual cost + API pricing rules
+     * Fetches everything from API except garment base cost
      * @param {number} manualCost - Base garment cost
-     * @returns {Object} Synthetic API-compatible data
+     * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
         console.log('[ScreenPrintPricingService] Generating manual pricing data with base cost:', manualCost);
 
-        // Default tiers
-        const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
-        ];
+        // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        const apiBundle = await this.fetchPricingBundle();
 
-        // Default screen print costs (per color count and tier)
-        const defaultScreenprintCosts = [];
-        for (let colors = 1; colors <= 6; colors++) {
-            defaultTiers.forEach(tier => {
-                // Primary location costs (base + per color)
-                defaultScreenprintCosts.push({
-                    ColorCount: colors,
-                    TierLabel: tier.TierLabel,
-                    CostType: 'PrimaryLocation',  // FIXED: Was LocationType, must be CostType
-                    BasePrintCost: 2.00 + (colors * 1.50)
-                });
-                // Additional location costs
-                defaultScreenprintCosts.push({
-                    ColorCount: colors,
-                    TierLabel: tier.TierLabel,
-                    CostType: 'AdditionalLocation',  // FIXED: Was LocationType, must be CostType
-                    BasePrintCost: 1.50 + (colors * 1.00)
-                });
-            });
-        }
-
-        // Standard sizes
-        const defaultSizes = [
+        // Build sizes array using manual cost
+        const manualSizes = [
             { size: 'S', price: manualCost, sortOrder: 1 },
             { size: 'M', price: manualCost, sortOrder: 2 },
             { size: 'L', price: manualCost, sortOrder: 3 },
@@ -105,26 +106,14 @@ class ScreenPrintPricingService {
             { size: '4XL', price: manualCost, sortOrder: 7 }
         ];
 
-        // Standard upcharges
-        const defaultUpcharges = {
-            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
-            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
-        };
-
-        // Default rules
-        const defaultRules = {
-            RoundingMethod: 'HalfDollarCeil_Final',
-            FlashCharge: 0.35
-        };
-
-        // Create synthetic API data
+        // Use API data with manual cost substituted into sizes
         const syntheticAPIData = {
             styleNumber: 'MANUAL',
-            tiersR: defaultTiers,
-            allScreenprintCostsR: defaultScreenprintCosts,
-            sizes: defaultSizes,
-            sellingPriceDisplayAddOns: defaultUpcharges,
-            rulesR: defaultRules,
+            tiersR: apiBundle.tiersR,                          // From API
+            allScreenprintCostsR: apiBundle.allScreenprintCostsR,  // From API
+            sizes: manualSizes,                                 // Manual cost here
+            sellingPriceDisplayAddOns: apiBundle.sellingPriceDisplayAddOns,  // From API
+            rulesR: apiBundle.rulesR,                          // From API
             manualMode: true,
             manualCost: manualCost
         };

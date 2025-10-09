@@ -46,57 +46,51 @@ class DTFPricingService {
     }
 
     /**
-     * Generate synthetic pricing data using manual cost
+     * Fetch DTF pricing bundle from API using reference product
+     * @returns {Object} Complete pricing bundle from API
+     * @throws {Error} If API request fails
+     */
+    async fetchPricingBundle() {
+        const url = `${this.apiBase}/pricing-bundle?method=DTF&styleNumber=PC61`;
+        console.log('[DTFPricingService] Fetching complete pricing bundle from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch DTF pricing bundle from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate required fields
+        if (!data.tiersR || !data.allDtfCostsR || !data.freightR) {
+            throw new Error('Invalid API response: missing required DTF pricing data');
+        }
+
+        console.log('[DTFPricingService] Successfully fetched complete pricing bundle from API');
+        return data;
+    }
+
+    /**
+     * Generate pricing data using manual cost + API pricing rules
+     * Fetches everything from API except garment base cost
      * DTF uses garment cost + transfer cost + labor + freight
      * @param {number} manualCost - Base garment cost
-     * @returns {Object} Synthetic API-compatible data
+     * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
         console.log('[DTFPricingService] Generating manual pricing data with base cost:', manualCost);
 
-        // Default tiers
-        const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6, LTM_Fee: 0 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6, LTM_Fee: 0 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6, LTM_Fee: 0 }
-        ];
+        // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        const apiBundle = await this.fetchPricingBundle();
 
-        // Default DTF transfer costs by size
-        const defaultDTFCosts = [];
-        const transferSizes = ['Small (up to 5x7")', 'Medium (up to 11x17")', 'Large (up to 13x19")', 'XL (up to 16x20")'];
-        const transferCosts = [1.25, 2.50, 3.75, 5.00];
-
-        defaultTiers.forEach(tier => {
-            transferSizes.forEach((size, idx) => {
-                defaultDTFCosts.push({
-                    TierLabel: tier.TierLabel,
-                    TransferSizeName: size,
-                    TransferCost: transferCosts[idx],
-                    PressingLaborCost: 2.00 // Standard labor cost
-                });
-            });
-        });
-
-        // Default freight tiers
-        const defaultFreight = [
-            { MinQuantity: 24, MaxQuantity: 47, FreightCost: 2.00 },
-            { MinQuantity: 48, MaxQuantity: 71, FreightCost: 1.50 },
-            { MinQuantity: 72, MaxQuantity: 99999, FreightCost: 1.00 }
-        ];
-
-        // Default rules
-        const defaultRules = {
-            RoundingMethod: 'HalfDollarCeil_Final'
-        };
-
-        // Create synthetic API data
+        // Use API data with manual cost
         const syntheticAPIData = {
             styleNumber: 'MANUAL',
-            tiersR: defaultTiers,
-            allDtfCostsR: defaultDTFCosts,
-            freightR: defaultFreight,
-            rulesR: defaultRules,
-            locations: [{ code: 'FRONT', name: 'Front' }, { code: 'BACK', name: 'Back' }],
+            tiersR: apiBundle.tiersR,          // From API
+            allDtfCostsR: apiBundle.allDtfCostsR,  // From API
+            freightR: apiBundle.freightR,      // From API
+            rulesR: apiBundle.rulesR,          // From API
+            locations: apiBundle.locations || [{ code: 'FRONT', name: 'Front' }, { code: 'BACK', name: 'Back' }],
             manualMode: true,
             manualCost: manualCost
         };
