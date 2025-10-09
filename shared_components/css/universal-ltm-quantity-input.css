@@ -1,0 +1,162 @@
+/* ==================== UNIVERSAL LTM QUANTITY INPUT STYLING ==================== */
+/*
+ * Universal Less-Than-Minimum Quantity Input Styling
+ * Date: 2025-10-09
+ * Purpose: Consistent LTM tier display across DTG, DTF, and Screen Print calculators
+ * Based on: DTG pricing calculator pattern
+ */
+
+/* Main Container - Hidden by default, shown when LTM tier selected */
+.universal-quantity-input-container {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+    border: 3px solid #4cb354;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.15);
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Show state */
+.universal-quantity-input-container.show {
+    display: flex !important;
+}
+
+/* Slide-down animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 200px;
+    }
+}
+
+/* Label styling */
+.universal-quantity-input-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.universal-quantity-input-label i {
+    color: #4cb354;
+    font-size: 18px;
+}
+
+/* Number input field */
+.universal-quantity-input {
+    width: 100%;
+    max-width: 200px;
+    padding: 14px 16px;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: #1f2937;
+    border: 2px solid #d1d5db;
+    border-radius: 10px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.universal-quantity-input:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.15);
+}
+
+.universal-quantity-input:hover {
+    border-color: #9ca3af;
+}
+
+/* Invalid state */
+.universal-quantity-input:invalid {
+    border-color: #ef4444;
+}
+
+/* Hint text */
+.universal-quantity-hint {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.5;
+}
+
+.universal-quantity-hint i {
+    color: #4cb354;
+    font-size: 14px;
+}
+
+.universal-quantity-hint strong {
+    color: #4cb354;
+    font-weight: 700;
+    padding: 2px 6px;
+    background: rgba(76, 179, 84, 0.1);
+    border-radius: 4px;
+}
+
+/* Tier Button Enhancements (works with existing button styles) */
+.universal-tier-button small {
+    display: block;
+    font-size: 11px;
+    opacity: 0.9;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .universal-quantity-input-container {
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .universal-quantity-input-label {
+        font-size: 14px;
+    }
+
+    .universal-quantity-input {
+        max-width: 100%;
+        font-size: 18px;
+        padding: 12px 14px;
+    }
+
+    .universal-quantity-hint {
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+.universal-quantity-input:focus-visible {
+    outline: 3px solid #4cb354;
+    outline-offset: 2px;
+}
+
+/* Print styles - hide input when printing */
+@media print {
+    .universal-quantity-input-container {
+        display: none !important;
+    }
+}
+
+/* Compatibility with existing calculator-specific classes */
+.dtf-quantity-input-container.universal-quantity-input-container,
+.sp-quantity-input-container.universal-quantity-input-container,
+.dtg-quantity-input-container.universal-quantity-input-container {
+    /* Allow calculator-specific overrides if needed */
+}

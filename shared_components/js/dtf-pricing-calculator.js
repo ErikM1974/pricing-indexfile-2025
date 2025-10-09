@@ -383,7 +383,13 @@ class DTFPricingCalculator {
         const container = document.getElementById('dtf-tier-buttons');
 
         const tiers = [
-            { value: '10-23', label: '10-23 pieces' },
+            {
+                value: '10-23',
+                label: '10-23 pieces',
+                isLTM: true,
+                ltmFee: 50.00,
+                ltmLabel: '+ $50 Small Batch Fee'
+            },
             { value: '24-47', label: '24-47 pieces' },
             { value: '48-71', label: '48-71 pieces' },
             { value: '72+', label: '72+ pieces' }
@@ -395,27 +401,43 @@ class DTFPricingCalculator {
             const isSelected = this.currentData.selectedTier === tier.value;
 
             html += `
-                <button class="dtf-tier-button ${isSelected ? 'selected' : ''}" data-tier="${tier.value}">
+                <button class="dtf-tier-button universal-tier-button ${isSelected ? 'selected' : ''}" data-tier="${tier.value}">
                     ${tier.label}
+                    ${tier.isLTM ? `<br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">${tier.ltmLabel}</small>` : ''}
                 </button>
             `;
         });
 
         // Add conditional quantity input for 10-23 tier
         const showInput = this.currentData.selectedTier === '10-23';
+        const currentQty = this.currentData.quantity || 10;
+        const ltmFeePerPiece = (50 / currentQty).toFixed(2);
 
         html += `
-            <div class="dtf-quantity-input-container ${showInput ? 'show' : ''}">
-                <label class="dtf-quantity-input-label">Enter Exact Quantity (10-23):</label>
-                <input type="number" id="dtf-exact-quantity" class="dtf-quantity-input"
-                       min="10" max="23" value="${this.currentData.quantity}" />
-                <small class="dtf-quantity-hint">
-                    <i class="fas fa-info-circle"></i> Required for accurate LTM fee calculation
+            <div class="dtf-quantity-input-container universal-quantity-input-container ${showInput ? 'show' : ''}">
+                <label class="dtf-quantity-input-label universal-quantity-input-label">
+                    <i class="fas fa-calculator"></i> Enter Exact Quantity (10-23 pieces):
+                </label>
+                <input type="number" id="dtf-exact-quantity" class="dtf-quantity-input universal-quantity-input"
+                       min="10" max="23" value="${currentQty}" placeholder="Enter 10-23" />
+                <small class="dtf-quantity-hint universal-quantity-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Required for accurate $50 fee distribution:
+                    <strong id="dtf-ltm-fee-calc">$50 ÷ ${currentQty} = $${ltmFeePerPiece}/piece</strong>
                 </small>
             </div>
         `;
 
         container.innerHTML = html;
+    }
+
+    updateDTFLTMFeeDisplay() {
+        const feeCalcElement = document.getElementById('dtf-ltm-fee-calc');
+        if (feeCalcElement && this.currentData.selectedTier === '10-23') {
+            const qty = this.currentData.quantity || 10;
+            const feePerPiece = (50 / qty).toFixed(2);
+            feeCalcElement.textContent = `$50 ÷ ${qty} = $${feePerPiece}/piece`;
+        }
     }
 
     handleToggleClick(locationValue) {
@@ -642,6 +664,7 @@ class DTFPricingCalculator {
                 const value = parseInt(e.target.value);
                 if (!isNaN(value) && value >= 10 && value <= 23) {
                     this.currentData.quantity = value;
+                    this.updateDTFLTMFeeDisplay();
                     this.updatePricingDisplay();
                 }
             }

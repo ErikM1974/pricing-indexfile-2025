@@ -222,53 +222,49 @@ class ScreenPrintPricing {
                             Quantity Tiers
                         </div>
 
-                        <button class="sp-tier-button" id="sp-tier-24-36" data-tier="24-36">
-                            <div class="sp-tier-label">24-36 pieces</div>
-                            <div class="sp-tier-fee">$75 Small Batch Fee</div>
-                            <div class="sp-tier-hint">
-                                <i class="fas fa-calculator"></i>
-                                Click to set exact quantity
-                            </div>
-
-                            <!-- Hidden until expanded -->
-                            <div class="sp-tier-qty-input-wrapper" style="display: none;">
-                                <label class="sp-qty-label">Exact Qty:</label>
-                                <input type="number" min="24" max="36" value="24"
-                                       id="sp-qty-tier-1" class="sp-qty-input"
-                                       onclick="event.stopPropagation()">
-                                <span class="sp-qty-unit">shirts</span>
-                            </div>
-                            <small class="sp-ltm-calc" style="display: none;">
-                                $75 fee = $<span id="sp-ltm-calc-1">3.13</span>/shirt
-                            </small>
+                        <button class="sp-tier-button universal-tier-button" id="sp-tier-24-36" data-tier="24-36">
+                            24-36 pieces
+                            <br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">+ $75 Small Batch Fee</small>
                         </button>
 
-                        <button class="sp-tier-button selected" id="sp-tier-37-72" data-tier="37-72">
-                            <div class="sp-tier-label">37-72 pieces</div>
-                            <div class="sp-tier-fee">$50 Small Batch Fee</div>
-                            <div class="sp-tier-hint">
-                                <i class="fas fa-calculator"></i>
-                                Click to set exact quantity
-                            </div>
-
-                            <!-- Hidden until expanded -->
-                            <div class="sp-tier-qty-input-wrapper" style="display: none;">
-                                <label class="sp-qty-label">Exact Qty:</label>
-                                <input type="number" min="37" max="72" value="37"
-                                       id="sp-qty-tier-2" class="sp-qty-input"
-                                       onclick="event.stopPropagation()">
-                                <span class="sp-qty-unit">shirts</span>
-                            </div>
-                            <small class="sp-ltm-calc" style="display: none;">
-                                $50 fee = $<span id="sp-ltm-calc-2">1.35</span>/shirt
+                        <!-- Separate input container for 24-36 tier -->
+                        <div class="sp-quantity-input-container-1 universal-quantity-input-container">
+                            <label class="sp-quantity-input-label universal-quantity-input-label">
+                                <i class="fas fa-calculator"></i> Enter Exact Quantity (24-36 pieces):
+                            </label>
+                            <input type="number" id="sp-qty-tier-1" class="sp-quantity-input universal-quantity-input"
+                                   min="24" max="36" value="24" placeholder="Enter 24-36">
+                            <small class="sp-quantity-hint universal-quantity-hint">
+                                <i class="fas fa-info-circle"></i>
+                                Required for accurate $75 fee distribution:
+                                <strong id="sp-ltm-calc-1">$75 ÷ 24 = $3.13/piece</strong>
                             </small>
+                        </div>
+
+                        <button class="sp-tier-button universal-tier-button selected" id="sp-tier-37-72" data-tier="37-72">
+                            37-72 pieces
+                            <br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">+ $50 Small Batch Fee</small>
                         </button>
 
-                        <button class="sp-tier-button" id="sp-tier-73-144" data-tier="73-144">
+                        <!-- Separate input container for 37-72 tier -->
+                        <div class="sp-quantity-input-container-2 universal-quantity-input-container show">
+                            <label class="sp-quantity-input-label universal-quantity-input-label">
+                                <i class="fas fa-calculator"></i> Enter Exact Quantity (37-72 pieces):
+                            </label>
+                            <input type="number" id="sp-qty-tier-2" class="sp-quantity-input universal-quantity-input"
+                                   min="37" max="72" value="37" placeholder="Enter 37-72">
+                            <small class="sp-quantity-hint universal-quantity-hint">
+                                <i class="fas fa-info-circle"></i>
+                                Required for accurate $50 fee distribution:
+                                <strong id="sp-ltm-calc-2">$50 ÷ 37 = $1.35/piece</strong>
+                            </small>
+                        </div>
+
+                        <button class="sp-tier-button universal-tier-button" id="sp-tier-73-144" data-tier="73-144">
                             73-144 pieces
                         </button>
 
-                        <button class="sp-tier-button" id="sp-tier-145-576" data-tier="145-576">
+                        <button class="sp-tier-button universal-tier-button" id="sp-tier-145-576" data-tier="145-576">
                             145-576 pieces
                         </button>
                     </div>
@@ -439,7 +435,7 @@ class ScreenPrintPricing {
                 }
                 // Update LTM calculation display
                 const ltmPerShirt = (75 / clamped).toFixed(2);
-                document.getElementById('sp-ltm-calc-1').textContent = ltmPerShirt;
+                document.getElementById('sp-ltm-calc-1').textContent = `$75 ÷ ${clamped} = $${ltmPerShirt}/piece`;
 
                 // Update state and recalculate
                 this.state.quantity = clamped;
@@ -462,7 +458,7 @@ class ScreenPrintPricing {
                 }
                 // Update LTM calculation display
                 const ltmPerShirt = (50 / clamped).toFixed(2);
-                document.getElementById('sp-ltm-calc-2').textContent = ltmPerShirt;
+                document.getElementById('sp-ltm-calc-2').textContent = `$50 ÷ ${clamped} = $${ltmPerShirt}/piece`;
 
                 // Update state and recalculate
                 this.state.quantity = clamped;
@@ -761,24 +757,17 @@ class ScreenPrintPricing {
      * Collapse all LTM tier input fields
      */
     collapseLTMTiers() {
-        const ltmTiers = ['24-36', '37-72'];
+        // Hide container 1 (24-36 tier)
+        const container1 = document.querySelector('.sp-quantity-input-container-1');
+        if (container1) {
+            container1.classList.remove('show');
+        }
 
-        ltmTiers.forEach(tier => {
-            const button = document.getElementById(`sp-tier-${tier}`);
-            if (!button) return;
-
-            // Remove expanded class
-            button.classList.remove('expanded');
-
-            // Hide input wrapper, calculation, and show hint
-            const wrapper = button.querySelector('.sp-tier-qty-input-wrapper');
-            const calc = button.querySelector('.sp-ltm-calc');
-            const hint = button.querySelector('.sp-tier-hint');
-
-            if (wrapper) wrapper.style.display = 'none';
-            if (calc) calc.style.display = 'none';
-            if (hint) hint.style.display = 'flex';
-        });
+        // Hide container 2 (37-72 tier)
+        const container2 = document.querySelector('.sp-quantity-input-container-2');
+        if (container2) {
+            container2.classList.remove('show');
+        }
 
         this.state.expandedLTMTier = null;
     }
@@ -787,34 +776,46 @@ class ScreenPrintPricing {
      * Expand a specific LTM tier to show quantity input
      */
     expandLTMTier(tier, defaultQty) {
-        const button = document.getElementById(`sp-tier-${tier}`);
-        if (!button) return;
+        // Show the appropriate container based on tier
+        if (tier === '24-36') {
+            const container1 = document.querySelector('.sp-quantity-input-container-1');
+            if (container1) {
+                container1.classList.add('show');
 
-        // Add expanded class for styling
-        button.classList.add('expanded');
+                // Update the input value
+                const input = document.getElementById('sp-qty-tier-1');
+                if (input && !input.value) {
+                    input.value = defaultQty;
+                }
 
-        // Show input wrapper and calculation, hide hint
-        const wrapper = button.querySelector('.sp-tier-qty-input-wrapper');
-        const calc = button.querySelector('.sp-ltm-calc');
-        const hint = button.querySelector('.sp-tier-hint');
-
-        if (wrapper) wrapper.style.display = 'flex';
-        if (calc) calc.style.display = 'block';
-        if (hint) hint.style.display = 'none';
-
-        // Set default quantity if input is empty
-        const input = button.querySelector('.sp-qty-input');
-        if (input && !input.value) {
-            input.value = defaultQty;
-        }
-
-        // Focus and select the input for immediate editing
-        setTimeout(() => {
-            if (input) {
-                input.focus();
-                input.select();
+                // Focus and select the input for immediate editing
+                setTimeout(() => {
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                }, 100);
             }
-        }, 100);
+        } else if (tier === '37-72') {
+            const container2 = document.querySelector('.sp-quantity-input-container-2');
+            if (container2) {
+                container2.classList.add('show');
+
+                // Update the input value
+                const input = document.getElementById('sp-qty-tier-2');
+                if (input && !input.value) {
+                    input.value = defaultQty;
+                }
+
+                // Focus and select the input for immediate editing
+                setTimeout(() => {
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                }, 100);
+            }
+        }
 
         // Track expanded state
         this.state.expandedLTMTier = tier;
