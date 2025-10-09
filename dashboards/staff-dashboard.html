@@ -3315,21 +3315,21 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .row-label {
                 margin-bottom: 0.5rem;
             }
-            
+
             .button-group {
                 width: 100%;
             }
-            
+
             .quick-btn {
                 flex: 1;
                 text-align: center;
             }
         }
-        
+
         /* Sales Metrics Widget Styles */
         .sales-metrics-widget {
             background: var(--white);
@@ -3854,7 +3854,7 @@
                         <h1 class="welcome-greeting" id="welcomeGreeting">Welcome back!</h1>
                         <p class="welcome-subtitle">Here's what's happening at Northwest Custom Apparel today.</p>
                     </div>
-                    
+
                     <!-- Weather Widget -->
                     <div class="weather-widget" id="weatherWidget">
                         <div class="weather-loading">
@@ -3862,39 +3862,17 @@
                         </div>
                     </div>
                     
-                    <!-- Quick Access Bar - Company Resources -->
-                    <div class="quick-access-bar" style="margin-bottom: 2rem;">
-                        <a href="/bundle-orders-dashboard.html" class="quick-btn" style="background: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important; position: relative; overflow: visible !important;" title="View and manage all bundle orders (Christmas & BCA) - Now on a dedicated page!">
-                            <i class="fas fa-box-open" style="color: white !important;"></i>
-                            <span style="color: white !important;">📦 Bundle Orders</span>
-                            <span style="position: absolute; top: -8px; right: -8px; background: #22c55e; color: white; font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: bold; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">NEW PAGE</span>
-                        </a>
-                        <a href="christmas-bundles.html" class="quick-btn" style="background: linear-gradient(135deg, #dc2626, #16a34a) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);" title="Christmas Bundle Order Form">
-                            <i class="fas fa-gift" style="color: white !important;"></i>
-                            <span style="color: white !important;">🎄 Christmas Bundles</span>
-                        </a>
-                        <a href="breast-cancer-awareness-bundle.html" class="quick-btn" style="background: linear-gradient(135deg, #ec4899, #f472b6) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);" title="Breast Cancer Awareness Bundle - October Fundraising">
-                            <i class="fas fa-ribbon" style="color: white !important;"></i>
-                            <span style="color: white !important;">🎀 BCA Bundle</span>
-                        </a>
-                        <a href="top-sellers-showcase.html" class="quick-btn" style="background: linear-gradient(135deg, #f59e0b, #ef4444) !important; color: white !important; border-color: #f59e0b !important;" title="2025 Best Selling Products Catalog with Search">
-                            <i class="fas fa-fire" style="color: white !important;"></i>
-                            <span style="color: white !important;">🔥 Top Sellers 2025</span>
-                        </a>
-
-                        <a href="/ai-designer.html" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #667eea, #764ba2) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);" title="AI Sticker & Decal Studio">
-                            <i class="fas fa-magic" style="color: white !important;"></i>
-                            <span style="color: white !important;">AI Sticker & Decal Studio</span>
-                        </a>
-
-                        <a href="/ai-mockup-generator.html" target="_blank" class="quick-btn" style="background: linear-gradient(135deg, #10b981, #3b82f6) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);" title="AI Mockup Generator">
-                            <i class="fas fa-layer-group" style="color: white !important;"></i>
-                            <span style="color: white !important;">AI Mockup Generator</span>
-                        </a>
-                        <a href="policies-hub.html" class="quick-btn" style="background: var(--wsu-crimson) !important; color: white !important; border-color: var(--wsu-crimson) !important;">
-                            <i class="fas fa-book-open" style="color: white !important;"></i>
-                            <span style="color: white !important;">Company Policies</span>
-                        </a>
+                    <!-- Bundles & Resources -->
+                    <div class="bundles-section" style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">Seasonal & Promotions</h3>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="/bundle-orders-dashboard.html" class="quick-btn">Bundle Orders</a>
+                            <a href="christmas-bundles.html" class="quick-btn">Christmas Bundles</a>
+                            <a href="breast-cancer-awareness-bundle.html" class="quick-btn">BCA Bundle</a>
+                            <a href="top-sellers-showcase.html" class="quick-btn">Top Sellers</a>
+                            <a href="/ai-designer.html" target="_blank" class="quick-btn">AI Sticker Studio</a>
+                            <a href="/ai-mockup-generator.html" target="_blank" class="quick-btn">AI Mockup Generator</a>
+                        </div>
                     </div>
                     
                     <!-- Quick Hitter Tips Widget (Shows tips from last 14 days) -->
@@ -3994,24 +3972,8 @@
                                             <span>Manual Screen Print</span>
                                         </a>
 
-                                        <!-- Separator -->
-                                        <div class="dropdown-divider"></div>
-
-                                        <a href="/pricing/stickers"
-                                           class="dropdown-item"
-                                           role="menuitem">
-                                            <i class="fas fa-tag"></i>
-                                            <span>Manual Stickers</span>
-                                        </a>
-
-                                        <a href="javascript:void(0)"
-                                           onclick="showComingSoon('Laser')"
-                                           class="dropdown-item disabled"
-                                           role="menuitem">
-                                            <i class="fas fa-bolt"></i>
-                                            <span>Manual Laser</span>
-                                            <span class="coming-soon-badge">Coming Soon</span>
-                                        </a>
+                                        <!-- Removed Manual Stickers - moved to Specialty section -->
+                                        <!-- Removed Manual Laser - coming soon -->
                                     </div>
                                 </div>
                             </div>
@@ -4021,10 +3983,10 @@
                         <div class="quick-access-row">
                             <div class="row-label">CONTRACT</div>
                             <div class="button-group">
-                                <a href="/calculators/dtg-contract/" class="quick-btn" title="ASI Distributors Handled by Ruthie">Contract DTG</a>
-                                <a href="/calculators/embroidery-contract/" class="quick-btn" title="ASI Distributors Handled by Ruthie">Contract Embroidery</a>
-                                <a href="/calculators/embroidery-customer/" class="quick-btn" title="Corporate Customers (End Users that bring in their own garments for embroidery)">Corporate Supplied Embroidery</a>
-                                <a href="/calculators/screenprint-customer/" class="quick-btn" title="Corporate Customers (End Users that bring in their own garments for screen printing, Note: We only offer in special situations)">Corporate Supplied Screen Print</a>
+                                <a href="/calculators/dtg-contract/" class="quick-btn">Contract DTG</a>
+                                <a href="/calculators/embroidery-contract/" class="quick-btn">Contract Embroidery</a>
+                                <a href="/calculators/embroidery-customer/" class="quick-btn">Corporate Supplied Embroidery</a>
+                                <a href="/calculators/screenprint-customer/" class="quick-btn">Corporate Supplied Screen Print</a>
                             </div>
                         </div>
                         
@@ -4032,10 +3994,11 @@
                         <div class="quick-access-row">
                             <div class="row-label">SPECIALTY</div>
                             <div class="button-group">
-                                <a href="/calculators/embroidered-emblem/" class="quick-btn" title="Custom embroidered emblems and patches - 4-5 week production time">Embroidered Emblems</a>
-                                <a href="/calculators/laser-tumbler-polarcamel.html" class="quick-btn" title="Laser-engraved tumblers sourced from JDS Supply">Laser Tumblers</a>
-                                <a href="/calculators/webstores.html" class="quick-btn" title="Custom webstore setup - $300 base fee plus artwork setup charges">Webstore Pricing</a>
-                                <a href="/calculators/richardson-2025.html" class="quick-btn" title="Richardson caps with embroidery or laser leatherette patches">Richardson Caps</a>
+                                <a href="/calculators/embroidered-emblem/" class="quick-btn">Embroidered Emblems</a>
+                                <a href="/calculators/laser-tumbler-polarcamel.html" class="quick-btn">Laser Tumblers</a>
+                                <a href="/pricing/stickers" class="quick-btn">Stickers</a>
+                                <a href="/calculators/webstores.html" class="quick-btn">Webstore Pricing</a>
+                                <a href="/calculators/richardson-2025.html" class="quick-btn">Richardson Caps</a>
                             </div>
                         </div>
                         
