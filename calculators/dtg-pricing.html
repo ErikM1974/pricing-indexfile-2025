@@ -1928,74 +1928,12 @@
             try {
                 showLoading();
 
-                // Generate synthetic API data structure (same as DTGPricingService)
-                const defaultTiers = [
-                    { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6, LTM_Fee: 50 },
-                    { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6, LTM_Fee: 0 },
-                    { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 999999, MarginDenominator: 0.6, LTM_Fee: 0 }
-                ];
-
-                const defaultLocations = [
-                    { code: 'LC', name: 'Left Chest', PrintCost: 6.00 },
-                    { code: 'FF', name: 'Full Front', PrintCost: 8.00 },
-                    { code: 'FB', name: 'Full Back', PrintCost: 8.00 },
-                    { code: 'JF', name: 'Jumbo Front', PrintCost: 10.00 },
-                    { code: 'JB', name: 'Jumbo Back', PrintCost: 10.00 },
-                    { code: 'SLV', name: 'Sleeve', PrintCost: 5.00 }
-                ];
-
-                const defaultSizes = [
-                    { size: 'S', price: manualCost, maxCasePrice: manualCost, sortOrder: 1 },
-                    { size: 'M', price: manualCost, maxCasePrice: manualCost, sortOrder: 2 },
-                    { size: 'L', price: manualCost, maxCasePrice: manualCost, sortOrder: 3 },
-                    { size: 'XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 4 },
-                    { size: '2XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 5 },
-                    { size: '3XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 6 },
-                    { size: '4XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 7 },
-                    { size: '5XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 8 },
-                    { size: '6XL', price: manualCost, maxCasePrice: manualCost, sortOrder: 9 }
-                ];
-
-                const defaultUpcharges = {
-                    'S': 0, 'M': 0, 'L': 0, 'XL': 0,
-                    '2XL': 2.00, '3XL': 3.00, '4XL': 4.00,
-                    '5XL': 5.00, '6XL': 6.00
-                };
-
-                // Build DTG costs array
-                const defaultDTGCosts = [];
-                defaultTiers.forEach(tier => {
-                    defaultLocations.forEach(location => {
-                        defaultDTGCosts.push({
-                            TierLabel: tier.TierLabel,
-                            PrintLocationCode: location.code,
-                            PrintLocationName: location.name,
-                            PrintCost: location.PrintCost
-                        });
-                    });
-                });
-
-                // Create synthetic API response
-                const syntheticData = {
-                    styleNumber: 'MANUAL',
-                    product: {
-                        styleNumber: 'MANUAL',
-                        brand: 'Manual Entry',
-                        description: 'Manual Pricing Mode',
-                        image_url: ''
-                    },
-                    pricing: {
-                        tiers: defaultTiers,
-                        costs: defaultDTGCosts,
-                        sizes: defaultSizes,
-                        upcharges: defaultUpcharges
-                    },
-                    manualMode: true,
-                    manualCost: manualCost
-                };
+                // Use service to generate manual pricing with real API data
+                // This fetches tier-specific print costs from the API
+                const manualData = await dtgPricingService.generateManualPricingData(manualCost);
 
                 // Store data globally
-                pricingData = syntheticData;
+                pricingData = manualData;
 
                 // Update page title for manual mode
                 document.getElementById('productTitle').textContent = `DTG Manual Pricing ($${manualCost.toFixed(2)} Base Cost)`;
