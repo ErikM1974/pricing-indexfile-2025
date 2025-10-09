@@ -3642,7 +3642,7 @@
                             <a href="javascript:void(0)" onclick="openManualPricingModal('screen-print')" class="nav-link">
                                 <span>Manual Screen Print</span>
                             </a>
-                            <a href="javascript:void(0)" onclick="openManualPricingModal('stickers')" class="nav-link">
+                            <a href="/pricing/stickers" class="nav-link">
                                 <span>Manual Stickers</span>
                             </a>
                             <a href="javascript:void(0)" onclick="openManualPricingModal('laser')" class="nav-link coming-soon">
@@ -3997,14 +3997,11 @@
                                         <!-- Separator -->
                                         <div class="dropdown-divider"></div>
 
-                                        <!-- Coming Soon (Disabled) -->
-                                        <a href="javascript:void(0)"
-                                           onclick="showComingSoon('Stickers')"
-                                           class="dropdown-item disabled"
+                                        <a href="/pricing/stickers"
+                                           class="dropdown-item"
                                            role="menuitem">
                                             <i class="fas fa-tag"></i>
                                             <span>Manual Stickers</span>
-                                            <span class="coming-soon-badge">Coming Soon</span>
                                         </a>
 
                                         <a href="javascript:void(0)"
@@ -9712,7 +9709,7 @@
         'stickers': {
             name: 'Stickers',
             url: '/pricing/stickers',
-            available: false
+            available: true
         },
         'laser': {
             name: 'Laser',

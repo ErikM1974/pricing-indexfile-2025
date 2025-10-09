@@ -518,6 +518,10 @@ app.get('/pricing/dtf', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'dtf-pricing.html'));
 });
 
+app.get('/pricing/stickers', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'sticker-manual-pricing.html'));
+});
+
 // Cart Sessions API
 app.get('/api/cart-sessions', async (req, res) => {
   try {
