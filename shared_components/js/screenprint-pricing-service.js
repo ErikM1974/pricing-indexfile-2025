@@ -81,14 +81,14 @@ class ScreenPrintPricingService {
                 defaultScreenprintCosts.push({
                     ColorCount: colors,
                     TierLabel: tier.TierLabel,
-                    LocationType: 'PrimaryLocation',
+                    CostType: 'PrimaryLocation',  // FIXED: Was LocationType, must be CostType
                     BasePrintCost: 2.00 + (colors * 1.50)
                 });
                 // Additional location costs
                 defaultScreenprintCosts.push({
                     ColorCount: colors,
                     TierLabel: tier.TierLabel,
-                    LocationType: 'AdditionalLocation',
+                    CostType: 'AdditionalLocation',  // FIXED: Was LocationType, must be CostType
                     BasePrintCost: 1.50 + (colors * 1.00)
                 });
             });

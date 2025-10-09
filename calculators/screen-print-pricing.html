@@ -2225,7 +2225,10 @@
             setupSearch();
 
             setTimeout(() => {
-                if (typeof ScreenPrintPricing !== 'undefined') {
+                // Skip if manual mode already initialized calculator
+                if (window.screenPrintManualMode) {
+                    console.log('[ScreenPrint Debug] Skipping third calculator initialization - manual mode active');
+                } else if (typeof ScreenPrintPricing !== 'undefined') {
                     window.screenPrintCalculator = new ScreenPrintPricing();
                     console.log('═══════════════════════════════════════════════════════════');
                     console.log('🚀 Screen Print Pricing System: Direct API Mode');
