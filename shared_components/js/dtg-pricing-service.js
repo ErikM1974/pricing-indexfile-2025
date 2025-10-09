@@ -165,8 +165,32 @@ class DTGPricingService {
     async generateManualPricingData(manualCost) {
         console.log('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
 
+        // CRITICAL: Clear cache to ensure fresh API data for manual mode
+        console.log('[DTGPricingService] Clearing cache for fresh API data...');
+        this.cache.clear();
+
         // Fetch complete pricing bundle from API (throws error if fails - no fallback)
         const apiBundle = await this.fetchPricingBundle();
+
+        // VALIDATION: Ensure API data is complete and correct
+        console.log('[Manual Pricing] 🔍 API Data Validation:', {
+            totalTiers: apiBundle.tiersR?.length,
+            totalCosts: apiBundle.allDtgCostsR?.length,
+            tierLabels: apiBundle.tiersR?.map(t => t.TierLabel),
+        });
+
+        // VALIDATION: Check LC costs specifically
+        const lcCosts = apiBundle.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
+        console.log('[Manual Pricing] 🔍 LC Costs from API:', lcCosts?.map(c => ({
+            tier: c.TierLabel,
+            cost: c.PrintCost,
+            fullData: c
+        })));
+
+        if (!apiBundle.allDtgCostsR || apiBundle.allDtgCostsR.length === 0) {
+            console.error('[Manual Pricing] ❌ No cost data received from API!');
+            throw new Error('API returned no cost data');
+        }
 
         // Build sizes array using manual cost
         const manualSizes = [
@@ -181,7 +205,7 @@ class DTGPricingService {
 
         // Return API data with manual cost substituted into sizes
         // Wrapped in 'pricing' object to match regular DTG product-bundle API structure
-        return {
+        const manualPricingData = {
             pricing: {
                 tiers: apiBundle.tiersR,                          // From API
                 costs: apiBundle.allDtgCostsR,                   // From API
@@ -201,6 +225,18 @@ class DTGPricingService {
             manualMode: true,
             manualCost: manualCost
         };
+
+        // FINAL VALIDATION: Verify costs array is complete
+        console.log('[Manual Pricing] 🔍 Final data structure validation:', {
+            totalCosts: manualPricingData.pricing.costs?.length,
+            lcCostsCount: manualPricingData.pricing.costs?.filter(c => c.PrintLocationCode === 'LC').length,
+            firstFewLcCosts: manualPricingData.pricing.costs
+                ?.filter(c => c.PrintLocationCode === 'LC')
+                ?.slice(0, 4)
+                ?.map(c => `${c.TierLabel}: $${c.PrintCost}`)
+        });
+
+        return manualPricingData;
     }
 
     /**
