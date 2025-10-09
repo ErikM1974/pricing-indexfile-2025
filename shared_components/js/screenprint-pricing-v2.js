@@ -306,6 +306,7 @@ class ScreenPrintPricing {
                             <div class="sp-price-amount-wrapper">
                                 <span class="sp-live-price-amount" id="sp-live-price-amount">$0.00</span>
                                 <i class="fas fa-info-circle sp-upcharge-info-icon" id="sp-upcharge-info-icon"></i>
+                                <i class="fas fa-palette sp-setup-fee-badge" id="sp-setup-fee-badge"></i>
 
                                 <!-- Upcharge Tooltip - positioned relative to icon -->
                                 <div id="sp-upcharge-tooltip" class="sp-upcharge-tooltip">
@@ -313,6 +314,33 @@ class ScreenPrintPricing {
                                         <div class="sp-upcharge-tooltip-header">Size Pricing</div>
                                         <div id="sp-upcharge-tooltip-body" class="sp-upcharge-tooltip-body">
                                             <!-- Populated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Setup Fee Tooltip -->
+                                <div id="sp-setup-fee-tooltip" class="sp-setup-fee-tooltip" style="display: none;">
+                                    <div class="sp-setup-fee-tooltip-content">
+                                        <div class="sp-setup-fee-tooltip-header">
+                                            <i class="fas fa-palette"></i>
+                                            Art Setup Fee
+                                        </div>
+                                        <div class="sp-setup-fee-tooltip-body">
+                                            <div class="sp-setup-fee-amount">$50.00 (GRT-50)</div>
+                                            <p><strong>This one-time fee covers:</strong></p>
+                                            <ul style="margin: 8px 0; padding-left: 20px;">
+                                                <li>Custom logo mockup on your products</li>
+                                                <li>Print readiness check for clarity & sizing</li>
+                                                <li>Up to 2 rounds of revisions</li>
+                                            </ul>
+                                            <div class="sp-setup-fee-details">
+                                                <i class="fas fa-check-circle"></i>
+                                                One-time charge for new artwork
+                                            </div>
+                                            <div class="sp-setup-fee-details">
+                                                <i class="fas fa-check-circle"></i>
+                                                Applies to all new logos or designs
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -566,6 +594,50 @@ class ScreenPrintPricing {
             document.addEventListener('click', (e) => {
                 if (!upchargeTooltip.contains(e.target) && e.target !== upchargeIcon) {
                     upchargeTooltip.classList.remove('show');
+                }
+            });
+        }
+
+        // Setup Fee Tooltip - Similar interaction pattern
+        const setupFeeBadge = document.getElementById('sp-setup-fee-badge');
+        const setupFeeTooltip = document.getElementById('sp-setup-fee-tooltip');
+
+        if (setupFeeBadge && setupFeeTooltip) {
+            console.log('✅ Initializing setup fee tooltip for Screen Print');
+
+            // Desktop: Show on hover
+            setupFeeBadge.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768) {
+                    setupFeeTooltip.style.display = 'block';
+                }
+            });
+
+            setupFeeBadge.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    setTimeout(() => {
+                        if (!setupFeeTooltip.matches(':hover')) {
+                            setupFeeTooltip.style.display = 'none';
+                        }
+                    }, 100);
+                }
+            });
+
+            setupFeeTooltip.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    setupFeeTooltip.style.display = 'none';
+                }
+            });
+
+            // Mobile: Toggle on tap
+            setupFeeBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setupFeeTooltip.style.display = setupFeeTooltip.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!setupFeeTooltip.contains(e.target) && e.target !== setupFeeBadge) {
+                    setupFeeTooltip.style.display = 'none';
                 }
             });
         }

@@ -271,15 +271,19 @@ class DTFPricingCalculator {
                     </div>
                     <div style="font-size: 14px; color: #78350f; line-height: 1.6;">
                         <div style="font-size: 18px; font-weight: 700; color: #f59e0b; margin: 8px 0;">$50.00 (GRT-50)</div>
-                        <p><strong>Included with your order:</strong></p>
+                        <p><strong>This one-time fee covers:</strong></p>
                         <ul style="margin: 8px 0; padding-left: 20px;">
-                            <li>Logo mockup on your products</li>
+                            <li>Custom logo mockup on your products</li>
                             <li>Print readiness check for clarity & sizing</li>
-                            <li>Up to 2 revisions included</li>
+                            <li>Up to 2 rounds of revisions</li>
                         </ul>
                         <div style="font-size: 13px; color: #92400e; margin-top: 8px; padding-top: 8px; border-top: 1px solid #fef3c7;">
                             <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
-                            One-time fee for new orders
+                            One-time charge for new artwork
+                        </div>
+                        <div style="font-size: 13px; color: #92400e; margin-top: 4px;">
+                            <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
+                            Applies to all new logos or designs
                         </div>
                     </div>
                     <!-- Tooltip arrow -->
