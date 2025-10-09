@@ -760,7 +760,6 @@
             <div class="product-content">
                 <!-- Product Image Section -->
                 <div class="product-image-section">
-                    <div class="product-badge">DTF</div>
                     <div class="image-gallery" id="imageGallery">
                         <div class="main-image-container">
                             <img id="productImage" class="product-image" style="display: none;">
@@ -930,7 +929,7 @@
 
                     // Set basic fallback info if we don't have product data yet
                     if (styleNumber) {
-                        document.getElementById('productTitle').textContent = `${styleNumber} - DTF Pricing`;
+                        document.getElementById('productTitle').textContent = styleNumber;
                         document.getElementById('productDescription').textContent = 'Direct-to-Film transfer printing';
                         document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
                         document.getElementById('currentBrand').textContent = getBrandFromStyle(styleNumber);
@@ -1279,7 +1278,7 @@
                 }
 
                 // Use PRODUCT_TITLE from API or fallback
-                const title = product.PRODUCT_TITLE || product.title || `${styleNumber} - DTF Pricing`;
+                const title = product.PRODUCT_TITLE || product.title || styleNumber;
 
                 // Use PRODUCT_DESCRIPTION from API or fallback
                 const description = product.PRODUCT_DESCRIPTION || product.description || 'Direct-to-Film transfer printing';
