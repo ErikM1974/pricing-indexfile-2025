@@ -1,0 +1,206 @@
+/**
+ * Additional Logo Pricing Table Styles
+ * Simple, clean pricing table for additional logo costs
+ * Matches main pricing table design for consistency
+ * Created: 2025-01-10
+ */
+
+/* Section Container */
+.additional-logo-pricing-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.additional-logo-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d5f3f;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.additional-logo-title i {
+    color: #4cb354;
+    font-size: 28px;
+}
+
+/* Table Styling - Matches Main Pricing Table */
+.additional-logo-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+}
+
+.additional-logo-table thead {
+    background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    color: white;
+}
+
+.additional-logo-table th {
+    padding: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+
+.additional-logo-table td {
+    padding: 24px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #e8f5e9;
+}
+
+.additional-logo-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.additional-logo-table tbody tr:hover {
+    background: rgba(76, 179, 84, 0.05);
+}
+
+/* Tier Label Cell (First Column) */
+.additional-logo-table .tier-label {
+    text-align: left;
+    font-weight: 700;
+    color: #2d5f3f;
+    background: #f1f8f4;
+}
+
+.additional-logo-table .tier-label small {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* Price Cells */
+.additional-logo-table .price-cell {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4cb354;
+}
+
+.additional-logo-table .price-cell.loading {
+    color: #999;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Notes Section */
+.additional-logo-notes {
+    padding: 20px;
+    background: #f8f9fa;
+    border-left: 4px solid #4cb354;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.additional-logo-notes p {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.additional-logo-notes p:last-child {
+    margin-bottom: 0;
+}
+
+.additional-logo-notes strong {
+    color: #2d5f3f;
+    font-weight: 700;
+}
+
+.additional-logo-notes small {
+    font-size: 13px;
+    color: #666;
+}
+
+/* API Error State */
+.additional-logo-error {
+    padding: 16px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.additional-logo-error p {
+    margin: 0;
+    font-size: 14px;
+    color: #856404;
+}
+
+.additional-logo-error i {
+    color: #ffc107;
+    margin-right: 8px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .additional-logo-pricing-section {
+        padding: 20px;
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+
+    .additional-logo-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+
+    .additional-logo-title i {
+        font-size: 24px;
+    }
+
+    .additional-logo-table th,
+    .additional-logo-table td {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    .additional-logo-table .price-cell {
+        font-size: 16px;
+    }
+
+    .additional-logo-notes {
+        padding: 16px;
+    }
+
+    .additional-logo-notes p {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Stack table on very small screens */
+    .additional-logo-table th:first-child,
+    .additional-logo-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 1;
+    }
+
+    .additional-logo-table thead th:first-child {
+        background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    }
+
+    .additional-logo-table .tier-label {
+        min-width: 120px;
+    }
+}
