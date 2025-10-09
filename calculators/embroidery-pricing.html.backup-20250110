@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --warning-bg: #fef3c7;
+            --warning-border: #fbbf24;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-result-item {
+            display: block;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-result-item:hover {
+            background: var(--primary-light);
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #f5f5f5;
+        }
+        
+        .search-result-info {
+            flex: 1;
+        }
+        
+        .search-result-style {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .search-result-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .search-no-results {
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .search-loading {
+            padding: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        /* Product type mismatch overlay */
+        .product-mismatch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .product-mismatch-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-icon {
+            font-size: 48px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .product-mismatch-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .product-mismatch-message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .product-mismatch-message strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .product-mismatch-button {
+            background: #4cb354;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-mismatch-button:hover {
+            background: #409a47;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 400px;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Multiple Image Gallery */
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .image-thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-thumbnail:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .image-thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+        
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.2);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Info Boxes */
+        .info-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-box.primary {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+
+        .info-box.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+        }
+
+        .info-box i {
+            margin-right: 8px;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .pricing-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .pricing-table th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-table td {
+            padding: 24px 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-table tbody tr:hover {
+            background: rgba(76, 179, 84, 0.05);
+        }
+
+        .pricing-table .size-cell {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pricing-table .price-cell {
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Order Information Section */
+        .order-info-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .order-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .order-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 24px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .order-info-item:hover {
+            background: rgba(76, 179, 84, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .order-info-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .order-info-content {
+            flex: 1;
+        }
+
+        .order-info-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .order-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* API Error Notification */
+        .api-error-notification {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(204, 0, 0, 0.1);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .api-error-notification i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .api-error-notification strong {
+            margin-right: 8px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image-section {
+                min-height: 300px;
+            }
+
+            .pricing-table th,
+            .pricing-table td {
+                padding: 16px 12px;
+                font-size: 14px;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
+            
+            .api-error-notification {
+                margin: 15px;
+                font-size: 14px;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-title {
+                font-size: 24px;
+            }
+
+            .pricing-title {
+                font-size: 28px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 24px;
+            }
+
+            .pricing-section,
+            .order-info-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <nav class="breadcrumb">
+                <a href="/">Home</a> / 
+                <a href="/product.html" id="products-breadcrumb">Products</a> / 
+                <span>Embroidery Pricing</span>
+            </nav>
+            
+            <div class="search-wrapper">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="styleSearch" 
+                    placeholder="Search by style number or name..."
+                    autocomplete="off"
+                >
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- API Error Notification -->
+    <div id="apiErrorNotification" class="api-error-notification" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Pricing Service Unavailable</strong>
+        <span id="errorMessage">Unable to load pricing data. Please try again later or contact support at 253-922-5793.</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
+        </div>
+
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-badge">Embroidery</div>
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+                    
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+
+                    <!-- Info Boxes -->
+                    <div class="info-boxes">
+                        <div class="info-box primary">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Includes a Left Chest Embroidered Logo.</strong> Minimum order 24 pieces. Orders under 24 pieces incur a $50.00 LTM (Less Than Minimum) fee.
+                        </div>
+                        
+                        <div class="info-box warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Headwear Note:</strong> Beanies are included in flat embroidery pricing. Our #1 Selling Beanie is the <a href="?StyleNumber=CP90" style="color: #4cb354; text-decoration: none; font-weight: 600; border-bottom: 1px dotted #4cb354; transition: all 0.2s ease;" onmouseover="this.style.borderBottom='1px solid #4cb354'" onmouseout="this.style.borderBottom='1px dotted #4cb354'">CP90</a>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-section" id="pricingSection" style="display: none;">
+            <div class="pricing-header">
+                <h2 class="pricing-title">Embroidery Pricing</h2>
+                <p class="pricing-subtitle">Includes one left chest logo at 8,000 stitches</p>
+            </div>
+            
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Size Range</th>
+                        <th>24-47 pieces</th>
+                        <th>48-71 pieces</th>
+                        <th>72+ pieces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Pricing rows will be dynamically generated -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Information -->
+        <div class="order-info-section" id="orderInfoSection" style="display: none;">
+            <h3 class="order-info-title">Order Information</h3>
+            
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Minimum Order</div>
+                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Orders Under 24</div>
+                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Mix & Match</div>
+                        <div class="order-info-text">Combine different styles and colors to meet quantity tiers for best pricing</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Custom Quotes</div>
+                        <div class="order-info-text">For additional logos or complex designs, please contact our customer service team at 253-922-5793 for a personalized quote.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
+    <script>
+        // Initialize embroidery pricing service
+        const embroideryService = new EmbroideryPricingService();
+        
+        // State
+        let currentProduct = null;
+        let currentColors = [];
+        let selectedColor = null;
+        
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const productHero = document.getElementById('productHero');
+        const pricingSection = document.getElementById('pricingSection');
+        const orderInfoSection = document.getElementById('orderInfoSection');
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎨 Embroidery Pricing Page - Professional Layout');
+            
+            // Get style from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const styleNumber = urlParams.get('StyleNumber') || urlParams.get('STYLE_No') || urlParams.get('style');
+            
+            if (styleNumber) {
+                loadProduct(styleNumber);
+            } else {
+                showNoProduct();
+            }
+            
+            // Setup search
+            setupSearch();
+        });
+        
+        // Setup search functionality with API integration
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
+            
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+            
+            let searchTimeout = null;
+            
+            // Perform API search
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+                
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.classList.add('active');
+                
+                try {
+                    // Search using the same API endpoint as the product page
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+                    
+                    const results = await response.json();
+                    
+                    // Separate caps and non-caps
+                    const capResults = [];
+                    const flatResults = [];
+                    
+                    results.forEach(result => {
+                        const label = result.label.toLowerCase();
+                        const isCapProduct = (
+                            (label.includes('cap') || label.includes('trucker') || label.includes('snapback') || label.includes('fitted')) &&
+                            !label.includes('beanie') && 
+                            !label.includes('knit')
+                        );
+                        
+                        if (isCapProduct) {
+                            capResults.push(result);
+                        } else {
+                            flatResults.push(result);
+                        }
+                    });
+                    
+                    if (capResults.length > 0 && flatResults.length === 0) {
+                        // Only caps were found
+                        resultsContainer.innerHTML = `
+                            <div class="search-no-results" style="padding: 15px; color: #92400e;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                Found ${capResults.length} cap item(s). Please use the 
+                                <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                                page for structured caps.
+                            </div>
+                        `;
+                    } else if (flatResults.length === 0) {
+                        // No results found at all
+                        resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                    } else {
+                        // Build results HTML with filtered results
+                        let resultsHTML = '';
+                        
+                        // Add a note if caps were filtered out
+                        if (capResults.length > 0) {
+                            resultsHTML = `
+                                <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
+                                    <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                                    Found ${capResults.length} cap item(s). Please use the 
+                                    <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                                    page for structured caps.
+                                </div>
+                            `;
+                        }
+                        
+                        // Add the flat embroidery results
+                        resultsHTML += flatResults.map(result => {
+                            return `
+                                <div class="search-result-item" data-style="${result.value}">
+                                    <div class="search-result-info">
+                                        <div class="search-result-style">Style #${result.value}</div>
+                                        <div class="search-result-name">${result.label}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        resultsContainer.innerHTML = resultsHTML;
+                        
+                        // Add click handlers to results
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please check your connection and try again.</div>';
+                    showApiError('Search service is temporarily unavailable. Please try again later.');
+                }
+            }
+            
+            // Handle search input
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+                
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(query);
+                }, 300);
+            });
+            
+            // Handle enter key for direct navigation
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        // Try direct style number navigation
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
+                }
+            });
+            
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+            
+            // Handle escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    resultsContainer.classList.remove('active');
+                    searchInput.blur();
+                }
+            });
+        }
+        
+        // Load product data
+        async function loadProduct(styleNumber) {
+            console.log(`🎨 Loading product: ${styleNumber}`);
+            
+            try {
+                showLoading();
+                
+                // Fetch product details - API returns array
+                console.log('📡 Fetching product details...');
+                const productResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
+                if (!productResponse.ok) {
+                    throw new Error(`Product details API error: ${productResponse.status}`);
+                }
+                
+                const productArray = await productResponse.json();
+                console.log('📦 Product details response:', productArray);
+                
+                // API returns array - use first item or find by color
+                if (!productArray || productArray.length === 0) {
+                    throw new Error('No product data found');
+                }
+                
+                currentProduct = productArray[0]; // Use first item as base product info
+                
+                // Validate product type - stop if it's a cap
+                if (!validateProductType(currentProduct, styleNumber)) {
+                    hideLoading();
+                    return; // Stop loading if wrong product type
+                }
+                
+                // Update product info
+                updateProductInfo(currentProduct, styleNumber);
+                
+                // Set initial main product image from product data
+                setMainProductImage(currentProduct);
+                
+                // Load colors and images
+                await loadColors(styleNumber);
+                
+                // Load size pricing for upcharges
+                await loadSizePricing(styleNumber);
+                
+                // Load pricing data
+                const pricingData = await embroideryService.fetchPricingData(styleNumber);
+                
+                // Check if we got valid data
+                if (!pricingData || !pricingData.pricing) {
+                    throw new Error('Invalid pricing data received from API');
+                }
+                
+                updatePricing(pricingData);
+                
+                // Update breadcrumb to pass style back to product page
+                const productsBreadcrumb = document.getElementById('products-breadcrumb');
+                if (productsBreadcrumb) {
+                    productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                    console.log('✅ Updated products breadcrumb with style:', styleNumber);
+                }
+                
+                // Show all sections
+                showProduct();
+                
+            } catch (error) {
+                console.error('❌ Error loading product:', error);
+                showApiError(error.message || 'Failed to load product pricing. Please try again later.');
+                showNoProduct();
+            }
+        }
+        
+        // Update product information
+        function updateProductInfo(product, styleNumber) {
+            console.log('📝 Updating product info with:', product);
+            
+            // Extract product info from API response
+            const title = product.PRODUCT_TITLE || product.ProductTitle || product.STYLE || styleNumber.toUpperCase();
+            const description = product.PRODUCT_DESCRIPTION || product.Description || product.PRODUCT_TITLE || '';
+            const brand = product.BRAND_NAME || product.BRAND || product.Brand || 'Unknown Brand';
+            
+            // Update UI elements
+            document.getElementById('productTitle').textContent = title;
+            document.getElementById('productDescription').textContent = description;
+            document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+            document.getElementById('currentBrand').textContent = brand;
+            
+            console.log('✅ Product info updated:', { title, description, brand });
+        }
+        
+        // Validate if product is a cap and should use cap pricing
+        function validateProductType(product, styleNumber) {
+            // Get product title and description for validation
+            const productTitle = (product.PRODUCT_TITLE || product.ProductTitle || '').toLowerCase();
+            const description = (product.PRODUCT_DESCRIPTION || product.Description || '').toLowerCase();
+            const category = (product.CATEGORY || product.Category || '').toLowerCase();
+            
+            console.log('🔍 Validating product type:', {
+                title: productTitle,
+                description: description,
+                category: category
+            });
+            
+            // Check if this is a cap product - use word boundaries to avoid false matches
+            const isCapProduct = (
+                /\bcap\b/i.test(productTitle) ||
+                /\bcap\b/i.test(description) ||
+                /\bcap\b/i.test(category) ||
+                productTitle.includes('trucker') ||
+                productTitle.includes('snapback') ||
+                productTitle.includes('fitted') ||
+                productTitle.includes('flexfit')
+            );
+            
+            // Exclude beanies and knit caps (they use flat embroidery)
+            const isBeanie = (
+                productTitle.includes('beanie') ||
+                productTitle.includes('knit') ||
+                description.includes('beanie') ||
+                description.includes('knit cap')
+            );
+            
+            if (isCapProduct && !isBeanie) {
+                console.log('⚠️ Cap product detected - should use cap embroidery pricing');
+                const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;
+                const reason = 'This product is a structured cap and requires cap embroidery pricing.';
+                showProductMismatchOverlay(styleNumber, productName, reason);
+                return false; // Invalid for flat embroidery
+            }
+            
+            return true; // Valid for flat embroidery
+        }
+        
+        // Show overlay for product type mismatch
+        function showProductMismatchOverlay(styleNumber, productName, reason) {
+            console.log('🚫 Showing product mismatch overlay');
+            
+            // Check if overlay already exists
+            let overlay = document.getElementById('productMismatchOverlay');
+            
+            if (!overlay) {
+                // Create the overlay HTML dynamically
+                const overlayHTML = `
+                    <div id="productMismatchOverlay" class="product-mismatch-overlay">
+                        <div class="product-mismatch-modal">
+                            <div class="product-mismatch-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
+                            <p class="product-mismatch-message" id="mismatchMessage"></p>
+                            <a id="redirectButton" href="#" class="product-mismatch-button">
+                                Go to Cap Embroidery Pricing →
+                            </a>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', overlayHTML);
+                overlay = document.getElementById('productMismatchOverlay');
+            }
+            
+            // Update the message
+            document.getElementById('mismatchMessage').innerHTML = `
+                <strong>${productName}</strong><br><br>
+                ${reason}<br><br>
+                Flat embroidery pricing is for shirts, polos, jackets, and beanies.
+            `;
+            
+            document.getElementById('redirectButton').href = `/pricing/cap-embroidery?StyleNumber=${styleNumber}`;
+            
+            // Show the overlay
+            overlay.style.display = 'flex';
+            
+            // Gray out the background content
+            if (document.getElementById('productHero')) {
+                document.getElementById('productHero').style.opacity = '0.3';
+            }
+            if (document.getElementById('pricingSection')) {
+                document.getElementById('pricingSection').style.opacity = '0.3';
+            }
+        }
+        
+        // Helper function to detect generic catalog images
+        function isGenericProductImage(url) {
+            if (!url) return true;
+            
+            // Check for generic catalog image patterns
+            // These are typically: /catalog/images/[STYLE].jpg or similar
+            const genericPatterns = [
+                /\/catalog\/images\/[A-Z0-9]+\.jpg$/i,  // Matches /catalog/images/PC61.jpg
+                /\/catalog\/[A-Z0-9]+\.jpg$/i,          // Matches /catalog/PC61.jpg
+                /\/imglib\/mft\/[A-Z0-9]+\.jpg$/i       // Matches other generic patterns
+            ];
+            
+            return genericPatterns.some(pattern => pattern.test(url));
+        }
+        
+        // Set main product image and create thumbnails
+        function setMainProductImage(product, colorSpecific = false) {
+            console.log('🖼️ Setting main product image with:', product);
+            
+            // Collect all available images ONLY from this specific product/color variant
+            const images = [];
+            
+            // Add images in priority order, but only if they exist on THIS product variant
+            if (product.FRONT_MODEL) {
+                images.push({ url: product.FRONT_MODEL, label: 'Model', field: 'FRONT_MODEL' });
+            }
+            if (product.FRONT_FLAT) {
+                images.push({ url: product.FRONT_FLAT, label: 'Flat', field: 'FRONT_FLAT' });
+            }
+            
+            // Only add PRODUCT_IMAGE if it's different, not generic, and exists on this variant
+            if (product.PRODUCT_IMAGE && 
+                product.PRODUCT_IMAGE !== product.FRONT_MODEL && 
+                product.PRODUCT_IMAGE !== product.FRONT_FLAT &&
+                !isGenericProductImage(product.PRODUCT_IMAGE)) {
+                images.push({ url: product.PRODUCT_IMAGE, label: 'Product', field: 'PRODUCT_IMAGE' });
+            }
+            
+            // Only add back/side images if they exist on THIS color variant
+            // Skip these if we're loading color-specific images to avoid mixing colors
+            if (!colorSpecific || (product.BACK_FLAT && product.COLOR_NAME === selectedColor?.COLOR_NAME)) {
+                if (product.BACK_FLAT) {
+                    images.push({ url: product.BACK_FLAT, label: 'Back', field: 'BACK_FLAT' });
+                }
+            }
+            
+            if (!colorSpecific || (product.SIDE_MODEL && product.COLOR_NAME === selectedColor?.COLOR_NAME)) {
+                if (product.SIDE_MODEL) {
+                    images.push({ url: product.SIDE_MODEL, label: 'Side', field: 'SIDE_MODEL' });
+                }
+            }
+            
+            console.log('🖼️ Found images for color:', product.COLOR_NAME || 'default', images);
+            
+            // Set main image
+            const mainImageUrl = images[0]?.url || null;
+            if (mainImageUrl) {
+                const img = document.getElementById('productImage');
+                const placeholder = document.getElementById('imagePlaceholder');
+                
+                img.src = mainImageUrl;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                // Handle image load error
+                img.onerror = () => {
+                    console.log('❌ Main image failed to load:', mainImageUrl);
+                    img.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                };
+                
+                img.onload = () => {
+                    console.log('✅ Main image loaded successfully:', mainImageUrl);
+                };
+                
+                // Create thumbnails if we have multiple images
+                if (images.length > 1) {
+                    createImageThumbnails(images);
+                }
+            } else {
+                console.log('⚠️ No images found in product data');
+            }
+        }
+        
+        // Create image thumbnails for multiple views
+        function createImageThumbnails(images) {
+            const thumbnailsContainer = document.getElementById('imageThumbnails');
+            thumbnailsContainer.innerHTML = '';
+            
+            images.forEach((image, index) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'image-thumbnail';
+                if (index === 0) thumbnail.classList.add('active');
+                
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.alt = image.label;
+                img.title = image.label;
+                
+                thumbnail.appendChild(img);
+                
+                // Add click handler
+                thumbnail.addEventListener('click', () => {
+                    // Update main image
+                    const mainImg = document.getElementById('productImage');
+                    mainImg.src = image.url;
+                    
+                    // Update active thumbnail
+                    document.querySelectorAll('.image-thumbnail').forEach(t => t.classList.remove('active'));
+                    thumbnail.classList.add('active');
+                    
+                    console.log('🖼️ Switched to image:', image.label);
+                });
+                
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+            
+            thumbnailsContainer.style.display = 'flex';
+            console.log('✅ Created', images.length, 'thumbnails');
+        }
+        
+        // Load colors and images
+        async function loadColors(styleNumber) {
+            try {
+                console.log('🎨 Fetching color swatches...');
+                const colorsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
+                if (colorsResponse.ok) {
+                    const colorsArray = await colorsResponse.json();
+                    console.log('🎨 Color swatches response:', colorsArray);
+                    
+                    // API returns array directly
+                    const colors = Array.isArray(colorsArray) ? colorsArray : [];
+                    currentColors = colors;
+                    
+                    if (colors.length > 0) {
+                        // Set first color as selected
+                        selectedColor = colors[0];
+                        updateSelectedColor(selectedColor);
+                        
+                        // Show color swatches if we have more than one
+                        if (colors.length > 1) {
+                            displayColorSwatches(colors);
+                        }
+                        
+                        console.log(`✅ Loaded ${colors.length} colors, selected:`, selectedColor.COLOR_NAME || selectedColor.color);
+                    } else {
+                        console.log('⚠️ No colors found, using placeholder');
+                    }
+                } else {
+                    console.log(`⚠️ Colors API returned ${colorsResponse.status}`);
+                }
+            } catch (error) {
+                console.log('❌ Could not load colors:', error);
+                // Use default image placeholder
+            }
+        }
+        
+        // Display color swatches
+        function displayColorSwatches(colors) {
+            const swatchesContainer = document.getElementById('colorSwatches');
+            const swatchesSection = document.getElementById('colorSwatchesSection');
+            
+            swatchesContainer.innerHTML = '';
+            
+            colors.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                if (index === 0) swatch.classList.add('active');
+                
+                swatch.innerHTML = `<img src="${color.COLOR_SQUARE_IMAGE || color.swatchUrl}" alt="${color.COLOR_NAME || color.color}">`;
+                swatch.title = color.COLOR_NAME || color.color;
+                
+                swatch.addEventListener('click', () => {
+                    // Remove active class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    
+                    // Update selected color
+                    selectedColor = color;
+                    updateSelectedColor(color);
+                });
+                
+                swatchesContainer.appendChild(swatch);
+            });
+            
+            swatchesSection.style.display = 'block';
+        }
+        
+        // Load size pricing for upcharges
+        async function loadSizePricing(styleNumber) {
+            try {
+                console.log('📏 Fetching size pricing...');
+                const sizePricingResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                if (sizePricingResponse.ok) {
+                    const sizePricingArray = await sizePricingResponse.json();
+                    console.log('📏 Size pricing response:', sizePricingArray);
+                    
+                    // API returns array - use first item or find by color
+                    if (sizePricingArray && sizePricingArray.length > 0) {
+                        const sizePricingData = sizePricingArray[0]; // Use first item
+                        console.log('📏 Using size pricing data:', sizePricingData);
+                        
+                        // Store for use in pricing table
+                        window.currentSizePricing = sizePricingData;
+                    }
+                } else {
+                    console.log(`⚠️ Size pricing API returned ${sizePricingResponse.status}`);
+                }
+            } catch (error) {
+                console.log('❌ Could not load size pricing:', error);
+            }
+        }
+
+        // Update selected color
+        function updateSelectedColor(color) {
+            console.log('🎨 Updating selected color:', color);
+            
+            const colorName = color.COLOR_NAME || color.color || 'Natural';
+            document.getElementById('currentColor').textContent = colorName;
+            
+            // Find matching product image from product-details data based on color
+            updateMainImageForColor(colorName);
+        }
+        
+        // Update main product image for selected color
+        function updateMainImageForColor(colorName) {
+            console.log('🖼️ Finding image for color:', colorName);
+            
+            // Find matching product from original product data that has the same color and has image
+            const productResponse = fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${currentProduct.STYLE}`)
+                .then(response => response.json())
+                .then(productArray => {
+                    // Find ALL product entries that match this specific color
+                    const matchingProducts = productArray.filter(p => p.COLOR_NAME === colorName);
+                    
+                    if (matchingProducts.length > 0) {
+                        // Merge all image fields from products with this color
+                        const mergedProduct = { ...matchingProducts[0] };
+                        
+                        // Collect all unique image URLs from this color's variants
+                        matchingProducts.forEach(p => {
+                            if (p.FRONT_MODEL && !mergedProduct.FRONT_MODEL) mergedProduct.FRONT_MODEL = p.FRONT_MODEL;
+                            if (p.FRONT_FLAT && !mergedProduct.FRONT_FLAT) mergedProduct.FRONT_FLAT = p.FRONT_FLAT;
+                            if (p.PRODUCT_IMAGE && !mergedProduct.PRODUCT_IMAGE) mergedProduct.PRODUCT_IMAGE = p.PRODUCT_IMAGE;
+                            if (p.BACK_FLAT && !mergedProduct.BACK_FLAT) mergedProduct.BACK_FLAT = p.BACK_FLAT;
+                            if (p.SIDE_MODEL && !mergedProduct.SIDE_MODEL) mergedProduct.SIDE_MODEL = p.SIDE_MODEL;
+                        });
+                        
+                        // Update with all images for this specific color only
+                        setMainProductImage(mergedProduct, true);
+                        console.log('✅ Updated images for color:', colorName, 'with', matchingProducts.length, 'variants');
+                    } else {
+                        console.log('⚠️ No matching product found for color:', colorName);
+                        // Use the original default image
+                        setMainProductImage(currentProduct, false);
+                    }
+                })
+                .catch(error => {
+                    console.log('❌ Error fetching color-specific image:', error);
+                    // Fall back to original image
+                    setMainProductImage(currentProduct, false);
+                });
+        }
+        
+        // Update pricing table with multiple size rows
+        function updatePricing(pricingData) {
+            console.log('💰 Updating pricing table with:', pricingData);
+            
+            const tiers = pricingData.tierData || [];
+            
+            // Get pricing tiers
+            const tier1 = tiers.find(t => t.TierLabel === '24-47');
+            const tier2 = tiers.find(t => t.TierLabel === '48-71');
+            const tier3 = tiers.find(t => t.TierLabel === '72+');
+            
+            // Get base prices from the calculated pricing data
+            // The service returns prices in two formats:
+            // pricingData.pricing['24-47']['S'] or pricingData.prices['S']['24-47']
+            let basePrices = {
+                tier1: null,
+                tier2: null,
+                tier3: null
+            };
+            
+            // Get sizes with sortOrder from API data for determining base size
+            const sizesWithOrder = pricingData.apiData?.sizes || [];
+            const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
+            
+            // Find the first base size (no upcharge) to use for base pricing
+            // Find the base size - the size with the lowest upcharge (or zero upcharge)
+            // For standard products, this will be S/M/L/XL with zero upcharge
+            // For tall-only products, this will be the size with the minimum upcharge (e.g., LT)
+            let firstBaseSize = sizesWithOrder.find(s =>
+                !displayAddOns[s.size] || displayAddOns[s.size] === 0
+            );
+
+            // If no size has zero upcharge (tall-only products), find the one with minimum upcharge
+            if (!firstBaseSize && sizesWithOrder.length > 0) {
+                const minUpcharge = Math.min(...sizesWithOrder.map(s => displayAddOns[s.size] || 0));
+                firstBaseSize = sizesWithOrder.find(s => (displayAddOns[s.size] || 0) === minUpcharge);
+            }
+
+            const baseSizeToUse = firstBaseSize ? firstBaseSize.size : sizesWithOrder[0]?.size || 'S';
+            
+            console.log('🎯 Using base size for pricing:', baseSizeToUse);
+            
+            // Try to get calculated prices from the service
+            if (pricingData.pricing) {
+                // Format: pricingData.pricing['24-47']['S']
+                if (pricingData.pricing['24-47']) {
+                    // Use the first base size (could be OSFA, S, SM, etc.)
+                    const tier1Prices = pricingData.pricing['24-47'];
+                    basePrices.tier1 = tier1Prices[baseSizeToUse] || tier1Prices['S'] || tier1Prices['SM'] || tier1Prices['OSFA'] || Object.values(tier1Prices).find(p => typeof p === 'number');
+                }
+                if (pricingData.pricing['48-71']) {
+                    const tier2Prices = pricingData.pricing['48-71'];
+                    basePrices.tier2 = tier2Prices[baseSizeToUse] || tier2Prices['S'] || tier2Prices['SM'] || tier2Prices['OSFA'] || Object.values(tier2Prices).find(p => typeof p === 'number');
+                }
+                if (pricingData.pricing['72+']) {
+                    const tier3Prices = pricingData.pricing['72+'];
+                    basePrices.tier3 = tier3Prices[baseSizeToUse] || tier3Prices['S'] || tier3Prices['SM'] || tier3Prices['OSFA'] || Object.values(tier3Prices).find(p => typeof p === 'number');
+                }
+            } else if (pricingData.prices) {
+                // Alternative format: pricingData.prices['S']['24-47']
+                // Find the first available size (use base size from API, or fallback to S, SM, OSFA, or any)
+                const availableSizes = Object.keys(pricingData.prices);
+                const baseSize = availableSizes.find(s => s === baseSizeToUse) || 
+                                availableSizes.find(s => s === 'S') || 
+                                availableSizes.find(s => s === 'SM') || 
+                                availableSizes.find(s => s === 'OSFA') || 
+                                availableSizes[0];
+                
+                if (baseSize && pricingData.prices[baseSize]) {
+                    if (pricingData.prices[baseSize]['24-47']) {
+                        basePrices.tier1 = pricingData.prices[baseSize]['24-47'];
+                    }
+                    if (pricingData.prices[baseSize]['48-71']) {
+                        basePrices.tier2 = pricingData.prices[baseSize]['48-71'];
+                    }
+                    if (pricingData.prices[baseSize]['72+']) {
+                        basePrices.tier3 = pricingData.prices[baseSize]['72+'];
+                    }
+                }
+            }
+            
+            console.log('💰 Calculated base prices:', basePrices);
+            
+            // Check if we have valid pricing data
+            if (!basePrices.tier1 || !basePrices.tier2 || !basePrices.tier3) {
+                console.error('❌ Invalid pricing data - missing base prices');
+                showApiError('Pricing data is incomplete. Please contact support at 253-922-5793.');
+                
+                // Show pricing unavailable in table
+                const pricingTable = document.querySelector('.pricing-table');
+                const tbody = pricingTable.querySelector('tbody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                            <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>
+                            Pricing currently unavailable. Please contact sales for a quote.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by sortOrder (we already have sizesWithOrder and displayAddOns from above)
+            const sortedSizes = [...sizesWithOrder].sort((a, b) => a.sortOrder - b.sortOrder);
+            
+            console.log('💰 Base prices:', basePrices);
+            console.log('📏 Sorted sizes:', sortedSizes);
+            console.log('💰 Display add-ons:', displayAddOns);
+            
+            // Build pricing table HTML with multiple rows
+            const pricingTable = document.querySelector('.pricing-table');
+            const tbody = pricingTable.querySelector('tbody');
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Determine base sizes dynamically from API data
+            // For products with standard sizes (S/M/L/XL), base sizes are those with no upcharge
+            // For products without standard sizes (like tall-only jackets), use the size with lowest upcharge
+            let baseSizes = sortedSizes.filter(s =>
+                !displayAddOns[s.size] || displayAddOns[s.size] === 0
+            );
+
+            // If no sizes have zero upcharge (e.g., tall-only products), use the size(s) with lowest upcharge
+            if (baseSizes.length === 0 && sortedSizes.length > 0) {
+                // Find the minimum upcharge value
+                const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
+                // Get all sizes with that minimum upcharge (could be multiple like LT and XLT both at $4)
+                baseSizes = sortedSizes.filter(s => (displayAddOns[s.size] || 0) === minUpcharge);
+            }
+
+            // Get the base size names for display - always use actual sizes from API
+            const baseSizeNames = baseSizes.map(s => s.size);
+            const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : sortedSizes[0]?.size || 'N/A';
+            
+            console.log('📏 Base sizes from API:', baseSizeNames);
+            
+            // Add base sizes row
+            const baseRow = document.createElement('tr');
+            baseRow.innerHTML = `
+                <td class="size-cell">${baseSizeDisplay}</td>
+                <td class="price-cell">$${basePrices.tier1.toFixed(2)}</td>
+                <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
+                <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
+            `;
+            tbody.appendChild(baseRow);
+            
+            // Filter for extended sizes that have upcharges
+            // For tall-only products, this means sizes with upcharges HIGHER than the base
+            const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
+            const extendedSizes = sortedSizes.filter(s =>
+                displayAddOns[s.size] > minUpcharge
+            );
+            
+            // Add extended size rows in sorted order
+            extendedSizes.forEach(sizeData => {
+                const size = sizeData.size;
+                const absoluteUpcharge = displayAddOns[size] || 0;
+                // Calculate RELATIVE upcharge (difference from minimum upcharge)
+                const relativeUpcharge = absoluteUpcharge - minUpcharge;
+
+                if (relativeUpcharge > 0) {
+                    let price1, price2, price3;
+
+                    // Try to get calculated prices for this specific size first
+                    if (pricingData.pricing) {
+                        // Format: pricingData.pricing['24-47']['2XL'] or ['XXL']
+                        price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + relativeUpcharge);
+                        price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + relativeUpcharge);
+                    } else if (pricingData.prices && pricingData.prices[size]) {
+                        // Alternative format: pricingData.prices['2XL']['24-47']
+                        price1 = pricingData.prices[size]?.['24-47'] || (basePrices.tier1 + relativeUpcharge);
+                        price2 = pricingData.prices[size]?.['48-71'] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.prices[size]?.['72+'] || (basePrices.tier3 + relativeUpcharge);
+                    } else {
+                        // Fall back to base price + relative upcharge
+                        price1 = basePrices.tier1 + relativeUpcharge;
+                        price2 = basePrices.tier2 + relativeUpcharge;
+                        price3 = basePrices.tier3 + relativeUpcharge;
+                    }
+                    
+                    const extendedRow = document.createElement('tr');
+                    extendedRow.innerHTML = `
+                        <td class="size-cell">${size}</td>
+                        <td class="price-cell">$${price1.toFixed(2)}</td>
+                        <td class="price-cell">$${price2.toFixed(2)}</td>
+                        <td class="price-cell">$${price3.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(extendedRow);
+                }
+            });
+            
+            console.log('✅ Pricing table updated with multiple size tiers in correct sort order');
+        }
+        
+        // Show loading state
+        function showLoading() {
+            loadingState.style.display = 'flex';
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+            hideApiError();
+        }
+        
+        // Show product sections
+        function showProduct() {
+            loadingState.style.display = 'none';
+            productHero.style.display = 'block';
+            pricingSection.style.display = 'block';
+            orderInfoSection.style.display = 'block';
+            hideApiError();
+        }
+        
+        // Show API error notification
+        function showApiError(message) {
+            const errorNotification = document.getElementById('apiErrorNotification');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (errorNotification && errorMessage) {
+                errorMessage.textContent = message || 'Unable to load pricing data. Please try again later or contact support at 253-922-5793.';
+                errorNotification.style.display = 'flex';
+            }
+        }
+        
+        // Hide API error notification
+        function hideApiError() {
+            const errorNotification = document.getElementById('apiErrorNotification');
+            if (errorNotification) {
+                errorNotification.style.display = 'none';
+            }
+        }
+        
+        // Show no product state
+        function showNoProduct() {
+            loadingState.style.display = 'none';
+            
+            // Update loading text to show no product
+            document.querySelector('.loading p').textContent = 'No product selected. Please search for a product style number above.';
+            document.querySelector('.loading i').className = 'fas fa-search';
+            loadingState.style.display = 'flex';
+            
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

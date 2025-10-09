@@ -666,20 +666,20 @@
         }
     </style>
 </head>
-<body class="pricing-calculator-page">
+<body class="dtf-pricing-page">
     <!-- Enhanced Pricing Header -->
     <header class="enhanced-pricing-header">
-        <!-- TIER 1: Contact Bar -->
+        <!-- Contact Bar -->
         <div class="header-contact-bar">
             <div class="contact-bar-content">
                 <div class="contact-info">
                     <div class="contact-item">
                         <i class="fas fa-phone"></i>
-                        <a href="tel:253-922-5793" class="contact-link">253-922-5793</a>
+                        <a href="tel:253-922-5793" style="color: white; text-decoration: none;">253-922-5793</a>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
-                        <a href="mailto:sales@nwcustomapparel.com" class="contact-link">sales@nwcustomapparel.com</a>
+                        <a href="mailto:sales@nwcustomapparel.com" style="color: white; text-decoration: none;">sales@nwcustomapparel.com</a>
                     </div>
                 </div>
                 <div class="business-hours">
@@ -688,60 +688,40 @@
                 </div>
             </div>
         </div>
-
-        <!-- TIER 2: Logo/Navigation Bar -->
+        
+        <!-- Main Navigation -->
         <div class="header-nav">
             <div class="nav-content">
+                <!-- Logo and Navigation -->
                 <div class="logo-section">
                     <a href="/" class="logo-link">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                             alt="Northwest Custom Apparel"
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                             alt="Northwest Custom Apparel" 
                              class="logo-image">
                     </a>
                 </div>
             </div>
         </div>
-
-        <!-- TIER 3: Pricing Context Bar -->
+        
+        <!-- Pricing Context Bar -->
         <div class="pricing-context-bar">
             <div class="context-bar-content">
                 <div class="context-left">
                     <!-- Breadcrumb Navigation -->
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="/">Home</a>
-                        <span class="breadcrumb-separator">/</span>
-                        <a href="/product.html" id="products-breadcrumb">Products</a>
-                        <span class="breadcrumb-separator">/</span>
-                        <span class="breadcrumb-current">DTF Pricing</span>
+                    <nav class="breadcrumb">
+                        <a href="/">Home</a> /
+                        <a href="/product.html" id="products-breadcrumb">Products</a> /
+                        <span>DTF Pricing</span>
                     </nav>
-
-                    <!-- Calculator Type Badge -->
-                    <div class="calculator-type-badge">
-                        <i class="fas fa-file-image"></i>
-                        <span class="badge-text">DTF Transfer Pricing Calculator</span>
-                    </div>
                 </div>
 
-                <!-- Search Wrapper -->
+                <!-- Search Bar -->
                 <div class="search-wrapper">
-                    <input type="text"
-                           class="search-input"
-                           id="styleSearch"
-                           placeholder="Search by style number or name..."
-                           autocomplete="off"
-                           role="combobox"
-                           aria-label="Search products"
-                           aria-autocomplete="list"
-                           aria-controls="searchResults"
-                           aria-expanded="false">
-                    <button class="search-btn" id="searchBtn" aria-label="Search">
+                    <input type="text" class="search-input" id="styleSearch"
+                           placeholder="Search by style number or name..." autocomplete="off">
+                    <button class="search-btn" id="searchBtn">
                         <i class="fas fa-search"></i>
                     </button>
-
-                    <!-- Search Results Dropdown -->
-                    <div id="searchResults" class="search-results" role="listbox" aria-live="polite">
-                        <!-- Results will be populated by JavaScript -->
-                    </div>
                 </div>
             </div>
         </div>
