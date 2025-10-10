@@ -134,7 +134,8 @@
       "WebFetch(domain:www.raygunprinting.com)",
       "WebFetch(domain:www.screenprinting.com)",
       "WebFetch(domain:tannersinc.net)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Read(//c/Users/erik/Downloads/**)"
     ],
     "deny": [],
     "ask": [],
