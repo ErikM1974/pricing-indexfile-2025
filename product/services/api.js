@@ -40,7 +40,7 @@ export class API {
      */
     async getProduct(styleNumber) {
         const cacheKey = `product_${styleNumber}`;
-        
+
         // Check cache first
         const cached = this.getFromCache(cacheKey);
         if (cached) {
@@ -48,36 +48,76 @@ export class API {
         }
 
         try {
-            const response = await fetch(`${this.baseUrl}/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`);
+            // Use direct Caspio API endpoint for product-details (has all 4 image types)
+            const response = await fetch(`${this.caspioUrl}/product-details?styleNumber=${encodeURIComponent(styleNumber)}`);
             
             if (!response.ok) {
                 throw new Error(`Failed to load product: ${response.statusText}`);
             }
 
             const data = await response.json();
-            
-            // Transform data to consistent format, including all new fields
+
+            // product-details endpoint returns array of products (one per color)
+            // Transform to the format expected by the app
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('No product data found');
+            }
+
+            // Use first item for product-level data, but collect all colors
+            const firstProduct = data[0];
+
             const product = {
                 styleNumber: styleNumber,
-                title: data.productTitle || '',
-                description: data.PRODUCT_DESCRIPTION || '',
-                colors: data.colors || [],
-                // Include all the new fields from the API
-                AVAILABLE_SIZES: data.AVAILABLE_SIZES || '',
-                BRAND_NAME: data.BRAND_NAME || '',
-                CATEGORY_NAME: data.CATEGORY_NAME || '',
-                SUBCATEGORY_NAME: data.SUBCATEGORY_NAME || '',
-                PRODUCT_STATUS: data.PRODUCT_STATUS || '',
-                basePriceRange: data.basePriceRange || '',
-                MSRP: data.MSRP || null,
+                title: firstProduct.PRODUCT_TITLE || '',
+                description: firstProduct.PRODUCT_DESCRIPTION || '',
+                // Transform array of products into colors array
+                colors: data.map(item => ({
+                    COLOR_NAME: item.COLOR_NAME,
+                    colorName: item.COLOR_NAME,
+                    color_name: item.COLOR_NAME,
+                    CATALOG_COLOR: item.CATALOG_COLOR,
+                    catalogColor: item.CATALOG_COLOR,
+                    catalog_color: item.CATALOG_COLOR,
+                    COLOR_SQUARE_IMAGE: item.COLOR_SQUARE_IMAGE,
+                    colorSquareImage: item.COLOR_SQUARE_IMAGE,
+                    // All 4 image types from product-details endpoint
+                    FRONT_MODEL: item.FRONT_MODEL,
+                    frontModel: item.FRONT_MODEL,
+                    front_model: item.FRONT_MODEL,
+                    BACK_MODEL: item.BACK_MODEL,
+                    backModel: item.BACK_MODEL,
+                    back_model: item.BACK_MODEL,
+                    FRONT_FLAT: item.FRONT_FLAT,
+                    frontFlat: item.FRONT_FLAT,
+                    front_flat: item.FRONT_FLAT,
+                    BACK_FLAT: item.BACK_FLAT,
+                    backFlat: item.BACK_FLAT,
+                    back_flat: item.BACK_FLAT,
+                    // Main image fallback
+                    MAIN_IMAGE_URL: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                    mainImageUrl: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                    main_image_url: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                    // Brand logo
+                    BRAND_LOGO_IMAGE: item.BRAND_LOGO_IMAGE,
+                    brandLogoImage: item.BRAND_LOGO_IMAGE,
+                    BRAND_NAME: item.BRAND_NAME
+                })),
+                // Include all the product-level fields from the API
+                AVAILABLE_SIZES: firstProduct.AVAILABLE_SIZES || '',
+                BRAND_NAME: firstProduct.BRAND_NAME || '',
+                CATEGORY_NAME: firstProduct.CATEGORY_NAME || '',
+                SUBCATEGORY_NAME: firstProduct.SUBCATEGORY_NAME || '',
+                PRODUCT_STATUS: firstProduct.PRODUCT_STATUS || '',
+                basePriceRange: firstProduct.BASE_PRICE || '',
+                MSRP: firstProduct.MSRP || null,
                 // Also preserve the original fields in case they're needed
-                productTitle: data.productTitle || '',
-                PRODUCT_DESCRIPTION: data.PRODUCT_DESCRIPTION || ''
+                productTitle: firstProduct.PRODUCT_TITLE || '',
+                PRODUCT_DESCRIPTION: firstProduct.PRODUCT_DESCRIPTION || ''
             };
 
             // Cache the result
             this.setCache(cacheKey, product);
-            
+
             return product;
         } catch (error) {
             console.error('Product API error:', error);
