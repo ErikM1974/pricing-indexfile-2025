@@ -438,44 +438,47 @@
     transform: scale(1.1);
 }
 
-/* Enhanced Add Location button */
+/* Enhanced Add Location button - Ghost Button Style (Option B - Hybrid) */
 .sp-add-location-button {
-    background: #4cb354;  /* Solid green to match DTG/DTF */
-    color: white;
-    border: none;
+    background: #f9fafb;  /* Light gray background for "slot" appearance */
+    color: #6b7280;  /* Gray text */
+    border: 2px dashed #d1d5db;  /* Dashed gray border - universal "add here" signal */
     border-radius: 12px;
-    padding: 16px 24px;
+    padding: 40px 24px;  /* Increased vertical padding for prominent "slot" feel */
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 600;  /* Slightly lighter than solid buttons */
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     margin-top: 8px;
     width: 100%;
-    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.2);
 }
 
 .sp-add-location-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(76, 179, 84, 0.35);
+    border-color: #4cb354;  /* Green border on hover */
+    background: rgba(76, 179, 84, 0.08);  /* Subtle green background tint */
+    color: #4cb354;  /* Green text on hover */
 }
 
 .sp-add-location-button:active {
-    transform: translateY(0);
+    transform: scale(0.98);  /* Subtle press effect */
+    background: rgba(76, 179, 84, 0.12);  /* Slightly darker green tint on click */
 }
 
 .sp-add-location-button:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none;
-    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.1);
+    border-color: #e5e7eb;  /* Lighter gray border when disabled */
+    background: #f9fafb;
+    color: #9ca3af;  /* Lighter gray text when disabled */
 }
 
 .sp-add-location-button i {
-    font-size: 16px;
+    font-size: 18px;  /* Keep larger icon size for visibility */
 }
 
 /* ==================== DARK GARMENT TOGGLE ==================== */

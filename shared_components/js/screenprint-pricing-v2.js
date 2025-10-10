@@ -284,7 +284,7 @@ class ScreenPrintPricing {
                     </div>
                     <!-- Add Location button (moved outside container to prevent deletion) -->
                     <button type="button" id="sp-add-location" class="sp-add-location-button">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus-circle"></i>
                         Add Location
                     </button>
                 </div>
@@ -1169,7 +1169,7 @@ class ScreenPrintPricing {
             button.type = 'button';
             button.id = 'sp-add-location';
             button.className = 'sp-add-location-button';
-            button.innerHTML = '<i class="fas fa-plus"></i> Add Location';
+            button.innerHTML = '<i class="fas fa-plus-circle"></i> Add Location';
             button.addEventListener('click', () => this.addLocation());
 
             // Insert button after container
