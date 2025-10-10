@@ -260,9 +260,9 @@ app.get('/christmas-bundles.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'christmas-bundles.html'));
 });
 
-// Breast Cancer Awareness Bundle page
+// Breast Cancer Awareness Bundle page (Archived - October 2025 promotion)
 app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'breast-cancer-awareness-bundle.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'archive', 'seasonal-2025', 'breast-cancer-awareness-bundle.html'));
 });
 
 // Marketing page
@@ -482,20 +482,6 @@ app.get('/cart', (req, res) => {
 });
 
 // Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
-
-// Serve AI Designer iframe page
-app.get('/ai-designer.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tools', 'ai-designer.html'));
-});
-
-// Serve AI Mockup Generator iframe page
-app.get('/ai-mockup-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tools', 'ai-mockup-generator.html'));
-});
-
-app.get('/ai-mockup-generator', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tools', 'ai-mockup-generator.html'));
-});
 
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {

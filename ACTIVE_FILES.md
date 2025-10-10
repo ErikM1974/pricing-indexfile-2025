@@ -75,7 +75,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/christmas-bundles.html` | Christmas bundle | product-search-service.js | ✅ Active |
-| `/calculators/breast-cancer-awareness-bundle.html` | BCA bundle | breast-cancer-bundle-service.js | ✅ Active |
+| `/calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html` | BCA bundle (Oct 2025 promo - archived) | breast-cancer-bundle-service.js | 📦 Archived |
 | `/calculators/safety-stripe-creator.html` | Safety stripes | safety-stripe-calculator.js | ✅ Active |
 | `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
 

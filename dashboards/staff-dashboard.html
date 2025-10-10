@@ -318,6 +318,93 @@
             }
         }
 
+        /* Enhanced Seasonal Promotion Buttons */
+        .seasonal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.875rem;
+            padding: 1.25rem 1.75rem;
+            border-radius: 16px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .seasonal-btn i {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .seasonal-btn span {
+            color: white;
+        }
+
+        .seasonal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Bundle Orders - Northwest Green */
+        .seasonal-btn-orders {
+            background: linear-gradient(135deg, #27a844 0%, #1e7e34 100%);
+        }
+
+        .seasonal-btn-orders:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+        }
+
+        /* Christmas Bundles - Red/Christmas Gradient */
+        .seasonal-btn-christmas {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            position: relative;
+        }
+
+        .seasonal-btn-christmas:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+        }
+
+        .seasonal-btn-christmas .live-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.8px;
+        }
+
+        /* Top Sellers - Orange Gradient */
+        .seasonal-btn-sellers {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+
+        .seasonal-btn-sellers:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .seasonal-btn {
+                padding: 1rem 1.25rem;
+                font-size: 1rem;
+            }
+
+            .seasonal-btn i {
+                font-size: 1.5rem;
+            }
+        }
+
         /* Coming Soon - Elegant Disabled State */
         .quick-btn.coming-soon {
             position: relative;
@@ -3862,16 +3949,23 @@
                         </div>
                     </div>
                     
-                    <!-- Bundles & Resources -->
+                    <!-- Seasonal & Promotions -->
                     <div class="bundles-section" style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #e5e7eb;">
                         <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">Seasonal & Promotions</h3>
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <a href="/bundle-orders-dashboard.html" class="quick-btn">Bundle Orders</a>
-                            <a href="christmas-bundles.html" class="quick-btn">Christmas Bundles</a>
-                            <a href="breast-cancer-awareness-bundle.html" class="quick-btn">BCA Bundle</a>
-                            <a href="top-sellers-showcase.html" class="quick-btn">Top Sellers</a>
-                            <a href="/ai-designer.html" target="_blank" class="quick-btn">AI Sticker Studio</a>
-                            <a href="/ai-mockup-generator.html" target="_blank" class="quick-btn">AI Mockup Generator</a>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                            <a href="/bundle-orders-dashboard.html" class="seasonal-btn seasonal-btn-orders">
+                                <i class="fas fa-box-open"></i>
+                                <span>Bundle Orders</span>
+                            </a>
+                            <a href="christmas-bundles.html" class="seasonal-btn seasonal-btn-christmas">
+                                <i class="fas fa-gift"></i>
+                                <span>Christmas Bundles</span>
+                                <span class="live-badge">LIVE</span>
+                            </a>
+                            <a href="top-sellers-showcase.html" class="seasonal-btn seasonal-btn-sellers">
+                                <i class="fas fa-star"></i>
+                                <span>Top Sellers</span>
+                            </a>
                         </div>
                     </div>
                     
