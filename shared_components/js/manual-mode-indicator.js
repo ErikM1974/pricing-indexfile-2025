@@ -29,18 +29,12 @@
         return null;
     }
 
-    // Clear manual mode and reload
+    // Clear manual mode and return to dashboard
     function clearManualMode() {
         sessionStorage.removeItem('manualCostOverride');
 
-        // Remove manualCost parameter from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.delete('manualCost');
-        urlParams.delete('cost');
-
-        // Reload page without manual cost parameter
-        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-        window.location.href = newUrl;
+        // Return to Staff Dashboard
+        window.location.href = '/staff-dashboard.html';
     }
 
     // Create and display manual mode banner
@@ -56,17 +50,16 @@
         banner.innerHTML = `
             <div class="manual-mode-content">
                 <div class="manual-mode-icon">
-                    <i class="fas fa-tools"></i>
+                    <i class="fas fa-clipboard"></i>
                 </div>
                 <div class="manual-mode-info">
-                    <strong>⚠️ INTERNAL MANUAL PRICING MODE</strong>
+                    <strong>📋 Manual Pricing Calculator</strong>
                     <span class="manual-mode-details">
-                        Base Cost: <strong>$${manualCost.toFixed(2)}</strong> |
-                        No product images/swatches will display
+                        Base cost: <strong>$${manualCost.toFixed(2)}</strong> • Custom product pricing
                     </span>
                 </div>
-                <button class="manual-mode-exit" onclick="window.clearManualMode()" title="Exit manual mode">
-                    <i class="fas fa-times"></i> Exit Manual Mode
+                <button class="manual-mode-exit" onclick="window.clearManualMode()" title="Return to Staff Dashboard">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </button>
             </div>
         `;
@@ -85,10 +78,11 @@
             styles.id = 'manual-mode-styles';
             styles.textContent = `
                 .manual-mode-banner {
-                    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-                    color: white;
-                    padding: 16px 20px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+                    color: #2d5f3f;
+                    border-bottom: 3px solid #4cb354;
+                    padding: 14px 20px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
                     position: sticky;
                     top: 0;
                     z-index: 9999;
@@ -144,9 +138,9 @@
                 }
 
                 .manual-mode-exit {
-                    background: rgba(255,255,255,0.2);
-                    border: 2px solid white;
-                    color: white;
+                    background: rgba(45, 95, 63, 0.15);
+                    border: 2px solid #2d5f3f;
+                    color: #2d5f3f;
                     padding: 10px 20px;
                     border-radius: 6px;
                     cursor: pointer;
@@ -157,10 +151,10 @@
                 }
 
                 .manual-mode-exit:hover {
-                    background: white;
-                    color: #ff9800;
+                    background: #2d5f3f;
+                    color: white;
                     transform: translateY(-2px);
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                    box-shadow: 0 4px 8px rgba(45, 95, 63, 0.3);
                 }
 
                 .manual-mode-exit i {
@@ -218,9 +212,9 @@
                 const warning = document.createElement('div');
                 warning.className = 'manual-mode-product-warning alert alert-info';
                 warning.innerHTML = `
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Manual Pricing Mode:</strong> Product images and color swatches are not available
-                    for non-SanMar products. All pricing calculations are accurate based on your entered cost.
+                    <i class="fas fa-calculator"></i>
+                    <strong>Custom Pricing:</strong> Pricing calculated using your base cost of $${getManualCost().toFixed(2)}.
+                    Product details may be limited for vendor-supplied items.
                 `;
                 container.insertBefore(warning, container.firstChild);
             }

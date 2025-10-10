@@ -9239,14 +9239,22 @@
     <div id="manualPricingModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-calculator"></i> Manual Pricing - <span id="modalCalculatorName">DTG</span></h3>
-                <span class="close" onclick="closeManualPricingModal()">&times;</span>
+                <div class="modal-header-content">
+                    <i class="fas fa-calculator"></i>
+                    <div class="modal-header-text">
+                        <h3>Manual Pricing</h3>
+                        <span class="modal-subtitle" id="modalCalculatorName">DTG (Direct-to-Garment)</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeManualPricingModal()" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 1rem; color: #666;">Enter the base garment cost to calculate manual pricing.</p>
+                <p class="modal-description">Enter the base garment cost to calculate manual pricing.</p>
 
-                <div style="margin-bottom: 1.5rem;">
-                    <label for="manualCostInput" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="modal-input-group">
+                    <label for="manualCostInput" class="modal-label">
                         Base Garment Cost ($)
                     </label>
                     <input
@@ -9255,23 +9263,20 @@
                         step="0.01"
                         min="0.01"
                         placeholder="Example: 6.25"
-                        style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box;"
+                        class="modal-input"
                         onkeypress="if(event.key === 'Enter') openManualPricingWithCost()"
                     />
-                    <small style="display: block; margin-top: 0.5rem; color: #666;">
-                        <i class="fas fa-info-circle"></i> Common costs: T-Shirts $6-8, Hoodies $15-20, Caps $4-6
-                    </small>
+                    <div id="manualCostError" class="modal-error" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="manualCostErrorText">Please enter a valid cost</span>
+                    </div>
                 </div>
 
-                <div id="manualCostError" style="display: none; padding: 10px; background: #fee; border: 1px solid #fcc; border-radius: 4px; color: #c00; margin-bottom: 1rem;">
-                    <i class="fas fa-exclamation-triangle"></i> <span id="manualCostErrorText">Please enter a valid cost</span>
-                </div>
-
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="closeManualPricingModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                <div class="modal-actions">
+                    <button onclick="closeManualPricingModal()" class="modal-btn modal-btn-cancel">
                         Cancel
                     </button>
-                    <button onclick="openManualPricingWithCost()" style="padding: 10px 20px; background: #981e32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    <button onclick="openManualPricingWithCost()" class="modal-btn modal-btn-primary">
                         <i class="fas fa-arrow-right"></i> Calculate Pricing
                     </button>
                 </div>
@@ -9464,7 +9469,7 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -9477,14 +9482,15 @@
     }
 
     #manualPricingModal .modal-content {
-        background-color: #fefefe;
+        background-color: #ffffff;
         padding: 0;
-        border: 1px solid #888;
+        border: none;
         width: 90%;
-        max-width: 500px;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        max-width: 560px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         animation: slideIn 0.3s ease-out;
+        overflow: hidden;
     }
 
     @keyframes slideIn {
@@ -9498,45 +9504,169 @@
         }
     }
 
+    /* Modal Header */
     #manualPricingModal .modal-header {
-        padding: 20px;
-        background-color: #981e32;
+        padding: 28px 32px;
+        background-color: #4cb354;
         color: white;
-        border-radius: 8px 8px 0 0;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+    }
+
+    #manualPricingModal .modal-header-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    #manualPricingModal .modal-header-content > i {
+        font-size: 28px;
+        margin-top: 2px;
+    }
+
+    #manualPricingModal .modal-header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     #manualPricingModal .modal-header h3 {
         margin: 0;
-        font-size: 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.2;
     }
 
-    #manualPricingModal .modal-body {
-        padding: 24px;
+    #manualPricingModal .modal-subtitle {
+        font-size: 16px;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.3;
     }
 
-    #manualPricingModal .close {
+    #manualPricingModal .modal-close {
+        background: transparent;
+        border: none;
         color: white;
-        font-size: 28px;
-        font-weight: bold;
+        font-size: 24px;
         cursor: pointer;
+        padding: 4px;
         line-height: 1;
         transition: opacity 0.2s;
+        margin-top: -4px;
     }
 
-    #manualPricingModal .close:hover {
+    #manualPricingModal .modal-close:hover {
         opacity: 0.8;
     }
 
-    #manualCostInput:focus {
+    /* Modal Body */
+    #manualPricingModal .modal-body {
+        padding: 36px 32px;
+    }
+
+    #manualPricingModal .modal-description {
+        margin: 0 0 28px 0;
+        color: #4b5563;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    #manualPricingModal .modal-input-group {
+        margin-bottom: 32px;
+    }
+
+    #manualPricingModal .modal-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 15px;
+    }
+
+    #manualPricingModal .modal-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        box-sizing: border-box;
+        transition: all 0.2s;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    #manualPricingModal .modal-input::placeholder {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+    #manualPricingModal .modal-input:focus {
         outline: none;
-        border-color: #981e32;
-        box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+        border-color: #4cb354;
+        box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+    }
+
+    #manualPricingModal .modal-error {
+        margin-top: 10px;
+        padding: 10px 12px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 6px;
+        color: #dc2626;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #manualPricingModal .modal-error i {
+        font-size: 16px;
+    }
+
+    /* Modal Actions */
+    #manualPricingModal .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    #manualPricingModal .modal-btn {
+        padding: 14px 28px;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #manualPricingModal .modal-btn-cancel {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    #manualPricingModal .modal-btn-cancel:hover {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    #manualPricingModal .modal-btn-primary {
+        background: #4cb354;
+        color: white;
+    }
+
+    #manualPricingModal .modal-btn-primary:hover {
+        background: #3d9943;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    }
+
+    #manualPricingModal .modal-btn-primary:active {
+        transform: translateY(0);
     }
 
     /* Mobile responsive */
@@ -9544,10 +9674,32 @@
         #manualPricingModal .modal-content {
             width: 95%;
             margin: 20px;
+            max-width: none;
+        }
+
+        #manualPricingModal .modal-header {
+            padding: 24px 20px;
         }
 
         #manualPricingModal .modal-body {
-            padding: 20px;
+            padding: 28px 20px;
+        }
+
+        #manualPricingModal .modal-header h3 {
+            font-size: 20px;
+        }
+
+        #manualPricingModal .modal-subtitle {
+            font-size: 14px;
+        }
+
+        #manualPricingModal .modal-actions {
+            flex-direction: column;
+        }
+
+        #manualPricingModal .modal-btn {
+            width: 100%;
+            justify-content: center;
         }
     }
     </style>
