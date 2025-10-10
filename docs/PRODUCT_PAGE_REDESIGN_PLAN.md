@@ -1,1140 +1,739 @@
-# Product Page Redesign Plan 🎨
+# Product Page Redesign Plan - 2025 Enhancement
 
-**Date:** January 10, 2025
-**Status:** Design Document
-**Target File:** `/product.html`
-
-## 🎯 Design Goals
-
-Transform the product page from a dated 2005 aesthetic to a modern, intuitive 2025 design that:
-1. **Emphasizes product imagery** - Bigger, more prominent product photos
-2. **Streamlines customization** - Makes decoration method selection the primary action
-3. **Simplifies navigation** - Cleaner header focused on search functionality
-4. **Maintains brand consistency** - Uses Northwest green theme matching pricing pages
-5. **Improves user flow** - Intuitive path from viewing product → selecting decoration → getting pricing
+**Date:** October 10, 2025
+**Status:** Ready for Implementation
+**Primary Reference:** `/pages/top-sellers-product.html` (User's Inspiration)
+**Key Decision:** 1-click navigation for decoration methods (User Approved)
 
 ---
 
-## 📋 Current Issues (2005 Look)
+## Executive Summary
 
-### Problems Identified by Sales Team:
-- ❌ Product images are too small
-- ❌ Customization options are tiny and hard to find
-- ❌ Outdated visual design and layout
-- ❌ Header is cluttered with unnecessary navigation
-- ❌ Check Inventory button uses wrong color (needs Northwest green)
-- ❌ Overall layout doesn't prioritize key user actions
+**Problem**: Current product page has inefficient 2-click navigation, small product images, and buried customization options that don't match modern e-commerce standards.
 
----
+**Solution**: Redesign based on our successful `/pages/top-sellers-product.html` page, featuring:
+- Sticky decoration method header with 1-click navigation
+- 60/40 image-first layout (up from 33% width)
+- 700px gallery height (up from 600px)
+- 70px color swatches (up from 48px)
+- Professional retail presentation
 
-## ✨ Redesign Strategy
+**Reference Model**: `/pages/top-sellers-product.html` - Our proven design that already works
 
-### 1. Header Simplification
+**Timeline**: 4 weeks (phased implementation)
 
-**BEFORE:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Contact Bar: Phone | Email | Business Hours                 │
-├─────────────────────────────────────────────────────────────┤
-│ Logo  |  Search Bar  |  Home Products Resources Contact    │
-├─────────────────────────────────────────────────────────────┤
-│ Breadcrumb                                                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**AFTER:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│              Northwest Green Contact Bar                     │
-│           Phone | Email | Business Hours                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  [NWCA Logo]          [Search Bar]                         │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Changes:**
-- Remove: Home, Products, Resources, Contact navigation links
-- Keep: Logo (left), Search Bar (center-right)
-- Update: Contact bar background to Northwest green (#4cb354)
-- Clean: Minimal, focused design
+**Risk**: Low - CSS-only changes where possible, simplified JavaScript (not more complex)
 
 ---
 
-### 2. Decoration Method Selector - TOP PRIORITY 🎯
+## Phase 1: Sticky Decoration Header (Week 1)
 
-**NEW PROMINENT POSITION:**
-Place customization selector immediately below header, before product display
+### Current State Problem
+- Decoration selector buried below fold
+- 2-click flow: Click method → Click "View Pricing" button
+- Not visible during color/product selection
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  HOW WOULD YOU LIKE TO CUSTOMIZE?           │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  🧵 EMB  │  │  🎨 DTG  │  │  🖨️ CAP  │  │  🖨️ SP   │   │
-│  │Embroidery│  │  Print   │  │   Emb    │  │  Screen  │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐                                │
-│  │  🖨️ DTF  │  │  📦 MORE │                                │
-│  │  Transfer│  │  Options │                                │
-│  └──────────┘  └──────────┘                                │
-└─────────────────────────────────────────────────────────────┘
-```
+### Proposed Solution
+Move decoration methods to sticky header bar with 1-click direct navigation.
 
-**Design Specifications:**
-- **Size:** 140px × 140px minimum per button
-- **Layout:** Grid layout, centered on page
-- **Icons:** Large, colorful Font Awesome icons (48px)
-- **Labels:** Clear, readable text (16px font)
-- **Hover Effects:** Lift effect, shadow, color change
-- **Active State:** Green border, filled background
-- **Spacing:** 24px gap between buttons
+### CSS Implementation
+Create new file: `product/styles/product-2025-enhanced.css`
 
-**HTML Structure:**
-```html
-<section class="decoration-selector-hero">
-    <div class="container">
-        <h2 class="decoration-hero-title">How would you like to customize this?</h2>
-        <p class="decoration-hero-subtitle">Choose your decoration method to see pricing</p>
-
-        <div class="decoration-methods-grid">
-            <!-- Embroidery -->
-            <button class="decoration-method-card" data-method="embroidery">
-                <div class="method-icon">
-                    <i class="fas fa-spool-thread"></i>
-                </div>
-                <div class="method-name">Embroidery</div>
-                <div class="method-desc">Professional thread embroidery</div>
-            </button>
-
-            <!-- DTG -->
-            <button class="decoration-method-card" data-method="dtg">
-                <div class="method-icon">
-                    <i class="fas fa-print"></i>
-                </div>
-                <div class="method-name">DTG Print</div>
-                <div class="method-desc">Direct-to-garment printing</div>
-            </button>
-
-            <!-- Cap Embroidery -->
-            <button class="decoration-method-card" data-method="cap-embroidery">
-                <div class="method-icon">
-                    <i class="fas fa-hat-cowboy"></i>
-                </div>
-                <div class="method-name">Cap Embroidery</div>
-                <div class="method-desc">Premium cap decoration</div>
-            </button>
-
-            <!-- Screen Print -->
-            <button class="decoration-method-card" data-method="screen-print">
-                <div class="method-icon">
-                    <i class="fas fa-shirt"></i>
-                </div>
-                <div class="method-name">Screen Print</div>
-                <div class="method-desc">High-volume printing</div>
-            </button>
-
-            <!-- DTF -->
-            <button class="decoration-method-card" data-method="dtf">
-                <div class="method-icon">
-                    <i class="fas fa-file-image"></i>
-                </div>
-                <div class="method-name">DTF Transfer</div>
-                <div class="method-desc">Direct-to-film transfers</div>
-            </button>
-
-            <!-- More Options -->
-            <button class="decoration-method-card more-options" data-method="more">
-                <div class="method-icon">
-                    <i class="fas fa-ellipsis-h"></i>
-                </div>
-                <div class="method-name">More Options</div>
-                <div class="method-desc">View all decoration methods</div>
-            </button>
-        </div>
-    </div>
-</section>
-```
-
-**CSS Styling:**
 ```css
-/* Decoration Selector Hero Section */
-.decoration-selector-hero {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    padding: 60px 20px;
-    margin-bottom: 40px;
-    border-bottom: 3px solid #4cb354;
+/* Sticky Decoration Header */
+.decoration-methods-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #2f661e 0%, #1a3d11 100%);
+    padding: 16px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 32px;
 }
 
-.decoration-hero-title {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 12px;
-}
-
-.decoration-hero-subtitle {
-    text-align: center;
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 40px;
+.decoration-methods-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
 .decoration-methods-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 24px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.decoration-method-card {
-    background: white;
-    border: 3px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    gap: 12px;
     align-items: center;
 }
 
-.decoration-method-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(76, 179, 84, 0.2);
-    border-color: #4cb354;
-}
-
-.decoration-method-card.active {
-    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
-    border-color: #409a47;
+.decoration-method-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
     color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
-.method-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    color: #4cb354;
-    transition: transform 0.3s ease;
+.decoration-method-link:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
-.decoration-method-card:hover .method-icon {
-    transform: scale(1.1);
+.decoration-method-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
 }
 
-.decoration-method-card.active .method-icon {
-    color: white;
-}
-
-.method-name {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #333;
-}
-
-.decoration-method-card.active .method-name {
-    color: white;
-}
-
-.method-desc {
+.decoration-method-name {
     font-size: 14px;
-    color: #666;
-    line-height: 1.4;
+    font-weight: 600;
+    line-height: 1.2;
 }
 
-.decoration-method-card.active .method-desc {
-    color: rgba(255, 255, 255, 0.9);
+.decoration-method-tagline {
+    font-size: 11px;
+    opacity: 0.9;
+    line-height: 1.3;
 }
 
-/* More Options Card - Subtle Style */
-.decoration-method-card.more-options {
-    border-style: dashed;
-    background: #f9fafb;
-}
-
-.decoration-method-card.more-options:hover {
-    background: white;
-}
-
-/* Mobile Responsive */
+/* Mobile optimization */
 @media (max-width: 768px) {
     .decoration-methods-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
+        gap: 8px;
     }
 
-    .decoration-method-card {
-        padding: 24px 12px;
-        min-height: 160px;
+    .decoration-method-link {
+        padding: 12px 8px;
     }
 
-    .method-icon {
-        font-size: 36px;
+    .decoration-method-icon {
+        font-size: 24px;
     }
 
-    .method-name {
-        font-size: 16px;
+    .decoration-method-name {
+        font-size: 13px;
     }
 
-    .method-desc {
-        font-size: 12px;
+    .decoration-method-tagline {
+        display: none; /* Hide on mobile for cleaner look */
+    }
+}
+```
+
+### JavaScript Changes
+Modify `product/components/decoration-selector.js`:
+
+```javascript
+// BEFORE (2-click flow - 60 lines of complexity)
+render() {
+    this.container.innerHTML = `
+        <div class="segmented-control">
+            ${Object.entries(this.methods).map(([key, method]) => `
+                <button class="segment ${key === this.selectedMethod ? 'active' : ''}">
+                    ${method.label}
+                </button>
+            `).join('')}
+        </div>
+        <div class="method-content">
+            <button class="cta-button">View Pricing</button>
+        </div>
+    `;
+
+    // Event listeners for segments
+    this.container.querySelectorAll('.segment').forEach(button => {
+        button.addEventListener('click', (e) => {
+            this.selectMethod(e.currentTarget.dataset.method);
+        });
+    });
+
+    // Event listener for CTA
+    const ctaButton = this.container.querySelector('.cta-button');
+    ctaButton.addEventListener('click', () => {
+        this.navigateToPricing();
+    });
+}
+
+// AFTER (1-click flow - 20 lines, simpler)
+render() {
+    this.container.innerHTML = `
+        <div class="decoration-methods-grid">
+            ${Object.entries(this.methods).map(([key, method]) => `
+                <a href="${method.path}?StyleNumber=${encodeURIComponent(this.styleNumber)}&COLOR=${encodeURIComponent(this.colorCode)}"
+                   class="decoration-method-link">
+                    <span class="decoration-method-icon">${method.icon}</span>
+                    <span class="decoration-method-name">${method.name}</span>
+                    <span class="decoration-method-tagline">${method.tagline}</span>
+                </a>
+            `).join('')}
+        </div>
+    `;
+    // No JavaScript event listeners needed - pure HTML links!
+}
+```
+
+### Update Required in `product/app.js`
+Add one line to update decoration links when color changes:
+
+```javascript
+async updateColorSelection(color) {
+    // Existing code...
+    this.components.gallery.update(color);
+    this.components.decorationSelector.update(product.styleNumber, catalogColor); // ← This already exists
+
+    // Add this to ensure links update:
+    if (this.components.decorationSelector.render) {
+        this.components.decorationSelector.render();
     }
 }
 ```
 
 ---
 
-### 3. Product Display Layout
+## Phase 2: Larger Gallery Layout (Week 2)
 
-**NEW LAYOUT:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    DECORATION SELECTOR                       │
-│                    (See Above Section)                       │
-└─────────────────────────────────────────────────────────────┘
+### Reference Model Analysis
+From `/pages/top-sellers-product.html` (lines 195-220):
 
-┌─────────────────────────────────────────────────────────────┐
-│  ┌──────────┐  ┌────────────────────────┐  ┌─────────────┐ │
-│  │          │  │                        │  │             │ │
-│  │   Thumb  │  │                        │  │  Product    │ │
-│  │   nails  │  │    LARGE MAIN IMAGE    │  │  Info       │ │
-│  │          │  │       (60% width)      │  │             │ │
-│  │   [  ]   │  │                        │  │  Style: XXX │ │
-│  │   [  ]   │  │         800px+         │  │             │ │
-│  │   [  ]   │  │                        │  │  ┌────────┐ │ │
-│  │   [  ]   │  │                        │  │  │ CHECK  │ │ │
-│  │          │  │                        │  │  │INVENTOR│ │ │
-│  └──────────┘  └────────────────────────┘  │  │  (NW   │ │ │
-│                                             │  │ Green) │ │ │
-│                                             │  └────────┘ │ │
-│                                             │             │ │
-│                                             │  Colors     │ │
-│                                             │  Available  │ │
-│                                             └─────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Grid Layout:**
 ```css
-.product-display-grid {
+.product-showcase {
     display: grid;
-    grid-template-columns: 100px 1fr 400px;
-    gap: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 20px;
+    grid-template-columns: 60% 40%;  /* Image-first! */
+    gap: 40px;
+    align-items: start;
 }
 
-/* Column 1: Thumbnails */
-.product-thumbnails {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.thumbnail {
-    width: 100px;
-    height: 100px;
-    border: 3px solid #e5e7eb;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    overflow: hidden;
-}
-
-.thumbnail:hover,
-.thumbnail.active {
-    border-color: #4cb354;
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
-}
-
-/* Column 2: Main Image */
-.product-gallery {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #f9fafb;
-    min-height: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.gallery-section {
+    position: sticky;
+    top: 20px;
 }
 
 .main-image {
-    max-width: 100%;
-    height: auto;
-    display: block;
+    width: 100%;
+    height: 650px;  /* Large, professional */
+    object-fit: contain;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+```
+
+### Implementation for Product Page
+
+```css
+/* New Grid Layout - 60/40 Image First */
+.product-page-columns-container {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
 }
 
-/* Column 3: Product Info */
-.product-info-column {
+.product-context-column {
+    /* Image section - 60% */
+}
+
+.product-interactive-column {
+    /* Info section - 40% */
+}
+
+/* Gallery Enhancement */
+.product-gallery {
+    position: sticky;
+    top: 180px; /* Below sticky header */
+}
+
+.gallery-main {
+    min-height: 700px; /* Up from 600px */
+    max-height: 700px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background: #f8f9fa;
+}
+
+.gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Thumbnail Grid */
+.product-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.thumbnail:hover {
+    border-color: #2f661e;
+    transform: scale(1.05);
+}
+
+.thumbnail.active {
+    border-color: #2f661e;
+    box-shadow: 0 0 0 3px rgba(47,102,30,0.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 968px) {
+    .product-page-columns-container {
+        grid-template-columns: 1fr; /* Stack on mobile */
+    }
+
+    .gallery-main {
+        min-height: 400px;
+        max-height: 400px;
+    }
+
+    .product-gallery {
+        position: relative; /* Not sticky on mobile */
+        top: 0;
+    }
+}
+```
+
+---
+
+## Phase 3: Enhanced Color Swatches (Week 2)
+
+### Reference Model from Top Sellers
+From `/pages/top-sellers-product.html` (lines 287-315):
+
+```css
+.color-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.color-swatch {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.color-swatch-image {
+    width: 70px;   /* Large, clickable */
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.color-swatch.active .color-swatch-image {
+    border-color: #2f661e;
+    box-shadow: 0 0 0 3px rgba(47,102,30,0.2);
+}
+
+.color-swatch:hover .color-swatch-image {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.color-name {
+    font-size: 12px;
+    margin-top: 6px;
+    color: #333;
+    font-weight: 500;
+}
+```
+
+### Implementation for Product Page
+
+```css
+/* Color Swatches Section */
+#color-swatches {
     background: white;
     border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
 }
-```
 
----
-
-### 4. Check Inventory Button - Northwest Green
-
-**NEW DESIGN:**
-```html
-<button class="check-inventory-btn">
-    <i class="fas fa-boxes"></i>
-    <span>Check Inventory</span>
-</button>
-```
-
-**Styling:**
-```css
-.check-inventory-btn {
-    background: #4cb354;  /* Northwest green */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 16px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.selected-color-display {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #2f661e 0%, #1a3d11 100%);
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 16px;
 }
 
-.check-inventory-btn:hover {
-    background: #409a47;  /* Darker green */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(76, 179, 84, 0.4);
+.checkmark {
+    font-size: 20px;
 }
 
-.check-inventory-btn:active {
-    transform: translateY(0);
+.selected-label {
+    font-size: 14px;
+    opacity: 0.9;
 }
 
-.check-inventory-btn i {
-    font-size: 18px;
-}
-```
-
----
-
-### 5. Color Swatches Enhancement
-
-**IMPROVED DESIGN:**
-```html
-<div class="color-swatches-section">
-    <h3>Available Colors (3)</h3>
-    <div class="swatches-grid">
-        <div class="color-swatch" data-color="Black">
-            <div class="swatch-circle">
-                <img src="black-swatch.jpg" alt="Black">
-            </div>
-            <span class="swatch-label">Black</span>
-        </div>
-        <!-- More swatches -->
-    </div>
-</div>
-```
-
-**Styling:**
-```css
-.color-swatches-section {
-    margin-top: 30px;
-    padding-top: 30px;
-    border-top: 2px solid #e5e7eb;
-}
-
-.color-swatches-section h3 {
-    font-size: 18px;
+.selected-name {
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 20px;
-    color: #333;
 }
 
 .swatches-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 12px;
 }
 
 .color-swatch {
-    text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
+    text-align: center;
 }
 
-.color-swatch:hover {
-    transform: scale(1.05);
-}
-
-.swatch-circle {
+.swatch-image {
     width: 70px;
     height: 70px;
-    border: 3px solid #e5e7eb;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 8px;
-    transition: border-color 0.2s ease;
-    background: white;
-}
-
-.color-swatch.selected .swatch-circle,
-.color-swatch:hover .swatch-circle {
-    border-color: #4cb354;
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
-}
-
-.swatch-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.swatch-label {
-    font-size: 13px;
-    color: #666;
-    display: block;
-}
-
-.color-swatch.selected .swatch-label {
-    color: #4cb354;
-    font-weight: 600;
-}
-```
-
----
-
-### 6. Complete Header Code
-
-**HTML Structure:**
-```html
-<header class="product-page-header">
-    <!-- Tier 1: Contact Bar -->
-    <div class="header-contact-bar">
-        <div class="contact-bar-content">
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <a href="tel:2539225793" class="contact-link">(253) 922-5793</a>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:sales@nwcustomapparel.com" class="contact-link">sales@nwcustomapparel.com</a>
-                </div>
-            </div>
-            <div class="business-hours">
-                <i class="fas fa-clock"></i>
-                Monday - Friday: 8:30 AM - 5:00 PM PST
-            </div>
-        </div>
-    </div>
-
-    <!-- Tier 2: Logo & Search -->
-    <div class="header-main">
-        <div class="header-main-content">
-            <a href="/" class="logo-link">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel"
-                     class="logo-image">
-            </a>
-
-            <div class="header-search">
-                <input type="text"
-                       class="search-input"
-                       placeholder="Search products by style number or name..."
-                       id="header-style-search">
-                <button class="search-button">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
-```
-
-**CSS Styling:**
-```css
-/* Product Page Header */
-.product-page-header {
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-/* Tier 1: Contact Bar */
-.header-contact-bar {
-    background: #4cb354;  /* Northwest green */
-    color: white;
-    padding: 12px 0;
-    font-size: 14px;
-}
-
-.contact-bar-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.contact-info {
-    display: flex;
-    gap: 30px;
-    align-items: center;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.contact-link {
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-}
-
-.contact-link:hover {
-    opacity: 0.8;
-    text-decoration: underline;
-}
-
-.business-hours {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    opacity: 0.95;
-}
-
-/* Tier 2: Logo & Search */
-.header-main {
-    background: white;
-    padding: 20px 0;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.header-main-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-}
-
-.logo-link {
-    display: flex;
-    align-items: center;
-}
-
-.logo-image {
-    height: 45px;
-    width: auto;
-    display: block;
-}
-
-.header-search {
-    flex: 1;
-    max-width: 600px;
-    display: flex;
-    gap: 10px;
-}
-
-.search-input {
-    flex: 1;
-    padding: 12px 20px;
-    border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 15px;
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #e0e0e0;
     transition: all 0.2s ease;
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: #4cb354;
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+.color-swatch:hover .swatch-image {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.search-button {
-    background: #4cb354;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
+.color-swatch.selected .swatch-image {
+    border-color: #2f661e;
+    box-shadow: 0 0 0 3px rgba(47,102,30,0.2);
+}
+
+.swatch-name {
+    font-size: 12px;
+    margin-top: 6px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .swatches-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 8px;
+    }
+
+    .swatch-image {
+        width: 60px;
+        height: 60px;
+    }
+}
+```
+
+### JavaScript - No Changes Needed!
+The existing `product/components/swatches.js` already works perfectly. We're only enhancing the CSS styling.
+
+---
+
+## Phase 4: Collapsible Product Description (Week 3)
+
+### Implementation
+
+```css
+/* Product Description Section */
+.product-description-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 24px;
+}
+
+.description-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    user-select: none;
 }
 
-.search-button:hover {
-    background: #409a47;
+.description-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #2f661e;
 }
 
-.search-button i {
+.description-toggle {
+    font-size: 20px;
+    color: #2f661e;
+    transition: transform 0.3s ease;
+}
+
+.description-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.description-content.expanded {
+    max-height: 500px;
+    padding-top: 16px;
+}
+
+.description-toggle.expanded {
+    transform: rotate(180deg);
+}
+```
+
+---
+
+## Phase 5: Inventory Summary Enhancement (Week 3)
+
+### Current State (Keep Functionality!)
+`product/components/inventory-summary.js` works perfectly. We're only improving the visual presentation.
+
+### CSS Enhancement
+
+```css
+/* Inventory Summary */
+.inventory-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.stock-status {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stock-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
     font-size: 16px;
 }
 
-/* Adjust body for fixed header */
-body {
-    padding-top: 130px;  /* Height of header */
+.stock-indicator.high-stock {
+    color: #28a745;
+}
+
+.stock-indicator.medium-stock {
+    color: #17a2b8;
+}
+
+.stock-indicator.low-stock {
+    color: #ffc107;
+}
+
+.stock-indicator.out-of-stock {
+    color: #dc3545;
+}
+
+.stock-details {
+    font-size: 13px;
+    color: #666;
+}
+
+.check-inventory-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #2f661e 0%, #1a3d11 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.check-inventory-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(47,102,30,0.3);
 }
 ```
 
 ---
 
-### 7. Mobile Responsive Design
+## Functionality Guarantee
 
-**Breakpoints:**
-```css
-/* Tablet (768px and below) */
-@media (max-width: 768px) {
-    body {
-        padding-top: 200px;  /* More space for stacked header */
-    }
+### What WON'T Break ✅
 
-    .contact-bar-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
+1. **Color Selection** - Uses existing `selectColor()` in `swatches.js`
+2. **Inventory Loading** - Uses existing `loadInventory()` in `app.js`
+3. **Product Loading** - Uses existing `loadProduct()` in `app.js`
+4. **URL Parameters** - Still uses `?StyleNumber=PC61&COLOR=Black`
+5. **Image Gallery** - Existing gallery component stays intact
+6. **API Calls** - No changes to API integration
 
-    .contact-info {
-        flex-direction: column;
-        gap: 10px;
-    }
+### What WILL Improve ✅
 
-    .header-main-content {
-        flex-direction: column;
-    }
-
-    .header-search {
-        width: 100%;
-        max-width: none;
-    }
-
-    /* Product Grid - Stack Vertically */
-    .product-display-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .product-thumbnails {
-        flex-direction: row;
-        overflow-x: auto;
-    }
-
-    .thumbnail {
-        width: 80px;
-        height: 80px;
-    }
-
-    /* Decoration Methods - 2 Columns */
-    .decoration-methods-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-}
-
-/* Mobile (480px and below) */
-@media (max-width: 480px) {
-    .logo-image {
-        height: 36px;
-    }
-
-    .search-input {
-        font-size: 14px;
-        padding: 10px 16px;
-    }
-
-    .contact-item {
-        font-size: 12px;
-    }
-
-    .decoration-hero-title {
-        font-size: 24px;
-    }
-
-    .decoration-hero-subtitle {
-        font-size: 16px;
-    }
-}
-```
+1. **Navigation Efficiency** - 2 clicks → 1 click (50% reduction)
+2. **Image Visibility** - 33% width → 60% width (81% increase)
+3. **Gallery Height** - 600px → 700px (17% increase)
+4. **Swatch Size** - 48px → 70px (46% increase)
+5. **User Experience** - Sticky navigation always visible
 
 ---
 
-## 🎨 Color Palette Reference
+## Implementation Timeline
 
-### Primary Colors (Northwest Custom Apparel)
-```css
-:root {
-    /* Northwest Green (Primary) */
-    --nw-green: #4cb354;
-    --nw-green-dark: #409a47;
-    --nw-green-light: #e8f5e9;
-    --nw-green-pale: rgba(76, 179, 84, 0.1);
+### Week 1: Sticky Header
+- Create `product-2025-enhanced.css`
+- Modify `decoration-selector.js` (simplify to 1-click)
+- Add one line to `app.js` for link updates
+- Test on 5 products
 
-    /* Neutral Colors */
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --text-light: #999999;
-    --border-color: #e5e7eb;
-    --bg-white: #ffffff;
-    --bg-light: #f9fafb;
-    --bg-lighter: #f3f4f6;
+### Week 2: Layout & Swatches
+- Implement 60/40 grid layout
+- Increase gallery to 700px
+- Enhance color swatches to 70px
+- Test responsive breakpoints
 
-    /* Accent Colors */
-    --success-green: #10b981;
-    --warning-yellow: #f59e0b;
-    --error-red: #ef4444;
-    --info-blue: #3b82f6;
+### Week 3: Polish & Details
+- Add collapsible description
+- Enhance inventory summary styling
+- Mobile optimization
+- Cross-browser testing
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-
-    /* Green Shadows */
-    --shadow-green-sm: 0 2px 8px rgba(76, 179, 84, 0.2);
-    --shadow-green-md: 0 4px 12px rgba(76, 179, 84, 0.3);
-    --shadow-green-lg: 0 8px 20px rgba(76, 179, 84, 0.4);
-}
-```
+### Week 4: Testing & Launch
+- Full QA on all products
+- Performance testing
+- Accessibility audit
+- Staged rollout (10% → 50% → 100%)
 
 ---
 
-## 🔄 Implementation Priority
+## Testing Checklist
 
-### Phase 1: Critical Updates (Do First)
-1. ✅ Update header color to Northwest green
-2. ✅ Remove navigation links from header
-3. ✅ Create prominent decoration selector section
-4. ✅ Update Check Inventory button to Northwest green
+### Functional Tests
+- [ ] Color swatches change product images
+- [ ] Decoration links include correct StyleNumber and COLOR
+- [ ] Inventory button links to inventory page
+- [ ] Gallery thumbnails work
+- [ ] Mobile layout stacks correctly
+- [ ] Sticky header stays visible on scroll
 
-### Phase 2: Layout Improvements
-1. ✅ Enlarge product images
-2. ✅ Reorganize product display grid
-3. ✅ Improve thumbnail navigation
-4. ✅ Enhance color swatches
+### Visual Tests
+- [ ] Gallery is 700px height on desktop
+- [ ] Color swatches are 70px
+- [ ] 60/40 layout on desktop
+- [ ] Responsive breakpoints work
+- [ ] No layout shift on load
 
-### Phase 3: Polish & Refinement
-1. ✅ Add hover effects and transitions
-2. ✅ Implement mobile responsive design
-3. ✅ Test cross-browser compatibility
-4. ✅ Optimize page load performance
-
----
-
-## 📊 Before & After Comparison
-
-### Visual Hierarchy
-
-**BEFORE:**
-```
-Priority 1: Header navigation
-Priority 2: Search
-Priority 3: Product image (small)
-Priority 4: Product info
-Priority 5: Decoration options (tiny, hidden)
-```
-
-**AFTER:**
-```
-Priority 1: Decoration method selector (HUGE, centered)
-Priority 2: Product image (large, prominent)
-Priority 3: Product info & inventory
-Priority 4: Color swatches
-Priority 5: Search (header)
-```
-
-### User Flow
-
-**BEFORE:**
-1. User lands on page
-2. Sees small product image
-3. Scrolls to find decoration options
-4. Tiny buttons are hard to click
-5. Not clear what to do next
-
-**AFTER:**
-1. User lands on page
-2. Immediately sees "HOW WOULD YOU LIKE TO CUSTOMIZE?"
-3. Large, clear decoration method buttons
-4. Clicks preferred method
-5. Sees large product image
-6. Checks inventory (green button)
-7. Views colors
-8. Proceeds to pricing
+### Performance Tests
+- [ ] Page load < 3 seconds
+- [ ] No CSS conflicts
+- [ ] Images lazy load
+- [ ] Smooth scrolling
 
 ---
 
-## 🚀 JavaScript Functionality
+## Rollback Strategy
 
-### Decoration Method Selection
-```javascript
-// Handle decoration method selection
-document.querySelectorAll('.decoration-method-card').forEach(card => {
-    card.addEventListener('click', function() {
-        const method = this.dataset.method;
+If any issues arise:
 
-        // Remove active class from all cards
-        document.querySelectorAll('.decoration-method-card').forEach(c => {
-            c.classList.remove('active');
-        });
+1. **Quick Rollback**: Remove `product-2025-enhanced.css` from HTML
+2. **Revert JavaScript**: Git revert `decoration-selector.js` changes
+3. **Old version still works**: Original files untouched
 
-        // Add active class to clicked card
-        this.classList.add('active');
-
-        // Store selected method
-        sessionStorage.setItem('selectedDecorationMethod', method);
-
-        // Update pricing display based on method
-        updatePricingForMethod(method);
-
-        // Scroll to product display
-        document.querySelector('.product-display-grid').scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    });
-});
-
-function updatePricingForMethod(method) {
-    // Logic to fetch and display pricing for selected method
-    console.log('Selected decoration method:', method);
-
-    // Example: Show relevant pricing calculator link
-    const pricingLink = document.querySelector('.pricing-calculator-link');
-    if (pricingLink) {
-        pricingLink.href = `/calculators/${method}-pricing.html`;
-        pricingLink.textContent = `View ${method.toUpperCase()} Pricing`;
-    }
-}
-```
-
-### Check Inventory Button
-```javascript
-// Enhanced inventory check
-document.querySelector('.check-inventory-btn').addEventListener('click', function() {
-    const button = this;
-    const originalHTML = button.innerHTML;
-
-    // Show loading state
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Checking...</span>';
-    button.disabled = true;
-
-    // Fetch inventory (existing function)
-    fetchInventoryData().then(data => {
-        // Show inventory modal or section
-        displayInventory(data);
-
-        // Reset button
-        button.innerHTML = originalHTML;
-        button.disabled = false;
-    }).catch(error => {
-        console.error('Inventory check failed:', error);
-        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error - Retry</span>';
-        button.disabled = false;
-    });
-});
-```
+Files to backup before changes:
+- `product/components/decoration-selector.js`
+- `product/styles/product-redesign.css`
+- `product/app.js`
 
 ---
 
-## ✨ Additional Enhancements
+## Success Metrics
 
-### 1. Breadcrumb Navigation (Optional)
-```html
-<div class="breadcrumb-nav">
-    <a href="/">Home</a>
-    <i class="fas fa-chevron-right"></i>
-    <a href="/products">Products</a>
-    <i class="fas fa-chevron-right"></i>
-    <span>Port Authority Jacket</span>
-</div>
-```
+### Before vs After
 
-### 2. Quick Actions Bar
-```html
-<div class="quick-actions-bar">
-    <button class="quick-action-btn">
-        <i class="fas fa-share-alt"></i>
-        Share
-    </button>
-    <button class="quick-action-btn">
-        <i class="fas fa-heart"></i>
-        Save
-    </button>
-    <button class="quick-action-btn">
-        <i class="fas fa-print"></i>
-        Print
-    </button>
-</div>
-```
-
-### 3. Sticky "Get Pricing" Button (Mobile)
-```css
-/* Mobile sticky action button */
-@media (max-width: 768px) {
-    .mobile-sticky-action {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        padding: 16px;
-        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 999;
-    }
-
-    .sticky-get-pricing-btn {
-        background: #4cb354;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 16px;
-        font-size: 16px;
-        font-weight: 600;
-        width: 100%;
-        cursor: pointer;
-    }
-}
-```
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Clicks to pricing | 2 | 1 | -50% |
+| Gallery width | 33% | 60% | +81% |
+| Gallery height | 600px | 700px | +17% |
+| Swatch size | 48px | 70px | +46% |
+| Time to customization | 3+ seconds scroll | 0 seconds (sticky) | -100% |
 
 ---
 
-## 📝 Testing Checklist
+## Files That Will Be Modified
 
-### Desktop Testing
-- [ ] Header displays correctly with Northwest green
-- [ ] Search bar functions properly
-- [ ] Decoration method selector is prominent and centered
-- [ ] Product images are large and clear
-- [ ] Check Inventory button uses Northwest green
-- [ ] Color swatches are easy to click
-- [ ] All hover effects work smoothly
-- [ ] Page loads in under 2 seconds
+1. **New File**: `product/styles/product-2025-enhanced.css` (all new CSS)
+2. **Modified**: `product/components/decoration-selector.js` (simplified, fewer lines)
+3. **Modified**: `product/app.js` (add 1 line for link updates)
+4. **Modified**: `product.html` (add CSS link to head)
 
-### Mobile Testing (Portrait)
-- [ ] Header stacks correctly
-- [ ] Decoration methods show in 2-column grid
-- [ ] Product image is full-width
-- [ ] Thumbnails scroll horizontally
-- [ ] All buttons are thumb-friendly (44px minimum)
-- [ ] No horizontal scrolling issues
-- [ ] Touch interactions feel responsive
-
-### Mobile Testing (Landscape)
-- [ ] Layout adjusts appropriately
-- [ ] Content remains readable
-- [ ] No awkward spacing issues
-
-### Cross-Browser Testing
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest)
-- [ ] Edge (latest)
-- [ ] Mobile Safari (iOS)
-- [ ] Mobile Chrome (Android)
-
-### Performance Testing
-- [ ] Page load time < 2 seconds
-- [ ] Images optimized (WebP where supported)
-- [ ] CSS minified for production
-- [ ] JavaScript optimized
-- [ ] No layout shift (CLS score)
+Total lines changed: ~200 new CSS lines, ~40 fewer JavaScript lines
 
 ---
 
-## 🎯 Success Metrics
+## References Used
 
-### User Experience Goals
-- **80% reduction** in time to find decoration options
-- **50% increase** in product image viewing time
-- **90% satisfaction** rate from sales team
-- **Zero confusion** about next steps
+1. **Primary Design Reference**: `/pages/top-sellers-product.html`
+   - 60/40 layout proven to work
+   - 70px swatches proven to work
+   - 650px+ gallery proven to work
 
-### Technical Goals
-- Page load time < 2 seconds
-- Lighthouse score > 90
-- Mobile usability score > 95
-- Zero accessibility violations
+2. **Industry Research**:
+   - SanMar.com - 1-click customization
+   - Nike.com - Sticky color selection
+   - Baymard Institute - Product page UX research
 
----
-
-## 📚 Resources & References
-
-### Design Inspiration
-- Modern e-commerce sites (2024-2025 trends)
-- Apple product pages (clean, focused design)
-- Nike customization flow (prominent options)
-
-### Technical References
-- [CSS Grid Layout Guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
-- [Mobile-First Responsive Design](https://www.w3schools.com/css/css_rwd_intro.asp)
-- [Font Awesome Icons](https://fontawesome.com/icons)
-
-### Color Accessibility
-- Northwest Green (#4cb354) on white: 4.5:1 (WCAG AA ✓)
-- White text on Northwest Green: 4.5:1 (WCAG AA ✓)
+3. **Current Working Code**:
+   - `product/components/swatches.js` - Keep as-is
+   - `product/components/inventory-summary.js` - Keep as-is
+   - `product/app.js` - Minimal changes only
 
 ---
 
-## 🔧 Implementation Files
+## Next Steps
 
-### Files to Update:
-1. `/product.html` - Main HTML structure
-2. `/product/styles/product.css` - Base styles
-3. `/product/styles/product-redesign.css` - New modern styles
-4. `/product/app.js` - JavaScript functionality
-
-### New Files to Create:
-1. `/product/styles/product-2025.css` - Complete redesign styles
-2. `/product/js/decoration-selector.js` - Decoration method logic
+1. **Review & Approve** this plan ✅ APPROVED
+2. **Week 1**: Start with sticky header implementation
+3. **Weekly demos** to show progress
+4. **Staged rollout** after Week 4
 
 ---
 
-## 🎉 Expected Results
+## Notes from Planning Session
 
-### Sales Team Feedback Goals
-- ✅ "Images are now big enough to show product details"
-- ✅ "Decoration options are impossible to miss"
-- ✅ "Page looks modern and professional"
-- ✅ "Easy to navigate on mobile devices"
-- ✅ "Check Inventory button matches our brand"
+- User confirmed: **1-click navigation is preferred** over 2-click
+- User requested: Use **`/pages/top-sellers-product.html`** as design inspiration
+- User goal: **Professional retail vibe with larger images**
+- Key principle: **Don't break existing functionality**, only enhance visuals
+- Implementation approach: **CSS-first, minimal JavaScript changes**
 
-### Customer Experience Goals
-- ✅ Immediately understand customization options
-- ✅ See product clearly before making decisions
-- ✅ Feel confident about inventory availability
-- ✅ Complete journey from viewing to pricing smoothly
-
----
-
-**This design document provides a complete blueprint for transforming the product page from a dated 2005 design to a modern, intuitive 2025 interface that prioritizes product imagery and customization options.**
-
-**Implementation Timeline:** 1-2 days for Phase 1 critical updates, 1 week for complete redesign.
-
-**Approval Required:** Sales team review after Phase 1 implementation.
+**Document Created**: October 10, 2025
+**Last Updated**: October 10, 2025
+**Status**: Ready for Implementation ✅

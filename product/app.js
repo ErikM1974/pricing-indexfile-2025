@@ -306,30 +306,9 @@ class ProductPageApp {
     }
     
     addProductDescription() {
-        // Check if product info component has description
-        if (this.components.info && this.components.info.getProductDescription) {
-            const description = this.components.info.getProductDescription();
-            
-            // Find or create description container
-            let descContainer = document.getElementById('product-description-section');
-            if (!descContainer) {
-                descContainer = document.createElement('div');
-                descContainer.id = 'product-description-section';
-                descContainer.className = 'product-description-section';
-                
-                const infoColumn = document.querySelector('.product-info-column');
-                if (infoColumn) {
-                    infoColumn.appendChild(descContainer);
-                }
-            }
-            
-            if (descContainer && description) {
-                descContainer.innerHTML = `
-                    <h3>Description</h3>
-                    <p>${description}</p>
-                `;
-            }
-        }
+        // DISABLED: Description already rendered in ProductInfo component (info.js lines 40-44)
+        // This was creating a duplicate description at the bottom of the page
+        // Keeping function stub for compatibility with existing calls
     }
     
     addProductResources() {

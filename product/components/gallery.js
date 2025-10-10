@@ -16,16 +16,19 @@ export class ProductGallery {
     }
 
     render() {
-        // Main image area - Add zoom-ready class
+        // Main image area - Add zoom-ready class and image dots container
         this.container.innerHTML = `
             <div class="gallery-main zoom-ready">
                 <img id="main-image" class="main-image" alt="Product image">
                 <div class="image-loading">
                     <div class="mini-spinner"></div>
                 </div>
+                <div class="image-dots" id="image-dots" style="display: none;">
+                    <!-- Navigation dots will be added here -->
+                </div>
             </div>
         `;
-        
+
         // If separate thumbnail container provided, use it; otherwise create within gallery
         if (!this.thumbnailContainer) {
             this.container.innerHTML += `
@@ -37,11 +40,12 @@ export class ProductGallery {
         } else {
             this.thumbnailsContainer = this.thumbnailContainer;
         }
-        
+
         // Get references
         this.mainImage = this.container.querySelector('#main-image');
         this.loadingIndicator = this.container.querySelector('.image-loading');
-        
+        this.dotsContainer = this.container.querySelector('#image-dots');
+
         // Set up event listeners
         this.setupEventListeners();
     }
@@ -251,17 +255,40 @@ export class ProductGallery {
 
     updateThumbnails() {
         this.thumbnailsContainer.innerHTML = '';
-        
+
         this.images.forEach((image, index) => {
             const thumb = document.createElement('div');
             thumb.className = `thumbnail ${index === this.currentIndex ? 'active' : ''}`;
             thumb.innerHTML = `<img src="${image.url}" alt="${image.alt}">`;
-            
+
             thumb.addEventListener('click', () => {
                 this.selectImage(index);
             });
-            
+
             this.thumbnailsContainer.appendChild(thumb);
+        });
+
+        // Update navigation dots
+        this.updateNavigationDots();
+    }
+
+    updateNavigationDots() {
+        // Only show dots if there are multiple images
+        if (this.images.length <= 1) {
+            this.dotsContainer.style.display = 'none';
+            return;
+        }
+
+        this.dotsContainer.style.display = 'flex';
+        this.dotsContainer.innerHTML = '';
+
+        this.images.forEach((image, index) => {
+            const dot = document.createElement('span');
+            dot.className = `image-dot ${index === this.currentIndex ? 'active' : ''}`;
+            dot.addEventListener('click', () => {
+                this.selectImage(index);
+            });
+            this.dotsContainer.appendChild(dot);
         });
     }
 

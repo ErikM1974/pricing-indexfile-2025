@@ -19,8 +19,11 @@ export class ProductInfo {
         const selectedColor = product.colors[0];
         const colorName = selectedColor.COLOR_NAME || selectedColor.colorName || selectedColor.color_name || 'N/A';
 
-        // Show initial content with loading price
+        // Show initial content with enhanced layout
         this.container.innerHTML = `
+            <!-- Product Badge -->
+            <div class="product-badge">Product Details</div>
+
             <div class="product-header">
                 <div class="product-header-text">
                     <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
@@ -32,50 +35,18 @@ export class ProductInfo {
                     </div>
                 ` : ''}
             </div>
-            
+
+            <!-- Product Description -->
+            ${product.description || product.PRODUCT_DESCRIPTION ? `
+                <div class="product-description-text">
+                    ${this.escapeHtml(product.description || product.PRODUCT_DESCRIPTION)}
+                </div>
+            ` : ''}
+
             <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(product.styleNumber)}', '${this.escapeHtml(selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA')}')">
                 <i class="fas fa-warehouse"></i>
                 Check Inventory
             </button>
-            
-            <!-- TODO: QUOTE FEATURE - COMING SOON (Date: 2025-01-20)
-            ================================================
-            The quote functionality is built but not ready for production.
-            To re-enable:
-            1. Uncomment the quote button code below (QUOTE-BUTTON)
-            2. Re-enable event listener in app.js (search for QUOTE-LISTENER)
-            3. Test email service integration
-            4. Remove the "coming soon" notice at bottom of product info
-            ================================================
-            
-            QUOTE-BUTTON: Temporarily disabled - uncomment when ready
-            <button class="send-quote-btn" id="send-quote-btn">
-                <i class="fas fa-envelope"></i>
-                Send Quote
-            </button>
-            -->
-            
-            ${product.AVAILABLE_SIZES ? `
-                <div class="available-sizes">
-                    <strong>Available Sizes:</strong> ${this.escapeHtml(product.AVAILABLE_SIZES)}
-                </div>
-            ` : ''}
-            
-            <div class="price-estimate hidden" id="price-estimate-container">
-                <span class="price-label">Estimated Price:</span>
-                <span class="price-value" id="estimated-price">Calculating...</span>
-                <span class="price-note">(24pc with basic logo)</span>
-            </div>
-            
-            <div class="selected-color hidden">
-                <strong>Selected Color:</strong> 
-                <span id="selected-color-name">${this.escapeHtml(colorName)}</span>
-            </div>
-            
-            <!-- Quote Feature Coming Soon Notice -->
-            <div class="feature-coming-soon">
-                <small><i class="fas fa-info-circle"></i> Quote feature coming soon</small>
-            </div>
         `;
 
         // Store product reference for later use

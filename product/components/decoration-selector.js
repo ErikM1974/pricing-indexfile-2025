@@ -73,16 +73,20 @@ export class DecorationSelector {
         }
 
         this.container.classList.remove('hidden');
-        
+
         this.container.innerHTML = `
             <h3>How would you like to customize this?</h3>
-            
-            <div class="segmented-control">
+
+            <div class="decoration-methods-grid">
                 ${Object.entries(this.methods).map(([key, method]) => `
-                    <button class="segment ${key === this.selectedMethod ? 'active' : ''}" 
+                    <button class="method-card ${key === this.selectedMethod ? 'active' : ''}"
                             data-method="${key}">
-                        <span class="segment-icon">${method.icon}</span>
-                        <span class="segment-label">${method.label}</span>
+                        <span class="method-icon">${method.icon}</span>
+                        <span class="method-name">${method.name}</span>
+                        <span class="method-feature" style="color: ${method.feature.color};">
+                            <i class="${method.feature.icon}"></i>
+                            ${method.feature.text}
+                        </span>
                     </button>
                 `).join('')}
             </div>
@@ -93,7 +97,7 @@ export class DecorationSelector {
         `;
 
         // Add event listeners
-        this.container.querySelectorAll('.segment').forEach(button => {
+        this.container.querySelectorAll('.method-card').forEach(button => {
             button.addEventListener('click', (e) => {
                 const method = e.currentTarget.dataset.method;
                 this.selectMethod(method);
@@ -130,9 +134,9 @@ export class DecorationSelector {
 
     selectMethod(methodKey) {
         this.selectedMethod = methodKey;
-        
+
         // Update active state
-        this.container.querySelectorAll('.segment').forEach(button => {
+        this.container.querySelectorAll('.method-card').forEach(button => {
             button.classList.toggle('active', button.dataset.method === methodKey);
         });
 
@@ -141,7 +145,7 @@ export class DecorationSelector {
         const contentEl = this.container.querySelector('#method-content');
         if (contentEl) {
             contentEl.innerHTML = this.renderMethodContent(method);
-            
+
             // Re-add CTA listener
             const ctaButton = contentEl.querySelector('.cta-button');
             if (ctaButton) {
