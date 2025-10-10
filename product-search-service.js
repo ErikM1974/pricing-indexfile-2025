@@ -383,13 +383,6 @@ class ProductSearchService {
         return result;
     }
     
-    /**
-     * Smart search that tries multiple strategies
-     */
-    async smartSearch(category, subcategory = null, additionalFilters = {}) {
-        // This is an alias for searchByCategory with enhanced logging
-        return this.searchByCategory(category, subcategory, additionalFilters);
-    }
 
     /**
      * Get top sellers
