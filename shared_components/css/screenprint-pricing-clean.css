@@ -26,8 +26,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    margin-top: 20px;
-    margin-bottom: 30px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /* Ensure both sections are equal height */
@@ -294,7 +294,7 @@
 
 /* Reduce spacing around calculator */
 .sp-calculator {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
