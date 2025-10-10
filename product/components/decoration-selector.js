@@ -17,7 +17,7 @@ export class DecorationSelector {
                 name: 'Embroidery',
                 label: 'Embroidery',
                 tagline: 'Professional thread embroidery for logos and text',
-                feature: { icon: 'fas fa-star', text: 'Premium quality', color: '#ffa500' },
+                feature: { icon: 'fas fa-award', text: 'Experts Since 1977', color: '#ffa500' },
                 path: '/pricing/embroidery',
                 cta: 'View Embroidery Pricing'
             },
@@ -26,7 +26,7 @@ export class DecorationSelector {
                 name: 'Cap Embroidery',
                 label: 'Cap\nEmbroidery',
                 tagline: 'Specialized embroidery for headwear',
-                feature: { icon: 'fas fa-hat-cowboy', text: '3D puff available', color: '#2f661e' },
+                feature: { icon: 'fas fa-layer-group', text: 'Add up to 4 Designs', color: '#2f661e' },
                 path: '/pricing/cap-embroidery',
                 cta: 'View Cap Pricing'
             },
@@ -35,7 +35,7 @@ export class DecorationSelector {
                 name: 'DTG',
                 label: 'DTG',
                 tagline: 'Full-color printing for complex designs',
-                feature: { icon: 'fas fa-palette', text: 'Unlimited colors', color: '#e91e63' },
+                feature: { icon: 'fas fa-palette', text: 'Full Color on Cotton', color: '#e91e63' },
                 path: '/pricing/dtg',
                 cta: 'View DTG Pricing'
             },
@@ -44,7 +44,7 @@ export class DecorationSelector {
                 name: 'Screen Print',
                 label: 'Screen\nPrint',
                 tagline: 'Classic printing for bold graphics',
-                feature: { icon: 'fas fa-dollar-sign', text: 'Great for bulk', color: '#4caf50' },
+                feature: { icon: 'fas fa-dollar-sign', text: 'Bulk Pricing Available', color: '#4caf50' },
                 path: '/pricing/screen-print',
                 cta: 'View Screen Print Pricing'
             },
@@ -53,7 +53,7 @@ export class DecorationSelector {
                 name: 'DTF',
                 label: 'DTF',
                 tagline: 'Versatile heat transfer for any fabric',
-                feature: { icon: 'fas fa-tshirt', text: 'Works on all fabrics', color: '#2196f3' },
+                feature: { icon: 'fas fa-fill-drip', text: 'Colors Pop on Nylon', color: '#2196f3' },
                 path: '/pricing/dtf',
                 cta: 'View DTF Pricing'
             }
