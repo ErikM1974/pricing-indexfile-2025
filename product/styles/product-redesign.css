@@ -221,7 +221,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 650px;
+    min-height: 750px;
     position: relative;
     overflow: hidden;
     cursor: zoom-in;
@@ -232,7 +232,7 @@
 
 .product-gallery .main-image {
     max-width: 100%;
-    max-height: 650px;
+    max-height: 750px;
     width: auto;
     height: auto;
     transition: transform 0.3s ease;
@@ -283,6 +283,12 @@
     gap: 2rem;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
+}
+
+.product-info-column > * {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Product Badge - Modern Subtle Style */
@@ -501,6 +507,8 @@
     font-weight: 700;
     color: var(--text-primary, #1f2937);
     letter-spacing: -0.025em;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Selected Color Display - SanMar Style */
@@ -597,7 +605,7 @@
     border-radius: 2px;
 }
 
-/* Show All Colors Button */
+/* Show All Colors Button with Overflow Fix */
 .show-all-colors-btn {
     width: 100%;
     padding: 0.875rem 1.5rem;
@@ -614,6 +622,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .show-all-colors-btn:hover {
@@ -1021,13 +1031,17 @@
     transform: translateX(4px);
 }
 
-/* Product Description - Modern Readability */
+/* Product Description - Modern Readability with Overflow Fix */
 .product-description-text {
     color: var(--text-secondary, #4b5563);
     margin-bottom: 2rem;
     line-height: 1.75;
     font-size: 1rem;
     letter-spacing: 0.01em;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
 }
 
 .product-description-section {
