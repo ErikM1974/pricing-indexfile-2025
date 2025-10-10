@@ -164,10 +164,10 @@
     border: 1px solid #f0f0f0;
 }
 
-/* Product Grid Layout - Enhanced (60/40 Split like Top Sellers) */
+/* Product Grid Layout - Enhanced (55/45 Split for Better Content Balance) */
 .product-layout {
     display: grid;
-    grid-template-columns: 60% 40%;
+    grid-template-columns: 55% 45%;
     gap: 3rem;
 }
 
