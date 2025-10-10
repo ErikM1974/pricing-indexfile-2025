@@ -70,38 +70,47 @@ export class API {
                 styleNumber: styleNumber,
                 title: firstProduct.PRODUCT_TITLE || '',
                 description: firstProduct.PRODUCT_DESCRIPTION || '',
-                // Transform array of products into colors array
-                colors: data.map(item => ({
-                    COLOR_NAME: item.COLOR_NAME,
-                    colorName: item.COLOR_NAME,
-                    color_name: item.COLOR_NAME,
-                    CATALOG_COLOR: item.CATALOG_COLOR,
-                    catalogColor: item.CATALOG_COLOR,
-                    catalog_color: item.CATALOG_COLOR,
-                    COLOR_SQUARE_IMAGE: item.COLOR_SQUARE_IMAGE,
-                    colorSquareImage: item.COLOR_SQUARE_IMAGE,
-                    // All 4 image types from product-details endpoint
-                    FRONT_MODEL: item.FRONT_MODEL,
-                    frontModel: item.FRONT_MODEL,
-                    front_model: item.FRONT_MODEL,
-                    BACK_MODEL: item.BACK_MODEL,
-                    backModel: item.BACK_MODEL,
-                    back_model: item.BACK_MODEL,
-                    FRONT_FLAT: item.FRONT_FLAT,
-                    frontFlat: item.FRONT_FLAT,
-                    front_flat: item.FRONT_FLAT,
-                    BACK_FLAT: item.BACK_FLAT,
-                    backFlat: item.BACK_FLAT,
-                    back_flat: item.BACK_FLAT,
-                    // Main image fallback
-                    MAIN_IMAGE_URL: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
-                    mainImageUrl: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
-                    main_image_url: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
-                    // Brand logo
-                    BRAND_LOGO_IMAGE: item.BRAND_LOGO_IMAGE,
-                    brandLogoImage: item.BRAND_LOGO_IMAGE,
-                    BRAND_NAME: item.BRAND_NAME
-                })),
+                // Deduplicate colors by COLOR_NAME (API returns duplicates per size)
+                colors: (() => {
+                    const colorMap = new Map();
+                    data.forEach(item => {
+                        // Only add color if we haven't seen this COLOR_NAME before
+                        if (!colorMap.has(item.COLOR_NAME)) {
+                            colorMap.set(item.COLOR_NAME, {
+                                COLOR_NAME: item.COLOR_NAME,
+                                colorName: item.COLOR_NAME,
+                                color_name: item.COLOR_NAME,
+                                CATALOG_COLOR: item.CATALOG_COLOR,
+                                catalogColor: item.CATALOG_COLOR,
+                                catalog_color: item.CATALOG_COLOR,
+                                COLOR_SQUARE_IMAGE: item.COLOR_SQUARE_IMAGE,
+                                colorSquareImage: item.COLOR_SQUARE_IMAGE,
+                                // All 4 image types from product-details endpoint
+                                FRONT_MODEL: item.FRONT_MODEL,
+                                frontModel: item.FRONT_MODEL,
+                                front_model: item.FRONT_MODEL,
+                                BACK_MODEL: item.BACK_MODEL,
+                                backModel: item.BACK_MODEL,
+                                back_model: item.BACK_MODEL,
+                                FRONT_FLAT: item.FRONT_FLAT,
+                                frontFlat: item.FRONT_FLAT,
+                                front_flat: item.FRONT_FLAT,
+                                BACK_FLAT: item.BACK_FLAT,
+                                backFlat: item.BACK_FLAT,
+                                back_flat: item.BACK_FLAT,
+                                // Main image fallback
+                                MAIN_IMAGE_URL: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                                mainImageUrl: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                                main_image_url: item.FRONT_MODEL || item.FRONT_FLAT || item.MAIN_IMAGE_URL,
+                                // Brand logo
+                                BRAND_LOGO_IMAGE: item.BRAND_LOGO_IMAGE,
+                                brandLogoImage: item.BRAND_LOGO_IMAGE,
+                                BRAND_NAME: item.BRAND_NAME
+                            });
+                        }
+                    });
+                    return Array.from(colorMap.values());
+                })(),
                 // Include all the product-level fields from the API
                 AVAILABLE_SIZES: firstProduct.AVAILABLE_SIZES || '',
                 BRAND_NAME: firstProduct.BRAND_NAME || '',
