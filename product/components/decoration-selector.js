@@ -75,12 +75,12 @@ export class DecorationSelector {
         this.container.classList.remove('hidden');
 
         this.container.innerHTML = `
-            <h3>How would you like to customize this?</h3>
-
             <div class="decoration-methods-grid">
                 ${Object.entries(this.methods).map(([key, method]) => `
-                    <button class="method-card ${key === this.selectedMethod ? 'active' : ''}"
-                            data-method="${key}">
+                    <button class="method-card"
+                            data-method="${key}"
+                            data-path="${method.path}"
+                            title="Click to view ${method.name} pricing">
                         <span class="method-icon">${method.icon}</span>
                         <span class="method-name">${method.name}</span>
                         <span class="method-feature" style="color: ${method.feature.color};">
@@ -90,75 +90,31 @@ export class DecorationSelector {
                     </button>
                 `).join('')}
             </div>
-
-            <div class="method-content" id="method-content">
-                ${this.renderMethodContent(this.methods[this.selectedMethod])}
-            </div>
         `;
 
-        // Add event listeners
+        // Add direct navigation listeners
         this.container.querySelectorAll('.method-card').forEach(button => {
             button.addEventListener('click', (e) => {
                 const method = e.currentTarget.dataset.method;
-                this.selectMethod(method);
+                this.navigateToMethod(method);
             });
         });
-
-        // Add CTA button listener
-        const ctaButton = this.container.querySelector('.cta-button');
-        if (ctaButton) {
-            ctaButton.addEventListener('click', () => {
-                this.navigateToPricing();
-            });
-        }
     }
 
-    renderMethodContent(method) {
-        return `
-            <div class="method-info">
-                <h4 class="method-title">${method.name}</h4>
-                <p class="method-tagline">${method.tagline}</p>
-            </div>
-            <div class="method-details">
-                <div class="detail-item">
-                    <i class="${method.feature.icon}" style="color: ${method.feature.color};"></i>
-                    <span>${method.feature.text}</span>
-                </div>
-            </div>
-            <button class="cta-button">
-                ${method.cta}
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        `;
-    }
-
-    selectMethod(methodKey) {
-        this.selectedMethod = methodKey;
-
-        // Update active state
-        this.container.querySelectorAll('.method-card').forEach(button => {
-            button.classList.toggle('active', button.dataset.method === methodKey);
-        });
-
-        // Update content
+    navigateToMethod(methodKey) {
         const method = this.methods[methodKey];
-        const contentEl = this.container.querySelector('#method-content');
-        if (contentEl) {
-            contentEl.innerHTML = this.renderMethodContent(method);
 
-            // Re-add CTA listener
-            const ctaButton = contentEl.querySelector('.cta-button');
-            if (ctaButton) {
-                ctaButton.addEventListener('click', () => {
-                    this.navigateToPricing();
-                });
-            }
+        // Optional: Add subtle loading state to the clicked card
+        const clickedCard = this.container.querySelector(`[data-method="${methodKey}"]`);
+        if (clickedCard) {
+            clickedCard.style.opacity = '0.7';
+            clickedCard.style.pointerEvents = 'none';
         }
-    }
 
-    navigateToPricing() {
-        const method = this.methods[this.selectedMethod];
+        // Build URL with product context
         const url = `${method.path}?StyleNumber=${encodeURIComponent(this.styleNumber)}&COLOR=${encodeURIComponent(this.colorCode)}`;
+
+        // Navigate directly
         window.location.href = url;
     }
 }
