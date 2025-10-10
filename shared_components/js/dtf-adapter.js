@@ -173,7 +173,20 @@
         async checkForInitialData() {
             // Check URL parameters
             const urlParams = new URLSearchParams(window.location.search);
-            
+
+            // MANUAL MODE DETECTION: If manualCost parameter exists, skip adapter initialization
+            const manualCost = urlParams.get('manualCost');
+            if (manualCost) {
+                this.log('DTF Adapter: Manual pricing mode detected, skipping adapter initialization');
+
+                // Clear any cached data to prevent interference
+                sessionStorage.removeItem('dtfPricingData');
+
+                // Mark as initialized but don't dispatch any data
+                this.initialDataDispatched = true;
+                return;
+            }
+
             const styleNumber = urlParams.get('StyleNumber') || urlParams.get('styleNumber') || urlParams.get('sku');
             const garmentCost = urlParams.get('garmentCost') || urlParams.get('cost');
             const quantity = urlParams.get('quantity') || urlParams.get('qty');

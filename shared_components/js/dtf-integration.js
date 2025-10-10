@@ -76,6 +76,14 @@ class DTFIntegration {
             return;
         }
 
+        // MANUAL MODE CHECK: Ignore adapter data if in manual pricing mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const manualCost = urlParams.get('manualCost');
+        if (manualCost) {
+            console.log('DTF Integration: Manual pricing mode active, ignoring adapter data');
+            return;
+        }
+
         console.log('DTF Integration: Processing data:', data);
 
         // Track if this is a style/product change

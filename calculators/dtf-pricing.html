@@ -1291,6 +1291,20 @@
                         detail: pricingData
                     }));
 
+                    // CRITICAL: Directly set garment cost in calculator (manual mode)
+                    // The calculator needs garment cost to perform pricing calculations
+                    if (window.dtfCalculator) {
+                        console.log('🔧 Setting manual garment cost in calculator:', manualCost);
+                        window.dtfCalculator.updateGarmentCost(manualCost);
+                    } else {
+                        // Calculator not ready yet, wait for it
+                        console.log('⏳ Calculator not ready, waiting for dtfCalculatorReady event...');
+                        window.addEventListener('dtfCalculatorReady', () => {
+                            console.log('🔧 Calculator ready, setting manual cost:', manualCost);
+                            window.dtfCalculator.updateGarmentCost(manualCost);
+                        }, { once: true });
+                    }
+
                     // Update product info for manual mode
                     const manualProduct = {
                         productTitle: 'Manual DTF Pricing Mode',
