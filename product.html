@@ -61,14 +61,25 @@
         <div class="breadcrumb">
             <a href="/">Home</a> / Products / <span id="breadcrumb-product">Product</span>
         </div>
+
+        <!-- Decoration Method Selector - FULL WIDTH HERO BANNER -->
+        <section id="decoration-selector-banner" class="decoration-selector-banner">
+            <div class="banner-content">
+                <h2 class="banner-title">How would you like to customize this?</h2>
+                <div id="decoration-selector" class="decoration-selector-horizontal">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
         <!-- Product Search Section (Hidden - using header search instead) -->
         <section id="product-search" class="search-section" style="display: none;">
             <div class="search-container">
                 <label for="style-search">Search Products:</label>
-                <input 
-                    type="text" 
-                    id="style-search" 
-                    placeholder="Enter style number (e.g., PC61)" 
+                <input
+                    type="text"
+                    id="style-search"
+                    placeholder="Enter style number (e.g., PC61)"
                     autocomplete="off"
                 >
                 <div id="search-results" class="search-results hidden"></div>
@@ -91,11 +102,6 @@
 
                 <!-- Right: Product Info (40%) -->
                 <div class="product-info-column">
-                    <!-- Decoration Method Selector - HERO POSITION AT TOP -->
-                    <div id="decoration-selector" class="decoration-selector">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-
                     <div id="product-info" class="product-info">
                         <!-- Product details will be populated by JavaScript -->
                     </div>

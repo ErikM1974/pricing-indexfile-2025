@@ -578,6 +578,42 @@
     font-size: 0.875rem;
 }
 
+/* Decoration Selector Banner - Full Width Hero Section */
+.decoration-selector-banner {
+    background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--border-color);
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+}
+
+.decoration-selector-banner .banner-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.decoration-selector-banner .banner-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #1f2937);
+    text-align: center;
+    margin: 0 0 2rem 0;
+    letter-spacing: -0.025em;
+}
+
+/* Horizontal Decoration Selector */
+.decoration-selector-horizontal {
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin: 0;
+    box-shadow: none;
+}
+
+.decoration-selector-horizontal h3 {
+    display: none; /* Hide the h3 since we have banner-title */
+}
+
 /* Decoration Selector - Modern 2025 Style (NO GREEN GRADIENT!) */
 .decoration-selector {
     background: white;
@@ -604,6 +640,16 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+/* Horizontal banner specific styling */
+.decoration-selector-horizontal .decoration-methods-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 0;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .method-card {
