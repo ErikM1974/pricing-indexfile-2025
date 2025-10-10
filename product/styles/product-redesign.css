@@ -167,7 +167,7 @@
 /* Product Grid Layout - Enhanced (55/45 Split for Better Content Balance) */
 .product-layout {
     display: grid;
-    grid-template-columns: 55% 45%;
+    grid-template-columns: 1.22fr 1fr;
     gap: 3rem;
 }
 
