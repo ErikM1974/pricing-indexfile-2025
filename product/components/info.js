@@ -21,9 +21,6 @@ export class ProductInfo {
 
         // Show initial content with enhanced layout
         this.container.innerHTML = `
-            <!-- Product Badge -->
-            <div class="product-badge">Product Details</div>
-
             <div class="product-header">
                 <div class="product-header-text">
                     <h2 class="product-title">${this.escapeHtml(product.title || product.productTitle || product.PRODUCT_TITLE || product.styleNumber)}</h2>
@@ -64,7 +61,7 @@ export class ProductInfo {
         container.innerHTML = `
             <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(styleNumber)}', '${this.escapeHtml(catalogColor)}')">
                 <i class="fas fa-warehouse"></i>
-                Check Inventory
+                Check Inventory & Warehouse Locations
             </button>
         `;
     }

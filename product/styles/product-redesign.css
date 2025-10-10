@@ -478,6 +478,14 @@
     z-index: 1;
 }
 
+/* Responsive text for smaller buttons */
+@media (max-width: 480px) {
+    .inventory-button {
+        font-size: 0.9375rem;
+        padding: 0.875rem 1.25rem;
+    }
+}
+
 /* Color Swatches - Modern Section Spacing with Overflow Fix */
 .color-swatches {
     background: transparent;
