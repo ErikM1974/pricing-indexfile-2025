@@ -135,7 +135,7 @@
 | **Laser Manual** | ✅ Standard | 1 (shared) | ~150 lines | Product showcase, laser features |
 | **Screen Print Manual** | 🔶 Complex | **16 files** | ~200 lines | Copied from contract page, never refactored. Uses universal-pricing-* files + manual-calculator-styles.css. **Looks great, leave it alone.** |
 | **Cap Embroidery Manual** | 🔶 Standalone | 1 (cap-fix) | ~550 lines | Built independently, doesn't use shared CSS. **Works fine as-is.** |
-| **Sticker Manual** | 🔶 Standalone | 0 | ~686 lines | Complete CSS framework inline. **Built standalone, functions correctly.** |
+| **Sticker Pricing** | ✅ Clean Table | 0 | ~400 lines | **Simple pricing table page - NO calculator.** Replaced complex calculator with clean, easy-to-read tables for 4 standard sizes (2"×2", 3"×3", 4"×4", 5"×5"). Mobile-responsive, NWCA green theme. |
 
 #### CSS Files Detail
 

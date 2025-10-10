@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Manual Sticker Pricing - Northwest Custom Apparel</title>
+    <title>Die Cut Sticker Pricing - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <style>
         /* NWCA Green Theme Variables */
         :root {
@@ -25,30 +25,31 @@
             --success-text: #065f46;
             --warning-bg: #fef3c7;
             --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+            --best-value-bg: #fef3c7;
+            --best-value-border: #f59e0b;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
         }
-        
-        /* Header with NWCA Branding */
+
+        /* Header */
         .header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
             padding: 1rem 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        
+
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -58,18 +59,18 @@
             align-items: center;
             gap: 2rem;
         }
-        
+
         .header-left {
             display: flex;
             align-items: center;
             gap: 2rem;
         }
-        
+
         .logo {
             height: 40px;
             width: auto;
         }
-        
+
         .breadcrumb {
             display: flex;
             align-items: center;
@@ -77,47 +78,37 @@
             color: var(--text-secondary);
             font-size: 0.875rem;
         }
-        
+
         .breadcrumb a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
-        
+
         .breadcrumb a:hover {
             color: var(--primary-dark);
         }
-        
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        /* Main Container - Prevents page from stretching too wide */
+
+        /* Main Container */
         .main-container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 2rem;
         }
-        
-        /* Enhanced Page Header with Hero Image */
+
+        /* Page Header */
         .page-header {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
-            padding: 2rem;
+            padding: 3rem 2rem;
             border-radius: 12px;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 2rem;
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
-        
+
         .page-header::before {
             content: '';
             position: absolute;
@@ -128,138 +119,65 @@
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
         }
-        
+
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        
+
         .page-header-content {
-            flex: 1;
-            text-align: left;
             position: relative;
             z-index: 1;
         }
-        
+
         .page-header h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .page-header p {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             opacity: 0.95;
         }
-        
-        .page-header-image {
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
+
+        .effective-date {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
         }
-        
-        .page-header-image img {
-            width: 180px;
-            height: auto;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            border: 3px solid rgba(255,255,255,0.3);
-            animation: float 3s ease-in-out infinite;
-            transition: transform 0.3s ease;
-        }
-        
-        .page-header-image img:hover {
-            transform: scale(1.05);
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @media (max-width: 768px) {
-            .page-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .page-header-content {
-                text-align: center;
-            }
-            
-            .page-header-image img {
-                width: 150px;
-            }
-        }
-        
-        /* Product Showcase Section */
+
+        /* Product Showcase */
         .product-showcase {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .product-showcase::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark), var(--primary-color));
-            background-size: 200% 100%;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        .product-showcase-inner {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 2rem;
             align-items: center;
         }
-        
-        .product-showcase-image {
+
+        .product-image {
             text-align: center;
         }
-        
-        .product-showcase-image img {
-            width: 100%;
-            max-width: 300px;
+
+        .product-image img {
+            max-width: 100%;
             height: auto;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .product-showcase-image img:hover {
-            transform: scale(1.02) rotate(1deg);
-            box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
-        }
-        
-        .product-showcase-content h3 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
+
         .product-features {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-top: 1.5rem;
         }
-        
+
         .feature-item {
             display: flex;
             align-items: center;
@@ -269,931 +187,571 @@
             border-radius: 8px;
             border-left: 3px solid var(--primary-color);
         }
-        
+
         .feature-item i {
             color: var(--primary-color);
             font-size: 1.25rem;
         }
-        
-        .feature-item span {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-        
-        @media (max-width: 768px) {
-            .product-showcase-inner {
-                grid-template-columns: 1fr;
-            }
-            
-            .product-features {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Video Section */
-        .video-section {
+
+        /* Pricing Table */
+        .pricing-section {
             background: var(--card-bg);
             border-radius: 12px;
+            padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            overflow: hidden;
         }
-        
-        .video-header {
-            padding: 1.25rem 1.5rem;
-            background: var(--hover-bg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: background 0.2s;
-            user-select: none;
-        }
-        
-        .video-header:hover {
-            background: var(--success-bg);
-        }
-        
-        .video-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: var(--text-primary);
-            font-size: 1.125rem;
-            margin: 0;
-        }
-        
-        .video-duration {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: normal;
-        }
-        
-        .toggle-icon {
-            color: var(--primary-color);
-            font-size: 1.25rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .toggle-icon.open {
-            transform: rotate(180deg);
-        }
-        
-        .video-content {
-            display: none;
-            padding: 1.5rem;
-            animation: slideDown 0.3s ease;
-        }
-        
-        .video-content.show {
-            display: block;
-        }
-        
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .video-notes {
-            background: var(--success-bg);
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .video-notes p {
-            color: var(--success-text);
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        
-        /* Main Content Grid */
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Input and Results Sections */
-        .input-section, .results-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        
-        .section-title {
+
+        .size-title {
             font-size: 1.5rem;
             color: var(--primary-color);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
         }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-        
-        input[type="number"], select {
+
+        .pricing-table {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.2s;
-            background: white;
+            border-collapse: collapse;
+            margin-top: 1rem;
         }
-        
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: var(--focus-shadow);
+
+        .pricing-table thead {
+            background: var(--hover-bg);
         }
-        
-        small {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-        
-        .size-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        
-        /* Preset Buttons */
-        .preset-buttons {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-        }
-        
-        .preset-btn {
+
+        .pricing-table th {
             padding: 1rem;
-            border: 2px solid var(--border-color);
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-        
-        .preset-btn:hover {
-            border-color: var(--primary-color);
-            background: var(--success-bg);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.15);
-        }
-        
-        .preset-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .preset-size {
+            text-align: left;
             font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
         }
-        
-        .preset-area {
+
+        .pricing-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .pricing-table tbody tr.best-value {
+            background: var(--best-value-bg);
+            border-left: 4px solid var(--best-value-border);
+        }
+
+        .pricing-table tbody tr.best-value td {
+            font-weight: 600;
+        }
+
+        .best-value-badge {
+            display: inline-block;
+            background: var(--best-value-border);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
             font-size: 0.75rem;
-            opacity: 0.8;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
         }
-        
-        /* Price Display */
-        .price-display {
+
+        .price-highlight {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: var(--success-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .info-box h3 {
+            color: var(--success-text);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box ul {
+            margin-left: 1.5rem;
+            color: var(--success-text);
+        }
+
+        .info-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             padding: 2rem;
             border-radius: 12px;
             text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+            margin: 2rem 0;
         }
-        
-        .total-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+
+        .cta-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
         }
-        
-        .price-per-unit {
-            font-size: 1.1rem;
-            opacity: 0.95;
-        }
-        
-        /* Breakdown Section */
-        .breakdown {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .breakdown-header {
+
+        .cta-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 0.75rem;
-            margin: -1.5rem -1.5rem 1rem -1.5rem;
-            background: var(--hover-bg);
-            border-radius: 10px 10px 0 0;
-            user-select: none;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
         }
-        
-        .breakdown-header:hover {
-            background: var(--success-bg);
-        }
-        
-        .breakdown-header h3 {
-            color: var(--text-primary);
-            font-size: 1.125rem;
-            margin: 0;
-        }
-        
-        .breakdown-toggle {
-            color: var(--primary-color);
-            font-size: 1.25rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .breakdown-toggle.open {
-            transform: rotate(180deg);
-        }
-        
-        .breakdown-content {
-            display: none;
-        }
-        
-        .breakdown-content.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .breakdown-item:last-child {
-            border-bottom: none;
-        }
-        
-        .breakdown-item.total {
-            font-weight: 600;
-            font-size: 1.125rem;
-            color: var(--primary-color);
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-            border-top: 2px solid var(--primary-color);
-        }
-        
-        /* Warnings */
-        .warning {
-            background: var(--warning-bg);
-            border: 1px solid #fbbf24;
-            color: var(--warning-text);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            display: flex;
+
+        .cta-btn {
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        
-        /* Admin Panel */
-        .admin-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--text-secondary);
-            color: white;
-            border: none;
-            padding: 0.625rem 1.25rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
             transition: all 0.2s;
         }
-        
-        .admin-toggle:hover {
-            background: var(--text-primary);
+
+        .cta-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        
-        .admin-panel {
-            display: none;
-            position: fixed;
-            bottom: 70px;
-            right: 20px;
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            width: 320px;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-        }
-        
-        .admin-panel h3 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-        
-        .admin-input {
-            margin-bottom: 1rem;
-        }
-        
-        .admin-input label {
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-            color: var(--text-secondary);
-        }
-        
-        .admin-input input {
-            padding: 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        /* Cost Breakdown (Internal) */
-        #costBreakdown {
-            background: var(--hover-bg);
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            border: 1px dashed var(--border-color);
-        }
-        
-        #costBreakdown h4 {
+
+        /* Footer */
+        .pricing-footer {
+            text-align: center;
+            padding: 2rem;
             color: var(--text-secondary);
             font-size: 0.875rem;
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
-        
-        #costBreakdown .breakdown-item {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            padding: 0.5rem 0;
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .product-showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .product-features {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-table {
+                font-size: 0.875rem;
+            }
+
+            .pricing-table th,
+            .pricing-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header with NWCA Branding -->
+    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                      alt="Northwest Custom Apparel" class="logo">
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Dashboard</a>
                     <span>/</span>
-                    <span>Manual Sticker Pricing</span>
+                    <span>Sticker Pricing</span>
                 </nav>
             </div>
         </div>
     </header>
-    
+
     <!-- Main Content -->
     <main class="main-container">
-        <div class="calculator-title text-center">
-            <h1>Manual Sticker Pricing Calculator</h1>
-            <p>Professional pricing for custom die-cut stickers and labels</p>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1>Die Cut Sticker Price List</h1>
+                <p>Premium Quality Custom Stickers - Fast Turnaround</p>
+                <div class="effective-date">Updated Pricing - October 2025</div>
+            </div>
         </div>
-        
-        <!-- Product Showcase Section -->
+
+        <!-- Product Showcase -->
         <div class="product-showcase">
-            <div class="product-showcase-inner">
-                <div class="product-showcase-image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531" 
-                         alt="Premium Custom Stickers" 
-                         title="High-Quality Die-Cut Stickers">
-                </div>
-                <div class="product-showcase-content">
-                    <h3><i class="fas fa-star"></i> Premium Custom Stickers</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Our state-of-the-art printing technology delivers vibrant, durable custom stickers that make your brand stand out. 
-                        From small logos to large decals, we provide professional quality at competitive prices.
-                    </p>
-                    <div class="product-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Die-Cut Precision</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-palette"></i>
-                            <span>Vibrant Colors</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Weather Resistant</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-clock"></i>
-                            <span>Fast Turnaround</span>
-                        </div>
+            <div class="product-image">
+                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531"
+                     alt="Premium Custom Stickers">
+            </div>
+            <div>
+                <h2 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-star"></i> Premium Custom Stickers
+                </h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Our state-of-the-art printing technology delivers vibrant, durable custom stickers
+                    that make your brand stand out. From small logos to large decals, we provide
+                    professional quality at competitive prices.
+                </p>
+                <div class="product-features">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Full Color Printing</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-cut"></i>
+                        <span>Custom Die-Cut Shapes</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Durable Vinyl Material</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Fast Turnaround</span>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Industry Research Video -->
-        <div class="video-section">
-            <div class="video-header" onclick="toggleVideo()">
-                <h3>
-                    <span>📹</span>
-                    Sticker Industry Research Video
-                    <span class="video-duration">- Learn about industry pricing strategies</span>
-                </h3>
-                <span class="toggle-icon" id="videoToggle">▼</span>
-            </div>
-            <div class="video-content" id="videoContent">
-                <div class="video-wrapper">
-                    <iframe src="https://www.youtube.com/embed/2hchq73qpCU" 
-                            title="Sticker Industry Research" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen></iframe>
-                </div>
-                <div class="video-notes">
-                    <p>
-                        <strong>Key Takeaways:</strong> Understanding market pricing, material costs, and competitor strategies 
-                        helps us position NWCA competitively while maintaining healthy margins. Pay attention to volume discounts 
-                        and specialty material upcharges discussed in the video.
-                    </p>
-                </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3><i class="fas fa-info-circle"></i> Key Features</h3>
+            <ul>
+                <li><strong>Full Color Printing:</strong> Vibrant, long-lasting colors</li>
+                <li><strong>Custom Die-Cut Shapes:</strong> Cut to your exact design specifications</li>
+                <li><strong>Fast Turnaround:</strong> Quick production and delivery</li>
+                <li><strong>Premium Quality:</strong> Durable vinyl material suitable for indoor and outdoor use</li>
+            </ul>
+        </div>
+
+        <!-- Pricing Tables -->
+
+        <!-- 2x2 Stickers -->
+        <div class="pricing-section">
+            <h2 class="size-title">
+                <i class="fas fa-square"></i> 2" × 2" Stickers
+            </h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Price Per Sticker</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>50</td>
+                        <td class="price-highlight">$87.00</td>
+                        <td>$1.74</td>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td class="price-highlight">$104.00</td>
+                        <td>$1.04</td>
+                    </tr>
+                    <tr class="best-value">
+                        <td>200 <span class="best-value-badge">Best Value</span></td>
+                        <td class="price-highlight">$140.00</td>
+                        <td>$0.70</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td class="price-highlight">$186.00</td>
+                        <td>$0.62</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td class="price-highlight">$234.00</td>
+                        <td>$0.47</td>
+                    </tr>
+                    <tr>
+                        <td>1,000</td>
+                        <td class="price-highlight">$408.00</td>
+                        <td>$0.41</td>
+                    </tr>
+                    <tr>
+                        <td>2,000</td>
+                        <td class="price-highlight">$654.00</td>
+                        <td>$0.33</td>
+                    </tr>
+                    <tr>
+                        <td>3,000</td>
+                        <td class="price-highlight">$874.00</td>
+                        <td>$0.29</td>
+                    </tr>
+                    <tr>
+                        <td>5,000</td>
+                        <td class="price-highlight">$1,275.00</td>
+                        <td>$0.26</td>
+                    </tr>
+                    <tr>
+                        <td>10,000</td>
+                        <td class="price-highlight">$2,158.00</td>
+                        <td>$0.22</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3x3 Stickers -->
+        <div class="pricing-section">
+            <h2 class="size-title">
+                <i class="fas fa-square"></i> 3" × 3" Stickers
+            </h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Price Per Sticker</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>50</td>
+                        <td class="price-highlight">$128.00</td>
+                        <td>$2.56</td>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td class="price-highlight">$124.00</td>
+                        <td>$1.24</td>
+                    </tr>
+                    <tr class="best-value">
+                        <td>200 <span class="best-value-badge">Best Value</span></td>
+                        <td class="price-highlight">$234.00</td>
+                        <td>$1.17</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td class="price-highlight">$296.00</td>
+                        <td>$0.99</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td class="price-highlight">$406.00</td>
+                        <td>$0.81</td>
+                    </tr>
+                    <tr>
+                        <td>1,000</td>
+                        <td class="price-highlight">$656.00</td>
+                        <td>$0.66</td>
+                    </tr>
+                    <tr>
+                        <td>2,000</td>
+                        <td class="price-highlight">$1,089.00</td>
+                        <td>$0.54</td>
+                    </tr>
+                    <tr>
+                        <td>3,000</td>
+                        <td class="price-highlight">$1,482.00</td>
+                        <td>$0.49</td>
+                    </tr>
+                    <tr>
+                        <td>5,000</td>
+                        <td class="price-highlight">$2,199.00</td>
+                        <td>$0.44</td>
+                    </tr>
+                    <tr>
+                        <td>10,000</td>
+                        <td class="price-highlight">$3,790.00</td>
+                        <td>$0.38</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4x4 Stickers -->
+        <div class="pricing-section">
+            <h2 class="size-title">
+                <i class="fas fa-square"></i> 4" × 4" Stickers
+            </h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Price Per Sticker</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>50</td>
+                        <td class="price-highlight">$153.00</td>
+                        <td>$3.06</td>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td class="price-highlight">$212.00</td>
+                        <td>$2.12</td>
+                    </tr>
+                    <tr class="best-value">
+                        <td>200 <span class="best-value-badge">Best Value</span></td>
+                        <td class="price-highlight">$294.00</td>
+                        <td>$1.47</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td class="price-highlight">$378.00</td>
+                        <td>$1.26</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td class="price-highlight">$544.00</td>
+                        <td>$1.09</td>
+                    </tr>
+                    <tr>
+                        <td>1,000</td>
+                        <td class="price-highlight">$962.00</td>
+                        <td>$0.96</td>
+                    </tr>
+                    <tr>
+                        <td>2,000</td>
+                        <td class="price-highlight">$1,630.00</td>
+                        <td>$0.82</td>
+                    </tr>
+                    <tr>
+                        <td>3,000</td>
+                        <td class="price-highlight">$2,236.00</td>
+                        <td>$0.75</td>
+                    </tr>
+                    <tr>
+                        <td>5,000</td>
+                        <td class="price-highlight">$3,346.00</td>
+                        <td>$0.67</td>
+                    </tr>
+                    <tr>
+                        <td>10,000</td>
+                        <td class="price-highlight">$5,846.00</td>
+                        <td>$0.58</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 5x5 Stickers -->
+        <div class="pricing-section">
+            <h2 class="size-title">
+                <i class="fas fa-square"></i> 5" × 5" Stickers
+            </h2>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Price Per Sticker</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>50</td>
+                        <td class="price-highlight">$183.00</td>
+                        <td>$3.66</td>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td class="price-highlight">$266.00</td>
+                        <td>$2.66</td>
+                    </tr>
+                    <tr class="best-value">
+                        <td>200 <span class="best-value-badge">Best Value</span></td>
+                        <td class="price-highlight">$412.00</td>
+                        <td>$2.06</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td class="price-highlight">$536.00</td>
+                        <td>$1.79</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td class="price-highlight">$784.00</td>
+                        <td>$1.57</td>
+                    </tr>
+                    <tr>
+                        <td>1,000</td>
+                        <td class="price-highlight">$1,322.00</td>
+                        <td>$1.32</td>
+                    </tr>
+                    <tr>
+                        <td>2,000</td>
+                        <td class="price-highlight">$2,266.00</td>
+                        <td>$1.13</td>
+                    </tr>
+                    <tr>
+                        <td>3,000</td>
+                        <td class="price-highlight">$3,123.00</td>
+                        <td>$1.04</td>
+                    </tr>
+                    <tr>
+                        <td>5,000</td>
+                        <td class="price-highlight">$4,694.00</td>
+                        <td>$0.94</td>
+                    </tr>
+                    <tr>
+                        <td>10,000</td>
+                        <td class="price-highlight">$8,892.00</td>
+                        <td>$0.89</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Volume Discounts Info -->
+        <div class="info-box">
+            <h3><i class="fas fa-chart-line"></i> Volume Discounts</h3>
+            <p style="color: var(--success-text);">
+                The more you order, the more you save! Our per-unit costs decrease significantly at higher quantities.
+                <strong>Contact us for quotes on quantities over 10,000 or custom sizes.</strong>
+            </p>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>Need Custom Sizes or Have Questions?</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                Our team is ready to help with custom quotes and rush orders
+            </p>
+            <div class="cta-buttons">
+                <a href="tel:253-922-5793" class="cta-btn">
+                    <i class="fas fa-phone"></i> (253) 922-5793
+                </a>
+                <a href="mailto:sales@nwcustomapparel.com" class="cta-btn">
+                    <i class="fas fa-envelope"></i> sales@nwcustomapparel.com
+                </a>
             </div>
         </div>
-        
-        <!-- Main Content -->
-        <div class="content">
-            <!-- Input Section -->
-            <div class="input-section">
-                <h2 class="section-title">
-                    <span>📐</span> Sticker Details
-                </h2>
-                
-                <div class="form-group">
-                    <label>Quick Size Selection</label>
-                    <div class="preset-buttons">
-                        <div class="preset-btn" onclick="setPresetSize(2, 2)">
-                            <div class="preset-size">2"×2"</div>
-                            <div class="preset-area">4 sq in</div>
-                        </div>
-                        <div class="preset-btn" onclick="setPresetSize(3, 3)">
-                            <div class="preset-size">3"×3"</div>
-                            <div class="preset-area">9 sq in</div>
-                        </div>
-                        <div class="preset-btn" onclick="setPresetSize(4, 4)">
-                            <div class="preset-size">4"×4"</div>
-                            <div class="preset-area">16 sq in</div>
-                        </div>
-                        <div class="preset-btn" onclick="setPresetSize(5, 5)">
-                            <div class="preset-size">5"×5"</div>
-                            <div class="preset-area">25 sq in</div>
-                        </div>
-                        <div class="preset-btn" onclick="setPresetSize(3, 4)">
-                            <div class="preset-size">3"×4"</div>
-                            <div class="preset-area">12 sq in</div>
-                        </div>
-                        <div class="preset-btn" onclick="setPresetSize(6, 4)">
-                            <div class="preset-size">6"×4"</div>
-                            <div class="preset-area">24 sq in</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Custom Size (inches)</label>
-                    <div class="size-inputs">
-                        <input type="number" id="width" placeholder="Width" min="0.5" max="20" step="0.25" value="3" onchange="calculatePrice()">
-                        <input type="number" id="height" placeholder="Height" min="0.5" max="20" step="0.25" value="3" onchange="calculatePrice()">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" id="quantity" min="50" value="100" onchange="calculatePrice()">
-                    <small>Minimum order: 50 stickers</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>Material Type</label>
-                    <select id="material" onchange="calculatePrice()">
-                        <option value="1">Standard Vinyl (Glossy/Matte)</option>
-                        <option value="1.15">Clear Vinyl (+15%)</option>
-                        <option value="1.30">Holographic/Glitter (+30%)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Lamination</label>
-                    <select id="lamination" onchange="calculatePrice()">
-                        <option value="true">Yes - Laminated (Outdoor/Durable)</option>
-                        <option value="false">No - Unlaminated (Indoor/Short-term)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Number of Unique Designs</label>
-                    <input type="number" id="designs" min="1" value="1" onchange="calculatePrice()">
-                    <small>Additional setup fee for multiple designs</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>Art Preparation Required?</label>
-                    <select id="artPrep" onchange="calculatePrice()">
-                        <option value="false">No - Files are print-ready</option>
-                        <option value="true">Yes - Need art preparation ($50 first design, $25 additional)</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Results Section -->
-            <div class="results-section">
-                <h2 class="section-title">
-                    <span>💰</span> Pricing
-                </h2>
-                
-                <div class="price-display">
-                    <div class="total-price" id="totalPrice">$0.00</div>
-                    <div class="price-per-unit" id="pricePerUnit">$0.00 per sticker</div>
-                    <div id="artChargeDisplay" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
-                        <div style="font-size: 1rem; margin-bottom: 0.25rem;">Art Preparation: <span id="artChargeAmount">$0.00</span></div>
-                        <div style="font-size: 0.875rem; opacity: 0.9;" id="artChargeDetails"></div>
-                    </div>
-                </div>
-                
-                <div class="breakdown">
-                    <div class="breakdown-header" onclick="toggleBreakdown()">
-                        <h3>Invoice Summary</h3>
-                        <span class="breakdown-toggle" id="breakdownToggle">▼</span>
-                    </div>
-                    <div class="breakdown-content" id="breakdownContent">
-                        <div class="breakdown-item">
-                            <span>Sticker Total:</span>
-                            <span id="stickerTotal">$0.00</span>
-                        </div>
-                        <div class="breakdown-item" id="artPrepLine" style="display: none;">
-                            <span>Art Preparation:</span>
-                            <span id="artPrepFeeDisplay">$0.00</span>
-                        </div>
-                        <div class="breakdown-item total">
-                            <span>Total Price:</span>
-                            <span id="finalPrice">$0.00</span>
-                        </div>
-                        
-                        <div id="costBreakdown" style="display: none;">
-                            <h4>Cost Breakdown (Internal)</h4>
-                            <div class="breakdown-item">
-                                <span>Materials Cost:</span>
-                                <span id="materialsCost">$0.00</span>
-                            </div>
-                            <div class="breakdown-item">
-                                <span>Machine Time:</span>
-                                <span id="machineCost">$0.00</span>
-                            </div>
-                            <div class="breakdown-item">
-                                <span>Labor Cost:</span>
-                                <span id="laborCost">$0.00</span>
-                            </div>
-                            <div class="breakdown-item">
-                                <span>Base Cost:</span>
-                                <span id="baseCost">$0.00</span>
-                            </div>
-                            <div class="breakdown-item">
-                                <span>Markup Applied:</span>
-                                <span id="markupInfo">2.5x</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="warning" id="minimumWarning" style="display: none;">
-                    <span>⚠️</span>
-                    <span>Minimum order value is $100.00</span>
-                </div>
-                
-                <div class="warning" id="ltmWarning" style="display: none;">
-                    <span>⚠️</span>
-                    <span>Less than minimum fee of $50.00 applied (under 50 stickers)</span>
-                </div>
-            </div>
+
+        <!-- Footer -->
+        <div class="pricing-footer">
+            <p>
+                <strong>Northwest Custom Apparel</strong><br>
+                Pricing updated October 2025 to reflect current material costs and premium quality standards.<br>
+                Custom sizes and rush orders available - contact us for a quote.
+            </p>
         </div>
     </main>
-    
-    <button class="admin-toggle" onclick="toggleAdmin()">Admin Settings</button>
-    
-    <div class="admin-panel" id="adminPanel">
-        <h3>Admin Settings</h3>
-        <div class="admin-input">
-            <label>BHR ($/hour)</label>
-            <input type="number" id="bhr" value="114.29" step="0.01" onchange="calculatePrice()">
-        </div>
-        <div class="admin-input">
-            <label>Labor Rate ($/hour)</label>
-            <input type="number" id="laborRate" value="30" step="0.01" onchange="calculatePrice()">
-        </div>
-        <div class="admin-input">
-            <label>Markup Multiplier</label>
-            <input type="number" id="markup" value="2.5" step="0.1" onchange="calculatePrice()">
-        </div>
-        <div class="admin-input">
-            <label>Setup Time (hours)</label>
-            <input type="number" id="setupTime" value="0.15" step="0.01" onchange="calculatePrice()">
-        </div>
-        <div class="admin-input">
-            <label>Print Speed (sq in/hour)</label>
-            <input type="number" id="printSpeed" value="720" step="10" onchange="calculatePrice()">
-        </div>
-    </div>
-    
-    <script>
-        // Constants - Based on NWCA specific costs
-        const COSTS = {
-            BHR: 114.29, // Calculated from printer costs
-            LABOR_RATE: 30.00,
-            SETUP_TIME_HOURS: 0.15,
-            PRINT_CUT_RATE_SQIN_PER_HOUR: 720,
-            WASTE_FACTOR: 1.055,
-            
-            // Material costs with 10% added
-            COST_SQFT_VINYL: 0.84 * 1.10,
-            COST_SQFT_LAMINATION: 0.95 * 1.10,
-            COST_SQFT_INK: 0.60 * 1.10,
-            
-            MINIMUM_ORDER: 100.00,
-            MINIMUM_QUANTITY: 50,
-            LTM_FEE: 50.00, // Less than minimum fee
-            ART_PREP_FEE: 50.00, // First design art prep
-            ART_PREP_ADDITIONAL: 25.00, // Additional designs art prep
-            SETUP_FEE_PER_DESIGN: 25.00,
-            
-            // Markup tiers
-            MARKUP_TIERS: {
-                50: 2.5,
-                100: 2.3,
-                250: 2.0,
-                500: 1.8,
-                1000: 1.6
-            }
-        };
-        
-        let breakdownUnlocked = false;
-        
-        function toggleVideo() {
-            const content = document.getElementById('videoContent');
-            const toggle = document.getElementById('videoToggle');
-            
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                toggle.classList.remove('open');
-            } else {
-                content.classList.add('show');
-                toggle.classList.add('open');
-            }
-        }
-        
-        function toggleBreakdown() {
-            const content = document.getElementById('breakdownContent');
-            const toggle = document.getElementById('breakdownToggle');
-            const costBreakdown = document.getElementById('costBreakdown');
-            
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                toggle.classList.remove('open');
-            } else {
-                content.classList.add('show');
-                toggle.classList.add('open');
-                
-                // Check if cost breakdown should be shown (password protected)
-                if (!breakdownUnlocked && costBreakdown.style.display === 'none') {
-                    const password = prompt('Enter password to view cost breakdown:');
-                    if (password === 'nwca2025') {
-                        breakdownUnlocked = true;
-                        costBreakdown.style.display = 'block';
-                    }
-                } else if (breakdownUnlocked) {
-                    costBreakdown.style.display = 'block';
-                }
-            }
-        }
-        
-        function toggleAdmin() {
-            const panel = document.getElementById('adminPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function setPresetSize(width, height) {
-            document.getElementById('width').value = width;
-            document.getElementById('height').value = height;
-            
-            // Update active state
-            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.preset-btn').classList.add('active');
-            
-            calculatePrice();
-        }
-        
-        function getAdminValues() {
-            return {
-                BHR: parseFloat(document.getElementById('bhr').value) || COSTS.BHR,
-                LABOR_RATE: parseFloat(document.getElementById('laborRate').value) || COSTS.LABOR_RATE,
-                MARKUP: parseFloat(document.getElementById('markup').value) || 2.5,
-                SETUP_TIME: parseFloat(document.getElementById('setupTime').value) || COSTS.SETUP_TIME_HOURS,
-                PRINT_SPEED: parseFloat(document.getElementById('printSpeed').value) || COSTS.PRINT_CUT_RATE_SQIN_PER_HOUR
-            };
-        }
-        
-        function calculatePrice() {
-            // Get inputs
-            const width = parseFloat(document.getElementById('width').value) || 0;
-            const height = parseFloat(document.getElementById('height').value) || 0;
-            const quantity = parseInt(document.getElementById('quantity').value) || 0;
-            const materialMultiplier = parseFloat(document.getElementById('material').value) || 1;
-            const isLaminated = document.getElementById('lamination').value === 'true';
-            const numDesigns = parseInt(document.getElementById('designs').value) || 1;
-            const needsArtPrep = document.getElementById('artPrep').value === 'true';
-            
-            // Get admin values
-            const admin = getAdminValues();
-            
-            // Calculate areas
-            const stickerArea_sqin = width * height;
-            const stickerArea_sqft = stickerArea_sqin / 144;
-            const totalMaterialArea_sqft = stickerArea_sqft * quantity * COSTS.WASTE_FACTOR;
-            
-            // Calculate time costs
-            const totalMachineTime_hours = (stickerArea_sqin * quantity) / admin.PRINT_SPEED;
-            const totalLaborTime_hours = admin.SETUP_TIME + totalMachineTime_hours;
-            
-            // Calculate material costs
-            let materialCostPerSqFt = COSTS.COST_SQFT_VINYL + COSTS.COST_SQFT_INK;
-            if (isLaminated) {
-                materialCostPerSqFt += COSTS.COST_SQFT_LAMINATION;
-            }
-            materialCostPerSqFt *= materialMultiplier;
-            
-            const totalMaterialCost = totalMaterialArea_sqft * materialCostPerSqFt;
-            const totalMachineCost = totalMachineTime_hours * admin.BHR;
-            const totalLaborCost = totalLaborTime_hours * admin.LABOR_RATE;
-            const setupFees = (numDesigns - 1) * COSTS.SETUP_FEE_PER_DESIGN;
-            
-            // Calculate art prep fees correctly
-            let artPrepFee = 0;
-            let artPrepDetails = '';
-            if (needsArtPrep) {
-                artPrepFee = COSTS.ART_PREP_FEE; // $50 for first design
-                if (numDesigns > 1) {
-                    const additionalDesigns = numDesigns - 1;
-                    const additionalFee = additionalDesigns * COSTS.ART_PREP_ADDITIONAL;
-                    artPrepFee += additionalFee;
-                    artPrepDetails = `($50 first + $${additionalFee} for ${additionalDesigns} additional)`;
-                } else {
-                    artPrepDetails = '(First design)';
-                }
-            }
-            
-            const ltmFee = quantity < COSTS.MINIMUM_QUANTITY ? COSTS.LTM_FEE : 0;
-            
-            const totalBaseCost = totalMaterialCost + totalMachineCost + totalLaborCost + setupFees;
-            
-            // Apply tiered markup
-            let markupMultiplier = admin.MARKUP;
-            for (const [tier, multiplier] of Object.entries(COSTS.MARKUP_TIERS).reverse()) {
-                if (quantity >= parseInt(tier)) {
-                    markupMultiplier = multiplier;
-                    break;
-                }
-            }
-            
-            // Calculate sticker price (without art prep)
-            let stickerPrice = (totalBaseCost + ltmFee) * markupMultiplier;
-            
-            // Apply minimum to sticker price only
-            if (stickerPrice < COSTS.MINIMUM_ORDER) {
-                stickerPrice = COSTS.MINIMUM_ORDER;
-            }
-            
-            // Final price includes art prep on top
-            const finalPrice = stickerPrice + artPrepFee;
-            
-            // Update main price display
-            document.getElementById('totalPrice').textContent = `$${finalPrice.toFixed(2)}`;
-            document.getElementById('pricePerUnit').textContent = `$${(finalPrice / quantity).toFixed(2)} per sticker`;
-            
-            // Update art charge display
-            const artChargeDisplay = document.getElementById('artChargeDisplay');
-            if (needsArtPrep && artPrepFee > 0) {
-                artChargeDisplay.style.display = 'block';
-                document.getElementById('artChargeAmount').textContent = `$${artPrepFee.toFixed(2)}`;
-                document.getElementById('artChargeDetails').textContent = artPrepDetails;
-            } else {
-                artChargeDisplay.style.display = 'none';
-            }
-            
-            // Update invoice breakdown
-            document.getElementById('stickerTotal').textContent = `$${stickerPrice.toFixed(2)}`;
-            
-            const artPrepLine = document.getElementById('artPrepLine');
-            if (needsArtPrep && artPrepFee > 0) {
-                artPrepLine.style.display = 'flex';
-                document.getElementById('artPrepFeeDisplay').textContent = `$${artPrepFee.toFixed(2)}`;
-            } else {
-                artPrepLine.style.display = 'none';
-            }
-            
-            document.getElementById('finalPrice').textContent = `$${finalPrice.toFixed(2)}`;
-            
-            // Update cost breakdown (internal)
-            document.getElementById('materialsCost').textContent = `$${totalMaterialCost.toFixed(2)}`;
-            document.getElementById('machineCost').textContent = `$${totalMachineCost.toFixed(2)}`;
-            document.getElementById('laborCost').textContent = `$${totalLaborCost.toFixed(2)}`;
-            document.getElementById('baseCost').textContent = `$${totalBaseCost.toFixed(2)}`;
-            document.getElementById('markupInfo').textContent = `${markupMultiplier}x`;
-            
-            // Show/hide warnings
-            document.getElementById('minimumWarning').style.display = 
-                (stickerPrice === COSTS.MINIMUM_ORDER) ? 'flex' : 'none';
-            document.getElementById('ltmWarning').style.display = 
-                (quantity < COSTS.MINIMUM_QUANTITY) ? 'flex' : 'none';
-        }
-        
-        // Calculate BHR based on NWCA specific numbers
-        function calculateBHR() {
-            // NWCA specific costs
-            const printerCost = 30000;
-            const depreciationYears = 5;
-            const annualDepreciation = printerCost / depreciationYears;
-            const serviceAgreement = 3000;
-            const annualMaintenance = 1000;
-            
-            // 5 hours/week * 50 weeks = 250 hours/year
-            const annualProductionHours = 250;
-            
-            // Total annual overhead
-            const totalAnnualOverhead = annualDepreciation + serviceAgreement + annualMaintenance;
-            
-            // BHR = Total Annual Overhead / Production Hours
-            const calculatedBHR = totalAnnualOverhead / annualProductionHours;
-            
-            // Add 10% for utilities and other overhead
-            return calculatedBHR * 1.10;
-        }
-        
-        // Initialize with calculated BHR
-        document.addEventListener('DOMContentLoaded', function() {
-            const calculatedBHR = calculateBHR();
-            document.getElementById('bhr').value = calculatedBHR.toFixed(2);
-            calculatePrice();
-        });
-    </script>
 </body>
 </html>
