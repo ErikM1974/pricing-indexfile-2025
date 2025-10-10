@@ -276,11 +276,13 @@
 }
 
 
-/* Product Info Column - Modern 2025 Spacing */
+/* Product Info Column - Modern 2025 Spacing with Overflow Fix */
 .product-info-column {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 /* Product Badge - Modern Subtle Style */
@@ -409,41 +411,80 @@
     color: #333;
 }
 
-/* Inventory Button - Modern Action Button */
+/* Inventory Button Container - Below Thumbnails */
+.inventory-button-container {
+    margin-top: 1.5rem;
+    padding: 0;
+}
+
+/* Inventory Button - Northwest Green Action Button */
 .inventory-button {
-    background: var(--info-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3a9940 100%);
     color: white;
     border: none;
     padding: 1rem 1.5rem;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 12px rgba(47, 102, 30, 0.15),
+                0 2px 4px rgba(47, 102, 30, 0.1);
     letter-spacing: 0.025em;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle shine effect */
+.inventory-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+    );
+    transition: left 0.5s ease;
+}
+
+.inventory-button:hover::before {
+    left: 100%;
 }
 
 .inventory-button:hover {
-    background: #106ebe;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #2d7a33 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(47, 102, 30, 0.25),
+                0 3px 8px rgba(47, 102, 30, 0.15);
+}
+
+.inventory-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(47, 102, 30, 0.2);
 }
 
 .inventory-button i {
     font-size: 1.125rem;
+    position: relative;
+    z-index: 1;
 }
 
-/* Color Swatches - Modern Section Spacing */
+/* Color Swatches - Modern Section Spacing with Overflow Fix */
 .color-swatches {
     background: transparent;
     padding: 0;
     margin-top: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .color-swatches h3 {
@@ -490,6 +531,7 @@
     gap: 1rem;
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .color-swatch {

@@ -42,19 +42,31 @@ export class ProductInfo {
                     ${this.escapeHtml(product.description || product.PRODUCT_DESCRIPTION)}
                 </div>
             ` : ''}
-
-            <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(product.styleNumber)}', '${this.escapeHtml(selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA')}')">
-                <i class="fas fa-warehouse"></i>
-                Check Inventory
-            </button>
         `;
 
         // Store product reference for later use
         this.currentProduct = product;
         this.currentSelectedColor = selectedColor;
 
+        // Render Check Inventory button in the new location (below thumbnails)
+        this.renderInventoryButton(product.styleNumber, selectedColor);
+
         // Fetch and calculate estimated price
         this.calculateAndDisplayPrice(product.styleNumber);
+    }
+
+    renderInventoryButton(styleNumber, selectedColor) {
+        const container = document.getElementById('inventory-button-container');
+        if (!container) return;
+
+        const catalogColor = selectedColor.CATALOG_COLOR || selectedColor.catalogColor || selectedColor.catalog_color || 'NA';
+
+        container.innerHTML = `
+            <button class="inventory-button" onclick="window.checkInventoryDetails('${this.escapeHtml(styleNumber)}', '${this.escapeHtml(catalogColor)}')">
+                <i class="fas fa-warehouse"></i>
+                Check Inventory
+            </button>
+        `;
     }
 
     async calculateAndDisplayPrice(styleNumber) {
