@@ -304,6 +304,211 @@ const RICHARDSON_112_COLORS = [
         color: 'Cyan/White',
         url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Cyan.jpg,White.jpg,Cyan.jpg,Cyan.jpg,Cyan.jpg,White.jpg,White.jpg',
         description: '112 Trucker Hat - Cyan/White'
+    },
+
+    // ===== ADDITIONAL SPLIT COLORS =====
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Cardinal/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Cardinal.jpg,White.jpg,Cardinal.jpg,Cardinal.jpg,Cardinal.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Cardinal/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Charcoal/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Charcoal.jpg,White.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Charcoal/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Royal/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Royal.jpg,White.jpg,Royal.jpg,Royal.jpg,Royal.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Royal/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Dark Green/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Dark%20Green.jpg,White.jpg,Dark%20Green.jpg,Dark%20Green.jpg,Dark%20Green.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Dark Green/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Black.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Heather Grey/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Red/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Red.jpg,White.jpg,Red.jpg,Red.jpg,Red.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Red/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Maroon/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Maroon.jpg,White.jpg,Maroon.jpg,Maroon.jpg,Maroon.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Maroon/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Navy/Orange',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Navy.jpg,Orange.jpg,Navy.jpg,Navy.jpg,Navy.jpg,Orange.jpg,Orange.jpg',
+        description: '112 Trucker Hat - Navy/Orange'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Red/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Red.jpg,Black.jpg,Red.jpg,Red.jpg,Red.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Red/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Royal/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Royal.jpg,Black.jpg,Royal.jpg,Royal.jpg,Royal.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Royal/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Purple/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Purple.jpg,White.jpg,Purple.jpg,Purple.jpg,Purple.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Purple/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Orange/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Orange.jpg,White.jpg,Orange.jpg,Orange.jpg,Orange.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Orange/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Orange/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Orange.jpg,Black.jpg,Orange.jpg,Orange.jpg,Orange.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Orange/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Navy/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Navy.jpg,White.jpg,Navy.jpg,Navy.jpg,Navy.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Navy/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Loden/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Loden-115.jpg,Black.jpg,Loden-115.jpg,Loden-115.jpg,Loden-115.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Loden/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Khaki/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=%20Khaki-112.jpg,White.jpg,%20Khaki-112.jpg,%20Khaki-112.jpg,%20Khaki-112.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Khaki/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Kelly/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Kelly.jpg,White.jpg,Kelly.jpg,Kelly.jpg,Kelly.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Kelly/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Khaki/Coffee',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=%20Khaki-112.jpg,Coffee.jpg,%20Khaki-112.jpg,%20Khaki-112.jpg,%20Khaki-112.jpg,Coffee.jpg,Coffee.jpg',
+        description: '112 Trucker Hat - Khaki/Coffee'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Hot Pink/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Hot%20Pink.jpg,White.jpg,Hot%20Pink.jpg,Hot%20Pink.jpg,Hot%20Pink.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Hot Pink/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/Dark Green',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Dark%20Green.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Dark%20Green.jpg,Dark%20Green.jpg',
+        description: '112 Trucker Hat - Heather Grey/Dark Green'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Navy.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Navy.jpg,Navy.jpg',
+        description: '112 Trucker Hat - Heather Grey/Navy'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/Royal',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Royal.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Royal.jpg,Royal.jpg',
+        description: '112 Trucker Hat - Heather Grey/Royal'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/White',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,White.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Heather Grey/White'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Hot Pink/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Hot%20Pink.jpg,Black.jpg,Hot%20Pink.jpg,Hot%20Pink.jpg,Hot%20Pink.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Hot Pink/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Cardinal/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Cardinal.jpg,Black.jpg,Cardinal.jpg,Cardinal.jpg,Cardinal.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Cardinal/Black'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Navy/Charcoal',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Navy.jpg,Charcoal.jpg,Navy.jpg,Navy.jpg,Navy.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Navy/Charcoal'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Biscuit/True Blue',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Biscuit.jpg,Blue-Ribon.jpg,Biscuit.jpg,Biscuit.jpg,Biscuit.jpg,Blue-Ribon.jpg,Blue-Ribon.jpg',
+        description: '112 Trucker Hat - Biscuit/True Blue'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Black/Yellow',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,Yellow.jpg,Black.jpg,Black.jpg,Black.jpg,Yellow.jpg,Yellow.jpg',
+        description: '112 Trucker Hat - Black/Yellow'
+    },
+    {
+        style: '112',
+        category: 'Split',
+        color: 'Heather Grey/Light Grey',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Light-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Light-Grey.jpg,Light-Grey.jpg',
+        description: '112 Trucker Hat - Heather Grey/Light Grey'
     }
 ];
 

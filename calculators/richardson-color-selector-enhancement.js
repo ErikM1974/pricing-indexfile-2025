@@ -33,6 +33,14 @@ class RichardsonColorSelector {
         'Cream': '#fff5e1',
         'Light Grey': '#d3d3d3',
         'Quarry': '#7a7a7a',
+        'Cardinal': '#8B001A',
+        'Purple': '#800080',
+        'Hot Pink': '#ff69b4',
+        'Khaki': '#c3b091',
+        'Biscuit': '#E6C9A8',
+        'True Blue': '#0047AB',
+        'Yellow': '#ffff00',
+        'Heather Grey': '#b3b3b3',
 
         // Split/Two-Tone Colors (use first color for now, will apply gradient)
         'Charcoal/Black': { primary: '#4a4a4a', secondary: '#000000' },
@@ -57,7 +65,32 @@ class RichardsonColorSelector {
         'Red/White': { primary: '#dc3545', secondary: '#ffffff' },
         'Black/Neon Green': { primary: '#000000', secondary: '#39ff14' },
         'Black/Orange': { primary: '#000000', secondary: '#ff6b35' },
-        'Navy/Neon Green': { primary: '#001f3f', secondary: '#39ff14' }
+        'Navy/Neon Green': { primary: '#001f3f', secondary: '#39ff14' },
+
+        // Additional Split Colors (2025-01-10)
+        'Cardinal/White': { primary: '#8B001A', secondary: '#ffffff' },
+        'Charcoal/White': { primary: '#4a4a4a', secondary: '#ffffff' },
+        'Dark Green/White': { primary: '#013220', secondary: '#ffffff' },
+        'Maroon/White': { primary: '#800000', secondary: '#ffffff' },
+        'Navy/Orange': { primary: '#001f3f', secondary: '#ff6b35' },
+        'Red/Black': { primary: '#dc3545', secondary: '#000000' },
+        'Royal/Black': { primary: '#4169e1', secondary: '#000000' },
+        'Purple/White': { primary: '#800080', secondary: '#ffffff' },
+        'Orange/White': { primary: '#ff6b35', secondary: '#ffffff' },
+        'Orange/Black': { primary: '#ff6b35', secondary: '#000000' },
+        'Khaki/White': { primary: '#c3b091', secondary: '#ffffff' },
+        'Kelly/White': { primary: '#2e7d32', secondary: '#ffffff' },
+        'Khaki/Coffee': { primary: '#c3b091', secondary: '#6f4e37' },
+        'Hot Pink/White': { primary: '#ff69b4', secondary: '#ffffff' },
+        'Heather Grey/Dark Green': { primary: '#b3b3b3', secondary: '#013220' },
+        'Heather Grey/Royal': { primary: '#b3b3b3', secondary: '#4169e1' },
+        'Heather Grey/White': { primary: '#b3b3b3', secondary: '#ffffff' },
+        'Hot Pink/Black': { primary: '#ff69b4', secondary: '#000000' },
+        'Cardinal/Black': { primary: '#8B001A', secondary: '#000000' },
+        'Navy/Charcoal': { primary: '#001f3f', secondary: '#4a4a4a' },
+        'Biscuit/True Blue': { primary: '#E6C9A8', secondary: '#0047AB' },
+        'Black/Yellow': { primary: '#000000', secondary: '#ffff00' },
+        'Heather Grey/Light Grey': { primary: '#b3b3b3', secondary: '#d3d3d3' }
     };
 
     /**
