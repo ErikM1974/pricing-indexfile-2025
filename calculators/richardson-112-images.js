@@ -509,6 +509,183 @@ const RICHARDSON_112_COLORS = [
         color: 'Heather Grey/Light Grey',
         url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Light-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Light-Grey.jpg,Light-Grey.jpg',
         description: '112 Trucker Hat - Heather Grey/Light Grey'
+    },
+
+    // ===== TRI-COLOR (THREE-TONE) COLORS =====
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Mink Beige/Charcoal/Amber Gold',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Mink-Beige.jpg,Charcoal.jpg,Amber-Gold.jpg,Amber-Gold.jpg,Mink-Beige.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Mink Beige/Charcoal/Amber Gold'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Blue Teal/Birch/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Blue%20Teal.jpg,Birch.jpg,Navy.jpg,Navy.jpg,Blue%20Teal.jpg,Birch.jpg,Birch.jpg',
+        description: '112 Trucker Hat - Blue Teal/Birch/Navy'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'White/Columbia Blue/Yellow',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=White.jpg,Columbia%20Blue.jpg,Yellow_220.jpg,Yellow_220.jpg,White.jpg,Birch.jpg,Columbia%20Blue.jpg',
+        description: '112 Trucker Hat - White/Columbia Blue/Yellow'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Red/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Red.jpg,Black.jpg,black.jpg,112-Heather-Grey.jpg,Red.jpg,Red.jpg',
+        description: '112 Trucker Hat - Heather Grey/Red/Black'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Birch/Army Olive',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Birch.jpg,Army-Olive.jpg,Army-Olive.jpg,112-Heather-Grey.jpg,birch.jpg,birch.jpg',
+        description: '112 Trucker Hat - Heather Grey/Birch/Army Olive'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Cream/Navy/Amber Gold',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112cream.jpg,Navy.jpg,AmberGold.jpg,AmberGold.jpg,112cream.jpg,Navy.jpg',
+        description: '112 Trucker Hat - Cream/Navy/Amber Gold'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Cream/Grey Brown/Brown',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112cream.jpg,Grey-Brown.jpg,brown.jpg,brown.jpg,112cream.jpg,Brown.jpg',
+        description: '112 Trucker Hat - Cream/Grey Brown/Brown'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Birch/Amber Gold',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Birch.jpg,Amber-Gold.jpg,Amber-Gold.jpg,112-Heather-Grey.jpg,Birch.jpg,Birch.jpg',
+        description: '112 Trucker Hat - Heather Grey/Birch/Amber Gold'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Cream/Black/Loden',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112cream.jpg,Black.jpg,Loden-115.jpg,Loden-115.jpg,112cream.jpg,Black.jpg,Black.jpg',
+        description: '112 Trucker Hat - Cream/Black/Loden'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Black/White/Red',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,White.jpg,Red.jpg,Red.jpg,Black.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Black/White/Red'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Columbia Blue/White/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Columbia%20Blue.jpg,White.jpg,Navy.jpg,Navy.jpg,Columbia%20Blue.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Columbia Blue/White/Navy'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Royal/White/Red',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Royal.jpg,White.jpg,Red.jpg,Red.jpg,Royal.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Royal/White/Red'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Red/White/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Red.jpg,White.jpg,Navy.jpg,Navy.jpg,Red.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Red/White/Navy'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Grey/Charcoal/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Light-Grey.jpg,Charcoal.jpg,Black.jpg,Black.jpg,Light-Grey.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Grey/Charcoal/Black'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Red/White/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Red.jpg,White.jpg,Black.jpg,Black.jpg,Red.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Red/White/Black'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Orange/White/Black',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Orange.jpg,White.jpg,Black.jpg,Black.jpg,Orange.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Orange/White/Black'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Navy/White/Red',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Navy.jpg,White.jpg,Red.jpg,Red.jpg,Navy.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Navy/White/Red'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Black/White/Heather Grey',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,White.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Black.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Black/White/Heather Grey'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Navy/White/Heather Grey',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Navy.jpg,White.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Navy.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Navy/White/Heather Grey'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Red/White/Heather Grey',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Red.jpg,White.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Red.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Red/White/Heather Grey'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Royal/White/Heather Grey',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Royal.jpg,White.jpg,112-Heather-Grey.jpg,112-Heather-Grey.jpg,Royal.jpg,White.jpg,White.jpg',
+        description: '112 Trucker Hat - Royal/White/Heather Grey'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Grey/Charcoal/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Light-Grey.jpg,Charcoal.jpg,Navy.jpg,Navy.jpg,Light-Grey.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Grey/Charcoal/Navy'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Cardinal/Navy',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Cardinal.jpg,Navy.jpg,Navy.jpg,112-Heather-Grey.jpg,Cardinal.jpg,Cardinal.jpg',
+        description: '112 Trucker Hat - Heather Grey/Cardinal/Navy'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Charcoal/Dark Orange',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Charcoal.jpg,Dark%20Orange.jpg,Dark%20Orange.jpg,112-Heather-Grey.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Heather Grey/Charcoal/Dark Orange'
+    },
+    {
+        style: '112',
+        category: 'Tri-Color',
+        color: 'Heather Grey/Charcoal/Maroon',
+        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112-Heather-Grey.jpg,Charcoal.jpg,Maroon.jpg,Maroon.jpg,112-Heather-Grey.jpg,Charcoal.jpg,Charcoal.jpg',
+        description: '112 Trucker Hat - Heather Grey/Charcoal/Maroon'
     }
 ];
 

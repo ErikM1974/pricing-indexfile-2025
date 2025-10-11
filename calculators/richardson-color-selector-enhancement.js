@@ -41,6 +41,12 @@ class RichardsonColorSelector {
         'True Blue': '#0047AB',
         'Yellow': '#ffff00',
         'Heather Grey': '#b3b3b3',
+        'Mink Beige': '#D4C4B0',
+        'Blue Teal': '#008B8B',
+        'Birch': '#F5F3EE',
+        'Army Olive': '#4B5320',
+        'Grey Brown': '#7C6A5C',
+        'Dark Orange': '#FF8C00',
 
         // Split/Two-Tone Colors (use first color for now, will apply gradient)
         'Charcoal/Black': { primary: '#4a4a4a', secondary: '#000000' },
@@ -90,7 +96,34 @@ class RichardsonColorSelector {
         'Navy/Charcoal': { primary: '#001f3f', secondary: '#4a4a4a' },
         'Biscuit/True Blue': { primary: '#E6C9A8', secondary: '#0047AB' },
         'Black/Yellow': { primary: '#000000', secondary: '#ffff00' },
-        'Heather Grey/Light Grey': { primary: '#b3b3b3', secondary: '#d3d3d3' }
+        'Heather Grey/Light Grey': { primary: '#b3b3b3', secondary: '#d3d3d3' },
+
+        // Tri-Color (Three-Tone) Colors
+        'Mink Beige/Charcoal/Amber Gold': { primary: '#D4C4B0', secondary: '#4a4a4a', tertiary: '#f4a900' },
+        'Blue Teal/Birch/Navy': { primary: '#008B8B', secondary: '#F5F3EE', tertiary: '#001f3f' },
+        'White/Columbia Blue/Yellow': { primary: '#ffffff', secondary: '#9bddff', tertiary: '#ffff00' },
+        'Heather Grey/Red/Black': { primary: '#b3b3b3', secondary: '#dc3545', tertiary: '#000000' },
+        'Heather Grey/Birch/Army Olive': { primary: '#b3b3b3', secondary: '#F5F3EE', tertiary: '#4B5320' },
+        'Cream/Navy/Amber Gold': { primary: '#fff5e1', secondary: '#001f3f', tertiary: '#f4a900' },
+        'Cream/Grey Brown/Brown': { primary: '#fff5e1', secondary: '#7C6A5C', tertiary: '#654321' },
+        'Heather Grey/Birch/Amber Gold': { primary: '#b3b3b3', secondary: '#F5F3EE', tertiary: '#f4a900' },
+        'Cream/Black/Loden': { primary: '#fff5e1', secondary: '#000000', tertiary: '#4a5f42' },
+        'Black/White/Red': { primary: '#000000', secondary: '#ffffff', tertiary: '#dc3545' },
+        'Columbia Blue/White/Navy': { primary: '#9bddff', secondary: '#ffffff', tertiary: '#001f3f' },
+        'Royal/White/Red': { primary: '#4169e1', secondary: '#ffffff', tertiary: '#dc3545' },
+        'Red/White/Navy': { primary: '#dc3545', secondary: '#ffffff', tertiary: '#001f3f' },
+        'Grey/Charcoal/Black': { primary: '#d3d3d3', secondary: '#4a4a4a', tertiary: '#000000' },
+        'Red/White/Black': { primary: '#dc3545', secondary: '#ffffff', tertiary: '#000000' },
+        'Orange/White/Black': { primary: '#ff6b35', secondary: '#ffffff', tertiary: '#000000' },
+        'Navy/White/Red': { primary: '#001f3f', secondary: '#ffffff', tertiary: '#dc3545' },
+        'Black/White/Heather Grey': { primary: '#000000', secondary: '#ffffff', tertiary: '#b3b3b3' },
+        'Navy/White/Heather Grey': { primary: '#001f3f', secondary: '#ffffff', tertiary: '#b3b3b3' },
+        'Red/White/Heather Grey': { primary: '#dc3545', secondary: '#ffffff', tertiary: '#b3b3b3' },
+        'Royal/White/Heather Grey': { primary: '#4169e1', secondary: '#ffffff', tertiary: '#b3b3b3' },
+        'Grey/Charcoal/Navy': { primary: '#d3d3d3', secondary: '#4a4a4a', tertiary: '#001f3f' },
+        'Heather Grey/Cardinal/Navy': { primary: '#b3b3b3', secondary: '#8B001A', tertiary: '#001f3f' },
+        'Heather Grey/Charcoal/Dark Orange': { primary: '#b3b3b3', secondary: '#4a4a4a', tertiary: '#FF8C00' },
+        'Heather Grey/Charcoal/Maroon': { primary: '#b3b3b3', secondary: '#4a4a4a', tertiary: '#800000' }
     };
 
     /**
@@ -341,7 +374,7 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Get CSS style for a color circle (solid or gradient)
+     * Get CSS style for a color circle (solid, split, or tri-color gradient)
      * @param {string} colorName - Color name to get style for
      * @returns {string} CSS style string
      */
@@ -353,10 +386,16 @@ class RichardsonColorSelector {
             return 'background-color: #cccccc;';
         }
 
-        // Check if it's a split color (object with primary/secondary)
-        if (typeof colorData === 'object' && colorData.primary && colorData.secondary) {
-            // Use CSS gradient for split colors
-            return `background: linear-gradient(90deg, ${colorData.primary} 50%, ${colorData.secondary} 50%);`;
+        // Check if it's an object (split or tri-color)
+        if (typeof colorData === 'object') {
+            // Tri-color (has tertiary)
+            if (colorData.tertiary) {
+                return `background: linear-gradient(90deg, ${colorData.primary} 33.33%, ${colorData.secondary} 33.33%, ${colorData.secondary} 66.66%, ${colorData.tertiary} 66.66%);`;
+            }
+            // Split color (only primary and secondary)
+            if (colorData.primary && colorData.secondary) {
+                return `background: linear-gradient(90deg, ${colorData.primary} 50%, ${colorData.secondary} 50%);`;
+            }
         }
 
         // Solid color
