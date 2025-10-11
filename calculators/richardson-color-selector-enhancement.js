@@ -1,14 +1,65 @@
 /**
- * Richardson Color Selector Enhancement - 2-Column Professional Layout (2025)
- * Modern grid design: Large image left, organized controls right
+ * Richardson Color Selector Enhancement - Visual Color Circle Design (2025)
+ * Modern grid with color circles showing actual colors
  *
  * USAGE:
  * 1. Include richardson-112-images.js before this file
  * 2. Call RichardsonColorSelector.enhanceLineItem(lineItemElement) after creating a line item
- * 3. When style 112 is selected, professional 2-column selector appears
+ * 3. When style 112 is selected, visual color selector with circles appears
  */
 
 class RichardsonColorSelector {
+    /**
+     * Color hex mapping for all Richardson 112 colors
+     */
+    static COLOR_HEX_MAP = {
+        // Solid Colors
+        'Black': '#000000',
+        'Navy': '#001f3f',
+        'Charcoal': '#4a4a4a',
+        'White': '#ffffff',
+        'Red': '#dc3545',
+        'Kelly': '#2e7d32',
+        'Light Blue': '#87ceeb',
+        'Maroon': '#800000',
+        'Smoke Blue': '#6c8e9e',
+        'Columbia Blue': '#9bddff',
+        'Dark Green': '#013220',
+        'Loden': '#4a5f42',
+        'Orange': '#ff6b35',
+        'Royal': '#4169e1',
+        'Amber Gold': '#f4a900',
+        'Coffee': '#6f4e37',
+        'Cream': '#fff5e1',
+        'Light Grey': '#d3d3d3',
+        'Quarry': '#7a7a7a',
+
+        // Split/Two-Tone Colors (use first color for now, will apply gradient)
+        'Charcoal/Black': { primary: '#4a4a4a', secondary: '#000000' },
+        'Navy/Khaki': { primary: '#001f3f', secondary: '#c3b091' },
+        'Charcoal/Neon Green': { primary: '#4a4a4a', secondary: '#39ff14' },
+        'Charcoal/Neon Orange': { primary: '#4a4a4a', secondary: '#ff6600' },
+        'Charcoal/Neon Pink': { primary: '#4a4a4a', secondary: '#ff10f0' },
+        'Black/Khaki': { primary: '#000000', secondary: '#c3b091' },
+        'Black/White': { primary: '#000000', secondary: '#ffffff' },
+        'Heather/Black': { primary: '#b3b3b3', secondary: '#000000' },
+        'Heather/Navy': { primary: '#b3b3b3', secondary: '#001f3f' },
+        'Navy/White': { primary: '#001f3f', secondary: '#ffffff' },
+        'Royal/White': { primary: '#4169e1', secondary: '#ffffff' },
+        'Smoke Blue/Navy': { primary: '#6c8e9e', secondary: '#001f3f' },
+        'Charcoal/Red': { primary: '#4a4a4a', secondary: '#dc3545' },
+        'Charcoal/Royal': { primary: '#4a4a4a', secondary: '#4169e1' },
+        'Loden/Black': { primary: '#4a5f42', secondary: '#000000' },
+        'Navy/Gold': { primary: '#001f3f', secondary: '#ffd700' },
+        'Black/Red': { primary: '#000000', secondary: '#dc3545' },
+        'Navy/Red': { primary: '#001f3f', secondary: '#dc3545' },
+        'Pink/White': { primary: '#ffc0cb', secondary: '#ffffff' },
+        'Red/White': { primary: '#dc3545', secondary: '#ffffff' },
+        'Black/Neon Green': { primary: '#000000', secondary: '#39ff14' },
+        'Black/Orange': { primary: '#000000', secondary: '#ff6b35' },
+        'Navy/Neon Green': { primary: '#001f3f', secondary: '#39ff14' }
+    };
+
     /**
      * Enhance a line item with color selection capability
      * @param {HTMLElement} lineItemElement - The line item to enhance
@@ -91,7 +142,7 @@ class RichardsonColorSelector {
             return;
         }
 
-        console.log('[Color Selector] Style 112 detected! Creating 2-column color selector...');
+        console.log('[Color Selector] Style 112 detected! Creating visual color selector...');
 
         // Insert color selector after quantity input
         const quantityGroup = lineItemElement.querySelector('.quantity-input-group');
@@ -100,10 +151,10 @@ class RichardsonColorSelector {
             return;
         }
 
-        const colorSelector = this.createTwoColumnColorSelector();
+        const colorSelector = this.createColorSelectorWithCircles();
         quantityGroup.insertAdjacentElement('afterend', colorSelector);
 
-        console.log('[Color Selector] 2-column color selector inserted into DOM');
+        console.log('[Color Selector] Color circle selector inserted into DOM');
 
         // Initialize color selection functionality
         this.initializeColorSelector(colorSelector, lineItemElement);
@@ -112,10 +163,10 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Create the 2-column professional color selector
+     * Create the visual color selector with color circles
      * @returns {HTMLElement} The color selector wrapper element
      */
-    static createTwoColumnColorSelector() {
+    static createColorSelectorWithCircles() {
         const wrapper = document.createElement('div');
         wrapper.className = 'color-selector-compact';
         wrapper.dataset.activeCategory = 'All'; // Default to showing all colors
@@ -144,35 +195,7 @@ class RichardsonColorSelector {
 
             <!-- RIGHT COLUMN: Color Controls -->
             <div class="color-controls-column">
-                <!-- Color Dropdown -->
-                <div class="color-dropdown-wrapper">
-                    <label for="color-select">Select Color:</label>
-                    <select class="color-dropdown" id="color-select">
-                        <option value="">Choose a color...</option>
-                        ${solidColors.length > 0 ? `
-                        <optgroup label="🔴 Solid Colors (${solidColors.length})">
-                            ${solidColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Solid">${c.color}</option>`).join('')}
-                        </optgroup>
-                        ` : ''}
-                        ${splitColors.length > 0 ? `
-                        <optgroup label="◐ Split Colors (${splitColors.length})">
-                            ${splitColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Split">${c.color}</option>`).join('')}
-                        </optgroup>
-                        ` : ''}
-                        ${triColors.length > 0 ? `
-                        <optgroup label="🎨 Tri-Color (${triColors.length})">
-                            ${triColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Tri-Color">${c.color}</option>`).join('')}
-                        </optgroup>
-                        ` : ''}
-                        ${combColors.length > 0 ? `
-                        <optgroup label="🔷 Combination (${combColors.length})">
-                            ${combColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Combination">${c.color}</option>`).join('')}
-                        </optgroup>
-                        ` : ''}
-                    </select>
-                </div>
-
-                <!-- Category Filter Tabs -->
+                <!-- Category Pills -->
                 <div class="category-filter-section">
                     <div class="category-filter-label">Filter by Category:</div>
                     <div class="category-filter-tabs">
@@ -198,20 +221,26 @@ class RichardsonColorSelector {
                             Tri
                         </button>
                         ` : ''}
+                        ${combColors.length > 0 ? `
+                        <button type="button" class="category-tab" data-category="Combination">
+                            <i class="fas fa-swatchbook"></i>
+                            Combo
+                        </button>
+                        ` : ''}
                     </div>
                 </div>
 
-                <!-- Quick Select Buttons -->
+                <!-- Color Circles Grid -->
                 <div class="quick-colors-section">
                     <div class="quick-colors-header">
-                        <span class="quick-colors-label">Quick Select:</span>
+                        <span class="quick-colors-label">Select Color:</span>
                         <a href="#" class="view-all-link">
                             <i class="fas fa-th"></i>
-                            View Gallery
+                            View All
                         </a>
                     </div>
                     <div class="quick-colors-grid">
-                        ${this.generateQuickColorButtons(allColors)}
+                        ${this.generateColorCircles(allColors)}
                     </div>
                 </div>
             </div>
@@ -231,36 +260,54 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Generate quick color buttons HTML
+     * Generate color circles HTML
      * @param {Array} allColors - All available colors
-     * @returns {string} HTML string of quick color buttons
+     * @returns {string} HTML string of color circles
      */
-    static generateQuickColorButtons(allColors) {
-        // Popular colors for quick select
-        const quickColorNames = [
-            { name: 'Black', category: 'Solid' },
-            { name: 'Navy', category: 'Solid' },
-            { name: 'Charcoal', category: 'Solid' },
-            { name: 'White', category: 'Solid' },
-            { name: 'Red', category: 'Solid' },
-            { name: 'Charcoal/Black', category: 'Split' }
-        ];
+    static generateColorCircles(allColors) {
+        return allColors.map(colorItem => {
+            const colorName = colorItem.color;
+            const category = colorItem.category;
 
-        return quickColorNames.map(qc => {
-            const colorData = allColors.find(c => c.color === qc.name && c.category === qc.category);
-            if (!colorData) return '';
+            // Get color hex or gradient
+            const colorStyle = this.getColorStyle(colorName);
 
             return `
-                <button type="button"
-                        class="quick-color-btn"
-                        data-color="${colorData.color}"
-                        data-url="${colorData.url}"
-                        data-category="${colorData.category}">
-                    <i class="fas ${qc.category === 'Split' ? 'fa-adjust' : 'fa-circle'}"></i>
-                    ${colorData.color}
-                </button>
+                <div class="color-circle"
+                     data-color="${colorName}"
+                     data-url="${colorItem.url}"
+                     data-category="${category}"
+                     data-tooltip="${colorName}"
+                     style="${colorStyle}"
+                     tabindex="0"
+                     role="button"
+                     aria-label="Select ${colorName}">
+                </div>
             `;
         }).join('');
+    }
+
+    /**
+     * Get CSS style for a color circle (solid or gradient)
+     * @param {string} colorName - Color name to get style for
+     * @returns {string} CSS style string
+     */
+    static getColorStyle(colorName) {
+        const colorData = this.COLOR_HEX_MAP[colorName];
+
+        if (!colorData) {
+            // Fallback to a gray circle if color not found
+            return 'background-color: #cccccc;';
+        }
+
+        // Check if it's a split color (object with primary/secondary)
+        if (typeof colorData === 'object' && colorData.primary && colorData.secondary) {
+            // Use CSS gradient for split colors
+            return `background: linear-gradient(90deg, ${colorData.primary} 50%, ${colorData.secondary} 50%);`;
+        }
+
+        // Solid color
+        return `background-color: ${colorData};`;
     }
 
     /**
@@ -269,7 +316,6 @@ class RichardsonColorSelector {
      * @param {HTMLElement} lineItemElement - The parent line item
      */
     static initializeColorSelector(colorSelector, lineItemElement) {
-        const dropdown = colorSelector.querySelector('.color-dropdown');
         const previewImage = colorSelector.querySelector('.preview-image');
         const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
         const selectedBanner = colorSelector.querySelector('.selected-color-banner');
@@ -277,7 +323,7 @@ class RichardsonColorSelector {
         const clearBtn = colorSelector.querySelector('.clear-color-btn');
         const viewAllLink = colorSelector.querySelector('.view-all-link');
         const categoryTabs = colorSelector.querySelectorAll('.category-tab');
-        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
+        const colorCircles = colorSelector.querySelectorAll('.color-circle');
 
         // Handle image loading
         if (previewImage && loadingOverlay) {
@@ -290,19 +336,7 @@ class RichardsonColorSelector {
             });
         }
 
-        // Handle dropdown selection
-        dropdown.addEventListener('change', (e) => {
-            const selectedOption = e.target.options[e.target.selectedIndex];
-            if (!selectedOption.value) return;
-
-            const color = selectedOption.value;
-            const imageUrl = selectedOption.dataset.url;
-            const category = selectedOption.dataset.category;
-
-            this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
-        });
-
-        // Handle category filter tabs
+        // Handle category filter tabs (show/hide circles)
         categoryTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const category = tab.dataset.category;
@@ -314,36 +348,41 @@ class RichardsonColorSelector {
                 // Update wrapper data attribute
                 colorSelector.dataset.activeCategory = category;
 
-                // Filter quick color buttons
-                this.filterQuickColorButtons(colorSelector, category);
+                // Filter color circles (show/hide based on category)
+                this.filterColorCircles(colorSelector, category);
 
                 console.log('[Color Selector] Category filter changed to:', category);
             });
         });
 
-        // Handle quick color buttons
-        quickColorBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const color = btn.dataset.color;
-                const imageUrl = btn.dataset.url;
-                const category = btn.dataset.category;
+        // Handle color circle clicks
+        colorCircles.forEach(circle => {
+            // Click handler
+            circle.addEventListener('click', () => {
+                const color = circle.dataset.color;
+                const imageUrl = circle.dataset.url;
+                const category = circle.dataset.category;
 
-                // Update dropdown to match
-                dropdown.value = color;
+                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category, circle);
+            });
 
-                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
+            // Keyboard navigation (Enter or Space)
+            circle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    circle.click();
+                }
             });
         });
 
         // Handle clear selection
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
-                dropdown.value = '';
                 selectedBanner.classList.add('hidden');
                 delete lineItemElement.dataset.selectedColor;
 
-                // Remove selection from quick buttons
-                quickColorBtns.forEach(btn => btn.classList.remove('selected'));
+                // Remove selection from circles
+                colorCircles.forEach(c => c.classList.remove('selected'));
 
                 // Reset to default image
                 const allColors = window.RICHARDSON_112_COLORS || [];
@@ -368,20 +407,20 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Filter quick color buttons based on category
+     * Filter color circles based on category
      * @param {HTMLElement} colorSelector - The color selector element
-     * @param {string} category - Category to filter ('All', 'Solid', 'Split', 'Tri-Color')
+     * @param {string} category - Category to filter ('All', 'Solid', 'Split', etc.)
      */
-    static filterQuickColorButtons(colorSelector, category) {
-        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
+    static filterColorCircles(colorSelector, category) {
+        const colorCircles = colorSelector.querySelectorAll('.color-circle');
 
-        quickColorBtns.forEach(btn => {
-            const btnCategory = btn.dataset.category;
+        colorCircles.forEach(circle => {
+            const circleCategory = circle.dataset.category;
 
-            if (category === 'All' || btnCategory === category) {
-                btn.classList.remove('hidden');
+            if (category === 'All' || circleCategory === category) {
+                circle.classList.remove('hidden');
             } else {
-                btn.classList.add('hidden');
+                circle.classList.add('hidden');
             }
         });
     }
@@ -393,13 +432,14 @@ class RichardsonColorSelector {
      * @param {string} color - Color name
      * @param {string} imageUrl - Image URL
      * @param {string} category - Color category
+     * @param {HTMLElement} clickedCircle - The circle that was clicked
      */
-    static selectColor(colorSelector, lineItemElement, color, imageUrl, category) {
+    static selectColor(colorSelector, lineItemElement, color, imageUrl, category, clickedCircle) {
         const previewImage = colorSelector.querySelector('.preview-image');
         const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
         const selectedBanner = colorSelector.querySelector('.selected-color-banner');
         const selectedName = colorSelector.querySelector('.selected-color-name');
-        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
+        const colorCircles = colorSelector.querySelectorAll('.color-circle');
 
         console.log('[Color Selector] Selecting color:', color);
 
@@ -417,14 +457,11 @@ class RichardsonColorSelector {
         // Store color in line item data
         lineItemElement.dataset.selectedColor = color;
 
-        // Update quick button states
-        quickColorBtns.forEach(btn => {
-            if (btn.dataset.color === color) {
-                btn.classList.add('selected');
-            } else {
-                btn.classList.remove('selected');
-            }
-        });
+        // Update circle states (remove all selected, add to clicked)
+        colorCircles.forEach(c => c.classList.remove('selected'));
+        if (clickedCircle) {
+            clickedCircle.classList.add('selected');
+        }
 
         console.log('[Color Selector] Color selected successfully');
     }
@@ -622,17 +659,15 @@ class RichardsonColorSelector {
 
                 console.log('[Color Selector] Gallery item clicked:', color);
 
-                // Update dropdown
-                const dropdown = colorSelector.querySelector('.color-dropdown');
-                if (dropdown) {
-                    dropdown.value = color;
-                }
+                // Find matching circle in selector
+                const matchingCircle = colorSelector.querySelector(`.color-circle[data-color="${color}"]`);
 
                 // Select the color
-                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
+                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category, matchingCircle);
 
                 // Update gallery selection state
-                galleryItems.forEach(gi => gi.classList.remove('selected'));
+                const allGalleryItems = galleryModal.querySelectorAll('.gallery-item');
+                allGalleryItems.forEach(gi => gi.classList.remove('selected'));
                 newItem.classList.add('selected');
 
                 // Close gallery after short delay
@@ -666,7 +701,7 @@ class RichardsonColorSelector {
 if (typeof window !== 'undefined') {
     window.RichardsonColorSelector = RichardsonColorSelector;
 
-    console.log('[Richardson Color Selector] 2-Column Professional Layout loaded (2025)');
+    console.log('[Richardson Color Selector] Visual Color Circle Design loaded (2025)');
     console.log('[Richardson Color Selector] Available colors:',
                 window.RICHARDSON_112_COLORS ? window.RICHARDSON_112_COLORS.length : 0);
 }
