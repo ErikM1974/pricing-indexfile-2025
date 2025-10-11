@@ -1,24 +1,36 @@
 /**
- * Richardson Color Selector - Visual Color Circle Design (2025)
- * Modern layout with large image preview and intuitive color circles
+ * Richardson Color Selector - Professional Visual Design (2025)
+ * Complete redesign for catalog-quality presentation
+ *
+ * Design Philosophy: Large, bold, beautiful
+ * - Prominent color circles (80px)
+ * - Generous whitespace
+ * - Professional shadows and depth
+ * - Smooth animations
  */
 
 /* ============================================
-   MAIN CONTAINER - 2 COLUMN GRID
+   MAIN CONTAINER - 2 COLUMN PROFESSIONAL GRID
    ============================================ */
 
 .color-selector-compact {
     width: 100%;
     max-width: 100%;
-    margin-top: 0.75rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
+    margin-top: 1.25rem;
+    padding: 1.75rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 420px 1fr;
+    gap: 2.5rem;
     align-items: start;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.color-selector-compact:hover {
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
 }
 
 /* ============================================
@@ -27,20 +39,20 @@
 
 .color-preview-large {
     width: 100%;
-    height: 240px;
-    border-radius: 8px;
+    height: 320px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 2px solid #dee2e6;
+    border: 3px solid #e0e0e0;
     background: white;
-    transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     position: relative;
 }
 
 .color-preview-large:hover {
     border-color: #4cb354;
     transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 32px rgba(76, 179, 84, 0.25);
 }
 
 .color-preview-large img {
@@ -60,13 +72,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     color: #6c757d;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .image-loading-overlay i {
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: #4cb354;
 }
 
@@ -77,127 +90,150 @@
 .color-controls-column {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.75rem;
 }
 
-/* Category Pills */
+/* Category Pills Section */
 .category-filter-section {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.875rem;
 }
 
 .category-filter-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 0.3px;
 }
 
 .category-filter-tabs {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.875rem;
     flex-wrap: wrap;
 }
 
 .category-tab {
-    padding: 8px 24px;
-    background: #e9ecef;
-    border: 2px solid transparent;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 12px 32px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #495057;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
     white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .category-tab:hover {
-    background: #dee2e6;
-    transform: translateY(-1px);
+    background: #e9ecef;
+    border-color: #4cb354;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .category-tab.active {
-    background: #4cb354;
+    background: linear-gradient(135deg, #4cb354 0%, #45a048 100%);
     border-color: #4cb354;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.35);
 }
 
 .category-tab i {
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
 /* Color Circles Section */
 .quick-colors-section {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1.125rem;
 }
 
 .quick-colors-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f0f0;
 }
 
 .quick-colors-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 0.3px;
 }
 
 .view-all-link {
-    font-size: 0.85rem;
+    font-size: 0.925rem;
     color: #4cb354;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: 0.5rem;
     cursor: pointer;
     transition: all 0.2s;
-    font-weight: 500;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
 }
 
 .view-all-link:hover {
     color: #3da045;
-    text-decoration: underline;
+    background: #e8f5e9;
+    text-decoration: none;
 }
 
-/* Color Circles Grid */
+.view-all-link i {
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   COLOR CIRCLES GRID - LARGE & BEAUTIFUL
+   ============================================ */
+
 .quick-colors-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 1.5rem;
+    padding: 0.5rem 0;
 }
 
 .color-circle {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    border: 3px solid transparent;
+    border: 3px solid #e0e0e0;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto;
 }
 
 .color-circle:hover {
-    transform: scale(1.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: scale(1.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     border-color: #4cb354;
+    border-width: 4px;
+    z-index: 10;
 }
 
 .color-circle.selected {
-    border: 4px solid #4cb354;
-    box-shadow: 0 0 0 2px white, 0 0 0 6px #4cb354;
-    transform: scale(1.1);
+    border: 5px solid #4cb354;
+    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.2),
+                0 8px 24px rgba(76, 179, 84, 0.4);
+    transform: scale(1.15);
 }
 
 .color-circle.selected::after {
@@ -205,52 +241,74 @@
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     color: white;
-    font-size: 1rem;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    font-size: 1.5rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
 }
 
 .color-circle.hidden {
     display: none;
 }
 
-/* Tooltip for color name */
+/* Tooltip for color name - Enhanced */
 .color-circle[data-tooltip]::before {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 8px);
+    bottom: calc(100% + 12px);
     left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
+    transform: translateX(-50%) translateY(5px);
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
-    z-index: 10;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.color-circle[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 20;
 }
 
 .color-circle:hover[data-tooltip]::before {
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.color-circle:hover[data-tooltip]::after {
+    opacity: 1;
 }
 
 /* ============================================
-   SELECTED COLOR BANNER (Full Width)
+   SELECTED COLOR BANNER - PROFESSIONAL
    ============================================ */
 
 .selected-color-banner {
     grid-column: 1 / -1;
-    padding: 0.75rem 1rem;
+    padding: 1.25rem 1.5rem;
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border-radius: 6px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    border: 2px solid #4cb354;
-    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.2);
-    margin-top: 0.25rem;
+    gap: 1rem;
+    border: 3px solid #4cb354;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.25);
+    margin-top: 0.5rem;
 }
 
 .selected-color-banner.hidden {
@@ -259,46 +317,51 @@
 
 .selected-color-icon {
     color: #4cb354;
-    font-size: 1.25rem;
+    font-size: 1.75rem;
     flex-shrink: 0;
 }
 
 .selected-color-label {
-    font-weight: 600;
+    font-weight: 700;
     color: #2e7d32;
-    font-size: 0.875rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .selected-color-name {
     color: #1b5e20;
-    font-weight: 700;
+    font-weight: 800;
     flex: 1;
-    font-size: 1.125rem;
+    font-size: 1.375rem;
+    letter-spacing: 0.3px;
 }
 
 .clear-color-btn {
-    padding: 0.375rem 0.75rem;
+    padding: 0.625rem 1.125rem;
     background: white;
-    border: 1px solid #4cb354;
-    border-radius: 4px;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
     cursor: pointer;
-    color: #4cb354;
-    transition: all 0.2s;
-    font-size: 0.875rem;
-    font-weight: 500;
+    color: #dc3545;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.925rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
 }
 
 .clear-color-btn:hover {
-    background: #fee;
-    border-color: #dc3545;
-    color: #dc3545;
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
 }
 
 /* ============================================
-   COLOR GALLERY MODAL (Full Catalog View)
+   COLOR GALLERY MODAL
    ============================================ */
 
 .color-gallery-modal {
@@ -321,8 +384,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
 }
 
 .color-gallery-modal .modal-content {
@@ -331,15 +394,15 @@
     max-height: 90vh;
     margin: 2rem auto;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
 }
 
 .color-gallery-modal .modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #dee2e6;
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -347,24 +410,26 @@
 
 .color-gallery-modal .modal-header h3 {
     margin: 0;
-    font-size: 1.5rem;
-    color: #212529;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #2c3e50;
+    letter-spacing: 0.3px;
 }
 
 .color-gallery-modal .modal-close-btn {
-    padding: 0.5rem;
+    padding: 0.625rem;
     background: transparent;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     color: #6c757d;
     cursor: pointer;
-    transition: color 0.2s;
-    width: 40px;
-    height: 40px;
+    transition: all 0.2s;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 .color-gallery-modal .modal-close-btn:hover {
@@ -373,7 +438,7 @@
 }
 
 .color-gallery-modal .modal-body {
-    padding: 1.5rem;
+    padding: 2rem;
     overflow-y: auto;
     flex: 1;
 }
@@ -381,82 +446,84 @@
 /* Category tabs in modal */
 .modal-category-tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem;
+    gap: 0.875rem;
+    margin-bottom: 2rem;
+    padding: 0.75rem;
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 12px;
     flex-wrap: wrap;
 }
 
 .modal-category-tab {
     flex: 1;
-    min-width: 120px;
-    padding: 0.625rem 0.875rem;
+    min-width: 140px;
+    padding: 0.875rem 1.125rem;
     background: white;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #6c757d;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
     white-space: nowrap;
 }
 
 .modal-category-tab:hover {
     background: #e9ecef;
-    border-color: #dee2e6;
-    color: #495057;
+    border-color: #4cb354;
+    color: #2c3e50;
+    transform: translateY(-2px);
 }
 
 .modal-category-tab.active {
-    background: #4cb354;
+    background: linear-gradient(135deg, #4cb354 0%, #45a048 100%);
     border-color: #4cb354;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.35);
 }
 
 .modal-category-tab i {
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 /* Gallery grid */
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
 }
 
 .gallery-item {
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 3px solid transparent;
 }
 
 .gallery-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
     border-color: #4cb354;
 }
 
 .gallery-item.selected {
     border-color: #4cb354;
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.4);
 }
 
 .gallery-image-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 75%; /* 4:3 aspect ratio */
+    padding-top: 75%;
     background: #f8f9fa;
     overflow: hidden;
 }
@@ -476,19 +543,20 @@
     left: 50%;
     transform: translate(-50%, -50%);
     color: #6c757d;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .gallery-item-info {
-    padding: 0.75rem;
+    padding: 1rem;
     text-align: center;
     background: white;
 }
 
 .gallery-color-name {
-    font-weight: 600;
-    color: #212529;
-    font-size: 0.875rem;
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
 }
 
 .gallery-item.selected .gallery-item-info {
@@ -503,45 +571,89 @@
    RESPONSIVE DESIGN
    ============================================ */
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
     .color-selector-compact {
-        grid-template-columns: 240px 1fr;
-        gap: 1rem;
-        padding: 0.875rem;
+        grid-template-columns: 360px 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
     }
 
     .color-preview-large {
-        height: 180px;
+        height: 280px;
+    }
+
+    .color-circle {
+        width: 75px;
+        height: 75px;
     }
 
     .quick-colors-grid {
-        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .color-selector-compact {
+        grid-template-columns: 300px 1fr;
+        gap: 1.5rem;
+        padding: 1.25rem;
+    }
+
+    .color-preview-large {
+        height: 240px;
+    }
+
+    .color-circle {
+        width: 70px;
+        height: 70px;
+    }
+
+    .quick-colors-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 1rem;
+    }
+
+    .category-tab {
+        padding: 10px 24px;
+        font-size: 0.875rem;
     }
 }
 
 @media (max-width: 768px) {
     .color-selector-compact {
         grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 0.75rem;
+        gap: 1.5rem;
+        padding: 1rem;
     }
 
     .color-preview-large {
-        height: 240px;
+        height: 280px;
         max-width: 100%;
     }
 
+    .color-circle {
+        width: 65px;
+        height: 65px;
+    }
+
     .quick-colors-grid {
-        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+        gap: 1rem;
     }
 
     .category-filter-tabs {
         flex-wrap: wrap;
     }
 
+    .category-tab {
+        flex: 1 1 auto;
+        min-width: 120px;
+    }
+
     .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
     }
 
     .color-gallery-modal .modal-content {
@@ -557,16 +669,26 @@
     .modal-category-tab {
         min-width: 0;
     }
+
+    .selected-color-banner {
+        flex-wrap: wrap;
+        padding: 1rem;
+    }
+
+    .selected-color-name {
+        font-size: 1.125rem;
+    }
 }
 
 @media (max-width: 480px) {
     .quick-colors-grid {
-        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+        gap: 0.875rem;
     }
 
     .color-circle {
-        width: 45px;
-        height: 45px;
+        width: 60px;
+        height: 60px;
     }
 
     .category-filter-tabs {
@@ -575,6 +697,28 @@
 
     .category-tab {
         justify-content: center;
+        width: 100%;
+    }
+
+    .color-preview-large {
+        height: 220px;
+    }
+
+    .selected-color-banner {
+        gap: 0.75rem;
+    }
+
+    .selected-color-icon {
+        font-size: 1.5rem;
+    }
+
+    .selected-color-name {
+        font-size: 1rem;
+    }
+
+    .clear-color-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
     }
 }
 
@@ -594,7 +738,7 @@
 }
 
 .color-gallery-modal.active .modal-content {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes spin {
@@ -612,15 +756,30 @@
 
 @keyframes pulse {
     0%, 100% {
-        transform: scale(1);
+        transform: scale(1.15);
     }
     50% {
-        transform: scale(1.05);
+        transform: scale(1.2);
     }
 }
 
 .color-circle.selected {
-    animation: pulse 0.5s ease-out;
+    animation: pulse 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selected-color-banner {
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================
@@ -634,5 +793,32 @@
 
 .loading-spinner {
     color: #4cb354;
-    font-size: 1.5rem;
+    font-size: 2rem;
+}
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+.color-circle:focus {
+    outline: 3px solid #4cb354;
+    outline-offset: 4px;
+}
+
+.category-tab:focus,
+.modal-category-tab:focus,
+.clear-color-btn:focus {
+    outline: 2px solid #4cb354;
+    outline-offset: 2px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .color-circle,
+    .category-tab,
+    .gallery-item,
+    .modal-category-tab {
+        transition: none;
+        animation: none;
+    }
 }
