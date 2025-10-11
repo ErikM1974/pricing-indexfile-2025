@@ -40,6 +40,11 @@
     display: none;
 }
 
+/* Fix grid layout - Disable grid for Richardson 112 line items */
+.line-item.is-richardson-112 {
+    display: block;  /* Override the grid layout - Richardson 112 doesn't need multi-column */
+}
+
 /* ===========================================
    TITLE SECTION
    =========================================== */
