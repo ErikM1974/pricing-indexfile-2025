@@ -1,11 +1,11 @@
 /**
- * Richardson Color Selector Enhancement - Compact Design (2025)
- * Modern, professional, contained color selector for Richardson 112 caps
+ * Richardson Color Selector Enhancement - 2-Column Professional Layout (2025)
+ * Modern grid design: Large image left, organized controls right
  *
  * USAGE:
  * 1. Include richardson-112-images.js before this file
  * 2. Call RichardsonColorSelector.enhanceLineItem(lineItemElement) after creating a line item
- * 3. When style 112 is selected, compact color selector appears
+ * 3. When style 112 is selected, professional 2-column selector appears
  */
 
 class RichardsonColorSelector {
@@ -91,7 +91,7 @@ class RichardsonColorSelector {
             return;
         }
 
-        console.log('[Color Selector] Style 112 detected! Creating compact color selector...');
+        console.log('[Color Selector] Style 112 detected! Creating 2-column color selector...');
 
         // Insert color selector after quantity input
         const quantityGroup = lineItemElement.querySelector('.quantity-input-group');
@@ -100,10 +100,10 @@ class RichardsonColorSelector {
             return;
         }
 
-        const colorSelector = this.createCompactColorSelector();
+        const colorSelector = this.createTwoColumnColorSelector();
         quantityGroup.insertAdjacentElement('afterend', colorSelector);
 
-        console.log('[Color Selector] Compact color selector inserted into DOM');
+        console.log('[Color Selector] 2-column color selector inserted into DOM');
 
         // Initialize color selection functionality
         this.initializeColorSelector(colorSelector, lineItemElement);
@@ -112,43 +112,53 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Create the compact color selector HTML structure
+     * Create the 2-column professional color selector
      * @returns {HTMLElement} The color selector wrapper element
      */
-    static createCompactColorSelector() {
+    static createTwoColumnColorSelector() {
         const wrapper = document.createElement('div');
         wrapper.className = 'color-selector-compact';
+        wrapper.dataset.activeCategory = 'All'; // Default to showing all colors
 
         // Get all colors grouped by category
-        const solidColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Solid');
-        const splitColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Split');
-        const triColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Tri-Color');
-        const combColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Combination');
+        const allColors = window.RICHARDSON_112_COLORS || [];
+        const solidColors = allColors.filter(c => c.category === 'Solid');
+        const splitColors = allColors.filter(c => c.category === 'Split');
+        const triColors = allColors.filter(c => c.category === 'Tri-Color');
+        const combColors = allColors.filter(c => c.category === 'Combination');
 
-        // Default first solid color
-        const defaultColor = solidColors[0];
-
-        // Popular colors for quick select (most common orders)
-        const quickColors = [
-            { name: 'Black', category: 'Solid' },
-            { name: 'Navy', category: 'Solid' },
-            { name: 'Charcoal', category: 'Solid' },
-            { name: 'White', category: 'Solid' },
-            { name: 'Red', category: 'Solid' }
-        ];
+        // Default first solid color for initial image
+        const defaultColor = solidColors[0] || allColors[0];
 
         wrapper.innerHTML = `
-            <!-- Color Selection Row: Dropdown + Preview -->
-            <div class="color-selection-row">
+            <!-- LEFT COLUMN: Large Cap Image -->
+            <div class="color-preview-large">
+                <img src="${defaultColor.url}"
+                     alt="${defaultColor.color}"
+                     class="preview-image">
+                <div class="image-loading-overlay" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Loading...</span>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Color Controls -->
+            <div class="color-controls-column">
+                <!-- Color Dropdown -->
                 <div class="color-dropdown-wrapper">
-                    <select class="color-dropdown">
-                        <option value="">Select a color...</option>
+                    <label for="color-select">Select Color:</label>
+                    <select class="color-dropdown" id="color-select">
+                        <option value="">Choose a color...</option>
+                        ${solidColors.length > 0 ? `
                         <optgroup label="🔴 Solid Colors (${solidColors.length})">
                             ${solidColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Solid">${c.color}</option>`).join('')}
                         </optgroup>
+                        ` : ''}
+                        ${splitColors.length > 0 ? `
                         <optgroup label="◐ Split Colors (${splitColors.length})">
                             ${splitColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Split">${c.color}</option>`).join('')}
                         </optgroup>
+                        ` : ''}
                         ${triColors.length > 0 ? `
                         <optgroup label="🎨 Tri-Color (${triColors.length})">
                             ${triColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Tri-Color">${c.color}</option>`).join('')}
@@ -162,64 +172,95 @@ class RichardsonColorSelector {
                     </select>
                 </div>
 
-                <div class="color-preview-thumbnail">
-                    <img src="${defaultColor.url}"
-                         alt="${defaultColor.color}"
-                         class="thumbnail-image">
-                </div>
-            </div>
-
-            <!-- Quick Color Selection -->
-            <div class="quick-colors-section">
-                <div class="quick-colors-header">
-                    <span class="quick-colors-label">Quick Select:</span>
-                    <a href="#" class="view-all-link">
-                        <i class="fas fa-th"></i>
-                        View All
-                    </a>
-                </div>
-                <div class="quick-colors-grid">
-                    ${quickColors.map(qc => {
-                        const colorData = window.RICHARDSON_112_COLORS.find(
-                            c => c.color === qc.name && c.category === qc.category
-                        );
-                        if (!colorData) return '';
-                        return `
-                            <button type="button"
-                                    class="quick-color-btn"
-                                    data-color="${colorData.color}"
-                                    data-url="${colorData.url}"
-                                    data-category="${colorData.category}">
-                                <i class="fas fa-circle"></i>
-                                ${colorData.color}
-                            </button>
-                        `;
-                    }).join('')}
-                    ${splitColors.length > 0 ? `
-                        <button type="button"
-                                class="quick-color-btn"
-                                data-color="${splitColors[0].color}"
-                                data-url="${splitColors[0].url}"
-                                data-category="Split">
-                            <i class="fas fa-adjust"></i>
-                            ${splitColors[0].color}
+                <!-- Category Filter Tabs -->
+                <div class="category-filter-section">
+                    <div class="category-filter-label">Filter by Category:</div>
+                    <div class="category-filter-tabs">
+                        <button type="button" class="category-tab active" data-category="All">
+                            <i class="fas fa-th"></i>
+                            All
                         </button>
-                    ` : ''}
+                        ${solidColors.length > 0 ? `
+                        <button type="button" class="category-tab" data-category="Solid">
+                            <i class="fas fa-circle"></i>
+                            Solid
+                        </button>
+                        ` : ''}
+                        ${splitColors.length > 0 ? `
+                        <button type="button" class="category-tab" data-category="Split">
+                            <i class="fas fa-adjust"></i>
+                            Split
+                        </button>
+                        ` : ''}
+                        ${triColors.length > 0 ? `
+                        <button type="button" class="category-tab" data-category="Tri-Color">
+                            <i class="fas fa-palette"></i>
+                            Tri
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Quick Select Buttons -->
+                <div class="quick-colors-section">
+                    <div class="quick-colors-header">
+                        <span class="quick-colors-label">Quick Select:</span>
+                        <a href="#" class="view-all-link">
+                            <i class="fas fa-th"></i>
+                            View Gallery
+                        </a>
+                    </div>
+                    <div class="quick-colors-grid">
+                        ${this.generateQuickColorButtons(allColors)}
+                    </div>
                 </div>
             </div>
 
-            <!-- Selected Color Display -->
-            <div class="selected-color-display hidden">
+            <!-- Selected Color Banner (Spans Both Columns) -->
+            <div class="selected-color-banner hidden">
                 <i class="fas fa-check-circle selected-color-icon"></i>
                 <span class="selected-color-label">Selected:</span>
                 <span class="selected-color-name"></span>
                 <button type="button" class="clear-color-btn" title="Clear selection">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times"></i> Clear
                 </button>
             </div>
         `;
 
         return wrapper;
+    }
+
+    /**
+     * Generate quick color buttons HTML
+     * @param {Array} allColors - All available colors
+     * @returns {string} HTML string of quick color buttons
+     */
+    static generateQuickColorButtons(allColors) {
+        // Popular colors for quick select
+        const quickColorNames = [
+            { name: 'Black', category: 'Solid' },
+            { name: 'Navy', category: 'Solid' },
+            { name: 'Charcoal', category: 'Solid' },
+            { name: 'White', category: 'Solid' },
+            { name: 'Red', category: 'Solid' },
+            { name: 'Charcoal/Black', category: 'Split' }
+        ];
+
+        return quickColorNames.map(qc => {
+            const colorData = allColors.find(c => c.color === qc.name && c.category === qc.category);
+            if (!colorData) return '';
+
+            return `
+                <button type="button"
+                        class="quick-color-btn"
+                        data-color="${colorData.color}"
+                        data-url="${colorData.url}"
+                        data-category="${colorData.category}">
+                    <i class="fas ${qc.category === 'Split' ? 'fa-adjust' : 'fa-circle'}"></i>
+                    ${colorData.color}
+                </button>
+            `;
+        }).join('');
     }
 
     /**
@@ -229,12 +270,25 @@ class RichardsonColorSelector {
      */
     static initializeColorSelector(colorSelector, lineItemElement) {
         const dropdown = colorSelector.querySelector('.color-dropdown');
-        const thumbnail = colorSelector.querySelector('.thumbnail-image');
-        const selectedDisplay = colorSelector.querySelector('.selected-color-display');
+        const previewImage = colorSelector.querySelector('.preview-image');
+        const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
+        const selectedBanner = colorSelector.querySelector('.selected-color-banner');
         const selectedName = colorSelector.querySelector('.selected-color-name');
         const clearBtn = colorSelector.querySelector('.clear-color-btn');
         const viewAllLink = colorSelector.querySelector('.view-all-link');
+        const categoryTabs = colorSelector.querySelectorAll('.category-tab');
         const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
+
+        // Handle image loading
+        if (previewImage && loadingOverlay) {
+            previewImage.addEventListener('load', () => {
+                loadingOverlay.style.display = 'none';
+            });
+
+            previewImage.addEventListener('error', () => {
+                loadingOverlay.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Image failed to load</span>';
+            });
+        }
 
         // Handle dropdown selection
         dropdown.addEventListener('change', (e) => {
@@ -246,6 +300,25 @@ class RichardsonColorSelector {
             const category = selectedOption.dataset.category;
 
             this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
+        });
+
+        // Handle category filter tabs
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const category = tab.dataset.category;
+
+                // Update active tab
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update wrapper data attribute
+                colorSelector.dataset.activeCategory = category;
+
+                // Filter quick color buttons
+                this.filterQuickColorButtons(colorSelector, category);
+
+                console.log('[Color Selector] Category filter changed to:', category);
+            });
         });
 
         // Handle quick color buttons
@@ -266,17 +339,19 @@ class RichardsonColorSelector {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
                 dropdown.value = '';
-                selectedDisplay.classList.add('hidden');
+                selectedBanner.classList.add('hidden');
                 delete lineItemElement.dataset.selectedColor;
 
                 // Remove selection from quick buttons
                 quickColorBtns.forEach(btn => btn.classList.remove('selected'));
 
                 // Reset to default image
-                const defaultColor = window.RICHARDSON_112_COLORS.find(c => c.category === 'Solid');
-                if (defaultColor && thumbnail) {
-                    thumbnail.src = defaultColor.url;
-                    thumbnail.alt = defaultColor.color;
+                const allColors = window.RICHARDSON_112_COLORS || [];
+                const defaultColor = allColors.find(c => c.category === 'Solid') || allColors[0];
+                if (defaultColor && previewImage) {
+                    loadingOverlay.style.display = 'flex';
+                    previewImage.src = defaultColor.url;
+                    previewImage.alt = defaultColor.color;
                 }
 
                 console.log('[Color Selector] Selection cleared');
@@ -293,6 +368,25 @@ class RichardsonColorSelector {
     }
 
     /**
+     * Filter quick color buttons based on category
+     * @param {HTMLElement} colorSelector - The color selector element
+     * @param {string} category - Category to filter ('All', 'Solid', 'Split', 'Tri-Color')
+     */
+    static filterQuickColorButtons(colorSelector, category) {
+        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
+
+        quickColorBtns.forEach(btn => {
+            const btnCategory = btn.dataset.category;
+
+            if (category === 'All' || btnCategory === category) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        });
+    }
+
+    /**
      * Select a color and update UI
      * @param {HTMLElement} colorSelector - The color selector element
      * @param {HTMLElement} lineItemElement - The line item element
@@ -301,21 +395,23 @@ class RichardsonColorSelector {
      * @param {string} category - Color category
      */
     static selectColor(colorSelector, lineItemElement, color, imageUrl, category) {
-        const thumbnail = colorSelector.querySelector('.thumbnail-image');
-        const selectedDisplay = colorSelector.querySelector('.selected-color-display');
+        const previewImage = colorSelector.querySelector('.preview-image');
+        const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
+        const selectedBanner = colorSelector.querySelector('.selected-color-banner');
         const selectedName = colorSelector.querySelector('.selected-color-name');
         const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
 
         console.log('[Color Selector] Selecting color:', color);
 
-        // Update thumbnail image
-        if (thumbnail) {
-            thumbnail.src = imageUrl;
-            thumbnail.alt = color;
+        // Update preview image
+        if (previewImage && loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+            previewImage.src = imageUrl;
+            previewImage.alt = color;
         }
 
-        // Show selected color
-        selectedDisplay.classList.remove('hidden');
+        // Show selected banner
+        selectedBanner.classList.remove('hidden');
         selectedName.textContent = color;
 
         // Store color in line item data
@@ -386,7 +482,7 @@ class RichardsonColorSelector {
             <div class="modal-backdrop"></div>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Richardson 112 - All Colors</h3>
+                    <h3>Richardson 112 - Color Gallery</h3>
                     <button type="button" class="modal-close-btn">
                         <i class="fas fa-times"></i>
                     </button>
@@ -570,7 +666,7 @@ class RichardsonColorSelector {
 if (typeof window !== 'undefined') {
     window.RichardsonColorSelector = RichardsonColorSelector;
 
-    console.log('[Richardson Color Selector] Compact enhancement loaded (2025)');
+    console.log('[Richardson Color Selector] 2-Column Professional Layout loaded (2025)');
     console.log('[Richardson Color Selector] Available colors:',
                 window.RICHARDSON_112_COLORS ? window.RICHARDSON_112_COLORS.length : 0);
 }
