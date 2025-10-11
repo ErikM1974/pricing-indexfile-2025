@@ -1,11 +1,11 @@
 /**
- * Richardson Color Selector Enhancement
- * Adds color selection with image preview for Richardson 112 caps
+ * Richardson Color Selector Enhancement - Compact Design (2025)
+ * Modern, professional, contained color selector for Richardson 112 caps
  *
  * USAGE:
  * 1. Include richardson-112-images.js before this file
  * 2. Call RichardsonColorSelector.enhanceLineItem(lineItemElement) after creating a line item
- * 3. When style 112 is selected, color selector appears with image gallery
+ * 3. When style 112 is selected, compact color selector appears
  */
 
 class RichardsonColorSelector {
@@ -79,7 +79,7 @@ class RichardsonColorSelector {
         console.log('[Color Selector] handleStyleChange called with:', styleNumber);
 
         // Remove existing color selector if present
-        const existingSelector = lineItemElement.querySelector('.color-selector-wrapper');
+        const existingSelector = lineItemElement.querySelector('.color-selector-compact');
         if (existingSelector) {
             console.log('[Color Selector] Removing existing selector');
             existingSelector.remove();
@@ -91,7 +91,7 @@ class RichardsonColorSelector {
             return;
         }
 
-        console.log('[Color Selector] Style 112 detected! Creating color selector...');
+        console.log('[Color Selector] Style 112 detected! Creating compact color selector...');
 
         // Insert color selector after quantity input
         const quantityGroup = lineItemElement.querySelector('.quantity-input-group');
@@ -100,10 +100,10 @@ class RichardsonColorSelector {
             return;
         }
 
-        const colorSelector = this.createColorSelector();
+        const colorSelector = this.createCompactColorSelector();
         quantityGroup.insertAdjacentElement('afterend', colorSelector);
 
-        console.log('[Color Selector] Color selector inserted into DOM');
+        console.log('[Color Selector] Compact color selector inserted into DOM');
 
         // Initialize color selection functionality
         this.initializeColorSelector(colorSelector, lineItemElement);
@@ -112,118 +112,114 @@ class RichardsonColorSelector {
     }
 
     /**
-     * Create the color selector HTML structure with catalog-style layout
+     * Create the compact color selector HTML structure
      * @returns {HTMLElement} The color selector wrapper element
      */
-    static createColorSelector() {
+    static createCompactColorSelector() {
         const wrapper = document.createElement('div');
-        wrapper.className = 'color-selector-wrapper';
-        wrapper.dataset.activeCategory = 'Solid'; // Default to Solid category
+        wrapper.className = 'color-selector-compact';
 
-        // Get default image (first solid color - Amber Gold)
-        const defaultColor = window.RICHARDSON_112_COLORS.find(c => c.category === 'Solid');
-        const defaultImageUrl = defaultColor ? defaultColor.url : '';
-        const defaultColorName = defaultColor ? defaultColor.color : 'Amber Gold';
+        // Get all colors grouped by category
+        const solidColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Solid');
+        const splitColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Split');
+        const triColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Tri-Color');
+        const combColors = window.RICHARDSON_112_COLORS.filter(c => c.category === 'Combination');
+
+        // Default first solid color
+        const defaultColor = solidColors[0];
+
+        // Popular colors for quick select (most common orders)
+        const quickColors = [
+            { name: 'Black', category: 'Solid' },
+            { name: 'Navy', category: 'Solid' },
+            { name: 'Charcoal', category: 'Solid' },
+            { name: 'White', category: 'Solid' },
+            { name: 'Red', category: 'Solid' }
+        ];
 
         wrapper.innerHTML = `
-            <!-- LEFT COLUMN: Image Preview -->
-            <div class="color-image-preview">
-                <div class="preview-image-container">
-                    <img src="${defaultImageUrl}"
-                         alt="Richardson 112 - ${defaultColorName}"
-                         class="color-preview-image">
-                    <div class="image-loading-overlay">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <span>Loading image...</span>
-                    </div>
+            <!-- Color Selection Row: Dropdown + Preview -->
+            <div class="color-selection-row">
+                <div class="color-dropdown-wrapper">
+                    <select class="color-dropdown">
+                        <option value="">Select a color...</option>
+                        <optgroup label="🔴 Solid Colors (${solidColors.length})">
+                            ${solidColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Solid">${c.color}</option>`).join('')}
+                        </optgroup>
+                        <optgroup label="◐ Split Colors (${splitColors.length})">
+                            ${splitColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Split">${c.color}</option>`).join('')}
+                        </optgroup>
+                        ${triColors.length > 0 ? `
+                        <optgroup label="🎨 Tri-Color (${triColors.length})">
+                            ${triColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Tri-Color">${c.color}</option>`).join('')}
+                        </optgroup>
+                        ` : ''}
+                        ${combColors.length > 0 ? `
+                        <optgroup label="🔷 Combination (${combColors.length})">
+                            ${combColors.map(c => `<option value="${c.color}" data-url="${c.url}" data-category="Combination">${c.color}</option>`).join('')}
+                        </optgroup>
+                        ` : ''}
+                    </select>
                 </div>
-                <div class="image-caption">
-                    <i class="fas fa-info-circle"></i>
-                    Click a color to see the cap
+
+                <div class="color-preview-thumbnail">
+                    <img src="${defaultColor.url}"
+                         alt="${defaultColor.color}"
+                         class="thumbnail-image">
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: Color Options -->
-            <div class="color-options-column">
-                <div class="color-selector-header">
-                    <label class="form-label">
-                        <i class="fas fa-palette"></i>
-                        Select Color
-                    </label>
-                    <button type="button" class="view-all-colors-btn">
+            <!-- Quick Color Selection -->
+            <div class="quick-colors-section">
+                <div class="quick-colors-header">
+                    <span class="quick-colors-label">Quick Select:</span>
+                    <a href="#" class="view-all-link">
                         <i class="fas fa-th"></i>
-                        View All Colors
-                    </button>
+                        View All
+                    </a>
                 </div>
+                <div class="quick-colors-grid">
+                    ${quickColors.map(qc => {
+                        const colorData = window.RICHARDSON_112_COLORS.find(
+                            c => c.color === qc.name && c.category === qc.category
+                        );
+                        if (!colorData) return '';
+                        return `
+                            <button type="button"
+                                    class="quick-color-btn"
+                                    data-color="${colorData.color}"
+                                    data-url="${colorData.url}"
+                                    data-category="${colorData.category}">
+                                <i class="fas fa-circle"></i>
+                                ${colorData.color}
+                            </button>
+                        `;
+                    }).join('')}
+                    ${splitColors.length > 0 ? `
+                        <button type="button"
+                                class="quick-color-btn"
+                                data-color="${splitColors[0].color}"
+                                data-url="${splitColors[0].url}"
+                                data-category="Split">
+                            <i class="fas fa-adjust"></i>
+                            ${splitColors[0].color}
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
 
-                <!-- Category Tabs -->
-                <div class="category-tabs">
-                    <button type="button" class="category-tab active" data-category="Solid">
-                        <i class="fas fa-circle"></i>
-                        Solid
-                    </button>
-                    <button type="button" class="category-tab" data-category="Split">
-                        <i class="fas fa-adjust"></i>
-                        Split
-                    </button>
-                    <button type="button" class="category-tab" data-category="Tri-Color">
-                        <i class="fas fa-palette"></i>
-                        Tri-Color
-                    </button>
-                    <button type="button" class="category-tab" data-category="Combination">
-                        <i class="fas fa-swatchbook"></i>
-                        Combination
-                    </button>
-                </div>
-
-                <!-- Color Grid (will be populated by active category) -->
-                <div class="color-grid">
-                    ${this.renderColorOptions('Solid')}
-                </div>
-
-                <div class="selected-color-display hidden">
-                    <span class="selected-color-label">Selected:</span>
-                    <span class="selected-color-name"></span>
-                    <button type="button" class="clear-color-btn" title="Clear selection">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            <!-- Selected Color Display -->
+            <div class="selected-color-display hidden">
+                <i class="fas fa-check-circle selected-color-icon"></i>
+                <span class="selected-color-label">Selected:</span>
+                <span class="selected-color-name"></span>
+                <button type="button" class="clear-color-btn" title="Clear selection">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         `;
 
         return wrapper;
-    }
-
-    /**
-     * Render color option buttons for a specific category
-     * @param {string} category - Category to filter ('Solid' or 'Split')
-     * @returns {string} HTML string of color options
-     */
-    static renderColorOptions(category = 'Solid') {
-        if (!window.RICHARDSON_112_COLORS) {
-            return '<div class="error">Color data not loaded</div>';
-        }
-
-        // Filter colors by category
-        const filteredColors = window.RICHARDSON_112_COLORS.filter(
-            colorItem => colorItem.category === category
-        );
-
-        if (filteredColors.length === 0) {
-            return '<div class="error">No colors found for this category</div>';
-        }
-
-        return filteredColors.map(colorItem => `
-            <button type="button"
-                    class="color-option"
-                    data-color="${colorItem.color}"
-                    data-category="${colorItem.category}"
-                    data-image-url="${colorItem.url}"
-                    title="${colorItem.color} - Click to preview">
-                <span class="color-name">${colorItem.color}</span>
-                <i class="fas fa-check color-check"></i>
-            </button>
-        `).join('');
     }
 
     /**
@@ -232,234 +228,113 @@ class RichardsonColorSelector {
      * @param {HTMLElement} lineItemElement - The parent line item
      */
     static initializeColorSelector(colorSelector, lineItemElement) {
+        const dropdown = colorSelector.querySelector('.color-dropdown');
+        const thumbnail = colorSelector.querySelector('.thumbnail-image');
         const selectedDisplay = colorSelector.querySelector('.selected-color-display');
         const selectedName = colorSelector.querySelector('.selected-color-name');
         const clearBtn = colorSelector.querySelector('.clear-color-btn');
-        const viewAllBtn = colorSelector.querySelector('.view-all-colors-btn');
-        const previewImage = colorSelector.querySelector('.color-preview-image');
-        const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
-        const colorGrid = colorSelector.querySelector('.color-grid');
-        const categoryTabs = colorSelector.querySelectorAll('.category-tab');
+        const viewAllLink = colorSelector.querySelector('.view-all-link');
+        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
 
-        // Handle image loading states
-        if (previewImage && loadingOverlay) {
-            // Show loading initially
-            loadingOverlay.style.display = 'flex';
+        // Handle dropdown selection
+        dropdown.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            if (!selectedOption.value) return;
 
-            previewImage.addEventListener('load', () => {
-                loadingOverlay.style.display = 'none';
-            });
+            const color = selectedOption.value;
+            const imageUrl = selectedOption.dataset.url;
+            const category = selectedOption.dataset.category;
 
-            previewImage.addEventListener('error', () => {
-                loadingOverlay.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Image failed to load</span>';
-            });
-        }
-
-        // Handle category tab switching
-        categoryTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const category = tab.dataset.category;
-
-                console.log('[Color Selector] Switching to category:', category);
-
-                // Update active tab
-                categoryTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                // Update wrapper data attribute
-                colorSelector.dataset.activeCategory = category;
-
-                // Re-render color grid with new category
-                colorGrid.innerHTML = this.renderColorOptions(category);
-
-                // Re-attach click listeners to new buttons
-                this.attachColorOptionListeners(colorSelector, lineItemElement);
-
-                // Update image to first color of new category
-                const firstColor = window.RICHARDSON_112_COLORS.find(c => c.category === category);
-                if (firstColor) {
-                    this.updateInlineImage(colorSelector, firstColor.url, firstColor.color);
-                }
-
-                // Clear selection display
-                selectedDisplay.classList.add('hidden');
-                delete lineItemElement.dataset.selectedColor;
-            });
+            this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
         });
 
-        // Attach color option listeners for initial render
-        this.attachColorOptionListeners(colorSelector, lineItemElement);
+        // Handle quick color buttons
+        quickColorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const color = btn.dataset.color;
+                const imageUrl = btn.dataset.url;
+                const category = btn.dataset.category;
+
+                // Update dropdown to match
+                dropdown.value = color;
+
+                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
+            });
+        });
 
         // Handle clear selection
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
-                const colorOptions = colorSelector.querySelectorAll('.color-option');
-                colorOptions.forEach(opt => opt.classList.remove('selected'));
+                dropdown.value = '';
                 selectedDisplay.classList.add('hidden');
                 delete lineItemElement.dataset.selectedColor;
 
-                // Reset to default image of current category
-                const activeCategory = colorSelector.dataset.activeCategory || 'Solid';
-                const defaultColor = window.RICHARDSON_112_COLORS.find(c => c.category === activeCategory);
-                if (defaultColor) {
-                    this.updateInlineImage(colorSelector, defaultColor.url, defaultColor.color);
+                // Remove selection from quick buttons
+                quickColorBtns.forEach(btn => btn.classList.remove('selected'));
+
+                // Reset to default image
+                const defaultColor = window.RICHARDSON_112_COLORS.find(c => c.category === 'Solid');
+                if (defaultColor && thumbnail) {
+                    thumbnail.src = defaultColor.url;
+                    thumbnail.alt = defaultColor.color;
                 }
+
+                console.log('[Color Selector] Selection cleared');
             });
         }
 
-        // Handle view all colors - opens gallery modal
-        if (viewAllBtn) {
-            viewAllBtn.addEventListener('click', () => {
+        // Handle view all link
+        if (viewAllLink) {
+            viewAllLink.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.showColorGallery(colorSelector, lineItemElement);
             });
         }
     }
 
     /**
-     * Attach click listeners to color option buttons
+     * Select a color and update UI
      * @param {HTMLElement} colorSelector - The color selector element
-     * @param {HTMLElement} lineItemElement - The parent line item
+     * @param {HTMLElement} lineItemElement - The line item element
+     * @param {string} color - Color name
+     * @param {string} imageUrl - Image URL
+     * @param {string} category - Color category
      */
-    static attachColorOptionListeners(colorSelector, lineItemElement) {
-        const colorOptions = colorSelector.querySelectorAll('.color-option');
+    static selectColor(colorSelector, lineItemElement, color, imageUrl, category) {
+        const thumbnail = colorSelector.querySelector('.thumbnail-image');
         const selectedDisplay = colorSelector.querySelector('.selected-color-display');
         const selectedName = colorSelector.querySelector('.selected-color-name');
+        const quickColorBtns = colorSelector.querySelectorAll('.quick-color-btn');
 
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const color = option.dataset.color;
-                const imageUrl = option.dataset.imageUrl;
+        console.log('[Color Selector] Selecting color:', color);
 
-                console.log('[Color Selector] Color clicked:', color);
-
-                // Update selection state
-                colorOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-
-                // Show selected color
-                selectedDisplay.classList.remove('hidden');
-                selectedName.textContent = color;
-
-                // Store color in line item data
-                lineItemElement.dataset.selectedColor = color;
-
-                // Update inline image (catalog style - no modal)
-                this.updateInlineImage(colorSelector, imageUrl, color);
-            });
-        });
-    }
-
-    /**
-     * Update the inline image preview (catalog style)
-     * @param {HTMLElement} colorSelector - The color selector element
-     * @param {string} imageUrl - The image URL to display
-     * @param {string} colorName - The color name
-     */
-    static updateInlineImage(colorSelector, imageUrl, colorName) {
-        const previewImage = colorSelector.querySelector('.color-preview-image');
-        const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
-
-        if (!previewImage || !loadingOverlay) {
-            console.error('[Color Selector] Preview image elements not found');
-            return;
+        // Update thumbnail image
+        if (thumbnail) {
+            thumbnail.src = imageUrl;
+            thumbnail.alt = color;
         }
 
-        console.log('[Color Selector] Updating inline image to:', colorName);
+        // Show selected color
+        selectedDisplay.classList.remove('hidden');
+        selectedName.textContent = color;
 
-        // Show loading overlay
-        loadingOverlay.style.display = 'flex';
+        // Store color in line item data
+        lineItemElement.dataset.selectedColor = color;
 
-        // Update image
-        previewImage.alt = `Richardson 112 - ${colorName}`;
-        previewImage.src = imageUrl;
+        // Update quick button states
+        quickColorBtns.forEach(btn => {
+            if (btn.dataset.color === color) {
+                btn.classList.add('selected');
+            } else {
+                btn.classList.remove('selected');
+            }
+        });
 
-        // Loading overlay will hide automatically via the load event listener
+        console.log('[Color Selector] Color selected successfully');
     }
 
     /**
-     * Show image preview modal
-     * @param {string} imageUrl - The image URL to display
-     * @param {string} colorName - The color name
-     */
-    static showImagePreview(imageUrl, colorName) {
-        // Create or get existing modal
-        let modal = document.getElementById('colorPreviewModal');
-        if (!modal) {
-            modal = this.createImageModal();
-            document.body.appendChild(modal);
-        }
-
-        // Update modal content
-        const modalImage = modal.querySelector('.preview-image');
-        const modalTitle = modal.querySelector('.preview-title');
-
-        if (modalImage && modalTitle) {
-            modalImage.src = imageUrl;
-            modalImage.alt = `Richardson 112 - ${colorName}`;
-            modalTitle.textContent = `Richardson 112 - ${colorName}`;
-        }
-
-        // Show modal
-        modal.classList.add('active');
-    }
-
-    /**
-     * Create image preview modal
-     * @returns {HTMLElement} The modal element
-     */
-    static createImageModal() {
-        const modal = document.createElement('div');
-        modal.id = 'colorPreviewModal';
-        modal.className = 'color-preview-modal';
-
-        modal.innerHTML = `
-            <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="preview-title">Richardson 112</h3>
-                    <button type="button" class="modal-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <img src="" alt="Cap Preview" class="preview-image">
-                    <div class="loading-indicator">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        Loading image...
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Handle close button
-        const closeBtn = modal.querySelector('.modal-close-btn');
-        closeBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        // Handle backdrop click
-        const backdrop = modal.querySelector('.modal-backdrop');
-        backdrop.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        // Handle image load
-        const image = modal.querySelector('.preview-image');
-        const loadingIndicator = modal.querySelector('.loading-indicator');
-
-        image.addEventListener('load', () => {
-            loadingIndicator.style.display = 'none';
-        });
-
-        image.addEventListener('error', () => {
-            loadingIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Image failed to load';
-        });
-
-        return modal;
-    }
-
-    /**
-     * Show color gallery with all options
+     * Show color gallery modal with all options
      * @param {HTMLElement} colorSelector - The color selector to update when gallery item clicked
      * @param {HTMLElement} lineItemElement - The line item element
      */
@@ -471,6 +346,19 @@ class RichardsonColorSelector {
         } else {
             // Update click handlers for current color selector
             this.updateGalleryClickHandlers(galleryModal, colorSelector, lineItemElement);
+        }
+
+        // Update selected state in gallery
+        const currentColor = lineItemElement.dataset.selectedColor;
+        if (currentColor) {
+            const galleryItems = galleryModal.querySelectorAll('.gallery-item');
+            galleryItems.forEach(item => {
+                if (item.dataset.color === currentColor) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
         }
 
         galleryModal.classList.add('active');
@@ -487,26 +375,16 @@ class RichardsonColorSelector {
         modal.id = 'colorGalleryModal';
         modal.className = 'color-gallery-modal';
 
-        const galleryItems = window.RICHARDSON_112_COLORS.map(colorItem => `
-            <div class="gallery-item" data-color="${colorItem.color}" data-url="${colorItem.url}">
-                <div class="gallery-image-wrapper">
-                    <img src="${colorItem.url}"
-                         alt="${colorItem.description}"
-                         loading="lazy"
-                         class="gallery-image">
-                    <div class="gallery-image-loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
-                </div>
-                <div class="gallery-item-info">
-                    <span class="gallery-color-name">${colorItem.color}</span>
-                </div>
-            </div>
-        `).join('');
+        // Group colors by category
+        const categories = ['Solid', 'Split', 'Tri-Color', 'Combination'];
+        const colorsByCategory = {};
+        categories.forEach(cat => {
+            colorsByCategory[cat] = window.RICHARDSON_112_COLORS.filter(c => c.category === cat);
+        });
 
         modal.innerHTML = `
             <div class="modal-backdrop"></div>
-            <div class="modal-content gallery-content">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3>Richardson 112 - All Colors</h3>
                     <button type="button" class="modal-close-btn">
@@ -514,9 +392,57 @@ class RichardsonColorSelector {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="gallery-grid">
-                        ${galleryItems}
+                    <!-- Category Tabs -->
+                    <div class="modal-category-tabs">
+                        ${categories.map((cat, idx) => {
+                            const count = colorsByCategory[cat].length;
+                            if (count === 0) return '';
+                            const icons = {
+                                'Solid': 'fa-circle',
+                                'Split': 'fa-adjust',
+                                'Tri-Color': 'fa-palette',
+                                'Combination': 'fa-swatchbook'
+                            };
+                            return `
+                                <button type="button"
+                                        class="modal-category-tab ${idx === 0 ? 'active' : ''}"
+                                        data-category="${cat}">
+                                    <i class="fas ${icons[cat]}"></i>
+                                    ${cat} (${count})
+                                </button>
+                            `;
+                        }).join('')}
                     </div>
+
+                    <!-- Gallery Grids (one per category) -->
+                    ${categories.map((cat, idx) => {
+                        const colors = colorsByCategory[cat];
+                        if (colors.length === 0) return '';
+
+                        return `
+                            <div class="gallery-grid" data-category="${cat}" style="${idx === 0 ? '' : 'display:none;'}">
+                                ${colors.map(colorItem => `
+                                    <div class="gallery-item"
+                                         data-color="${colorItem.color}"
+                                         data-url="${colorItem.url}"
+                                         data-category="${colorItem.category}">
+                                        <div class="gallery-image-wrapper">
+                                            <img src="${colorItem.url}"
+                                                 alt="${colorItem.description}"
+                                                 loading="lazy"
+                                                 class="gallery-image">
+                                            <div class="gallery-image-loading">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            </div>
+                                        </div>
+                                        <div class="gallery-item-info">
+                                            <span class="gallery-color-name">${colorItem.color}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -530,6 +456,29 @@ class RichardsonColorSelector {
         const backdrop = modal.querySelector('.modal-backdrop');
         backdrop.addEventListener('click', () => {
             modal.classList.remove('active');
+        });
+
+        // Handle category tabs
+        const categoryTabs = modal.querySelectorAll('.modal-category-tab');
+        const galleryGrids = modal.querySelectorAll('.gallery-grid');
+
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const category = tab.dataset.category;
+
+                // Update active tab
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Show matching gallery
+                galleryGrids.forEach(grid => {
+                    if (grid.dataset.category === category) {
+                        grid.style.display = 'grid';
+                    } else {
+                        grid.style.display = 'none';
+                    }
+                });
+            });
         });
 
         // Set up gallery click handlers
@@ -573,22 +522,27 @@ class RichardsonColorSelector {
             newItem.addEventListener('click', () => {
                 const color = newItem.dataset.color;
                 const imageUrl = newItem.dataset.url;
+                const category = newItem.dataset.category;
 
                 console.log('[Color Selector] Gallery item clicked:', color);
 
-                // Close gallery
-                galleryModal.classList.remove('active');
+                // Update dropdown
+                const dropdown = colorSelector.querySelector('.color-dropdown');
+                if (dropdown) {
+                    dropdown.value = color;
+                }
 
-                // Update inline image
-                this.updateInlineImage(colorSelector, imageUrl, color);
+                // Select the color
+                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category);
 
-                // Update color selection in the color grid
-                const colorOptions = colorSelector.querySelectorAll('.color-option');
-                colorOptions.forEach(opt => {
-                    if (opt.dataset.color === color) {
-                        opt.click(); // This will handle selection state and storage
-                    }
-                });
+                // Update gallery selection state
+                galleryItems.forEach(gi => gi.classList.remove('selected'));
+                newItem.classList.add('selected');
+
+                // Close gallery after short delay
+                setTimeout(() => {
+                    galleryModal.classList.remove('active');
+                }, 300);
             });
         });
     }
@@ -608,7 +562,7 @@ class RichardsonColorSelector {
      * @returns {boolean} True if line item is for style 112 and has color selector
      */
     static hasColorSelector(lineItemElement) {
-        return lineItemElement.querySelector('.color-selector-wrapper') !== null;
+        return lineItemElement.querySelector('.color-selector-compact') !== null;
     }
 }
 
@@ -616,7 +570,7 @@ class RichardsonColorSelector {
 if (typeof window !== 'undefined') {
     window.RichardsonColorSelector = RichardsonColorSelector;
 
-    console.log('[Richardson Color Selector] Enhancement loaded');
+    console.log('[Richardson Color Selector] Compact enhancement loaded (2025)');
     console.log('[Richardson Color Selector] Available colors:',
                 window.RICHARDSON_112_COLORS ? window.RICHARDSON_112_COLORS.length : 0);
 }
