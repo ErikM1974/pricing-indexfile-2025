@@ -129,47 +129,83 @@ class RichardsonColorSelector {
     static handleStyleChange(lineItemElement, styleNumber) {
         console.log('[Color Selector] handleStyleChange called with:', styleNumber);
 
-        // Remove existing color selector if present
-        const existingSelector = lineItemElement.querySelector('.color-selector-compact');
-        if (existingSelector) {
-            console.log('[Color Selector] Removing existing selector');
-            existingSelector.remove();
+        // Check if style 112
+        if (styleNumber.toUpperCase() === '112') {
+            console.log('[Color Selector] Style 112 detected! Creating integrated component...');
+
+            // COMPLETELY REPLACE the line item with the integrated Richardson component
+            const colorSelector = this.createColorSelectorWithCircles();
+
+            // Clear the line item and replace with integrated component
+            lineItemElement.innerHTML = '';
+            lineItemElement.appendChild(colorSelector);
+            lineItemElement.classList.add('is-richardson-112');
+
+            // Initialize functionality
+            this.initializeColorSelector(colorSelector, lineItemElement);
+
+            console.log('[Color Selector] Richardson 112 integrated component created');
+        } else {
+            // For non-112 styles, check if it was previously 112 and restore standard structure
+            const existingIntegrated = lineItemElement.querySelector('.richardson-112-integrated');
+            if (existingIntegrated || lineItemElement.classList.contains('is-richardson-112')) {
+                console.log('[Color Selector] Removing 112 component for non-112 style');
+                this.restoreStandardLineItem(lineItemElement, styleNumber);
+            } else {
+                // Just remove any old color selector
+                const existingSelector = lineItemElement.querySelector('.color-selector-compact');
+                if (existingSelector) {
+                    existingSelector.remove();
+                }
+            }
         }
+    }
 
-        // Only add color selector for style 112
-        if (styleNumber.toUpperCase() !== '112') {
-            console.log('[Color Selector] Not style 112, skipping');
-            return;
-        }
+    /**
+     * Restore standard line item structure for non-112 styles
+     * @param {HTMLElement} lineItemElement - The line item element
+     * @param {string} styleNumber - The style number to restore
+     */
+    static restoreStandardLineItem(lineItemElement, styleNumber) {
+        console.log('[Color Selector] Restoring standard line item for style:', styleNumber);
 
-        console.log('[Color Selector] Style 112 detected! Creating visual color selector...');
+        lineItemElement.classList.remove('is-richardson-112');
+        lineItemElement.innerHTML = `
+            <div class="style-input-group">
+                <label>Style Number</label>
+                <div class="autocomplete-wrapper">
+                    <input type="text"
+                           class="form-input style-input"
+                           value="${styleNumber}"
+                           placeholder="Type style number..."
+                           autocomplete="off">
+                    <div class="autocomplete-list hidden"></div>
+                    <span class="validation-indicator valid"></span>
+                </div>
+            </div>
+            <div class="quantity-input-group">
+                <label>Quantity</label>
+                <input type="number"
+                       class="form-input quantity-input"
+                       placeholder="Enter quantity"
+                       min="1">
+            </div>
+            <button type="button" class="remove-btn remove-style-btn" aria-label="Remove item">
+                <i class="fas fa-times"></i>
+                <span>Remove</span>
+            </button>
+        `;
 
-        // Insert color selector after quantity input
-        const quantityGroup = lineItemElement.querySelector('.quantity-input-group');
-        if (!quantityGroup) {
-            console.error('[Color Selector] Quantity group not found!');
-            return;
-        }
-
-        const colorSelector = this.createColorSelectorWithCircles();
-        quantityGroup.insertAdjacentElement('afterend', colorSelector);
-
-        console.log('[Color Selector] Color circle selector inserted into DOM');
-
-        // Initialize color selection functionality
-        this.initializeColorSelector(colorSelector, lineItemElement);
-
-        console.log('[Color Selector] Color selector initialized');
+        console.log('[Color Selector] Standard line item restored');
     }
 
     /**
      * Create the visual color selector with color circles
-     * @returns {HTMLElement} The color selector wrapper element
+     * @returns {HTMLElement} The integrated Richardson 112 component
      */
     static createColorSelectorWithCircles() {
         const wrapper = document.createElement('div');
-        wrapper.className = 'color-selector-compact';
-        wrapper.dataset.activeCategory = 'All'; // Default to showing all colors
+        wrapper.className = 'richardson-112-integrated';
 
         // Get all colors grouped by category
         const allColors = window.RICHARDSON_112_COLORS || [];
@@ -182,78 +218,103 @@ class RichardsonColorSelector {
         const defaultColor = solidColors[0] || allColors[0];
 
         wrapper.innerHTML = `
-            <!-- LEFT COLUMN: Large Cap Image -->
-            <div class="color-preview-large">
-                <img src="${defaultColor.url}"
-                     alt="${defaultColor.color}"
-                     class="preview-image">
-                <div class="image-loading-overlay" style="display: none;">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>Loading...</span>
-                </div>
+            <!-- Title Header -->
+            <div class="richardson-title-section">
+                <h3 class="richardson-title">Richardson 112 Trucker Hat</h3>
+                <p class="richardson-subtitle">The gold standard of trucker hats.</p>
             </div>
 
-            <!-- RIGHT COLUMN: Color Controls -->
-            <div class="color-controls-column">
-                <!-- Category Pills -->
-                <div class="category-filter-section">
-                    <div class="category-filter-label">Filter by Category:</div>
-                    <div class="category-filter-tabs">
-                        <button type="button" class="category-tab active" data-category="All">
-                            <i class="fas fa-th"></i>
+            <!-- 2-Column Color Selector -->
+            <div class="color-selector-2column">
+
+                <!-- LEFT COLUMN: Large Cap Image -->
+                <div class="image-column">
+                    <img src="${defaultColor.url}"
+                         alt="${defaultColor.color}"
+                         class="preview-image">
+                    <div class="image-loading-overlay" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: All Controls -->
+                <div class="controls-column">
+
+                    <!-- Current Color Label -->
+                    <div class="color-label-row">
+                        <span class="color-label-text">Select Color:</span>
+                        <span class="color-current-name">${defaultColor.color}</span>
+                    </div>
+
+                    <!-- Category Pills - Single Row -->
+                    <div class="category-pills-row">
+                        <button type="button" class="category-pill active" data-category="All">
                             All
                         </button>
                         ${solidColors.length > 0 ? `
-                        <button type="button" class="category-tab" data-category="Solid">
-                            <i class="fas fa-circle"></i>
+                        <button type="button" class="category-pill" data-category="Solid">
                             Solid
                         </button>
                         ` : ''}
                         ${splitColors.length > 0 ? `
-                        <button type="button" class="category-tab" data-category="Split">
-                            <i class="fas fa-adjust"></i>
+                        <button type="button" class="category-pill" data-category="Split">
                             Split
                         </button>
                         ` : ''}
                         ${triColors.length > 0 ? `
-                        <button type="button" class="category-tab" data-category="Tri-Color">
-                            <i class="fas fa-palette"></i>
-                            Tri
+                        <button type="button" class="category-pill" data-category="Tri-Color">
+                            Tri-Color
                         </button>
                         ` : ''}
                         ${combColors.length > 0 ? `
-                        <button type="button" class="category-tab" data-category="Combination">
-                            <i class="fas fa-swatchbook"></i>
-                            Combo
+                        <button type="button" class="category-pill" data-category="Combination">
+                            Combination
                         </button>
                         ` : ''}
                     </div>
-                </div>
 
-                <!-- Color Circles Grid -->
-                <div class="quick-colors-section">
-                    <div class="quick-colors-header">
-                        <span class="quick-colors-label">Select Color:</span>
-                        <a href="#" class="view-all-link">
-                            <i class="fas fa-th"></i>
-                            View All
-                        </a>
+                    <!-- Color Count Indicator -->
+                    <div class="color-count-row">
+                        <span class="color-count-text">
+                            Showing <strong class="count-current">${allColors.length}</strong> of <strong class="count-total">${allColors.length}</strong> colors
+                        </span>
+                        <span class="color-scroll-hint">
+                            <i class="fas fa-arrows-left-right"></i> Scroll horizontally
+                        </span>
                     </div>
-                    <div class="quick-colors-grid">
+
+                    <!-- Color Circles - Multi-Row Grid -->
+                    <div class="color-circles-single-row">
                         ${this.generateColorCircles(allColors)}
                     </div>
+
+                    <!-- Selected Banner -->
+                    <div class="selected-banner hidden">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="selected-text">Selected:</span>
+                        <strong class="selected-color-name">${defaultColor.color}</strong>
+                        <button type="button" class="clear-btn">Clear</button>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Selected Color Banner (Spans Both Columns) -->
-            <div class="selected-color-banner hidden">
-                <i class="fas fa-check-circle selected-color-icon"></i>
-                <span class="selected-color-label">Selected:</span>
-                <span class="selected-color-name"></span>
-                <button type="button" class="clear-color-btn" title="Clear selection">
-                    <i class="fas fa-times"></i> Clear
-                </button>
+            <!-- Style & Quantity Row (Below Color Selector) -->
+            <div class="inputs-row-bottom">
+                <div class="style-input-wrapper">
+                    <label>Style Number</label>
+                    <input type="text" class="style-input style-input-readonly" value="112" readonly>
+                </div>
+                <div class="quantity-input-wrapper">
+                    <label>Quantity</label>
+                    <input type="number" class="quantity-input" placeholder="E.g., 24" min="1">
+                </div>
             </div>
+
+            <!-- Remove Button - Full Width -->
+            <button type="button" class="remove-btn-full">
+                Remove
+            </button>
         `;
 
         return wrapper;
@@ -312,18 +373,22 @@ class RichardsonColorSelector {
 
     /**
      * Initialize color selector functionality
-     * @param {HTMLElement} colorSelector - The color selector element
+     * @param {HTMLElement} colorSelector - The integrated Richardson component
      * @param {HTMLElement} lineItemElement - The parent line item
      */
     static initializeColorSelector(colorSelector, lineItemElement) {
         const previewImage = colorSelector.querySelector('.preview-image');
         const loadingOverlay = colorSelector.querySelector('.image-loading-overlay');
-        const selectedBanner = colorSelector.querySelector('.selected-color-banner');
+        const selectedBanner = colorSelector.querySelector('.selected-banner');
         const selectedName = colorSelector.querySelector('.selected-color-name');
-        const clearBtn = colorSelector.querySelector('.clear-color-btn');
-        const viewAllLink = colorSelector.querySelector('.view-all-link');
-        const categoryTabs = colorSelector.querySelectorAll('.category-tab');
+        const currentColorLabel = colorSelector.querySelector('.color-current-name');
+        const clearBtn = colorSelector.querySelector('.clear-btn');
+        const removeBtn = colorSelector.querySelector('.remove-btn-full');
+        const categoryPills = colorSelector.querySelectorAll('.category-pill');
         const colorCircles = colorSelector.querySelectorAll('.color-circle');
+        const quantityInput = colorSelector.querySelector('.quantity-input');
+
+        console.log('[Color Selector] Initializing with new structure');
 
         // Handle image loading
         if (previewImage && loadingOverlay) {
@@ -332,26 +397,24 @@ class RichardsonColorSelector {
             });
 
             previewImage.addEventListener('error', () => {
-                loadingOverlay.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Image failed to load</span>';
+                loadingOverlay.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                console.error('[Color Selector] Image failed to load');
             });
         }
 
-        // Handle category filter tabs (show/hide circles)
-        categoryTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const category = tab.dataset.category;
+        // Handle category pills
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                const category = pill.dataset.category;
 
-                // Update active tab
-                categoryTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
+                // Update active pill
+                categoryPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
 
-                // Update wrapper data attribute
-                colorSelector.dataset.activeCategory = category;
-
-                // Filter color circles (show/hide based on category)
+                // Filter circles
                 this.filterColorCircles(colorSelector, category);
 
-                console.log('[Color Selector] Category filter changed to:', category);
+                console.log('[Color Selector] Category changed to:', category);
             });
         });
 
@@ -361,9 +424,31 @@ class RichardsonColorSelector {
             circle.addEventListener('click', () => {
                 const color = circle.dataset.color;
                 const imageUrl = circle.dataset.url;
-                const category = circle.dataset.category;
 
-                this.selectColor(colorSelector, lineItemElement, color, imageUrl, category, circle);
+                console.log('[Color Selector] Color clicked:', color);
+
+                // Update image
+                if (previewImage) {
+                    loadingOverlay.style.display = 'flex';
+                    previewImage.src = imageUrl;
+                    previewImage.alt = color;
+                }
+
+                // Update labels
+                if (currentColorLabel) currentColorLabel.textContent = color;
+                if (selectedName) selectedName.textContent = color;
+
+                // Show banner
+                if (selectedBanner) selectedBanner.classList.remove('hidden');
+
+                // Update circle states
+                colorCircles.forEach(c => c.classList.remove('selected'));
+                circle.classList.add('selected');
+
+                // Store in line item
+                lineItemElement.dataset.selectedColor = color;
+
+                console.log('[Color Selector] Color selected:', color);
             });
 
             // Keyboard navigation (Enter or Space)
@@ -375,33 +460,63 @@ class RichardsonColorSelector {
             });
         });
 
-        // Handle clear selection
+        // Handle clear button
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
                 selectedBanner.classList.add('hidden');
                 delete lineItemElement.dataset.selectedColor;
-
-                // Remove selection from circles
                 colorCircles.forEach(c => c.classList.remove('selected'));
 
-                // Reset to default image
+                // Reset to default
                 const allColors = window.RICHARDSON_112_COLORS || [];
                 const defaultColor = allColors.find(c => c.category === 'Solid') || allColors[0];
                 if (defaultColor && previewImage) {
                     loadingOverlay.style.display = 'flex';
                     previewImage.src = defaultColor.url;
-                    previewImage.alt = defaultColor.color;
+                    currentColorLabel.textContent = defaultColor.color;
                 }
 
                 console.log('[Color Selector] Selection cleared');
             });
         }
 
-        // Handle view all link
-        if (viewAllLink) {
-            viewAllLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showColorGallery(colorSelector, lineItemElement);
+        // Handle remove button
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                if (confirm('Remove this Richardson 112 item?')) {
+                    lineItemElement.remove();
+                    console.log('[Color Selector] Item removed');
+                }
+            });
+        }
+
+        // Handle quantity input changes
+        if (quantityInput) {
+            quantityInput.addEventListener('change', () => {
+                const quantity = parseInt(quantityInput.value);
+                if (quantity > 0) {
+                    lineItemElement.dataset.quantity = quantity;
+                    console.log('[Color Selector] Quantity updated:', quantity);
+
+                    // Trigger quote counter update
+                    if (window.richardsonCalculator && window.richardsonCalculator.updateQuoteCounter) {
+                        window.richardsonCalculator.updateQuoteCounter();
+                        console.log('[Color Selector] Quote counter updated');
+                    }
+                }
+            });
+
+            // Also listen for 'input' event for real-time updates
+            quantityInput.addEventListener('input', () => {
+                const quantity = parseInt(quantityInput.value);
+                if (quantity > 0) {
+                    lineItemElement.dataset.quantity = quantity;
+
+                    // Trigger quote counter update
+                    if (window.richardsonCalculator && window.richardsonCalculator.updateQuoteCounter) {
+                        window.richardsonCalculator.updateQuoteCounter();
+                    }
+                }
             });
         }
     }
@@ -413,16 +528,29 @@ class RichardsonColorSelector {
      */
     static filterColorCircles(colorSelector, category) {
         const colorCircles = colorSelector.querySelectorAll('.color-circle');
+        const countCurrent = colorSelector.querySelector('.count-current');
+        const countTotal = colorSelector.querySelector('.count-total');
+
+        let visibleCount = 0;
 
         colorCircles.forEach(circle => {
             const circleCategory = circle.dataset.category;
 
             if (category === 'All' || circleCategory === category) {
                 circle.classList.remove('hidden');
+                visibleCount++;
             } else {
                 circle.classList.add('hidden');
             }
         });
+
+        // Update count display
+        if (countCurrent) countCurrent.textContent = visibleCount;
+        if (countTotal && category === 'All') {
+            countTotal.textContent = colorCircles.length;
+        }
+
+        console.log('[Color Selector] Filtered:', visibleCount, 'of', colorCircles.length, 'colors (category:', category + ')');
     }
 
     /**
