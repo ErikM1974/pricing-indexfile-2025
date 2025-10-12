@@ -123,7 +123,27 @@ class RichardsonColorSelector {
         'Grey/Charcoal/Navy': { primary: '#d3d3d3', secondary: '#4a4a4a', tertiary: '#001f3f' },
         'Heather Grey/Cardinal/Navy': { primary: '#b3b3b3', secondary: '#8B001A', tertiary: '#001f3f' },
         'Heather Grey/Charcoal/Dark Orange': { primary: '#b3b3b3', secondary: '#4a4a4a', tertiary: '#FF8C00' },
-        'Heather Grey/Charcoal/Maroon': { primary: '#b3b3b3', secondary: '#4a4a4a', tertiary: '#800000' }
+        'Heather Grey/Charcoal/Maroon': { primary: '#b3b3b3', secondary: '#4a4a4a', tertiary: '#800000' },
+
+        // Combination Colors (Visor Variations)
+        'Black/Black/White': { primary: '#000000', secondary: '#ffffff' },
+        'Black/Black/Grey': { primary: '#000000', secondary: '#d3d3d3' },
+        'Black/Black/Red': { primary: '#000000', secondary: '#dc3545' },
+        'Black/Black/Royal': { primary: '#000000', secondary: '#4169e1' },
+        'Black/Black/Orange': { primary: '#000000', secondary: '#ff6b35' },
+        'Black/Black/Navy': { primary: '#000000', secondary: '#001f3f' },
+        'Navy/Navy/White': { primary: '#001f3f', secondary: '#ffffff' },
+        'Navy/Navy/Grey': { primary: '#001f3f', secondary: '#d3d3d3' },
+        'Navy/Navy/Orange': { primary: '#001f3f', secondary: '#ff6b35' },
+        'Charcoal/Charcoal/White': { primary: '#4a4a4a', secondary: '#ffffff' },
+        'Charcoal/Charcoal/Black': { primary: '#4a4a4a', secondary: '#000000' },
+        'Charcoal/Charcoal/Red': { primary: '#4a4a4a', secondary: '#dc3545' },
+        'Charcoal/Charcoal/Orange': { primary: '#4a4a4a', secondary: '#ff6b35' },
+        'Charcoal/Charcoal/Royal': { primary: '#4a4a4a', secondary: '#4169e1' },
+        'Heather Grey/Heather Grey/Black': { primary: '#b3b3b3', secondary: '#000000' },
+        'Heather Grey/Heather Grey/Navy': { primary: '#b3b3b3', secondary: '#001f3f' },
+        'Heather Grey/Heather Grey/Red': { primary: '#b3b3b3', secondary: '#dc3545' },
+        'Heather Grey/Heather Grey/Royal': { primary: '#b3b3b3', secondary: '#4169e1' }
     };
 
     /**
