@@ -2983,11 +2983,17 @@
 
         // Navigate to product detail page
         function navigateToProduct(product) {
+            // Special handling for Richardson 112 - dedicated product page
+            if (product.style === '112') {
+                window.location.href = '/richardson-112-product.html';
+                return;
+            }
+
             // Check if we have custom description for this product
             const customDesc = productDescriptions[product.style];
-            
+
             if (customDesc) {
-                // Show custom product modal for Richardson 112 and others with descriptions
+                // Show custom product modal for other products with descriptions
                 showProductModal(product, customDesc);
             } else {
                 // Original navigation for other products
