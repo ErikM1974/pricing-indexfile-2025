@@ -6,6 +6,7 @@
    - `richardson-caps-catalog-updated.md` - The comprehensive catalog with all cap colors including the combination colors
    - `richardson-combination-caps.md` - Specific catalog for just the combination caps
    - `richardson-combination-caps.json` - JSON data for the combination caps
+   - `view-combination-caps.html` - Interactive viewer for the combination caps
 
 2. **Core Scripts**
    - `richardson-combination-caps-manual.js` - The script that generates the combination cap URLs
@@ -37,8 +38,9 @@ richardson-caps/
 ├── docs/
 │   ├── richardson-caps-catalog-updated.md
 │   └── richardson-combination-caps.md
-└── scripts/
-    └── richardson-combination-caps-manual.js
+├── scripts/
+│   └── richardson-combination-caps-manual.js
+└── view-combination-caps.html
 ```
 
 ## Implementation Steps

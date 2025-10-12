@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Richardson 112 Combination Caps Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .caps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .cap-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+    .cap-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .cap-card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .cap-name {
+      font-weight: bold;
+      margin: 15px 0 5px;
+      color: #333;
+    }
+    .cap-url {
+      font-size: 12px;
+      color: #666;
+      word-break: break-all;
+      margin-top: 10px;
+      background-color: #f9f9f9;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: left;
+      height: 60px;
+      overflow-y: auto;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+    }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      padding: 20px;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Richardson 112 Combination Caps</h1>
+    <p style="text-align: center;">High-resolution images of Richardson 112 trucker caps in combination colors</p>
+  </header>
+
+  <div class="caps-grid" id="caps-container">
+    <!-- Caps will be loaded here via JavaScript -->
+    <p style="text-align: center; grid-column: 1 / -1;">Loading caps...</p>
+  </div>
+
+  <footer>
+    <p>© 2025 Northwest Custom Apparel - Richardson 112 Cap Image Catalog</p>
+    <p>Images sourced from Richardson Sports</p>
+  </footer>
+
+  <script>
+    // Load the JSON data
+    fetch('../richardson-caps/data/richardson-combination-caps.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const container = document.getElementById('caps-container');
+        container.innerHTML = ''; // Clear loading message
+        
+        // Create a card for each cap
+        data.forEach(cap => {
+          const card = document.createElement('div');
+          card.className = 'cap-card';
+          
+          card.innerHTML = `
+            <img src="${cap.fullSizeUrl}" alt="${cap.colorName}" loading="lazy">
+            <div class="cap-name">${cap.colorName}</div>
+            <div class="cap-url">${cap.fullSizeUrl}</div>
+          `;
+          
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading cap data:', error);
+        document.getElementById('caps-container').innerHTML = `
+          <p style="text-align: center; grid-column: 1 / -1; color: red;">
+            Error loading cap data. Please check the console for details.
+          </p>
+        `;
+      });
+  </script>
+</body>
+</html>

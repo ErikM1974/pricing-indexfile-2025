@@ -16,6 +16,8 @@ This project contains a collection of high-resolution image URLs for Richardson 
 - **`scripts/`**: Code for generating the data
   - `richardson-combination-caps-manual.js`: Script to generate combination cap URLs
 
+- **`view-combination-caps.html`**: Interactive viewer for combination caps
+
 ## Key Features
 
 1. **High-Resolution Images**: All URLs use the full-size format with width=1600&height=950 parameters
@@ -32,10 +34,11 @@ This project contains a collection of high-resolution image URLs for Richardson 
 
 ## Usage
 
-1. **Direct Viewing**: Paste any URL directly into a web browser to view the cap
-2. **Downloading Images**: Right-click on the image in your browser and select "Save Image As..."
-3. **E-commerce Integration**: Use the URLs in product listings for accurate color representation
-4. **Programmatic Usage**: Use the JSON data for integration with web applications
+1. **Interactive Viewer**: Open `view-combination-caps.html` in a web browser to see all combination caps
+2. **Direct Viewing**: Paste any URL directly into a web browser to view the cap
+3. **Downloading Images**: Right-click on the image in your browser and select "Save Image As..."
+4. **E-commerce Integration**: Use the URLs in product listings for accurate color representation
+5. **Programmatic Usage**: Use the JSON data for integration with web applications
 
 ## Example URL
 
