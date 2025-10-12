@@ -117,6 +117,7 @@ app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
 app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
 app.use('/training', express.static(path.join(__dirname, 'training'), staticOptions));
 app.use('/shared_components', express.static(path.join(__dirname, 'shared_components'), staticOptions));
+app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
 // Serve CSS and JS files from root directory
 app.get('/*.css', (req, res) => {
@@ -334,6 +335,10 @@ app.get('/top-sellers-showcase.html', (req, res) => {
 
 app.get('/top-sellers-product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'top-sellers-product.html'));
+});
+
+app.get('/richardson-112-product.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'richardson-112-product.html'));
 });
 
 app.get('/pricing-negotiation-policy.html', (req, res) => {
