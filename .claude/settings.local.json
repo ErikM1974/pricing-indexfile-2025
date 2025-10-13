@@ -135,7 +135,9 @@
       "WebFetch(domain:www.screenprinting.com)",
       "WebFetch(domain:tannersinc.net)",
       "Bash(git checkout:*)",
-      "Read(//c/Users/erik/Downloads/**)"
+      "Read(//c/Users/erik/Downloads/**)",
+      "Bash(heroku apps:*)",
+      "Bash(heroku certs:auto:*)"
     ],
     "deny": [],
     "ask": [],
