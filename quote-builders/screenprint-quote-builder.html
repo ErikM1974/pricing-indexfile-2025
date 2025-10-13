@@ -2662,8 +2662,32 @@
             // Calculate totals
             const subtotal = productPricing.reduce((sum, p) => sum + p.lineTotal, 0);
             const setupFee = this.calculateTotalSetupFee();
-            const ltmFee = this.calculateLTMFee(totalQuantity, pricingDataByStyle);
-            const grandTotal = subtotal + setupFee + ltmFee;
+
+            // FIX: Get pricing data from first product (all products share same tier structure)
+            const firstStyle = Object.keys(pricingDataByStyle)[0];
+            const pricingData = pricingDataByStyle[firstStyle];
+            const ltmFee = this.calculateLTMFee(totalQuantity, pricingData);
+
+            console.log('[ScreenPrintQuote] LTM Fee Calculation:', {
+                totalQuantity,
+                tierData: pricingData?.tierData ? 'Found' : 'Missing',
+                ltmFee: ltmFee
+            });
+
+            // Calculate LTM impact per shirt for detailed breakdown
+            const ltmImpactPerShirt = ltmFee > 0 && totalQuantity > 0 ? ltmFee / totalQuantity : 0;
+
+            // Calculate products with LTM impact distributed
+            const productsWithLTM = productPricing.map(p => ({
+                ...p,
+                basePriceWithoutLTM: p.perShirtTotal,
+                ltmImpact: ltmImpactPerShirt,
+                finalUnitPrice: p.perShirtTotal + ltmImpactPerShirt,
+                finalLineTotal: (p.perShirtTotal + ltmImpactPerShirt) * p.quantity
+            }));
+
+            const subtotalWithLTM = productsWithLTM.reduce((sum, p) => sum + p.finalLineTotal, 0);
+            const grandTotal = subtotalWithLTM + setupFee;
 
             // Display breakdown
             const summaryContainer = document.getElementById('quote-summary');
@@ -2693,15 +2717,40 @@
 
                 <div class="summary-section">
                     <h3>Products</h3>
-                    ${productPricing.map(p => `
+                    ${productsWithLTM.map(p => `
                         <div class="product-summary-item">
                             <div class="product-header">
                                 <strong>${p.styleNumber} - ${p.color}</strong>
                                 <span class="product-qty-badge">${p.quantity} pieces</span>
                             </div>
 
+                            ${ltmFee > 0 ? `
+                            <div class="per-shirt-pricing-breakdown" style="background: #e8f5e9; border: 2px solid #4caf50; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <div style="font-weight: 700; color: #2d5f3f; margin-bottom: 0.75rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-calculator" style="color: #4caf50;"></i>
+                                    Per Shirt Pricing
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.95rem; border-bottom: 1px solid #c8e6c9;">
+                                    <span>Base Price:</span>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">$${p.basePriceWithoutLTM.toFixed(2)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.95rem; color: #ff9800; border-bottom: 1px solid #c8e6c9;">
+                                    <span><i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>Small Batch Fee Impact:</span>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">+$${p.ltmImpact.toFixed(2)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0 0.5rem 0; font-weight: 700; font-size: 1.15rem; color: #2d5f3f;">
+                                    <span>Price per Shirt:</span>
+                                    <span style="font-family: 'Courier New', monospace;">$${p.finalUnitPrice.toFixed(2)}</span>
+                                </div>
+                                <div style="background: #fff; padding: 0.625rem; border-radius: 4px; margin-top: 0.75rem; text-align: center; font-size: 0.9rem; border: 1px solid #c8e6c9;">
+                                    <span style="color: #666;">Order Total:</span>
+                                    <strong style="color: #2d5f3f; margin-left: 0.5rem; font-size: 1rem;">${p.quantity} × $${p.finalUnitPrice.toFixed(2)} = $${p.finalLineTotal.toFixed(2)}</strong>
+                                </div>
+                            </div>
+                            ` : ''}
+
                             <div class="pricing-breakdown-section">
-                                <div class="breakdown-header">💰 Pricing Breakdown</div>
+                                <div class="breakdown-header">${ltmFee > 0 ? '📋 Size & Options Breakdown' : '💰 Pricing Breakdown'}</div>
 
                                 <!-- Size Distribution with Transparent Pricing -->
                                 <div class="size-breakdown-transparent">
@@ -2785,33 +2834,44 @@
                 <div class="summary-section summary-totals">
                     <h3 style="margin-bottom: 1rem;">Quote Total</h3>
                     <div class="summary-row">
-                        <span>Products Subtotal:</span>
-                        <span>$${subtotal.toFixed(2)}</span>
+                        <span>Products Subtotal${ltmFee > 0 ? ' (includes Small Batch Fee)' : ''}:</span>
+                        <span>$${subtotalWithLTM.toFixed(2)}</span>
                     </div>
                     <div class="summary-row">
-                        <span>Setup Fees:</span>
+                        <span>Setup Fees (One-Time):</span>
                         <span>$${setupFee.toFixed(2)}</span>
                     </div>
-                    ${ltmFee > 0 ? `
-                        <div class="summary-row" style="color: #ff9800;">
-                            <span>Small Batch Fee (${totalQuantity} ${totalQuantity === 1 ? 'piece' : 'pieces'}):</span>
-                            <span>$${ltmFee.toFixed(2)}</span>
-                        </div>
-                    ` : ''}
                     <div class="summary-row grand-total-row" style="border-top: 3px double #2d5f3f; padding-top: 1rem; margin-top: 1rem; font-weight: 900; font-size: 1.5rem;">
                         <span>GRAND TOTAL:</span>
                         <span style="color: #2d5f3f;">$${grandTotal.toFixed(2)}</span>
                     </div>
+                    ${ltmFee > 0 ? `
+                    <div class="ltm-info-note" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 0.875rem; margin-top: 1rem; font-size: 0.875rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                            <i class="fas fa-info-circle" style="color: #ff9800; margin-top: 2px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: #856404;">Small Batch Fee Breakdown:</strong><br>
+                                <span style="color: #856404;">
+                                    $${ltmFee.toFixed(2)} total fee ÷ ${totalQuantity} ${totalQuantity === 1 ? 'shirt' : 'shirts'} = $${ltmImpactPerShirt.toFixed(2)} per shirt
+                                </span><br>
+                                <small style="color: #856404; font-style: italic;">
+                                    This fee is included in the per-shirt prices shown above. Order 73+ pieces to eliminate this fee!
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
             `;
 
             // Store pricing for quote save
             this.currentPricing = {
                 totalQuantity,
-                productPricing,
-                subtotal,
+                productPricing: productsWithLTM,
+                subtotal: subtotalWithLTM,
                 setupFee,
                 ltmFee,
+                ltmImpactPerShirt,
                 grandTotal
             };
         }
