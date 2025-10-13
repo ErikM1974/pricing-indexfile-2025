@@ -709,6 +709,49 @@ Before committing pricing changes:
 
 **Future Improvement**: Consider extracting LTM calculation logic into the shared service file to eliminate duplication (see screenprint-pricing-service.js header for implementation suggestions).
 
+### ⚠️ Size Upcharge Handling Differences (INTENTIONAL)
+
+**IMPORTANT:** The two calculators handle size upcharges differently by design. This is NOT a bug.
+
+#### Pricing Calculator Approach (Simplified)
+- **Uses:** BASE size price (smallest size, typically S/M) for ALL pieces
+- **Ignores:** 2XL/3XL/4XL upcharges completely
+- **Purpose:** Quick ballpark estimates for customers
+- **Assumption:** Standard sizing (most orders are S-XL)
+
+#### Quote Builder Approach (Accurate)
+- **Calculates:** Each size individually with proper upcharges
+- **Includes:** All size-specific pricing (2XL +$2.00, 3XL +$3.00, etc.)
+- **Purpose:** Accurate final quotes for sales team
+- **Use Case:** Orders with known size breakdown
+
+#### Expected Pricing Differences
+
+When upcharge sizes (2XL+) are present:
+- **Per-piece difference:** ~$0.10-0.15 when averaged across all pieces
+- **Total difference:** ~$4.00 for 37 pieces with 2 pieces of 2XL
+- **This is ACCEPTABLE and by design**
+
+**Example Test Case:**
+```
+Product: PC61 Forest Green
+Quantity: 37 pieces (35 standard + 2 pieces of 2XL)
+Setup: 3 colors + underbase + safety stripes (front + back)
+
+Pricing Calculator: $937.50 total ($18.85/piece) - uses base size for all
+Quote Builder: $941.50 total ($18.96/piece) - includes 2XL upcharge
+
+Difference: $4.00 (2 pieces × $2.00 upcharge)
+```
+
+#### DO NOT "Fix" This Difference
+
+This is **intentional product design:**
+- Pricing Calculator = Fast, simple tool for customer estimates
+- Quote Builder = Precise, detailed tool for final quotes
+
+The calculators serve different purposes and audiences. Trying to make them show identical prices when upcharge sizes are involved would compromise their respective use cases.
+
 ## 🐛 Debugging & Communication
 
 For effective debugging communication and API troubleshooting:

@@ -20,6 +20,26 @@
  * 7. LTM fee logic
  * 8. Safety stripes implementation
  *
+ * ⚠️ INTENTIONAL DESIGN DIFFERENCE: SIZE UPCHARGE HANDLING
+ *
+ * This Pricing Calculator uses SIMPLIFIED pricing model:
+ * - Uses BASE size price (smallest size, typically S/M) for ALL pieces
+ * - Does NOT account for 2XL/3XL/4XL upcharges
+ * - Purpose: Quick estimates for customers (standard sizing assumed)
+ *
+ * The Quote Builder (/quote-builders/screenprint-quote-builder.html) uses ACCURATE model:
+ * - Calculates each size individually with proper upcharges
+ * - Purpose: Precise quotes for sales team with actual size breakdown
+ *
+ * Expected Difference: ~$0.10-0.15 per piece when upcharge sizes are present
+ * Example: 37 pieces with 2 pieces of 2XL = ~$4.00 difference in subtotal
+ *
+ * This is INTENTIONAL and ACCEPTABLE design:
+ * - Pricing Calculator = Simple tool for ballpark estimates
+ * - Quote Builder = Accurate tool for final quotes
+ *
+ * DO NOT "fix" this difference - it's by design for different use cases.
+ *
  * Last synchronized: 2025-10-04
  */
 
@@ -1525,6 +1545,9 @@ class ScreenPrintPricing {
                 if (tier?.prices) {
                     const sizes = Object.keys(tier.prices);
                     if (sizes.length > 0) {
+                        // SIMPLIFIED PRICING: Uses first/smallest size as base for ALL pieces
+                        // Does NOT account for 2XL/3XL/4XL upcharges (intentional design choice)
+                        // For accurate size-specific pricing, see Quote Builder (screenprint-quote-builder.html)
                         pricing.basePrice = parseFloat(tier.prices[sizes[0]]) || 0;
                         // Calculate breakdown: total - garment = print cost
                         pricing.garmentCost = garmentOnlyPrice;
