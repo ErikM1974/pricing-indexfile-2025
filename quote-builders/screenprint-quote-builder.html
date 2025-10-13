@@ -2725,32 +2725,25 @@
                             </div>
 
                             ${ltmFee > 0 ? `
-                            <div class="per-shirt-pricing-breakdown" style="background: #e8f5e9; border: 2px solid #4caf50; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                                <div style="font-weight: 700; color: #2d5f3f; margin-bottom: 0.75rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-calculator" style="color: #4caf50;"></i>
-                                    Per Shirt Pricing
+                            <div class="ltm-notice" style="background: #fff9e6; border: 1px solid #ffc107; padding: 0.875rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #856404; font-size: 0.95rem;">
+                                    <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
+                                    <span style="font-weight: 600;">Small Batch Fee Applied:</span>
+                                    <span>$${ltmFee.toFixed(2)} ÷ ${p.quantity} pieces = $${ltmImpactPerShirt.toFixed(2)} per shirt</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.95rem; border-bottom: 1px solid #c8e6c9;">
-                                    <span>Base Price:</span>
-                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">$${p.basePriceWithoutLTM.toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.95rem; color: #ff9800; border-bottom: 1px solid #c8e6c9;">
-                                    <span><i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>Small Batch Fee Impact:</span>
-                                    <span style="font-family: 'Courier New', monospace; font-weight: 600;">+$${p.ltmImpact.toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0 0.5rem 0; font-weight: 700; font-size: 1.15rem; color: #2d5f3f;">
-                                    <span>Price per Shirt:</span>
-                                    <span style="font-family: 'Courier New', monospace;">$${p.finalUnitPrice.toFixed(2)}</span>
-                                </div>
-                                <div style="background: #fff; padding: 0.625rem; border-radius: 4px; margin-top: 0.75rem; text-align: center; font-size: 0.9rem; border: 1px solid #c8e6c9;">
-                                    <span style="color: #666;">Order Total:</span>
-                                    <strong style="color: #2d5f3f; margin-left: 0.5rem; font-size: 1rem;">${p.quantity} × $${p.finalUnitPrice.toFixed(2)} = $${p.finalLineTotal.toFixed(2)}</strong>
+                                <div style="font-size: 0.85rem; color: #856404; margin-top: 0.5rem; margin-left: 1.6rem;">
+                                    See size-specific final pricing in the breakdown below.
                                 </div>
                             </div>
                             ` : ''}
 
                             <div class="pricing-breakdown-section">
                                 <div class="breakdown-header">${ltmFee > 0 ? '📋 Size & Options Breakdown' : '💰 Pricing Breakdown'}</div>
+                                ${ltmFee > 0 ? `
+                                <div class="breakdown-subtitle" style="font-size: 0.85rem; color: #666; margin: -8px 0 12px 0; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+                                    <i class="fas fa-info-circle"></i> Base components shown below. Final prices include $${ltmImpactPerShirt.toFixed(2)}/pc Small Batch Fee. See summary table for quick reference.
+                                </div>
+                                ` : ''}
 
                                 <!-- Size Distribution with Transparent Pricing -->
                                 <div class="size-breakdown-transparent">
