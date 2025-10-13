@@ -47,6 +47,11 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   // Skip for localhost development
   if (process.env.NODE_ENV === 'production') {
+    // Allow Let's Encrypt ACME challenge to pass through (needed for SSL cert validation)
+    if (req.path.startsWith('/.well-known/acme-challenge/')) {
+      return next();
+    }
+
     // The 'x-forwarded-proto' header is set by Heroku
     if (req.headers['x-forwarded-proto'] !== 'https') {
       // Redirect to HTTPS
