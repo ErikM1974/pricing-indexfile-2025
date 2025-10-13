@@ -52,6 +52,11 @@ app.use((req, res, next) => {
       // Redirect to HTTPS
       return res.redirect('https://' + req.hostname + req.url);
     }
+
+    // Redirect non-www to www
+    if (req.hostname === 'teamnwca.com') {
+      return res.redirect(301, 'https://www.teamnwca.com' + req.url);
+    }
   }
   return next();
 });
