@@ -3012,6 +3012,18 @@
             return frontSetup + additionalSetup;
         }
 
+        /**
+         * ⚠️ CALCULATOR SYNC WARNING
+         *
+         * This LTM fee calculation is DUPLICATED in:
+         * - shared_components/js/screenprint-pricing-v2.js (lines 1587-1595)
+         *
+         * If you change this logic, you MUST also update the pricing calculator
+         * to ensure both calculators show identical prices for the same inputs.
+         *
+         * See shared_components/js/screenprint-pricing-service.js header for
+         * complete synchronization requirements.
+         */
         calculateLTMFee(totalQuantity, pricingDataByStyle) {
             // API-DRIVEN LTM Fee: Pull from tier data (matches screenprint-manual-pricing.js)
             // No hardcoded values - uses API tier data for flexibility

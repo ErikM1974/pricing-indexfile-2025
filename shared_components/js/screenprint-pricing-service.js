@@ -16,6 +16,44 @@
  * - Primary location: base cost + flash, then apply margin
  * - Additional location: use BasePrintCost as-is (margin included)
  * - Rounding: HalfDollarCeil_Final (round UP to $0.50)
+ *
+ * ⚠️ CRITICAL: CALCULATOR SYNCHRONIZATION REQUIREMENTS
+ *
+ * Two calculators depend on Screen Print pricing logic:
+ * 1. /calculators/screen-print-pricing.html - Single-product pricing calculator
+ * 2. /quote-builders/screenprint-quote-builder.html - Multi-product quote builder
+ *
+ * ⚠️ THESE CALCULATORS MUST SHOW IDENTICAL PRICES FOR THE SAME INPUTS
+ *
+ * SHARED CODE (changes automatically sync):
+ * - This file (screenprint-pricing-service.js) - API fetching, pricing formulas
+ * - API tier data (LTM fees, margin denominators, print costs)
+ *
+ * INDEPENDENT CODE (must update manually in BOTH places):
+ * - LTM fee calculation logic:
+ *   • Quote Builder: quote-builders/screenprint-quote-builder.html lines 3015-3044
+ *   • Pricing Calc: shared_components/js/screenprint-pricing-v2.js lines 1587-1595
+ *
+ * - LTM fee display text:
+ *   • Quote Builder: line 2732 (per-product notice)
+ *   • Pricing Calc: lines 227, 246 (tier button labels)
+ *
+ * - Rounding logic:
+ *   • Quote Builder: line 2794 (Math.round subtotal calculation)
+ *   • Pricing Calc: calculation methods in screenprint-pricing-v2.js
+ *
+ * BEFORE MAKING PRICING CHANGES:
+ * 1. Test change in BOTH calculators with identical inputs
+ * 2. Verify both calculators show same final price per piece
+ * 3. Check LTM fee displays correctly in both UIs
+ * 4. Update this comment if you add new independent logic
+ *
+ * TESTING COMMAND:
+ * Open both calculators side-by-side with:
+ * - Same product (e.g., PC61 Forest Green)
+ * - Same quantity (e.g., 37 pieces)
+ * - Same setup (e.g., 3 colors + underbase + safety stripes on front and back)
+ * - Verify prices match exactly: $29.85/piece
  */
 
 class ScreenPrintPricingService {

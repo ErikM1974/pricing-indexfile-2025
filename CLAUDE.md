@@ -639,6 +639,76 @@ Object.entries(allUpcharges).forEach(([size, amount]) => {
 - Filtering pattern: `/shared_components/js/universal-pricing-grid.js:103-115`
 - Tooltip implementation: `/calculators/dtg-pricing.html:2169-2239`
 
+## 🎯 Screen Print Calculator Synchronization
+
+### Two Independent Calculators
+The Screen Print pricing system has TWO calculators that must show identical prices:
+
+1. **Pricing Calculator** (`/calculators/screen-print-pricing.html`)
+   - Single product pricing
+   - Location: Front page at `/pricing/screen-print`
+   - Used by: Customers for quick quotes
+
+2. **Quote Builder** (`/quote-builders/screenprint-quote-builder.html`)
+   - Multi-product quotes with database persistence
+   - Location: Quote builder system
+   - Used by: Sales team for complex quotes
+
+### ⚠️ CRITICAL: Synchronization Requirements
+
+**These calculators MUST produce identical prices for the same inputs.**
+
+#### What IS Shared (Automatically Syncs)
+✅ **File**: `shared_components/js/screenprint-pricing-service.js`
+- API data fetching
+- Pricing formulas (flash charge, margins)
+- Tier boundaries from API
+- Base print cost calculations
+
+**Changes here affect both calculators automatically.**
+
+#### What IS NOT Shared (Manual Sync Required)
+❌ **LTM Fee Calculation Logic**:
+- Quote Builder: `quote-builders/screenprint-quote-builder.html` lines 3015-3044
+- Pricing Calc: `shared_components/js/screenprint-pricing-v2.js` lines 1587-1595
+
+❌ **LTM Fee Display Text**:
+- Quote Builder: Line 2732 (Small Batch Fee notice per product)
+- Pricing Calc: Lines 227, 246 (tier button labels)
+
+❌ **Rounding Logic**:
+- Quote Builder: Line 2794 (subtotal calculation with Math.round)
+- Pricing Calc: Multiple calculation methods
+
+**Changes to these must be applied to BOTH files manually.**
+
+### Testing for Synchronization
+
+Before committing pricing changes:
+
+```bash
+# Open both calculators in separate browser tabs
+# Test with identical inputs:
+# - Product: PC61 Forest Green
+# - Quantity: 37 pieces
+# - Setup: 3 colors + underbase + safety stripes (front + back)
+#
+# Expected Result: Both show $29.85/piece
+```
+
+**Verification Checklist**:
+- [ ] Same quantity shows same per-piece price
+- [ ] Same quantity shows same LTM fee ($50.00 for 37-72 pieces)
+- [ ] LTM fee distributed correctly ($50 ÷ 37 = $1.35/piece)
+- [ ] Setup fees match (4 colors × $30 × 2 locations = $240)
+- [ ] Grand total matches when comparing single product in quote builder
+
+### Why They're Not Fully Shared
+
+**Historical Reason**: The quote builder was created before the pricing calculator and has embedded JavaScript, while the pricing calculator uses external JS files for better code organization.
+
+**Future Improvement**: Consider extracting LTM calculation logic into the shared service file to eliminate duplication (see screenprint-pricing-service.js header for implementation suggestions).
+
 ## 🐛 Debugging & Communication
 
 For effective debugging communication and API troubleshooting:
