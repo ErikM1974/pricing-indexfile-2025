@@ -2729,7 +2729,7 @@
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: #856404; font-size: 0.95rem;">
                                     <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
                                     <span style="font-weight: 600;">Small Batch Fee Applied:</span>
-                                    <span>$${ltmFee.toFixed(2)} ÷ ${p.quantity} pieces = $${ltmImpactPerShirt.toFixed(2)} per shirt</span>
+                                    <span>$${ltmFee.toFixed(2)} ÷ ${totalQuantity} total pieces = $${ltmImpactPerShirt.toFixed(2)} per shirt</span>
                                 </div>
                                 <div style="font-size: 0.85rem; color: #856404; margin-top: 0.5rem; margin-left: 1.6rem;">
                                     See size-specific final pricing in the breakdown below.
@@ -2791,7 +2791,7 @@
 
                                                 // Calculate final price with LTM for this size group
                                                 const finalUnitPriceWithLTM = group.totalUnitPrice + ltmImpactPerShirt;
-                                                const finalSubtotalWithLTM = finalUnitPriceWithLTM * group.quantity;
+                                                const finalSubtotalWithLTM = Math.round((finalUnitPriceWithLTM * group.quantity) * 100) / 100;
 
                                                 return `
                                                     <div class="size-pricing-detail">
