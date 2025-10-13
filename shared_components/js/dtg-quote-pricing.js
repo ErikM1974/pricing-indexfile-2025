@@ -2,6 +2,20 @@
  * DTG Quote Pricing Calculator
  * Wrapper around DTGPricingService for quote-specific calculations
  * Handles aggregate pricing, LTM distribution, and quote totals
+ *
+ * ⚠️ SHARED COMPONENT - USED BY DTG QUOTE BUILDER
+ * This file contains critical LTM (Less Than Minimum) fee logic used by:
+ * - DTG Quote Builder (/quote-builders/dtg-quote-builder.html)
+ *
+ * CRITICAL LTM CALCULATION (Lines 41-48):
+ * Uses Math.floor() to round DOWN and prevent over-charging customers.
+ * Example: $50 ÷ 18 = 2.777... → $2.77 (not $2.78)
+ * Result: 18 × $2.77 = $49.86 (14¢ under $50, customer-friendly)
+ *
+ * NEVER change Math.floor() to Math.round() or Math.ceil() in LTM calculation.
+ * This ensures we never accidentally overcharge customers.
+ *
+ * See CLAUDE.md "DTG Calculator Synchronization" section for testing requirements.
  */
 
 class DTGQuotePricing {
@@ -36,10 +50,13 @@ class DTGQuotePricing {
     
     /**
      * Calculate LTM fee per unit if applicable
+     * IMPORTANT: Round DOWN to prevent over-charging customers
      */
     calculateLTMPerUnit(totalQuantity) {
         if (totalQuantity < this.LTM_THRESHOLD) {
-            return this.LTM_FEE / totalQuantity;
+            // Use Math.floor to round DOWN - better to under-charge slightly than over-charge
+            // Example: $50 ÷ 11 = $4.545... → $4.54 (not $4.55)
+            return Math.floor((this.LTM_FEE / totalQuantity) * 100) / 100;
         }
         return 0;
     }
@@ -192,7 +209,8 @@ class DTGQuotePricing {
                 const group = groups.get(groupKey);
                 group.sizes[size] = quantity;
                 group.quantity += quantity;
-                group.total = group.quantity * finalPrice;
+                // Round to 2 decimal places to prevent floating point errors
+                group.total = Math.round((group.quantity * finalPrice) * 100) / 100;
             }
         });
         

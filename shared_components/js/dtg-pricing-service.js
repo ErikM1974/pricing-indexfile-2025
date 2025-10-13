@@ -1,7 +1,22 @@
 /**
  * DTG Pricing Service - Direct API Implementation
  * Replaces the complex Caspio master bundle approach with direct API calls
- * 
+ *
+ * ⚠️ SHARED SERVICE - AFFECTS MULTIPLE CALCULATORS
+ * This service is used by BOTH:
+ * - DTG Quote Builder (/quote-builders/dtg-quote-builder.html)
+ * - DTG Pricing Calculator (/calculators/dtg-pricing.html)
+ *
+ * CRITICAL: Any changes to pricing formulas here will affect both calculators.
+ * Always test BOTH calculators after making changes to ensure pricing remains synchronized.
+ *
+ * Key Pricing Formulas (MUST NOT CHANGE):
+ * - Base garment cost: Math.min(...sizes.map(s => s.price))  [Use 'price' NOT 'maxCasePrice']
+ * - Margin denominator: From API tier data (tiersR[].MarginDenominator)
+ * - Rounding: Math.ceil(basePrice * 2) / 2 (round UP to half dollar)
+ *
+ * See CLAUDE.md "DTG Calculator Synchronization" section for testing requirements.
+ *
  * @author Claude & Erik
  * @date 2025-08-18
  * @version 1.0.0

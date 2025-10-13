@@ -752,6 +752,85 @@ This is **intentional product design:**
 
 The calculators serve different purposes and audiences. Trying to make them show identical prices when upcharge sizes are involved would compromise their respective use cases.
 
+## ⚠️ CRITICAL: DTG Calculator Synchronization
+
+### Two Independent Calculators That MUST Match
+
+The DTG pricing system has TWO calculators that must produce identical prices:
+
+1. **Pricing Calculator** (`/calculators/dtg-pricing.html`)
+   - Single product pricing
+   - Location: Front page at `/pricing/dtg`
+   - Used by: Customers for quick quotes
+
+2. **Quote Builder** (`/quote-builders/dtg-quote-builder.html`)
+   - Multi-product quotes with database persistence
+   - Location: Quote builder system
+   - Used by: Sales team for complex quotes
+
+### ⚠️ CRITICAL: These calculators MUST produce identical prices for the same inputs
+
+#### What IS Shared (Automatically Syncs) ✅
+
+**File**: `shared_components/js/dtg-pricing-service.js`
+- API data fetching
+- Base pricing formulas (margin denominators)
+- Tier boundaries from API
+- Base garment cost calculations
+- Print cost calculations
+
+**File**: `shared_components/js/dtg-quote-pricing.js`
+- LTM fee calculation (Math.floor rounding)
+- Aggregate quantity tier determination
+- Size grouping logic
+
+**Changes to these files affect BOTH calculators automatically.**
+
+#### What IS NOT Shared (Manual Sync Required) ❌
+
+❌ **LTM Fee Display Logic**:
+- Quote Builder: `dtg-quote-builder.js` lines 949-959
+- Pricing Calculator: `dtg-pricing-v4-cleaned.js` (check for LTM display)
+
+❌ **Size Breakdown Display**:
+- Quote Builder: `dtg-quote-builder.js` lines 897-934 (product card HTML generation)
+- Pricing Calculator: HTML template in `dtg-pricing.html`
+
+❌ **Green Button Styling** (Added 2025-10-13):
+- Quote Builder: `dtg-quote-builder.js` line 928 (green pill button)
+- Pricing Calculator: Must match this styling
+
+**Changes to these must be applied to BOTH files manually.**
+
+### Testing for Synchronization
+
+Before committing DTG pricing changes:
+
+```bash
+# Open both calculators in separate browser tabs
+# Test with identical inputs:
+# - Product: PC61 Orange
+# - Quantity: 17 pieces (tests LTM)
+# - Location: Left Chest + Full Back
+# - Sizes: S:1, M:1, L:2, XL:1, 2XL:1, 3XL:1
+#
+# Expected Result: Both show same per-piece prices
+```
+
+**Verification Checklist**:
+- [ ] Same quantity shows same per-piece price for each size
+- [ ] Same LTM fee calculation ($50 ÷ 17 = $2.94 via Math.floor)
+- [ ] LTM breakdown text matches ($2.94 per shirt)
+- [ ] Size upcharges applied identically
+- [ ] Green button styling matches on both
+- [ ] Grand total matches
+
+### Why They're Not Fully Shared
+
+**Historical Reason**: Quote Builder was created first with embedded logic, Pricing Calculator uses external JS files. Both now share core pricing services (`dtg-pricing-service.js` and `dtg-quote-pricing.js`).
+
+**Future Improvement**: Consider extracting display logic into shared components to eliminate remaining duplication.
+
 ## 🐛 Debugging & Communication
 
 For effective debugging communication and API troubleshooting:

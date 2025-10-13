@@ -1,6 +1,26 @@
 /**
  * DTG Quote Builder Main Controller
  * Orchestrates all modules for the DTG quote builder application
+ *
+ * ⚠️ CRITICAL PRICING CONSISTENCY REQUIREMENT:
+ * This quote builder MUST produce identical prices as the DTG Pricing Calculator
+ * (/calculators/dtg-pricing.html) for the same inputs.
+ *
+ * SHARED DEPENDENCIES (auto-sync):
+ * - /shared_components/js/dtg-pricing-service.js (core pricing logic)
+ * - /shared_components/js/dtg-quote-pricing.js (LTM calculations)
+ *
+ * NOT SHARED (manual sync required):
+ * - LTM display logic (lines 949-959)
+ * - Size breakdown HTML generation (lines 897-934)
+ * - Green button styling (line 928)
+ *
+ * Before committing changes that affect pricing display or calculations:
+ * 1. Test this quote builder with PC61, 17 pieces, LC+FB
+ * 2. Test pricing calculator with same inputs
+ * 3. Verify all per-piece prices match exactly
+ *
+ * See CLAUDE.md "DTG Calculator Synchronization" section for full details.
  */
 
 class DTGQuoteBuilder {
@@ -832,8 +852,21 @@ class DTGQuoteBuilder {
             }
         });
 
-        // Build detailed product summary HTML (like screenprint)
+        // Build detailed product summary HTML (like screenprint with location header)
         let summaryHTML = '';
+
+        // Add location header section at the top
+        summaryHTML += `
+            <div class="summary-section" style="background: #f0f9ff; border: 1px solid #0284c7; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #0369a1; margin-bottom: 0.75rem; font-size: 1.1rem;">
+                    <i class="fas fa-map-marker-alt"></i> Print Location
+                </h3>
+                <div class="summary-row">
+                    <span style="font-weight: 600; color: #334155;">${this.selectedLocationName || 'Not Set'}</span>
+                </div>
+            </div>
+        `;
+
         quoteTotals.products.forEach((product, productIndex) => {
             console.log(`[DTGQuoteBuilder] Building HTML for product ${productIndex}:`, product.styleNumber);
 
@@ -849,8 +882,13 @@ class DTGQuoteBuilder {
                 product.subtotal = product.sizeGroups.reduce((sum, g) => sum + (g.total || 0), 0);
                 console.log(`  ✅ Calculated subtotal: $${product.subtotal.toFixed(2)}`);
             }
+
             // Get product image with fallback
             const productImageUrl = product.imageUrl || product.MAIN_IMAGE_URL || '/assets/placeholder-product.png';
+
+            // Check if any size group has LTM
+            const hasLTM = quoteTotals.hasLTM;
+            const ltmImpactPerShirt = hasLTM ? (quoteTotals.ltmFee / totalQuantity) : 0;
 
             summaryHTML += `
                 <div class="product-summary-item">
@@ -866,31 +904,54 @@ class DTGQuoteBuilder {
                             <span class="product-qty-badge">${product.quantity} pcs</span>
                         </div>
 
-                        <div class="size-breakdown-compact">
-                        ${product.sizeGroups.map((group, gIndex) => {
-                            // Safety check
-                            if (!group.sizes || typeof group.sizes !== 'object') {
-                                console.error(`❌ Size group ${gIndex} has invalid sizes property!`, group);
-                                return '';
-                            }
+                        ${hasLTM ? `
+                        <div class="ltm-notice" style="background: #fff9e6; border: 1px solid #ffc107; padding: 0.875rem; border-radius: 6px; margin: 1rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: #856404; font-size: 0.95rem;">
+                                <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
+                                <span style="font-weight: 600;">Small Batch Fee Applied:</span>
+                                <span>$${quoteTotals.ltmFee.toFixed(2)} ÷ ${totalQuantity} total pieces = $${ltmImpactPerShirt.toFixed(2)} per piece</span>
+                            </div>
+                        </div>
+                        ` : ''}
 
-                            const sizeList = Object.entries(group.sizes || {})
-                                .map(([size, qty]) => `${size}:${qty}`)
-                                .join(', ');
+                        <div style="margin-top: 1rem; padding: 0.875rem; background: #f8fafc; border-radius: 6px;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #1e293b;">Size & Pricing Breakdown</h4>
+                                <i class="fas fa-info-circle" style="color: #94a3b8; font-size: 0.85rem;" title="Base price + fees = final price per piece"></i>
+                            </div>
+                            <div class="size-breakdown-transparent">
+                            ${product.sizeGroups.map((group, gIndex) => {
+                                // Safety check
+                                if (!group.sizes || typeof group.sizes !== 'object') {
+                                    console.error(`❌ Size group ${gIndex} has invalid sizes property!`, group);
+                                    return '';
+                                }
 
-                            const totalQty = Object.values(group.sizes || {}).reduce((sum, q) => sum + q, 0);
-                            const hasLTM = group.ltmPerUnit > 0;
+                                const sizeList = Object.entries(group.sizes || {})
+                                    .map(([size, qty]) => `${size}:${qty}`)
+                                    .join(', ');
 
-                            return `
-                                <div class="size-group-row">
-                                    <span class="sizes">${sizeList}</span>
-                                    <span class="pricing">
-                                        $${group.unitPrice.toFixed(2)}/pc${hasLTM ? ' <span class="ltm-tag">+LTM</span>' : ''}
-                                        <strong>→ $${group.total.toFixed(2)}</strong>
-                                    </span>
-                                </div>
-                            `;
-                        }).join('')}
+                                const totalQty = Object.values(group.sizes || {}).reduce((sum, q) => sum + q, 0);
+
+                                return `
+                                    <div class="size-pricing-detail" style="padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0;">
+                                        <div class="size-label" style="font-weight: 600; margin-bottom: 4px; color: #334155;">
+                                            ${sizeList} <span style="color: #64748b; font-weight: 400;">(${totalQty} total)</span>
+                                        </div>
+                                        <div class="price-calculation" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.95rem;">
+                                            <span class="base-price" style="color: #0f172a; font-weight: 500;">$${group.basePrice.toFixed(2)}</span>
+                                            ${hasLTM ? `
+                                                <span class="price-plus" style="color: #94a3b8;">+</span>
+                                                <span class="small-batch-fee" style="color: #f97316; font-weight: 500;">$${group.ltmPerUnit.toFixed(2)} Small Batch Fee</span>
+                                            ` : ''}
+                                            <span class="price-equals" style="color: #94a3b8;">=</span>
+                                            <span class="unit-total" style="font-weight: 700; color: white; background: #059669; padding: 0.375rem 1rem; border-radius: 8px; font-size: 0.95rem; box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3);">$${group.unitPrice.toFixed(2)}/pc</span>
+                                            <span class="size-subtotal" style="color: #4cb354; font-weight: 600; margin-left: auto;">→ $${group.total.toFixed(2)} total</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -907,6 +968,14 @@ class DTGQuoteBuilder {
         // Show LTM note if applicable
         if (quoteTotals.hasLTM) {
             this.summaryLtmNote.style.display = 'block';
+            // Populate dynamic breakdown text using the actual ltmPerUnit from pricing calculations
+            const ltmBreakdownText = document.getElementById('ltm-breakdown-text');
+            if (ltmBreakdownText) {
+                // Use the actual ltmPerUnit from pricing calculations (already rounded with Math.floor)
+                const firstProduct = quoteTotals.products[0];
+                const ltmPerPiece = firstProduct?.pricing?.ltmPerUnit || 0;
+                ltmBreakdownText.textContent = `$${quoteTotals.ltmFee.toFixed(2)} total fee ÷ ${totalQuantity} ${totalQuantity === 1 ? 'shirt' : 'shirts'} = $${ltmPerPiece.toFixed(2)} per shirt`;
+            }
         } else {
             this.summaryLtmNote.style.display = 'none';
         }
