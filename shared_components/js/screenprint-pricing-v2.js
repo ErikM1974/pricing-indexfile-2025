@@ -1624,7 +1624,8 @@ class ScreenPrintPricing {
             pricing.perShirtTotal = pricing.totalPerShirtPrintOnlyCost + pricing.ltmImpactPerShirt;
 
             // Setup is separate (one-time cost)
-            pricing.subtotal = pricing.perShirtTotal * quantity;
+            // SYNC FIX: Round subtotal to 2 decimal places to match quote builder (line 2794)
+            pricing.subtotal = Math.round((pricing.perShirtTotal * quantity) * 100) / 100;
             pricing.grandTotal = pricing.subtotal + pricing.setupFee;
             pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
         } else {
@@ -1635,7 +1636,8 @@ class ScreenPrintPricing {
             // Include LTM in per-shirt price
             pricing.perShirtTotal = quantity > 0 ? pricing.totalPerShirtPrintOnlyCost + pricing.ltmImpactPerShirt : 0;
 
-            pricing.subtotal = pricing.perShirtTotal * quantity;
+            // SYNC FIX: Round subtotal to 2 decimal places to match quote builder (line 2794)
+            pricing.subtotal = Math.round((pricing.perShirtTotal * quantity) * 100) / 100;
             pricing.grandTotal = pricing.subtotal + pricing.setupFee;
             pricing.setupPerShirt = quantity > 0 ? pricing.setupFee / quantity : 0;
         }
