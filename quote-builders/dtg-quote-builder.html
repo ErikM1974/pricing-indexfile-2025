@@ -430,12 +430,19 @@
                     </div>
 
                     <!-- LTM Fee Notice -->
-                    <div id="summary-ltm-note" class="ltm-fee-notice" style="display: none;">
-                        <div class="summary-row">
-                            <span class="summary-label"><i class="fas fa-info-circle"></i> Small Batch Fee:</span>
-                            <span class="summary-value">$50.00</span>
+                    <div id="summary-ltm-note" class="ltm-fee-notice" style="display: none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 0.875rem; margin-top: 1rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                            <i class="fas fa-info-circle" style="color: #ff9800; margin-top: 2px; flex-shrink: 0;"></i>
+                            <div style="font-size: 0.875rem;">
+                                <strong style="color: #856404;">Small Batch Fee Breakdown:</strong><br>
+                                <span style="color: #856404;" id="ltm-breakdown-text">
+                                    <!-- Dynamically populated -->
+                                </span><br>
+                                <small style="color: #856404; font-style: italic;">
+                                    This fee is included in the per-shirt prices shown above. Order 24+ pieces to eliminate this fee!
+                                </small>
+                            </div>
                         </div>
-                        <p class="ltm-explanation">Orders under 24 pieces include a $50 small batch fee</p>
                     </div>
 
                     <!-- Grand Total -->
