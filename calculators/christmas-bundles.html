@@ -4910,8 +4910,17 @@
         }
 
         function showSuccessModal(quoteID) {
+            console.log("🎉 showSuccessModal called with quote ID:", quoteID);
             const modal = document.getElementById('successModal');
             const referenceNumber = document.getElementById('referenceNumber');
+            // CRITICAL: Check if elements exist
+            if (!modal || !referenceNumber) {
+                console.error("❌ CRITICAL: Modal elements missing!", { modal: !!modal, ref: !!referenceNumber });
+                alert(`Order submitted successfully! Your reference number is: ${quoteID}
+
+You will receive a confirmation email shortly.`);
+                return;
+            }
 
             // Display the quote ID prominently
             referenceNumber.textContent = quoteID;
@@ -4960,6 +4969,11 @@
             `;
 
             orderDetails.innerHTML = detailsHTML;
+            // CRITICAL FIX: Force display for mobile devices
+            modal.style.display = "flex";
+            modal.style.opacity = "1";
+            modal.style.visibility = "visible";
+            console.log("✅ SUCCESS MODAL DISPLAYED - quoteID:", quoteID);
             modal.classList.add('active');
         }
 
@@ -5045,9 +5059,10 @@
 
             // Mark as attached to prevent duplicates
             submitBtn.setAttribute('data-handlers-attached', 'true');
-            // Sync submit button enabled state with current form validity
-            try { validateForm(); } catch (e) { console.warn('[Submit] validateForm failed:', e); }
-            console.log('Submit button handlers attached successfully');
+            // CRITICAL FIX: Force enable button - user has completed all steps to reach Step 7
+            // The submitOrder function itself validates all required fields before submission
+            submitBtn.disabled = false;
+            console.log("Submit button handlers attached successfully, button enabled");
         }
 
         // Phone number formatting function
@@ -7647,7 +7662,9 @@
             const form = document.getElementById('deliveryForm');
             const isValid = form.checkValidity();
             const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
+            // CRITICAL FIX: Do not disable button on Step 7
+            // User has completed all steps to reach Step 7, and submitOrder() validates everything
+            if (submitBtn && currentStep !== 7) {
                 submitBtn.disabled = !isValid;
             }
         }
