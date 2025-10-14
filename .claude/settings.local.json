@@ -137,7 +137,14 @@
       "Bash(git checkout:*)",
       "Read(//c/Users/erik/Downloads/**)",
       "Bash(heroku apps:*)",
-      "Bash(heroku certs:auto:*)"
+      "Bash(heroku certs:auto:*)",
+      "Bash(nslookup:*)",
+      "Bash(whois:*)",
+      "Bash(heroku domains:*)",
+      "Bash(dig:*)",
+      "Bash(heroku certs:auto:refresh:*)",
+      "Bash(openssl s_client:*)",
+      "Bash(openssl x509:*)"
     ],
     "deny": [],
     "ask": [],
