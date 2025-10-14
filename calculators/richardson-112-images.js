@@ -13,28 +13,28 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Solid',
         color: 'Amber Gold',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=ambergold.jpg,ambergoldmesh.jpg,ambergold.jpg,ambergold.jpg,ambergold.jpg,436-brown.jpg,ambergold.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148418',
         description: '112 Trucker Hat - Amber Gold'
     },
     {
         style: '112',
         category: 'Solid',
         color: 'Charcoal',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148432',
         description: '112 Trucker Hat - Charcoal'
     },
     {
         style: '112',
         category: 'Solid',
         color: 'Coffee',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Coffee.jpg,Coffee.jpg,Coffee.jpg,Coffee.jpg,Coffee.jpg,Coffee.jpg,Coffee.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148419',
         description: '112 Trucker Hat - Coffee'
     },
     {
         style: '112',
         category: 'Solid',
         color: 'Cream',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=112cream.jpg,Birch-112FP.jpg,112cream.jpg,112cream.jpg,112cream.jpg,Birch-112FP.jpg,112cream.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148437',
         description: '112 Trucker Hat - Cream'
     },
     {
@@ -48,7 +48,7 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Solid',
         color: 'Black',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148415',
         description: '112 Trucker Hat - Black'
     },
     {
@@ -83,7 +83,7 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Solid',
         color: 'Maroon',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=maroon.jpg,maroon.jpg,maroon.jpg,maroon.jpg,maroon.jpg,maroon.jpg,maroon.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148406',
         description: '112 Trucker Hat - Maroon'
     },
     {
@@ -183,7 +183,7 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Split',
         color: 'Black/Gold',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,Gold.jpg,Black.jpg,Black.jpg,Black.jpg,Gold.jpg,Gold.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148402',
         description: '112 Trucker Hat - Black/Gold'
     },
     {
@@ -260,7 +260,7 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Split',
         color: 'Charcoal/Kelly',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Charcoal.jpg,Kelly.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg,Kelly.jpg,Kelly.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148408',
         description: '112 Trucker Hat - Charcoal/Kelly'
     },
     {
@@ -784,7 +784,7 @@ const RICHARDSON_112_COLORS = [
         style: '112',
         category: 'Combination',
         color: 'Charcoal/Charcoal/Royal',
-        url: 'https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Charcoal.jpg,Charcoal.jpg,Royal.jpg,Royal.jpg,Charcoal.jpg,Charcoal.jpg,Charcoal.jpg',
+        url: 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148412',
         description: '112 Trucker Hat - Charcoal/Charcoal/Royal'
     },
     {
