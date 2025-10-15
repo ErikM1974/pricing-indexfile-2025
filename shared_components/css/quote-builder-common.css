@@ -169,7 +169,9 @@
 
 /* Hide unsaved indicator permanently (auto-save is silent now - 2025-10-15) */
 .unsaved-indicator,
-.unsaved-indicator.show {
+.unsaved-indicator.show,
+#save-indicator,
+#save-indicator.show {
     display: none !important;
 }
 
