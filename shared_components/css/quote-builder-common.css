@@ -171,7 +171,9 @@
 .unsaved-indicator,
 .unsaved-indicator.show,
 #save-indicator,
-#save-indicator.show {
+#save-indicator.show,
+#unsaved-indicator,
+#unsaved-indicator.show {
     display: none !important;
 }
 
