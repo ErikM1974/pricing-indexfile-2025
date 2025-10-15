@@ -1,0 +1,552 @@
+/**
+ * Embroidery Quote Builder - Improved Layout
+ * Created: 2025-10-15
+ * Purpose: Modern two-column layout with compact swatches and sticky quote summary
+ */
+
+/* ==========================================================================
+   TWO-COLUMN LAYOUT SYSTEM
+   ========================================================================== */
+
+/**
+ * Main container becomes a two-column grid on desktop
+ */
+#product-phase {
+    display: grid;
+    grid-template-columns: 1fr 400px; /* Main content + 400px sidebar */
+    gap: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/**
+ * Left column: Main workflow area
+ * Contains: search, swatches, product display
+ */
+.qb-main-workflow {
+    min-width: 0; /* Prevent grid blowout */
+}
+
+/**
+ * Right column: Quote summary sidebar (sticky)
+ */
+#products-list {
+    position: sticky;
+    top: 200px; /* Account for header height */
+    height: fit-content;
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   COMPACT COLOR SWATCHES
+   ========================================================================== */
+
+/**
+ * Swatches section: Scrollable container to reduce vertical space
+ */
+.qb-swatches-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
+
+/**
+ * Swatch grid: Tighter, scrollable layout
+ */
+#color-swatches-container {
+    max-height: 400px; /* Limit height */
+    overflow-y: auto; /* Enable scrolling */
+    overflow-x: hidden;
+
+    /* Tighter grid: 8 swatches per row */
+    display: grid !important;
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 12px !important;
+
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+}
+
+/* Webkit scrollbar styling */
+#color-swatches-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#color-swatches-container::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+}
+
+#color-swatches-container::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+}
+
+#color-swatches-container::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/**
+ * Individual swatch sizing
+ */
+.color-swatch {
+    aspect-ratio: 1 !important;
+    min-width: 0; /* Allow grid to shrink */
+}
+
+/* ==========================================================================
+   PRODUCT DISPLAY (AFTER COLOR SELECTION)
+   ========================================================================== */
+
+/**
+ * Product display: Horizontal card layout
+ */
+#product-display {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
+
+/**
+ * Product info: Image + details side-by-side
+ */
+.product-info {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+#product-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.product-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-details h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.product-details p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/**
+ * Size matrix: Compact grid layout
+ */
+.size-matrix h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+}
+
+#size-inputs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.size-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.size-input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+}
+
+.size-qty-input {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.size-qty-input:focus {
+    outline: none;
+    border-color: #3a7c52;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+}
+
+/**
+ * Total row styling
+ */
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.total-row strong {
+    color: #1f2937;
+}
+
+#product-total-qty {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a7c52;
+}
+
+/**
+ * Add to Quote button
+ */
+#add-to-quote-btn {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* ==========================================================================
+   PRODUCTS IN QUOTE SIDEBAR
+   ========================================================================== */
+
+/**
+ * Sidebar container styling
+ */
+#products-list {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#products-list h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+/**
+ * Products container inside sidebar
+ * Constrained to match sidebar width and prevent super-wide cards
+ */
+.qb-products-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;  /* Match sidebar width from grid layout */
+    width: 100%;       /* Allow responsive shrinking */
+}
+
+/**
+ * Individual product items in sidebar
+ */
+.product-item {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.2s;
+}
+
+.product-item:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/**
+ * Product item header (image + info)
+ */
+.product-item-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.product-item-header img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.product-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-item-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-item-info p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/**
+ * Product item actions (remove button)
+ */
+.product-item-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.remove-product-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.remove-product-btn:hover {
+    background: #fecaca;
+    border-color: #fca5a5;
+}
+
+/* ==========================================================================
+   EMPTY STATE (when no products added)
+   ========================================================================== */
+
+.qb-empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    background: #f9fafb;
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+}
+
+.qb-empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 12px;
+    opacity: 0.4;
+}
+
+.qb-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+}
+
+.qb-empty-description {
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0 0 16px 0;
+}
+
+.qb-empty-action {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.qb-empty-action:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+/**
+ * Tablet: Narrower sidebar
+ */
+@media (max-width: 1200px) {
+    #product-phase {
+        grid-template-columns: 1fr 350px;
+        gap: 24px;
+    }
+
+    #color-swatches-container {
+        grid-template-columns: repeat(6, 1fr) !important;
+    }
+}
+
+/**
+ * Mobile: Stack vertically
+ */
+@media (max-width: 768px) {
+    #product-phase {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    /* Sidebar becomes normal section below main content */
+    #products-list {
+        position: static;
+        max-height: none;
+        order: 2; /* Appears after main workflow */
+    }
+
+    /* Swatches: Fewer columns on mobile */
+    #color-swatches-container {
+        grid-template-columns: repeat(4, 1fr) !important;
+        max-height: 300px;
+    }
+
+    /* Size inputs: 3 columns on mobile */
+    #size-inputs {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Product info: Stack on mobile */
+    .product-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/**
+ * Small mobile: Even more compact
+ */
+@media (max-width: 480px) {
+    #color-swatches-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    #size-inputs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================================================================
+   PHASE HEADER ADJUSTMENTS
+   ========================================================================== */
+
+/**
+ * Phase header spans both columns
+ */
+.phase-header {
+    grid-column: 1 / -1; /* Span all columns */
+    margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & POLISH
+   ========================================================================== */
+
+/**
+ * Focus visible states
+ */
+.size-qty-input:focus-visible,
+#add-to-quote-btn:focus-visible,
+.remove-product-btn:focus-visible {
+    outline: 3px solid #3a7c52;
+    outline-offset: 2px;
+}
+
+/**
+ * Smooth scrolling
+ */
+#color-swatches-container,
+#products-list {
+    scroll-behavior: smooth;
+}
+
+/**
+ * Reduced motion preference
+ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/**
+ * Show/hide elements
+ */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+/**
+ * Loading state
+ */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #3a7c52;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}

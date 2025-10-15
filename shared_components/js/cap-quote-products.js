@@ -250,32 +250,166 @@ class CapProductLineManager {
     }
     
     /**
-     * Populate color dropdown
+     * Populate color dropdown and fetch color swatches
      */
-    populateColorDropdown(colors) {
+    async populateColorDropdown(colors) {
         const colorSelect = document.getElementById('color-select');
         if (!colorSelect) return;
-        
+
         if (colors.length === 0) {
             colorSelect.innerHTML = '<option value="">No colors available</option>';
             colorSelect.disabled = true;
             return;
         }
-        
+
         // Sort colors alphabetically
-        const sortedColors = colors.sort((a, b) => 
+        const sortedColors = colors.sort((a, b) =>
             (a.COLOR_NAME || a.name || '').localeCompare(b.COLOR_NAME || b.name || '')
         );
-        
-        colorSelect.innerHTML = '<option value="">Select color...</option>' + 
+
+        colorSelect.innerHTML = '<option value="">Select color...</option>' +
             sortedColors.map(color => {
                 const colorName = color.COLOR_NAME || color.name || 'Unknown';
                 const catalogColor = color.CATALOG_COLOR || colorName;
                 return `<option value="${colorName}" data-catalog="${catalogColor}">${colorName}</option>`;
             }).join('');
-        
+
         colorSelect.disabled = false;
         console.log('[CapProductLineManager] Colors populated:', sortedColors.length);
+
+        // Fetch and display color swatches if available
+        if (this.currentProduct && this.currentProduct.style) {
+            await this.fetchAndDisplayColorSwatches(this.currentProduct.style);
+        }
+    }
+
+    /**
+     * Fetch and display color swatches from API
+     */
+    async fetchAndDisplayColorSwatches(styleNumber) {
+        const swatchContainer = document.getElementById('color-swatches-container');
+        const colorSelect = document.getElementById('color-select');
+
+        if (!swatchContainer || !colorSelect) {
+            console.warn('[CapProductLineManager] Swatch container or select not found');
+            return;
+        }
+
+        try {
+            console.log('[CapProductLineManager] Fetching color swatches for:', styleNumber);
+
+            // Show loading state
+            swatchContainer.innerHTML = '<div class="color-swatch-loading"><i class="fas fa-spinner fa-spin"></i> Loading colors...</div>';
+            swatchContainer.style.display = 'block';
+
+            // Fetch swatches from API
+            const response = await fetch(`${this.baseURL}/api/color-swatches?styleNumber=${styleNumber}`);
+
+            if (!response.ok) {
+                throw new Error(`Color swatches API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[CapProductLineManager] Color swatches received:', data);
+
+            // API returns array directly, not wrapped in { swatches: [] }
+            const swatches = Array.isArray(data) ? data : (data.swatches || []);
+
+            if (swatches.length === 0) {
+                // No swatches available, keep using dropdown
+                console.log('[CapProductLineManager] No swatches available, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+                return;
+            }
+
+            // Build swatch HTML
+            const swatchesHTML = swatches.map(swatch => {
+                const colorName = swatch.COLOR_NAME || swatch.name || 'Unknown';
+                // API uses COLOR_SQUARE_IMAGE, not SWATCH_IMAGE_URL
+                const imageUrl = swatch.COLOR_SQUARE_IMAGE || swatch.SWATCH_IMAGE_URL || swatch.swatchUrl || '';
+                const catalogColor = swatch.CATALOG_COLOR || colorName;
+
+                if (!imageUrl) {
+                    console.warn('[CapProductLineManager] No image URL for color:', colorName);
+                    return ''; // Skip swatches without images
+                }
+
+                return `
+                    <div class="color-swatch"
+                         data-color="${colorName}"
+                         data-catalog="${catalogColor}"
+                         title="${colorName}">
+                        <img src="${imageUrl}"
+                             alt="${colorName}"
+                             class="color-swatch-image"
+                             onerror="this.parentElement.style.display='none'">
+                        <span class="color-swatch-name">${colorName}</span>
+                    </div>
+                `;
+            }).filter(html => html !== '').join('');
+
+            if (swatchesHTML) {
+                // Display swatches and hide dropdown
+                swatchContainer.innerHTML = swatchesHTML;
+                swatchContainer.style.display = 'block';
+                colorSelect.classList.add('swatch-mode');
+
+                // Add click handlers to swatches
+                swatchContainer.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        const selectedColor = swatch.dataset.color;
+                        const catalogColor = swatch.dataset.catalog;
+
+                        // Remove selected class from all swatches
+                        swatchContainer.querySelectorAll('.color-swatch').forEach(s => {
+                            s.classList.remove('selected');
+                        });
+
+                        // Add selected class to clicked swatch
+                        swatch.classList.add('selected');
+
+                        // Update hidden dropdown value (for form submission)
+                        colorSelect.value = selectedColor;
+
+                        // Update catalog color attribute
+                        const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
+                        if (selectedOption) {
+                            selectedOption.setAttribute('data-catalog', catalogColor);
+                        }
+
+                        // Trigger change event
+                        colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                        console.log('[CapProductLineManager] Color swatch selected:', selectedColor, catalogColor);
+                    });
+                });
+
+                console.log('[CapProductLineManager] ✅ Color swatches displayed:', swatches.length);
+
+                // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
+                // Show the modern swatches section (progressive disclosure pattern)
+                const swatchesSection = document.getElementById('qb-swatches-section');
+                if (swatchesSection) {
+                    swatchesSection.style.display = 'block';
+                    console.log('[CapProductLineManager] ✅ Modern swatches section shown');
+                }
+            } else {
+                // No valid swatches with images, fall back to dropdown
+                console.log('[CapProductLineManager] No valid swatch images, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+            }
+
+        } catch (error) {
+            console.warn('[CapProductLineManager] Color swatches failed, falling back to dropdown:', error);
+
+            // Hide swatches container and show dropdown
+            swatchContainer.style.display = 'none';
+            colorSelect.classList.remove('swatch-mode');
+
+            // Don't show error to user - dropdown is perfectly fine fallback
+        }
     }
     
     /**
@@ -531,14 +665,19 @@ class CapProductLineManager {
             
             this.products.push(product);
             console.log('[CapProductLineManager] ✅ Cap added to quote');
-            
+
             // Update UI
             this.renderProductsList();
             this.updateAggregateTotal();
             this.resetProductForm();
-            
+
             // Check if we can continue to summary
             this.updateContinueButton();
+
+            // 🎯 UX IMPROVEMENT (2025-10-15): Show success toast
+            if (window.ToastNotifications) {
+                ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
+            }
             
         } catch (error) {
             console.error('[CapProductLineManager] ❌ Failed to add cap:', error);
@@ -574,41 +713,85 @@ class CapProductLineManager {
     
     /**
      * Render products list
+     * 🎨 PHASE 2 (2025-10-15): Modern compact card design
      */
     renderProductsList() {
         const container = document.getElementById('products-container');
         if (!container) return;
-        
+
         if (this.products.length === 0) {
             container.innerHTML = '<p class="empty-message">No caps added yet</p>';
+            document.getElementById('aggregate-total').textContent = '0';
             return;
         }
-        
+
+        let aggregateTotal = 0;
+
         container.innerHTML = this.products.map(product => {
-            const sizesList = Object.entries(product.sizeBreakdown)
-                .filter(([size, qty]) => qty > 0)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(' ');
-            
+            aggregateTotal += product.totalQuantity;
+
+            // Build size breakdown with tooltip
+            const sizeEntries = Object.entries(product.sizeBreakdown);
+            const sizeBadges = sizeEntries.slice(0, 3).map(([size, qty]) =>
+                `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
+            ).join('');
+            const remainingCount = sizeEntries.length - 3;
+            const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
+
             return `
-                <div class="product-item" data-product-id="${product.id}">
-                    <div class="product-item-image">
-                        <img src="${product.imageUrl || `https://via.placeholder.com/60x60/4cb354/white?text=${product.style}`}" alt="${product.style}">
+                <div class="product-card-modern" data-product-id="${product.id}">
+                    <!-- Product Header -->
+                    <div class="product-card-header">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent(product.style)}"
+                             alt="${product.style}"
+                             onerror="this.src='https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent('${product.style}')"
+                             class="product-card-image">
+                        <div class="product-card-info">
+                            <h4 class="product-card-title">${product.style}</h4>
+                            <p class="product-card-subtitle">${product.title}</p>
+                            <div class="product-card-meta">
+                                <span class="color-badge">${product.color}</span>
+                                <span class="qty-badge">${product.totalQuantity} pcs</span>
+                            </div>
+                        </div>
+                        <div class="product-card-actions">
+                            <button class="btn-icon btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})" title="Remove">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="product-item-info">
-                        <h4>${product.style} - ${product.title}</h4>
-                        <p>${product.brand} | ${product.color}</p>
-                        <p class="sizes">${sizesList}</p>
-                        <p class="quantity"><strong>Total: ${product.totalQuantity} caps</strong></p>
-                    </div>
-                    <div class="product-item-actions">
-                        <button class="btn-sm btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
+
+                    <!-- Size Breakdown (compact, first 3) -->
+                    <div class="product-card-sizes" title="${sizesTooltip}">
+                        ${sizeBadges}
+                        ${remainingCount > 0 ? `<span class="size-badge more">+${remainingCount} more</span>` : ''}
                     </div>
                 </div>
             `;
         }).join('');
+
+        document.getElementById('aggregate-total').textContent = aggregateTotal;
+
+        // Update tier indicator
+        this.updateTierIndicator(aggregateTotal);
+    }
+
+    /**
+     * Update tier indicator based on aggregate quantity
+     * 🎨 PHASE 2 (2025-10-15): Helper for tier display
+     */
+    updateTierIndicator(totalQty) {
+        const tierIndicator = document.getElementById('tier-indicator');
+        if (tierIndicator) {
+            let tierText = '';
+            if (totalQty > 0) {
+                if (totalQty < 24) tierText = '(1-23 tier + LTM fee)';
+                else if (totalQty < 48) tierText = '(24-47 tier)';
+                else if (totalQty < 72) tierText = '(48-71 tier)';
+                else tierText = '(72+ tier)';
+            }
+            tierIndicator.textContent = tierText;
+        }
     }
     
     /**
@@ -631,25 +814,15 @@ class CapProductLineManager {
      */
     updateAggregateTotal() {
         const totalQty = this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
-        
+
         const totalSpan = document.getElementById('aggregate-total');
         if (totalSpan) {
             totalSpan.textContent = totalQty;
         }
-        
-        // Update tier indicator
-        const tierIndicator = document.getElementById('tier-indicator');
-        if (tierIndicator) {
-            let tierText = '';
-            if (totalQty > 0) {
-                if (totalQty < 24) tierText = '(1-23 tier + LTM fee)';
-                else if (totalQty < 48) tierText = '(24-47 tier)';
-                else if (totalQty < 72) tierText = '(48-71 tier)';
-                else tierText = '(72+ tier)';
-            }
-            tierIndicator.textContent = tierText;
-        }
-        
+
+        // Update tier indicator using dedicated function
+        this.updateTierIndicator(totalQty);
+
         // Dispatch event for pricing updates
         window.dispatchEvent(new CustomEvent('capProductsChanged', {
             detail: { products: this.products, totalQuantity: totalQty }
@@ -668,20 +841,44 @@ class CapProductLineManager {
     
     /**
      * Reset product form
+     * CRITICAL: Hides ALL elements to return to clean search state (2025 UX)
      */
     resetProductForm() {
+        // Clear search input
+        document.getElementById('style-search').value = '';
+
+        // Reset color dropdown
+        document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
+        document.getElementById('color-select').disabled = true;
+
+        // 🎯 CRITICAL FIX (2025-10-15): Hide swatches section after adding product
+        // This returns the interface to a clean search state (progressive disclosure pattern)
+        const swatchesSection = document.getElementById('qb-swatches-section');
+        if (swatchesSection) {
+            swatchesSection.style.display = 'none';
+            console.log('[CapProductLineManager] ✅ Swatches section hidden (clean state)');
+        }
+
+        // Clear swatches container
+        const swatchContainer = document.getElementById('color-swatches-container');
+        if (swatchContainer) {
+            swatchContainer.innerHTML = '';
+        }
+
+        // Hide product display
         const display = document.getElementById('product-display');
         if (display) {
             display.style.display = 'none';
         }
-        
-        document.getElementById('style-search').value = '';
-        document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
-        document.getElementById('color-select').disabled = true;
+
+        // Disable load product button
         document.getElementById('load-product-btn').disabled = true;
-        
+
+        // Reset state
         this.currentProduct = null;
         this.availableSizes = [];
+
+        console.log('[CapProductLineManager] ✅ Form reset to clean search state');
     }
     
     /**

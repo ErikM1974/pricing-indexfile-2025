@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2025-10-03
-**Total Active Files:** ~259 (includes Screen Print systems + Automated Testing Suite)
+**Last Updated:** 2025-10-15
+**Total Active Files:** ~261 (includes Screen Print systems + Automated Testing Suite + Modern Step 2 Refactor)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -106,6 +106,7 @@
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |
 | `/shared_components/js/quote-validation.js` | Input validation | All quote builders | ✅ Active |
 | `/shared_components/js/quote-ui-feedback.js` | User feedback | All quote builders | ✅ Active |
+| `/shared_components/js/quote-builder-step2-modern.js` | **NEW** Modern Step 2 UI manager (2025 refactor) | Embroidery & Cap quote builders | ✅ Active |
 
 ## 🎨 Stylesheets
 
@@ -117,6 +118,7 @@
 | `/shared_components/css/embroidery-quote-builder.css` | Embroidery styles | Quote builders | ✅ Active |
 | `/shared_components/css/quote-builder-unified-step1.css` | Step 1 styles | Quote builders | ✅ Active |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
+| `/shared_components/css/quote-builder-step2-modern.css` | **NEW** Modern Step 2 styles (2025 refactor) | Embroidery & Cap quote builders | ✅ Active |
 
 ### 🧮 Manual Calculator CSS Architecture
 
@@ -198,6 +200,13 @@ cap-embroidery-fix.css
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
+
+### Implementation Documentation
+| File | Purpose | Status |
+|------|---------|--------|
+| `/docs/STEP2_REFACTOR_IMPLEMENTATION_SUMMARY.md` | Step 2 modernization complete details | ✅ Active |
+| `/docs/STEP2_TESTING_GUIDE.md` | Quick testing guide for Nika & Taneisha | ✅ Active |
+| `/docs/SWATCHES_FIX_20251015.md` | **NEW** Color swatches visibility fix | ✅ Active |
 
 ## 📂 Dashboard & Admin
 

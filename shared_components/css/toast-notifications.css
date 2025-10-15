@@ -1,0 +1,123 @@
+/**
+ * Toast Notifications CSS
+ * Modern, lightweight toast notifications for user feedback
+ * Created: 2025-10-15
+ */
+
+/* Container for all toasts (top-right corner) */
+#nwca-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+/* Individual toast */
+.nwca-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border-radius: 8px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateX(450px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    min-width: 280px;
+    max-width: 400px;
+}
+
+/* Show animation */
+.nwca-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Toast icon */
+.nwca-toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Toast message */
+.nwca-toast-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Success toast */
+.nwca-toast-success {
+    border-left: 4px solid #10b981;
+}
+
+.nwca-toast-success .nwca-toast-icon {
+    color: #10b981;
+}
+
+/* Error toast */
+.nwca-toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.nwca-toast-error .nwca-toast-icon {
+    color: #ef4444;
+}
+
+/* Warning toast */
+.nwca-toast-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.nwca-toast-warning .nwca-toast-icon {
+    color: #f59e0b;
+}
+
+/* Info toast */
+.nwca-toast-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.nwca-toast-info .nwca-toast-icon {
+    color: #3b82f6;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    #nwca-toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .nwca-toast {
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .nwca-toast {
+        transition: opacity 0.01ms;
+    }
+
+    .nwca-toast.show {
+        transform: none;
+    }
+}
+
+/* Stacking multiple toasts */
+.nwca-toast:not(:last-child) {
+    margin-bottom: 0;
+}

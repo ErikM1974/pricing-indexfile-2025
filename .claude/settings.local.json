@@ -144,7 +144,16 @@
       "Bash(dig:*)",
       "Bash(heroku certs:auto:refresh:*)",
       "Bash(openssl s_client:*)",
-      "Bash(openssl x509:*)"
+      "Bash(openssl x509:*)",
+      "Read(//c/**)",
+      "Bash(git mv:*)",
+      "Bash(for:*)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(if git ls-files --error-unmatch \"$file\")",
+      "Bash(/dev/null)",
+      "Bash(else)",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": [],

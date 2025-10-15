@@ -220,23 +220,26 @@ class ProductLineManager {
                 const colorSelect = document.getElementById('color-select');
                 if (colors.colors && colors.colors.length > 0) {
                     console.log('[ProductLineManager] Populating color dropdown with', colors.colors.length, 'colors');
-                    
+
                     // Store full color data for future use
                     this.currentProduct.colorData = colors.colors;
-                    
+
                     console.log('[ProductLineManager] Sample color object:', colors.colors[0]);
-                    
+
                     colorSelect.innerHTML = '<option value="">Select a color</option>' +
-                        colors.colors.map(color => 
+                        colors.colors.map(color =>
                             `<option value="${color.COLOR_NAME}" data-catalog="${color.CATALOG_COLOR || ''}">${color.COLOR_NAME}</option>`
                         ).join('');
                     colorSelect.disabled = false;
+
+                    // Fetch and display color swatches if available
+                    this.fetchAndDisplayColorSwatches(styleNumber);
                 } else {
                     console.log('[ProductLineManager] No colors available');
                     colorSelect.innerHTML = '<option value="">No colors available</option>';
                     colorSelect.disabled = true;
                 }
-                
+
                 const loadBtn = document.getElementById('load-product-btn');
                 loadBtn.disabled = false;
                 console.log('[ProductLineManager] Load Product button enabled');
@@ -251,6 +254,135 @@ class ProductLineManager {
         }
     }
     
+    /**
+     * Fetch and display color swatches from API
+     */
+    async fetchAndDisplayColorSwatches(styleNumber) {
+        const swatchContainer = document.getElementById('color-swatches-container');
+        const colorSelect = document.getElementById('color-select');
+
+        if (!swatchContainer || !colorSelect) {
+            console.warn('[ProductLineManager] Swatch container or select not found');
+            return;
+        }
+
+        try {
+            console.log('[ProductLineManager] Fetching color swatches for:', styleNumber);
+
+            // Show loading state
+            swatchContainer.innerHTML = '<div class="color-swatch-loading"><i class="fas fa-spinner fa-spin"></i> Loading colors...</div>';
+            swatchContainer.style.display = 'grid';
+
+            // Fetch swatches from API
+            const response = await fetch(`${this.baseURL}/api/color-swatches?styleNumber=${styleNumber}`);
+
+            if (!response.ok) {
+                throw new Error(`Color swatches API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[ProductLineManager] Color swatches received:', data);
+
+            // API returns array directly, not wrapped in { swatches: [] }
+            const swatches = Array.isArray(data) ? data : (data.swatches || []);
+
+            if (swatches.length === 0) {
+                // No swatches available, keep using dropdown
+                console.log('[ProductLineManager] No swatches available, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+                return;
+            }
+
+            // Build swatch HTML
+            const swatchesHTML = swatches.map(swatch => {
+                const colorName = swatch.COLOR_NAME || swatch.name || 'Unknown';
+                // API uses COLOR_SQUARE_IMAGE, not SWATCH_IMAGE_URL
+                const imageUrl = swatch.COLOR_SQUARE_IMAGE || swatch.SWATCH_IMAGE_URL || swatch.swatchUrl || '';
+                const catalogColor = swatch.CATALOG_COLOR || colorName;
+
+                if (!imageUrl) {
+                    console.warn('[ProductLineManager] No image URL for color:', colorName);
+                    return ''; // Skip swatches without images
+                }
+
+                return `
+                    <div class="color-swatch"
+                         data-color="${colorName}"
+                         data-catalog="${catalogColor}"
+                         title="${colorName}">
+                        <img src="${imageUrl}"
+                             alt="${colorName}"
+                             class="color-swatch-image"
+                             onerror="this.parentElement.style.display='none'">
+                        <span class="color-swatch-name">${colorName}</span>
+                    </div>
+                `;
+            }).filter(html => html !== '').join('');
+
+            if (swatchesHTML) {
+                // Display swatches and hide dropdown
+                swatchContainer.innerHTML = swatchesHTML;
+                swatchContainer.style.display = 'grid';
+                colorSelect.classList.add('swatch-mode');
+
+                // Add click handlers to swatches
+                swatchContainer.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        const selectedColor = swatch.dataset.color;
+                        const catalogColor = swatch.dataset.catalog;
+
+                        // Remove selected class from all swatches
+                        swatchContainer.querySelectorAll('.color-swatch').forEach(s => {
+                            s.classList.remove('selected');
+                        });
+
+                        // Add selected class to clicked swatch
+                        swatch.classList.add('selected');
+
+                        // Update hidden dropdown value (for form submission)
+                        colorSelect.value = selectedColor;
+
+                        // Update catalog color attribute
+                        const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
+                        if (selectedOption) {
+                            selectedOption.setAttribute('data-catalog', catalogColor);
+                        }
+
+                        // Trigger change event
+                        colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                        console.log('[ProductLineManager] Color swatch selected:', selectedColor, catalogColor);
+                    });
+                });
+
+                console.log('[ProductLineManager] ✅ Color swatches displayed:', swatches.length);
+
+                // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
+                // Show the modern swatches section (progressive disclosure pattern)
+                const swatchesSection = document.getElementById('qb-swatches-section');
+                if (swatchesSection) {
+                    swatchesSection.style.display = 'block';
+                    console.log('[ProductLineManager] ✅ Modern swatches section shown');
+                }
+            } else {
+                // No valid swatches with images, fall back to dropdown
+                console.log('[ProductLineManager] No valid swatch images, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+            }
+
+        } catch (error) {
+            console.warn('[ProductLineManager] Color swatches failed, falling back to dropdown:', error);
+
+            // Hide swatches container and show dropdown
+            swatchContainer.style.display = 'none';
+            colorSelect.classList.remove('swatch-mode');
+
+            // Don't show error to user - dropdown is perfectly fine fallback
+        }
+    }
+
     /**
      * Handle color change
      */
@@ -507,39 +639,41 @@ class ProductLineManager {
         this.renderProductsList();
         this.resetProductForm();
         this.updateContinueButton();
-        
+
         // Trigger pricing update
         if (window.embroideryQuoteBuilder) {
             window.embroideryQuoteBuilder.updatePricing();
+        }
+
+        // 🎯 UX IMPROVEMENT (2025-10-15): Show success toast
+        if (window.ToastNotifications) {
+            ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
         }
     }
     
     /**
      * Render products list
+     * 🎨 PHASE 2 (2025-10-15): Modern compact card design
      */
     renderProductsList() {
         const container = document.getElementById('products-container');
-        
+
         if (this.products.length === 0) {
             container.innerHTML = '<p class="empty-message">No products added yet</p>';
             document.getElementById('aggregate-total').textContent = '0';
             return;
         }
-        
+
         let aggregateTotal = 0;
-        
+
         container.innerHTML = this.products.map(product => {
             aggregateTotal += product.totalQuantity;
-            
-            const sizesList = Object.entries(product.sizeBreakdown)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(', ');
-            
+
             // Get logos from LogoManager if available
             const logos = window.embroideryQuoteBuilder?.logoManager?.logos || [];
             const primaryLogo = logos.find(l => l.isPrimary);
             const additionalLogos = logos.filter(l => !l.isPrimary);
-            
+
             // Initialize logo assignments if not present
             if (!product.logoAssignments) {
                 product.logoAssignments = {
@@ -548,35 +682,55 @@ class ProductLineManager {
                     monogram: null
                 };
             }
-            
+
+            // Build size breakdown with tooltip
+            const sizeEntries = Object.entries(product.sizeBreakdown);
+            const sizeBadges = sizeEntries.slice(0, 3).map(([size, qty]) =>
+                `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
+            ).join('');
+            const remainingCount = sizeEntries.length - 3;
+            const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
+
             return `
-                <div class="product-item" data-product-id="${product.id}">
-                    <div class="product-item-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
-                             alt="${product.style} - ${product.color}" 
-                             onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
-                             class="product-item-image">
-                        <div class="product-item-info">
-                            <strong>${product.style} - ${product.title}</strong>
-                            <span>${product.color} | ${product.totalQuantity} pieces</span>
-                            <small>${sizesList}</small>
+                <div class="product-card-modern" data-product-id="${product.id}">
+                    <!-- Product Header -->
+                    <div class="product-card-header">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(product.style)}"
+                             alt="${product.style}"
+                             onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${product.style}')"
+                             class="product-card-image">
+                        <div class="product-card-info">
+                            <h4 class="product-card-title">${product.style}</h4>
+                            <p class="product-card-subtitle">${product.title}</p>
+                            <div class="product-card-meta">
+                                <span class="color-badge">${product.color}</span>
+                                <span class="qty-badge">${product.totalQuantity} pcs</span>
+                            </div>
                         </div>
-                        <div class="product-item-actions">
-                            <button class="btn-edit" onclick="window.productLineManager.editProduct(${product.id})" title="Edit quantities">
+                        <div class="product-card-actions">
+                            <button class="btn-icon" onclick="window.productLineManager.editProduct(${product.id})" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn-delete" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove product">
+                            <button class="btn-icon btn-danger" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
-                    ${this.renderLogoSelection(product, primaryLogo, additionalLogos)}
+
+                    <!-- Size Breakdown (compact, first 3) -->
+                    <div class="product-card-sizes" title="${sizesTooltip}">
+                        ${sizeBadges}
+                        ${remainingCount > 0 ? `<span class="size-badge more">+${remainingCount} more</span>` : ''}
+                    </div>
+
+                    <!-- Logo Selection (Collapsible) -->
+                    ${this.renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos)}
                 </div>
             `;
         }).join('');
-        
+
         document.getElementById('aggregate-total').textContent = aggregateTotal;
-        
+
         // Update tier indicator
         this.updateTierIndicator(aggregateTotal);
     }
@@ -753,14 +907,38 @@ class ProductLineManager {
     
     /**
      * Reset product form
+     * CRITICAL: Hides ALL elements to return to clean search state (2025 UX)
      */
     resetProductForm() {
+        // Clear search input
         document.getElementById('style-search').value = '';
+        document.getElementById('style-suggestions').style.display = 'none';
+
+        // Reset color dropdown
         document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
         document.getElementById('color-select').disabled = true;
-        document.getElementById('load-product-btn').disabled = true;
+
+        // 🎯 CRITICAL FIX (2025-10-15): Hide swatches section after adding product
+        // This returns the interface to a clean search state (progressive disclosure pattern)
+        const swatchesSection = document.getElementById('qb-swatches-section');
+        if (swatchesSection) {
+            swatchesSection.style.display = 'none';
+            console.log('[ProductLineManager] ✅ Swatches section hidden (clean state)');
+        }
+
+        // Clear swatches container
+        const swatchContainer = document.getElementById('color-swatches-container');
+        if (swatchContainer) {
+            swatchContainer.innerHTML = '';
+        }
+
+        // Hide product display
         document.getElementById('product-display').style.display = 'none';
-        document.getElementById('style-suggestions').style.display = 'none';
+
+        // Disable load product button
+        document.getElementById('load-product-btn').disabled = true;
+
+        console.log('[ProductLineManager] ✅ Form reset to clean search state');
     }
     
     /**
@@ -774,7 +952,36 @@ class ProductLineManager {
     }
     
     /**
-     * Render logo selection checkboxes for a product
+     * Render logo selection with collapsible <details> element
+     * 🎨 PHASE 2 (2025-10-15): Modern collapsible design
+     */
+    renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos) {
+        if (!primaryLogo && additionalLogos.length === 0) {
+            return ''; // No logos defined yet
+        }
+
+        // Count selected logos for summary
+        let logoCount = primaryLogo ? 1 : 0;
+        logoCount += product.logoAssignments?.additional?.length || 0;
+        logoCount += product.logoAssignments?.monogram ? 1 : 0;
+
+        return `
+            <details class="logo-details">
+                <summary class="logo-summary">
+                    <i class="fas fa-image"></i>
+                    <span>Logo Options</span>
+                    <span class="logo-count">${logoCount} selected</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </summary>
+                <div class="logo-content">
+                    ${this.renderLogoSelection(product, primaryLogo, additionalLogos)}
+                </div>
+            </details>
+        `;
+    }
+
+    /**
+     * Render logo selection checkboxes for a product (internal helper)
      */
     renderLogoSelection(product, primaryLogo, additionalLogos) {
         if (!primaryLogo && additionalLogos.length === 0) {

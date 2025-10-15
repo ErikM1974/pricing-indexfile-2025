@@ -741,10 +741,20 @@ body {
 }
 
 .search-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
     gap: 1rem;
     align-items: end;
     margin-bottom: 1rem;
+}
+
+.search-row .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#load-product-btn {
+    margin-top: auto;
 }
 
 .search-group {
@@ -2399,10 +2409,9 @@ body {
 
 /* Enhanced Search Row */
 .search-row {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: white;
     border-radius: 10px;
-    border: 1px solid var(--border-color);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 /* Enhanced Form Controls */
@@ -2429,6 +2438,7 @@ body {
     font-size: 15px;
     transition: all 0.3s ease;
     background: white;
+    min-height: 48px;
 }
 
 .form-group input[type="text"]:focus,
@@ -2460,6 +2470,8 @@ body {
     gap: 8px;
     position: relative;
     overflow: hidden;
+    min-height: 48px;
+    white-space: nowrap;
 }
 
 #load-product-btn::before {
@@ -2682,6 +2694,9 @@ body {
     padding: 2rem;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     border: 1px solid var(--border-color);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #products-list h3 {
