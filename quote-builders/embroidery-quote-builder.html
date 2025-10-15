@@ -1355,12 +1355,12 @@
                     }
                 }
                 
-                // Set up auto-save
+                // Set up auto-save (silent - no toast notifications)
                 persistence.onAutoSave = function() {
                     const data = collectFormDataForSave();
                     if (persistence.save(data)) {
-                        showSaveIndicator('Draft saved');
-                        console.log('💾 Auto-save completed');
+                        // Silent save - only console log, no toast notification
+                        console.log('💾 Auto-save completed (silent)');
                     }
                 };
                 
@@ -1373,23 +1373,36 @@
                 // Check for recovery on page load
                 setTimeout(() => {
                     if (session.shouldShowRecovery()) {
-                        session.showRecoveryDialog(
-                            (draft) => {
-                                // Restore customer info only
-                                if (draft.customerName) document.getElementById('customer-name').value = draft.customerName;
-                                if (draft.customerEmail) document.getElementById('customer-email').value = draft.customerEmail;
-                                if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
-                                if (draft.companyName) document.getElementById('company-name').value = draft.companyName;
-                                if (draft.projectName) document.getElementById('project-name').value = draft.projectName;
-                                if (draft.salesRep) document.getElementById('sales-rep').value = draft.salesRep;
-                                if (draft.specialNotes) document.getElementById('special-notes').value = draft.specialNotes;
-                                showSaveIndicator('Draft restored');
-                            },
-                            () => {
-                                console.log('Starting fresh quote');
-                                showSaveIndicator('Starting new quote');
-                            }
+                        const draft = persistence.load();
+                        // Only show modal if draft has customer name OR products
+                        const hasRealData = draft && (
+                            (draft.customerName && draft.customerName.trim().length > 0) ||
+                            (draft.products && draft.products.length > 0)
                         );
+
+                        if (hasRealData) {
+                            session.showRecoveryDialog(
+                                (draft) => {
+                                    // Restore customer info only
+                                    if (draft.customerName) document.getElementById('customer-name').value = draft.customerName;
+                                    if (draft.customerEmail) document.getElementById('customer-email').value = draft.customerEmail;
+                                    if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
+                                    if (draft.companyName) document.getElementById('company-name').value = draft.companyName;
+                                    if (draft.projectName) document.getElementById('project-name').value = draft.projectName;
+                                    if (draft.salesRep) document.getElementById('sales-rep').value = draft.salesRep;
+                                    if (draft.specialNotes) document.getElementById('special-notes').value = draft.specialNotes;
+                                    console.log('📂 Draft restored successfully');
+                                },
+                                () => {
+                                    console.log('Starting fresh quote');
+                                    persistence.clearDraft();
+                                }
+                            );
+                        } else {
+                            // Silently clear empty draft
+                            console.log('🗑️ Clearing empty draft (no meaningful data)');
+                            persistence.clearDraft();
+                        }
                     }
                 }, 1000);
                 
