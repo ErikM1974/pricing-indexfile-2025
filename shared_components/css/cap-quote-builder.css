@@ -834,11 +834,21 @@ body {
     background: var(--secondary-color);
     border-top: 1px solid var(--border-color);
     gap: 1rem;
+
+    /* FORCE normal positioning - Fix for floating button issue (2025-10-15) */
+    position: static !important;
+    bottom: auto !important;
+    right: auto !important;
+    left: auto !important;
+    width: auto !important;
 }
 
 .phase-actions .btn {
     min-width: 120px;
     justify-content: center;
+
+    /* FORCE buttons to stay in flex container */
+    position: static !important;
 }
 
 /* Modals */
