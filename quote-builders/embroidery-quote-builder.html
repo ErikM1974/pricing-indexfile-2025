@@ -142,6 +142,21 @@
     #color-select.swatch-mode {
         display: none;
     }
+
+    /* ===================================================================
+       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
+       2025-10-15: Prevents "everything on one page" issue
+       =================================================================== */
+
+    /* HIDE the entire quote-summary container when not in Phase 3 */
+    #product-phase #quote-summary {
+        display: none !important;
+    }
+
+    /* ONLY show quote-summary when in summary-phase */
+    #summary-phase #quote-summary {
+        display: block !important;
+    }
     </style>
     
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -166,6 +181,9 @@
 
     <!-- Improved Layout (2025-10-15) - Two-column with compact swatches -->
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-improved-layout.css?v=20251015">
+
+    <!-- Phase 3 Modern Redesign (2025-10-15) - Eliminates "two pages" issue -->
+    <link rel="stylesheet" href="/shared_components/css/phase3-modern-redesign.css?v=20251015">
 
     <!-- Toast Notifications (2025-10-15) - Modern user feedback -->
     <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=20251015">

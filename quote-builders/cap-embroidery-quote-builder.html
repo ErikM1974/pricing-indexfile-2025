@@ -283,6 +283,21 @@
     #color-select.swatch-mode {
         display: none;
     }
+
+    /* ===================================================================
+       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
+       2025-10-15: Prevents "everything on one page" issue
+       =================================================================== */
+
+    /* HIDE the entire quote-summary container when not in Phase 3 */
+    #product-phase #quote-summary {
+        display: none !important;
+    }
+
+    /* ONLY show quote-summary when in summary-phase */
+    #summary-phase #quote-summary {
+        display: block !important;
+    }
     </style>
     
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -300,7 +315,10 @@
     
     <!-- Cap Specific Overrides (highest priority) -->
     <link rel="stylesheet" href="/shared_components/css/cap-quote-builder.css">
-    
+
+    <!-- Phase 3 Modern Redesign (2025-10-15) - Eliminates "two pages" issue -->
+    <link rel="stylesheet" href="/shared_components/css/phase3-modern-redesign.css?v=20251015">
+
     <!-- Unified Step 1 Styles -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1.css?v=20250115">
     <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css?v=20250115">
@@ -1301,56 +1319,77 @@
                 }
             },
 
-            // Generate the detailed summary HTML
+            // Generate the detailed summary HTML - PHASE 3 UNIFIED DESIGN
             generateSummaryHTML: function() {
                 if (this.selectedCaps.length === 0) {
                     return '<p class="text-center text-muted">No caps have been selected yet.</p>';
                 }
 
-                let html = '';
                 let grandTotal = 0;
 
-                // Generate HTML for each cap
+                // Start with Phase 3 unified container
+                let html = '<div class="phase3-unified-container">';
+
+                // Phase 3 Products Section
+                html += '<div class="phase3-section">';
+                html += '<h4 class="section-title"><i class="fas fa-baseball-cap"></i> Cap Products</h4>';
+
+                // Generate HTML for each cap using Phase 3 product card structure
                 this.selectedCaps.forEach((cap, index) => {
                     const capTotal = this.calculateCapTotal(cap);
                     grandTotal += capTotal;
 
                     html += `
-                        <div class="summary-cap-item">
-                            <div class="summary-cap-header">
-                                ${cap.imageUrl ? `<img src="${cap.imageUrl}" alt="${cap.styleName}" class="summary-cap-image">` : ''}
-                                <div class="summary-cap-details">
-                                    <div class="summary-cap-title">${cap.styleName || 'Cap Style'}</div>
-                                    <div class="summary-cap-vendor">${cap.vendor || 'Port Authority'}</div>
-                                    <div>
-                                        <span class="summary-size-info">OSFA</span>
-                                        <span class="summary-quantity-badge">${cap.quantity} pieces total</span>
+                        <div class="product-card">
+                            <div class="product-card-header">
+                                ${cap.imageUrl ? `<img src="${cap.imageUrl}" alt="${cap.styleName}" class="product-card-img">` : ''}
+                                <div class="product-card-info">
+                                    <h5 class="product-name">${cap.styleName || 'Cap Style'}</h5>
+                                    <p class="product-desc">${cap.vendor || 'Port Authority'}</p>
+                                    <div class="product-meta">
+                                        <span class="meta-badge">
+                                            <i class="fas fa-ruler"></i> OSFA
+                                        </span>
+                                        <span class="meta-badge">
+                                            <i class="fas fa-boxes"></i> ${cap.quantity} pieces
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="summary-pricing-breakdown">
+                            <div class="product-card-body">
                                 ${this.generatePricingBreakdown(cap)}
                             </div>
 
-                            <div class="summary-line-total">
-                                Line Total: <span class="price-result">$${capTotal.toFixed(2)}</span>
+                            <div class="product-card-footer">
+                                <span class="footer-label">Product Total</span>
+                                <span class="footer-amount">$${capTotal.toFixed(2)}</span>
                             </div>
                         </div>
                     `;
                 });
 
-                // Add grand total
+                html += '</div>'; // End products section
+
+                // Phase 3 Totals Section
+                html += '<div class="phase3-section totals-section">';
+                html += '<h4 class="section-title"><i class="fas fa-calculator"></i> Quote Total</h4>';
+                html += '<div class="totals-table">';
                 html += `
-                    <div class="summary-grand-total">
-                        Product Subtotal: $${grandTotal.toFixed(2)}
+                    <div class="total-row grand-total-row">
+                        <span class="total-label">Grand Total</span>
+                        <span class="total-value">$${grandTotal.toFixed(2)}</span>
                     </div>
                 `;
+                html += '</div>'; // End totals-table
+                html += '</div>'; // End totals section
+
+                html += '</div>'; // End phase3-unified-container
 
                 return html;
             },
 
-            // Generate the pricing breakdown formula with quantity calculations
+            // Generate the pricing breakdown - PHASE 3 SIZE LINE STRUCTURE
             generatePricingBreakdown: function(cap) {
                 const basePrice = cap.basePrice || 0;
                 const smallBatchFee = cap.smallBatchFee || 0;
@@ -1364,75 +1403,64 @@
                 if (smallBatchFee > 0) frontLogoTotal += smallBatchFee;
                 if (extraStitchesFee > 0) frontLogoTotal += extraStitchesFee;
 
-                // Calculate subtotals
-                const frontLogoSubtotal = frontLogoTotal * quantity;
-                const backLogoSubtotal = backLogoPrice * quantity;
-                const sideLogoSubtotal = sideLogoPrice * quantity;
-
                 // Calculate total per piece including all logos
                 const totalPerPiece = frontLogoTotal + backLogoPrice + sideLogoPrice;
-
-                // Build the comprehensive formula with quantity calculations
-                let formula = '<div class="pricing-formula">';
-
-                // Show individual components
-                formula += `<div style="margin-bottom: 8px;">Cap with Logo: <span class="price-component">$${basePrice.toFixed(2)}</span></div>`;
-
-                if (smallBatchFee > 0) {
-                    formula += `<div style="margin-bottom: 8px;">Small Batch: <span class="price-component">$${smallBatchFee.toFixed(2)}</span></div>`;
-                }
-
-                if (extraStitchesFee > 0) {
-                    formula += `<div style="margin-bottom: 8px;">Extra Stitches: <span class="price-component">$${extraStitchesFee.toFixed(2)}</span></div>`;
-                }
-
-                // Add separator line
-                formula += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
-
-                // Front logo subtotal with quantity calculation
-                formula += `<div style="margin-bottom: 8px;">Front Logo Subtotal: <span class="price-result">$${frontLogoTotal.toFixed(2)}</span>`;
-                formula += ` <span style="color: #6c757d; font-style: italic;">× ${quantity} caps =</span>`;
-                formula += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${frontLogoSubtotal.toFixed(2)}</span></div>`;
-
-                // Add additional logos with quantity calculations
-                if (backLogoPrice > 0) {
-                    formula += `<div style="margin-bottom: 8px;">Cap Back: <span class="price-component">$${backLogoPrice.toFixed(2)}</span>`;
-                    formula += ` <span style="color: #6c757d; font-style: italic;">× ${quantity} caps =</span>`;
-                    formula += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${backLogoSubtotal.toFixed(2)}</span></div>`;
-                }
-
-                if (sideLogoPrice > 0) {
-                    formula += `<div style="margin-bottom: 8px;">Cap Side: <span class="price-component">$${sideLogoPrice.toFixed(2)}</span>`;
-                    formula += ` <span style="color: #6c757d; font-style: italic;">× ${quantity} caps =</span>`;
-                    formula += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${sideLogoSubtotal.toFixed(2)}</span></div>`;
-                }
-
-                // Add separator line before total per cap
-                formula += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
-
-                // Add Total Per Cap reference
-                formula += '<div style="background: #e8f4f8; padding: 8px 12px; border-radius: 6px; margin-top: 12px;">';
-                formula += '<strong style="color: #003f7f;">Total Per Cap: ';
-
-                // Show the calculation
-                formula += `$${frontLogoTotal.toFixed(2)}`;
-                if (backLogoPrice > 0) {
-                    formula += ` + $${backLogoPrice.toFixed(2)}`;
-                }
-                if (sideLogoPrice > 0) {
-                    formula += ` + $${sideLogoPrice.toFixed(2)}`;
-                }
-                formula += ` = <span style="font-size: 1.1em;">$${totalPerPiece.toFixed(2)}</span>`;
-                formula += '</strong>';
-                formula += '<br><span style="font-size: 0.9em; color: #6c757d;">(all logos & fees included)</span>';
-                formula += '</div>';
-
-                formula += '</div>';
 
                 // Store the total per piece for use in line total calculation
                 cap.totalPerPiece = totalPerPiece;
 
-                return formula;
+                // Build Phase 3 size line structure
+                let html = '';
+
+                // Main line - Front Logo with fees breakdown
+                html += '<div class="size-line">';
+                html += '<div class="size-line-header">';
+                html += '<span class="size-badge">Front</span>';
+                html += '<div class="size-qty" style="display: flex; flex-direction: column; gap: 4px;">';
+                html += '<span>Cap with Logo</span>';
+                if (smallBatchFee > 0 || extraStitchesFee > 0) {
+                    html += '<span style="font-size: 0.85em; color: #666;">';
+                    if (smallBatchFee > 0) html += `Small Batch +$${smallBatchFee.toFixed(2)}`;
+                    if (smallBatchFee > 0 && extraStitchesFee > 0) html += ', ';
+                    if (extraStitchesFee > 0) html += `Extra Stitches +$${extraStitchesFee.toFixed(2)}`;
+                    html += '</span>';
+                }
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="size-line-pricing">';
+                html += `<span class="unit-price">$${frontLogoTotal.toFixed(2)}/ea</span>`;
+                html += `<span class="line-total">$${(frontLogoTotal * quantity).toFixed(2)}</span>`;
+                html += '</div>';
+                html += '</div>';
+
+                // Additional logo lines
+                if (backLogoPrice > 0) {
+                    html += '<div class="size-line">';
+                    html += '<div class="size-line-header">';
+                    html += '<span class="size-badge">Back</span>';
+                    html += '<span class="size-qty">Additional Logo</span>';
+                    html += '</div>';
+                    html += '<div class="size-line-pricing">';
+                    html += `<span class="unit-price">$${backLogoPrice.toFixed(2)}/ea</span>`;
+                    html += `<span class="line-total">$${(backLogoPrice * quantity).toFixed(2)}</span>`;
+                    html += '</div>';
+                    html += '</div>';
+                }
+
+                if (sideLogoPrice > 0) {
+                    html += '<div class="size-line">';
+                    html += '<div class="size-line-header">';
+                    html += '<span class="size-badge">Side</span>';
+                    html += '<span class="size-qty">Additional Logo</span>';
+                    html += '</div>';
+                    html += '<div class="size-line-pricing">';
+                    html += `<span class="unit-price">$${sideLogoPrice.toFixed(2)}/ea</span>`;
+                    html += `<span class="line-total">$${(sideLogoPrice * quantity).toFixed(2)}</span>`;
+                    html += '</div>';
+                    html += '</div>';
+                }
+
+                return html;
             },
 
 

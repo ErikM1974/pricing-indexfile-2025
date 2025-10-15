@@ -222,6 +222,15 @@ body {
     overflow: hidden;
 }
 
+/* Phase 3 Content Wrapper - Fix for "two pages" appearance (2025-10-15) */
+#summary-phase {
+    padding: 0; /* Remove padding on Phase 3 - individual sections have their own padding */
+}
+
+#summary-phase .phase-header {
+    margin: 0 2.5rem 2rem 2.5rem; /* Restore margin for header only */
+}
+
 .phase-section::before {
     content: '';
     position: absolute;

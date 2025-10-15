@@ -1269,6 +1269,21 @@
             max-width: 60px;
         }
     }
+
+    /* ===================================================================
+       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
+       2025-10-15: Prevents "everything on one page" issue
+       =================================================================== */
+
+    /* HIDE the entire quote-summary container when not in Phase 3 */
+    #product-phase #quote-summary {
+        display: none !important;
+    }
+
+    /* ONLY show quote-summary when in summary-phase */
+    #summary-phase #quote-summary {
+        display: block !important;
+    }
     </style>
 
     <!-- Bootstrap CSS FIRST (foundation layer) -->

@@ -263,222 +263,153 @@ class CapQuoteBuilder {
     renderQuoteSummary() {
         const summaryContainer = document.getElementById('quote-summary');
         if (!summaryContainer || !this.currentQuote) return;
-        
+
         console.log('[CapQuoteBuilder] Rendering quote summary...');
-        
-        let html = '<div class="quote-summary-content">';
-        
-        // Header
+
+        // NEW UNIFIED DESIGN - Single professional container
+        let html = '<div class="phase3-unified-container">';
+
+        // Header with key info
         html += `
-            <div class="summary-header">
-                <h3>Cap Embroidery Quote Summary</h3>
-                <div class="quote-meta">
-                    <span>Total Pieces: <strong>${this.currentQuote.totalQuantity}</strong></span>
-                    <span>Tier: <strong>${this.currentQuote.tier}</strong></span>
+            <div class="phase3-header">
+                <div class="phase3-title">
+                    <h3>Cap Embroidery Quote Summary</h3>
+                    <div class="phase3-meta">
+                        <span class="meta-item"><i class="fas fa-box"></i> ${this.currentQuote.totalQuantity} pieces</span>
+                        <span class="meta-item"><i class="fas fa-layer-group"></i> ${this.currentQuote.tier}</span>
+                    </div>
                 </div>
             </div>
         `;
-        
-        // Logos section with PRIMARY/ADDITIONAL badges
-        html += '<div class="summary-section">';
-        html += '<h4><i class="fas fa-thread"></i> Embroidery Specifications</h4>';
+
+        // Embroidery specifications - compact list
+        html += `
+            <div class="phase3-section embroidery-specs">
+                <h4 class="section-title"><i class="fas fa-thread"></i> Embroidery Details</h4>
+                <div class="logo-list">
+        `;
+
         this.currentQuote.logos.forEach((logo, idx) => {
-            const isPrimary = logo.isRequired || idx === 0; // Front logo is primary
+            const isPrimary = logo.isRequired || idx === 0;
             html += `
-                <div class="logo-spec">
-                    <span class="logo-number">${idx + 1}.</span>
-                    <span class="logo-details">
-                        ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
-                        ${isPrimary ? '<span class="badge badge-primary">PRIMARY</span>' : '<span class="badge badge-additional">ADDITIONAL</span>'}
-                        ${logo.needsDigitizing ? '<span class="digitizing-badge">+Digitizing $100</span>' : ''}
-                    </span>
+                <div class="logo-item">
+                    <span class="logo-icon">${isPrimary ? '⭐' : '➕'}</span>
+                    <div class="logo-info">
+                        <strong>${logo.position}</strong>
+                        <span class="logo-detail">${logo.stitchCount.toLocaleString()} stitches</span>
+                    </div>
+                    ${isPrimary ? '<span class="badge-primary">INCLUDED</span>' : '<span class="badge-additional">ADDITIONAL</span>'}
+                    ${logo.needsDigitizing ? '<span class="badge-setup">+$100 Setup</span>' : ''}
                 </div>
             `;
         });
-        
+
         if (this.currentQuote.hasLTM) {
-            html += '<p class="ltm-notice"><i class="fas fa-info-circle"></i> Includes small batch pricing for orders under 24 pieces</p>';
+            html += '<div class="ltm-alert"><i class="fas fa-info-circle"></i> Small batch fee included for orders under 24 pieces</div>';
         }
-        
-        html += '</div>';
-        
-        // Products section with images
-        html += '<div class="summary-section">';
-        html += '<h4><i class="fas fa-hat-cowboy"></i> Caps</h4>';
+
+        html += '</div></div>';
+
+        // Products section - cleaner cards
+        html += '<div class="phase3-section products-list">';
+        html += '<h4 class="section-title"><i class="fas fa-hat-cowboy"></i> Cap Products</h4>';
         
         this.currentQuote.products.forEach(product => {
             html += `
-                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
-                             alt="${product.styleNumber} - ${product.color}"
-                             style="width: 85px; height: 85px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px; padding: 5px; background: #fff;"
-                             onerror="this.src='https://via.placeholder.com/150x150/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
-                        <div class="product-info" style="flex: 1;">
-                            <strong style="font-size: 18px; color: #333;">${product.styleNumber} - ${product.color}</strong>
-                            <p style="margin: 6px 0; color: #666; font-size: 14px;">${product.title}</p>
-                            <p style="margin: 6px 0; color: #888; font-size: 14px;">${product.brand}</p>
-                            <p style="margin: 6px 0; color: #4cb354; font-weight: 600; font-size: 15px;">
-                                <i class="fas fa-box"></i> ${product.totalQuantity} pieces total
-                            </p>
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
+                             alt="${product.styleNumber}"
+                             class="product-card-img"
+                             onerror="this.src='https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
+                        <div class="product-card-info">
+                            <h5 class="product-name">${product.styleNumber} - ${product.color}</h5>
+                            <p class="product-desc">${product.title}</p>
+                            <div class="product-meta">
+                                <span class="meta-badge"><i class="fas fa-box"></i> ${product.totalQuantity} pieces</span>
+                                <span class="meta-badge"><i class="fas fa-tag"></i> ${product.brand}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="product-lines">
+                    <div class="product-card-body">
             `;
             
-            // Show size breakdown with consolidated pricing including all embroidery
+            // Simplified size breakdown with cleaner pricing
             product.sizePricedItems.forEach(item => {
-                const upchargeNote = item.sizeUpcharge > 0 ? ` (+$${item.sizeUpcharge.toFixed(2)} upcharge)` : '';
-                
-                // Calculate components for consolidated price
-                const ltmPerPiece = this.currentQuote.hasLTM ? this.currentQuote.ltmFeeTotal / this.currentQuote.totalQuantity : 0;
-                
-                // Get pricing components from product breakdown
-                const capPrice = product.pricingBreakdown?.capPrice || 0;
-                const frontEmbroideryPrice = product.pricingBreakdown?.frontEmbroideryPrice || 0;
-                
-                // Calculate additional logo cost per piece
                 const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
                 const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
-                
-                // Get front logo breakdown for extra stitch display
-                const frontBreakdown = product.pricingBreakdown?.frontLogoBreakdown;
-                const hasExtraStitches = frontBreakdown?.hasExtraStitches;
-                const extraStitchCost = frontBreakdown?.extraStitchCost || 0;
-                
-                // Calculate base price (cap + base embroidery, rounded)
-                const baseEmbroideryPrice = hasExtraStitches ? frontEmbroideryPrice - extraStitchCost : frontEmbroideryPrice;
-                const basePrice = Math.ceil(capPrice + baseEmbroideryPrice);
-                
-                // Calculate total consolidated price per cap (includes all embroidery + LTM if applicable)
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                const consolidatedTotal = consolidatedPricePerCap * item.quantity;
-                
-                // Build the new detailed pricing breakdown
-                let pricingBreakdown = '<div style="background: #f8f9fa; border-radius: 6px; padding: 15px; margin: 15px 0; font-size: 16px; line-height: 1.8;">';
-
-                // Show individual components
-                pricingBreakdown += `<div style="margin-bottom: 8px;">Cap with Logo: <span style="color: #003f7f; font-weight: bold;">$${basePrice.toFixed(2)}</span></div>`;
-
-                if (this.currentQuote.hasLTM && ltmPerPiece > 0) {
-                    pricingBreakdown += `<div style="margin-bottom: 8px;">Small Batch: <span style="color: #003f7f; font-weight: bold;">$${ltmPerPiece.toFixed(2)}</span></div>`;
-                }
-
-                if (hasExtraStitches && extraStitchCost > 0) {
-                    pricingBreakdown += `<div style="margin-bottom: 8px;">Extra Stitches: <span style="color: #003f7f; font-weight: bold;">$${extraStitchCost.toFixed(2)}</span></div>`;
-                }
-
-                // Add separator line
-                pricingBreakdown += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
-
-                // Calculate front logo subtotal
-                const frontLogoSubtotal = basePrice + (hasExtraStitches ? extraStitchCost : 0) + (this.currentQuote.hasLTM ? ltmPerPiece : 0);
-                const frontLogoTotal = frontLogoSubtotal * item.quantity;
-
-                // Front logo subtotal with quantity calculation
-                pricingBreakdown += `<div style="margin-bottom: 8px;">Front Logo Subtotal: <span style="color: #28a745; font-weight: bold;">$${frontLogoSubtotal.toFixed(2)}</span>`;
-                pricingBreakdown += ` <span style="color: #6c757d; font-style: italic;">× ${item.quantity} caps =</span>`;
-                pricingBreakdown += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${frontLogoTotal.toFixed(2)}</span></div>`;
-
-                // Add additional logos with quantity calculations
-                let totalPerCapCalc = `$${frontLogoSubtotal.toFixed(2)}`;
-                if (additionalLogoPrices.length > 0) {
-                    additionalLogoPrices.forEach(logo => {
-                        const logoTotal = logo.pricePerPiece * item.quantity;
-                        pricingBreakdown += `<div style="margin-bottom: 8px;">${logo.position}: <span style="color: #003f7f; font-weight: bold;">$${logo.pricePerPiece.toFixed(2)}</span>`;
-                        pricingBreakdown += ` <span style="color: #6c757d; font-style: italic;">× ${item.quantity} caps =</span>`;
-                        pricingBreakdown += ` <span style="background: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold;">$${logoTotal.toFixed(2)}</span></div>`;
-                        totalPerCapCalc += ` + $${logo.pricePerPiece.toFixed(2)}`;
-                    });
-                }
-
-                // Add separator line before total per cap
-                pricingBreakdown += '<div style="border-top: 1px solid #dee2e6; margin: 10px 0;"></div>';
-
-                // Add Total Per Cap reference
-                pricingBreakdown += '<div style="background: #e8f4f8; padding: 8px 12px; border-radius: 6px; margin-top: 12px;">';
-                pricingBreakdown += '<strong style="color: #003f7f;">Total Per Cap: ';
-                pricingBreakdown += totalPerCapCalc;
-                pricingBreakdown += ` = <span style="font-size: 1.1em;">$${consolidatedPricePerCap.toFixed(2)}</span>`;
-                pricingBreakdown += '</strong>';
-                pricingBreakdown += '<br><span style="font-size: 0.9em; color: #6c757d;">(all logos & fees included)</span>';
-                pricingBreakdown += '</div>';
-
-                pricingBreakdown += '</div>';
+                const lineTotal = consolidatedPricePerCap * item.quantity;
 
                 html += `
-                    <div class="line-item" style="padding: 16px 0; ${product.sizePricedItems.indexOf(item) > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
-                        <div style="margin-bottom: 12px;">
-                            <strong style="font-size: 15px;">${item.size}${upchargeNote} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
+                    <div class="size-line">
+                        <div class="size-line-header">
+                            <span class="size-badge">${item.size}</span>
+                            <span class="size-qty">${item.quantity} pieces</span>
+                            ${item.sizeUpcharge > 0 ? `<span class="size-upcharge">+$${item.sizeUpcharge.toFixed(2)}</span>` : ''}
                         </div>
-                        ${pricingBreakdown}
-                        <div style="text-align: right; margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
-                            <div style="font-size: 18px; font-weight: bold; color: #003f7f;">Line Total: $${consolidatedTotal.toFixed(2)}</div>
+                        <div class="size-line-pricing">
+                            <span class="unit-price">$${consolidatedPricePerCap.toFixed(2)} each</span>
+                            <span class="line-total">$${lineTotal.toFixed(2)}</span>
                         </div>
                     </div>
                 `;
             });
             
+            // Product card footer with subtotal
+            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
+            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
+            const productTotal = product.sizePricedItems.reduce((sum, item) => {
+                const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
+                return sum + (consolidatedPricePerCap * item.quantity);
+            }, 0);
+
             html += `
-                    </div>
-                    <div class="product-subtotal" style="text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #f0f0f0;">
-                        ${(() => {
-                            // Calculate updated subtotal including additional logos
-                            const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
-                            const additionalLogoCostPerPiece = additionalLogoPrices.reduce((logoSum, logo) => logoSum + logo.pricePerPiece, 0);
-                            const consolidatedSubtotal = product.sizePricedItems.reduce((sum, item) => {
-                                const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
-                                return sum + (consolidatedPricePerCap * item.quantity);
-                            }, 0);
-                            return `<span style="font-size: 14px; color: #666; margin-right: 8px;">Product Subtotal:</span>
-                                    <strong style="font-size: 20px; color: #4cb354;">$${consolidatedSubtotal.toFixed(2)}</strong>`;
-                        })()}
+                    <div class="product-card-footer">
+                        <span class="footer-label">Product Total:</span>
+                        <span class="footer-amount">$${productTotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
         });
-        
-        html += '</div>';
-        
-        // Additional logos are now included in the consolidated price per cap above
-        
-        // Totals section with detailed breakdown
+
+        html += '</div>'; // Close products-list
+
+        // Invoice-style totals section
         html += `
-            <div class="summary-section totals-section">
-                <h4><i class="fas fa-calculator"></i> Quote Totals</h4>
-                <div class="totals-breakdown">
-                    <div class="total-line">
-                        <span>Decorated Caps Total${this.currentQuote.hasLTM ? ' (includes all embroidery & small batch)' : ' (includes all embroidery)'}:</span>
-                        <span>$${(this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0)).toFixed(2)}</span>
+            <div class="phase3-section totals-section">
+                <h4 class="section-title"><i class="fas fa-calculator"></i> Quote Total</h4>
+                <div class="totals-table">
+                    <div class="total-row">
+                        <span class="total-label">Caps & Embroidery${this.currentQuote.hasLTM ? ' (includes small batch fee)' : ''}:</span>
+                        <span class="total-value">$${(this.currentQuote.subtotal + (this.currentQuote.additionalEmbroideryTotal || 0)).toFixed(2)}</span>
                     </div>
         `;
-        
+
         if (this.currentQuote.setupFees > 0) {
             const digitizingLogos = this.currentQuote.logos.filter(l => l.needsDigitizing).length;
             html += `
-                <div class="total-line">
-                    <span>Setup Fees (${digitizingLogos} logos):</span>
-                    <span>$${this.currentQuote.setupFees.toFixed(2)}</span>
-                </div>
+                    <div class="total-row">
+                        <span class="total-label">Digitizing Setup (${digitizingLogos} logo${digitizingLogos > 1 ? 's' : ''}):</span>
+                        <span class="total-value">$${this.currentQuote.setupFees.toFixed(2)}</span>
+                    </div>
             `;
         }
-        
-        // Small Batch Fee is now included in the per-piece pricing above, so no separate line needed
-        
+
         html += `
-                    <div class="total-line grand-total">
-                        <span><strong>GRAND TOTAL:</strong></span>
-                        <span><strong>$${this.currentQuote.grandTotal.toFixed(2)}</strong></span>
+                    <div class="total-row grand-total-row">
+                        <span class="total-label"><strong>GRAND TOTAL:</strong></span>
+                        <span class="total-value"><strong>$${this.currentQuote.grandTotal.toFixed(2)}</strong></span>
                     </div>
                 </div>
             </div>
         `;
-        
-        html += '</div>'; // Close quote-summary-content
-        
+
+        html += '</div>'; // Close phase3-unified-container
+
         summaryContainer.innerHTML = html;
-        
-        console.log('[CapQuoteBuilder] Quote summary rendered with images and badges');
+
+        console.log('[CapQuoteBuilder] Quote summary rendered with modern unified design');
     }
     
     /**

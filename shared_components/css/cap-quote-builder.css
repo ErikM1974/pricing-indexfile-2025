@@ -189,6 +189,7 @@ body {
 
 /* Phase Sections */
 .phase-section {
+    display: none; /* Hide all phases by default - active class shows the current phase */
     background: white;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
@@ -233,6 +234,11 @@ body {
 /* Phase Content */
 .phase-section > div:not(.phase-header) {
     padding: 2rem;
+}
+
+/* Phase 3 Content Wrapper - Fix for "two pages" appearance (2025-10-15) */
+#summary-phase > div:not(.phase-header):not(.phase-actions) {
+    padding: 0; /* Remove padding on Phase 3 content - individual sections have their own padding */
 }
 
 /* Logo Sections */

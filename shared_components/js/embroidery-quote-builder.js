@@ -213,103 +213,112 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Render summary display - matching Cap Embroidery style
+     * Render summary display - Modern Phase 3 redesign (matches Cap Embroidery)
      */
     renderSummary() {
         const container = document.getElementById('quote-summary');
         if (!container || !this.currentPricing) return;
-        
-        let html = '<div class="quote-summary-content">';
-        
-        // Header
+
+        // NEW UNIFIED DESIGN - Single professional container
+        let html = '<div class="phase3-unified-container">';
+
+        // Modern header with gradient and key info
         html += `
-            <div class="summary-header">
-                <h3>Embroidery Quote Summary</h3>
-                <div class="quote-meta">
-                    <span>Total Pieces: <strong>${this.currentPricing.totalQuantity}</strong></span>
-                    <span>Tier: <strong>${this.currentPricing.tier}</strong></span>
+            <div class="phase3-header">
+                <div class="phase3-title">
+                    <h3>Embroidery Quote Summary</h3>
+                    <div class="phase3-meta">
+                        <span class="meta-item"><i class="fas fa-box"></i> ${this.currentPricing.totalQuantity} pieces</span>
+                        <span class="meta-item"><i class="fas fa-layer-group"></i> ${this.currentPricing.tier}</span>
+                    </div>
                 </div>
             </div>
         `;
-        
-        // EMBROIDERY PACKAGE BREAKDOWN - Like Cap Embroidery
+
+        // Embroidery specifications - compact list
         html += `
-            <div style="background: #f0f8f0; border: 1px solid #4cb354; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h4 style="margin: 0 0 12px 0; color: #4cb354; text-transform: uppercase; font-size: 14px;">
-                    <i class="fas fa-thread"></i> EMBROIDERY PACKAGE FOR THIS ORDER:
-                </h4>
+            <div class="phase3-section embroidery-specs">
+                <h4 class="section-title"><i class="fas fa-thread"></i> Embroidery Details</h4>
+                <div class="logo-list">
         `;
-        
+
         // Show primary logo first
         const primaryLogos = this.currentPricing.logos.filter((l, idx) => idx === 0);
         const additionalLogos = this.currentPricing.logos.filter((l, idx) => idx > 0);
-        
+
         primaryLogos.forEach(logo => {
             html += `
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <span style="color: #4cb354;">✓</span> 
-                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                    <strong style="color: #4cb354;">INCLUDED IN BASE PRICE</strong>
-                    ${logo.needsDigitizing ? '<span style="color: #ff6b6b;"> [+$100 Digitizing]</span>' : ''}
-                </p>
+                <div class="logo-item">
+                    <span class="logo-icon">✓</span>
+                    <div class="logo-info">
+                        <strong>${logo.position}</strong>
+                        <div class="logo-detail">${logo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <span class="badge-primary">Primary Logo</span>
+                    ${logo.needsDigitizing ? '<span class="badge-setup" style="margin-left: 8px;">+$100 Setup</span>' : ''}
+                </div>
             `;
         });
-        
+
         // Show additional logos with pricing from API
         additionalLogos.forEach(logo => {
             // Find matching additional service for this logo position
             let matchedService = null;
             let alPrice = 0;
-            
+
             if (this.currentPricing.additionalServices) {
                 // Try to match by position name in service description
                 matchedService = this.currentPricing.additionalServices.find(service => {
                     const serviceDesc = service.description.toLowerCase();
                     const logoPos = logo.position.toLowerCase();
                     // Match if service description contains the logo position
-                    return serviceDesc.includes(logoPos.replace(' ', '')) || 
+                    return serviceDesc.includes(logoPos.replace(' ', '')) ||
                            serviceDesc.includes(logoPos) ||
                            (logoPos.includes('chest') && serviceDesc.includes('chest')) ||
                            (logoPos.includes('back') && serviceDesc.includes('back')) ||
                            (logoPos.includes('sleeve') && serviceDesc.includes('sleeve'));
                 });
-                
+
                 if (matchedService) {
                     alPrice = matchedService.unitPrice;
                 }
             }
-            
+
             html += `
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <span style="color: #4cb354;">✓</span> 
-                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                    <strong style="color: #ff9800;">ADDITIONAL ${alPrice > 0 ? `(+$${alPrice.toFixed(2)} per piece)` : '(see additional services)'}</strong>
-                    ${logo.needsDigitizing ? '<span style="color: #ff6b6b;"> [+$100 Digitizing]</span>' : ''}
-                </p>
+                <div class="logo-item">
+                    <span class="logo-icon">✓</span>
+                    <div class="logo-info">
+                        <strong>${logo.position}</strong>
+                        <div class="logo-detail">${logo.stitchCount.toLocaleString()} stitches${alPrice > 0 ? ` • +$${alPrice.toFixed(2)}/piece` : ''}</div>
+                    </div>
+                    <span class="badge-additional">Additional</span>
+                    ${logo.needsDigitizing ? '<span class="badge-setup" style="margin-left: 8px;">+$100 Setup</span>' : ''}
+                </div>
             `;
         });
-        
+
         // Show small batch fee if applicable
         if (this.currentPricing.ltmFee > 0) {
             const ltmPerPiece = (this.currentPricing.ltmFee / this.currentPricing.totalQuantity).toFixed(2);
             html += `
-                <p style="margin: 5px 0; font-size: 14px; color: #ff6b6b;">
-                    <span>⚠</span> 
-                    <strong>Small Batch Fee</strong> - 
-                    <strong>ADDITIONAL (+$${ltmPerPiece} per piece for orders under 24)</strong>
-                </p>
+                <div class="ltm-alert">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Small Batch Fee:</strong> +$${ltmPerPiece} per piece (orders under 24)
+                </div>
             `;
         }
-        
-        html += '</div>';
-        
-        // Products section - Enhanced like Cap Embroidery
-        html += '<div class="summary-section">';
-        html += '<h4><i class="fas fa-tshirt"></i> Products</h4>';
-        
+
+        html += '</div></div>'; // Close logo-list and embroidery-specs
+
+        // Products section - Modern card design
+        html += `
+            <div class="phase3-section products-section">
+                <h4 class="section-title"><i class="fas fa-tshirt"></i> Products</h4>
+        `;
+
         // Track corrected overall subtotal for grand total calculation
         let correctedOverallSubtotal = 0;
-        
+
         this.currentPricing.products.forEach(pp => {
             // Calculate total additional logo cost from API data
             let totalAdditionalLogoCost = 0;
@@ -317,84 +326,43 @@ class EmbroideryQuoteBuilder {
                 totalAdditionalLogoCost = this.currentPricing.additionalServices
                     .reduce((sum, service) => sum + service.unitPrice, 0);
             }
-            
+
             html += `
-                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
-                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(pp.product.style)}"
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
                              alt="${pp.product.style} - ${pp.product.color}"
-                             style="width: 85px; height: 85px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px; padding: 5px; background: #fff;"
-                             onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${pp.product.style}')">
-                        <div class="product-info" style="flex: 1;">
-                            <strong style="font-size: 18px; color: #333;">${pp.product.style} - ${pp.product.color}</strong>
-                            <p style="margin: 6px 0; color: #666; font-size: 14px;">${pp.product.title}</p>
-                            <p style="margin: 6px 0; color: #4cb354; font-weight: 600; font-size: 15px;">
-                                <i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces total
-                            </p>
+                             class="product-card-img"
+                             onerror="this.src='https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
+                        <div class="product-card-info">
+                            <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
+                            <p class="product-desc">${pp.product.title}</p>
+                            <div class="product-meta">
+                                <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="product-lines">
+                    <div class="product-card-body">
             `;
             
             // Calculate corrected product subtotal based on corrected line items
             let correctedProductSubtotal = 0;
-            
+
+            // Simplified size breakdown with cleaner pricing
             pp.lineItems.forEach((item, index) => {
-                // Calculate pricing components
-                const ltmPerPiece = this.currentPricing.ltmFee > 0 ? this.currentPricing.ltmFee / this.currentPricing.totalQuantity : 0;
-                const extraStitchCharge = this.currentPricing.additionalStitchCost || 0; // Extra stitch charge for primary logo over 8000
-                
-                // Use the stored basePrice from the line item (this is the rounded base without extra stitches)
-                const basePrice = item.basePrice || item.unitPrice; // Use stored basePrice if available
                 const displayPrice = item.unitPriceWithLTM || item.unitPrice;
                 const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
-                const correctedTotal = consolidatedPrice * item.quantity;
-                correctedProductSubtotal += correctedTotal;
-                
-                // Build the pricing breakdown like cap quote
-                let baseLine = '';
-                if (extraStitchCharge > 0) {
-                    // Show base price with extra stitch charge separately
-                    baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCharge.toFixed(2)}`;
-                    if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
-                    }
-                } else {
-                    // No extra stitches, show normal breakdown
-                    baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)}`;
-                    if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
-                    }
-                }
-                
-                // Build additional logos lines if present
-                let additionalLogosLines = '';
-                if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
-                    this.currentPricing.additionalServices.forEach(service => {
-                        additionalLogosLines += `<br>+ ${service.description}: $${service.unitPrice.toFixed(2)}`;
-                    });
-                }
-                
+                const lineTotal = consolidatedPrice * item.quantity;
+                correctedProductSubtotal += lineTotal;
+
                 html += `
-                    <div class="line-item" style="padding: 16px 0; ${index > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
-                        <div style="margin-bottom: 12px;">
-                            <strong style="font-size: 15px;">${item.description} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
+                    <div class="size-line">
+                        <div class="size-line-header">
+                            <span class="size-qty">${item.description} • ${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'}</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="margin-bottom: 8px;">
-                                    <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
-                                    <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPrice.toFixed(2)}</span>
-                                </div>
-                                <div style="font-size: 11px; color: #999; line-height: 1.4; padding-left: 20px; border-left: 2px solid #e8e8e8; margin-top: -4px;">
-                                    ${baseLine}
-                                    ${additionalLogosLines}
-                                </div>
-                            </div>
-                            <div style="text-align: right; min-width: 120px; align-self: center;">
-                                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">Line total:</div>
-                                <div style="font-size: 18px; font-weight: bold; color: #333;">$${correctedTotal.toFixed(2)}</div>
-                            </div>
+                        <div class="size-line-pricing">
+                            <span class="unit-price">$${consolidatedPrice.toFixed(2)} each</span>
+                            <span class="line-total">$${lineTotal.toFixed(2)}</span>
                         </div>
                     </div>
                 `;
@@ -402,60 +370,60 @@ class EmbroideryQuoteBuilder {
             
             // Add to overall corrected subtotal
             correctedOverallSubtotal += correctedProductSubtotal;
-            
+
             html += `
                     </div>
-                    <div class="product-subtotal" style="text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #f0f0f0;">
-                        <span style="font-size: 14px; color: #666; margin-right: 8px;">Product Subtotal:</span>
-                        <strong style="font-size: 20px; color: #4cb354;">$${correctedProductSubtotal.toFixed(2)}</strong>
+                    <div class="product-card-footer">
+                        <span class="footer-label">Product Total:</span>
+                        <span class="footer-amount">$${correctedProductSubtotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
         });
-        
-        html += '</div>';
-        
+
+        html += '</div>'; // Close products-section
+
         // Additional Services section removed from display since costs are already included in line item prices
         // The additional services data is still maintained in this.currentPricing.additionalServices for database/email purposes
-        
-        // Totals section - No tax in summary (tax only in PDF like cap quote)
+
+        // Invoice-style totals section
         // Note: LTM fee is already included in correctedOverallSubtotal via unitPriceWithLTM
         // Since additional services are already included in our corrected line items, we don't double-add them
         const grandTotal = correctedOverallSubtotal + this.currentPricing.setupFees;
-        
+
         // Calculate tax separately for PDF use (not shown in summary)
         const salesTax = grandTotal * 0.101; // 10.1% Milton, WA sales tax
         const grandTotalWithTax = grandTotal + salesTax;
-        
+
         html += `
-            <div class="summary-section totals-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                <h4 style="color: #4cb354; margin-bottom: 15px;"><i class="fas fa-calculator"></i> Quote Totals</h4>
-                <div class="totals-breakdown">
-                    <div class="total-line" style="display: flex; justify-content: space-between; padding: 8px 0;">
-                        <span>Products & Primary Embroidery${this.currentPricing.ltmFee > 0 ? ' (includes small batch fee)' : ''}:</span>
-                        <span style="font-weight: bold;">$${correctedOverallSubtotal.toFixed(2)}</span>
+            <div class="phase3-section totals-section">
+                <h4 class="section-title"><i class="fas fa-calculator"></i> Quote Total</h4>
+                <div class="totals-table">
+                    <div class="total-row">
+                        <span class="total-label">Products & Embroidery${this.currentPricing.ltmFee > 0 ? ' (includes small batch fee)' : ''}:</span>
+                        <span class="total-value">$${correctedOverallSubtotal.toFixed(2)}</span>
                     </div>
         `;
-        
+
         // Additional services are already included in corrected line item calculations
         // So we don't show them as a separate line in the totals
-        
+
         if (this.currentPricing.setupFees > 0) {
             html += `
-                <div class="total-line" style="display: flex; justify-content: space-between; padding: 8px 0;">
-                    <span>Setup Fees (${this.currentPricing.logos.filter(l => l.needsDigitizing).length} logo${this.currentPricing.logos.filter(l => l.needsDigitizing).length > 1 ? 's' : ''}):</span>
-                    <span style="font-weight: bold;">$${this.currentPricing.setupFees.toFixed(2)}</span>
+                <div class="total-row">
+                    <span class="total-label">Setup Fees (${this.currentPricing.logos.filter(l => l.needsDigitizing).length} logo${this.currentPricing.logos.filter(l => l.needsDigitizing).length > 1 ? 's' : ''}):</span>
+                    <span class="total-value">$${this.currentPricing.setupFees.toFixed(2)}</span>
                 </div>
             `;
         }
-        
+
         // Small batch fee is already included in product pricing, so we don't add it as a separate line
         // No subtotal or sales tax lines in summary (like cap quote) - tax only appears in PDF
-        
+
         html += `
-                    <div class="total-line grand-total" style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #4cb354; margin-top: 10px; font-size: 18px;">
-                        <span style="font-weight: bold; color: #333;">GRAND TOTAL:</span>
-                        <span style="font-weight: bold; color: #333;">$${grandTotal.toFixed(2)}</span>
+                    <div class="total-row grand-total-row">
+                        <span class="total-label">GRAND TOTAL:</span>
+                        <span class="total-value">$${grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
@@ -464,8 +432,8 @@ class EmbroideryQuoteBuilder {
         // Store both totals for later use (summary shows pre-tax, PDF shows with tax)
         this.currentPricing.grandTotal = grandTotal;
         this.currentPricing.grandTotalWithTax = grandTotalWithTax;
-        
-        html += '</div>';
+
+        html += '</div>'; // Close phase3-unified-container
         container.innerHTML = html;
     }
     
