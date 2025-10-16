@@ -376,9 +376,19 @@ class QuoteIndicatorManager {
      * Handle phase changes
      */
     handlePhaseChange(phase) {
-        // Widget should only be visible in Phase 2
-        if (phase === 'product-phase' || phase === 2) {
-            // Widget visibility is controlled by CSS and has-products class
+        // Widget should only be visible in Phase 2, hide in Phase 3 (Summary)
+        if (phase === 'summary-phase' || phase === 3) {
+            // Hide widget completely in summary phase to avoid duplication
+            if (this.widget) {
+                this.widget.style.display = 'none';
+                this.widget.style.visibility = 'hidden';
+            }
+        } else if (phase === 'product-phase' || phase === 2) {
+            // Show widget in product phase if it has products
+            if (this.widget && this.productManager && this.productManager.products && this.productManager.products.length > 0) {
+                this.widget.style.display = '';
+                this.widget.style.visibility = '';
+            }
             this.updateIndicator();
         }
     }

@@ -642,94 +642,129 @@
             </div>
         </section>
 
-        <!-- Phase 3: Quote Summary -->
+        <!-- Phase 3: Quote Summary - Industry Standard Layout -->
         <section id="summary-phase" class="phase-section" style="display: none;">
             <div class="phase-header">
-                <h2><span class="phase-number">3</span> Quote Summary</h2>
-                <p>Review and finalize your quote</p>
+                <h2><span class="phase-number">3</span> Review Your Quote</h2>
+                <p>Your quote is ready! Choose how you'd like to proceed</p>
             </div>
-            
+
+            <!-- PRIMARY: Quote Summary (Always Visible) -->
             <div id="quote-summary" class="quote-summary">
                 <!-- Summary will be generated here -->
             </div>
-            
-            <!-- Customer Information -->
-            <div class="customer-info-section">
-                <h3>Customer Information</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="customer-name">Customer Name *</label>
-                        <input type="text" id="customer-name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-email">Email *</label>
-                        <input type="email" id="customer-email" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-phone">Phone</label>
-                        <input type="tel" id="customer-phone" class="form-control">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="company-name">Company Name</label>
-                        <input type="text" id="company-name" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="sales-rep">Sales Representative *</label>
-                        <select id="sales-rep" class="form-control" required>
-                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
-                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                            <option value="art@nwcustomapparel.com">Steve Deland</option>
-                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="special-notes">Special Notes</label>
-                    <textarea id="special-notes" rows="3" class="form-textarea"></textarea>
+
+            <!-- QUICK ACTIONS: Immediate Use Without Forms (Industry Standard) -->
+            <div class="quick-actions-section" style="background: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0;">
+                <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #374151;">
+                    <i class="fas fa-bolt" style="color: #10b981;"></i> Quick Actions
+                </h3>
+                <p style="color: #6b7280; margin-bottom: 16px;">Use your quote immediately without saving</p>
+                <div class="action-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button id="copy-quote-btn" class="btn btn-secondary">
+                        <i class="fas fa-copy"></i> Copy to Clipboard
+                    </button>
+                    <button id="print-quote-btn" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Print PDF
+                    </button>
+                    <button id="download-quote-btn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Download
+                    </button>
                 </div>
             </div>
-            
-            <!-- Quote Actions - matching Cap Embroidery style -->
-            <div class="quote-actions">
-                <div class="action-row">
-                    <div class="save-option">
-                        <input type="checkbox" id="save-to-database" checked>
-                        <label for="save-to-database">Save to Database</label>
+
+            <!-- SAVE & SEND SECTION: Collapsible (Following QuickBooks/FreshBooks Pattern) -->
+            <div class="save-send-section" style="border: 2px solid #e5e7eb; border-radius: 8px; margin: 24px 0; overflow: hidden;">
+                <!-- Section Header (Always Visible - Click to Expand) -->
+                <div id="save-send-header" style="background: #fff; padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px; color: #111827;">
+                            <i class="fas fa-database" style="color: #3b82f6;"></i> Save & Send Quote
+                        </h3>
+                        <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Save to database or email to customer</p>
                     </div>
-                    <div class="action-buttons">
-                        <button id="save-quote-btn" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Quote
-                        </button>
-                        <button id="email-quote-btn" class="btn btn-primary">
-                            <i class="fas fa-envelope"></i> Email Quote
-                        </button>
-                        <button id="copy-quote-btn" class="btn btn-secondary">
-                            <i class="fas fa-copy"></i> Copy Text
-                        </button>
-                        <button id="print-quote-btn" class="btn btn-secondary">
-                            <i class="fas fa-print"></i> Print PDF
-                        </button>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span id="save-send-status" style="font-size: 13px; color: #6b7280;">Click to expand</span>
+                        <i id="save-send-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+                    </div>
+                </div>
+
+                <!-- Collapsible Content (Hidden by Default) -->
+                <div id="save-send-content" style="display: none; border-top: 1px solid #e5e7eb; padding: 24px; background: #fafafa;">
+                    <!-- Customer Information Form -->
+                    <div class="customer-info-section">
+                        <h4 style="margin: 0 0 16px 0; font-size: 16px;">Customer Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customer-name">Customer Name *</label>
+                                <input type="text" id="customer-name" class="form-control" placeholder="Required for saving">
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-email">Email *</label>
+                                <input type="email" id="customer-email" class="form-control" placeholder="Required for emailing">
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone">Phone</label>
+                                <input type="tel" id="customer-phone" class="form-control" placeholder="Optional">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company-name">Company Name</label>
+                                <input type="text" id="company-name" class="form-control" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label for="project-name">Project Name</label>
+                                <input type="text" id="project-name" class="form-control" placeholder="Optional">
+                            </div>
+                            <div class="form-group">
+                                <label for="sales-rep">Sales Representative</label>
+                                <select id="sales-rep" class="form-control">
+                                    <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                    <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="special-notes">Special Notes</label>
+                            <textarea id="special-notes" rows="3" class="form-textarea" placeholder="Optional notes about this quote"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Save/Send Actions -->
+                    <div class="quote-actions" style="margin-top: 20px;">
+                        <div class="action-row">
+                            <div class="save-option">
+                                <input type="checkbox" id="save-to-database" checked>
+                                <label for="save-to-database">Save to Database</label>
+                            </div>
+                            <div class="action-buttons">
+                                <button id="save-quote-btn" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Quote
+                                </button>
+                                <button id="email-quote-btn" class="btn btn-primary">
+                                    <i class="fas fa-envelope"></i> Email to Customer
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="phase-actions">
+
+            <!-- Navigation Actions -->
+            <div class="phase-actions" style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
                 <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </button>
                 <button id="new-quote-btn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Quote
+                    <i class="fas fa-plus"></i> Start New Quote
                 </button>
             </div>
         </section>

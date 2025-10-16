@@ -471,6 +471,18 @@
     }
 }
 
+/* CRITICAL: Hide widget completely in Phase 3 (Summary Phase) to avoid duplicate information */
+/* When summary phase is active, hide the widget entirely */
+#summary-phase.active ~ .quote-indicator-widget,
+#summary-phase:not([style*="display: none"]) ~ .quote-indicator-widget,
+body:has(#summary-phase.active) .quote-indicator-widget,
+body:has(#summary-phase:not([style*="display: none"])) .quote-indicator-widget {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 /* Print styles - hide widget when printing */
 @media print {
     .quote-indicator-widget {

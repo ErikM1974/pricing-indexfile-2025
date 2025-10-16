@@ -154,13 +154,23 @@ class CapQuoteBuilder {
         this.currentPhase = phase;
 
         // Dispatch phase change event for the quote indicator
+        // CRITICAL: Include both numeric phase and the actual phase ID for proper widget handling
+        const phaseId = this.getPhaseId(phase);
         document.dispatchEvent(new CustomEvent('phaseChanged', {
             detail: {
                 phase: phase,
-                phaseId: this.getPhaseId(phase),
+                phaseId: phaseId,
+                phaseName: phaseId + '-phase',  // e.g., 'summary-phase'
                 source: 'CapQuoteBuilder'
             }
         }));
+
+        // Also directly hide the widget if we're on step 3 (Summary)
+        if (phase === 3 && window.quoteIndicator && window.quoteIndicator.widget) {
+            console.log('[CapQuoteBuilder] Hiding quote widget for Step 3');
+            window.quoteIndicator.widget.style.display = 'none';
+            window.quoteIndicator.widget.style.visibility = 'hidden';
+        }
     }
     
     /**
@@ -543,9 +553,10 @@ class CapQuoteBuilder {
      */
     handleCopyQuote() {
         if (!this.currentQuote) return;
-        
-        const quoteText = this.generateQuoteText();
-        
+
+        // Pass false to use generic customer data for quick copy
+        const quoteText = this.generateQuoteText(false);
+
         navigator.clipboard.writeText(quoteText).then(() => {
             console.log('[CapQuoteBuilder] Quote copied to clipboard');
             
@@ -767,12 +778,12 @@ class CapQuoteBuilder {
     /**
      * Generate quote text for copying
      */
-    generateQuoteText() {
+    generateQuoteText(useCustomerData = false) {
         if (!this.currentQuote) return '';
-        
+
         const quoteId = this.quoteService.generateQuoteID();
         const currentDate = new Date().toLocaleDateString('en-US');
-        
+
         // Header with company info
         let text = `NORTHWEST CUSTOM APPAREL
 `;
@@ -783,7 +794,7 @@ class CapQuoteBuilder {
         text += `${'='.repeat(60)}
 
 `;
-        
+
         // Quote section
         text += `QUOTE
 `;
@@ -794,9 +805,17 @@ class CapQuoteBuilder {
         text += `Valid for: 30 days
 
 `;
-        
-        // Customer information
-        const customerInfo = this.collectCustomerInfo();
+
+        // Customer information - use form data only when requested
+        const customerInfo = useCustomerData ? this.collectCustomerInfo() : {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepName: 'General Sales'
+        };
         text += `CUSTOMER INFORMATION
 `;
         text += `${customerInfo.name || 'Not provided'}

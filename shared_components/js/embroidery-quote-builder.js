@@ -40,40 +40,53 @@ class EmbroideryQuoteBuilder {
         document.getElementById('continue-to-products')?.addEventListener('click', () => {
             this.showPhase('product');
         });
-        
+
         document.getElementById('continue-to-summary')?.addEventListener('click', () => {
             this.showPhase('summary');
             this.generateSummary();
         });
-        
+
         document.getElementById('back-to-logos')?.addEventListener('click', () => {
             this.showPhase('logo');
         });
-        
+
         document.getElementById('back-to-products')?.addEventListener('click', () => {
             this.showPhase('product');
         });
-        
-        // Quote actions
-        document.getElementById('save-quote-btn')?.addEventListener('click', () => {
-            this.handleSaveQuote();
-        });
-        
-        document.getElementById('email-quote-btn')?.addEventListener('click', () => {
-            this.handleEmailQuote();
-        });
-        
+
+        // Quick Actions (no customer info required)
         document.getElementById('copy-quote-btn')?.addEventListener('click', () => {
             this.handleCopyQuote();
         });
-        
+
         document.getElementById('print-quote-btn')?.addEventListener('click', () => {
             this.handlePrintQuote();
         });
-        
+
+        document.getElementById('download-quote-btn')?.addEventListener('click', () => {
+            this.handleDownloadQuote();
+        });
+
+        // Save & Send Actions (require customer info)
+        document.getElementById('save-quote-btn')?.addEventListener('click', () => {
+            this.handleSaveQuote();
+        });
+
+        document.getElementById('email-quote-btn')?.addEventListener('click', () => {
+            this.handleEmailQuote();
+        });
+
         document.getElementById('new-quote-btn')?.addEventListener('click', () => {
             this.handleNewQuote();
         });
+
+        // Collapsible Save & Send section (Industry standard pattern)
+        const saveSendHeader = document.getElementById('save-send-header');
+        if (saveSendHeader) {
+            saveSendHeader.addEventListener('click', () => {
+                this.toggleSaveSendSection();
+            });
+        }
         
         // Hide suggestions when clicking outside
         document.addEventListener('click', (e) => {
@@ -587,17 +600,85 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Handle copy quote to clipboard
+     * Toggle Save & Send section (collapsible)
+     */
+    toggleSaveSendSection() {
+        const content = document.getElementById('save-send-content');
+        const icon = document.getElementById('save-send-icon');
+        const status = document.getElementById('save-send-status');
+
+        if (!content) return;
+
+        const isExpanded = content.style.display === 'block';
+
+        if (isExpanded) {
+            // Collapse
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            status.textContent = 'Click to expand';
+        } else {
+            // Expand
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            status.textContent = 'Click to collapse';
+        }
+    }
+
+    /**
+     * Handle download quote (Quick Action - no customer info required)
+     */
+    handleDownloadQuote() {
+        if (!this.currentPricing) {
+            this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
+            return;
+        }
+
+        console.log('[EmbroideryQuoteBuilder] Handling download quote...');
+
+        // Generate a temporary quote ID for the filename
+        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
+
+        // Use generic customer data for quick download
+        const customerData = {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
+        // Generate HTML content
+        const htmlContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
+
+        // Create blob and download
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Quote_${quoteId}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.showSuccessNotification('Quote Downloaded', `Quote saved as Quote_${quoteId}.html`);
+    }
+
+    /**
+     * Handle copy quote to clipboard (Quick Action - no customer info required)
      */
     handleCopyQuote() {
         if (!this.currentPricing) {
             this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
             return;
         }
-        
+
         console.log('[EmbroideryQuoteBuilder] Handling copy quote...');
-        
-        const quoteText = this.generateQuoteText();
+
+        // Pass false to use generic customer data for quick copy
+        const quoteText = this.generateQuoteText(false);
         
         navigator.clipboard.writeText(quoteText).then(() => {
             console.log('[EmbroideryQuoteBuilder] Quote copied to clipboard');
@@ -624,18 +705,29 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Handle print quote
+     * Handle print quote (Quick Action - no customer info required)
      */
     handlePrintQuote() {
         if (!this.currentPricing) {
             this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
             return;
         }
-        
+
         console.log('[EmbroideryQuoteBuilder] Handling print quote...');
-        
+
         const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
-        const customerData = this.getCustomerData();
+
+        // Use generic customer data for quick print
+        const customerData = {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
         const printContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
         
         const printWindow = window.open('', '_blank');
@@ -651,11 +743,22 @@ class EmbroideryQuoteBuilder {
     /**
      * Generate quote text for copying - Professional format
      */
-    generateQuoteText() {
+    generateQuoteText(useCustomerData = false) {
         if (!this.currentPricing) return '';
-        
+
         const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
-        const customerData = this.getCustomerData();
+
+        // Use generic data for Quick Actions, form data for Save/Email actions
+        const customerData = useCustomerData ? this.getCustomerData() : {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
         const currentDate = new Date().toLocaleDateString('en-US');
         
         let text = '';
