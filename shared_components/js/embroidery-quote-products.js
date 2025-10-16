@@ -649,6 +649,11 @@ class ProductLineManager {
         if (window.ToastNotifications) {
             ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
         }
+
+        // Trigger quote indicator update
+        document.dispatchEvent(new CustomEvent('productAdded', {
+            detail: { product, source: 'ProductLineManager' }
+        }));
     }
     
     /**
@@ -897,11 +902,16 @@ class ProductLineManager {
             this.products = this.products.filter(p => p.id !== productId);
             this.renderProductsList();
             this.updateContinueButton();
-            
+
             // Trigger pricing update
             if (window.embroideryQuoteBuilder) {
                 window.embroideryQuoteBuilder.updatePricing();
             }
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productRemoved', {
+                detail: { productId, source: 'ProductLineManager' }
+            }));
         }
     }
     

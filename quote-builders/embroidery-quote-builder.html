@@ -144,18 +144,18 @@
     }
 
     /* ===================================================================
-       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
-       2025-10-15: Prevents "everything on one page" issue
+       SIMPLIFIED PHASE VISIBILITY - Fixed 2025-12-16
+       Clean, single-page summary without complex rules
        =================================================================== */
 
-    /* HIDE the entire quote-summary container when not in Phase 3 */
-    #product-phase #quote-summary {
-        display: none !important;
+    /* Phase sections are controlled by JavaScript only */
+    .phase-section {
+        display: none;
     }
 
-    /* ONLY show quote-summary when in summary-phase */
-    #summary-phase #quote-summary {
-        display: block !important;
+    /* Active phase is shown */
+    .phase-section.active {
+        display: block;
     }
     </style>
     
@@ -191,6 +191,9 @@
 
     <!-- Modern Product Cards (2025-10-15 Phase 2) - Compact vertical card design -->
     <link rel="stylesheet" href="/shared_components/css/product-cards-modern.css?v=20251015">
+
+    <!-- Persistent Quote Indicator Widget (2025-12-15) - Floating quote summary -->
+    <link rel="stylesheet" href="/shared_components/css/quote-indicator-widget.css?v=20251215">
 
     <!-- Phase 1 Infrastructure - v20250911 -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -745,6 +748,7 @@
     <script src="/shared_components/js/embroidery-quote-pricing.js"></script>
     <script src="/shared_components/js/embroidery-quote-service.js"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20250915"></script>
+    <script src="/shared_components/js/quote-indicator-manager.js?v=20251215"></script>
     <script src="/shared_components/js/embroidery-quote-builder.js"></script>
     
     <script>
@@ -1169,13 +1173,48 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // Check API status before initializing
             const apiStatus = await checkAPIStatus();
-            
+
             if (!apiStatus) {
                 console.error('[EmbroideryQuoteBuilder] API check failed - system may not work correctly');
             }
-            
+
             // Initialize anyway but warnings will be shown if API failed
             window.embroideryQuoteBuilder = new EmbroideryQuoteBuilder();
+
+            // Initialize the persistent quote indicator widget
+            if (window.QuoteIndicatorManager) {
+                // Wait a moment for embroideryQuoteBuilder to be fully initialized
+                setTimeout(() => {
+                    if (window.embroideryQuoteBuilder && window.embroideryQuoteBuilder.productLineManager) {
+                        window.quoteIndicator = new QuoteIndicatorManager(window.embroideryQuoteBuilder.productLineManager);
+                        console.log('✅ Quote Indicator Widget initialized with product manager');
+
+                        // Force widget to be visible and expanded initially
+                        if (window.quoteIndicator) {
+                            // Force update even if no products yet
+                            window.quoteIndicator.updateIndicator();
+
+                            // Make sure widget is visible and expanded
+                            if (window.quoteIndicator.widget) {
+                                // Force expanded state on initial load
+                                window.quoteIndicator.isCollapsed = false;
+                                window.quoteIndicator.widget.classList.remove('collapsed');
+
+                                // Add a temporary "demo" class to make it visible for testing
+                                window.quoteIndicator.widget.classList.add('has-products');
+
+                                console.log('🎯 Widget forced to be visible and expanded');
+                                console.log('Widget element:', window.quoteIndicator.widget);
+                                console.log('Widget classes:', window.quoteIndicator.widget.className);
+                            }
+                        }
+                    } else {
+                        console.warn('⚠️ Quote Indicator Widget not initialized - productLineManager not available');
+                    }
+                }, 100);
+            } else {
+                console.warn('⚠️ QuoteIndicatorManager not loaded');
+            }
         });
         
         // Check if critical APIs are available

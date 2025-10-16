@@ -93,23 +93,28 @@ class EmbroideryQuoteBuilder {
             section.style.display = 'none';
             section.classList.remove('active');
         });
-        
+
         // Show selected phase
         const phaseElement = document.getElementById(`${phase}-phase`);
         if (phaseElement) {
             phaseElement.style.display = 'block';
             phaseElement.classList.add('active');
         }
-        
+
         // Update navigation indicators
         this.updatePhaseNavigation(phase);
-        
+
         this.currentPhase = phase;
-        
+
         // Update pricing if showing summary
         if (phase === 'summary') {
             this.updatePricing();
         }
+
+        // Trigger phase change event for quote indicator
+        document.dispatchEvent(new CustomEvent('phaseChanged', {
+            detail: phase === 'product' ? 'product-phase' : phase
+        }));
     }
     
     /**

@@ -678,6 +678,11 @@ class CapProductLineManager {
             if (window.ToastNotifications) {
                 ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
             }
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productAdded', {
+                detail: { product, source: 'CapProductLineManager' }
+            }))
             
         } catch (error) {
             console.error('[CapProductLineManager] ❌ Failed to add cap:', error);
@@ -800,12 +805,18 @@ class CapProductLineManager {
     removeProduct(productId) {
         const index = this.products.findIndex(p => p.id === productId);
         if (index > -1) {
+            const removedProduct = this.products[index];
             this.products.splice(index, 1);
             console.log('[CapProductLineManager] Product removed:', productId);
-            
+
             this.renderProductsList();
             this.updateAggregateTotal();
             this.updateContinueButton();
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productRemoved', {
+                detail: { productId, product: removedProduct, source: 'CapProductLineManager' }
+            }));
         }
     }
     

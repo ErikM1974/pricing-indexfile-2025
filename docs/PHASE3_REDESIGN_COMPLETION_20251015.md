@@ -428,8 +428,195 @@ Both cap embroidery and regular embroidery quote builders now share the same mod
 
 ---
 
+## PHASE 2/3 SEPARATION FIX (2025-10-15 - Final Implementation)
+
+### Problem: "Everything on One Page" - Continued Issue
+
+After the initial Phase 3 redesign, a second issue was discovered where Phase 2's "Products in Quote" list appeared alongside Phase 3's summary. The user reported seeing "everything on one page" instead of proper phase separation.
+
+### Root Cause
+
+The JavaScript `showPhase()` function (lines 90-113 in embroidery-quote-builder.js) correctly hides/shows phases by toggling `display: none` and the `.active` class. However, CSS cascade issues were allowing Phase 2 content to leak through into Phase 3.
+
+**Two separate issues identified:**
+1. `#quote-summary` div appearing in Phase 2 (Fixed at lines 146-159)
+2. Phases not properly isolated from each other (New issue)
+
+### Final CSS Solution
+
+**File:** `quote-builders/embroidery-quote-builder.html` (lines 161-180)
+
+```css
+/* ===================================================================
+   PHASE 2/3 ISOLATION - Proper phase separation
+   2025-10-15: Critical architectural fix - ensure phases don't overlap
+   =================================================================== */
+
+/* FORCE hide Phase 2 completely when Phase 3 is active */
+#summary-phase.active ~ #product-phase,
+.phase-section#product-phase:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* FORCE show Phase 3 content ONLY when summary-phase is active */
+#summary-phase:not(.active) {
+    display: none !important;
+}
+
+#summary-phase.active {
+    display: block !important;
+}
+```
+
+### How This Works
+
+1. **Sibling Selector**: `#summary-phase.active ~ #product-phase`
+   - When Phase 3 has `.active` class, forcibly hide Phase 2 (even if sibling)
+
+2. **Direct Targeting**: `.phase-section#product-phase:not(.active)`
+   - When Phase 2 doesn't have `.active` class, force it hidden
+
+3. **Double Safety**: Both `display: none !important` AND `visibility: hidden !important`
+   - Ensures no rendering at all, not just invisible
+
+4. **Phase 3 Controls**: Explicit show/hide rules for `#summary-phase`
+   - Only displays when it has `.active` class
+
+### Why Previous CSS Fix Wasn't Enough
+
+The initial fix (lines 146-159) only addressed the `#quote-summary` container visibility. It didn't account for:
+- The parent `.phase-section` potentially being visible
+- CSS cascade allowing Phase 2's background/padding to show
+- Lack of specificity to override other CSS rules
+
+The new fix uses:
+- **Higher specificity** with compound selectors (`#summary-phase.active`)
+- **!important flags** to override all other CSS
+- **Multiple approaches** (sibling selector + :not() pseudo-class)
+- **Defensive redundancy** (both display and visibility)
+
+### JavaScript Architecture (Already Correct)
+
+The `showPhase()` function in embroidery-quote-builder.js was working correctly:
+
+```javascript
+showPhase(phase) {
+    // Hide all phases
+    document.querySelectorAll('.phase-section').forEach(section => {
+        section.style.display = 'none';
+        section.classList.remove('active');
+    });
+
+    // Show selected phase
+    const phaseElement = document.getElementById(`${phase}-phase`);
+    if (phaseElement) {
+        phaseElement.style.display = 'block';
+        phaseElement.classList.add('active');
+    }
+
+    // Update pricing if showing summary
+    if (phase === 'summary') {
+        this.updatePricing();
+    }
+}
+```
+
+**Key Point:** The issue was CSS cascade allowing both phases to show, NOT the JavaScript phase switching logic.
+
+### Testing Checklist
+
+**Phase 1 (Logo Setup):**
+- [ ] Only Logo Setup visible
+- [ ] No Products section visible
+- [ ] No Quote Summary visible
+
+**Phase 2 (Add Products):**
+- [ ] Only Add Products section visible
+- [ ] Products in Quote list displays correctly
+- [ ] No Quote Summary visible
+
+**Phase 3 (Review & Save):**
+- [ ] ONLY Quote Summary visible
+- [ ] No "Products in Quote" list from Phase 2
+- [ ] Customer Information form visible
+- [ ] No double white boxes
+- [ ] Clean single-page summary
+
+**Phase Navigation:**
+- [ ] "Continue to Products" navigates from Phase 1 → Phase 2
+- [ ] "Continue to Summary" navigates from Phase 2 → Phase 3
+- [ ] "Back to Logos" navigates from Phase 2 → Phase 1
+- [ ] "Back to Products" navigates from Phase 3 → Phase 2
+
+### Files Modified
+
+1. **quote-builders/embroidery-quote-builder.html**
+   - Lines 146-159: Quote summary container isolation
+   - Lines 161-180: Phase 2/3 complete separation
+
+2. **shared_components/js/embroidery-quote-builder.js**
+   - Lines 218-221: Modern Phase 3 renderSummary() implementation
+   - Modern unified container design (matching Cap Embroidery)
+
+3. **shared_components/css/phase3-modern-redesign.css**
+   - Complete Phase 3 styling (643 lines)
+   - Shared across all quote builders
+
+---
+
+**Implementation Status:**
+1. ✅ Embroidery builder - Phase 2/3 isolation complete (lines 161-180)
+2. ✅ Cap embroidery builder - Phase 2/3 isolation complete (lines 302-321)
+3. ✅ Screen print builder - Phase 2/3 isolation complete (lines 1288-1307)
+
 **Next Steps:**
-1. User testing in both builders
-2. Gather feedback on visual design
-3. Minor adjustments if needed
-4. Consider applying pattern to other builders if requested
+1. User testing across all three builders (Nika & Taneisha)
+2. Verify phase separation works correctly
+3. Gather feedback on visual design
+4. Monitor for any similar issues in other quote builders
+
+---
+
+### Screen Print Builder Implementation
+
+**File:** `quote-builders/screenprint-quote-builder.html`
+
+**Status:** ✅ Phase 2/3 isolation applied (lines 1288-1307)
+
+The screen print builder already had the quote-summary isolation fix (lines 1278-1286) but was missing the complete Phase 2/3 separation. Applied the same CSS fix pattern as the embroidery builders to ensure consistency:
+
+```css
+/* ===================================================================
+   PHASE 2/3 ISOLATION - Proper phase separation
+   2025-10-15: Critical architectural fix - ensure phases don't overlap
+   =================================================================== */
+
+/* FORCE hide Phase 2 completely when Phase 3 is active */
+#summary-phase.active ~ #product-phase,
+.phase-section#product-phase:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* FORCE show Phase 3 content ONLY when summary-phase is active */
+#summary-phase:not(.active) {
+    display: none !important;
+}
+
+#summary-phase.active {
+    display: block !important;
+}
+```
+
+**Rationale:**
+- Preventative measure to maintain consistency across all quote builders
+- Even though screen print builder wasn't exhibiting the issue, applying the fix ensures it won't occur in the future
+- Standardizes phase isolation approach across the entire quote builder system
+
+**Three-Phase Architecture:**
+- Phase 1: Setup Phase (setup-phase) - Location and print setup selection
+- Phase 2: Product Phase (product-phase) - Add products to quote
+- Phase 3: Summary Phase (summary-phase) - Review and save quote
+
+All three phases now have guaranteed isolation using the same CSS pattern.

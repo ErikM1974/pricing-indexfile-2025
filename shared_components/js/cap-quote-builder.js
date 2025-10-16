@@ -128,30 +128,39 @@ class CapQuoteBuilder {
      */
     goToPhase(phase) {
         console.log('[CapQuoteBuilder] Navigating to phase:', phase);
-        
-        // Hide all phases
+
+        // Remove active class from all phases (CSS will handle hiding)
         document.querySelectorAll('.phase-section').forEach(section => {
-            section.style.display = 'none';
+            section.classList.remove('active');
         });
-        
+
         // Remove active class from all nav steps
         document.querySelectorAll('.phase-step').forEach(step => {
             step.classList.remove('active');
         });
-        
-        // Show target phase
+
+        // Add active class to target phase (CSS will handle showing)
         const targetPhase = document.getElementById(`${this.getPhaseId(phase)}-phase`);
         if (targetPhase) {
-            targetPhase.style.display = 'block';
+            targetPhase.classList.add('active');
         }
-        
+
         // Activate nav step
         const navStep = document.getElementById(`phase-${phase}-nav`);
         if (navStep) {
             navStep.classList.add('active');
         }
-        
+
         this.currentPhase = phase;
+
+        // Dispatch phase change event for the quote indicator
+        document.dispatchEvent(new CustomEvent('phaseChanged', {
+            detail: {
+                phase: phase,
+                phaseId: this.getPhaseId(phase),
+                source: 'CapQuoteBuilder'
+            }
+        }));
     }
     
     /**

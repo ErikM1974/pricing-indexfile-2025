@@ -285,18 +285,33 @@
     }
 
     /* ===================================================================
-       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
-       2025-10-15: Prevents "everything on one page" issue
+       SIMPLIFIED PHASE VISIBILITY - Fixed 2025-12-16
+       Removed overly complex rules causing "two pages" display issue
        =================================================================== */
 
-    /* HIDE the entire quote-summary container when not in Phase 3 */
-    #product-phase #quote-summary {
-        display: none !important;
+    /* Simple phase visibility control */
+    .phase-section {
+        display: none;
     }
 
-    /* ONLY show quote-summary when in summary-phase */
-    #summary-phase #quote-summary {
-        display: block !important;
+    .phase-section.active {
+        display: block;
+    }
+
+    /* Simple fade animation for phase transitions */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .phase-section.active {
+        animation: fadeIn 0.3s ease-in-out;
     }
     </style>
     
@@ -329,6 +344,9 @@
     <!-- Toast Notifications (2025-10-15) - Modern user feedback -->
     <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=20251015">
     <script src="/shared_components/js/toast-notifications.js?v=20251015"></script>
+
+    <!-- Quote Indicator Widget (2025-10-15) - Persistent quote summary display -->
+    <link rel="stylesheet" href="/shared_components/css/quote-indicator-widget.css?v=20251015">
 
     <!-- Modern Product Cards (2025-10-15 Phase 2) - Compact vertical card design -->
     <link rel="stylesheet" href="/shared_components/css/product-cards-modern.css?v=20251015">
@@ -915,6 +933,9 @@
     <script src="/shared_components/js/cap-quote-products.js"></script>
     <script src="/shared_components/js/cap-quote-pricing.js"></script>
     <script src="/shared_components/js/cap-quote-builder.js"></script>
+
+    <!-- Quote Indicator Widget Manager -->
+    <script src="/shared_components/js/quote-indicator-manager.js?v=20251015"></script>
     
     <script>
         // Initialize the cap quote builder when DOM is ready
@@ -938,6 +959,41 @@
             try {
                 window.capQuoteBuilder = new CapQuoteBuilder();
                 console.log('✅ Cap Quote Builder initialized successfully');
+
+                // Initialize the persistent quote indicator widget
+                if (window.QuoteIndicatorManager) {
+                    // Wait a moment for capQuoteBuilder to be fully initialized
+                    setTimeout(() => {
+                        if (window.capQuoteBuilder && window.capQuoteBuilder.productManager) {
+                            window.quoteIndicator = new QuoteIndicatorManager(window.capQuoteBuilder.productManager);
+                            console.log('✅ Quote Indicator Widget initialized with product manager');
+
+                            // Force widget to be visible and expanded initially
+                            if (window.quoteIndicator) {
+                                // Force update even if no products yet
+                                window.quoteIndicator.updateIndicator();
+
+                                // Make sure widget is visible and expanded
+                                if (window.quoteIndicator.widget) {
+                                    // Force expanded state on initial load
+                                    window.quoteIndicator.isCollapsed = false;
+                                    window.quoteIndicator.widget.classList.remove('collapsed');
+
+                                    // Add a temporary "demo" class to make it visible for testing
+                                    window.quoteIndicator.widget.classList.add('has-products');
+
+                                    console.log('🎯 Widget forced to be visible and expanded');
+                                    console.log('Widget element:', window.quoteIndicator.widget);
+                                    console.log('Widget classes:', window.quoteIndicator.widget.className);
+                                }
+                            }
+                        } else {
+                            console.warn('⚠️ Quote Indicator Widget not initialized - capQuoteBuilder.productManager not available');
+                        }
+                    }, 100);
+                } else {
+                    console.warn('⚠️ QuoteIndicatorManager not loaded');
+                }
             } catch (error) {
                 console.error('[CapQuoteBuilder] Initialization failed:', error);
                 showErrorBanner('QUOTE BUILDER FAILED TO INITIALIZE - Please refresh the page');
@@ -1518,7 +1574,7 @@
             if (backToProductsBtn) {
                 backToProductsBtn.addEventListener('click', function() {
                     document.getElementById('summary-phase').style.display = 'none';
-                    document.getElementById('logo-configuration-phase').style.display = 'block';
+                    document.getElementById('product-phase').style.display = 'block';
                 });
             }
 
