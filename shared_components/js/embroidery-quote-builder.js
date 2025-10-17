@@ -10,18 +10,31 @@ class EmbroideryQuoteBuilder {
         this.productLineManager = new ProductLineManager();
         this.pricingCalculator = new EmbroideryPricingCalculator();
         this.quoteService = new EmbroideryQuoteService();
-        
+
         // Make product manager globally accessible for UI callbacks
         window.productLineManager = this.productLineManager;
-        
+
         // Current state
         this.currentPhase = 'logo';
         this.currentPricing = null;
-        
+
         this.initializeUI();
         this.bindEvents();
-        
+
         console.log('[EmbroideryQuoteBuilder] Initialized successfully');
+    }
+
+    /**
+     * Initialize async components (call after constructor)
+     */
+    async init() {
+        console.log('[EmbroideryQuoteBuilder] Starting async initialization...');
+
+        // Initialize logo manager (fetches API configuration)
+        await this.logoManager.init();
+
+        console.log('[EmbroideryQuoteBuilder] Async initialization complete');
+        return this;
     }
     
     /**

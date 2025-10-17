@@ -39,10 +39,13 @@
     <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
 
     <!-- CAP EMBROIDERY MODERN CSS (DTG-inspired comprehensive styles - 2025-10-16 refactor) -->
-    <link rel="stylesheet" href="/shared_components/css/cap-embroidery-quote-builder-modern.css?v=20251016-fixed">
+    <link rel="stylesheet" href="/shared_components/css/cap-embroidery-quote-builder-modern.css?v=20251017">
 
     <!-- CRITICAL VISUAL FIXES (2025-10-16) - Giant circle removal, gentle centering, grid/layout fixes, toggle fix -->
     <link rel="stylesheet" href="/shared_components/css/embroidery-critical-fixes.css?v=20251016i">
+
+    <!-- STEP 2 UNIFIED CSS (2025-10-17) - High-specificity Step 2 styles override page CSS - LOADED LAST to win cascade -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-step2-unified.css?v=20251017-grid-fix">
 
     <!-- Toast Notifications (2025-10-15) - Modern user feedback -->
     <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=20251015">
@@ -313,10 +316,6 @@
                                autocomplete="off">
                         <div id="style-suggestions" class="qb-suggestions-dropdown"></div>
                     </div>
-                    <button id="load-product-btn" class="qb-btn-primary" disabled>
-                        <i class="fas fa-arrow-right"></i>
-                        <span>Load Cap</span>
-                    </button>
                 </div>
 
                 <!-- Hidden color dropdown (for functionality only - swatches shown below) -->
@@ -359,29 +358,13 @@
                         <i class="fas fa-plus"></i> Add to Quote
                     </button>
                 </div>
-            </div>
-            
+
             <!-- Products List with Modern Empty State -->
             <div id="products-list" class="products-list">
                 <h3>Caps in Quote</h3>
                 <div id="products-container" class="qb-products-container">
-                    <!-- Modern Empty State -->
-                    <div class="qb-empty-state" id="qb-empty-products">
-                        <svg class="qb-empty-icon" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="60" cy="60" r="50" fill="#e5e7eb"/>
-                            <path d="M40 50 L60 35 L80 50 L80 85 L40 85 Z" fill="#d1d5db"/>
-                            <rect x="50" y="60" width="20" height="25" fill="#9ca3af"/>
-                            <circle cx="60" cy="70" r="2" fill="#6b7280"/>
-                        </svg>
-                        <h4 class="qb-empty-title">No Caps Yet</h4>
-                        <p class="qb-empty-description">
-                            Search for a style number above to add your first cap to this quote
-                        </p>
-                        <button class="qb-empty-action" onclick="document.getElementById('style-search').focus()">
-                            <i class="fas fa-search"></i>
-                            <span>Start Searching</span>
-                        </button>
-                    </div>
+                    <!-- Simple Empty State (DTG Pattern) -->
+                    <p class="empty-message">No products added yet</p>
                 </div>
                 <div class="aggregate-total">
                     <strong>Total Pieces Across All Caps:</strong>
@@ -588,24 +571,9 @@
                             window.quoteIndicator = new QuoteIndicatorManager(window.capQuoteBuilder.productManager);
                             console.log('✅ Quote Indicator Widget initialized with product manager');
 
-                            // Force widget to be visible and expanded initially
+                            // Update the widget indicator
                             if (window.quoteIndicator) {
-                                // Force update even if no products yet
                                 window.quoteIndicator.updateIndicator();
-
-                                // Make sure widget is visible and expanded
-                                if (window.quoteIndicator.widget) {
-                                    // Force expanded state on initial load
-                                    window.quoteIndicator.isCollapsed = false;
-                                    window.quoteIndicator.widget.classList.remove('collapsed');
-
-                                    // Add a temporary "demo" class to make it visible for testing
-                                    window.quoteIndicator.widget.classList.add('has-products');
-
-                                    console.log('🎯 Widget forced to be visible and expanded');
-                                    console.log('Widget element:', window.quoteIndicator.widget);
-                                    console.log('Widget classes:', window.quoteIndicator.widget.className);
-                                }
                             }
                         } else {
                             console.warn('⚠️ Quote Indicator Widget not initialized - capQuoteBuilder.productManager not available');

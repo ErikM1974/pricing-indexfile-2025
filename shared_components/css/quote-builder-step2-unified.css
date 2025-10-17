@@ -1,0 +1,790 @@
+/**
+ * Unified Quote Builder Step 2 Styles (2025-10-17)
+ *
+ * Purpose: HIGH-SPECIFICITY styles for Step 2 (Add Products) across ALL quote builders
+ * Used by: embroidery-quote-builder.html, cap-embroidery-quote-builder.html
+ *
+ * Architecture Decision:
+ * - Uses high-specificity selectors to override page-specific CSS
+ * - Loaded AFTER page-specific modern CSS to win cascade
+ * - Strategic !important only for critical visual fixes
+ * - Single source of truth for Step 2 product selection UI
+ */
+
+/* ============================================================================
+   DESIGN TOKENS
+   ============================================================================ */
+
+:root {
+    /* Spacing */
+    --step2-space-xs: 8px;
+    --step2-space-sm: 12px;
+    --step2-space-md: 16px;
+    --step2-space-lg: 24px;
+    --step2-space-xl: 32px;
+
+    /* Colors */
+    --step2-primary: #3a7c52;
+    --step2-primary-light: #4a9d68;
+    --step2-success: #10b981;
+    --step2-success-light: #d1fae5;
+
+    /* Neutrals */
+    --step2-gray-50: #f9fafb;
+    --step2-gray-100: #f3f4f6;
+    --step2-gray-200: #e5e7eb;
+    --step2-gray-300: #d1d5db;
+    --step2-gray-600: #4b5563;
+    --step2-gray-900: #111827;
+
+    /* Shadows */
+    --step2-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --step2-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --step2-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    /* Border Radius */
+    --step2-radius-sm: 6px;
+    --step2-radius-md: 12px;
+    --step2-radius-lg: 16px;
+
+    /* Transitions */
+    --step2-transition: 250ms ease;
+}
+
+/* ============================================================================
+   SEARCH SECTION - "Find Your Product/Cap"
+   ============================================================================ */
+
+#product-phase .qb-search-hero,
+#product-phase .product-search-section {
+    background: white !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-xl) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+    margin-bottom: var(--step2-space-xl) !important;
+}
+
+#product-phase .qb-search-title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-900) !important;
+    margin-bottom: var(--step2-space-sm) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step2-space-sm) !important;
+}
+
+#product-phase .qb-search-subtitle {
+    color: var(--step2-gray-600) !important;
+    font-size: 14px !important;
+    margin-bottom: var(--step2-space-lg) !important;
+}
+
+/* Search Input Row */
+#product-phase .qb-search-row,
+#product-phase .qb-input-group {
+    display: flex !important;
+    gap: var(--step2-space-md) !important;
+    align-items: flex-start !important;
+}
+
+#product-phase .qb-search-input-wrapper,
+#product-phase .qb-input-wrapper {
+    flex: 1 !important;
+    position: relative !important;
+}
+
+/* Search icon positioning */
+#product-phase .qb-input-icon {
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--step2-gray-400) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+
+/* Search Input - ALL VARIANTS */
+#product-phase .qb-search-input,
+#product-phase .qb-input,
+#product-phase #style-search {
+    width: 100% !important;
+    padding: 14px 16px 14px 44px !important; /* Left padding for icon */
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-md) !important;
+    font-size: 16px !important;
+    transition: all var(--step2-transition) !important;
+    background: white !important;
+}
+
+#product-phase .qb-search-input:focus,
+#product-phase .qb-input:focus,
+#product-phase #style-search:focus {
+    outline: none !important;
+    border-color: var(--step2-primary) !important;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1) !important;
+}
+
+/* Autocomplete Suggestions Dropdown */
+#product-phase .qb-suggestions-dropdown,
+#product-phase #style-suggestions {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-md) !important;
+    box-shadow: var(--step2-shadow-lg) !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    z-index: 100 !important;
+}
+
+#product-phase .suggestion-item,
+#product-phase .qb-suggestion-item {
+    padding: 12px 16px !important;
+    cursor: pointer !important;
+    transition: background var(--step2-transition) !important;
+    border-bottom: 1px solid var(--step2-gray-100) !important;
+}
+
+#product-phase .suggestion-item:hover,
+#product-phase .qb-suggestion-item:hover {
+    background: var(--step2-gray-50) !important;
+}
+
+#product-phase .suggestion-item:last-child,
+#product-phase .qb-suggestion-item:last-child {
+    border-bottom: none !important;
+}
+
+/* LOAD PRODUCT BUTTON - CRITICAL FIX */
+#product-phase .qb-search-btn,
+#product-phase .qb-btn-primary,
+#product-phase #load-product-btn,
+#product-phase button[id*="load"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 14px 28px !important;
+    background: var(--step2-primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--step2-radius-md) !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all var(--step2-transition) !important;
+    white-space: nowrap !important;
+    box-shadow: var(--step2-shadow-sm) !important;
+}
+
+#product-phase .qb-search-btn:hover:not(:disabled),
+#product-phase .qb-btn-primary:hover:not(:disabled),
+#product-phase #load-product-btn:hover:not(:disabled),
+#product-phase button[id*="load"]:hover:not(:disabled) {
+    background: var(--step2-primary-light) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+}
+
+#product-phase .qb-search-btn:disabled,
+#product-phase .qb-btn-primary:disabled,
+#product-phase #load-product-btn:disabled,
+#product-phase button[id*="load"]:disabled {
+    background: var(--step2-gray-300) !important;
+    color: var(--step2-gray-600) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    opacity: 0.6 !important;
+    box-shadow: none !important;
+}
+
+/* Button icon spacing */
+#product-phase .qb-search-btn i,
+#product-phase .qb-btn-primary i,
+#product-phase #load-product-btn i {
+    font-size: 14px !important;
+}
+
+/* ============================================================================
+   COLOR SWATCHES - CRITICAL FIX
+   ============================================================================ */
+
+/* Force horizontal grid layout for color swatches */
+#product-phase .qb-swatches-section,
+#product-phase #qb-swatches-section,
+#product-phase .color-swatches-container {
+    display: block !important;
+    background: white !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-lg) !important;
+    margin-bottom: var(--step2-space-lg) !important;
+    box-shadow: var(--step2-shadow-sm) !important;
+}
+
+#product-phase .qb-swatches-label {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-900) !important;
+    margin-bottom: var(--step2-space-md) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step2-space-sm) !important;
+}
+
+/* THE CRITICAL FIX: Force grid layout for swatches container */
+/* 🎯 UX IMPROVEMENT (2025-10-17): Bigger swatches for better tap targets */
+#product-phase .qb-swatch-grid,
+#product-phase #color-swatches-container,
+#product-phase .color-swatches-container .row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; /* 70px → 100px (43% bigger) */
+    gap: 20px !important; /* 16px → 20px (more breathing room) */
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Individual color swatch */
+#product-phase .qb-swatch,
+#product-phase .color-swatch {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    padding: 12px !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-md) !important;
+    transition: all var(--step2-transition) !important;
+    background: white !important;
+    text-align: center !important;
+}
+
+#product-phase .qb-swatch:hover,
+#product-phase .color-swatch:hover {
+    border-color: var(--step2-primary) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+}
+
+#product-phase .qb-swatch.selected,
+#product-phase .color-swatch.selected {
+    border-color: var(--step2-primary) !important;
+    background: rgba(58, 124, 82, 0.05) !important;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.15) !important;
+}
+
+#product-phase .qb-swatch-color,
+#product-phase .color-swatch-preview {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: var(--step2-radius-sm) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    flex-shrink: 0 !important;
+}
+
+#product-phase .qb-swatch-name,
+#product-phase .color-swatch-name {
+    font-size: 12px !important;
+    color: var(--step2-gray-600) !important;
+    font-weight: 500 !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+}
+
+/* ============================================================================
+   SHOW MORE COLORS BUTTON (2025-10-17)
+   ============================================================================ */
+
+/* Show More Button - Professional Full-Width Design (2025-10-17 Refinement) */
+/* CRITICAL: High-specificity selectors to override grid parent */
+#product-phase .qb-show-more-btn,
+#product-phase #show-more-colors-btn,
+#product-phase .qb-swatch-grid .qb-show-more-btn,
+#product-phase .qb-swatch-grid #show-more-colors-btn,
+#product-phase #color-swatches-container .qb-show-more-btn,
+#product-phase #color-swatches-container #show-more-colors-btn {
+    /* Break out of grid layout */
+    grid-column: 1 / -1 !important;  /* Span all grid columns */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 14px 20px !important;
+    margin-top: 24px !important;
+
+    /* Subtle neutral background instead of transparent */
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: var(--step2-radius-md) !important;
+
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all var(--step2-transition) !important;
+}
+
+#product-phase .qb-show-more-btn:hover,
+#product-phase #show-more-colors-btn:hover,
+#product-phase .qb-swatch-grid .qb-show-more-btn:hover,
+#product-phase .qb-swatch-grid #show-more-colors-btn:hover,
+#product-phase #color-swatches-container .qb-show-more-btn:hover,
+#product-phase #color-swatches-container #show-more-colors-btn:hover {
+    background: #e9ecef !important;
+    border-color: #adb5bd !important;
+}
+
+/* Expanded state with blue accent to indicate active */
+#product-phase .qb-show-more-btn.expanded,
+#product-phase #show-more-colors-btn.expanded,
+#product-phase .qb-swatch-grid .qb-show-more-btn.expanded,
+#product-phase .qb-swatch-grid #show-more-colors-btn.expanded,
+#product-phase #color-swatches-container .qb-show-more-btn.expanded,
+#product-phase #color-swatches-container #show-more-colors-btn.expanded {
+    background: #e7f5ff !important;
+    border-color: #74c0fc !important;
+    color: #1971c2 !important;
+}
+
+#product-phase .qb-show-more-btn .toggle-icon,
+#product-phase #show-more-colors-btn .toggle-icon,
+#product-phase .qb-swatch-grid .qb-show-more-btn .toggle-icon,
+#product-phase .qb-swatch-grid #show-more-colors-btn .toggle-icon,
+#product-phase #color-swatches-container .qb-show-more-btn .toggle-icon,
+#product-phase #color-swatches-container #show-more-colors-btn .toggle-icon {
+    transition: transform var(--step2-transition) !important;
+}
+
+#product-phase .qb-show-more-btn.expanded .toggle-icon,
+#product-phase #show-more-colors-btn.expanded .toggle-icon,
+#product-phase .qb-swatch-grid .qb-show-more-btn.expanded .toggle-icon,
+#product-phase .qb-swatch-grid #show-more-colors-btn.expanded .toggle-icon,
+#product-phase #color-swatches-container .qb-show-more-btn.expanded .toggle-icon,
+#product-phase #color-swatches-container #show-more-colors-btn.expanded .toggle-icon {
+    transform: rotate(180deg) !important;
+}
+
+/* 🎯 NEW APPROACH (2025-10-17): Simplified "Show More" with class-based hiding */
+/* Individual swatches that are initially hidden (colors 13+) */
+#product-phase .color-swatch.initially-hidden {
+    display: none !important;
+}
+
+/* Show hidden swatches when "Show More" is clicked */
+#product-phase.show-more-active .color-swatch.initially-hidden {
+    display: flex !important;
+    animation: fadeInSwatch 0.3s ease-out !important;
+}
+
+@keyframes fadeInSwatch {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* OLD APPROACH (deprecated but kept for compatibility) */
+/* Hidden swatches container (wrapper div approach - no longer used) */
+#product-phase .qb-swatch-grid-hidden,
+#product-phase #hidden-swatches {
+    display: none !important;
+}
+
+#product-phase .qb-swatch-grid-hidden.expanded,
+#product-phase #hidden-swatches.expanded {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 20px !important;
+    margin-top: 20px !important;
+    animation: slideDown 0.3s ease-out !important;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 2000px;
+    }
+}
+
+/* ============================================================================
+   PRODUCT DISPLAY SECTION
+   ============================================================================ */
+
+#product-phase .product-display,
+#product-phase #product-display {
+    background: white !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-xl) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+    margin-top: var(--step2-space-xl) !important;
+}
+
+/* Product Info Row - Image + Details */
+#product-phase .product-info {
+    display: flex !important;
+    gap: var(--step2-space-xl) !important;
+    margin-bottom: var(--step2-space-xl) !important;
+    align-items: flex-start !important;
+}
+
+/* CRITICAL FIX: Constrain product image size */
+#product-phase .product-info img,
+#product-phase #product-image,
+#product-phase .product-image {
+    width: auto !important;
+    max-width: 300px !important;
+    max-height: 400px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: var(--step2-radius-md) !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    background: var(--step2-gray-50) !important;
+    padding: var(--step2-space-md) !important;
+    flex-shrink: 0 !important;
+}
+
+#product-phase .product-details {
+    flex: 1 !important;
+}
+
+#product-phase .product-details h3,
+#product-phase #product-name {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: var(--step2-gray-900) !important;
+    margin-bottom: var(--step2-space-sm) !important;
+}
+
+#product-phase .product-details p,
+#product-phase #product-description {
+    font-size: 14px !important;
+    color: var(--step2-gray-600) !important;
+    line-height: 1.6 !important;
+}
+
+/* ============================================================================
+   SIZE INPUTS - MODERN GRID LAYOUT
+   ============================================================================ */
+
+#product-phase .size-matrix {
+    margin-top: var(--step2-space-lg) !important;
+}
+
+#product-phase .size-matrix h4 {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-900) !important;
+    margin-bottom: var(--step2-space-md) !important;
+}
+
+/* Size inputs grid - responsive columns */
+#product-phase .size-inputs,
+#product-phase #size-inputs {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+    gap: var(--step2-space-md) !important;
+    margin-bottom: var(--step2-space-lg) !important;
+}
+
+/* Individual size input card */
+#product-phase .size-input-group {
+    background: white !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-md) !important;
+    padding: var(--step2-space-md) !important;
+    transition: all var(--step2-transition) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--step2-space-sm) !important;
+    min-height: 100px !important;
+    justify-content: space-between !important;
+}
+
+#product-phase .size-input-group:hover {
+    border-color: var(--step2-gray-300) !important;
+    box-shadow: var(--step2-shadow-sm) !important;
+}
+
+#product-phase .size-input-label,
+#product-phase .size-label {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: var(--step2-gray-900) !important;
+    text-align: center !important;
+}
+
+#product-phase .size-input,
+#product-phase .size-input-group input[type="number"] {
+    width: 100% !important;
+    padding: 10px !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-sm) !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    transition: all var(--step2-transition) !important;
+    background: var(--step2-gray-50) !important;
+}
+
+#product-phase .size-input:focus,
+#product-phase .size-input-group input[type="number"]:focus {
+    outline: none !important;
+    border-color: var(--step2-primary) !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1) !important;
+}
+
+/* CRITICAL: Green highlight when input has value */
+#product-phase .size-input:not(:placeholder-shown),
+#product-phase .size-input-group input:not(:placeholder-shown),
+#product-phase .size-input[value]:not([value=""]),
+#product-phase .size-input-group input[value]:not([value=""]) {
+    background: #ecfdf5 !important;
+    border-color: var(--step2-success) !important;
+    color: #065f46 !important;
+    font-weight: 800 !important;
+}
+
+/* Highlight parent card when input has value */
+#product-phase .size-input-group:has(input:not(:placeholder-shown)),
+#product-phase .size-input-group:has(input[value]:not([value=""])) {
+    border-color: var(--step2-success) !important;
+    background: #f0fdf4 !important;
+    box-shadow: 0 0 0 2px var(--step2-success-light) !important;
+}
+
+/* Total row */
+#product-phase .total-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: var(--step2-space-md) var(--step2-space-lg) !important;
+    background: var(--step2-gray-50) !important;
+    border-radius: var(--step2-radius-md) !important;
+    margin-top: var(--step2-space-md) !important;
+    border: 2px solid var(--step2-gray-200) !important;
+}
+
+#product-phase .total-row strong {
+    font-size: 16px !important;
+    color: var(--step2-gray-900) !important;
+}
+
+#product-phase .total-row span,
+#product-phase #product-total-qty {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--step2-primary) !important;
+}
+
+/* ============================================================================
+   ADD TO QUOTE BUTTON
+   ============================================================================ */
+
+#product-phase .qb-add-product-btn,
+#product-phase #add-to-quote-btn {
+    width: 100% !important;
+    padding: 16px 32px !important;
+    background: var(--step2-primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--step2-radius-md) !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all var(--step2-transition) !important;
+    margin-top: var(--step2-space-lg) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+}
+
+#product-phase .qb-add-product-btn:hover,
+#product-phase #add-to-quote-btn:hover {
+    background: var(--step2-primary-light) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--step2-shadow-lg) !important;
+}
+
+#product-phase .qb-add-product-btn:disabled,
+#product-phase #add-to-quote-btn:disabled {
+    background: var(--step2-gray-300) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ============================================================================
+   PRODUCTS IN QUOTE SECTION
+   ============================================================================ */
+
+#product-phase .qb-products-section,
+#product-phase #products-in-quote {
+    background: white !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-xl) !important;
+    box-shadow: var(--step2-shadow-md) !important;
+    margin-top: var(--step2-space-xl) !important;
+}
+
+#product-phase .qb-products-title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-900) !important;
+    margin-bottom: var(--step2-space-lg) !important;
+}
+
+#product-phase .qb-product-card {
+    background: var(--step2-gray-50) !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-md) !important;
+    padding: var(--step2-space-lg) !important;
+    margin-bottom: var(--step2-space-md) !important;
+    transition: all var(--step2-transition) !important;
+}
+
+#product-phase .qb-product-card:hover {
+    border-color: var(--step2-gray-300) !important;
+    box-shadow: var(--step2-shadow-sm) !important;
+}
+
+/* ============================================================================
+   AGGREGATE TOTAL DISPLAY
+   ============================================================================ */
+
+#product-phase .qb-aggregate-total {
+    background: linear-gradient(135deg, var(--step2-primary), var(--step2-primary-light)) !important;
+    color: white !important;
+    padding: var(--step2-space-xl) !important;
+    border-radius: var(--step2-radius-lg) !important;
+    box-shadow: var(--step2-shadow-lg) !important;
+    margin-top: var(--step2-space-xl) !important;
+    text-align: center !important;
+}
+
+#product-phase .qb-aggregate-total h3 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    opacity: 0.9 !important;
+    margin-bottom: var(--step2-space-sm) !important;
+}
+
+#product-phase .qb-aggregate-total .total-amount {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    /* Stack product info vertically on mobile */
+    #product-phase .product-info {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    #product-phase .product-info img,
+    #product-phase #product-image,
+    #product-phase .product-image {
+        max-width: 100% !important;
+        max-height: 350px !important;
+    }
+
+    /* Adjust size inputs for mobile - 4 columns */
+    #product-phase .size-inputs,
+    #product-phase #size-inputs {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--step2-space-sm) !important;
+    }
+
+    /* Fewer swatch columns on mobile - keep bigger size */
+    #product-phase .qb-swatch-grid,
+    #product-phase #color-swatches-container,
+    #product-phase .qb-swatch-grid-hidden.expanded,
+    #product-phase #hidden-swatches.expanded {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important; /* Slightly smaller on mobile but still bigger than before */
+        gap: 16px !important;
+    }
+
+    /* Stack search row vertically */
+    #product-phase .qb-search-row {
+        flex-direction: column !important;
+    }
+
+    #product-phase .qb-search-btn {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 3 columns for sizes on very small screens */
+    #product-phase .size-inputs,
+    #product-phase #size-inputs {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    /* Smaller swatches on tiny screens but still bigger than before */
+    #product-phase .qb-swatch-grid,
+    #product-phase #color-swatches-container,
+    #product-phase .qb-swatch-grid-hidden.expanded,
+    #product-phase #hidden-swatches.expanded {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important; /* Was 50px, now 80px */
+        gap: 12px !important;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+#product-phase .qb-hidden {
+    display: none !important;
+}
+
+#product-phase .qb-fade-in {
+    animation: qbFadeIn var(--step2-transition) ease-out !important;
+}
+
+@keyframes qbFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus visible for accessibility */
+#product-phase *:focus-visible {
+    outline: 2px solid var(--step2-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    #product-phase * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

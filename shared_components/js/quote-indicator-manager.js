@@ -47,6 +47,12 @@ class QuoteIndicatorManager {
         // Initial update
         this.updateIndicator();
 
+        // Hide widget initially until Phase 2
+        if (this.widget) {
+            this.widget.style.display = 'none';
+            this.widget.style.visibility = 'hidden';
+        }
+
         this.isInitialized = true;
 
         console.log('[QuoteIndicator] Initialized with productManager:', this.productManager);
@@ -376,15 +382,22 @@ class QuoteIndicatorManager {
      * Handle phase changes
      */
     handlePhaseChange(phase) {
-        // Widget should only be visible in Phase 2, hide in Phase 3 (Summary)
-        if (phase === 'summary-phase' || phase === 3) {
-            // Hide widget completely in summary phase to avoid duplication
+        // Phase 1 (Logo Setup): Hide widget completely
+        if (phase === 'logo-phase' || phase === 1) {
             if (this.widget) {
                 this.widget.style.display = 'none';
                 this.widget.style.visibility = 'hidden';
             }
-        } else if (phase === 'product-phase' || phase === 2) {
-            // Show widget in product phase if it has products
+        }
+        // Phase 3 (Review & Save): Hide widget completely to avoid duplication
+        else if (phase === 'summary-phase' || phase === 3) {
+            if (this.widget) {
+                this.widget.style.display = 'none';
+                this.widget.style.visibility = 'hidden';
+            }
+        }
+        // Phase 2 (Add Products): Show widget ONLY if products exist
+        else if (phase === 'product-phase' || phase === 2) {
             if (this.widget && this.productManager && this.productManager.products && this.productManager.products.length > 0) {
                 this.widget.style.display = '';
                 this.widget.style.visibility = '';

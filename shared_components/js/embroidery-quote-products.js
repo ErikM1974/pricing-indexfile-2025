@@ -60,13 +60,10 @@ class ProductLineManager {
         if (colorSelect) {
             colorSelect.addEventListener('change', (e) => this.handleColorChange(e.target.value));
         }
-        
-        // Load product button
-        const loadBtn = document.getElementById('load-product-btn');
-        if (loadBtn) {
-            loadBtn.addEventListener('click', () => this.loadProduct());
-        }
-        
+
+        // Load Product button removed (2025-10-17) - Auto-load on color selection now
+        // Button was removed from HTML, functionality moved to handleColorChange()
+
         // Add to quote button
         const addBtn = document.getElementById('add-to-quote-btn');
         if (addBtn) {
@@ -240,9 +237,8 @@ class ProductLineManager {
                     colorSelect.disabled = true;
                 }
 
-                const loadBtn = document.getElementById('load-product-btn');
-                loadBtn.disabled = false;
-                console.log('[ProductLineManager] Load Product button enabled');
+                // Load Product button removed (2025-10-17) - Auto-load on color selection now
+                console.log('[ProductLineManager] Product details loaded, ready for color selection');
             } else {
                 console.error('[ProductLineManager] No product data returned');
             }
@@ -294,20 +290,21 @@ class ProductLineManager {
                 return;
             }
 
-            // Build swatch HTML
-            const swatchesHTML = swatches.map(swatch => {
+            // 🎯 UX IMPROVEMENT (2025-10-17): Smart "Show More" pattern - Simplified approach
+            // Generate all swatches with "initially-hidden" class for colors beyond first 12
+            const generateSwatchHTML = (swatch, index) => {
                 const colorName = swatch.COLOR_NAME || swatch.name || 'Unknown';
-                // API uses COLOR_SQUARE_IMAGE, not SWATCH_IMAGE_URL
                 const imageUrl = swatch.COLOR_SQUARE_IMAGE || swatch.SWATCH_IMAGE_URL || swatch.swatchUrl || '';
                 const catalogColor = swatch.CATALOG_COLOR || colorName;
+                const isHidden = index >= 12; // Hide swatches beyond the first 12
 
                 if (!imageUrl) {
                     console.warn('[ProductLineManager] No image URL for color:', colorName);
-                    return ''; // Skip swatches without images
+                    return '';
                 }
 
                 return `
-                    <div class="color-swatch"
+                    <div class="color-swatch ${isHidden ? 'initially-hidden' : ''}"
                          data-color="${colorName}"
                          data-catalog="${catalogColor}"
                          title="${colorName}">
@@ -318,45 +315,32 @@ class ProductLineManager {
                         <span class="color-swatch-name">${colorName}</span>
                     </div>
                 `;
-            }).filter(html => html !== '').join('');
+            };
+
+            // Generate HTML for all swatches (no wrapper divs)
+            const swatchesHTML = swatches
+                .map((swatch, index) => generateSwatchHTML(swatch, index))
+                .filter(html => html !== '')
+                .join('');
+
+            const hiddenCount = swatches.length - 12; // Count of hidden swatches
 
             if (swatchesHTML) {
                 // Display swatches and hide dropdown
                 swatchContainer.innerHTML = swatchesHTML;
+                // Always use grid layout (no wrapper divs to complicate things)
                 swatchContainer.style.display = 'grid';
                 colorSelect.classList.add('swatch-mode');
 
-                // Add click handlers to swatches
-                swatchContainer.querySelectorAll('.color-swatch').forEach(swatch => {
-                    swatch.addEventListener('click', (e) => {
-                        const selectedColor = swatch.dataset.color;
-                        const catalogColor = swatch.dataset.catalog;
+                // Add "Show More" button if there are hidden swatches
+                if (hiddenCount > 0) {
+                    this.addShowMoreButton(swatchContainer, hiddenCount);
+                }
 
-                        // Remove selected class from all swatches
-                        swatchContainer.querySelectorAll('.color-swatch').forEach(s => {
-                            s.classList.remove('selected');
-                        });
+                // Add click handlers to ALL swatches (visible and hidden)
+                this.attachSwatchClickHandlers(swatchContainer, colorSelect);
 
-                        // Add selected class to clicked swatch
-                        swatch.classList.add('selected');
-
-                        // Update hidden dropdown value (for form submission)
-                        colorSelect.value = selectedColor;
-
-                        // Update catalog color attribute
-                        const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
-                        if (selectedOption) {
-                            selectedOption.setAttribute('data-catalog', catalogColor);
-                        }
-
-                        // Trigger change event
-                        colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-                        console.log('[ProductLineManager] Color swatch selected:', selectedColor, catalogColor);
-                    });
-                });
-
-                console.log('[ProductLineManager] ✅ Color swatches displayed:', swatches.length);
+                console.log('[ProductLineManager] ✅ Color swatches displayed:', swatches.length, '(showing', Math.min(12, swatches.length), 'initially)');
 
                 // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
                 // Show the modern swatches section (progressive disclosure pattern)
@@ -384,12 +368,91 @@ class ProductLineManager {
     }
 
     /**
-     * Handle color change
+     * Add "Show More Colors" button
+     * 🎯 UX IMPROVEMENT (2025-10-17): Progressive disclosure pattern - Simplified with classes
+     */
+    addShowMoreButton(container, hiddenCount) {
+        const button = document.createElement('button');
+        button.id = 'show-more-colors-btn';
+        button.className = 'qb-show-more-btn';
+        button.innerHTML = `
+            <span class="show-more-text">
+                Show <span id="hidden-color-count">${hiddenCount}</span> More Colors
+            </span>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        `;
+
+        button.addEventListener('click', () => {
+            // Toggle .show-more-active class on #product-phase
+            const productPhase = document.getElementById('product-phase');
+            const isExpanded = productPhase.classList.contains('show-more-active');
+
+            if (isExpanded) {
+                // Collapse - hide swatches with .initially-hidden class
+                productPhase.classList.remove('show-more-active');
+                button.classList.remove('expanded');
+                button.querySelector('.show-more-text').innerHTML =
+                    `Show <span id="hidden-color-count">${hiddenCount}</span> More Colors`;
+            } else {
+                // Expand - reveal swatches with .initially-hidden class
+                productPhase.classList.add('show-more-active');
+                button.classList.add('expanded');
+                button.querySelector('.show-more-text').textContent = 'Show Less';
+            }
+        });
+
+        container.appendChild(button);
+        console.log('[ProductLineManager] ✅ "Show More" button added for', hiddenCount, 'hidden colors');
+    }
+
+    /**
+     * Attach click handlers to all swatches (visible and hidden)
+     * 🎯 UX IMPROVEMENT (2025-10-17): Universal swatch interaction
+     */
+    attachSwatchClickHandlers(container, colorSelect) {
+        container.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', (e) => {
+                const selectedColor = swatch.dataset.color;
+                const catalogColor = swatch.dataset.catalog;
+
+                // Remove selected class from all swatches
+                container.querySelectorAll('.color-swatch').forEach(s => {
+                    s.classList.remove('selected');
+                });
+
+                // Add selected class to clicked swatch
+                swatch.classList.add('selected');
+
+                // Update dropdown value
+                colorSelect.value = selectedColor;
+
+                // Update catalog color data attribute
+                const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
+                if (selectedOption) {
+                    selectedOption.setAttribute('data-catalog', catalogColor);
+                }
+
+                // Trigger change event to auto-load product
+                colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                console.log('[ProductLineManager] ✅ Color swatch selected:', selectedColor, catalogColor);
+            });
+        });
+
+        console.log('[ProductLineManager] ✅ Click handlers attached to', container.querySelectorAll('.color-swatch').length, 'swatches');
+    }
+
+    /**
+     * Handle color change - AUTO-LOAD product like Cap Embroidery builder (2025-10-17)
      */
     handleColorChange(color) {
-        if (color) {
-            document.getElementById('load-product-btn').disabled = false;
-        }
+        if (!color || !this.currentProduct) return;
+
+        console.log('[ProductLineManager] Color selected:', color);
+
+        // 🎯 AUTO-LOAD IMPROVEMENT (2025-10-17): Match Cap builder behavior
+        // Automatically load product when color is selected (no button click needed)
+        this.loadProduct();
     }
     
     /**
@@ -945,8 +1008,7 @@ class ProductLineManager {
         // Hide product display
         document.getElementById('product-display').style.display = 'none';
 
-        // Disable load product button
-        document.getElementById('load-product-btn').disabled = true;
+        // Load Product button removed (2025-10-17) - No longer needed with auto-load
 
         console.log('[ProductLineManager] ✅ Form reset to clean search state');
     }

@@ -1380,6 +1380,213 @@ textarea {
 }
 
 /* ===================================
+   SIMPLE EMPTY STATE (DTG PATTERN)
+   =================================== */
+
+/* Simple empty state message - matches DTG clean design */
+.empty-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary, #6b7280);
+    font-style: italic;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 2px dashed #e5e7eb;
+}
+
+/* ===================================
+   ADDITIONAL LOGO CARDS (WORLD-CLASS ENHANCED PATTERN)
+   =================================== */
+
+/* Enhanced card styling with superior hierarchy and spacing */
+.additional-logo-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.additional-logo-card:hover {
+    border-color: var(--emb-primary);
+    box-shadow: 0 6px 16px rgba(58, 124, 82, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Primary logo gets BOLD enhanced styling */
+.primary-logo-section {
+    border: 4px solid var(--emb-primary);
+    background: #f0f7f4;
+    box-shadow: 0 6px 20px rgba(58, 124, 82, 0.25);
+}
+
+/* Enhanced header with stronger typography */
+.additional-logo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid var(--emb-gray-100);
+}
+
+.additional-logo-header h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--emb-gray-900);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+/* Enhanced form with improved spacing */
+.logo-form .form-row {
+    gap: 1.25rem;
+}
+
+.logo-form label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--emb-gray-700);
+    letter-spacing: -0.01em;
+}
+
+.logo-form input,
+.logo-form select {
+    padding: 0.75rem;
+    border: 2px solid var(--emb-gray-100);
+    transition: all 0.2s ease;
+}
+
+.logo-form input:focus,
+.logo-form select:focus {
+    border-left: 3px solid var(--emb-primary);
+}
+
+/* Larger, more tactile toggle switch */
+.toggle-switch {
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-slider {
+    width: 24px;
+    height: 24px;
+}
+
+.toggle-switch.on .toggle-slider {
+    transform: translateX(30px);
+}
+
+/* Refined delete button with smoother animation */
+.btn-delete {
+    background: white;
+    border: 2px solid #e53e3e;
+    color: #e53e3e;
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #e53e3e;
+    color: white;
+    transform: rotate(45deg) scale(1.1);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+/* Enhanced summary section spacing */
+.logo-summary {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--emb-gray-50);
+    flex-wrap: wrap;
+}
+
+/* Redesigned tags with solid colors and superior contrast */
+.position-tag,
+.stitch-tag,
+.digitizing-tag,
+.part-number-tag {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: 2px solid;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: transform 0.2s ease;
+}
+
+.position-tag {
+    background: #3a7c52;
+    border-color: #2d6341;
+    color: white;
+    box-shadow: 0 2px 4px rgba(58, 124, 82, 0.2);
+}
+
+.stitch-tag {
+    background: #4c6ef5;
+    border-color: #3b5bdb;
+    color: white;
+    box-shadow: 0 2px 4px rgba(76, 110, 245, 0.2);
+}
+
+.digitizing-tag {
+    background: #f59e0b;
+    border-color: #d97706;
+    color: #78350f;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+}
+
+.part-number-tag {
+    background: #6b7280;
+    border-color: #4b5563;
+    color: white;
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
+}
+
+/* Tag hover effects */
+.position-tag:hover,
+.stitch-tag:hover,
+.digitizing-tag:hover,
+.part-number-tag:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Mobile responsive enhancements */
+@media (max-width: 768px) {
+    .additional-logo-card {
+        padding: 1.25rem;
+    }
+
+    .additional-logo-header {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .logo-summary {
+        gap: 0.5rem;
+    }
+
+    .position-tag,
+    .stitch-tag,
+    .digitizing-tag,
+    .part-number-tag {
+        padding: 0.375rem 1rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* ===================================
    PRODUCTS IN QUOTE SECTION
    =================================== */
 .products-in-quote-container {
@@ -2703,4 +2910,31 @@ textarea {
         width: 100%;
         justify-content: space-between;
     }
+}
+
+/* ===================================
+   PHASE VISIBILITY CONTROL
+   Ensure child content respects parent phase visibility
+   =================================== */
+
+/* Hide all phase sections by default */
+.phase-section {
+    display: none !important;
+}
+
+/* Only show active phase */
+.phase-section.active {
+    display: block !important;
+}
+
+/* Ensure products list only shows in Phase 2 */
+#product-phase .products-list,
+#product-phase #products-container {
+    display: none;
+}
+
+/* Show products list only when Phase 2 is active */
+#product-phase.active .products-list,
+#product-phase.active #products-container {
+    display: block;
 }

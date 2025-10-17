@@ -33,8 +33,19 @@ class LogoManager {
             needsDigitizing: false
         };
 
-        // Fetch configuration from API
-        this.fetchConfiguration();
+        // Note: Do NOT fetch configuration in constructor!
+        // Call init() method after DOM is ready instead.
+    }
+
+    /**
+     * Initialize the logo manager (call after DOM ready)
+     * @returns {Promise<LogoManager>} Returns this for chaining
+     */
+    async init() {
+        console.log('[LogoManager] Initializing...');
+        await this.fetchConfiguration();
+        console.log('[LogoManager] Initialization complete');
+        return this;
     }
     
     /**
@@ -95,7 +106,11 @@ class LogoManager {
      */
     initializePrimaryLogo() {
         const positionSelect = document.getElementById('primary-position');
-        if (!positionSelect) return;
+        if (!positionSelect) {
+            console.error('❌ [LogoManager] #primary-position not found! DOM may not be ready.');
+            return;
+        }
+        console.log('✅ [LogoManager] Primary position dropdown found, initializing...');
 
         // Populate dropdown with positions from API
         positionSelect.innerHTML = '<option value="">Select position...</option>' +
