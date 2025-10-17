@@ -131,29 +131,28 @@ class QuoteBuilderBase {
         try {
             const key = `${this.config.prefix}_draft`;
             const saved = localStorage.getItem(key);
-            
+
             if (!saved) return false;
-            
+
             const data = JSON.parse(saved);
-            
+
             // Check if data is less than 24 hours old
             const ageInHours = (Date.now() - data.timestamp) / (1000 * 60 * 60);
-            
+
             if (ageInHours < 24) {
-                // Ask user if they want to restore
-                const shouldRestore = confirm(
-                    `Found an unsaved quote from ${new Date(data.timestamp).toLocaleString()}. ` +
-                    `Would you like to restore it?`
-                );
-                
-                if (shouldRestore) {
+                // Check if user has disabled restore prompts
+                const disablePrompts = localStorage.getItem('qb_disable_restore_prompts');
+
+                if (disablePrompts === 'true') {
+                    // Silently restore without prompt
                     this.restoreDraft(data);
-                    this.showToast('Previous draft restored', 'info');
+                    this.showToast('Previous draft restored', 'info', 2000);
                     return true;
-                } else {
-                    // Clear if user doesn't want it
-                    localStorage.removeItem(key);
                 }
+
+                // Show custom modal with "Don't ask again" option
+                this.showRestoreModal(data, key);
+                return false; // Will be handled by modal callbacks
             } else {
                 // Clear old drafts
                 localStorage.removeItem(key);
@@ -163,7 +162,7 @@ class QuoteBuilderBase {
             // Clear corrupted data
             localStorage.removeItem(`${this.config.prefix}_draft`);
         }
-        
+
         return false;
     }
 
@@ -173,9 +172,9 @@ class QuoteBuilderBase {
     restoreDraft(data) {
         // Restore customer info
         if (data.customerInfo) {
-            const fields = ['customer-name', 'customer-email', 'customer-phone', 
+            const fields = ['customer-name', 'customer-email', 'customer-phone',
                           'company-name', 'project-name', 'sales-rep'];
-            
+
             fields.forEach(field => {
                 const element = document.getElementById(field);
                 if (element && data.customerInfo[field]) {
@@ -183,7 +182,7 @@ class QuoteBuilderBase {
                 }
             });
         }
-        
+
         // Restore products (implement in child classes)
         if (data.products && data.products.length > 0) {
             this.products = data.products;
@@ -191,6 +190,118 @@ class QuoteBuilderBase {
                 this.renderProducts();
             }
         }
+    }
+
+    /**
+     * Show restore draft modal with "Don't ask again" option
+     */
+    showRestoreModal(data, draftKey) {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.className = 'qb-restore-modal-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-labelledby', 'restore-modal-title');
+        modal.setAttribute('aria-modal', 'true');
+
+        const formattedDate = new Date(data.timestamp).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+
+        modal.innerHTML = `
+            <div class="qb-restore-modal">
+                <div class="qb-restore-modal-header">
+                    <i class="fas fa-save" style="font-size: 32px; color: #3a7c52; margin-bottom: 12px;"></i>
+                    <h3 id="restore-modal-title">Unsaved Quote Found</h3>
+                </div>
+
+                <div class="qb-restore-modal-body">
+                    <p>Found an unsaved quote from <strong>${formattedDate}</strong>.</p>
+                    <p>Would you like to restore it and continue where you left off?</p>
+
+                    <label class="qb-restore-modal-checkbox">
+                        <input type="checkbox" id="qb-dont-ask-again">
+                        <span>Don't ask again (always restore automatically)</span>
+                    </label>
+                </div>
+
+                <div class="qb-restore-modal-footer">
+                    <button class="qb-btn-secondary" id="qb-discard-draft">
+                        <i class="fas fa-times"></i> Start Fresh
+                    </button>
+                    <button class="qb-btn-primary" id="qb-restore-draft">
+                        <i class="fas fa-check"></i> Restore Quote
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Focus trap and accessibility
+        const focusableElements = modal.querySelectorAll('button, input[type="checkbox"]');
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        // Focus first button
+        setTimeout(() => document.getElementById('qb-restore-draft').focus(), 100);
+
+        // Trap focus within modal
+        modal.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            }
+
+            // ESC key closes modal (same as discard)
+            if (e.key === 'Escape') {
+                handleDiscard();
+            }
+        });
+
+        // Handle restore button
+        const handleRestore = () => {
+            const dontAskAgain = document.getElementById('qb-dont-ask-again').checked;
+
+            if (dontAskAgain) {
+                localStorage.setItem('qb_disable_restore_prompts', 'true');
+                this.showToast('Auto-restore enabled. Future drafts will load automatically.', 'success', 4000);
+            }
+
+            modal.remove();
+            this.restoreDraft(data);
+            this.showToast('Previous draft restored', 'info', 3000);
+        };
+
+        // Handle discard button
+        const handleDiscard = () => {
+            localStorage.removeItem(draftKey);
+            modal.remove();
+            this.showToast('Starting with a fresh quote', 'info', 2000);
+        };
+
+        // Attach event listeners
+        document.getElementById('qb-restore-draft').onclick = handleRestore;
+        document.getElementById('qb-discard-draft').onclick = handleDiscard;
+
+        // Click outside to dismiss (same as discard)
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                handleDiscard();
+            }
+        };
     }
 
     /**
