@@ -29,7 +29,8 @@ class EmbroideryQuoteBuilder {
      */
     initializeUI() {
         this.showPhase('logo');
-        this.logoManager.addLogo(); // Start with one logo
+        // Primary logo is initialized by LogoManager constructor
+        // Additional logos are added by user via "Add Additional Position" button
     }
     
     /**
