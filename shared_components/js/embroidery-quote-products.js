@@ -751,48 +751,47 @@ class ProductLineManager {
                 };
             }
 
-            // Build size breakdown with tooltip
+            // Build size breakdown - SMART FILTERING (2025-10-17 POLISH)
+            // Only show sizes with qty >= 1 to reduce visual clutter (hide empty sizes only)
+            // If no meaningful quantities, show top 3 sizes
             const sizeEntries = Object.entries(product.sizeBreakdown);
-            const sizeBadges = sizeEntries.slice(0, 3).map(([size, qty]) =>
+            const significantSizes = sizeEntries.filter(([size, qty]) => qty >= 1);
+            const displaySizes = significantSizes.length > 0 ? significantSizes : sizeEntries.slice(0, 3);
+            const sizeBadges = displaySizes.map(([size, qty]) =>
                 `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
             ).join('');
-            const remainingCount = sizeEntries.length - 3;
             const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
 
             return `
                 <div class="product-card-modern" data-product-id="${product.id}">
-                    <!-- Product Header -->
-                    <div class="product-card-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(product.style)}"
-                             alt="${product.style}"
-                             onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${product.style}')"
-                             class="product-card-image">
-                        <div class="product-card-info">
-                            <h4 class="product-card-title">${product.style}</h4>
-                            <p class="product-card-subtitle">${product.title}</p>
-                            <div class="product-card-meta">
-                                <span class="color-badge">${product.color}</span>
-                                <span class="qty-badge">${product.totalQuantity} pcs</span>
-                            </div>
+                    <!-- Product Thumbnail (80px) -->
+                    <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(product.style)}"
+                         alt="${product.style}"
+                         onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${product.style}')"
+                         class="product-card-image">
+
+                    <!-- Product Info (flexible width) -->
+                    <div class="product-card-info">
+                        <h4 class="product-card-title">${product.style}</h4>
+                        <p class="product-card-subtitle">${product.title}</p>
+                        <div class="product-card-meta">
+                            <span class="color-badge">${product.color}</span>
+                            <span class="qty-badge">${product.totalQuantity} pcs</span>
                         </div>
-                        <div class="product-card-actions">
-                            <button class="btn-icon" onclick="window.productLineManager.editProduct(${product.id})" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon btn-danger" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <!-- Size Breakdown (all sizes visible) -->
+                        <div class="product-card-sizes" title="${sizesTooltip}">
+                            ${sizeBadges}
                         </div>
+                        <!-- Logo Selection (Collapsible) -->
+                        ${this.renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos)}
                     </div>
 
-                    <!-- Size Breakdown (compact, first 3) -->
-                    <div class="product-card-sizes" title="${sizesTooltip}">
-                        ${sizeBadges}
-                        ${remainingCount > 0 ? `<span class="size-badge more">+${remainingCount} more</span>` : ''}
+                    <!-- Actions (120px) -->
+                    <div class="product-card-actions">
+                        <button class="btn-icon btn-danger" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-
-                    <!-- Logo Selection (Collapsible) -->
-                    ${this.renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos)}
                 </div>
             `;
         }).join('');
@@ -817,144 +816,6 @@ class ProductLineManager {
         else tier = '72+';
         
         indicator.textContent = `Tier: ${tier}`;
-    }
-    
-    /**
-     * Edit product quantities
-     */
-    editProduct(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-        
-        // Create edit modal HTML
-        const modalHtml = `
-            <div id="edit-product-modal" class="modal active">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Edit Product Quantities</h3>
-                        <button class="modal-close" onclick="window.productLineManager.closeEditModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="product-edit-info">
-                            <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
-                                 alt="${product.style} - ${product.color}" 
-                                 onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
-                                 class="product-edit-image">
-                            <div>
-                                <strong>${product.style} - ${product.title}</strong>
-                                <p>${product.color}</p>
-                            </div>
-                        </div>
-                        <div class="size-inputs edit-size-inputs">
-                            ${Object.entries(product.sizeBreakdown).map(([size, qty]) => `
-                                <div class="size-input-group">
-                                    <label>${size}</label>
-                                    <input type="number" 
-                                           class="edit-size-qty" 
-                                           data-size="${size}" 
-                                           min="0" 
-                                           value="${qty}">
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="edit-total">
-                            Total: <span id="edit-total-qty">0</span> pieces
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="window.productLineManager.closeEditModal()">
-                            Cancel
-                        </button>
-                        <button class="btn btn-primary" onclick="window.productLineManager.saveProductEdit(${productId})">
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Add modal to DOM
-        const existingModal = document.getElementById('edit-product-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
-        // Add event listeners for quantity changes
-        document.querySelectorAll('.edit-size-qty').forEach(input => {
-            input.addEventListener('input', () => this.updateEditTotal());
-        });
-        
-        // Calculate initial total
-        this.updateEditTotal();
-    }
-    
-    /**
-     * Update edit modal total
-     */
-    updateEditTotal() {
-        const inputs = document.querySelectorAll('.edit-size-qty');
-        let total = 0;
-        inputs.forEach(input => {
-            total += parseInt(input.value) || 0;
-        });
-        const totalElement = document.getElementById('edit-total-qty');
-        if (totalElement) {
-            totalElement.textContent = total;
-        }
-    }
-    
-    /**
-     * Save product edit
-     */
-    saveProductEdit(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-        
-        const newSizeBreakdown = {};
-        let totalQty = 0;
-        
-        document.querySelectorAll('.edit-size-qty').forEach(input => {
-            const qty = parseInt(input.value) || 0;
-            if (qty > 0) {
-                newSizeBreakdown[input.dataset.size] = qty;
-                totalQty += qty;
-            }
-        });
-        
-        if (totalQty === 0) {
-            if (confirm('All quantities are 0. Remove this product?')) {
-                this.removeProduct(productId);
-                this.closeEditModal();
-            }
-            return;
-        }
-        
-        // Update product
-        product.sizeBreakdown = newSizeBreakdown;
-        product.totalQuantity = totalQty;
-        
-        // Re-render and update pricing
-        this.renderProductsList();
-        this.updateContinueButton();
-        
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-        
-        this.closeEditModal();
-    }
-    
-    /**
-     * Close edit modal
-     */
-    closeEditModal() {
-        const modal = document.getElementById('edit-product-modal');
-        if (modal) {
-            modal.remove();
-        }
     }
     
     /**

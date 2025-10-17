@@ -423,98 +423,124 @@
 }
 
 /* ============================================================================
-   PRODUCT DISPLAY SECTION
+   PRODUCT DISPLAY SECTION - COMPACT HORIZONTAL CARD (2025-10-17 REDESIGN)
    ============================================================================ */
 
 #product-phase .product-display,
 #product-phase #product-display {
     background: white !important;
     border-radius: var(--step2-radius-lg) !important;
-    padding: var(--step2-space-xl) !important;
-    box-shadow: var(--step2-shadow-md) !important;
-    margin-top: var(--step2-space-xl) !important;
+    padding: var(--step2-space-lg) !important; /* Reduced from XL for tighter layout */
+    box-shadow: var(--step2-shadow-sm) !important; /* Lighter shadow - more modern */
+    margin-top: var(--step2-space-lg) !important;
 }
 
-/* Product Info Row - Image + Details */
+/* Compact horizontal product card with thumbnail */
 #product-phase .product-info {
-    display: flex !important;
-    gap: var(--step2-space-xl) !important;
-    margin-bottom: var(--step2-space-xl) !important;
-    align-items: flex-start !important;
+    display: grid !important;
+    grid-template-columns: 80px 1fr !important; /* Fixed 80px thumbnail, rest flexible */
+    gap: var(--step2-space-lg) !important;
+    padding: var(--step2-space-md) !important;
+    background: var(--step2-gray-50) !important;
+    border-radius: var(--step2-radius-md) !important;
+    border: 1px solid var(--step2-gray-200) !important;
+    align-items: center !important; /* Vertical center alignment */
+    margin-bottom: var(--step2-space-md) !important; /* Tighter spacing */
 }
 
-/* CRITICAL FIX: Constrain product image size */
+/* Small thumbnail image - just for reference */
 #product-phase .product-info img,
 #product-phase #product-image,
 #product-phase .product-image {
-    width: auto !important;
-    max-width: 300px !important;
-    max-height: 400px !important;
-    height: auto !important;
-    object-fit: contain !important;
-    border-radius: var(--step2-radius-md) !important;
-    border: 2px solid var(--step2-gray-200) !important;
-    background: var(--step2-gray-50) !important;
-    padding: var(--step2-space-md) !important;
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    border-radius: var(--step2-radius-sm) !important;
+    border: 1px solid var(--step2-gray-200) !important;
+    background: white !important;
     flex-shrink: 0 !important;
 }
 
+/* Product metadata - compact inline format */
 #product-phase .product-details {
-    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
 }
 
 #product-phase .product-details h3,
 #product-phase #product-name {
-    font-size: 24px !important;
-    font-weight: 700 !important;
+    font-size: 16px !important; /* Reduced from 24px - more compact */
+    font-weight: 600 !important; /* Lighter than 700 - less shouty */
     color: var(--step2-gray-900) !important;
-    margin-bottom: var(--step2-space-sm) !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
 }
 
 #product-phase .product-details p,
 #product-phase #product-description {
-    font-size: 14px !important;
+    font-size: 13px !important;
     color: var(--step2-gray-600) !important;
-    line-height: 1.6 !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+}
+
+/* Color badge for selected color */
+#product-phase .product-color-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 10px !important;
+    background: white !important;
+    border: 1px solid var(--step2-gray-200) !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    color: var(--step2-gray-700) !important;
+    width: fit-content !important;
 }
 
 /* ============================================================================
-   SIZE INPUTS - MODERN GRID LAYOUT
+   SIZE INPUTS - HORIZONTAL COMPACT LAYOUT (2025-10-17 REDESIGN)
    ============================================================================ */
 
 #product-phase .size-matrix {
-    margin-top: var(--step2-space-lg) !important;
+    margin-top: var(--step2-space-md) !important; /* Tighter spacing */
+    padding: var(--step2-space-lg) !important;
+    background: var(--step2-gray-50) !important;
+    border-radius: var(--step2-radius-md) !important;
 }
 
 #product-phase .size-matrix h4 {
-    font-size: 18px !important;
+    font-size: 14px !important; /* Reduced from 18px - less prominent */
     font-weight: 600 !important;
-    color: var(--step2-gray-900) !important;
+    color: var(--step2-gray-700) !important;
+    margin-bottom: var(--step2-space-sm) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Horizontal flex layout for size inputs */
+#product-phase .size-inputs,
+#product-phase #size-inputs {
+    display: flex !important; /* Changed from grid to flex for horizontal flow */
+    flex-wrap: wrap !important;
+    gap: var(--step2-space-sm) !important;
     margin-bottom: var(--step2-space-md) !important;
 }
 
-/* Size inputs grid - responsive columns */
-#product-phase .size-inputs,
-#product-phase #size-inputs {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
-    gap: var(--step2-space-md) !important;
-    margin-bottom: var(--step2-space-lg) !important;
-}
-
-/* Individual size input card */
+/* Compact size input pill */
 #product-phase .size-input-group {
     background: white !important;
-    border: 2px solid var(--step2-gray-200) !important;
-    border-radius: var(--step2-radius-md) !important;
-    padding: var(--step2-space-md) !important;
-    transition: all var(--step2-transition) !important;
+    border: 1.5px solid var(--step2-gray-200) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important; /* Reduced from 16px - more compact */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: var(--step2-space-sm) !important;
-    min-height: 100px !important;
-    justify-content: space-between !important;
+    gap: 4px !important; /* Tighter vertical gap */
+    min-width: 70px !important; /* Reduced from 110px - smaller pills */
+    transition: all 0.2s !important;
+    min-height: auto !important; /* Remove fixed height */
 }
 
 #product-phase .size-input-group:hover {
@@ -524,23 +550,25 @@
 
 #product-phase .size-input-label,
 #product-phase .size-label {
-    font-size: 14px !important;
+    font-size: 11px !important; /* Reduced from 14px - more compact */
     font-weight: 700 !important;
-    color: var(--step2-gray-900) !important;
+    color: var(--step2-gray-600) !important;
     text-align: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
 }
 
 #product-phase .size-input,
 #product-phase .size-input-group input[type="number"] {
-    width: 100% !important;
-    padding: 10px !important;
-    border: 2px solid var(--step2-gray-200) !important;
-    border-radius: var(--step2-radius-sm) !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
+    width: 45px !important; /* Fixed narrow width - very compact */
+    padding: 6px !important; /* Reduced from 10px - smaller */
+    border: 1.5px solid var(--step2-gray-200) !important;
+    border-radius: 6px !important;
+    font-size: 15px !important; /* Slightly smaller from 16px */
+    font-weight: 700 !important;
     text-align: center !important;
-    transition: all var(--step2-transition) !important;
     background: var(--step2-gray-50) !important;
+    transition: all 0.2s !important;
 }
 
 #product-phase .size-input:focus,
@@ -570,55 +598,78 @@
     box-shadow: 0 0 0 2px var(--step2-success-light) !important;
 }
 
-/* Total row */
+/* ============================================================================
+   HORIZONTAL FOOTER: TOTAL + ADD BUTTON (2025-10-17 REDESIGN)
+   ============================================================================ */
+
+/* Container for total and button - horizontal layout */
+#product-phase .product-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: var(--step2-space-lg) !important;
+    margin-top: var(--step2-space-lg) !important;
+    padding-top: var(--step2-space-lg) !important;
+    border-top: 1px solid var(--step2-gray-200) !important;
+}
+
+/* Total quantity display - compact inline */
 #product-phase .total-row {
     display: flex !important;
-    justify-content: space-between !important;
     align-items: center !important;
+    gap: var(--step2-space-md) !important;
     padding: var(--step2-space-md) var(--step2-space-lg) !important;
     background: var(--step2-gray-50) !important;
     border-radius: var(--step2-radius-md) !important;
-    margin-top: var(--step2-space-md) !important;
-    border: 2px solid var(--step2-gray-200) !important;
+    border: 1.5px solid var(--step2-gray-200) !important;
+    flex: 0 0 auto !important; /* Don't grow - stay compact */
 }
 
 #product-phase .total-row strong {
-    font-size: 16px !important;
-    color: var(--step2-gray-900) !important;
+    font-size: 14px !important;
+    color: var(--step2-gray-600) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
 }
 
 #product-phase .total-row span,
 #product-phase #product-total-qty {
-    font-size: 20px !important;
+    font-size: 24px !important; /* Big and bold for emphasis */
     font-weight: 700 !important;
     color: var(--step2-primary) !important;
 }
 
 /* ============================================================================
-   ADD TO QUOTE BUTTON
+   ADD TO QUOTE BUTTON - INLINE WITH TOTAL
    ============================================================================ */
 
 #product-phase .qb-add-product-btn,
 #product-phase #add-to-quote-btn {
-    width: 100% !important;
-    padding: 16px 32px !important;
+    flex: 1 !important; /* Grow to fill available space */
+    max-width: 300px !important; /* Don't get too wide */
+    padding: 14px 28px !important;
     background: var(--step2-primary) !important;
     color: white !important;
     border: none !important;
     border-radius: var(--step2-radius-md) !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
-    transition: all var(--step2-transition) !important;
-    margin-top: var(--step2-space-lg) !important;
-    box-shadow: var(--step2-shadow-md) !important;
+    transition: all 0.2s !important;
+    box-shadow: var(--step2-shadow-sm) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 0 !important; /* Remove top margin - horizontal layout */
 }
 
 #product-phase .qb-add-product-btn:hover,
 #product-phase #add-to-quote-btn:hover {
     background: var(--step2-primary-light) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: var(--step2-shadow-lg) !important;
+    transform: translateY(-1px) !important; /* Subtle lift */
+    box-shadow: var(--step2-shadow-md) !important;
 }
 
 #product-phase .qb-add-product-btn:disabled,
@@ -627,66 +678,408 @@
     cursor: not-allowed !important;
     transform: none !important;
     box-shadow: none !important;
+    opacity: 0.6 !important;
 }
 
 /* ============================================================================
-   PRODUCTS IN QUOTE SECTION
+   PRODUCTS IN QUOTE SECTION - HORIZONTAL COMPACT CARDS (2025-10-17 REDESIGN)
    ============================================================================ */
 
-#product-phase .qb-products-section,
-#product-phase #products-in-quote {
+/* Products List Container */
+#product-phase #products-list,
+#product-phase .products-list {
     background: white !important;
     border-radius: var(--step2-radius-lg) !important;
     padding: var(--step2-space-xl) !important;
-    box-shadow: var(--step2-shadow-md) !important;
+    box-shadow: var(--step2-shadow-sm) !important;
     margin-top: var(--step2-space-xl) !important;
 }
 
-#product-phase .qb-products-title {
+/* Section Title "Caps in Quote" / "Products in Quote" */
+#product-phase #products-list h3,
+#product-phase .products-list h3 {
     font-size: 20px !important;
     font-weight: 600 !important;
     color: var(--step2-gray-900) !important;
-    margin-bottom: var(--step2-space-lg) !important;
+    margin: 0 0 var(--step2-space-lg) 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step2-space-sm) !important;
 }
 
-#product-phase .qb-product-card {
+/* Products Container */
+#product-phase #products-container,
+#product-phase .qb-products-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--step2-space-md) !important;
+}
+
+/* Empty State Message */
+#product-phase .empty-message {
+    text-align: center !important;
+    padding: var(--step2-space-xl) !important;
+    color: var(--step2-gray-600) !important;
+    font-size: 15px !important;
     background: var(--step2-gray-50) !important;
-    border: 2px solid var(--step2-gray-200) !important;
     border-radius: var(--step2-radius-md) !important;
-    padding: var(--step2-space-lg) !important;
-    margin-bottom: var(--step2-space-md) !important;
-    transition: all var(--step2-transition) !important;
-}
-
-#product-phase .qb-product-card:hover {
-    border-color: var(--step2-gray-300) !important;
-    box-shadow: var(--step2-shadow-sm) !important;
+    border: 2px dashed var(--step2-gray-200) !important;
 }
 
 /* ============================================================================
-   AGGREGATE TOTAL DISPLAY
+   VERTICAL PRODUCT CARD - E-COMMERCE STYLE (2025-10-17 REDESIGN)
    ============================================================================ */
 
-#product-phase .qb-aggregate-total {
-    background: linear-gradient(135deg, var(--step2-primary), var(--step2-primary-light)) !important;
-    color: white !important;
-    padding: var(--step2-space-xl) !important;
-    border-radius: var(--step2-radius-lg) !important;
-    box-shadow: var(--step2-shadow-lg) !important;
-    margin-top: var(--step2-space-xl) !important;
-    text-align: center !important;
+/* Products Container - Responsive Grid Layout */
+#product-phase #products-container,
+#product-phase .qb-products-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: var(--step2-space-xl) !important;
+    padding: 0 !important;
 }
 
-#product-phase .qb-aggregate-total h3 {
+/* Main Product Card - Vertical Layout (Shopify/Stripe Style) */
+#product-phase .qb-product-card,
+#product-phase .product-card,
+#product-phase .product-card-modern {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    background: white !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-lg) !important;
+
+    transition: all var(--step2-transition) !important;
+    min-height: auto !important;
+
+    /* Subtle shadow for depth */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+
+    /* POLISH (2025-10-17): Constrain max width to prevent stretching */
+    max-width: 350px !important;
+    margin: 0 auto !important; /* Center in grid cell */
+}
+
+#product-phase .qb-product-card:hover,
+#product-phase .product-card:hover,
+#product-phase .product-card-modern:hover {
+    border-color: var(--step2-primary) !important;
+    /* POLISH (2025-10-17): Enhanced hover shadow */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16) !important;
+    /* POLISH (2025-10-17): Bigger lift effect */
+    transform: translateY(-6px) !important;
+}
+
+/* Product Image - Large and Prominent (200x200px) */
+#product-phase .qb-product-card img,
+#product-phase .product-card img,
+#product-phase .product-card-img,
+#product-phase .product-card-modern img,
+#product-phase .product-card-image {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: contain !important;
+    border-radius: var(--step2-radius-md) !important;
+    background: var(--step2-gray-50) !important;
+    padding: var(--step2-space-md) !important;
+    margin-bottom: var(--step2-space-lg) !important;
+    flex-shrink: 0 !important;
+
+    /* Subtle border for definition */
+    border: 1px solid var(--step2-gray-200) !important;
+}
+
+/* Product Content Area - Centered */
+#product-phase .product-card-content,
+#product-phase .qb-product-info,
+#product-phase .product-card-header,
+#product-phase .product-card-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: var(--step2-space-md) !important;
+    flex: 1 !important; /* Push actions to bottom */
+    min-width: 0 !important; /* Allow text truncation */
+}
+
+/* Product Name - Bold and Prominent */
+#product-phase .product-card-content h4,
+#product-phase .qb-product-info h4,
+#product-phase .product-name,
+#product-phase .product-card-title {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--step2-gray-900) !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* Product Subtitle - Lighter Weight */
+#product-phase .product-card-subtitle {
+    font-size: 14px !important;
+    color: var(--step2-gray-600) !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+}
+
+/* Product Metadata - Beautiful Badges Centered */
+#product-phase .product-meta,
+#product-phase .qb-product-meta,
+#product-phase .product-card-meta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--step2-space-sm) !important;
+    flex-wrap: wrap !important;
+    margin: var(--step2-space-md) 0 !important;
+}
+
+/* Redesigned Badges - More Prominent with Icons */
+#product-phase .product-meta span,
+#product-phase .qb-product-meta span,
+#product-phase .meta-badge,
+#product-phase .color-badge,
+#product-phase .qty-badge {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-900) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 16px !important;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+    border: 1.5px solid var(--step2-success) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Size Breakdown Badges - Prominent Blue Gradient (2025-10-17 REDESIGN) */
+#product-phase .product-card-sizes,
+#product-phase .qb-product-sizes {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    margin: var(--step2-space-md) 0 !important;
+}
+
+#product-phase .size-badge {
+    font-size: 13px !important;
+    color: #1e40af !important; /* Deep blue text */
+    background: linear-gradient(135deg, #eff6ff, #dbeafe) !important; /* Blue gradient */
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    border: 1.5px solid #3b82f6 !important; /* Blue border */
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1) !important; /* Subtle blue shadow */
+
+    /* Smooth transition */
+    transition: all 0.2s ease !important;
+}
+
+#product-phase .size-badge:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Pricing Summary Line */
+#product-phase .product-pricing-summary,
+#product-phase .qb-pricing-summary {
+    font-size: 13px !important;
+    color: var(--step2-gray-600) !important;
+    line-height: 1.4 !important;
+}
+
+/* Product Card Body - Pricing Breakdown Section */
+#product-phase .product-card-body {
+    padding: var(--step2-space-sm) 0 !important;
+    font-size: 13px !important;
+    color: var(--step2-gray-600) !important;
+    line-height: 1.5 !important;
+}
+
+/* Product Card Footer - Total Price Section */
+#product-phase .product-card-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: var(--step2-space-sm) 0 !important;
+    margin-top: var(--step2-space-sm) !important;
+    border-top: 1px solid var(--step2-gray-200) !important;
+}
+
+#product-phase .footer-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--step2-gray-700) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+#product-phase .footer-amount {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--step2-success) !important;
+}
+
+/* Product Actions - Bottom of Card, Centered */
+#product-phase .product-card-actions,
+#product-phase .qb-product-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--step2-space-md) !important;
+    padding-top: var(--step2-space-lg) !important;
+    margin-top: var(--step2-space-lg) !important;
+    border-top: 1px solid var(--step2-gray-200) !important;
+    width: 100% !important;
+}
+
+/* Total Price Display - Prominent at Bottom */
+#product-phase .product-total-price,
+#product-phase .qb-product-total {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: var(--step2-success) !important;
+    margin: 0 !important;
+}
+
+/* Action Buttons Container - Horizontal Row */
+/* POLISH (2025-10-17): Added subtle background bar for better visual separation */
+#product-phase .action-buttons,
+#product-phase .qb-action-buttons {
+    display: flex !important;
+    gap: var(--step2-space-sm) !important;
+    width: 100% !important;
+    justify-content: center !important;
+
+    /* Subtle background bar */
+    background: var(--step2-gray-50) !important;
+    padding: var(--step2-space-md) !important;
+    margin: 0 calc(var(--step2-space-lg) * -1) calc(var(--step2-space-lg) * -1) !important; /* Negative margins to extend to card edges */
+    border-radius: 0 0 var(--step2-radius-lg) var(--step2-radius-lg) !important; /* Match card's bottom corners */
+    border-top: 1px solid var(--step2-gray-200) !important;
+}
+
+/* Icon Buttons - Larger, More Prominent */
+/* POLISH (2025-10-17): Increased size 44px → 48px for better tap targets */
+#product-phase .btn-edit,
+#product-phase .btn-delete,
+#product-phase .qb-btn-edit,
+#product-phase .qb-btn-delete,
+#product-phase .btn-icon {
+    width: 48px !important;  /* 44px → 48px */
+    height: 48px !important; /* 44px → 48px */
+    padding: 0 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border: 2px solid var(--step2-gray-300) !important;
+    border-radius: 50% !important; /* Circular buttons */
+    background: white !important;
+
+    font-size: 18px !important; /* 16px → 18px for better visibility */
+    cursor: pointer !important;
+    transition: all var(--step2-transition) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Edit Button - Blue accent */
+#product-phase .btn-edit,
+#product-phase .qb-btn-edit {
+    color: #3b82f6 !important;
+}
+
+#product-phase .btn-edit:hover,
+#product-phase .qb-btn-edit:hover {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Delete Button - Red accent */
+#product-phase .btn-delete,
+#product-phase .qb-btn-delete,
+#product-phase .btn-icon.btn-danger {
+    color: #ef4444 !important;
+}
+
+#product-phase .btn-delete:hover,
+#product-phase .qb-btn-delete:hover,
+#product-phase .btn-icon.btn-danger:hover {
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* ============================================================================
+   AGGREGATE TOTAL DISPLAY - MODERN CARD (2025-10-17 REDESIGN)
+   ============================================================================ */
+
+#product-phase .aggregate-total {
+    background: white !important;
+    border: 2px solid var(--step2-gray-200) !important;
+    border-radius: var(--step2-radius-lg) !important;
+    padding: var(--step2-space-xl) !important;
+    margin-top: var(--step2-space-xl) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: var(--step2-space-lg) !important;
+
+    /* Subtle shadow for depth */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+#product-phase .aggregate-total strong {
     font-size: 16px !important;
     font-weight: 600 !important;
-    opacity: 0.9 !important;
-    margin-bottom: var(--step2-space-sm) !important;
+    color: var(--step2-gray-700) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
 }
 
-#product-phase .qb-aggregate-total .total-amount {
-    font-size: 36px !important;
+#product-phase .aggregate-total span,
+#product-phase #aggregate-total {
+    font-size: 32px !important;
     font-weight: 700 !important;
+    color: var(--step2-gray-900) !important;
+    margin-left: var(--step2-space-sm) !important;
+}
+
+/* Tier Indicator Badge - Beautiful Green Gradient Pill */
+#product-phase .tier-indicator,
+#product-phase #tier-indicator {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 12px 20px !important;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important; /* Green gradient */
+    border: 2px solid #10b981 !important; /* Green border */
+    border-radius: 24px !important; /* Pill shape */
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #065f46 !important; /* Deep green text */
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important; /* Subtle green shadow */
+    transition: all 0.2s ease !important;
+}
+
+#product-phase .tier-indicator:hover,
+#product-phase #tier-indicator:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25) !important;
 }
 
 /* ============================================================================
@@ -694,25 +1087,52 @@
    ============================================================================ */
 
 @media (max-width: 768px) {
-    /* Stack product info vertically on mobile */
+    /* Stack product info vertically on mobile (2025-10-17 REDESIGN) */
     #product-phase .product-info {
-        flex-direction: column !important;
-        align-items: center !important;
+        grid-template-columns: 1fr !important; /* Single column - stack vertically */
         text-align: center !important;
     }
 
+    /* Thumbnail stays 80px but centered */
     #product-phase .product-info img,
     #product-phase #product-image,
     #product-phase .product-image {
-        max-width: 100% !important;
-        max-height: 350px !important;
+        margin: 0 auto !important; /* Center the thumbnail */
     }
 
-    /* Adjust size inputs for mobile - 4 columns */
+    /* Center product details text */
+    #product-phase .product-details {
+        align-items: center !important;
+    }
+
+    /* Adjust horizontal size pills for mobile - keep flex but adjust sizing */
     #product-phase .size-inputs,
     #product-phase #size-inputs {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: var(--step2-space-sm) !important;
+        justify-content: center !important; /* Center pills on mobile */
+        gap: 8px !important; /* Tighter gap on mobile */
+    }
+
+    #product-phase .size-input-group {
+        min-width: 65px !important; /* Slightly smaller on mobile */
+    }
+
+    /* Stack footer vertically on mobile (2025-10-17 REDESIGN) */
+    #product-phase .product-footer {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: var(--step2-space-md) !important;
+    }
+
+    #product-phase .total-row {
+        justify-content: center !important; /* Center total on mobile */
+        width: 100% !important;
+    }
+
+    /* Full width button on mobile */
+    #product-phase .qb-add-product-btn,
+    #product-phase #add-to-quote-btn {
+        max-width: 100% !important;
+        width: 100% !important;
     }
 
     /* Fewer swatch columns on mobile - keep bigger size */
@@ -732,13 +1152,49 @@
     #product-phase .qb-search-btn {
         width: 100% !important;
     }
+
+    /* PRODUCT CARDS IN QUOTE - Mobile Responsive (Vertical Layout Already Mobile-Friendly) */
+    /* Cards container - single column on mobile */
+    #product-phase #products-container,
+    #product-phase .qb-products-container {
+        grid-template-columns: 1fr !important; /* Single column on mobile */
+        gap: var(--step2-space-lg) !important;
+    }
+
+    /* Product cards maintain vertical layout (already perfect for mobile) */
+    #product-phase .qb-product-card,
+    #product-phase .product-card,
+    #product-phase .product-card-modern {
+        /* Already vertical - no changes needed */
+        padding: var(--step2-space-md) !important; /* Slightly tighter on mobile */
+    }
+
+    /* Product image - slightly smaller on mobile */
+    #product-phase .qb-product-card img,
+    #product-phase .product-card img,
+    #product-phase .product-card-img,
+    #product-phase .product-card-modern img,
+    #product-phase .product-card-image {
+        height: 180px !important; /* Reduce from 200px on mobile */
+    }
+
+    /* Aggregate total - stack on mobile */
+    #product-phase .aggregate-total {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: var(--step2-space-sm) !important;
+    }
 }
 
 @media (max-width: 480px) {
-    /* 3 columns for sizes on very small screens */
-    #product-phase .size-inputs,
-    #product-phase #size-inputs {
-        grid-template-columns: repeat(3, 1fr) !important;
+    /* Smaller size pills on very small screens (2025-10-17 REDESIGN) */
+    #product-phase .size-input-group {
+        min-width: 60px !important; /* Even more compact on tiny screens */
+        padding: 6px 10px !important; /* Tighter padding */
+    }
+
+    #product-phase .size-input {
+        width: 40px !important; /* Narrower input box */
     }
 
     /* Smaller swatches on tiny screens but still bigger than before */

@@ -793,41 +793,44 @@ class CapProductLineManager {
         container.innerHTML = this.products.map(product => {
             aggregateTotal += product.totalQuantity;
 
-            // Build size breakdown with tooltip
+            // Build size breakdown - SMART FILTERING (2025-10-17 POLISH)
+            // Only show sizes with qty >= 1 to reduce visual clutter (hide empty sizes only)
+            // If no meaningful quantities, show top 3 sizes
             const sizeEntries = Object.entries(product.sizeBreakdown);
-            const sizeBadges = sizeEntries.slice(0, 3).map(([size, qty]) =>
+            const significantSizes = sizeEntries.filter(([size, qty]) => qty >= 1);
+            const displaySizes = significantSizes.length > 0 ? significantSizes : sizeEntries.slice(0, 3);
+            const sizeBadges = displaySizes.map(([size, qty]) =>
                 `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
             ).join('');
-            const remainingCount = sizeEntries.length - 3;
             const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
 
             return `
                 <div class="product-card-modern" data-product-id="${product.id}">
-                    <!-- Product Header -->
-                    <div class="product-card-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent(product.style)}"
-                             alt="${product.style}"
-                             onerror="this.src='https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent('${product.style}')"
-                             class="product-card-image">
-                        <div class="product-card-info">
-                            <h4 class="product-card-title">${product.style}</h4>
-                            <p class="product-card-subtitle">${product.title}</p>
-                            <div class="product-card-meta">
-                                <span class="color-badge">${product.color}</span>
-                                <span class="qty-badge">${product.totalQuantity} pcs</span>
-                            </div>
+                    <!-- Product Thumbnail (80px) -->
+                    <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent(product.style)}"
+                         alt="${product.style}"
+                         onerror="this.src='https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent('${product.style}')"
+                         class="product-card-image">
+
+                    <!-- Product Info (flexible width) -->
+                    <div class="product-card-info">
+                        <h4 class="product-card-title">${product.style}</h4>
+                        <p class="product-card-subtitle">${product.title}</p>
+                        <div class="product-card-meta">
+                            <span class="color-badge">${product.color}</span>
+                            <span class="qty-badge">${product.totalQuantity} pcs</span>
                         </div>
-                        <div class="product-card-actions">
-                            <button class="btn-icon btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})" title="Remove">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <!-- Size Breakdown (all sizes visible) -->
+                        <div class="product-card-sizes" title="${sizesTooltip}">
+                            ${sizeBadges}
                         </div>
                     </div>
 
-                    <!-- Size Breakdown (compact, first 3) -->
-                    <div class="product-card-sizes" title="${sizesTooltip}">
-                        ${sizeBadges}
-                        ${remainingCount > 0 ? `<span class="size-badge more">+${remainingCount} more</span>` : ''}
+                    <!-- Actions (120px) -->
+                    <div class="product-card-actions">
+                        <button class="btn-icon btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             `;
