@@ -1,0 +1,807 @@
+/**
+ * QUOTE BUILDER STEP 3: UNIFIED MODERN SUMMARY STYLES
+ * =====================================================
+ * Modern, Shopify/Amazon-inspired design for quote review & summary
+ *
+ * Design Principles:
+ * - Clean white cards with subtle shadows
+ * - Clear visual hierarchy with proper typography
+ * - Scannable information layout
+ * - Professional, trustworthy appearance
+ * - Mobile-first responsive design
+ *
+ * Created: 2025-10-17
+ * Last Updated: 2025-10-17
+ */
+
+/* ============================================================================
+   CSS VARIABLES - STEP 3 THEME
+   ============================================================================ */
+
+:root {
+    /* Colors - Green Theme */
+    --step3-primary: #4cb354;
+    --step3-primary-dark: #3a9142;
+    --step3-primary-light: #e8f5e9;
+
+    /* Neutral Colors */
+    --step3-gray-50: #f9fafb;
+    --step3-gray-100: #f3f4f6;
+    --step3-gray-200: #e5e7eb;
+    --step3-gray-300: #d1d5db;
+    --step3-gray-600: #6b7280;
+    --step3-gray-900: #111827;
+
+    /* Spacing */
+    --step3-space-xs: 8px;
+    --step3-space-sm: 12px;
+    --step3-space-md: 16px;
+    --step3-space-lg: 20px;
+    --step3-space-xl: 24px;
+    --step3-space-2xl: 32px;
+
+    /* Border Radius */
+    --step3-radius-sm: 6px;
+    --step3-radius-md: 8px;
+    --step3-radius-lg: 12px;
+
+    /* Shadows */
+    --step3-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --step3-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --step3-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --step3-shadow-hover: 0 4px 12px rgba(76, 179, 84, 0.2);
+
+    /* Typography */
+    --step3-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --step3-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+    /* Transitions */
+    --step3-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ============================================================================
+   PHASE HEADER - MATCHES STEP 2 STYLE
+   ============================================================================ */
+
+#summary-phase .phase-header {
+    text-align: center !important;
+    margin-bottom: var(--step3-space-2xl) !important;
+    padding-bottom: var(--step3-space-lg) !important;
+    border-bottom: 2px solid var(--step3-gray-200) !important;
+}
+
+#summary-phase .phase-header h2 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin-bottom: var(--step3-space-sm) !important;
+    font-family: var(--step3-font-sans) !important;
+}
+
+#summary-phase .phase-header .phase-number {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--step3-primary) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    font-weight: 700 !important;
+    margin-right: var(--step3-space-sm) !important;
+    vertical-align: middle !important;
+}
+
+#summary-phase .phase-header p {
+    font-size: 16px !important;
+    color: var(--step3-gray-600) !important;
+    margin: 0 !important;
+}
+
+
+/* ============================================================================
+   MAIN LAYOUT - TWO COLUMN ON DESKTOP
+   ============================================================================ */
+
+.summary-container {
+    display: grid !important;
+    grid-template-columns: 1fr 400px !important;
+    gap: var(--step3-space-xl) !important;
+    align-items: start !important;
+}
+
+.summary-main-content {
+    min-width: 0 !important; /* Prevent grid blowout */
+}
+
+.summary-sidebar {
+    position: sticky !important;
+    top: 20px !important;
+}
+
+
+/* ============================================================================
+   QUOTE SUMMARY CARDS - CLEAN WHITE CARDS WITH SHADOWS
+   ============================================================================ */
+
+.quote-summary-card {
+    background: white !important;
+    border-radius: var(--step3-radius-lg) !important;
+    box-shadow: var(--step3-shadow-md) !important;
+    padding: var(--step3-space-xl) !important;
+    margin-bottom: var(--step3-space-lg) !important;
+    transition: var(--step3-transition) !important;
+}
+
+.quote-summary-card:hover {
+    box-shadow: var(--step3-shadow-lg) !important;
+}
+
+.card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+    margin-bottom: var(--step3-space-lg) !important;
+    padding-bottom: var(--step3-space-md) !important;
+    border-bottom: 2px solid var(--step3-gray-100) !important;
+}
+
+.card-header h3 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 !important;
+    font-family: var(--step3-font-sans) !important;
+}
+
+.card-header i {
+    font-size: 24px !important;
+    color: var(--step3-primary) !important;
+}
+
+
+/* ============================================================================
+   EMBROIDERY DETAILS BADGE - GREEN GRADIENT
+   ============================================================================ */
+
+.embroidery-details-badge {
+    background: linear-gradient(135deg, var(--step3-primary), var(--step3-primary-dark)) !important;
+    color: white !important;
+    padding: var(--step3-space-md) !important;
+    border-radius: var(--step3-radius-md) !important;
+    margin-bottom: var(--step3-space-lg) !important;
+    box-shadow: var(--step3-shadow-md) !important;
+}
+
+.embroidery-details-badge h4 {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 0 var(--step3-space-sm) 0 !important;
+    opacity: 0.9 !important;
+}
+
+.logo-spec-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+    padding: var(--step3-space-sm) 0 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.logo-spec-item i {
+    flex-shrink: 0 !important;
+}
+
+.logo-spec-item strong {
+    font-weight: 600 !important;
+}
+
+
+/* ============================================================================
+   PRODUCT CARDS - MATCH STEP 2 MODERN STYLE
+   ============================================================================ */
+
+.summary-product-card {
+    border: 2px solid var(--step3-gray-200) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    padding: var(--step3-space-lg) !important;
+    margin-bottom: var(--step3-space-md) !important;
+    background: white !important;
+    transition: var(--step3-transition) !important;
+}
+
+.summary-product-card:hover {
+    border-color: var(--step3-primary) !important;
+    box-shadow: var(--step3-shadow-hover) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Product Header with Image */
+.product-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-md) !important;
+    margin-bottom: var(--step3-space-md) !important;
+    padding-bottom: var(--step3-space-md) !important;
+    border-bottom: 1px solid var(--step3-gray-200) !important;
+}
+
+.product-thumbnail {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: var(--step3-radius-md) !important;
+    border: 1px solid var(--step3-gray-200) !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    background: white !important;
+}
+
+.product-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.product-style {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 0 4px 0 !important;
+}
+
+.product-description {
+    font-size: 14px !important;
+    color: var(--step3-gray-600) !important;
+    margin: 0 !important;
+}
+
+.product-total-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: var(--step3-primary-light) !important;
+    color: var(--step3-primary-dark) !important;
+    padding: 6px 12px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+
+/* ============================================================================
+   SIZE BREAKDOWN - CLEAN TABLE GRID
+   ============================================================================ */
+
+.size-breakdown-section {
+    margin: var(--step3-space-md) 0 !important;
+}
+
+.size-breakdown-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--step3-gray-600) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: var(--step3-space-sm) !important;
+}
+
+.size-breakdown-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.size-item {
+    background: var(--step3-gray-50) !important;
+    padding: var(--step3-space-sm) !important;
+    border-radius: var(--step3-radius-sm) !important;
+    text-align: center !important;
+    border: 1px solid var(--step3-gray-200) !important;
+    transition: var(--step3-transition) !important;
+}
+
+.size-item:hover {
+    background: white !important;
+    border-color: var(--step3-primary) !important;
+}
+
+.size-label {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    display: block !important;
+    margin-bottom: 4px !important;
+}
+
+.size-quantity {
+    font-size: 14px !important;
+    color: var(--step3-primary) !important;
+    font-weight: 700 !important;
+}
+
+
+/* ============================================================================
+   PRICING BREAKDOWN - CLEAR MONOSPACE TYPOGRAPHY
+   ============================================================================ */
+
+.pricing-breakdown {
+    background: var(--step3-gray-50) !important;
+    padding: var(--step3-space-md) !important;
+    border-radius: var(--step3-radius-md) !important;
+    margin: var(--step3-space-md) 0 !important;
+    border-left: 4px solid var(--step3-primary) !important;
+}
+
+.pricing-breakdown-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin-bottom: var(--step3-space-sm) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.pricing-line {
+    font-family: var(--step3-font-mono) !important;
+    font-size: 13px !important;
+    line-height: 1.8 !important;
+    color: var(--step3-gray-600) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 4px 0 !important;
+}
+
+.pricing-line.total-line {
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    border-top: 2px solid var(--step3-gray-300) !important;
+    margin-top: var(--step3-space-sm) !important;
+    padding-top: var(--step3-space-sm) !important;
+}
+
+.pricing-line-label {
+    color: var(--step3-gray-600) !important;
+}
+
+.pricing-line-value {
+    font-weight: 600 !important;
+    color: var(--step3-gray-900) !important;
+}
+
+
+/* ============================================================================
+   QUOTE TOTAL SIDEBAR - STICKY RIGHT COLUMN
+   ============================================================================ */
+
+.quote-total-sidebar {
+    background: white !important;
+    border-radius: var(--step3-radius-lg) !important;
+    box-shadow: var(--step3-shadow-lg) !important;
+    padding: var(--step3-space-xl) !important;
+    border: 2px solid var(--step3-primary) !important;
+}
+
+.sidebar-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 0 var(--step3-space-lg) 0 !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding-bottom: var(--step3-space-md) !important;
+    border-bottom: 2px solid var(--step3-gray-100) !important;
+}
+
+.total-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: var(--step3-space-sm) 0 !important;
+    font-size: 15px !important;
+    color: var(--step3-gray-600) !important;
+}
+
+.total-row-label {
+    font-weight: 500 !important;
+}
+
+.total-row-value {
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    font-family: var(--step3-font-mono) !important;
+}
+
+.total-row.subtotal-row {
+    border-top: 1px solid var(--step3-gray-200) !important;
+    padding-top: var(--step3-space-md) !important;
+    margin-top: var(--step3-space-sm) !important;
+}
+
+.total-row.grand-total {
+    border-top: 3px solid var(--step3-primary) !important;
+    padding-top: var(--step3-space-lg) !important;
+    margin-top: var(--step3-space-md) !important;
+    font-size: 24px !important;
+}
+
+.total-row.grand-total .total-row-label {
+    color: var(--step3-primary-dark) !important;
+    font-weight: 700 !important;
+}
+
+.total-row.grand-total .total-row-value {
+    color: var(--step3-primary) !important;
+    font-size: 28px !important;
+}
+
+.tier-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: var(--step3-primary-light) !important;
+    color: var(--step3-primary-dark) !important;
+    padding: 8px 16px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    margin-top: var(--step3-space-md) !important;
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+
+/* ============================================================================
+   QUICK ACTIONS - MODERN BUTTON GRID
+   ============================================================================ */
+
+.quick-actions-section {
+    background: var(--step3-gray-50) !important;
+    padding: var(--step3-space-xl) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    margin: var(--step3-space-xl) 0 !important;
+}
+
+.quick-actions-title {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 0 var(--step3-space-sm) 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.quick-actions-title i {
+    color: var(--step3-primary) !important;
+}
+
+.quick-actions-description {
+    font-size: 14px !important;
+    color: var(--step3-gray-600) !important;
+    margin: 0 0 var(--step3-space-lg) 0 !important;
+}
+
+.quick-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.action-button {
+    background: white !important;
+    border: 2px solid var(--step3-gray-200) !important;
+    padding: var(--step3-space-md) !important;
+    border-radius: var(--step3-radius-md) !important;
+    cursor: pointer !important;
+    transition: var(--step3-transition) !important;
+    text-align: center !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--step3-gray-700) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.action-button:hover {
+    border-color: var(--step3-primary) !important;
+    background: var(--step3-primary-light) !important;
+    color: var(--step3-primary-dark) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--step3-shadow-hover) !important;
+}
+
+.action-button i {
+    font-size: 18px !important;
+}
+
+
+/* ============================================================================
+   CUSTOMER FORM - CLEAN MATERIAL DESIGN
+   ============================================================================ */
+
+.save-send-section {
+    border: 2px solid var(--step3-gray-200) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    margin: var(--step3-space-xl) 0 !important;
+    overflow: hidden !important;
+    background: white !important;
+}
+
+.save-send-header {
+    background: var(--step3-gray-50) !important;
+    padding: var(--step3-space-lg) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    transition: var(--step3-transition) !important;
+    border-bottom: 1px solid var(--step3-gray-200) !important;
+}
+
+.save-send-header:hover {
+    background: var(--step3-primary-light) !important;
+}
+
+.save-send-header h3 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.save-send-header h3 i {
+    color: var(--step3-primary) !important;
+}
+
+.save-send-header p {
+    font-size: 14px !important;
+    color: var(--step3-gray-600) !important;
+    margin: 4px 0 0 0 !important;
+}
+
+.save-send-content {
+    padding: var(--step3-space-xl) !important;
+    background: var(--step3-gray-50) !important;
+}
+
+.customer-info-section h4 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--step3-gray-900) !important;
+    margin: 0 0 var(--step3-space-lg) 0 !important;
+}
+
+.form-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: var(--step3-space-lg) !important;
+    margin-bottom: var(--step3-space-lg) !important;
+}
+
+.form-group {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.form-group label {
+    display: block !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    color: var(--step3-gray-700) !important;
+    margin-bottom: var(--step3-space-xs) !important;
+}
+
+.form-control,
+.form-select,
+.form-textarea {
+    width: 100% !important;
+    padding: var(--step3-space-sm) !important;
+    border: 2px solid var(--step3-gray-200) !important;
+    border-radius: var(--step3-radius-md) !important;
+    font-size: 14px !important;
+    font-family: var(--step3-font-sans) !important;
+    transition: var(--step3-transition) !important;
+    background: white !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none !important;
+    border-color: var(--step3-primary) !important;
+    box-shadow: 0 0 0 3px var(--step3-primary-light) !important;
+}
+
+.form-control::placeholder {
+    color: var(--step3-gray-400) !important;
+}
+
+.form-textarea {
+    resize: vertical !important;
+    min-height: 100px !important;
+    font-family: var(--step3-font-sans) !important;
+}
+
+/* Action Buttons in Form */
+.quote-actions {
+    margin-top: var(--step3-space-lg) !important;
+    padding-top: var(--step3-space-lg) !important;
+    border-top: 1px solid var(--step3-gray-200) !important;
+}
+
+.action-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: var(--step3-space-md) !important;
+    flex-wrap: wrap !important;
+}
+
+.save-option {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.save-option input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer !important;
+}
+
+.save-option label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--step3-gray-700) !important;
+    cursor: pointer !important;
+}
+
+.action-buttons {
+    display: flex !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+
+/* ============================================================================
+   BUTTONS - PRIMARY & SECONDARY STYLES
+   ============================================================================ */
+
+.btn {
+    padding: var(--step3-space-sm) var(--step3-space-lg) !important;
+    border-radius: var(--step3-radius-md) !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: var(--step3-transition) !important;
+    border: 2px solid transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+    text-decoration: none !important;
+}
+
+.btn-primary {
+    background: var(--step3-primary) !important;
+    color: white !important;
+    border-color: var(--step3-primary) !important;
+}
+
+.btn-primary:hover {
+    background: var(--step3-primary-dark) !important;
+    border-color: var(--step3-primary-dark) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--step3-shadow-hover) !important;
+}
+
+.btn-secondary {
+    background: white !important;
+    color: var(--step3-gray-700) !important;
+    border-color: var(--step3-gray-300) !important;
+}
+
+.btn-secondary:hover {
+    background: var(--step3-gray-50) !important;
+    border-color: var(--step3-gray-400) !important;
+    transform: translateY(-2px) !important;
+}
+
+
+/* ============================================================================
+   PHASE NAVIGATION - BOTTOM BUTTONS
+   ============================================================================ */
+
+.phase-actions {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: var(--step3-space-md) !important;
+    padding-top: var(--step3-space-2xl) !important;
+    margin-top: var(--step3-space-2xl) !important;
+    border-top: 2px solid var(--step3-gray-200) !important;
+}
+
+
+/* ============================================================================
+   MOBILE RESPONSIVE - STACK ON SMALL SCREENS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    /* Stack columns on mobile */
+    .summary-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Total sidebar first on mobile */
+    .summary-sidebar {
+        position: relative !important;
+        order: -1 !important;
+    }
+
+    /* Smaller padding on cards */
+    .quote-summary-card {
+        padding: var(--step3-space-md) !important;
+    }
+
+    /* Single column forms */
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Stack action buttons */
+    .action-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .action-buttons {
+        width: 100% !important;
+        flex-direction: column !important;
+    }
+
+    .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Smaller typography */
+    .total-row.grand-total {
+        font-size: 20px !important;
+    }
+
+    .total-row.grand-total .total-row-value {
+        font-size: 24px !important;
+    }
+}
+
+
+/* ============================================================================
+   PRINT STYLES - CLEAN PRINTABLE OUTPUT
+   ============================================================================ */
+
+@media print {
+    .quick-actions-section,
+    .save-send-section,
+    .phase-actions {
+        display: none !important;
+    }
+
+    .summary-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .quote-summary-card,
+    .summary-product-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        page-break-inside: avoid !important;
+    }
+}
