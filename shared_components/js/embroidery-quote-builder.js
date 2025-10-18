@@ -254,7 +254,7 @@ class EmbroideryQuoteBuilder {
         // NEW UNIFIED DESIGN - Single professional container
         let html = '<div class="phase3-unified-container">';
 
-        // Modern header with gradient and key info
+        // Modern header with gradient and key info (spans full width)
         html += `
             <div class="phase3-header">
                 <div class="phase3-title">

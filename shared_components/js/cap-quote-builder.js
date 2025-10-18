@@ -288,10 +288,7 @@ class CapQuoteBuilder {
         // NEW UNIFIED DESIGN - Two-column layout (content + sidebar)
         let html = '<div class="phase3-unified-container">';
 
-        // LEFT COLUMN: Content wrapper (scrollable)
-        html += '<div class="phase3-content-wrapper">';
-
-        // Header with key info
+        // Header with key info (spans full width)
         html += `
             <div class="phase3-header">
                 <div class="phase3-title">
@@ -303,6 +300,9 @@ class CapQuoteBuilder {
                 </div>
             </div>
         `;
+
+        // LEFT COLUMN: Content wrapper (scrollable)
+        html += '<div class="phase3-content-wrapper">';
 
         // Embroidery specifications - compact list
         html += `
