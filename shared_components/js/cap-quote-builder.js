@@ -285,8 +285,11 @@ class CapQuoteBuilder {
 
         console.log('[CapQuoteBuilder] Rendering quote summary...');
 
-        // NEW UNIFIED DESIGN - Single professional container
+        // NEW UNIFIED DESIGN - Two-column layout (content + sidebar)
         let html = '<div class="phase3-unified-container">';
+
+        // LEFT COLUMN: Content wrapper (scrollable)
+        html += '<div class="phase3-content-wrapper">';
 
         // Header with key info
         html += `
@@ -394,6 +397,11 @@ class CapQuoteBuilder {
 
         html += '</div>'; // Close products-list
 
+        html += '</div>'; // Close phase3-content-wrapper (LEFT COLUMN)
+
+        // RIGHT COLUMN: Sticky sidebar with totals
+        html += '<div class="phase3-sidebar">';
+
         // Invoice-style totals section
         html += `
             <div class="phase3-section totals-section">
@@ -424,7 +432,9 @@ class CapQuoteBuilder {
             </div>
         `;
 
-        html += '</div>'; // Close phase3-unified-container
+        html += '</div>'; // Close phase3-sidebar (RIGHT COLUMN)
+
+        html += '</div>'; // Close phase3-unified-container (GRID WRAPPER)
 
         summaryContainer.innerHTML = html;
 
