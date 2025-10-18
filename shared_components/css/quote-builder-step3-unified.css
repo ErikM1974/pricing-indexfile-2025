@@ -118,7 +118,7 @@
 
 
 /* ============================================================================
-   PHASE 3 UNIFIED CONTAINER - MAIN WRAPPER
+   PHASE 3 UNIFIED CONTAINER - MAIN WRAPPER (SINGLE COLUMN LAYOUT)
    ============================================================================ */
 
 .phase3-unified-container {
@@ -126,47 +126,23 @@
     border-radius: var(--step3-radius-lg) !important;
     padding: var(--step3-space-xl) !important;
     margin: 0 auto !important;
-    max-width: 1400px !important;
-    /* REDESIGN: Use grid layout for content + sidebar */
-    display: grid !important;
-    grid-template-columns: 1fr 400px !important;
+    max-width: 900px !important; /* Narrower for better readability */
+    /* REDESIGN: Simple vertical stack like PDF */
+    display: flex !important;
+    flex-direction: column !important;
     gap: var(--step3-space-xl) !important;
-    align-items: start !important;
 }
 
 
 /* ============================================================================
-   PHASE 3 CONTENT WRAPPER - LEFT COLUMN (scrollable)
+   PHASE 3 CONTENT WRAPPER - NO LONGER A SCROLL CONTAINER
    ============================================================================ */
 
 .phase3-content-wrapper {
-    /* Left column - contains header, logos, products */
+    /* Just a container for sections now - no special scrolling */
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--step3-space-lg) !important;
-    max-height: calc(100vh - 320px) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding-right: var(--step3-space-sm) !important;
-}
-
-/* Scrollbar styling for content wrapper */
-.phase3-content-wrapper::-webkit-scrollbar {
-    width: 8px !important;
-}
-
-.phase3-content-wrapper::-webkit-scrollbar-track {
-    background: var(--step3-gray-100) !important;
-    border-radius: 4px !important;
-}
-
-.phase3-content-wrapper::-webkit-scrollbar-thumb {
-    background: var(--step3-primary) !important;
-    border-radius: 4px !important;
-}
-
-.phase3-content-wrapper::-webkit-scrollbar-thumb:hover {
-    background: var(--step3-primary-dark) !important;
+    gap: var(--step3-space-xl) !important;
 }
 
 
@@ -182,8 +158,6 @@
     box-shadow: var(--step3-shadow-md) !important;
     /* Remove margin-bottom since parent has gap */
     margin-bottom: 0 !important;
-    /* CRITICAL FIX: Span both columns in the grid */
-    grid-column: 1 / -1 !important;
 }
 
 .phase3-title h3 {
@@ -544,20 +518,17 @@
 
 
 /* ============================================================================
-   PHASE 3 SIDEBAR - RIGHT COLUMN (sticky totals)
+   PHASE 3 SIDEBAR - NOW A BOTTOM SECTION (like PDF)
    ============================================================================ */
 
 .phase3-sidebar {
-    /* Right column - sticky totals sidebar */
-    position: sticky !important;
-    top: var(--step3-space-xl) !important;
-    max-height: calc(100vh - 340px) !important;
-    overflow-y: auto !important;
+    /* No longer sticky - just a regular section at the bottom */
+    width: 100% !important;
 }
 
 
 /* ============================================================================
-   TOTALS SECTION - INVOICE-STYLE SUMMARY (in sidebar)
+   TOTALS SECTION - PROMINENT BOTTOM SUMMARY (PDF-style)
    ============================================================================ */
 
 .totals-section {
@@ -565,11 +536,10 @@
     border: 3px solid var(--step3-primary) !important;
     border-radius: var(--step3-radius-lg) !important;
     box-shadow: var(--step3-shadow-lg) !important;
-    /* Sidebar styling */
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    padding: var(--step3-space-xl) !important;
+    padding: var(--step3-space-2xl) !important; /* Slightly larger padding */
 }
 
 .totals-table {
@@ -907,22 +877,10 @@
    ============================================================================ */
 
 @media (max-width: 1024px) {
-    /* Tablet and below: Stack layout */
+    /* Tablet and below: Reduce padding */
     .phase3-unified-container {
-        grid-template-columns: 1fr !important;
         padding: var(--step3-space-md) !important;
-    }
-
-    .phase3-content-wrapper {
-        max-height: none !important;
-        overflow-y: visible !important;
-    }
-
-    .phase3-sidebar {
-        position: relative !important;
-        top: 0 !important;
-        max-height: none !important;
-        order: -1 !important; /* Move totals to top on mobile */
+        max-width: 100% !important;
     }
 }
 
@@ -967,9 +925,6 @@
 
     .grand-total-row {
         font-size: 18px !important;
-        /* FIX: Ensure grand total stays visible on mobile */
-        position: sticky !important;
-        bottom: 0 !important;
     }
 
     .grand-total-row .total-label {
