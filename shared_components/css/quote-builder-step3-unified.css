@@ -3,15 +3,17 @@
  * =====================================================
  * Modern, Shopify/Amazon-inspired design for quote review & summary
  *
+ * FIXED: 2025-10-18 - Selectors now match JavaScript-generated HTML
+ * - Replaced .summary-container with .phase3-unified-container
+ * - Replaced .summary-product-card with .product-card
+ * - Added all missing JavaScript-generated classes
+ *
  * Design Principles:
  * - Clean white cards with subtle shadows
  * - Clear visual hierarchy with proper typography
  * - Scannable information layout
  * - Professional, trustworthy appearance
  * - Mobile-first responsive design
- *
- * Created: 2025-10-17
- * Last Updated: 2025-10-17
  */
 
 /* ============================================================================
@@ -29,7 +31,9 @@
     --step3-gray-100: #f3f4f6;
     --step3-gray-200: #e5e7eb;
     --step3-gray-300: #d1d5db;
+    --step3-gray-400: #9ca3af;
     --step3-gray-600: #6b7280;
+    --step3-gray-700: #374151;
     --step3-gray-900: #111827;
 
     /* Spacing */
@@ -101,299 +105,367 @@
 
 
 /* ============================================================================
-   MAIN LAYOUT - TWO COLUMN ON DESKTOP
+   PHASE 3 UNIFIED CONTAINER - MAIN WRAPPER
    ============================================================================ */
 
-.summary-container {
-    display: grid !important;
-    grid-template-columns: 1fr 400px !important;
-    gap: var(--step3-space-xl) !important;
-    align-items: start !important;
-}
-
-.summary-main-content {
-    min-width: 0 !important; /* Prevent grid blowout */
-}
-
-.summary-sidebar {
-    position: sticky !important;
-    top: 20px !important;
+.phase3-unified-container {
+    background: var(--step3-gray-50) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    padding: var(--step3-space-xl) !important;
+    margin: 0 auto !important;
+    max-width: 1200px !important;
 }
 
 
 /* ============================================================================
-   QUOTE SUMMARY CARDS - CLEAN WHITE CARDS WITH SHADOWS
+   PHASE 3 HEADER - GRADIENT BANNER WITH META
    ============================================================================ */
 
-.quote-summary-card {
+.phase3-header {
+    background: linear-gradient(135deg, var(--step3-primary), var(--step3-primary-dark)) !important;
+    color: white !important;
+    padding: var(--step3-space-xl) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    margin-bottom: var(--step3-space-xl) !important;
+    box-shadow: var(--step3-shadow-md) !important;
+}
+
+.phase3-title h3 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin: 0 0 var(--step3-space-sm) 0 !important;
+    color: white !important;
+    font-family: var(--step3-font-sans) !important;
+}
+
+.phase3-meta {
+    display: flex !important;
+    gap: var(--step3-space-md) !important;
+    flex-wrap: wrap !important;
+    margin-top: var(--step3-space-sm) !important;
+}
+
+.meta-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    padding: 6px 12px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: white !important;
+}
+
+.meta-item i {
+    font-size: 16px !important;
+}
+
+
+/* ============================================================================
+   PHASE 3 SECTIONS - CONTENT BLOCKS
+   ============================================================================ */
+
+.phase3-section {
     background: white !important;
     border-radius: var(--step3-radius-lg) !important;
     box-shadow: var(--step3-shadow-md) !important;
     padding: var(--step3-space-xl) !important;
     margin-bottom: var(--step3-space-lg) !important;
-    transition: var(--step3-transition) !important;
 }
 
-.quote-summary-card:hover {
-    box-shadow: var(--step3-shadow-lg) !important;
-}
-
-.card-header {
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--step3-space-sm) !important;
-    margin-bottom: var(--step3-space-lg) !important;
-    padding-bottom: var(--step3-space-md) !important;
-    border-bottom: 2px solid var(--step3-gray-100) !important;
-}
-
-.card-header h3 {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    color: var(--step3-gray-900) !important;
-    margin: 0 !important;
-    font-family: var(--step3-font-sans) !important;
-}
-
-.card-header i {
-    font-size: 24px !important;
-    color: var(--step3-primary) !important;
-}
-
-
-/* ============================================================================
-   EMBROIDERY DETAILS BADGE - GREEN GRADIENT
-   ============================================================================ */
-
-.embroidery-details-badge {
-    background: linear-gradient(135deg, var(--step3-primary), var(--step3-primary-dark)) !important;
-    color: white !important;
-    padding: var(--step3-space-md) !important;
-    border-radius: var(--step3-radius-md) !important;
-    margin-bottom: var(--step3-space-lg) !important;
-    box-shadow: var(--step3-shadow-md) !important;
-}
-
-.embroidery-details-badge h4 {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    margin: 0 0 var(--step3-space-sm) 0 !important;
-    opacity: 0.9 !important;
-}
-
-.logo-spec-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--step3-space-sm) !important;
-    padding: var(--step3-space-sm) 0 !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-}
-
-.logo-spec-item i {
-    flex-shrink: 0 !important;
-}
-
-.logo-spec-item strong {
-    font-weight: 600 !important;
-}
-
-
-/* ============================================================================
-   PRODUCT CARDS - MATCH STEP 2 MODERN STYLE
-   ============================================================================ */
-
-.summary-product-card {
-    border: 2px solid var(--step3-gray-200) !important;
-    border-radius: var(--step3-radius-lg) !important;
-    padding: var(--step3-space-lg) !important;
-    margin-bottom: var(--step3-space-md) !important;
-    background: white !important;
-    transition: var(--step3-transition) !important;
-}
-
-.summary-product-card:hover {
-    border-color: var(--step3-primary) !important;
-    box-shadow: var(--step3-shadow-hover) !important;
-    transform: translateY(-2px) !important;
-}
-
-/* Product Header with Image */
-.product-header {
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--step3-space-md) !important;
-    margin-bottom: var(--step3-space-md) !important;
-    padding-bottom: var(--step3-space-md) !important;
-    border-bottom: 1px solid var(--step3-gray-200) !important;
-}
-
-.product-thumbnail {
-    width: 80px !important;
-    height: 80px !important;
-    border-radius: var(--step3-radius-md) !important;
-    border: 1px solid var(--step3-gray-200) !important;
-    object-fit: cover !important;
-    flex-shrink: 0 !important;
-    background: white !important;
-}
-
-.product-info {
-    flex: 1 !important;
-    min-width: 0 !important;
-}
-
-.product-style {
+.section-title {
     font-size: 18px !important;
     font-weight: 700 !important;
     color: var(--step3-gray-900) !important;
-    margin: 0 0 4px 0 !important;
-}
-
-.product-description {
-    font-size: 14px !important;
-    color: var(--step3-gray-600) !important;
-    margin: 0 !important;
-}
-
-.product-total-badge {
-    display: inline-flex !important;
+    margin: 0 0 var(--step3-space-lg) 0 !important;
+    padding-bottom: var(--step3-space-sm) !important;
+    border-bottom: 2px solid var(--step3-gray-100) !important;
+    display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    background: var(--step3-primary-light) !important;
-    color: var(--step3-primary-dark) !important;
-    padding: 6px 12px !important;
-    border-radius: var(--step3-radius-sm) !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
+    gap: var(--step3-space-sm) !important;
+}
+
+.section-title i {
+    color: var(--step3-primary) !important;
+    font-size: 20px !important;
 }
 
 
 /* ============================================================================
-   SIZE BREAKDOWN - CLEAN TABLE GRID
+   EMBROIDERY SPECS - LOGO LIST
    ============================================================================ */
 
-.size-breakdown-section {
-    margin: var(--step3-space-md) 0 !important;
-}
-
-.size-breakdown-label {
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: var(--step3-gray-600) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    margin-bottom: var(--step3-space-sm) !important;
-}
-
-.size-breakdown-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
-    gap: var(--step3-space-sm) !important;
-}
-
-.size-item {
+.embroidery-specs {
     background: var(--step3-gray-50) !important;
-    padding: var(--step3-space-sm) !important;
-    border-radius: var(--step3-radius-sm) !important;
-    text-align: center !important;
-    border: 1px solid var(--step3-gray-200) !important;
+}
+
+.logo-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--step3-space-md) !important;
+}
+
+.logo-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: var(--step3-space-md) !important;
+    padding: var(--step3-space-md) !important;
+    background: white !important;
+    border-radius: var(--step3-radius-md) !important;
+    border: 2px solid var(--step3-gray-200) !important;
     transition: var(--step3-transition) !important;
 }
 
-.size-item:hover {
-    background: white !important;
+.logo-item:hover {
     border-color: var(--step3-primary) !important;
+    box-shadow: var(--step3-shadow-sm) !important;
 }
 
-.size-label {
-    font-size: 12px !important;
+.logo-icon {
+    flex-shrink: 0 !important;
+    font-size: 24px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.logo-info {
+    flex: 1 !important;
+}
+
+.logo-info strong {
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: var(--step3-gray-900) !important;
     display: block !important;
     margin-bottom: 4px !important;
 }
 
-.size-quantity {
+.logo-detail {
     font-size: 14px !important;
-    color: var(--step3-primary) !important;
-    font-weight: 700 !important;
+    color: var(--step3-gray-600) !important;
 }
 
-
-/* ============================================================================
-   PRICING BREAKDOWN - CLEAR MONOSPACE TYPOGRAPHY
-   ============================================================================ */
-
-.pricing-breakdown {
-    background: var(--step3-gray-50) !important;
-    padding: var(--step3-space-md) !important;
-    border-radius: var(--step3-radius-md) !important;
-    margin: var(--step3-space-md) 0 !important;
-    border-left: 4px solid var(--step3-primary) !important;
-}
-
-.pricing-breakdown-title {
-    font-size: 13px !important;
+/* Logo Badges */
+.badge-primary,
+.badge-additional {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 4px 12px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
-    color: var(--step3-gray-900) !important;
-    margin-bottom: var(--step3-space-sm) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
 
-.pricing-line {
-    font-family: var(--step3-font-mono) !important;
-    font-size: 13px !important;
-    line-height: 1.8 !important;
-    color: var(--step3-gray-600) !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    padding: 4px 0 !important;
+.badge-primary {
+    background: var(--step3-primary) !important;
+    color: white !important;
 }
 
-.pricing-line.total-line {
+.badge-additional {
+    background: var(--step3-gray-200) !important;
+    color: var(--step3-gray-700) !important;
+}
+
+.badge-setup {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 4px 10px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    background: #fff3cd !important;
+    color: #856404 !important;
+    border: 1px solid #ffeaa7 !important;
+}
+
+/* LTM Alert */
+.ltm-alert {
+    background: #fff3cd !important;
+    border: 1px solid #ffeaa7 !important;
+    color: #856404 !important;
+    padding: var(--step3-space-sm) var(--step3-space-md) !important;
+    border-radius: var(--step3-radius-md) !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+    margin-top: var(--step3-space-md) !important;
+}
+
+.ltm-alert i {
+    font-size: 18px !important;
+}
+
+
+/* ============================================================================
+   PRODUCTS SECTION - MODERN CARD LAYOUT
+   ============================================================================ */
+
+.products-section,
+.products-list {
+    /* No special styles needed, inherits from .phase3-section */
+}
+
+.product-card {
+    border: 2px solid var(--step3-gray-200) !important;
+    border-radius: var(--step3-radius-lg) !important;
+    background: white !important;
+    margin-bottom: var(--step3-space-lg) !important;
+    overflow: hidden !important;
+    transition: var(--step3-transition) !important;
+}
+
+.product-card:hover {
+    border-color: var(--step3-primary) !important;
+    box-shadow: var(--step3-shadow-hover) !important;
+    transform: translateY(-2px) !important;
+}
+
+.product-card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-md) !important;
+    padding: var(--step3-space-lg) !important;
+    border-bottom: 2px solid var(--step3-gray-100) !important;
+    background: var(--step3-gray-50) !important;
+}
+
+.product-card-img {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: var(--step3-radius-md) !important;
+    border: 2px solid var(--step3-gray-200) !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    background: white !important;
+}
+
+.product-card-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.product-name {
+    font-size: 18px !important;
     font-weight: 700 !important;
     color: var(--step3-gray-900) !important;
-    border-top: 2px solid var(--step3-gray-300) !important;
-    margin-top: var(--step3-space-sm) !important;
-    padding-top: var(--step3-space-sm) !important;
+    margin: 0 0 6px 0 !important;
+    font-family: var(--step3-font-sans) !important;
 }
 
-.pricing-line-label {
+.product-desc {
+    font-size: 14px !important;
     color: var(--step3-gray-600) !important;
+    margin: 0 0 var(--step3-space-sm) 0 !important;
 }
 
-.pricing-line-value {
+.product-meta {
+    display: flex !important;
+    gap: var(--step3-space-sm) !important;
+    flex-wrap: wrap !important;
+}
+
+.meta-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: var(--step3-primary-light) !important;
+    color: var(--step3-primary-dark) !important;
+    padding: 4px 10px !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.product-card-body {
+    padding: var(--step3-space-lg) !important;
+}
+
+.product-card-footer {
+    background: var(--step3-gray-50) !important;
+    padding: var(--step3-space-md) var(--step3-space-lg) !important;
+    border-top: 2px solid var(--step3-gray-100) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.footer-label {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--step3-gray-700) !important;
+}
+
+.footer-amount {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--step3-primary) !important;
+    font-family: var(--step3-font-mono) !important;
+}
+
+
+/* ============================================================================
+   SIZE LINE - PRODUCT SIZE BREAKDOWN
+   ============================================================================ */
+
+.size-line {
+    padding: var(--step3-space-sm) 0 !important;
+    border-bottom: 1px solid var(--step3-gray-100) !important;
+}
+
+.size-line:last-child {
+    border-bottom: none !important;
+}
+
+.size-line-header {
+    margin-bottom: 6px !important;
+}
+
+.size-qty {
+    font-size: 14px !important;
     font-weight: 600 !important;
     color: var(--step3-gray-900) !important;
 }
 
-
-/* ============================================================================
-   QUOTE TOTAL SIDEBAR - STICKY RIGHT COLUMN
-   ============================================================================ */
-
-.quote-total-sidebar {
-    background: white !important;
-    border-radius: var(--step3-radius-lg) !important;
-    box-shadow: var(--step3-shadow-lg) !important;
-    padding: var(--step3-space-xl) !important;
-    border: 2px solid var(--step3-primary) !important;
+.size-line-pricing {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
 }
 
-.sidebar-title {
-    font-size: 16px !important;
+.unit-price {
+    font-size: 13px !important;
+    color: var(--step3-gray-600) !important;
+    font-family: var(--step3-font-mono) !important;
+}
+
+.line-total {
+    font-size: 15px !important;
     font-weight: 700 !important;
     color: var(--step3-gray-900) !important;
-    margin: 0 0 var(--step3-space-lg) 0 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    padding-bottom: var(--step3-space-md) !important;
-    border-bottom: 2px solid var(--step3-gray-100) !important;
+    font-family: var(--step3-font-mono) !important;
+}
+
+
+/* ============================================================================
+   TOTALS SECTION - INVOICE-STYLE SUMMARY
+   ============================================================================ */
+
+.totals-section {
+    background: var(--step3-gray-50) !important;
+    border: 3px solid var(--step3-primary) !important;
+}
+
+.totals-table {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--step3-space-sm) !important;
 }
 
 .total-row {
@@ -402,55 +474,37 @@
     align-items: center !important;
     padding: var(--step3-space-sm) 0 !important;
     font-size: 15px !important;
-    color: var(--step3-gray-600) !important;
 }
 
-.total-row-label {
+.total-label {
     font-weight: 500 !important;
+    color: var(--step3-gray-700) !important;
 }
 
-.total-row-value {
+.total-value {
     font-weight: 700 !important;
     color: var(--step3-gray-900) !important;
     font-family: var(--step3-font-mono) !important;
+    font-size: 16px !important;
 }
 
-.total-row.subtotal-row {
-    border-top: 1px solid var(--step3-gray-200) !important;
-    padding-top: var(--step3-space-md) !important;
-    margin-top: var(--step3-space-sm) !important;
-}
-
-.total-row.grand-total {
+.grand-total-row {
     border-top: 3px solid var(--step3-primary) !important;
     padding-top: var(--step3-space-lg) !important;
     margin-top: var(--step3-space-md) !important;
-    font-size: 24px !important;
+    font-size: 20px !important;
 }
 
-.total-row.grand-total .total-row-label {
+.grand-total-row .total-label {
     color: var(--step3-primary-dark) !important;
     font-weight: 700 !important;
+    font-size: 18px !important;
 }
 
-.total-row.grand-total .total-row-value {
+.grand-total-row .total-value {
     color: var(--step3-primary) !important;
     font-size: 28px !important;
-}
-
-.tier-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    background: var(--step3-primary-light) !important;
-    color: var(--step3-primary-dark) !important;
-    padding: 8px 16px !important;
-    border-radius: var(--step3-radius-sm) !important;
-    font-size: 14px !important;
     font-weight: 700 !important;
-    margin-top: var(--step3-space-md) !important;
-    width: 100% !important;
-    justify-content: center !important;
 }
 
 
@@ -735,28 +789,29 @@
    ============================================================================ */
 
 @media (max-width: 768px) {
-    /* Stack columns on mobile */
-    .summary-container {
-        grid-template-columns: 1fr !important;
-    }
-
-    /* Total sidebar first on mobile */
-    .summary-sidebar {
-        position: relative !important;
-        order: -1 !important;
-    }
-
-    /* Smaller padding on cards */
-    .quote-summary-card {
+    .phase3-unified-container {
         padding: var(--step3-space-md) !important;
     }
 
-    /* Single column forms */
+    .phase3-header,
+    .phase3-section {
+        padding: var(--step3-space-md) !important;
+    }
+
+    .product-card-header {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+
+    .product-card-img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
     .form-row {
         grid-template-columns: 1fr !important;
     }
 
-    /* Stack action buttons */
     .action-row {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -772,13 +827,16 @@
         justify-content: center !important;
     }
 
-    /* Smaller typography */
-    .total-row.grand-total {
-        font-size: 20px !important;
+    .grand-total-row {
+        font-size: 18px !important;
     }
 
-    .total-row.grand-total .total-row-value {
+    .grand-total-row .total-value {
         font-size: 24px !important;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -794,12 +852,13 @@
         display: none !important;
     }
 
-    .summary-container {
-        grid-template-columns: 1fr !important;
+    .phase3-unified-container {
+        padding: 0 !important;
+        background: white !important;
     }
 
-    .quote-summary-card,
-    .summary-product-card {
+    .product-card,
+    .phase3-section {
         box-shadow: none !important;
         border: 1px solid #000 !important;
         page-break-inside: avoid !important;
