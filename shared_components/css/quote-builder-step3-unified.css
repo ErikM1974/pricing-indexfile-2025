@@ -126,11 +126,47 @@
     border-radius: var(--step3-radius-lg) !important;
     padding: var(--step3-space-xl) !important;
     margin: 0 auto !important;
-    max-width: 1200px !important;
-    /* FIX: Allow scrolling for long content */
-    max-height: calc(100vh - 280px) !important;
+    max-width: 1400px !important;
+    /* REDESIGN: Use grid layout for content + sidebar */
+    display: grid !important;
+    grid-template-columns: 1fr 400px !important;
+    gap: var(--step3-space-xl) !important;
+    align-items: start !important;
+}
+
+
+/* ============================================================================
+   PHASE 3 CONTENT WRAPPER - LEFT COLUMN (scrollable)
+   ============================================================================ */
+
+.phase3-content-wrapper {
+    /* Left column - contains header, logos, products */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--step3-space-lg) !important;
+    max-height: calc(100vh - 320px) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    padding-right: var(--step3-space-sm) !important;
+}
+
+/* Scrollbar styling for content wrapper */
+.phase3-content-wrapper::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.phase3-content-wrapper::-webkit-scrollbar-track {
+    background: var(--step3-gray-100) !important;
+    border-radius: 4px !important;
+}
+
+.phase3-content-wrapper::-webkit-scrollbar-thumb {
+    background: var(--step3-primary) !important;
+    border-radius: 4px !important;
+}
+
+.phase3-content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--step3-primary-dark) !important;
 }
 
 
@@ -143,8 +179,11 @@
     color: white !important;
     padding: var(--step3-space-xl) !important;
     border-radius: var(--step3-radius-lg) !important;
-    margin-bottom: var(--step3-space-xl) !important;
     box-shadow: var(--step3-shadow-md) !important;
+    /* Remove margin-bottom since parent has gap */
+    margin-bottom: 0 !important;
+    /* CRITICAL FIX: Span both columns in the grid */
+    grid-column: 1 / -1 !important;
 }
 
 .phase3-title h3 {
@@ -188,7 +227,13 @@
     border-radius: var(--step3-radius-lg) !important;
     box-shadow: var(--step3-shadow-md) !important;
     padding: var(--step3-space-xl) !important;
-    margin-bottom: var(--step3-space-lg) !important;
+    /* Remove margin-bottom since parent uses gap */
+    margin-bottom: 0 !important;
+}
+
+/* Special handling for sections NOT in the sidebar */
+.phase3-content-wrapper .phase3-section {
+    /* These are in the left column */
 }
 
 .section-title {
@@ -499,16 +544,32 @@
 
 
 /* ============================================================================
-   TOTALS SECTION - INVOICE-STYLE SUMMARY
+   PHASE 3 SIDEBAR - RIGHT COLUMN (sticky totals)
+   ============================================================================ */
+
+.phase3-sidebar {
+    /* Right column - sticky totals sidebar */
+    position: sticky !important;
+    top: var(--step3-space-xl) !important;
+    max-height: calc(100vh - 340px) !important;
+    overflow-y: auto !important;
+}
+
+
+/* ============================================================================
+   TOTALS SECTION - INVOICE-STYLE SUMMARY (in sidebar)
    ============================================================================ */
 
 .totals-section {
-    background: var(--step3-gray-50) !important;
+    background: white !important;
     border: 3px solid var(--step3-primary) !important;
-    /* FIX: Ensure totals section doesn't overflow */
+    border-radius: var(--step3-radius-lg) !important;
+    box-shadow: var(--step3-shadow-lg) !important;
+    /* Sidebar styling */
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    padding: var(--step3-space-xl) !important;
 }
 
 .totals-table {
@@ -545,16 +606,11 @@
 
 .grand-total-row {
     border-top: 3px solid var(--step3-primary) !important;
-    padding: var(--step3-space-lg) !important;
-    margin: 0 !important;
+    padding-top: var(--step3-space-lg) !important;
+    margin-top: var(--step3-space-md) !important;
     font-size: 20px !important;
-    /* FIX: Make grand total always visible at bottom */
-    position: sticky !important;
-    bottom: 0 !important;
-    background: var(--step3-gray-50) !important;
-    z-index: 10 !important;
-    /* Add shadow for depth when scrolling */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08) !important;
+    /* NO sticky - sidebar itself is sticky */
+    background: transparent !important;
 }
 
 .grand-total-row .total-label {
@@ -850,11 +906,29 @@
    MOBILE RESPONSIVE - STACK ON SMALL SCREENS
    ============================================================================ */
 
+@media (max-width: 1024px) {
+    /* Tablet and below: Stack layout */
+    .phase3-unified-container {
+        grid-template-columns: 1fr !important;
+        padding: var(--step3-space-md) !important;
+    }
+
+    .phase3-content-wrapper {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    .phase3-sidebar {
+        position: relative !important;
+        top: 0 !important;
+        max-height: none !important;
+        order: -1 !important; /* Move totals to top on mobile */
+    }
+}
+
 @media (max-width: 768px) {
     .phase3-unified-container {
-        padding: var(--step3-space-md) !important;
-        /* FIX: Better mobile height */
-        max-height: calc(100vh - 200px) !important;
+        padding: var(--step3-space-sm) !important;
     }
 
     .phase3-header,
