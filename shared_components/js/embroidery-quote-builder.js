@@ -267,6 +267,9 @@ class EmbroideryQuoteBuilder {
             </div>
         `;
 
+        // LEFT COLUMN: Scrollable content wrapper
+        html += '<div class="phase3-content-wrapper">';
+
         // Embroidery specifications - compact list
         html += `
             <div class="phase3-section embroidery-specs">
@@ -415,6 +418,11 @@ class EmbroideryQuoteBuilder {
 
         html += '</div>'; // Close products-section
 
+        html += '</div>'; // Close phase3-content-wrapper (LEFT COLUMN)
+
+        // RIGHT COLUMN: Sticky sidebar with totals
+        html += '<div class="phase3-sidebar">';
+
         // Additional Services section removed from display since costs are already included in line item prices
         // The additional services data is still maintained in this.currentPricing.additionalServices for database/email purposes
 
@@ -460,12 +468,15 @@ class EmbroideryQuoteBuilder {
                 </div>
             </div>
         `;
-        
+
+        html += '</div>'; // Close phase3-sidebar (RIGHT COLUMN)
+
+        html += '</div>'; // Close phase3-unified-container (GRID WRAPPER)
+
         // Store both totals for later use (summary shows pre-tax, PDF shows with tax)
         this.currentPricing.grandTotal = grandTotal;
         this.currentPricing.grandTotalWithTax = grandTotalWithTax;
 
-        html += '</div>'; // Close phase3-unified-container
         container.innerHTML = html;
     }
     
