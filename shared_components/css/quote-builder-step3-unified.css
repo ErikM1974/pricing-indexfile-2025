@@ -65,6 +65,19 @@
 
 
 /* ============================================================================
+   QUOTE SUMMARY WRAPPER - ENSURE VISIBILITY
+   ============================================================================ */
+
+.quote-summary {
+    /* FIX: Ensure quote summary container is properly sized */
+    width: 100% !important;
+    min-height: 400px !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+
+/* ============================================================================
    PHASE HEADER - MATCHES STEP 2 STYLE
    ============================================================================ */
 
@@ -114,6 +127,10 @@
     padding: var(--step3-space-xl) !important;
     margin: 0 auto !important;
     max-width: 1200px !important;
+    /* FIX: Allow scrolling for long content */
+    max-height: calc(100vh - 280px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 
 
@@ -381,6 +398,15 @@
     border-radius: var(--step3-radius-sm) !important;
     font-size: 13px !important;
     font-weight: 600 !important;
+    white-space: nowrap !important;
+}
+
+/* Product card sizes from Step 2 product cards */
+.product-card-sizes {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: var(--step3-space-sm) !important;
 }
 
 .product-card-body {
@@ -425,6 +451,23 @@
 
 .size-line-header {
     margin-bottom: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--step3-space-sm) !important;
+    flex-wrap: wrap !important;
+}
+
+.size-badge {
+    /* FIX: Prevent awkward wrapping */
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 4px 10px !important;
+    background: var(--step3-primary-light) !important;
+    color: var(--step3-primary-dark) !important;
+    border-radius: var(--step3-radius-sm) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
 }
 
 .size-qty {
@@ -437,6 +480,8 @@
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: var(--step3-space-sm) !important;
 }
 
 .unit-price {
@@ -460,12 +505,19 @@
 .totals-section {
     background: var(--step3-gray-50) !important;
     border: 3px solid var(--step3-primary) !important;
+    /* FIX: Ensure totals section doesn't overflow */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .totals-table {
     display: flex !important;
     flex-direction: column !important;
     gap: var(--step3-space-sm) !important;
+    /* FIX: Prevent horizontal overflow */
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 .total-row {
@@ -474,6 +526,9 @@
     align-items: center !important;
     padding: var(--step3-space-sm) 0 !important;
     font-size: 15px !important;
+    /* FIX: Allow wrapping for long text instead of overflow */
+    flex-wrap: wrap !important;
+    gap: var(--step3-space-sm) !important;
 }
 
 .total-label {
@@ -490,9 +545,16 @@
 
 .grand-total-row {
     border-top: 3px solid var(--step3-primary) !important;
-    padding-top: var(--step3-space-lg) !important;
-    margin-top: var(--step3-space-md) !important;
+    padding: var(--step3-space-lg) !important;
+    margin: 0 !important;
     font-size: 20px !important;
+    /* FIX: Make grand total always visible at bottom */
+    position: sticky !important;
+    bottom: 0 !important;
+    background: var(--step3-gray-50) !important;
+    z-index: 10 !important;
+    /* Add shadow for depth when scrolling */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 .grand-total-row .total-label {
@@ -791,6 +853,8 @@
 @media (max-width: 768px) {
     .phase3-unified-container {
         padding: var(--step3-space-md) !important;
+        /* FIX: Better mobile height */
+        max-height: calc(100vh - 200px) !important;
     }
 
     .phase3-header,
@@ -829,6 +893,13 @@
 
     .grand-total-row {
         font-size: 18px !important;
+        /* FIX: Ensure grand total stays visible on mobile */
+        position: sticky !important;
+        bottom: 0 !important;
+    }
+
+    .grand-total-row .total-label {
+        font-size: 16px !important;
     }
 
     .grand-total-row .total-value {
@@ -837,6 +908,21 @@
 
     .quick-actions-grid {
         grid-template-columns: 1fr !important;
+    }
+
+    /* FIX: Better wrapping for meta items on mobile */
+    .phase3-meta {
+        justify-content: center !important;
+    }
+
+    .meta-item {
+        font-size: 12px !important;
+    }
+
+    /* FIX: Size badges better handling */
+    .size-badge {
+        font-size: 11px !important;
+        padding: 3px 8px !important;
     }
 }
 
