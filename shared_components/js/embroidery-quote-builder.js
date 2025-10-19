@@ -378,17 +378,19 @@ class EmbroideryQuoteBuilder {
 
             html += `
                 <div class="product-card">
-                    <div class="product-card-image-section">
-                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
-                             alt="${pp.product.style} - ${pp.product.color}"
-                             class="product-card-img"
-                             onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
-                    </div>
-                    <div class="product-card-info-section">
-                        <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
-                        <p class="product-desc">${pp.product.title}</p>
-                        <div class="product-meta">
-                            <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
+                    <div class="product-card-header-wrapper">
+                        <div class="product-card-image-section">
+                            <img src="${pp.product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
+                                 alt="${pp.product.style} - ${pp.product.color}"
+                                 class="product-card-img"
+                                 onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
+                        </div>
+                        <div class="product-card-info-section">
+                            <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
+                            <p class="product-desc">${pp.product.title}</p>
+                            <div class="product-meta">
+                                <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
+                            </div>
                         </div>
                     </div>
                     <div class="product-divider"></div>

@@ -339,18 +339,20 @@ class CapQuoteBuilder {
         this.currentQuote.products.forEach(product => {
             html += `
                 <div class="product-card">
-                    <div class="product-card-image-section">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
-                             alt="${product.styleNumber}"
-                             class="product-card-img"
-                             onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
-                    </div>
-                    <div class="product-card-info-section">
-                        <h5 class="product-name">${product.styleNumber} - ${product.color}</h5>
-                        <p class="product-desc">${product.title}</p>
-                        <div class="product-meta">
-                            <span class="meta-badge"><i class="fas fa-box"></i> ${product.totalQuantity} pieces</span>
-                            <span class="meta-badge"><i class="fas fa-tag"></i> ${product.brand}</span>
+                    <div class="product-card-header-wrapper">
+                        <div class="product-card-image-section">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
+                                 alt="${product.styleNumber}"
+                                 class="product-card-img"
+                                 onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
+                        </div>
+                        <div class="product-card-info-section">
+                            <h5 class="product-name">${product.styleNumber} - ${product.color}</h5>
+                            <p class="product-desc">${product.title}</p>
+                            <div class="product-meta">
+                                <span class="meta-badge"><i class="fas fa-box"></i> ${product.totalQuantity} pieces</span>
+                                <span class="meta-badge"><i class="fas fa-tag"></i> ${product.brand}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="product-divider"></div>
