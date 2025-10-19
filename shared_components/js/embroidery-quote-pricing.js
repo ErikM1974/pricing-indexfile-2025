@@ -655,7 +655,6 @@ class EmbroideryPricingCalculator {
                 }
             }
             
-            }
         }
         
         // Calculate setup fees
