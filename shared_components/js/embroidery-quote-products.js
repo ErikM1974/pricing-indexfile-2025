@@ -904,18 +904,61 @@ class ProductLineManager {
             return ''; // No logos defined yet
         }
 
-        // Count selected logos for summary
+        // Build preview cards for collapsed state
+        let previewCards = '';
+
+        // Primary logo preview
+        if (primaryLogo) {
+            previewCards += `
+                <div class="logo-preview-card primary">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="logo-preview-info">
+                        <div class="logo-preview-name">${primaryLogo.position}</div>
+                        <div class="logo-preview-meta">${primaryLogo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <span class="badge badge-primary">PRIMARY</span>
+                    <div class="logo-preview-qty">${product.totalQuantity} pcs</div>
+                </div>
+            `;
+        }
+
+        // Additional logo previews
+        if (product.logoAssignments?.additional) {
+            product.logoAssignments.additional.forEach(assignment => {
+                const logo = additionalLogos.find(l => l.id === assignment.logoId);
+                if (logo) {
+                    previewCards += `
+                        <div class="logo-preview-card additional">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="logo-preview-info">
+                                <div class="logo-preview-name">${logo.position}</div>
+                                <div class="logo-preview-meta">${logo.stitchCount.toLocaleString()} stitches</div>
+                            </div>
+                            <span class="badge badge-additional">ADDITIONAL</span>
+                            <div class="logo-preview-qty">${assignment.quantity} pcs</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Count selected logos for header
         let logoCount = primaryLogo ? 1 : 0;
         logoCount += product.logoAssignments?.additional?.length || 0;
 
         return `
             <details class="logo-details">
                 <summary class="logo-summary">
-                    <i class="fas fa-image"></i>
-                    <span>Logo Options</span>
-                    <span class="logo-count">${logoCount} selected</span>
+                    <div class="logo-summary-header">
+                        <i class="fas fa-image"></i>
+                        <span>Logo Options</span>
+                        <span class="logo-count">${logoCount} selected</span>
+                    </div>
                     <i class="fas fa-chevron-down toggle-icon"></i>
                 </summary>
+                <div class="logo-preview-section">
+                    ${previewCards}
+                </div>
                 <div class="logo-content">
                     ${this.renderLogoSelection(product, primaryLogo, additionalLogos)}
                 </div>
@@ -925,75 +968,99 @@ class ProductLineManager {
 
     /**
      * Render logo selection checkboxes for a product (internal helper)
+     * 🎨 PHASE 3 (2025-12-19): Modern card-based design with custom controls
      */
     renderLogoSelection(product, primaryLogo, additionalLogos) {
         if (!primaryLogo && additionalLogos.length === 0) {
             return ''; // No logos defined yet
         }
-        
+
         let html = '<div class="logo-selection-section">';
-        html += '<div class="logo-selection-header">Logo Selection:</div>';
+        html += '<div class="logo-selection-header">Configure Logo Assignments</div>';
         html += '<div class="logo-selection-grid">';
-        
-        // Primary logo (always checked, disabled)
+
+        // Primary logo (always checked, disabled) - MODERN CARD
         if (primaryLogo) {
             html += `
-                <div class="logo-selection-item primary">
-                    <label class="logo-checkbox-label">
-                        <input type="checkbox" 
-                               checked 
-                               disabled 
-                               class="logo-checkbox primary-logo-check">
-                        <span class="logo-label">
-                            <i class="fas fa-check-circle"></i>
-                            ${primaryLogo.position} - ${primaryLogo.stitchCount.toLocaleString()} stitches
+                <div class="logo-card primary">
+                    <div class="logo-card-checkbox-wrapper">
+                        <div class="custom-checkbox checked disabled">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="logo-card-content">
+                        <div class="logo-card-header">
+                            <span class="logo-card-title">${primaryLogo.position}</span>
                             <span class="badge badge-primary">PRIMARY</span>
-                        </span>
-                    </label>
-                    <span class="logo-qty">[${product.totalQuantity}] pieces</span>
+                        </div>
+                        <div class="logo-card-meta">${primaryLogo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <div class="logo-card-qty">
+                        <div class="qty-display primary">
+                            <span class="qty-number">${product.totalQuantity}</span>
+                            <span class="qty-label">pieces</span>
+                        </div>
+                    </div>
                 </div>
             `;
         }
-        
-        // Additional logos (optional with quantity input)
+
+        // Additional logos (optional with quantity controls) - MODERN CARDS
         additionalLogos.forEach(logo => {
             const assignment = product.logoAssignments?.additional?.find(a => a.logoId === logo.id);
-            const isChecked = assignment ? 'checked' : '';
-            const quantity = assignment?.quantity || '';
-            
+            const isChecked = assignment ? true : false;
+            const quantity = assignment?.quantity || product.totalQuantity;
+
             html += `
-                <div class="logo-selection-item additional">
-                    <label class="logo-checkbox-label">
-                        <input type="checkbox" 
-                               ${isChecked}
-                               class="logo-checkbox additional-logo-check"
-                               data-logo-id="${logo.id}"
-                               data-product-id="${product.id}"
-                               onchange="window.productLineManager.toggleAdditionalLogo(${product.id}, ${logo.id}, this.checked)">
-                        <span class="logo-label">
-                            ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
+                <div class="logo-card additional ${isChecked ? 'checked' : ''}">
+                    <div class="logo-card-checkbox-wrapper">
+                        <div class="custom-checkbox ${isChecked ? 'checked' : ''}"
+                             data-logo-id="${logo.id}"
+                             data-product-id="${product.id}"
+                             onclick="window.productLineManager.toggleAdditionalLogoModern(${product.id}, ${logo.id})">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="logo-card-content">
+                        <div class="logo-card-header">
+                            <span class="logo-card-title">${logo.position}</span>
                             <span class="badge badge-additional">ADDITIONAL</span>
-                        </span>
-                    </label>
-                    <input type="number" 
-                           class="logo-qty-input"
-                           placeholder="Qty"
-                           min="1"
-                           max="${product.totalQuantity}"
-                           value="${quantity}"
-                           ${!isChecked ? 'disabled' : ''}
-                           data-logo-id="${logo.id}"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.updateAdditionalLogoQty(${product.id}, ${logo.id}, this.value)">
-                    <span class="logo-qty-suffix">of ${product.totalQuantity}</span>
+                        </div>
+                        <div class="logo-card-meta">${logo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <div class="logo-card-qty">
+                        <div class="qty-controls ${!isChecked ? 'disabled' : ''}">
+                            <button type="button"
+                                    class="qty-btn qty-minus"
+                                    onclick="window.productLineManager.decrementLogoQty(${product.id}, ${logo.id})"
+                                    ${!isChecked ? 'disabled' : ''}>
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number"
+                                   class="qty-input"
+                                   min="1"
+                                   max="${product.totalQuantity}"
+                                   value="${quantity}"
+                                   ${!isChecked ? 'disabled' : ''}
+                                   data-logo-id="${logo.id}"
+                                   data-product-id="${product.id}"
+                                   onchange="window.productLineManager.updateAdditionalLogoQty(${product.id}, ${logo.id}, this.value)">
+                            <button type="button"
+                                    class="qty-btn qty-plus"
+                                    onclick="window.productLineManager.incrementLogoQty(${product.id}, ${logo.id})"
+                                    ${!isChecked ? 'disabled' : ''}>
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="qty-of-total">of ${product.totalQuantity}</div>
+                    </div>
                 </div>
             `;
         });
-        
-        
+
         html += '</div>';
         html += '</div>';
-        
+
         return html;
     }
     
@@ -1055,19 +1122,104 @@ class ProductLineManager {
     updateAdditionalLogoQty(productId, logoId, quantity) {
         const product = this.products.find(p => p.id === productId);
         if (!product || !product.logoAssignments) return;
-        
+
         const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
         if (assignment) {
             assignment.quantity = Math.min(parseInt(quantity) || 0, product.totalQuantity);
         }
-        
+
         // Trigger pricing update
         if (window.embroideryQuoteBuilder) {
             window.embroideryQuoteBuilder.updatePricing();
         }
     }
-    
-    
+
+    /**
+     * Modern checkbox toggle (for custom checkboxes)
+     * 🎨 PHASE 3 (2025-12-19): New helper for modern UI
+     */
+    toggleAdditionalLogoModern(productId, logoId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+
+        if (!product.logoAssignments) {
+            product.logoAssignments = { primary: null, additional: [], monogram: null };
+        }
+
+        // Check if logo is currently assigned
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        const isCurrentlyChecked = !!assignment;
+
+        if (isCurrentlyChecked) {
+            // Remove assignment
+            product.logoAssignments.additional = product.logoAssignments.additional.filter(a => a.logoId !== logoId);
+        } else {
+            // Add assignment
+            if (!product.logoAssignments.additional) {
+                product.logoAssignments.additional = [];
+            }
+            product.logoAssignments.additional.push({
+                logoId: logoId,
+                quantity: product.totalQuantity
+            });
+        }
+
+        // Update UI
+        this.renderAllProducts();
+
+        // Trigger pricing update
+        if (window.embroideryQuoteBuilder) {
+            window.embroideryQuoteBuilder.updatePricing();
+        }
+    }
+
+    /**
+     * Increment logo quantity
+     * 🎨 PHASE 3 (2025-12-19): New helper for +/- buttons
+     */
+    incrementLogoQty(productId, logoId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product || !product.logoAssignments) return;
+
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        if (assignment && assignment.quantity < product.totalQuantity) {
+            assignment.quantity++;
+
+            // Update input value
+            const input = document.querySelector(`input.qty-input[data-product-id="${productId}"][data-logo-id="${logoId}"]`);
+            if (input) input.value = assignment.quantity;
+
+            // Trigger pricing update
+            if (window.embroideryQuoteBuilder) {
+                window.embroideryQuoteBuilder.updatePricing();
+            }
+        }
+    }
+
+    /**
+     * Decrement logo quantity
+     * 🎨 PHASE 3 (2025-12-19): New helper for +/- buttons
+     */
+    decrementLogoQty(productId, logoId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product || !product.logoAssignments) return;
+
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        if (assignment && assignment.quantity > 1) {
+            assignment.quantity--;
+
+            // Update input value
+            const input = document.querySelector(`input.qty-input[data-product-id="${productId}"][data-logo-id="${logoId}"]`);
+            if (input) input.value = assignment.quantity;
+
+            // Trigger pricing update
+            if (window.embroideryQuoteBuilder) {
+                window.embroideryQuoteBuilder.updatePricing();
+            }
+        }
+    }
+
+
     /**
      * Export products data
      */

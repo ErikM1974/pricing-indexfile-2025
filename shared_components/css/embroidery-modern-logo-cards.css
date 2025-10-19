@@ -1,0 +1,470 @@
+/**
+ * Modern Logo Card Design (2025-12-19)
+ * Stripe-level polish for logo assignment UI
+ * Embroidery-specific color theming
+ */
+
+/* ============================================
+   LOGO DETAILS COLLAPSIBLE
+   ============================================ */
+.logo-details {
+    margin-top: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.logo-details[open] {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.logo-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    background: linear-gradient(135deg, rgba(76, 179, 84, 0.03), rgba(59, 130, 246, 0.03));
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    list-style: none;
+}
+
+.logo-summary:hover {
+    background: linear-gradient(135deg, rgba(76, 179, 84, 0.06), rgba(59, 130, 246, 0.06));
+}
+
+.logo-details[open] .logo-summary {
+    border-bottom-color: #e5e7eb;
+}
+
+.logo-summary::marker,
+.logo-summary::-webkit-details-marker {
+    display: none;
+}
+
+.logo-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.logo-summary-header i.fa-image {
+    font-size: 1.25rem;
+    color: #3a7c52;
+}
+
+.logo-summary-header > span:first-of-type {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1f2937;
+}
+
+.logo-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #3a7c52, #2d6341);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.toggle-icon {
+    color: #6b7280;
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+    margin-left: 0.75rem;
+}
+
+.logo-details[open] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   LOGO PREVIEW SECTION (Collapsed State)
+   ============================================ */
+.logo-preview-section {
+    padding: 1rem 1.25rem;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.logo-details:not([open]) .logo-preview-section {
+    display: none;
+}
+
+.logo-preview-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.logo-preview-card.primary {
+    border-color: #3a7c52;
+    background: linear-gradient(135deg, rgba(58, 124, 82, 0.04), rgba(58, 124, 82, 0.02));
+}
+
+.logo-preview-card.additional {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(59, 130, 246, 0.02));
+}
+
+.logo-preview-card i.fa-check-circle {
+    font-size: 1.125rem;
+    color: #10b981;
+}
+
+.logo-preview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.logo-preview-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+.logo-preview-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.logo-preview-qty {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1f2937;
+    padding: 0.25rem 0.625rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+/* ============================================
+   LOGO SELECTION SECTION (Expanded State)
+   ============================================ */
+.logo-selection-section {
+    padding: 1.5rem 1.25rem;
+    background: white;
+}
+
+.logo-selection-header {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1f2937;
+    margin-bottom: 1.25rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.logo-selection-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ============================================
+   MODERN LOGO CARDS
+   ============================================ */
+.logo-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.logo-card.primary::before {
+    background: linear-gradient(180deg, #3a7c52, #2d6341);
+}
+
+.logo-card.additional.checked::before {
+    background: linear-gradient(180deg, #3b82f6, #1e40af);
+}
+
+.logo-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.logo-card.primary {
+    background: linear-gradient(135deg, rgba(58, 124, 82, 0.04), rgba(58, 124, 82, 0.02));
+    border-color: rgba(58, 124, 82, 0.3);
+}
+
+.logo-card.additional.checked {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(59, 130, 246, 0.02));
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.logo-card.additional:not(.checked) {
+    background: white;
+    border-color: #e5e7eb;
+    opacity: 0.7;
+}
+
+.logo-card.additional:not(.checked):hover {
+    opacity: 1;
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ============================================
+   CUSTOM CHECKBOX
+   ============================================ */
+.logo-card-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-checkbox {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    position: relative;
+}
+
+.custom-checkbox i {
+    font-size: 0.875rem;
+    color: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-checkbox.checked i {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.logo-card.primary .custom-checkbox.checked {
+    background: linear-gradient(135deg, #3a7c52, #2d6341);
+    border-color: #3a7c52;
+    box-shadow: 0 2px 8px rgba(58, 124, 82, 0.3);
+}
+
+.logo-card.additional .custom-checkbox.checked {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.custom-checkbox:not(.disabled):not(.checked):hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+    transform: scale(1.05);
+}
+
+.custom-checkbox.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ============================================
+   LOGO CARD CONTENT
+   ============================================ */
+.logo-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    flex: 1;
+}
+
+.logo-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.logo-card-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.logo-card-meta {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+/* ============================================
+   QUANTITY CONTROLS
+   ============================================ */
+.logo-card-qty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.qty-display.primary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(58, 124, 82, 0.1), rgba(58, 124, 82, 0.05));
+    border-radius: 8px;
+    border: 1px solid rgba(58, 124, 82, 0.2);
+}
+
+.qty-display.primary .qty-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #3a7c52;
+    line-height: 1;
+}
+
+.qty-display.primary .qty-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.125rem;
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.qty-controls:not(.disabled):hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.qty-controls.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.qty-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    transform: scale(1.1);
+}
+
+.qty-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.qty-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.qty-input {
+    width: 50px;
+    height: 32px;
+    border: none;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1f2937;
+    background: transparent;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.qty-input:disabled {
+    color: #6b7280;
+}
+
+.qty-of-total {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* Badge styling for logo cards */
+.logo-card .badge-primary {
+    background: linear-gradient(135deg, #3a7c52, #2d6341);
+    color: white;
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 4px rgba(58, 124, 82, 0.3);
+}
+
+.logo-card .badge-additional {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
