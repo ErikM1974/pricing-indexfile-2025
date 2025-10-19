@@ -508,9 +508,12 @@
     padding: 14px 20px !important;
     border-bottom: 1px solid #e9ecef !important;
     transition: background 0.2s ease !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto auto !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 20px !important;
+    row-gap: 8px !important;
+    align-items: center !important;
 }
 
 .size-line:last-child {
@@ -522,11 +525,14 @@
 }
 
 .size-line-header {
-    margin-bottom: 6px !important;
+    margin-bottom: 0 !important;
     display: flex !important;
     align-items: center !important;
     gap: var(--step3-space-sm) !important;
     flex-wrap: wrap !important;
+    grid-column: 1 / 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
 }
 
 .size-badge {
@@ -602,6 +608,12 @@
     color: #28a745 !important;
     font-weight: 700 !important;
     font-family: var(--step3-font-mono) !important;
+    white-space: nowrap !important;
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+    justify-self: center !important;
+    min-width: 140px !important;
+    text-align: center !important;
 }
 
 /* Second line: Component breakdown with bullets - Improved spacing (2025-12-19) */
@@ -613,6 +625,8 @@
     color: #6c757d !important;
     line-height: 1.5 !important;
     padding: 4px 0 !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
 }
 
 #summary-phase .price-component {
@@ -644,27 +658,49 @@
 }
 
 /* Line total - prominent on right */
-#summary-phase .size-line-pricing .line-total {
-    font-size: 16px !important;
+#summary-phase .size-line .line-total {
+    font-size: 18px !important;
     font-weight: 700 !important;
     color: #1a1a1a !important;
     white-space: nowrap !important;
     font-family: var(--step3-font-mono) !important;
+    grid-column: 3 / 4 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    min-width: 140px !important;
+    text-align: right !important;
 }
 
-/* Responsive: Stack on mobile if needed */
+/* Responsive: Stack grid on mobile (2025-12-19) */
 @media (max-width: 576px) {
-    #summary-phase .price-summary-line {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 4px !important;
+    .size-line {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto auto !important;
+        row-gap: 12px !important;
+    }
+
+    .size-line-header {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
     }
 
     #summary-phase .unit-price-display {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        justify-self: start !important;
+        text-align: left !important;
         font-size: 16px !important;
     }
 
+    #summary-phase .size-line .line-total {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        justify-self: end !important;
+    }
+
     #summary-phase .price-components {
+        grid-column: 1 !important;
+        grid-row: 3 !important;
         font-size: 12px !important;
     }
 }

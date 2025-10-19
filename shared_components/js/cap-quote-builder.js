@@ -397,14 +397,10 @@ class CapQuoteBuilder {
                             <span class="size-badge">${item.size}</span>
                             <span class="size-qty">${item.quantity} pieces</span>
                         </div>
-                        <div class="size-line-pricing">
-                            <div class="price-summary-line">
-                                <span class="unit-price-display">$${consolidatedPricePerCap.toFixed(2)} /ea</span>
-                                <span class="line-total">$${lineTotal.toFixed(2)}</span>
-                            </div>
-                            <div class="price-components">
-                                ${components.join('')}
-                            </div>
+                        <span class="unit-price-display">$${consolidatedPricePerCap.toFixed(2)} /ea</span>
+                        <span class="line-total">$${lineTotal.toFixed(2)}</span>
+                        <div class="price-components">
+                            ${components.join('')}
                         </div>
                     </div>
                 `;
