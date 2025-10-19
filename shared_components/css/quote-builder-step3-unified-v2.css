@@ -349,19 +349,20 @@
 }
 
 .product-card {
-    border: 2px solid var(--step3-gray-200) !important;
+    border: 1px solid var(--step3-gray-200) !important;
     border-radius: var(--step3-radius-lg) !important;
     background: white !important;
-    margin-bottom: var(--step3-space-lg) !important;
+    margin-bottom: 24px !important;
     overflow: hidden !important;
     transition: var(--step3-transition) !important;
     display: flex !important;
     flex-direction: column !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 .product-card:hover {
     border-color: var(--step3-primary) !important;
-    box-shadow: var(--step3-shadow-hover) !important;
+    box-shadow: 0 4px 20px rgba(76, 179, 84, 0.25) !important;
     transform: translateY(-2px) !important;
 }
 
@@ -475,27 +476,30 @@
 
 .product-card-body {
     padding: var(--step3-space-lg) !important;
+    margin-bottom: 16px !important;
 }
 
 .product-card-footer {
-    background: var(--step3-gray-50) !important;
-    padding: var(--step3-space-md) var(--step3-space-lg) !important;
-    border-top: 2px solid var(--step3-gray-100) !important;
+    background: #f8f9fa !important;
+    padding: 20px 24px !important;
+    border-top: 2px solid #e9ecef !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+    gap: 40px !important;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04) !important;
 }
 
 .footer-label {
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 600 !important;
     color: var(--step3-gray-700) !important;
 }
 
 .footer-amount {
-    font-size: 20px !important;
+    font-size: 24px !important;
     font-weight: 700 !important;
-    color: var(--step3-primary) !important;
+    color: #2d5f3f !important;
     font-family: var(--step3-font-mono) !important;
 }
 
@@ -505,15 +509,16 @@
    ============================================================================ */
 
 .size-line {
-    padding: 14px 20px !important;
+    padding: 16px 20px !important;
     border-bottom: 1px solid #e9ecef !important;
-    transition: background 0.2s ease !important;
+    transition: all 0.2s ease !important;
     display: grid !important;
     grid-template-columns: 1fr auto auto !important;
     grid-template-rows: auto auto !important;
     column-gap: 20px !important;
     row-gap: 8px !important;
     align-items: center !important;
+    margin-bottom: 4px !important;
 }
 
 .size-line:last-child {
@@ -522,6 +527,8 @@
 
 .size-line:hover {
     background: #f8f9fa !important;
+    border-left: 3px solid #4cb354 !important;
+    padding-left: 17px !important;
 }
 
 .size-line-header {
@@ -604,9 +611,9 @@
 }
 
 #summary-phase .unit-price-display {
-    font-size: 18px !important;
-    color: #28a745 !important;
-    font-weight: 700 !important;
+    font-size: 20px !important;
+    color: #2d5f3f !important;
+    font-weight: 800 !important;
     font-family: var(--step3-font-mono) !important;
     white-space: nowrap !important;
     grid-column: 2 / 3 !important;
@@ -614,6 +621,9 @@
     justify-self: center !important;
     min-width: 140px !important;
     text-align: center !important;
+    background: #e8f5e9 !important;
+    padding: 4px 12px !important;
+    border-radius: 6px !important;
 }
 
 /* Second line: Component breakdown with bullets - Improved spacing (2025-12-19) */
@@ -644,8 +654,11 @@
 
 #summary-phase .price-component .component-value {
     font-weight: 700 !important;
-    color: #495057 !important;
+    color: #1a1a1a !important;
     font-family: var(--step3-font-mono) !important;
+    background: #f8f9fa !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
 }
 
 /* Bullet separator between components - Improved spacing (2025-12-19) */
@@ -659,8 +672,8 @@
 
 /* Line total - prominent on right */
 #summary-phase .size-line .line-total {
-    font-size: 18px !important;
-    font-weight: 700 !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
     color: #1a1a1a !important;
     white-space: nowrap !important;
     font-family: var(--step3-font-mono) !important;

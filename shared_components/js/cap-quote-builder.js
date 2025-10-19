@@ -384,7 +384,7 @@ class CapQuoteBuilder {
                 }
 
                 if (ltmFee > 0) {
-                    components.push(`<span class="price-component"><span class="component-label">Batch Fee</span> <span class="component-value">$${ltmFee.toFixed(2)}</span></span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Small Batch</span> <span class="component-value">$${ltmFee.toFixed(2)}</span></span>`);
                 }
 
                 if (alCost > 0) {
