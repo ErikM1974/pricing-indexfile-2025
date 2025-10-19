@@ -355,6 +355,8 @@
     margin-bottom: var(--step3-space-lg) !important;
     overflow: hidden !important;
     transition: var(--step3-transition) !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .product-card:hover {
@@ -363,48 +365,98 @@
     transform: translateY(-2px) !important;
 }
 
-.product-card-header {
+/* ============================================================================
+   PRODUCT CARD IMAGE SECTION (NEW - TOP OF CARD)
+   ============================================================================ */
+
+.product-card-image-section {
+    width: 100% !important;
     display: flex !important;
+    justify-content: center !important;
     align-items: center !important;
-    gap: var(--step3-space-md) !important;
-    padding: var(--step3-space-lg) !important;
-    border-bottom: 2px solid var(--step3-gray-100) !important;
-    background: var(--step3-gray-50) !important;
+    padding: 32px !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
+    border-bottom: 2px solid #e9ecef !important;
+    min-height: 264px !important;
+    flex-shrink: 0 !important;
 }
 
 .product-card-img {
-    width: 100px !important;
-    height: 100px !important;
-    border-radius: var(--step3-radius-md) !important;
-    border: 2px solid var(--step3-gray-200) !important;
+    width: 200px !important;
+    height: 200px !important;
+    border-radius: 12px !important;
+    border: 3px solid #e9ecef !important;
     object-fit: cover !important;
-    flex-shrink: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.3s ease !important;
     background: white !important;
 }
 
+.product-card-img:hover {
+    transform: scale(1.05) !important;
+}
+
+/* ============================================================================
+   PRODUCT CARD INFO SECTION (BELOW IMAGE)
+   ============================================================================ */
+
+.product-card-info-section {
+    width: 100% !important;
+    padding: 20px 24px !important;
+    text-align: center !important;
+    background: white !important;
+    border-bottom: 2px solid #f1f3f5 !important;
+    flex-shrink: 0 !important;
+}
+
+/* ============================================================================
+   DEPRECATED - NUCLEAR KILL OLD HEADER STYLES
+   ============================================================================ */
+.product-card-header {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
 .product-card-info {
-    flex: 1 !important;
-    min-width: 0 !important;
+    display: none !important;
+    visibility: hidden !important;
 }
 
 .product-name {
-    font-size: 18px !important;
+    font-size: 22px !important;
     font-weight: 700 !important;
-    color: var(--step3-gray-900) !important;
-    margin: 0 0 6px 0 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 12px 0 !important;
+    line-height: 1.3 !important;
     font-family: var(--step3-font-sans) !important;
 }
 
 .product-desc {
-    font-size: 14px !important;
-    color: var(--step3-gray-600) !important;
-    margin: 0 0 var(--step3-space-sm) 0 !important;
+    font-size: 15px !important;
+    color: #6c757d !important;
+    margin: 0 0 16px 0 !important;
+    line-height: 1.5 !important;
+    max-width: 600px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .product-meta {
     display: flex !important;
-    gap: var(--step3-space-sm) !important;
+    justify-content: center !important;
+    gap: 12px !important;
     flex-wrap: wrap !important;
+}
+
+/* Product Divider - Subtle separator between sections */
+.product-divider {
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent 0%, #dee2e6 50%, transparent 100%) !important;
+    margin: 0 24px !important;
 }
 
 .meta-badge {
@@ -429,28 +481,31 @@
 }
 
 .product-card-body {
-    padding: var(--step3-space-lg) !important;
+    width: 100% !important;
+    padding: 0 !important;
+    background: white !important;
+    flex: 1 1 auto !important;
 }
 
 .product-card-footer {
-    background: var(--step3-gray-50) !important;
-    padding: var(--step3-space-md) var(--step3-space-lg) !important;
-    border-top: 2px solid var(--step3-gray-100) !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    padding: 20px 24px !important;
+    border-top: 2px solid #dee2e6 !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
 }
 
 .footer-label {
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 600 !important;
-    color: var(--step3-gray-700) !important;
+    color: #495057 !important;
 }
 
 .footer-amount {
-    font-size: 20px !important;
+    font-size: 24px !important;
     font-weight: 700 !important;
-    color: var(--step3-primary) !important;
+    color: #28a745 !important;
     font-family: var(--step3-font-mono) !important;
 }
 
@@ -460,8 +515,16 @@
    ============================================================================ */
 
 .size-line {
-    padding: var(--step3-space-sm) 0 !important;
-    border-bottom: 1px solid var(--step3-gray-100) !important;
+    padding: 14px 20px !important;
+    border-bottom: 1px solid #e9ecef !important;
+    transition: background 0.2s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.size-line:hover {
+    background: #f8f9fa !important;
 }
 
 .size-line:last-child {
@@ -469,15 +532,14 @@
 }
 
 .size-line-header {
-    margin-bottom: 6px !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: var(--step3-space-sm) !important;
+    gap: 8px !important;
     flex-wrap: wrap !important;
 }
 
 .size-badge {
-    /* FIX: Prevent awkward wrapping */
     white-space: nowrap !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -490,17 +552,19 @@
 }
 
 .size-qty {
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-weight: 600 !important;
-    color: var(--step3-gray-900) !important;
+    color: #495057 !important;
 }
 
 .size-line-pricing {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: var(--step3-space-sm) !important;
+    gap: 16px !important;
+    flex-wrap: nowrap !important;
+    min-height: 40px !important;
+    overflow: visible !important;
 }
 
 .unit-price {
@@ -510,10 +574,150 @@
 }
 
 .line-total {
-    font-size: 15px !important;
+    color: #1a1a1a !important;
     font-weight: 700 !important;
-    color: var(--step3-gray-900) !important;
+    font-size: 16px !important;
+    white-space: nowrap !important;
     font-family: var(--step3-font-mono) !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+}
+
+
+/* ============================================================================
+   MODERN HORIZONTAL PRICING BREAKDOWN - E-COMMERCE STYLE
+   (SCOPED TO #summary-phase TO AVOID AFFECTING STEP 1 CONTROLS)
+   ============================================================================ */
+
+#summary-phase .size-line-pricing-breakdown {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px 0 !important;
+}
+
+/* Inline pricing formula (Modern E-commerce Style) - HORIZONTAL LAYOUT */
+#summary-phase .price-formula {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace !important;
+    font-size: 14px !important;
+    color: #495057 !important;
+    line-height: 1.6 !important;
+
+    /* Force horizontal layout with breathing room */
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+/* Force ALL children to stay inline and not shrink */
+#summary-phase .price-formula > * {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    display: inline !important;
+}
+
+/* Base amounts - Green (money color) */
+#summary-phase .price-formula > .base-amount,
+#summary-phase .price-formula .base-amount {
+    color: #28a745 !important;
+    font-weight: 700 !important;
+    display: inline !important;
+}
+
+/* Fee amounts - Orange (warning) */
+#summary-phase .price-formula > .fee-amount,
+#summary-phase .price-formula .fee-amount {
+    color: #fd7e14 !important;
+    font-weight: 700 !important;
+    display: inline !important;
+}
+
+/* Extra/additional amounts - Blue (info) */
+#summary-phase .price-formula > .extra-amount,
+#summary-phase .price-formula .extra-amount {
+    color: #007bff !important;
+    font-weight: 700 !important;
+    display: inline !important;
+}
+
+/* Additional logo - Purple (special) */
+#summary-phase .price-formula > .al-amount,
+#summary-phase .price-formula .al-amount {
+    color: #6f42c1 !important;
+    font-weight: 700 !important;
+    display: inline !important;
+}
+
+/* Size upcharge - Brown (upcharge) */
+#summary-phase .price-formula > .upcharge-amount,
+#summary-phase .price-formula .upcharge-amount {
+    color: #795548 !important;
+    font-weight: 700 !important;
+    display: inline !important;
+}
+
+/* Operators - Gray (subtle) */
+#summary-phase .price-formula > .operator,
+#summary-phase .price-formula .operator {
+    color: #6c757d !important;
+    font-weight: 500 !important;
+    padding: 0 4px !important;
+    display: inline !important;
+}
+
+/* Equals - Dark (emphasis) */
+#summary-phase .price-formula > .equals,
+#summary-phase .price-formula .equals {
+    color: #495057 !important;
+    font-weight: 700 !important;
+    padding: 0 4px !important;
+    display: inline !important;
+}
+
+/* Labels - Light gray, italic (descriptive) */
+#summary-phase .price-formula > .label,
+#summary-phase .price-formula .label {
+    font-size: 12px !important;
+    color: #868e96 !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+    display: inline !important;
+}
+
+/* Total line - more compact */
+#summary-phase .price-total {
+    margin-top: 4px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+#summary-phase .price-total strong {
+    color: #4cb354 !important;
+    font-weight: 700 !important;
+}
+
+/* Mobile responsive - wrap formula parts */
+@media (max-width: 768px) {
+    #summary-phase .price-formula {
+        font-size: 12px !important;
+    }
+
+    #summary-phase .price-total {
+        font-size: 13px !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
 }
 
 
@@ -894,14 +1098,56 @@
         padding: var(--step3-space-md) !important;
     }
 
-    .product-card-header {
-        flex-direction: column !important;
-        text-align: center !important;
+    /* Product card mobile adjustments */
+    .product-card-image-section {
+        padding: 20px !important;
     }
 
     .product-card-img {
-        width: 80px !important;
-        height: 80px !important;
+        width: 160px !important;
+        height: 160px !important;
+    }
+
+    .product-card-info-section {
+        padding: 16px !important;
+    }
+
+    .product-name {
+        font-size: 18px !important;
+    }
+
+    .product-desc {
+        font-size: 14px !important;
+    }
+
+    /* Size line mobile */
+    .size-line {
+        padding: 12px 16px !important;
+    }
+
+    .size-line-pricing {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    .price-formula {
+        font-size: 12px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .line-total {
+        font-size: 14px !important;
+        align-self: flex-end !important;
+    }
+
+    .footer-amount {
+        font-size: 20px !important;
+    }
+
+    /* Deprecated - keeping for backward compatibility */
+    .product-card-header {
+        display: none !important;
     }
 
     .form-row {

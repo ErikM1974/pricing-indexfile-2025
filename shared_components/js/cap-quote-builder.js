@@ -339,40 +339,70 @@ class CapQuoteBuilder {
         this.currentQuote.products.forEach(product => {
             html += `
                 <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
+                    <div class="product-card-image-section">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(product.styleNumber)}"
                              alt="${product.styleNumber}"
                              class="product-card-img"
-                             onerror="this.src='https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
-                        <div class="product-card-info">
-                            <h5 class="product-name">${product.styleNumber} - ${product.color}</h5>
-                            <p class="product-desc">${product.title}</p>
-                            <div class="product-meta">
-                                <span class="meta-badge"><i class="fas fa-box"></i> ${product.totalQuantity} pieces</span>
-                                <span class="meta-badge"><i class="fas fa-tag"></i> ${product.brand}</span>
-                            </div>
+                             onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${product.styleNumber}')">
+                    </div>
+                    <div class="product-card-info-section">
+                        <h5 class="product-name">${product.styleNumber} - ${product.color}</h5>
+                        <p class="product-desc">${product.title}</p>
+                        <div class="product-meta">
+                            <span class="meta-badge"><i class="fas fa-box"></i> ${product.totalQuantity} pieces</span>
+                            <span class="meta-badge"><i class="fas fa-tag"></i> ${product.brand}</span>
                         </div>
                     </div>
+                    <div class="product-divider"></div>
                     <div class="product-card-body">
             `;
             
-            // Simplified size breakdown with cleaner pricing
+            // Modern horizontal pricing breakdown (e-commerce style)
             product.sizePricedItems.forEach(item => {
                 const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
                 const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
+
+                // Extract pricing components
+                const basePrice = item.unitPrice - (item.sizeUpcharge || 0); // Base price without upcharge
+                const sizeUpcharge = item.sizeUpcharge || 0;
+                const ltmFee = item.ltmPerUnit || 0;
+                const alCost = additionalLogoCostPerPiece || 0;
+
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                 const lineTotal = consolidatedPricePerCap * item.quantity;
+
+                // Build inline pricing formula (only show applicable components)
+                let formulaParts = [];
+                formulaParts.push(`<span class="base-amount">$${basePrice.toFixed(2)}</span><span class="label">(base)</span>`);
+
+                if (sizeUpcharge > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="upcharge-amount">$${sizeUpcharge.toFixed(2)}</span><span class="label">(oversize)</span>`);
+                }
+
+                if (ltmFee > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="fee-amount">$${ltmFee.toFixed(2)}</span><span class="label">(small batch)</span>`);
+                }
+
+                if (alCost > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="al-amount">$${alCost.toFixed(2)}</span><span class="label">(add'l logo)</span>`);
+                }
+
+                formulaParts.push(`<span class="equals">=</span><span class="base-amount">$${consolidatedPricePerCap.toFixed(2)}</span><span class="label">/ea</span>`);
 
                 html += `
                     <div class="size-line">
                         <div class="size-line-header">
                             <span class="size-badge">${item.size}</span>
                             <span class="size-qty">${item.quantity} pieces</span>
-                            ${item.sizeUpcharge > 0 ? `<span class="size-upcharge">+$${item.sizeUpcharge.toFixed(2)}</span>` : ''}
                         </div>
-                        <div class="size-line-pricing">
-                            <span class="unit-price">$${consolidatedPricePerCap.toFixed(2)} each</span>
-                            <span class="line-total">$${lineTotal.toFixed(2)}</span>
+                        <div class="size-line-pricing-breakdown">
+                            <div class="price-formula">
+                                ${formulaParts.join('')}
+                            </div>
+                            <div class="price-total">
+                                <span>Line Total:</span>
+                                <span><strong>$${lineTotal.toFixed(2)}</strong></span>
+                            </div>
                         </div>
                     </div>
                 `;

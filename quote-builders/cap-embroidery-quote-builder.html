@@ -47,8 +47,8 @@
     <!-- STEP 2 UNIFIED CSS (2025-10-17) - High-specificity Step 2 styles override page CSS - LOADED LAST to win cascade -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-step2-unified.css?v=20251017-polish">
 
-    <!-- STEP 3 UNIFIED CSS (2025-10-17) - Modern Shopify/Amazon-inspired summary design -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-step3-unified.css?v=20251017-step3">
+    <!-- STEP 3 UNIFIED CSS V2 (2025-10-18) - Modern Shopify/Amazon-inspired summary design + HORIZONTAL FORMULA FIX (FILENAME CHANGED FOR CACHE BUST) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-step3-unified-v2.css?v=20251219-sizeinput-fix">
 
     <!-- Toast Notifications (2025-10-15) - Modern user feedback -->
     <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=20251015">
@@ -538,7 +538,7 @@
     <script src="/shared_components/js/cap-quote-logos.js"></script>
     <script src="/shared_components/js/cap-quote-products.js"></script>
     <script src="/shared_components/js/cap-quote-pricing.js"></script>
-    <script src="/shared_components/js/cap-quote-builder.js"></script>
+    <script src="/shared_components/js/cap-quote-builder.js?v=20251218-horizontal"></script>
 
     <!-- Quote Indicator Widget Manager -->
     <script src="/shared_components/js/quote-indicator-manager.js?v=20251015"></script>
@@ -1063,20 +1063,19 @@
                 html += '<div class="size-line">';
                 html += '<div class="size-line-header">';
                 html += '<span class="size-badge">Front</span>';
-                html += '<div class="size-qty" style="display: flex; flex-direction: column; gap: 4px;">';
-                html += '<span>Cap with Logo</span>';
+                html += '<span class="size-qty">Cap with Logo';
                 if (smallBatchFee > 0 || extraStitchesFee > 0) {
-                    html += '<span style="font-size: 0.85em; color: #666;">';
+                    html += ' (';
                     if (smallBatchFee > 0) html += `Small Batch +$${smallBatchFee.toFixed(2)}`;
                     if (smallBatchFee > 0 && extraStitchesFee > 0) html += ', ';
                     if (extraStitchesFee > 0) html += `Extra Stitches +$${extraStitchesFee.toFixed(2)}`;
-                    html += '</span>';
+                    html += ')';
                 }
-                html += '</div>';
+                html += '</span>';
                 html += '</div>';
                 html += '<div class="size-line-pricing">';
                 html += `<span class="unit-price">$${frontLogoTotal.toFixed(2)}/ea</span>`;
-                html += `<span class="line-total">$${(frontLogoTotal * quantity).toFixed(2)}</span>`;
+                html += `<span class="line-total" style="margin-left: auto; color: #4cb354; font-weight: 600;">→ $${(frontLogoTotal * quantity).toFixed(2)}</span>`;
                 html += '</div>';
                 html += '</div>';
 
@@ -1089,7 +1088,7 @@
                     html += '</div>';
                     html += '<div class="size-line-pricing">';
                     html += `<span class="unit-price">$${backLogoPrice.toFixed(2)}/ea</span>`;
-                    html += `<span class="line-total">$${(backLogoPrice * quantity).toFixed(2)}</span>`;
+                    html += `<span class="line-total" style="margin-left: auto; color: #4cb354; font-weight: 600;">→ $${(backLogoPrice * quantity).toFixed(2)}</span>`;
                     html += '</div>';
                     html += '</div>';
                 }
@@ -1102,7 +1101,7 @@
                     html += '</div>';
                     html += '<div class="size-line-pricing">';
                     html += `<span class="unit-price">$${sideLogoPrice.toFixed(2)}/ea</span>`;
-                    html += `<span class="line-total">$${(sideLogoPrice * quantity).toFixed(2)}</span>`;
+                    html += `<span class="line-total" style="margin-left: auto; color: #4cb354; font-weight: 600;">→ $${(sideLogoPrice * quantity).toFixed(2)}</span>`;
                     html += '</div>';
                     html += '</div>';
                 }

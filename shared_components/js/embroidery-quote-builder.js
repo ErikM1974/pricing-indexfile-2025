@@ -355,40 +355,78 @@ class EmbroideryQuoteBuilder {
         let correctedOverallSubtotal = 0;
 
         this.currentPricing.products.forEach(pp => {
-            // Calculate total additional logo cost from API data
-            let totalAdditionalLogoCost = 0;
+            // Calculate additional logo cost PER PIECE from API data (filtered by product)
+            // Note: additionalServices[].unitPrice is already a per-piece cost, not a total
+            let additionalLogoCostPerPiece = 0;
             if (this.currentPricing.additionalServices) {
-                totalAdditionalLogoCost = this.currentPricing.additionalServices
+                console.log('[DEBUG Phase 3] All additionalServices:', this.currentPricing.additionalServices);
+                console.log('[DEBUG Phase 3] Current product style:', pp.product.style);
+
+                // Filter additional services for THIS product only
+                const filteredServices = this.currentPricing.additionalServices
+                    .filter(service => service.productStyle === pp.product.style);
+
+                console.log('[DEBUG Phase 3] Filtered services for this product:', filteredServices);
+
+                additionalLogoCostPerPiece = filteredServices
                     .reduce((sum, service) => sum + service.unitPrice, 0);
+
+                console.log('[DEBUG Phase 3] additionalLogoCostPerPiece:', additionalLogoCostPerPiece);
+            } else {
+                console.log('[DEBUG Phase 3] NO additionalServices in currentPricing!');
             }
 
             html += `
                 <div class="product-card">
-                    <div class="product-card-header">
-                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
+                    <div class="product-card-image-section">
+                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
                              alt="${pp.product.style} - ${pp.product.color}"
                              class="product-card-img"
-                             onerror="this.src='https://via.placeholder.com/100x100/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
-                        <div class="product-card-info">
-                            <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
-                            <p class="product-desc">${pp.product.title}</p>
-                            <div class="product-meta">
-                                <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
-                            </div>
+                             onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
+                    </div>
+                    <div class="product-card-info-section">
+                        <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
+                        <p class="product-desc">${pp.product.title}</p>
+                        <div class="product-meta">
+                            <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
                         </div>
                     </div>
+                    <div class="product-divider"></div>
                     <div class="product-card-body">
             `;
             
             // Calculate corrected product subtotal based on corrected line items
             let correctedProductSubtotal = 0;
 
-            // Simplified size breakdown with cleaner pricing
+            // Modern horizontal pricing breakdown (e-commerce style)
             pp.lineItems.forEach((item, index) => {
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
+                // Extract pricing components
+                const basePrice = item.basePrice || item.unitPrice;
+                const ltmFee = item.ltmPerUnit || 0;
+                const extraStitch = item.extraStitchCost || 0;
+                const alCost = additionalLogoCostPerPiece || 0;
+
+                const consolidatedPrice = basePrice + ltmFee + extraStitch + alCost;
                 const lineTotal = consolidatedPrice * item.quantity;
                 correctedProductSubtotal += lineTotal;
+
+                // Build inline pricing formula (only show applicable components)
+                let formulaParts = [];
+                formulaParts.push(`<span class="base-amount">$${basePrice.toFixed(2)}</span><span class="label">(base)</span>`);
+
+                if (ltmFee > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="fee-amount">$${ltmFee.toFixed(2)}</span><span class="label">(small batch)</span>`);
+                }
+
+                if (extraStitch > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="extra-amount">$${extraStitch.toFixed(2)}</span><span class="label">(extra stitches)</span>`);
+                }
+
+                if (alCost > 0) {
+                    formulaParts.push(`<span class="operator">+</span><span class="al-amount">$${alCost.toFixed(2)}</span><span class="label">(add'l logo)</span>`);
+                }
+
+                formulaParts.push(`<span class="equals">=</span><span class="base-amount">$${consolidatedPrice.toFixed(2)}</span><span class="label">/ea</span>`);
 
                 html += `
                     <div class="size-line">
@@ -396,8 +434,8 @@ class EmbroideryQuoteBuilder {
                             <span class="size-qty">${item.description} • ${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'}</span>
                         </div>
                         <div class="size-line-pricing">
-                            <span class="unit-price">$${consolidatedPrice.toFixed(2)} each</span>
-                            <span class="line-total">$${lineTotal.toFixed(2)}</span>
+                            <span class="price-formula">${formulaParts.join('')}</span>
+                            <span class="line-total">→ $${lineTotal.toFixed(2)}</span>
                         </div>
                     </div>
                 `;

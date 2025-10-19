@@ -737,12 +737,16 @@ class ProductLineManager {
         container.innerHTML = this.products.map(product => {
             aggregateTotal += product.totalQuantity;
 
-            // Get logos from LogoManager if available
-            const logos = window.embroideryQuoteBuilder?.logoManager?.logos || [];
-            const primaryLogo = logos.find(l => l.isPrimary);
-            const additionalLogos = logos.filter(l => !l.isPrimary);
-
-            // Initialize logo assignments if not present
+            // FIX (2025-12-19): LogoManager has primaryLogo (object) and additionalLogos (array), NOT a combined logos array
+            const logoManager = window.embroideryQuoteBuilder?.logoManager;
+            const primaryLogo = logoManager?.primaryLogo?.position ? {
+                id: 'primary',
+                isPrimary: true,
+                position: logoManager.primaryLogo.position,
+                stitchCount: logoManager.primaryLogo.stitchCount,
+                needsDigitizing: logoManager.primaryLogo.needsDigitizing
+            } : null;
+            const additionalLogos = logoManager?.additionalLogos || [];
             if (!product.logoAssignments) {
                 product.logoAssignments = {
                     primary: primaryLogo ? { logoId: primaryLogo.id, quantity: product.totalQuantity } : null,
