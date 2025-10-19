@@ -364,8 +364,12 @@ class CapQuoteBuilder {
                 const additionalLogoPrices = product.pricingBreakdown?.additionalLogoPrices || [];
                 const additionalLogoCostPerPiece = additionalLogoPrices.reduce((sum, logo) => sum + logo.pricePerPiece, 0);
 
-                // Extract pricing components
-                const basePrice = item.unitPrice - (item.sizeUpcharge || 0); // Base price without upcharge
+                // Extract extra stitch data from front logo breakdown (2025-12-19)
+                const frontLogoBreakdown = product.pricingBreakdown?.frontLogoBreakdown || {};
+                const extraStitchCost = frontLogoBreakdown.extraStitchCost || 0;
+
+                // Extract pricing components (including extra stitches from API)
+                const basePrice = item.unitPrice - (item.sizeUpcharge || 0) - extraStitchCost; // Base without upcharge or extra stitches
                 const sizeUpcharge = item.sizeUpcharge || 0;
                 const ltmFee = item.ltmPerUnit || 0;
                 const alCost = additionalLogoCostPerPiece || 0;
@@ -381,6 +385,11 @@ class CapQuoteBuilder {
 
                 if (sizeUpcharge > 0) {
                     components.push(`<span class="price-component"><span class="component-label">Oversize</span> <span class="component-value">$${sizeUpcharge.toFixed(2)}</span></span>`);
+                }
+
+                // NEW: Show extra stitches from API if present
+                if (extraStitchCost > 0) {
+                    components.push(`<span class="price-component"><span class="component-label">Extra Stitches</span> <span class="component-value">$${extraStitchCost.toFixed(2)}</span></span>`);
                 }
 
                 if (ltmFee > 0) {
