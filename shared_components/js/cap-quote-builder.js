@@ -369,7 +369,7 @@ class CapQuoteBuilder {
                 const extraStitchCost = frontLogoBreakdown.extraStitchCost || 0;
 
                 // Extract pricing components (including extra stitches from API)
-                const basePrice = item.unitPrice - (item.sizeUpcharge || 0) - extraStitchCost; // Base without upcharge or extra stitches
+                const basePrice = item.unitPrice - (item.sizeUpcharge || 0) - extraStitchCost - (item.ltmPerUnit || 0); // Base without upcharge, extra stitches, or LTM
                 const sizeUpcharge = item.sizeUpcharge || 0;
                 const ltmFee = item.ltmPerUnit || 0;
                 const alCost = additionalLogoCostPerPiece || 0;

@@ -174,18 +174,18 @@ class CapQuotePricingCalculator {
             // Calculate decorated price per cap (returns detailed breakdown)
             const pricingBreakdown = this.calculateDecoratedPrice(baseCapPrice, logos, totalQuantity);
             
-            // Add LTM fee to base price if applicable 
+            // Add LTM fee to base price if applicable
             let adjustedPrice = pricingBreakdown.totalPrice;
             const ltmFee = this.getLTMFeeFromAPI(totalQuantity);
-            if (ltmFee > 0) {
-                const ltmPerPiece = ltmFee / totalQuantity;
-                adjustedPrice += ltmPerPiece;
-                console.log('[CapQuotePricingCalculator] 🔍 Adding LTM per piece:', '$' + ltmPerPiece.toFixed(2));
+            const ltmPerUnit = ltmFee > 0 ? ltmFee / totalQuantity : 0; // Store for size items
+            if (ltmPerUnit > 0) {
+                adjustedPrice += ltmPerUnit;
+                console.log('[CapQuotePricingCalculator] 🔍 Adding LTM per piece:', '$' + ltmPerUnit.toFixed(2));
                 console.log('[CapQuotePricingCalculator] 🔍 Adjusted price with LTM:', '$' + adjustedPrice.toFixed(2));
             }
-            
-            // Apply size-based pricing using LTM-adjusted price
-            const sizePricedItems = this.applySizePricing(product, adjustedPrice);
+
+            // Apply size-based pricing using LTM-adjusted price, pass ltmPerUnit for display
+            const sizePricedItems = this.applySizePricing(product, adjustedPrice, ltmPerUnit);
             
             const lineTotal = sizePricedItems.reduce((sum, item) => sum + item.total, 0);
             
@@ -415,14 +415,14 @@ class CapQuotePricingCalculator {
     /**
      * Apply size-specific pricing and upcharges
      */
-    applySizePricing(product, baseDecoratedPrice) {
+    applySizePricing(product, baseDecoratedPrice, ltmPerUnit = 0) {
         const sizePricedItems = [];
-        
+
         for (const [size, quantity] of Object.entries(product.sizeBreakdown)) {
             if (quantity <= 0) continue;
-            
+
             let unitPrice = baseDecoratedPrice;
-            
+
             // Apply size upcharge if any
             const sizeUpcharge = product.sizeUpcharges?.[size] || 0;
             if (sizeUpcharge > 0) {
@@ -430,18 +430,19 @@ class CapQuotePricingCalculator {
                 // Round UP to nearest dollar after upcharge
                 unitPrice = Math.ceil(unitPrice);
             }
-            
+
             const total = unitPrice * quantity;
-            
+
             sizePricedItems.push({
                 size: size,
                 quantity: quantity,
                 unitPrice: unitPrice,
                 sizeUpcharge: sizeUpcharge,
+                ltmPerUnit: ltmPerUnit, // NEW: Store for summary display
                 total: total
             });
         }
-        
+
         return sizePricedItems;
     }
     
