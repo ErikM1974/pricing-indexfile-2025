@@ -410,23 +410,23 @@ class EmbroideryQuoteBuilder {
                 const lineTotal = consolidatedPrice * item.quantity;
                 correctedProductSubtotal += lineTotal;
 
-                // Build inline pricing formula (only show applicable components)
-                let formulaParts = [];
-                formulaParts.push(`<span class="base-amount">$${basePrice.toFixed(2)}</span><span class="label">(base)</span>`);
+                // Build two-line compact pricing breakdown (2025-12-19)
+                // First line: Unit price and line total
+                // Second line: Component breakdown with bullets
+                let components = [];
+                components.push(`<span class="price-component"><span class="component-label">Base</span> <span class="component-value">$${basePrice.toFixed(2)}</span></span>`);
 
                 if (ltmFee > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="fee-amount">$${ltmFee.toFixed(2)}</span><span class="label">(small batch)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Batch Fee</span> <span class="component-value">$${ltmFee.toFixed(2)}</span></span>`);
                 }
 
                 if (extraStitch > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="extra-amount">$${extraStitch.toFixed(2)}</span><span class="label">(extra stitches)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Extra Stitches</span> <span class="component-value">$${extraStitch.toFixed(2)}</span></span>`);
                 }
 
                 if (alCost > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="al-amount">$${alCost.toFixed(2)}</span><span class="label">(add'l logo)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Add'l Logo</span> <span class="component-value">$${alCost.toFixed(2)}</span></span>`);
                 }
-
-                formulaParts.push(`<span class="equals">=</span><span class="base-amount">$${consolidatedPrice.toFixed(2)}</span><span class="label">/ea</span>`);
 
                 html += `
                     <div class="size-line">
@@ -434,8 +434,13 @@ class EmbroideryQuoteBuilder {
                             <span class="size-qty">${item.description} • ${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'}</span>
                         </div>
                         <div class="size-line-pricing">
-                            <span class="price-formula">${formulaParts.join('')}</span>
-                            <span class="line-total">→ $${lineTotal.toFixed(2)}</span>
+                            <div class="price-summary-line">
+                                <span class="unit-price-display">$${consolidatedPrice.toFixed(2)} /ea</span>
+                                <span class="line-total">$${lineTotal.toFixed(2)}</span>
+                            </div>
+                            <div class="price-components">
+                                ${components.join('')}
+                            </div>
                         </div>
                     </div>
                 `;

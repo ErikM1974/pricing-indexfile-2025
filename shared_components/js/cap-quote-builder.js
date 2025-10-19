@@ -371,23 +371,23 @@ class CapQuoteBuilder {
                 const consolidatedPricePerCap = item.unitPrice + additionalLogoCostPerPiece;
                 const lineTotal = consolidatedPricePerCap * item.quantity;
 
-                // Build inline pricing formula (only show applicable components)
-                let formulaParts = [];
-                formulaParts.push(`<span class="base-amount">$${basePrice.toFixed(2)}</span><span class="label">(base)</span>`);
+                // Build two-line compact pricing breakdown (2025-12-19)
+                // First line: Unit price and line total
+                // Second line: Component breakdown with bullets
+                let components = [];
+                components.push(`<span class="price-component"><span class="component-label">Base</span> <span class="component-value">$${basePrice.toFixed(2)}</span></span>`);
 
                 if (sizeUpcharge > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="upcharge-amount">$${sizeUpcharge.toFixed(2)}</span><span class="label">(oversize)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Oversize</span> <span class="component-value">$${sizeUpcharge.toFixed(2)}</span></span>`);
                 }
 
                 if (ltmFee > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="fee-amount">$${ltmFee.toFixed(2)}</span><span class="label">(small batch)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Batch Fee</span> <span class="component-value">$${ltmFee.toFixed(2)}</span></span>`);
                 }
 
                 if (alCost > 0) {
-                    formulaParts.push(`<span class="operator">+</span><span class="al-amount">$${alCost.toFixed(2)}</span><span class="label">(add'l logo)</span>`);
+                    components.push(`<span class="price-component"><span class="component-label">Add'l Logo</span> <span class="component-value">$${alCost.toFixed(2)}</span></span>`);
                 }
-
-                formulaParts.push(`<span class="equals">=</span><span class="base-amount">$${consolidatedPricePerCap.toFixed(2)}</span><span class="label">/ea</span>`);
 
                 html += `
                     <div class="size-line">
@@ -395,13 +395,13 @@ class CapQuoteBuilder {
                             <span class="size-badge">${item.size}</span>
                             <span class="size-qty">${item.quantity} pieces</span>
                         </div>
-                        <div class="size-line-pricing-breakdown">
-                            <div class="price-formula">
-                                ${formulaParts.join('')}
+                        <div class="size-line-pricing">
+                            <div class="price-summary-line">
+                                <span class="unit-price-display">$${consolidatedPricePerCap.toFixed(2)} /ea</span>
+                                <span class="line-total">$${lineTotal.toFixed(2)}</span>
                             </div>
-                            <div class="price-total">
-                                <span>Line Total:</span>
-                                <span><strong>$${lineTotal.toFixed(2)}</strong></span>
+                            <div class="price-components">
+                                ${components.join('')}
                             </div>
                         </div>
                     </div>
