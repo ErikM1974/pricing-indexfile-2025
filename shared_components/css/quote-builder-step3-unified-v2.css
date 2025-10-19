@@ -285,17 +285,18 @@
     color: var(--step3-gray-600) !important;
 }
 
-/* Logo Badges */
+/* Logo Badges - EXCEPTIONAL SPACING (2025-12-19) */
 .badge-primary,
 .badge-additional {
     display: inline-flex !important;
     align-items: center !important;
-    padding: 4px 12px !important;
+    padding: 6px 14px !important; /* Increased from 4px 12px */
     border-radius: var(--step3-radius-sm) !important;
     font-size: 12px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
+    margin-right: 8px !important; /* NEW: Space between badges */
 }
 
 .badge-primary {
@@ -311,13 +312,14 @@
 .badge-setup {
     display: inline-flex !important;
     align-items: center !important;
-    padding: 4px 10px !important;
+    padding: 6px 12px !important; /* Increased from 4px 10px */
     border-radius: var(--step3-radius-sm) !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     background: #fff3cd !important;
     color: #856404 !important;
     border: 1px solid #ffeaa7 !important;
+    margin-left: 8px !important; /* NEW: Space from previous badge */
 }
 
 /* LTM Alert */
@@ -491,8 +493,8 @@
 }
 
 .footer-label {
-    font-size: 16px !important;
-    font-weight: 600 !important;
+    font-size: 17px !important; /* Increased from 16px */
+    font-weight: 700 !important; /* Increased from 600 - BOLDER */
     color: var(--step3-gray-700) !important;
 }
 
@@ -510,7 +512,7 @@
 
 .size-line {
     padding: 16px 20px !important;
-    border-bottom: 1px solid #e9ecef !important;
+    border-bottom: 1px solid #dee2e6 !important; /* Darker for better visibility */
     transition: all 0.2s ease !important;
     display: grid !important;
     grid-template-columns: 1fr auto auto !important;
@@ -525,8 +527,13 @@
     border-bottom: none !important;
 }
 
+/* EXCEPTIONAL: Zebra striping for better scanning (2025-12-19) */
+.size-line:nth-child(even) {
+    background: #fafbfc !important;
+}
+
 .size-line:hover {
-    background: #f8f9fa !important;
+    background: #f0f7f1 !important; /* Subtle green tint */
     border-left: 3px solid #4cb354 !important;
     padding-left: 17px !important;
 }
@@ -556,7 +563,7 @@
 }
 
 .size-qty {
-    font-size: 14px !important;
+    font-size: 16px !important; /* Increased from 14px - MORE PROMINENT */
     font-weight: 600 !important;
     color: var(--step3-gray-900) !important;
 }
@@ -644,7 +651,8 @@
     align-items: center !important;
     gap: 6px !important;
     white-space: nowrap !important;
-    padding: 2px 0 !important;
+    padding: 2px 8px !important; /* Increased padding for breathing room */
+    position: relative !important;
 }
 
 #summary-phase .price-component .component-label {
@@ -657,17 +665,20 @@
     color: #1a1a1a !important;
     font-family: var(--step3-font-mono) !important;
     background: #f8f9fa !important;
-    padding: 2px 6px !important;
+    padding: 3px 8px !important; /* Increased from 2px 6px */
     border-radius: 4px !important;
 }
 
-/* Bullet separator between components - Improved spacing (2025-12-19) */
+/* Divider separator between components - EXCEPTIONAL VISUAL SEPARATION (2025-12-19) */
 #summary-phase .price-component:not(:last-child)::after {
-    content: "•" !important;
-    margin-left: 10px !important;
-    margin-right: 2px !important;
-    color: #dee2e6 !important;
-    font-weight: 400 !important;
+    content: "" !important;
+    display: inline-block !important;
+    width: 1px !important;
+    height: 14px !important;
+    background: #dee2e6 !important;
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+    vertical-align: middle !important;
 }
 
 /* Line total - prominent on right */
@@ -907,24 +918,31 @@
 }
 
 .grand-total-row {
-    border-top: 3px solid var(--step3-primary) !important;
-    padding-top: var(--step3-space-lg) !important;
+    border-top: 4px solid var(--step3-primary) !important; /* Thicker border */
+    padding-top: 24px !important; /* More padding */
     margin-top: var(--step3-space-md) !important;
-    font-size: 20px !important;
-    /* NO sticky - sidebar itself is sticky */
-    background: transparent !important;
+    font-size: 22px !important; /* Larger base size */
+    /* EXCEPTIONAL: Subtle gradient background for emphasis */
+    background: linear-gradient(to right, #f0f7f1, #e8f5e9) !important;
+    padding: 24px 20px !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    border-radius: var(--step3-radius-md) !important;
 }
 
 .grand-total-row .total-label {
     color: var(--step3-primary-dark) !important;
     font-weight: 700 !important;
-    font-size: 18px !important;
+    font-size: 20px !important; /* Increased from 18px */
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
 }
 
 .grand-total-row .total-value {
     color: var(--step3-primary) !important;
-    font-size: 28px !important;
-    font-weight: 700 !important;
+    font-size: 32px !important; /* Increased from 28px - MASSIVE */
+    font-weight: 800 !important; /* Extra bold */
+    letter-spacing: -0.5px !important; /* Tighter for impact */
 }
 
 
