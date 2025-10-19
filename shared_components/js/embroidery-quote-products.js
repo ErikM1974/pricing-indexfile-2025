@@ -748,10 +748,17 @@ class ProductLineManager {
             } : null;
             const additionalLogos = logoManager?.additionalLogos || [];
             if (!product.logoAssignments) {
+                // AUTO-SELECT additional logos by default (2025-12-19 UX IMPROVEMENT)
+                // 95% of orders include additional logos on ALL pieces
+                const autoSelectedAdditional = additionalLogos.map(logo => ({
+                    logoId: logo.id,
+                    quantity: product.totalQuantity
+                }));
+
                 product.logoAssignments = {
                     primary: primaryLogo ? { logoId: primaryLogo.id, quantity: product.totalQuantity } : null,
-                    additional: [],
-                    monogram: null
+                    additional: autoSelectedAdditional,  // Auto-select instead of empty array
+                    monogram: null  // To be removed in next commit
                 };
             }
 
@@ -900,7 +907,6 @@ class ProductLineManager {
         // Count selected logos for summary
         let logoCount = primaryLogo ? 1 : 0;
         logoCount += product.logoAssignments?.additional?.length || 0;
-        logoCount += product.logoAssignments?.monogram ? 1 : 0;
 
         return `
             <details class="logo-details">
@@ -984,46 +990,6 @@ class ProductLineManager {
             `;
         });
         
-        // Monogram option
-        const monogram = product.logoAssignments?.monogram;
-        const hasMonogram = monogram && monogram.quantity > 0;
-        
-        html += `
-            <div class="logo-selection-item monogram">
-                <label class="logo-checkbox-label">
-                    <input type="checkbox" 
-                           ${hasMonogram ? 'checked' : ''}
-                           class="logo-checkbox monogram-check"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.toggleMonogram(${product.id}, this.checked)">
-                    <span class="logo-label">
-                        <i class="fas fa-signature"></i> Monogram
-                        <span class="badge badge-monogram">$12.50 each</span>
-                    </span>
-                </label>
-                <div class="monogram-options" ${!hasMonogram ? 'style="display:none;"' : ''}>
-                    <select class="monogram-mode" 
-                            data-product-id="${product.id}"
-                            onchange="window.productLineManager.updateMonogramMode(${product.id}, this.value)">
-                        <option value="quick" ${monogram?.mode === 'quick' ? 'selected' : ''}>Quick (Qty only)</option>
-                        <option value="detailed" ${monogram?.mode === 'detailed' ? 'selected' : ''}>Detailed (Names)</option>
-                    </select>
-                    <input type="number" 
-                           class="monogram-qty-input"
-                           placeholder="Qty"
-                           min="1"
-                           max="${product.totalQuantity}"
-                           value="${monogram?.quantity || ''}"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.updateMonogramQty(${product.id}, this.value)">
-                    ${monogram?.mode === 'detailed' ? 
-                        `<button class="btn-small" onclick="window.productLineManager.openMonogramNames(${product.id})">
-                            <i class="fas fa-edit"></i> Names
-                        </button>` : ''
-                    }
-                </div>
-            </div>
-        `;
         
         html += '</div>';
         html += '</div>';
@@ -1101,132 +1067,6 @@ class ProductLineManager {
         }
     }
     
-    /**
-     * Toggle monogram for a product
-     */
-    toggleMonogram(productId, isChecked) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-        
-        if (!product.logoAssignments) {
-            product.logoAssignments = { primary: null, additional: [], monogram: null };
-        }
-        
-        const monogramOptions = document.querySelector(`.logo-selection-item.monogram .monogram-options[data-product-id="${productId}"]`);
-        const parentDiv = document.querySelector(`[data-product-id="${productId}"] .monogram-options`);
-        
-        if (isChecked) {
-            product.logoAssignments.monogram = {
-                quantity: product.totalQuantity,
-                mode: 'quick',
-                names: []
-            };
-            if (parentDiv) parentDiv.style.display = 'flex';
-        } else {
-            product.logoAssignments.monogram = null;
-            if (parentDiv) parentDiv.style.display = 'none';
-        }
-        
-        // Re-render to update the UI
-        this.renderProductsList();
-        
-        // Trigger pricing update
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-    }
-    
-    /**
-     * Update monogram mode
-     */
-    updateMonogramMode(productId, mode) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        product.logoAssignments.monogram.mode = mode;
-        
-        // Re-render to show/hide names button
-        this.renderProductsList();
-    }
-    
-    /**
-     * Update monogram quantity
-     */
-    updateMonogramQty(productId, quantity) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        product.logoAssignments.monogram.quantity = Math.min(parseInt(quantity) || 0, product.totalQuantity);
-        
-        // Trigger pricing update
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-    }
-    
-    /**
-     * Open monogram names entry modal
-     */
-    openMonogramNames(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        // Create modal for entering names
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-content monogram-modal">
-                <div class="modal-header">
-                    <h3>Enter Monogram Names</h3>
-                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>${product.style} - ${product.color}</strong></p>
-                    <p>Enter ${product.logoAssignments.monogram.quantity} names (one per line):</p>
-                    <p class="help-text">Format: Name - Size - Thread Color (optional)</p>
-                    <p class="help-text">Example: John Smith - M - Gold</p>
-                    <textarea id="monogram-names-input" rows="10" cols="50">${product.logoAssignments.monogram.names?.join('\n') || ''}</textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-                    <button class="btn-primary" onclick="window.productLineManager.saveMonogramNames(${productId})">Save Names</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Focus the textarea
-        document.getElementById('monogram-names-input').focus();
-    }
-    
-    /**
-     * Save monogram names
-     */
-    saveMonogramNames(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        const textarea = document.getElementById('monogram-names-input');
-        if (textarea) {
-            const names = textarea.value.split('\n').filter(n => n.trim());
-            product.logoAssignments.monogram.names = names;
-            product.logoAssignments.monogram.quantity = names.length;
-            
-            // Update the quantity input
-            const qtyInput = document.querySelector(`input.monogram-qty-input[data-product-id="${productId}"]`);
-            if (qtyInput) {
-                qtyInput.value = names.length;
-            }
-        }
-        
-        // Close modal
-        document.querySelector('.modal-overlay').remove();
-        
-        // Trigger pricing update
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-    }
     
     /**
      * Export products data

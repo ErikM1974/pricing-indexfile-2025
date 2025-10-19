@@ -640,18 +640,13 @@ class EmbroideryInvoiceGenerator {
                     // Remove AL-10000 or similar part numbers from description
                     cleanDescription = cleanDescription.replace(/AL-\d+\s*/g, '').trim();
                     
-                    const description = service.type === 'monogram' 
-                        ? 'Personalized Names/Monogramming'
-                        : `Additional Logo: ${cleanDescription}`;
-                    
-                    const appliedTo = service.type === 'monogram'
-                        ? `${service.quantity} names`
-                        : service.products 
-                            ? `${service.products.join(', ')}`
-                            : `${service.quantity} pieces`;
-                    
+                    const description = `Additional Logo: ${cleanDescription}`;
+
+                    const appliedTo = service.products
+                        ? `${service.products.join(", ")}`
+                        : `${service.quantity} pieces`;
+
                     tableHTML += `
-                        <tr class="additional-service-row">
                             <td>Service</td>
                             <td></td>
                             <td class="description-cell">
