@@ -1059,7 +1059,7 @@
             width: 100vw;
             height: 650px;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             margin-left: -2rem;
             margin-right: -2rem;
             margin-bottom: 3rem;
@@ -1089,6 +1089,7 @@
             object-fit: cover;
             object-position: center;
             transition: transform 0.3s ease;
+            z-index: 0;
         }
 
         .hero-image-placeholder:hover .hero-bg-img {
@@ -1105,6 +1106,34 @@
             background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* Richardson Logo Badge - Top Right Corner */
+        .richardson-logo-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            pointer-events: none;
+            opacity: 1;
+            display: block;
+        }
+
+        .richardson-logo-badge:hover {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+
+        .richardson-logo-img {
+            display: block;
+            width: 80px;
+            height: auto;
+            max-width: 100%;
         }
 
         /* Text overlay positioning */
@@ -1164,7 +1193,18 @@
         .hero-cta-button:hover svg {
             transform: translateX(4px);
         }
-        
+
+        /* Richardson logo in CTA button */
+        .button-brand-logo {
+            height: 24px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .button-text {
+            white-space: nowrap;
+        }
+
         .hero-overlay {
             position: absolute;
             top: 0;
@@ -1831,11 +1871,26 @@
                 right: 1rem;
             }
 
+            .richardson-logo-badge {
+                top: 10px;
+                right: 10px;
+                padding: 6px 10px;
+            }
+
+            .richardson-logo-img {
+                width: 60px;
+            }
+
             .hero-cta-button {
                 padding: 0.875rem 2rem;
                 font-size: 1rem;
             }
-            
+
+            /* Smaller logo on mobile */
+            .button-brand-logo {
+                height: 20px;
+            }
+
             .hero-features {
                 flex-direction: column;
                 gap: 1rem;
@@ -1929,6 +1984,10 @@
 
             .hero-text-overlay {
                 bottom: 40px;
+            }
+
+            .richardson-logo-img {
+                width: 50px;
             }
 
             .hero-cta-button {
