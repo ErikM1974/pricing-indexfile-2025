@@ -429,6 +429,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Also serve index.html when accessed with .html extension
+app.get('/index.html', (req, res) => {
+  console.log('Serving index.html for /index.html route');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // 2. API routes
 app.get('/api/status', (req, res) => {
   res.json({
