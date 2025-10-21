@@ -9,15 +9,18 @@
 class ShopWorksGuideGenerator {
     constructor() {
         // Part number suffix mapping (ShopWorks format)
-        // IMPORTANT: ShopWorks uses _2X not _2XL!
+        // IMPORTANT: ShopWorks uses mixed conventions - Port & Co: _XXL, Jerzees: _2X
         this.partNumberSuffixMap = {
-            // Standard sizes: NO suffix
+            // Standard sizes: NO suffix (S, M, L, XL ONLY)
             'S': '',
             'M': '',
             'L': '',
             'XL': '',
-            // Oversizes: _2X format (shortened from SanMar's _2XL)
-            '2XL': '_2X',
+            // Extra Small and XXL oversizes
+            'XS': '_XS',
+            'XXL': '_XXL',  // Port & Co uses _XXL
+            // Oversizes: _2X format
+            '2XL': '_2X',   // Some brands use _2X (same as XXL)
             '3XL': '_3X',
             '4XL': '_4X',
             '5XL': '_5X',
@@ -117,9 +120,9 @@ class ShopWorksGuideGenerator {
                 // Filter out non-size keys
                 if (['logos', 'tier', 'setup', 'stitchCount'].includes(size)) return;
 
-                // Standard sizes include XS, S, M, L, XL, XXL/2XL (up to 2XL)
-                // Oversizes are 3XL and beyond (get separate lines with _3X, _4X suffixes)
-                if (['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL'].includes(size.toUpperCase())) {
+                // Standard sizes: ONLY S, M, L, XL (grouped under base part number)
+                // Oversizes: XS, XXL/2XL, 3XL+ (get separate lines with suffixes)
+                if (['S', 'M', 'L', 'XL'].includes(size.toUpperCase())) {
                     standardSizes[size] = parseInt(qty);
                 } else {
                     oversizes[size] = parseInt(qty);
