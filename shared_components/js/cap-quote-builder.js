@@ -112,7 +112,11 @@ class CapQuoteBuilder {
         document.getElementById('print-quote-btn')?.addEventListener('click', () => {
             this.handlePrintQuote();
         });
-        
+
+        document.getElementById('shopworks-guide-btn')?.addEventListener('click', () => {
+            this.handleShopWorksGuide();
+        });
+
         // Listen for component events
         window.addEventListener('capLogosChanged', (e) => {
             this.handleLogosChanged(e.detail);
@@ -644,7 +648,72 @@ class CapQuoteBuilder {
             setTimeout(() => printWindow.close(), 500);
         };
     }
-    
+
+    /**
+     * Handle ShopWorks Data Entry Guide generation
+     */
+    handleShopWorksGuide() {
+        if (!this.currentQuote) {
+            alert('Please complete your quote first.');
+            return;
+        }
+
+        console.log('[CapQuoteBuilder] Generating ShopWorks Entry Guide...');
+        console.log('[CapQuoteBuilder] currentQuote:', this.currentQuote);
+
+        // Prepare quote data in format expected by ShopWorks guide generator
+        // The currentQuote structure has products with lineItems
+        const quoteData = {
+            QuoteID: this.quoteService.generateQuoteID(),
+            products: [],
+            TotalQuantity: this.currentQuote.totalQuantity || 0,
+            SubtotalAmount: this.currentQuote.subtotal || 0,
+            TotalAmount: this.currentQuote.grandTotal || 0
+        };
+
+        // Convert each product's lineItems into the format ShopWorks generator expects
+        this.currentQuote.products.forEach(productPricing => {
+            const product = productPricing.product;
+
+            productPricing.lineItems.forEach(lineItem => {
+                // Parse size breakdown from description like "S(3) M(1) L(3) XL(2)" or "2XL(2)"
+                const sizeBreakdown = {};
+                const sizeMatches = lineItem.description.matchAll(/([A-Z0-9]+)\((\d+)\)/g);
+                for (const match of sizeMatches) {
+                    const size = match[1];
+                    const qty = parseInt(match[2]);
+                    sizeBreakdown[size] = qty;
+                }
+
+                // Get product name and style from various possible fields
+                const productName = product.name || product.productName || product.description ||
+                                  product.Name || product.ProductName || '';
+                const styleNumber = product.style || product.styleNumber || product.StyleNumber || '';
+
+                // Description is ONLY the product name (style is already in Part Number column)
+                const description = productName || '';
+
+                quoteData.products.push({
+                    StyleNumber: styleNumber,
+                    ProductName: description,
+                    Color: product.color || '',
+                    ColorCode: product.colorCode || '',
+                    SizeBreakdown: JSON.stringify(sizeBreakdown),
+                    Quantity: lineItem.quantity,
+                    FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
+                    LineTotal: lineItem.total,
+                    PrintLocation: this.currentQuote.primaryLogos?.[0]?.location || 'Front'
+                });
+            });
+        });
+
+        console.log('[CapQuoteBuilder] Prepared quote data for ShopWorks:', quoteData);
+
+        // Generate and open the guide
+        const generator = new ShopWorksGuideGenerator();
+        generator.generateGuide(quoteData);
+    }
+
     /**
      * Validate customer information
      */

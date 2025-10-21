@@ -81,6 +81,10 @@ class EmbroideryQuoteBuilder {
             this.handleDownloadQuote();
         });
 
+        document.getElementById('shopworks-guide-btn')?.addEventListener('click', () => {
+            this.handleShopWorksGuide();
+        });
+
         // Save & Send Actions (require customer info)
         document.getElementById('save-quote-btn')?.addEventListener('click', () => {
             this.handleSaveQuote();
@@ -805,7 +809,75 @@ class EmbroideryQuoteBuilder {
             setTimeout(() => printWindow.close(), 500);
         };
     }
-    
+
+    /**
+     * Handle ShopWorks Data Entry Guide generation
+     */
+    handleShopWorksGuide() {
+        if (!this.currentPricing) {
+            this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
+            return;
+        }
+
+        console.log('[EmbroideryQuoteBuilder] Generating ShopWorks Entry Guide...');
+        console.log('[EmbroideryQuoteBuilder] currentPricing:', this.currentPricing);
+
+        // Prepare quote data in format expected by ShopWorks guide generator
+        // The currentPricing structure has products with lineItems
+        const quoteData = {
+            QuoteID: this.currentPricing.quoteId || this.quoteService.generateQuoteID(),
+            products: [],
+            TotalQuantity: this.currentPricing.totalQuantity || 0,
+            SubtotalAmount: this.currentPricing.subtotal || 0,
+            TotalAmount: this.currentPricing.grandTotal || 0
+        };
+
+        // Convert each product's lineItems into the format ShopWorks generator expects
+        this.currentPricing.products.forEach(productPricing => {
+            const product = productPricing.product;
+
+            // Log the product to see what fields are available
+            console.log('[EmbroideryQuoteBuilder] Product object:', product);
+
+            productPricing.lineItems.forEach(lineItem => {
+                // Parse size breakdown from description like "S(3) M(1) L(3) XL(2)" or "2XL(2)"
+                const sizeBreakdown = {};
+                const sizeMatches = lineItem.description.matchAll(/([A-Z0-9]+)\((\d+)\)/g);
+                for (const match of sizeMatches) {
+                    const size = match[1];
+                    const qty = parseInt(match[2]);
+                    sizeBreakdown[size] = qty;
+                }
+
+                // Get product name and style from various possible fields
+                const productName = product.name || product.productName || product.description ||
+                                  product.Name || product.ProductName || '';
+                const styleNumber = product.style || product.styleNumber || product.StyleNumber || '';
+
+                // Description is ONLY the product name (style is already in Part Number column)
+                const description = productName || '';
+
+                quoteData.products.push({
+                    StyleNumber: styleNumber,
+                    ProductName: description,
+                    Color: product.color || product.Color || '',
+                    ColorCode: product.colorCode || product.ColorCode || '',
+                    SizeBreakdown: JSON.stringify(sizeBreakdown),
+                    Quantity: lineItem.quantity,
+                    FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
+                    LineTotal: lineItem.total,
+                    PrintLocation: this.currentPricing.primaryLogos?.[0]?.location || 'Left Chest'
+                });
+            });
+        });
+
+        console.log('[EmbroideryQuoteBuilder] Prepared quote data for ShopWorks:', quoteData);
+
+        // Generate and open the guide
+        const generator = new ShopWorksGuideGenerator();
+        generator.generateGuide(quoteData);
+    }
+
     /**
      * Generate quote text for copying - Professional format
      */
