@@ -671,42 +671,46 @@ class CapQuoteBuilder {
             TotalAmount: this.currentQuote.grandTotal || 0
         };
 
-        // Convert each product's lineItems into the format ShopWorks generator expects
+        // Convert each product's sizePricedItems into the format ShopWorks generator expects
+        // Build a SizeBreakdown object from sizePricedItems for ShopWorks parsing
         this.currentQuote.products.forEach(productPricing => {
-            const product = productPricing.product;
+            // Get style and description from the product object
+            const styleNumber = productPricing.styleNumber || productPricing.StyleNumber || '';
+            const description = productPricing.title || productPricing.name || productPricing.productName || '';
+            const color = productPricing.color || '';
+            const colorCode = productPricing.colorCode || '';
 
-            productPricing.lineItems.forEach(lineItem => {
-                // Parse size breakdown from description like "S(3) M(1) L(3) XL(2)" or "2XL(2)"
-                const sizeBreakdown = {};
-                const sizeMatches = lineItem.description.matchAll(/([A-Z0-9]+)\((\d+)\)/g);
-                for (const match of sizeMatches) {
-                    const size = match[1];
-                    const qty = parseInt(match[2]);
-                    sizeBreakdown[size] = qty;
-                }
+            // Build size breakdown object from sizePricedItems
+            const sizeBreakdown = {};
+            let totalQuantity = 0;
+            let totalLineAmount = 0;
 
-                // Get style and description from product object
-                // product.title already contains the clean product name (e.g., "Richardson Pulse Cap")
-                // No parsing needed - it's already in the correct format!
-                const styleNumber = product.style || product.styleNumber || product.StyleNumber || '';
-                const description = product.title || product.name || product.productName || '';
+            productPricing.sizePricedItems.forEach(item => {
+                sizeBreakdown[item.size] = item.quantity;
+                totalQuantity += item.quantity;
+                totalLineAmount += item.total;
+            });
 
-                console.log('[CapQuoteBuilder] Product description:', {
-                    style: styleNumber,
-                    description: description
-                });
+            console.log('[CapQuoteBuilder] Processing product:', {
+                style: styleNumber,
+                description: description,
+                color: color,
+                sizeBreakdown: sizeBreakdown,
+                totalQty: totalQuantity
+            });
 
-                quoteData.products.push({
-                    StyleNumber: styleNumber,
-                    ProductName: description,
-                    Color: product.color || '',
-                    ColorCode: product.colorCode || '',
-                    SizeBreakdown: JSON.stringify(sizeBreakdown),
-                    Quantity: lineItem.quantity,
-                    FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
-                    LineTotal: lineItem.total,
-                    PrintLocation: this.currentQuote.primaryLogos?.[0]?.location || 'Front'
-                });
+            // Create ONE product entry with SizeBreakdown (ShopWorks will split as needed)
+            quoteData.products.push({
+                StyleNumber: styleNumber,
+                ProductName: description,
+                Color: color,
+                ColorCode: colorCode,
+                SizeBreakdown: sizeBreakdown,  // Object format (will be stringified if needed)
+                Quantity: totalQuantity,
+                BaseUnitPrice: productPricing.basePrice || 0,
+                FinalUnitPrice: productPricing.sizePricedItems[0]?.unitPrice || 0, // First item's price
+                LineTotal: totalLineAmount,
+                PrintLocation: this.currentQuote.logos?.[0]?.position || 'Front'
             });
         });
 

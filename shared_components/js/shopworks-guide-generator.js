@@ -47,7 +47,7 @@ class ShopWorksGuideGenerator {
 
     /**
      * Generate ShopWorks entry guide from quote data
-     * Opens in new window with print dialog
+     * Opens in new window for preview with manual print button
      */
     generateGuide(quoteData) {
         console.log('[ShopWorksGuide] Generating guide for:', quoteData);
@@ -460,11 +460,6 @@ class ShopWorksGuideGenerator {
         <p><strong>Total Pieces:</strong> ${totalQty} | <strong>Grand Total:</strong> $${total.toFixed(2)}</p>
     </div>
 
-    <div class="warning">
-        ⚠️ CRITICAL: Use part numbers EXACTLY as shown below!<br>
-        Oversizes use _2X format (NOT _2XL) • 4XL and beyond go in "Other" column
-    </div>
-
     <table>
         <thead>
             <tr>
@@ -519,21 +514,6 @@ class ShopWorksGuideGenerator {
         <p class="grand-total"><span class="total-label">GRAND TOTAL:</span> <span>$${total.toFixed(2)}</span></p>
     </div>
 
-    <div class="checklist">
-        <h3>📋 ENTRY CHECKLIST</h3>
-        <ul>
-            <li>All ${lineItems.length} lines entered into ShopWorks</li>
-            <li>Part numbers match exactly (check _2X vs _2XL!)</li>
-            <li>Line Qty matches size column totals for each row</li>
-            <li>Colors correct on all lines</li>
-            <li>Sizes in correct columns (4XL+ in "Other")</li>
-            <li>Manual prices entered correctly</li>
-            <li>Calc. Price toggle set to "On"</li>
-            <li>Line totals calculate correctly</li>
-            <li>Overall grand total matches: $${total.toFixed(2)}</li>
-        </ul>
-    </div>
-
     ${quoteData.Notes ? `
     <div class="notes">
         <h4>📝 QUOTE NOTES:</h4>
@@ -541,14 +521,6 @@ class ShopWorksGuideGenerator {
     </div>
     ` : ''}
 
-    <script>
-        // Auto-print when page loads (after brief delay for rendering)
-        window.onload = function() {
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        };
-    </script>
 </body>
 </html>`;
     }
