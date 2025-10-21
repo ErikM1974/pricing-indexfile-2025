@@ -685,13 +685,16 @@ class CapQuoteBuilder {
                     sizeBreakdown[size] = qty;
                 }
 
-                // Get product name and style from various possible fields
-                const productName = product.name || product.productName || product.description ||
-                                  product.Name || product.ProductName || '';
+                // Get style and description from product object
+                // product.title already contains the clean product name (e.g., "Richardson Pulse Cap")
+                // No parsing needed - it's already in the correct format!
                 const styleNumber = product.style || product.styleNumber || product.StyleNumber || '';
+                const description = product.title || product.name || product.productName || '';
 
-                // Description is ONLY the product name (style is already in Part Number column)
-                const description = productName || '';
+                console.log('[CapQuoteBuilder] Product description:', {
+                    style: styleNumber,
+                    description: description
+                });
 
                 quoteData.products.push({
                     StyleNumber: styleNumber,
