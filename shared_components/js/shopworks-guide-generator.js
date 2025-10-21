@@ -170,55 +170,69 @@ class ShopWorksGuideGenerator {
 
     /**
      * Format sizes into ShopWorks column structure
+     * Matches actual ShopWorks layout: S, M, LG, XL, XXL, XXXL (no Adult or Other columns)
      */
     formatSizesForShopWorks(sizeBreakdown) {
         const shopWorksFormat = {
-            Adult: '',
             S: '',
             M: '',
             LG: '',
             XL: '',
             XXL: '',
-            XXXL: '',
-            Other: ''
+            XXXL: ''  // Holds both 3XL and "other" sizes (XS, 4XL+, youth, OSFA)
         };
+
+        let hasNonStandardXXXL = false;
 
         Object.entries(sizeBreakdown).forEach(([size, qty]) => {
             const column = this.getSizeColumn(size);
+
+            // Track if XXXL column contains non-3XL sizes (for visual highlighting)
+            if (column === 'XXXL' && size.toUpperCase() !== '3XL') {
+                hasNonStandardXXXL = true;
+            }
+
             if (column && shopWorksFormat.hasOwnProperty(column)) {
                 shopWorksFormat[column] = qty || '';
             }
         });
 
-        return shopWorksFormat;
+        return { ...shopWorksFormat, hasNonStandardXXXL };
     }
 
     /**
      * Map size to ShopWorks column name
+     * Note: ShopWorks XXXL column holds both 3XL and "other" sizes (XS, 4XL+, youth, OSFA)
      */
     getSizeColumn(size) {
         const sizeUpper = size.toUpperCase();
 
         const columnMap = {
-            'XS': 'Other',  // XS goes in "Other" column (no dedicated XS column in ShopWorks)
+            'XS': 'XXXL',   // XS goes in XXXL column (will be highlighted)
             'S': 'S',
             'M': 'M',
             'L': 'LG',      // ShopWorks uses "LG" not "L"
             'XL': 'XL',
             'XXL': 'XXL',   // XXL can be written as 'XXL' or '2XL'
             '2XL': 'XXL',   // 2XL goes in XXL column
-            '3XL': 'XXXL',  // 3XL goes in XXXL column
-            '4XL': 'Other', // 4XL and beyond go in "Other"
-            '5XL': 'Other',
-            '6XL': 'Other',
-            '7XL': 'Other',
-            '8XL': 'Other',
-            '9XL': 'Other',
-            '10XL': 'Other',
-            'OSFA': 'Other'
+            '3XL': 'XXXL',  // True 3XL (no highlight)
+            '4XL': 'XXXL',  // 4XL and beyond go in XXXL column (will be highlighted)
+            '5XL': 'XXXL',
+            '6XL': 'XXXL',
+            '7XL': 'XXXL',
+            '8XL': 'XXXL',
+            '9XL': 'XXXL',
+            '10XL': 'XXXL',
+            'OSFA': 'XXXL', // One-size-fits-all goes in XXXL column (will be highlighted)
+            // Youth sizes
+            'YXS': 'XXXL',
+            'YS': 'XXXL',
+            'YM': 'XXXL',
+            'YL': 'XXXL',
+            'YXL': 'XXXL'
         };
 
-        return columnMap[sizeUpper] || 'Other';
+        return columnMap[sizeUpper] || 'XXXL';  // Default to XXXL for unknown sizes
     }
 
     /**
@@ -337,6 +351,19 @@ class ShopWorksGuideGenerator {
             font-weight: bold;
             font-size: 9pt;
             white-space: nowrap;
+        }
+
+        /* Highlight non-3XL sizes in XXXL column (XS, 4XL+, youth, OSFA) */
+        td.non-standard-xxxl {
+            background-color: #fff3cd !important;  /* Light yellow */
+            border: 2px solid #ffc107 !important;  /* Orange border */
+            font-weight: bold !important;
+        }
+
+        td.non-standard-xxxl::after {
+            content: " ⚠";  /* Warning icon */
+            color: #ff9800;
+            font-size: 10pt;
         }
 
         td.text-left {
@@ -471,14 +498,12 @@ class ShopWorksGuideGenerator {
                 <th>Color<br>Range</th>
                 <th>Color</th>
                 <th>Description</th>
-                <th>Adult</th>
                 <th>S</th>
                 <th>M</th>
                 <th>LG</th>
                 <th>XL</th>
                 <th>XXL</th>
-                <th>XXXL</th>
-                <th>Other</th>
+                <th>XXXL<br><span style="font-size: 8pt; font-weight: normal;">(Other)</span></th>
                 <th>Manual<br>Price</th>
                 <th>Calc.<br>Price</th>
                 <th>Line<br>Total</th>
@@ -492,14 +517,12 @@ class ShopWorksGuideGenerator {
                     <td>${item.colorRange}</td>
                     <td>${item.color}</td>
                     <td class="text-left">${item.description}</td>
-                    <td>${item.sizes.Adult}</td>
                     <td>${item.sizes.S}</td>
                     <td>${item.sizes.M}</td>
                     <td>${item.sizes.LG}</td>
                     <td>${item.sizes.XL}</td>
                     <td>${item.sizes.XXL}</td>
-                    <td>${item.sizes.XXXL}</td>
-                    <td>${item.sizes.Other}</td>
+                    <td class="${item.sizes.hasNonStandardXXXL ? 'non-standard-xxxl' : ''}">${item.sizes.XXXL}</td>
                     <td>$${item.manualPrice.toFixed(2)}</td>
                     <td>${item.calcPrice}</td>
                     <td>$${item.lineTotal.toFixed(2)}</td>
