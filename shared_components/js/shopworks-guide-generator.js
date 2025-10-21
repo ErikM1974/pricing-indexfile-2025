@@ -117,7 +117,9 @@ class ShopWorksGuideGenerator {
                 // Filter out non-size keys
                 if (['logos', 'tier', 'setup', 'stitchCount'].includes(size)) return;
 
-                if (['S', 'M', 'L', 'XL'].includes(size.toUpperCase())) {
+                // Standard sizes include XS, S, M, L, XL, XXL/2XL (up to 2XL)
+                // Oversizes are 3XL and beyond (get separate lines with _3X, _4X suffixes)
+                if (['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL'].includes(size.toUpperCase())) {
                     standardSizes[size] = parseInt(qty);
                 } else {
                     oversizes[size] = parseInt(qty);
@@ -195,10 +197,12 @@ class ShopWorksGuideGenerator {
         const sizeUpper = size.toUpperCase();
 
         const columnMap = {
+            'XS': 'Other',  // XS goes in "Other" column (no dedicated XS column in ShopWorks)
             'S': 'S',
             'M': 'M',
             'L': 'LG',      // ShopWorks uses "LG" not "L"
             'XL': 'XL',
+            'XXL': 'XXL',   // XXL can be written as 'XXL' or '2XL'
             '2XL': 'XXL',   // 2XL goes in XXL column
             '3XL': 'XXXL',  // 3XL goes in XXXL column
             '4XL': 'Other', // 4XL and beyond go in "Other"
