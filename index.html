@@ -48,6 +48,9 @@
                     </div>
                 </li>
                 <li class="nav-item">
+                    <a href="/brands.html" class="nav-link">Shop by Brand</a>
+                </li>
+                <li class="nav-item">
                     <a href="/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
                 </li>
                 <li class="nav-item">
@@ -96,6 +99,32 @@
             <ul class="category-list" id="categoryList">
                 <!-- Categories will be dynamically generated from CATEGORY_DATA -->
             </ul>
+
+            <!-- Brand Filters Section -->
+            <div class="filters-section" id="filtersSection" style="display: none;">
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <h3 class="filter-title">Brands</h3>
+                        <button class="filter-toggle" id="brandFilterToggle" aria-label="Toggle brand filters">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="filter-options" id="brandFilterOptions">
+                        <!-- Brand checkboxes will be dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Clear Filters Button -->
+                <button class="clear-filters-btn" id="clearFiltersBtn" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Clear All Filters
+                </button>
+            </div>
         </nav>
         
         <div class="sidebar-overlay" id="sidebarOverlay"></div>

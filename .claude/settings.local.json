@@ -153,7 +153,8 @@
       "Bash(if git ls-files --error-unmatch \"$file\")",
       "Bash(/dev/null)",
       "Bash(else)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Skill(christmas-bundle-orders)"
     ],
     "deny": [],
     "ask": [],

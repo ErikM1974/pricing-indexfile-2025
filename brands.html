@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shop by brand - Browse all apparel brands available at Northwest Custom Apparel including Nike, Carhartt, OGIO, Port Authority and more.">
+    <title>Shop by Brand - Northwest Custom Apparel</title>
+
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="main-redesign.css?v=10">
+    <link rel="stylesheet" href="brands.css?v=1">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle mobile menu">☰</button>
+            <a href="/" class="logo-link" title="Return to Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+            </a>
+            <div class="header-info">
+                <h1 class="header-title">Shop by Brand</h1>
+                <p class="header-services">Browse All Brands</p>
+            </div>
+        </div>
+    </header>
+
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">← Back to Catalog</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/resources.html" class="nav-link">Resources</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="brands-page-container">
+        <main class="brands-content">
+            <!-- Page Header -->
+            <div class="brands-header">
+                <h1 class="brands-title">Shop by Brand</h1>
+                <p class="brands-subtitle">Browse our complete collection of apparel brands. Click any brand to view all available products.</p>
+            </div>
+
+            <!-- Brand Search -->
+            <div class="brand-search-container">
+                <input type="text" id="brandSearchInput" class="brand-search-input" placeholder="Search brands..." aria-label="Search brands">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading brands...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <p>Unable to load brands. Please try again later.</p>
+                <button onclick="location.reload()" class="btn-retry">Retry</button>
+            </div>
+
+            <!-- Brands Grid -->
+            <div id="brandsContainer" class="brands-container" style="display: none;">
+                <!-- Brands will be dynamically inserted by brands.js -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="brands.js?v=1"></script>
+</body>
+</html>

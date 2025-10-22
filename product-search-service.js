@@ -10,10 +10,100 @@ class ProductSearchService {
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         this.requestCache = new Map(); // Prevent duplicate concurrent requests
-        
+
         // Price calculation constants
         this.MARGIN = 0.60;
         this.FIXED_ADDITION = 15.00;
+
+        // Smart search - Brand name detection dictionary
+        this.BRAND_KEYWORDS = {
+            // Major brands (lowercase for matching)
+            'nike': 'Nike',
+            'carhartt': 'Carhartt',
+            'ogio': 'OGIO',
+            'port authority': 'Port Authority',
+            'portauthority': 'Port Authority',
+            'port & company': 'Port & Company',
+            'port company': 'Port & Company',
+            'gildan': 'Gildan',
+            'champion': 'Champion',
+            'hanes': 'Hanes',
+            'adidas': 'adidas',
+            'under armour': 'Under Armour',
+            'underarmour': 'Under Armour',
+            'new era': 'New Era',
+            'newera': 'New Era',
+            'richardson': 'Richardson',
+            'columbia': 'Columbia',
+            'patagonia': 'Patagonia',
+            'the north face': 'The North Face',
+            'northface': 'The North Face',
+            'north face': 'The North Face',
+            'allmade': 'AllMade',
+            'all made': 'AllMade',
+            'bella canvas': 'Bella+Canvas',
+            'bella+canvas': 'Bella+Canvas',
+            'bellacanvas': 'Bella+Canvas',
+            'next level': 'Next Level Apparel',
+            'nextlevel': 'Next Level Apparel',
+            'american apparel': 'American Apparel',
+            'yeti': 'YETI',
+            'stanley': 'Stanley'
+        };
+
+        // Smart search - Category keyword mapping
+        this.CATEGORY_KEYWORDS = {
+            // Outerwear
+            'jacket': 'Outerwear',
+            'jackets': 'Outerwear',
+            'coat': 'Outerwear',
+            'coats': 'Outerwear',
+            'vest': 'Outerwear',
+            'vests': 'Outerwear',
+            'hoodie': 'Fleece',
+            'hoodies': 'Fleece',
+            'sweatshirt': 'Fleece',
+            'sweatshirts': 'Fleece',
+            'fleece': 'Fleece',
+
+            // Shirts
+            'shirt': 'T-Shirts',
+            'shirts': 'T-Shirts',
+            'tee': 'T-Shirts',
+            'tees': 'T-Shirts',
+            't-shirt': 'T-Shirts',
+            't-shirts': 'T-Shirts',
+            'tshirt': 'T-Shirts',
+            'tshirts': 'T-Shirts',
+            'polo': 'Polos/Knits',
+            'polos': 'Polos/Knits',
+            'knit': 'Polos/Knits',
+            'knits': 'Polos/Knits',
+
+            // Headwear
+            'hat': 'Headwear',
+            'hats': 'Headwear',
+            'cap': 'Headwear',
+            'caps': 'Headwear',
+            'beanie': 'Headwear',
+            'beanies': 'Headwear',
+
+            // Bags
+            'bag': 'Bags',
+            'bags': 'Bags',
+            'backpack': 'Bags',
+            'backpacks': 'Bags',
+            'tote': 'Bags',
+            'totes': 'Bags',
+
+            // Accessories
+            'glove': 'Accessories',
+            'gloves': 'Accessories',
+            'scarf': 'Accessories',
+            'scarves': 'Accessories',
+            'towel': 'Accessories',
+            'towels': 'Accessories'
+        };
     }
 
     /**
@@ -254,70 +344,166 @@ class ProductSearchService {
     }
 
     /**
+     * Parse query to detect brand names and category keywords
+     * Returns: { detectedBrand, detectedCategory, cleanedQuery, appliedFilters }
+     */
+    parseSmartQuery(query) {
+        const lowerQuery = query.toLowerCase().trim();
+        let detectedBrand = null;
+        let detectedCategory = null;
+        let remainingWords = lowerQuery.split(/\s+/);
+        const appliedFilters = [];
+
+        // Check for brand keywords (try multi-word brands first)
+        for (const [keyword, brandName] of Object.entries(this.BRAND_KEYWORDS)) {
+            if (lowerQuery.includes(keyword)) {
+                detectedBrand = brandName;
+                appliedFilters.push({ type: 'brand', value: brandName, keyword });
+                // Remove brand keyword from remaining words
+                const keywordWords = keyword.split(/\s+/);
+                remainingWords = remainingWords.filter(word => !keywordWords.includes(word));
+                break; // Only detect one brand
+            }
+        }
+
+        // Check for category keywords
+        for (const [keyword, categoryName] of Object.entries(this.CATEGORY_KEYWORDS)) {
+            if (remainingWords.includes(keyword)) {
+                detectedCategory = categoryName;
+                appliedFilters.push({ type: 'category', value: categoryName, keyword });
+                // Remove category keyword from remaining words
+                remainingWords = remainingWords.filter(word => word !== keyword);
+                break; // Only detect one category
+            }
+        }
+
+        // Build cleaned query from remaining words
+        const cleanedQuery = remainingWords.join(' ').trim();
+
+        console.log('[ProductSearch] Smart query parsed:', {
+            original: query,
+            detectedBrand,
+            detectedCategory,
+            cleanedQuery,
+            appliedFilters
+        });
+
+        return {
+            detectedBrand,
+            detectedCategory,
+            cleanedQuery,
+            appliedFilters
+        };
+    }
+
+    /**
      * Smart search that combines style search and text search
+     * Now also detects brand names and category keywords
      */
     async smartSearch(query, params = {}) {
         if (!query || query.length < 2) {
             return { products: [], pagination: { page: 1, limit: 0, total: 0, totalPages: 0 } };
         }
-        
+
         const trimmedQuery = query.trim();
-        const isStyle = this.isStyleNumber(trimmedQuery);
-        
-        console.log(`[ProductSearch] Smart search for "${trimmedQuery}" - isStyle: ${isStyle}`);
-        
+
+        // Parse query for smart keyword detection
+        const parsed = this.parseSmartQuery(trimmedQuery);
+
+        // Build search parameters with detected filters
+        const searchParams = { ...params };
+
+        // Apply detected brand filter
+        if (parsed.detectedBrand) {
+            if (!searchParams.brand) {
+                searchParams.brand = [];
+            }
+            if (Array.isArray(searchParams.brand)) {
+                if (!searchParams.brand.includes(parsed.detectedBrand)) {
+                    searchParams.brand.push(parsed.detectedBrand);
+                }
+            } else {
+                searchParams.brand = [parsed.detectedBrand];
+            }
+        }
+
+        // Apply detected category filter
+        if (parsed.detectedCategory) {
+            searchParams.category = parsed.detectedCategory;
+        }
+
+        // Use cleaned query if we detected filters, otherwise use original
+        const searchQuery = parsed.appliedFilters.length > 0 && parsed.cleanedQuery
+            ? parsed.cleanedQuery
+            : trimmedQuery;
+
+        const isStyle = this.isStyleNumber(searchQuery);
+
+        console.log(`[ProductSearch] Smart search for "${trimmedQuery}"`, {
+            isStyle,
+            detectedBrand: parsed.detectedBrand,
+            detectedCategory: parsed.detectedCategory,
+            cleanedQuery: parsed.cleanedQuery,
+            searchParams
+        });
+
         if (isStyle) {
-            // For style numbers, try both searches and combine results
+            // For style numbers, use full product search API but filter results
+            // to only show exact style matches (e.g., "PC61" matches PC61, PC61LS, PC61M)
+            // This gives us full product data (images, prices) unlike autocomplete API
             try {
-                // Get style-specific results first
-                const [styleResults, broadResults] = await Promise.all([
-                    this.searchByStyleAutocomplete(trimmedQuery),
-                    this.searchProducts({ ...params, q: trimmedQuery, limit: 20 })
-                ]);
-                
-                // Combine results, prioritizing exact style matches
-                const combinedProducts = [];
-                const seenStyles = new Set();
-                
-                // Add style search results first (these are most accurate)
-                if (styleResults.products) {
-                    styleResults.products.forEach(product => {
-                        if (!seenStyles.has(product.styleNumber)) {
-                            combinedProducts.push(product);
-                            seenStyles.add(product.styleNumber);
-                        }
-                    });
+                console.log('[ProductSearch] Style search - fetching full product data for filtering');
+
+                // Use full product search to get complete data
+                const results = await this.searchProducts({
+                    ...searchParams,
+                    q: searchQuery,
+                    limit: 50  // Get enough results for filtering
+                });
+
+                if (!results.products || results.products.length === 0) {
+                    return {
+                        products: [],
+                        pagination: { page: 1, total: 0, totalPages: 0 },
+                        smartFilters: parsed.appliedFilters
+                    };
                 }
-                
-                // Add broad search results (avoiding duplicates)
-                if (broadResults.products) {
-                    broadResults.products.forEach(product => {
-                        if (!seenStyles.has(product.styleNumber)) {
-                            combinedProducts.push(product);
-                            seenStyles.add(product.styleNumber);
-                        }
-                    });
-                }
-                
+
+                // Filter to only exact style matches
+                const queryLower = searchQuery.toLowerCase();
+                const exactMatches = results.products.filter(product => {
+                    const styleLower = (product.styleNumber || '').toLowerCase();
+
+                    // Match if style equals query OR starts with query
+                    // Examples: "pc61" matches "PC61", "PC61LS", "PC61M"
+                    // But NOT "SPC61" or "DISC61"
+                    return styleLower === queryLower || styleLower.startsWith(queryLower);
+                });
+
+                console.log(`[ProductSearch] Filtered ${results.products.length} results to ${exactMatches.length} exact matches`);
+
                 return {
-                    products: combinedProducts,
+                    products: exactMatches,
                     pagination: {
                         page: 1,
-                        limit: combinedProducts.length,
-                        total: combinedProducts.length,
+                        limit: exactMatches.length,
+                        total: exactMatches.length,
                         totalPages: 1
                     },
-                    facets: broadResults.facets || null
+                    smartFilters: parsed.appliedFilters
                 };
-                
+
             } catch (error) {
-                console.error('[ProductSearch] Smart search error, falling back:', error);
-                // Fall back to regular search
-                return this.searchProducts({ ...params, q: trimmedQuery });
+                console.error('[ProductSearch] Style search error, falling back:', error);
+                // Fall back to regular search only if style search fails
+                return this.searchProducts({ ...searchParams, q: searchQuery });
             }
         } else {
-            // For non-style searches, use the broad search
-            return this.searchProducts({ ...params, q: trimmedQuery });
+            // For non-style searches, use the broad search WITH FACETS
+            const result = await this.searchWithFacets({ ...searchParams, q: searchQuery });
+            // Attach smart filters to result
+            result.smartFilters = parsed.appliedFilters;
+            return result;
         }
     }
 
