@@ -30,17 +30,67 @@ class CatalogSearch {
 
     init() {
         console.log('[CatalogSearch] Initializing...');
-        
+
         // Set up event listeners
         this.setupSearchInput();
         this.setupCategoryMenu();
         this.setupSortOptions();
-        
-        // Load initial content
-        this.loadTopSellers();
-        
+
+        // Check URL parameters and apply filters if present
+        this.checkUrlParameters();
+
+        // Load initial content (only if no URL parameters)
+        if (!window.location.search) {
+            this.loadTopSellers();
+        }
+
         // Set up infinite scroll
         this.setupInfiniteScroll();
+    }
+
+    /**
+     * Check URL parameters and apply filters on page load
+     */
+    checkUrlParameters() {
+        const params = new URLSearchParams(window.location.search);
+
+        let hasFilters = false;
+
+        // Check for search query parameter
+        if (params.has('q')) {
+            this.currentFilters.q = params.get('q');
+            const searchInput = document.getElementById('navSearchInput');
+            if (searchInput) {
+                searchInput.value = this.currentFilters.q;
+            }
+            hasFilters = true;
+        }
+
+        // Check for brand parameter
+        if (params.has('brand')) {
+            const brandName = params.get('brand');
+            this.currentFilters.brand = [brandName];
+            console.log('[CatalogSearch] Brand filter from URL:', brandName);
+            hasFilters = true;
+        }
+
+        // Check for category parameter
+        if (params.has('category')) {
+            this.currentFilters.category = params.get('category');
+            hasFilters = true;
+        }
+
+        // Check for subcategory parameter
+        if (params.has('subcategory')) {
+            this.currentFilters.subcategory = params.get('subcategory');
+            hasFilters = true;
+        }
+
+        // If any filters were found in URL, trigger search
+        if (hasFilters) {
+            console.log('[CatalogSearch] Filters found in URL, performing search:', this.currentFilters);
+            this.performSearch();
+        }
     }
 
     /**
