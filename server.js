@@ -355,6 +355,11 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'pricing-negotiation-policy.html'));
 });
 
+// Brands browse page
+app.get('/brands.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'brands.html'));
+});
+
 // Phase 1 Infrastructure Test Pages
 app.get('/test-phase1-infrastructure.html', (req, res) => {
   console.log('Serving test-phase1-infrastructure.html page');
