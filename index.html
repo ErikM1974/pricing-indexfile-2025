@@ -48,7 +48,19 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a href="/brands.html" class="nav-link">Shop by Brand</a>
+                    <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">Brands <span class="nav-arrow">▼</span></a>
+                    <div class="nav-dropdown brands-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div class="brands-grid" id="navBrandsGrid">
+                                <div class="brands-loading">Loading brands...</div>
+                            </div>
+                            <div class="brands-footer">
+                                <a href="/brands.html" class="view-all-brands-link">
+                                    View All Brands →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a href="/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
@@ -286,6 +298,7 @@
     <script src="product-search-service.js?v=4"></script>
     <script src="autocomplete-new.js?v=4"></script>
     <script src="catalog-search.js?v=4"></script>
+    <script src="brands-flyout.js?v=1"></script>
     <script src="app-modern.js?v=4" defer></script>
 </body>
 </html>
