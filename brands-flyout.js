@@ -50,8 +50,17 @@ class BrandsFlyout {
 
             // Sort brands alphabetically
             this.allBrands.sort((a, b) => {
-                const nameA = (a.name || a).toString().toUpperCase();
-                const nameB = (b.name || b).toString().toUpperCase();
+                // Extract brand name using same defensive logic
+                const getNameString = (brand) => {
+                    if (typeof brand === 'string') return brand;
+                    if (typeof brand === 'object' && brand !== null) {
+                        return brand.name || brand.BrandName || brand.brand || brand.Brand || JSON.stringify(brand);
+                    }
+                    return String(brand);
+                };
+
+                const nameA = getNameString(a).toString().toUpperCase();
+                const nameB = getNameString(b).toString().toUpperCase();
                 return nameA.localeCompare(nameB);
             });
 
@@ -80,7 +89,26 @@ class BrandsFlyout {
 
         // Generate brand links HTML
         const brandsHTML = brandsToShow.map(brand => {
-            const brandName = brand.name || brand;
+            // Handle multiple API response formats defensively
+            let brandName;
+
+            if (typeof brand === 'string') {
+                // Simple string format: "Carhartt"
+                brandName = brand;
+            } else if (typeof brand === 'object' && brand !== null) {
+                // Object format: try multiple possible property names
+                brandName = brand.name || brand.BrandName || brand.brand || brand.Brand;
+
+                // If still an object, convert to string (shouldn't happen but defensive)
+                if (typeof brandName === 'object') {
+                    brandName = JSON.stringify(brand);
+                    console.warn('[BrandsFlyout] Unexpected brand object format:', brand);
+                }
+            } else {
+                // Fallback for unexpected types
+                brandName = String(brand);
+            }
+
             return this.createBrandLink(brandName);
         }).join('');
 
