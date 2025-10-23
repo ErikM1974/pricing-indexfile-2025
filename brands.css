@@ -161,8 +161,8 @@
 
 /* Brand Logo Image */
 .brand-card-logo {
-    width: 48px;
-    height: 48px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
     flex-shrink: 0;
     border-radius: 4px;
@@ -303,4 +303,14 @@
     .brand-card-arrow {
         display: none;
     }
+}
+
+/* Override body overflow for brands page to enable scrolling */
+body {
+    overflow: auto !important;
+    height: auto !important;
+}
+
+.brands-page-container {
+    min-height: 100vh;
 }
