@@ -835,6 +835,11 @@ class CatalogSearch {
 
     /**
      * Update or create Load More button
+     *
+     * NOTE: Client-side pagination tracking was added on 2025-01-27 as a defensive fallback
+     * when API pagination bugs were causing incomplete results. Server-side pagination bugs
+     * were fixed on 2025-10-23, but this fallback remains as a safety mechanism in case
+     * API pagination metadata is ever unavailable.
      */
     updateLoadMoreButton(results) {
         // Remove existing button/sentinel if any
