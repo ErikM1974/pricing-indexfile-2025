@@ -245,6 +245,15 @@ class BrandsPage {
         window.location.href = `/?brand=${encodeURIComponent(brandName)}`;
     }
 
+    /**
+     * Escape HTML to prevent XSS
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     setupMobileMenu() {
         const mobileBtn = document.getElementById('mobileMenuBtn');
         if (!mobileBtn) return;
