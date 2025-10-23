@@ -157,39 +157,60 @@ class CatalogSearch {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const category = link.dataset.category;
-                
-                // Clear search and set category
+
+                // Reset ALL filters for fresh category search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
                     subcategory: null,
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters for clean navigation
+                window.history.pushState({}, '', window.location.pathname);
+
                 // Update UI
                 this.setActiveCategory(link);
-                
+
                 // Perform search
                 this.performSearch();
             });
         });
         
-        // Subcategory links in flyout
+        // Subcategory links in flyout (including "View All" links)
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('flyout-item')) {
+            if (e.target.classList.contains('flyout-item') || e.target.closest('.flyout-item')) {
                 e.preventDefault();
-                const category = e.target.dataset.category;
-                const subcategory = e.target.dataset.subcategory;
-                
+
+                // Get the actual link element (in case <strong> was clicked)
+                const link = e.target.classList.contains('flyout-item') ? e.target : e.target.closest('.flyout-item');
+
+                const category = link.dataset.category;
+                const subcategory = link.dataset.subcategory; // Will be undefined for "View All"
+
+                // Reset ALL filters for fresh category/subcategory search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
-                    subcategory: subcategory,
+                    subcategory: subcategory || null, // null if "View All" (no subcategory)
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters
+                window.history.pushState({}, '', window.location.pathname);
+
                 this.performSearch();
             }
         });
@@ -200,15 +221,35 @@ class CatalogSearch {
                 e.preventDefault();
                 const category = e.target.dataset.category;
                 const subcategory = e.target.dataset.subcategory;
-                
+
+                // Reset ALL filters for fresh subcategory search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
                     subcategory: subcategory,
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters
+                window.history.pushState({}, '', window.location.pathname);
+
+                // Close dropdown smoothly
+                const dropdown = e.target.closest('.nav-dropdown');
+                const navLink = document.querySelector('.nav-products');
+                if (dropdown && navLink) {
+                    navLink.setAttribute('aria-expanded', 'false');
+                    dropdown.style.opacity = '0';
+                    dropdown.style.visibility = 'hidden';
+                    dropdown.style.transform = 'translateY(-10px)';
+                    dropdown.style.pointerEvents = 'none';
+                }
+
                 this.performSearch();
             }
         });
@@ -559,55 +600,78 @@ class CatalogSearch {
      * Display brand filter checkboxes
      */
     displayBrandFilters(brands) {
+        // Get references to BOTH old sidebar and new horizontal bar elements
         const filtersSection = document.getElementById('filtersSection');
         const brandOptions = document.getElementById('brandFilterOptions');
         const clearBtn = document.getElementById('clearFiltersBtn');
 
-        if (!filtersSection || !brandOptions) return;
+        // New horizontal filter bar elements
+        const filtersBarContainer = document.getElementById('filtersBarContainer');
+        const brandFilterOptionsNew = document.getElementById('brandFilterOptionsNew');
 
-        // Show filters section
-        filtersSection.style.display = 'block';
-
-        // Clear existing options
-        brandOptions.innerHTML = '';
-
-        // Limit to top 15 brands by count
-        const topBrands = brands.slice(0, 15);
-
-        // Create checkbox for each brand
-        topBrands.forEach((brand) => {
-            const option = document.createElement('label');
-            option.className = 'filter-option';
-            option.innerHTML = `
-                <input
-                    type="checkbox"
-                    value="${brand.value}"
-                    class="brand-checkbox"
-                    ${this.currentFilters.brand && this.currentFilters.brand.includes(brand.value) ? 'checked' : ''}
-                >
-                <span class="filter-label">${brand.label}</span>
-                <span class="filter-count">${brand.count}</span>
-            `;
-            brandOptions.appendChild(option);
-        });
-
-        // Add event listeners to checkboxes
-        document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
-                this.handleBrandFilterChange(e.target.value, e.target.checked);
-            });
-        });
-
-        // Setup toggle button
-        const toggleBtn = document.getElementById('brandFilterToggle');
-        if (toggleBtn) {
-            toggleBtn.onclick = () => {
-                brandOptions.classList.toggle('collapsed');
-                toggleBtn.classList.toggle('collapsed');
-            };
+        // DEPRECATED: Keep sidebar filters hidden - using horizontal filter bar instead
+        if (filtersSection) {
+            filtersSection.style.display = 'none';
         }
 
-        // Setup clear filters button
+        // Show horizontal filter bar and populate it
+        if (filtersBarContainer && brandFilterOptionsNew) {
+            // Show the filter bar container
+            filtersBarContainer.style.display = 'block';
+
+            // Clear existing options
+            brandFilterOptionsNew.innerHTML = '';
+
+            // Sort brands alphabetically
+            const sortedBrands = [...brands].sort((a, b) => a.label.localeCompare(b.label));
+
+            // Create checkbox for each brand (no limit - show all brands)
+            sortedBrands.forEach((brand) => {
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                option.dataset.brand = brand.label.toLowerCase();
+                option.innerHTML = `
+                    <input
+                        type="checkbox"
+                        id="brand-new-${brand.value.replace(/\s+/g, '-')}"
+                        value="${brand.value}"
+                        class="brand-checkbox-new"
+                        ${this.currentFilters.brand && this.currentFilters.brand.includes(brand.value) ? 'checked' : ''}
+                    >
+                    <label for="brand-new-${brand.value.replace(/\s+/g, '-')}">${brand.label}</label>
+                `;
+                brandFilterOptionsNew.appendChild(option);
+            });
+
+            // Initialize dropdown interactions (will be set up in separate method)
+            this.setupFilterDropdowns();
+
+            // Update active filters display and count
+            this.updateActiveFiltersDisplay();
+            this.updateFilterCount('brand', this.currentFilters.brand ? this.currentFilters.brand.length : 0);
+        }
+
+        // Keep old sidebar functionality for backwards compatibility (but hidden)
+        if (brandOptions) {
+            brandOptions.innerHTML = '';
+            const topBrands = brands.slice(0, 15);
+            topBrands.forEach((brand) => {
+                const option = document.createElement('label');
+                option.className = 'filter-option';
+                option.innerHTML = `
+                    <input
+                        type="checkbox"
+                        value="${brand.value}"
+                        class="brand-checkbox"
+                        ${this.currentFilters.brand && this.currentFilters.brand.includes(brand.value) ? 'checked' : ''}
+                    >
+                    <span class="filter-label">${brand.label}</span>
+                    <span class="filter-count">${brand.count}</span>
+                `;
+                brandOptions.appendChild(option);
+            });
+        }
+
         if (clearBtn) {
             clearBtn.style.display = this.hasActiveFilters() ? 'flex' : 'none';
             clearBtn.onclick = () => this.clearAllFilters();
@@ -653,6 +717,198 @@ class CatalogSearch {
         return (this.currentFilters.brand && this.currentFilters.brand.length > 0) ||
                (this.currentFilters.color && this.currentFilters.color.length > 0) ||
                (this.currentFilters.size && this.currentFilters.size.length > 0);
+    }
+
+    /**
+     * Setup horizontal filter dropdown interactions
+     */
+    setupFilterDropdowns() {
+        const brandBtn = document.getElementById('brandFilterBtn');
+        const brandPanel = document.getElementById('brandFilterPanel');
+        const closeBtn = brandPanel?.querySelector('.filter-panel-close');
+        const applyBtn = document.getElementById('applyBrandFilter');
+        const searchInput = document.getElementById('brandSearchInput');
+
+        if (!brandBtn || !brandPanel) return;
+
+        // Remove old listeners by cloning elements
+        const newBrandBtn = brandBtn.cloneNode(true);
+        brandBtn.parentNode.replaceChild(newBrandBtn, brandBtn);
+
+        // Toggle dropdown
+        newBrandBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = brandPanel.classList.contains('show');
+
+            // Close all other panels
+            document.querySelectorAll('.filter-dropdown-panel').forEach(panel => {
+                panel.classList.remove('show');
+            });
+            document.querySelectorAll('.filter-dropdown-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Toggle current panel
+            if (!isOpen) {
+                brandPanel.classList.add('show');
+                newBrandBtn.classList.add('active');
+            }
+        });
+
+        // Close button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            });
+        }
+
+        // Apply button
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                this.applyBrandFilter();
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            });
+        }
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.filter-controls')) {
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            }
+        });
+
+        // Brand search
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterBrandOptions(e.target.value);
+            });
+        }
+    }
+
+    /**
+     * Filter brand options by search term
+     */
+    filterBrandOptions(searchTerm) {
+        const options = document.querySelectorAll('#brandFilterOptionsNew .filter-option');
+        const term = searchTerm.toLowerCase().trim();
+
+        options.forEach(option => {
+            const brandName = option.dataset.brand;
+            option.style.display = brandName.includes(term) ? 'flex' : 'none';
+        });
+    }
+
+    /**
+     * Apply brand filter from horizontal bar
+     */
+    applyBrandFilter() {
+        const checkboxes = document.querySelectorAll('#brandFilterOptionsNew input[type="checkbox"]:checked');
+        const selectedBrands = Array.from(checkboxes).map(cb => cb.value);
+
+        // Update filters
+        this.currentFilters.brand = selectedBrands;
+        this.currentFilters.page = 1;
+
+        // Update UI
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount('brand', selectedBrands.length);
+
+        // Perform search
+        this.performSearch();
+    }
+
+    /**
+     * Update active filters chip display
+     */
+    updateActiveFiltersDisplay() {
+        const container = document.getElementById('activeFilters');
+        if (!container) return;
+
+        let html = '';
+
+        // Brand chips
+        if (this.currentFilters.brand && this.currentFilters.brand.length > 0) {
+            this.currentFilters.brand.forEach(brand => {
+                // Escape brand name for use in onclick attribute
+                const escapedBrand = brand.replace(/'/g, "\\'");
+                html += `
+                    <div class="filter-chip" data-filter-type="brand" data-filter-value="${brand}">
+                        <span>${brand}</span>
+                        <button class="filter-chip-remove" onclick="window.catalogSearch.removeFilter('brand', '${escapedBrand}')">×</button>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
+
+        // Show/hide clear all button
+        const clearAllBtn = document.getElementById('clearAllFiltersBtn');
+        const hasFilters = this.currentFilters.brand && this.currentFilters.brand.length > 0;
+        if (clearAllBtn) {
+            clearAllBtn.style.display = hasFilters ? 'flex' : 'none';
+
+            // Remove old listener and add new one
+            const newClearAllBtn = clearAllBtn.cloneNode(true);
+            clearAllBtn.parentNode.replaceChild(newClearAllBtn, clearAllBtn);
+            newClearAllBtn.addEventListener('click', () => this.clearAllFiltersNew());
+        }
+    }
+
+    /**
+     * Update filter count badge
+     */
+    updateFilterCount(filterType, count) {
+        const countEl = document.getElementById(`${filterType}Count`);
+        if (!countEl) return;
+
+        if (count > 0) {
+            countEl.textContent = count;
+            countEl.style.display = 'inline-flex';
+        } else {
+            countEl.style.display = 'none';
+        }
+    }
+
+    /**
+     * Remove individual filter from horizontal bar
+     */
+    removeFilter(filterType, value) {
+        if (filterType === 'brand') {
+            this.currentFilters.brand = this.currentFilters.brand.filter(b => b !== value);
+        }
+
+        // Update checkbox
+        const checkbox = document.querySelector(`#brandFilterOptionsNew input[value="${value}"]`);
+        if (checkbox) checkbox.checked = false;
+
+        // Update UI and search
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount(filterType, this.currentFilters.brand ? this.currentFilters.brand.length : 0);
+        this.currentFilters.page = 1;
+        this.performSearch();
+    }
+
+    /**
+     * Clear all filters from horizontal bar
+     */
+    clearAllFiltersNew() {
+        // Clear all filters
+        this.currentFilters.brand = [];
+
+        // Uncheck all checkboxes
+        document.querySelectorAll('#brandFilterOptionsNew input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Update UI and search
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount('brand', 0);
+        this.currentFilters.page = 1;
+        this.performSearch();
     }
 
     /**

@@ -41,6 +41,10 @@
                     <a href="#" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">Products <span class="nav-arrow">▼</span></a>
                     <div class="nav-dropdown mega-dropdown">
                         <div class="dropdown-content">
+                            <!-- Search bar container - Full width at top -->
+                            <div id="navDropdownSearch"></div>
+
+                            <!-- Categories grid - Below search bar -->
                             <div class="dropdown-categories" id="navCategories">
                                 <!-- Categories will be populated dynamically -->
                             </div>
@@ -277,8 +281,58 @@
                     </div>
                 </div>
             </div>
-            
-            
+
+            <!-- Horizontal Filter Bar - Modern Floating Card Design -->
+            <div class="filters-bar-container" id="filtersBarContainer" style="display: none;">
+                <div class="filters-bar">
+                    <!-- Row 1: Filters Label + Filter Buttons -->
+                    <div class="filters-bar-top-row">
+                        <span class="filters-label">Filters:</span>
+
+                        <div class="filter-controls">
+                            <button class="filter-dropdown-btn" id="brandFilterBtn" data-filter="brand">
+                                <span>Brand</span>
+                                <svg class="filter-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                                <span class="filter-count" id="brandCount" style="display: none;"></span>
+                            </button>
+
+                            <!-- Brand Dropdown Panel -->
+                            <div class="filter-dropdown-panel" id="brandFilterPanel">
+                                <div class="filter-panel-header">
+                                    <h4>Filter by Brand</h4>
+                                    <button class="filter-panel-close" data-panel="brandFilterPanel">×</button>
+                                </div>
+                                <div class="filter-panel-search">
+                                    <input type="text" id="brandSearchInput" placeholder="Search brands..." autocomplete="off">
+                                </div>
+                                <div class="filter-panel-options" id="brandFilterOptionsNew">
+                                    <!-- Brand checkboxes will be populated here -->
+                                </div>
+                                <div class="filter-panel-footer">
+                                    <button class="btn-apply-filter" id="applyBrandFilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Active Filter Chips -->
+                    <div class="active-filters" id="activeFilters">
+                        <!-- Active filter chips will appear here dynamically -->
+                    </div>
+
+                    <!-- Clear All Button (will be positioned by JavaScript) -->
+                    <button class="clear-all-filters-btn" id="clearAllFiltersBtn" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
             <div class="results-section" style="display: none;">
                 <div class="results-header">
                     <h3 class="results-title">

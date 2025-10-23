@@ -60,26 +60,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function buildTopNavCategories() {
     const navCategories = document.getElementById('navCategories');
+    const searchContainer = document.getElementById('navDropdownSearch');
     if (!navCategories) return;
-    
-    // Create category grid for dropdown
+
+    // Popular categories for highlighting
+    const POPULAR_CATEGORIES = ['T-Shirts', 'Caps', 'Sweatshirts/Fleece', 'Polos/Knits'];
+
+    // Build search bar HTML (separate from categories)
+    if (searchContainer) {
+        searchContainer.innerHTML = `
+            <div class="dropdown-search-container">
+                <input type="text"
+                       id="categoryDropdownSearch"
+                       class="dropdown-search-input"
+                       placeholder="Search categories..."
+                       autocomplete="off">
+                <svg class="dropdown-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </div>
+        `;
+    }
+
+    // Build categories grid HTML (no search bar here)
     let html = '';
     Object.keys(CATEGORY_DATA).forEach(categoryName => {
+        const isPopular = POPULAR_CATEGORIES.includes(categoryName);
         html += `
-            <div class="nav-category-item">
-                <h4 class="nav-category-title">${categoryName}</h4>
+            <div class="nav-category-item" data-category-name="${categoryName.toLowerCase()}">
+                <h4 class="nav-category-title">${categoryName}${isPopular ? ' <span class="popular-badge">⭐</span>' : ''}</h4>
                 <ul class="nav-subcategory-list">
-                    ${CATEGORY_DATA[categoryName].slice(0, 4).map(subcat => 
-                        `<li><a href="#" data-category="${categoryName}" data-subcategory="${subcat}" class="nav-subcategory-link">${subcat}</a></li>`
+                    ${CATEGORY_DATA[categoryName].slice(0, 6).map(subcat =>
+                        `<li data-subcategory-name="${subcat.toLowerCase()}"><a href="#" data-category="${categoryName}" data-subcategory="${subcat}" class="nav-subcategory-link">${subcat}</a></li>`
                     ).join('')}
-                    ${CATEGORY_DATA[categoryName].length > 4 ? 
-                        `<li><a href="#" data-category="${categoryName}" class="nav-view-all">View all ${CATEGORY_DATA[categoryName].length} subcategories</a></li>` : ''}
+                    ${CATEGORY_DATA[categoryName].length > 6 ?
+                        `<li><a href="#" data-category="${categoryName}" class="nav-view-all">View all ${CATEGORY_DATA[categoryName].length} subcategories →</a></li>` : ''}
                 </ul>
             </div>
         `;
     });
-    
+
+    // Add no results message to categories container
+    html += `
+        <div class="dropdown-no-results" id="dropdownNoResults" style="display: none;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <p>No categories found</p>
+            <small>Try a different search term</small>
+        </div>
+    `;
+
     navCategories.innerHTML = html;
+
+    // Setup dropdown search functionality
+    setupDropdownSearch();
     
     // Add click handlers are handled by catalog-search.js
     navCategories.querySelectorAll('.nav-view-all').forEach(link => {
@@ -109,6 +146,86 @@ function buildTopNavCategories() {
             }, 300);
         });
     });
+}
+
+function setupDropdownSearch() {
+    const searchInput = document.getElementById('categoryDropdownSearch');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const categoryItems = document.querySelectorAll('.nav-category-item');
+        const noResults = document.getElementById('dropdownNoResults');
+        let visibleCount = 0;
+
+        if (searchTerm === '') {
+            // Show all categories when search is empty
+            categoryItems.forEach(item => {
+                item.style.display = '';
+                // Show all subcategories
+                const subcategoryItems = item.querySelectorAll('.nav-subcategory-list li');
+                subcategoryItems.forEach(subItem => {
+                    subItem.style.display = '';
+                });
+            });
+            noResults.style.display = 'none';
+            return;
+        }
+
+        categoryItems.forEach(item => {
+            const categoryName = item.dataset.categoryName;
+            const categoryMatches = categoryName.includes(searchTerm);
+
+            // Check subcategories
+            const subcategoryItems = item.querySelectorAll('.nav-subcategory-list li');
+            let hasVisibleSubcategories = false;
+
+            subcategoryItems.forEach(subItem => {
+                const subcategoryName = subItem.dataset.subcategoryName || '';
+                const subcategoryMatches = subcategoryName.includes(searchTerm);
+
+                if (categoryMatches || subcategoryMatches) {
+                    subItem.style.display = '';
+                    hasVisibleSubcategories = true;
+                } else {
+                    subItem.style.display = 'none';
+                }
+            });
+
+            // Show category if it matches or has matching subcategories
+            if (categoryMatches || hasVisibleSubcategories) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            noResults.style.display = 'flex';
+        } else {
+            noResults.style.display = 'none';
+        }
+    });
+
+    // Clear search when dropdown closes
+    const navLink = document.querySelector('.nav-products');
+    if (navLink) {
+        navLink.addEventListener('click', () => {
+            searchInput.value = '';
+            // Reset all categories to visible
+            const categoryItems = document.querySelectorAll('.nav-category-item');
+            categoryItems.forEach(item => {
+                item.style.display = '';
+                const subcategoryItems = item.querySelectorAll('.nav-subcategory-list li');
+                subcategoryItems.forEach(subItem => {
+                    subItem.style.display = '';
+                });
+            });
+            document.getElementById('dropdownNoResults').style.display = 'none';
+        });
+    }
 }
 
 function enhanceDropdownInteraction() {
@@ -297,16 +414,20 @@ function setupCategoryNavigation() {
 
 function updateFlyoutMenu(category, subcategories) {
     const flyout = document.getElementById('categoryFlyout');
-    
+
     let html = `
         <div class="flyout-header">${category}</div>
         <div class="flyout-content">
+            <a href="#" class="flyout-item view-all-category" data-category="${category}">
+                <strong>→ View All ${category}</strong>
+            </a>
+            <div class="flyout-divider"></div>
     `;
-    
+
     subcategories.forEach(subcat => {
         html += `<a href="#" class="flyout-item" data-category="${category}" data-subcategory="${subcat}">${subcat}</a>`;
     });
-    
+
     html += '</div>';
     flyout.innerHTML = html;
 }
