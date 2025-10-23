@@ -1,7 +1,9 @@
 /**
  * Brands Flyout Menu
  * Displays top brands in navigation dropdown with links to brand-filtered search
- * @version 1.0.0
+ * @version 2.0.0
+ *
+ * Update 2.0.0: Added brand logo support from API
  */
 
 class BrandsFlyout {
@@ -41,7 +43,8 @@ class BrandsFlyout {
             const data = await response.json();
             console.log('[BrandsFlyout] API response:', data);
 
-            // Handle different response formats
+            // API now returns objects with { brand, logo, sampleStyles }
+            // Handle both legacy string format and new object format
             this.allBrands = data.brands || data.data?.brands || data;
 
             if (!Array.isArray(this.allBrands)) {
@@ -109,7 +112,7 @@ class BrandsFlyout {
                 brandName = String(brand);
             }
 
-            return this.createBrandLink(brandName);
+            return this.createBrandLink(brand, brand.logo);
         }).join('');
 
         // Update container
@@ -119,14 +122,31 @@ class BrandsFlyout {
     }
 
     /**
-     * Create a brand link element
+     * Create a brand link element with logo support
      */
-    createBrandLink(brandName) {
+    createBrandLink(brand, logo) {
+        // Handle both object and string formats
+        const brandName = typeof brand === 'object' ? (brand.brand || brand.name) : brand;
+        const logoUrl = typeof brand === 'object' ? brand.logo : logo;
         const encodedBrand = encodeURIComponent(brandName);
+
+        // Create icon HTML with fallback
+        let iconHtml;
+        if (logoUrl) {
+            iconHtml = `
+                <img src="${this.escapeHtml(logoUrl)}"
+                     alt="${this.escapeHtml(brandName)} logo"
+                     class="brand-link-logo"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <span class="brand-link-icon brand-link-icon-fallback" style="display:none;">🏷️</span>
+            `;
+        } else {
+            iconHtml = `<span class="brand-link-icon">🏷️</span>`;
+        }
 
         return `
             <a href="/?brand=${encodedBrand}" class="brand-link">
-                <span class="brand-link-icon">🏷️</span>
+                ${iconHtml}
                 <span class="brand-link-name">${this.escapeHtml(brandName)}</span>
             </a>
         `;
