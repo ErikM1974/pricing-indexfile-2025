@@ -148,25 +148,50 @@
     background: white;
     border: 2px solid #e5e7eb;
     border-radius: 12px;
-    padding: 24px;
+    padding: 32px 24px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 16px;
-    justify-content: space-between;
+    text-align: center;
     position: relative;
     overflow: hidden;
 }
 
+/* Brand Logo Container with Loading Effect */
+.brand-card-logo-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 0%,
+        #e8e8e8 50%,
+        #f0f0f0 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
 /* Brand Logo Image */
 .brand-card-logo {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
     flex-shrink: 0;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: block;
 }
 
 .brand-card:hover .brand-card-logo {
@@ -196,30 +221,26 @@
 }
 
 .brand-card-content {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .brand-name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 4px 0;
+    /* Removed - logo contains brand name */
+    display: none;
 }
 
 .brand-count {
     font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0;
+    color: #9ca3af;
+    margin: 8px 0 0 0;
+    font-weight: 400;
 }
 
 .brand-card-arrow {
-    color: #9ca3af;
-    transition: all 0.3s ease;
-}
-
-.brand-card:hover .brand-card-arrow {
-    color: #2d5f3f;
-    transform: translateX(4px);
+    /* Removed - unnecessary visual clutter */
+    display: none;
 }
 
 /* No Brands State */

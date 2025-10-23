@@ -1,8 +1,9 @@
 /**
  * Brands Flyout Menu
  * Displays top brands in navigation dropdown with links to brand-filtered search
- * @version 2.0.0
+ * @version 3.0.0
  *
+ * Update 3.0.0: Added lazy loading for performance optimization
  * Update 2.0.0: Added brand logo support from API
  */
 
@@ -130,13 +131,15 @@ class BrandsFlyout {
         const logoUrl = typeof brand === 'object' ? brand.logo : logo;
         const encodedBrand = encodeURIComponent(brandName);
 
-        // Create icon HTML with fallback
+        // Create icon HTML with fallback and lazy loading
         let iconHtml;
         if (logoUrl) {
             iconHtml = `
                 <img src="${this.escapeHtml(logoUrl)}"
-                     alt="${this.escapeHtml(brandName)} logo"
+                     alt="${this.escapeHtml(brandName)}"
                      class="brand-link-logo"
+                     loading="lazy"
+                     decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
                 <span class="brand-link-icon brand-link-icon-fallback" style="display:none;">🏷️</span>
             `;
