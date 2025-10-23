@@ -397,17 +397,17 @@
             white-space: nowrap;
         }
 
-        /* Brand logo image styling */
+        /* Brand logo image styling - Increased for better visibility */
         .brand-link-logo {
-            width: 24px;
-            height: 24px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
             flex-shrink: 0;
             transition: all 0.2s ease;
         }
 
         .brand-link:hover .brand-link-logo {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         /* Fallback icon when logo fails to load */
