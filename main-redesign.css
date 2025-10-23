@@ -506,6 +506,41 @@
             opacity: 0.7;
         }
 
+        /* Progressive loading states */
+        .brand-logo-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            opacity: 0.6;
+        }
+
+        .brand-logo-loaded {
+            animation: fadeIn 0.3s ease-in;
+            opacity: 1;
+        }
+
+        /* Shimmer animation for loading placeholders */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Fade-in animation when images load */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         .brands-footer {
             margin-top: 1.5rem;
             padding-top: 1.5rem;
