@@ -154,7 +154,11 @@
       "Bash(/dev/null)",
       "Bash(else)",
       "Bash(fi)",
-      "Skill(christmas-bundle-orders)"
+      "Skill(christmas-bundle-orders)",
+      "Bash(do echo \"Testing: $url\")",
+      "Bash(time curl:*)",
+      "Bash(do echo -e \"\\n$brand:\")",
+      "Bash(do echo -e \"\\nAttempt $i (sleeping 5s to clear cache):\")"
     ],
     "deny": [],
     "ask": [],
