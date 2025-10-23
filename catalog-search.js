@@ -417,10 +417,34 @@ class CatalogSearch {
             // Append for pagination
             grid.insertAdjacentHTML('beforeend', productsHTML);
         }
-        
+
         // Add sort dropdown if not exists
         this.addSortDropdown();
-        
+
+        // Create client-side pagination tracking if API didn't provide it
+        // This handles brand filtering where API doesn't return pagination metadata
+        if (!results.pagination) {
+            // If we got a full page (48 products), assume there might be more
+            // If we got fewer than 48, we've reached the end
+            const hasMore = results.products.length >= 48;
+
+            this.currentResults.pagination = {
+                page: this.currentFilters.page || 1,
+                hasMore: hasMore,
+                limit: 48,
+                clientSide: true // Flag to indicate this is client-side tracking
+            };
+
+            console.log('[CatalogSearch] Client-side pagination:', {
+                page: this.currentResults.pagination.page,
+                productsReturned: results.products.length,
+                hasMore: hasMore
+            });
+        } else if (results.pagination) {
+            // Mark server-side pagination
+            this.currentResults.pagination.clientSide = false;
+        }
+
         // Add Load More button if there are more products
         this.updateLoadMoreButton(results);
         
@@ -816,27 +840,56 @@ class CatalogSearch {
         // Remove existing button/sentinel if any
         const existingButton = document.getElementById('loadMoreButton');
         const existingSentinel = document.getElementById('scroll-sentinel');
-        
+
         if (existingButton) existingButton.remove();
         if (existingSentinel) existingSentinel.remove();
-        
+
         // Check if there are more products to load
+        // Handle both server-side pagination (with totalPages) and client-side (without)
         if (results && results.pagination) {
-            const { page, totalPages, total, limit } = results.pagination;
-            const showingCount = Math.min(page * limit, total);
-            
-            if (page < totalPages) {
+            const { page, totalPages, total, limit, clientSide, hasMore } = results.pagination;
+
+            // Determine if we should show the Load More button
+            let shouldShowButton = false;
+            let buttonHTML = '';
+
+            if (clientSide) {
+                // Client-side pagination (brand filtering without API pagination)
+                // Show button if we got a full page (48 products), suggesting more exist
+                shouldShowButton = hasMore && results.products.length >= 48;
+
+                if (shouldShowButton) {
+                    const showingCount = page * limit;
+                    buttonHTML = `
+                        <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
+                            Load More Products
+                            <span class="load-more-count">(Showing ${showingCount})</span>
+                        </button>
+                        <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
+                    `;
+                }
+            } else {
+                // Server-side pagination (normal search with API pagination metadata)
+                shouldShowButton = totalPages && page < totalPages;
+
+                if (shouldShowButton) {
+                    const showingCount = Math.min(page * limit, total);
+                    buttonHTML = `
+                        <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
+                            Load More Products
+                            <span class="load-more-count">(Showing ${showingCount} of ${total})</span>
+                        </button>
+                        <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
+                    `;
+                }
+            }
+
+            if (shouldShowButton) {
                 // Create Load More button container
                 const buttonContainer = document.createElement('div');
                 buttonContainer.className = 'load-more-container';
                 buttonContainer.id = 'loadMoreContainer';
-                buttonContainer.innerHTML = `
-                    <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
-                        Load More Products
-                        <span class="load-more-count">(Showing ${showingCount} of ${total})</span>
-                    </button>
-                    <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
-                `;
+                buttonContainer.innerHTML = buttonHTML;
                 
                 // Add after results grid
                 const resultsGrid = document.getElementById('resultsGrid');
@@ -885,17 +938,21 @@ class CatalogSearch {
      */
     async loadMoreProducts() {
         if (!this.currentResults || !this.currentResults.pagination) return;
-        
-        const { page, totalPages } = this.currentResults.pagination;
-        
-        if (page >= totalPages) return;
-        
+
+        const { page, totalPages, clientSide } = this.currentResults.pagination;
+
+        // For server-side pagination, check if we've reached the end
+        if (!clientSide && totalPages && page >= totalPages) return;
+
+        // For client-side pagination, just continue loading until we get < 48 products
+        // (The check for hasMore happens in displayResults when next page loads)
+
         // Remove existing Load More button container before loading
         const container = document.getElementById('loadMoreContainer');
         if (container) {
             container.remove();
         }
-        
+
         this.currentFilters.page = page + 1;
         await this.performSearch();
     }
