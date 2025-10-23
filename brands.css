@@ -153,9 +153,24 @@
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    gap: 16px;
     justify-content: space-between;
     position: relative;
     overflow: hidden;
+}
+
+/* Brand Logo Image */
+.brand-card-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.brand-card:hover .brand-card-logo {
+    transform: scale(1.05);
 }
 
 .brand-card::before {

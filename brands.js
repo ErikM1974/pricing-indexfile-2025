@@ -1,6 +1,9 @@
 /**
  * Brands Browse Page
  * Displays all available brands in an alphabetical grid
+ * @version 2.0.0
+ *
+ * Update 2.0.0: Added brand logo support from API, fixed property access for new API format
  */
 
 class BrandsPage {
@@ -69,8 +72,8 @@ class BrandsPage {
 
             // Sort alphabetically
             this.allBrands.sort((a, b) => {
-                const nameA = (a.name || a).toString().toUpperCase();
-                const nameB = (b.name || b).toString().toUpperCase();
+                const nameA = (a.brand || a.name || a).toString().toUpperCase();
+                const nameB = (b.brand || b.name || b).toString().toUpperCase();
                 return nameA.localeCompare(nameB);
             });
 
@@ -95,7 +98,7 @@ class BrandsPage {
         console.log('[BrandsPage] Enriching brands with product counts...');
 
         const enrichPromises = this.allBrands.map(async (brand) => {
-            const brandName = brand.name || brand;
+            const brandName = brand.brand || brand.name || brand;
 
             try {
                 // Quick search to get count
@@ -132,7 +135,7 @@ class BrandsPage {
             this.filteredBrands = [...this.allBrands];
         } else {
             this.filteredBrands = this.allBrands.filter(brand => {
-                const name = (brand.name || brand).toString().toLowerCase();
+                const name = (brand.brand || brand.name || brand).toString().toLowerCase();
                 return name.includes(term);
             });
         }
@@ -181,7 +184,7 @@ class BrandsPage {
         const grouped = {};
 
         brands.forEach(brand => {
-            const name = (brand.name || brand).toString();
+            const name = (brand.brand || brand.name || brand).toString();
             const firstLetter = name.charAt(0).toUpperCase();
 
             if (!grouped[firstLetter]) {
@@ -195,14 +198,27 @@ class BrandsPage {
     }
 
     createBrandCard(brand) {
-        const name = brand.name || brand;
+        const name = brand.brand || brand.name || brand;
+        const logo = brand.logo || '';
         const count = brand.productCount || 0;
         const encodedName = encodeURIComponent(name);
 
+        // Create logo HTML with fallback
+        let logoHtml = '';
+        if (logo) {
+            logoHtml = `
+                <img src="${this.escapeHtml(logo)}"
+                     alt="${this.escapeHtml(name)} logo"
+                     class="brand-card-logo"
+                     onerror="this.style.display='none';">
+            `;
+        }
+
         return `
             <div class="brand-card" data-brand="${encodedName}">
+                ${logoHtml}
                 <div class="brand-card-content">
-                    <h3 class="brand-name">${name}</h3>
+                    <h3 class="brand-name">${this.escapeHtml(name)}</h3>
                     ${count > 0 ? `<p class="brand-count">${count} ${count === 1 ? 'product' : 'products'}</p>` : ''}
                 </div>
                 <div class="brand-card-arrow">
