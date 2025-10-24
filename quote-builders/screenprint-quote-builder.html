@@ -1614,22 +1614,27 @@
         <!-- Phase 3: Review & Save -->
         <section id="summary-phase" class="phase-section">
             <div class="phase-header">
-                <h2><span class="phase-number">3</span> Review & Save</h2>
-                <p>Review and enter customer information</p>
+                <h2><span class="phase-number">3</span> Review & Export</h2>
+                <p>Review pricing and export or save quote</p>
             </div>
 
             <div id="quote-summary" class="quote-summary"></div>
 
             <div class="customer-info-section">
-                <h3>Customer Information</h3>
+                <div class="section-header" style="margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 5px;">Customer Information</h3>
+                    <p class="text-muted" style="margin: 0; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Optional - only needed if saving quote to database or emailing customer
+                    </p>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="customer-name">Customer Name *</label>
-                        <input type="text" id="customer-name" class="form-control" required>
+                        <label for="customer-name">Customer Name</label>
+                        <input type="text" id="customer-name" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="customer-email">Email *</label>
-                        <input type="email" id="customer-email" class="form-control" required>
+                        <label for="customer-email">Email</label>
+                        <input type="email" id="customer-email" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="customer-phone">Phone</label>
@@ -1642,8 +1647,8 @@
                         <input type="text" id="company-name" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="sales-rep">Sales Representative *</label>
-                        <select id="sales-rep" class="form-control" required>
+                        <label for="sales-rep">Sales Representative</label>
+                        <select id="sales-rep" class="form-control">
                             <option value="sales@nwcustomapparel.com" selected>General Sales</option>
                             <option value="adriyella@nwcustomapparel.com">Adriyella</option>
                             <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
@@ -1658,15 +1663,39 @@
                 </div>
             </div>
 
-            <div class="phase-actions">
+            <!-- Quote Actions -->
+            <div class="quote-actions" style="margin-top: 20px; padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div class="action-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div class="save-option" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="save-to-database" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="save-to-database" style="margin: 0; cursor: pointer; font-weight: 500;">
+                            Save to Database
+                        </label>
+                        <span class="help-text" style="color: #6b7280; font-size: 13px;">
+                            (Uncheck for quick pricing only)
+                        </span>
+                    </div>
+                    <div class="action-buttons" style="display: flex; gap: 10px;">
+                        <button id="save-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Quote
+                        </button>
+                        <button id="email-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Email to Customer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="phase-actions" style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
                 <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </button>
-                <button id="shopworks-guide-btn" class="btn btn-secondary" style="background: #2d5f3f; color: white;">
+                <button id="shopworks-guide-btn" class="btn btn-success" style="background: #2d5f3f; border-color: #2d5f3f;" title="Quick pricing export (no save required)">
                     <i class="fas fa-file-pdf"></i> ShopWorks Entry Guide
                 </button>
-                <button id="save-quote-btn" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Quote
+                <button id="new-quote-btn" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> New Quote
                 </button>
             </div>
         </section>
@@ -2091,10 +2120,22 @@
                 saveQuoteBtn.addEventListener('click', () => this.saveQuote());
             }
 
+            // Email quote
+            const emailQuoteBtn = document.getElementById('email-quote-btn');
+            if (emailQuoteBtn) {
+                emailQuoteBtn.addEventListener('click', () => this.emailQuote());
+            }
+
             // ShopWorks Entry Guide
             const shopworksBtn = document.getElementById('shopworks-guide-btn');
             if (shopworksBtn) {
                 shopworksBtn.addEventListener('click', () => this.generateShopWorksGuide());
+            }
+
+            // New Quote button
+            const newQuoteBtn = document.getElementById('new-quote-btn');
+            if (newQuoteBtn) {
+                newQuoteBtn.addEventListener('click', () => location.reload());
             }
         }
 
@@ -3138,12 +3179,21 @@
         }
 
         async saveQuote() {
+            // Check if user wants to save to database
+            const saveToDatabase = document.getElementById('save-to-database').checked;
+
+            if (!saveToDatabase) {
+                alert('Quote not saved to database (Save to Database is unchecked).\n\nFor quick pricing:\n• Use "ShopWorks Entry Guide" to export\n• Or check "Save to Database" and fill in customer info');
+                return;
+            }
+
+            // Validate customer info ONLY if saving to database
             const customerName = document.getElementById('customer-name').value.trim();
             const customerEmail = document.getElementById('customer-email').value.trim();
             const salesRep = document.getElementById('sales-rep').value;
 
             if (!customerName || !customerEmail || !salesRep) {
-                alert('Please fill in all required fields');
+                alert('Please fill in customer information to save quote to database:\n\n• Customer Name (required)\n• Email (required)\n• Sales Representative (required)');
                 return;
             }
 
@@ -3171,6 +3221,50 @@
             } else {
                 alert('Error saving quote: ' + result.error);
             }
+        }
+
+        async emailQuote() {
+            // Validate customer email (required for emailing)
+            const customerEmail = document.getElementById('customer-email').value.trim();
+
+            if (!customerEmail) {
+                alert('Please enter customer email address to send quote.');
+                return;
+            }
+
+            // Get other optional customer info
+            const customerName = document.getElementById('customer-name').value.trim() || 'Customer';
+            const salesRep = document.getElementById('sales-rep').value;
+
+            // Check if user wants to save to database before emailing
+            const saveToDatabase = document.getElementById('save-to-database').checked;
+
+            if (saveToDatabase) {
+                // Save to database first if checkbox is checked
+                if (!customerName || customerName === 'Customer' || !salesRep) {
+                    alert('To save quote before emailing, please fill in:\n\n• Customer Name (required)\n• Sales Representative (required)');
+                    return;
+                }
+
+                // Save quote first
+                await this.saveQuote();
+            }
+
+            // TODO: Implement email sending via quoteService
+            // For now, show a placeholder message
+            alert(`Email Quote Feature\n\nThis will send quote to: ${customerEmail}\n\nNote: Email functionality needs to be implemented in screenprint-quote-service.js`);
+
+            // Future implementation:
+            // const result = await this.quoteService.emailQuote({
+            //     customerName,
+            //     customerEmail,
+            //     customerPhone: document.getElementById('customer-phone').value.trim(),
+            //     companyName: document.getElementById('company-name').value.trim(),
+            //     salesRepEmail: salesRep,
+            //     printSetup: this.printSetup,
+            //     items: this.products,
+            //     pricing: this.currentPricing
+            // });
         }
 
         /**
