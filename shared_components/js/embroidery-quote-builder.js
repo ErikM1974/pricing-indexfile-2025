@@ -909,14 +909,22 @@ class EmbroideryQuoteBuilder {
         console.log('[EmbroideryQuoteBuilder] Generating ShopWorks Entry Guide...');
         console.log('[EmbroideryQuoteBuilder] currentPricing:', this.currentPricing);
 
+        // Calculate sales tax for ShopWorks guide (10.1% Milton, WA)
+        const subtotalBeforeTax = (this.currentPricing.subtotal || 0) + (this.currentPricing.setupFees || 0);
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
         // Prepare quote data in format expected by ShopWorks guide generator
         // The currentPricing structure has products with lineItems
         const quoteData = {
             QuoteID: this.currentPricing.quoteId || this.quoteService.generateQuoteID(),
+            CustomerName: this.currentCustomerInfo?.name || 'Customer',
             products: [],
             TotalQuantity: this.currentPricing.totalQuantity || 0,
-            SubtotalAmount: this.currentPricing.subtotal || 0,
-            TotalAmount: this.currentPricing.grandTotal || 0
+            SubtotalAmount: subtotalBeforeTax,  // Full subtotal including all fees
+            SalesTaxAmount: salesTax,           // 10.1% calculated tax
+            TotalAmount: grandTotalWithTax,     // Total with tax included
+            Notes: this.currentCustomerInfo?.notes || ''
         };
 
         // Convert each product's lineItems into the format ShopWorks generator expects

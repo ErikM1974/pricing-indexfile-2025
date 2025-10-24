@@ -756,14 +756,23 @@ class CapQuoteBuilder {
         console.log('[CapQuoteBuilder] Generating ShopWorks Entry Guide...');
         console.log('[CapQuoteBuilder] currentQuote:', this.currentQuote);
 
+        // Calculate sales tax for ShopWorks guide (10.1% Milton, WA)
+        const productSubtotal = (this.currentQuote.subtotal || 0) + (this.currentQuote.additionalEmbroideryTotal || 0);
+        const subtotalBeforeTax = productSubtotal + (this.currentQuote.setupFees || 0);
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
         // Prepare quote data in format expected by ShopWorks guide generator
         // The currentQuote structure has products with lineItems
         const quoteData = {
             QuoteID: this.quoteService.generateQuoteID(),
+            CustomerName: this.currentQuote.customerInfo?.name || 'Customer',
             products: [],
             TotalQuantity: this.currentQuote.totalQuantity || 0,
-            SubtotalAmount: this.currentQuote.subtotal || 0,
-            TotalAmount: this.currentQuote.grandTotal || 0
+            SubtotalAmount: subtotalBeforeTax,  // Full subtotal including all fees
+            SalesTaxAmount: salesTax,           // 10.1% calculated tax
+            TotalAmount: grandTotalWithTax,     // Total with tax included
+            Notes: this.currentQuote.customerInfo?.notes || ''
         };
 
         // Convert each product's sizePricedItems into the format ShopWorks generator expects

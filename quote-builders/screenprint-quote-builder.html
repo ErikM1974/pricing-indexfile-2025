@@ -1662,6 +1662,9 @@
                 <button id="back-to-products" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Products
                 </button>
+                <button id="shopworks-guide-btn" class="btn btn-secondary" style="background: #2d5f3f; color: white;">
+                    <i class="fas fa-file-pdf"></i> ShopWorks Entry Guide
+                </button>
                 <button id="save-quote-btn" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Quote
                 </button>
@@ -1701,6 +1704,8 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
+    <script src="/shared_components/js/shopworks-guide-generator.js"></script>
+    <script src="/shared_components/js/screenprint-shopworks-guide-generator.js"></script>
 
     <script>
     class ScreenPrintQuoteBuilder {
@@ -2084,6 +2089,12 @@
             const saveQuoteBtn = document.getElementById('save-quote-btn');
             if (saveQuoteBtn) {
                 saveQuoteBtn.addEventListener('click', () => this.saveQuote());
+            }
+
+            // ShopWorks Entry Guide
+            const shopworksBtn = document.getElementById('shopworks-guide-btn');
+            if (shopworksBtn) {
+                shopworksBtn.addEventListener('click', () => this.generateShopWorksGuide());
             }
         }
 
@@ -3161,6 +3172,323 @@
                 alert('Error saving quote: ' + result.error);
             }
         }
+
+        /**
+         * Generate ShopWorks Data Entry Guide for screen print quote
+         */
+        generateShopWorksGuide() {
+            if (!this.currentPricing || this.products.length === 0) {
+                alert('Please complete your quote first by adding products.');
+                return;
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Generating ShopWorks Entry Guide...');
+            console.log('[ScreenPrintQuoteBuilder] currentPricing:', this.currentPricing);
+            console.log('[ScreenPrintQuoteBuilder] products:', this.products);
+
+            // Calculate sales tax for ShopWorks guide (10.1% Milton, WA)
+            const subtotalBeforeTax = this.currentPricing.subtotal + this.currentPricing.setupFees + (this.currentPricing.ltmFee || 0);
+            const salesTax = subtotalBeforeTax * 0.101;
+            const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
+            // ENHANCED DEBUGGING: Setup fee breakdown
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🛠️ SETUP FEE BREAKDOWN FOR SHOPWORKS');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[Setup] isDarkGarment:', this.printSetup.isDarkGarment);
+
+            if (this.printSetup.frontColors > 0) {
+                const frontInk = this.printSetup.frontColors;
+                const frontUnderbase = this.printSetup.isDarkGarment ? 1 : 0;
+                const frontTotal = frontInk + frontUnderbase;
+                console.log(`[Setup] Front: ${frontInk} ink colors${frontUnderbase ? ' + 1 underbase' : ''} = ${frontTotal} screens × $30 = $${frontTotal * 30}`);
+            }
+
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.colors > 0) {
+                    const locInk = loc.colors;
+                    const locUnderbase = this.printSetup.isDarkGarment ? 1 : 0;
+                    const locTotal = locInk + locUnderbase;
+                    console.log(`[Setup] ${loc.location}: ${locInk} ink colors${locUnderbase ? ' + 1 underbase' : ''} = ${locTotal} screens × $30 = $${locTotal * 30}`);
+                }
+            });
+
+            const totalColors = this.calculateTotalColors();
+            const setupBreakdown = this.getSetupBreakdown();
+            console.log(`[Setup] Total Effective Colors: ${totalColors}`);
+            console.log(`[Setup] Setup Breakdown:`, setupBreakdown);
+            console.log(`[Setup] Total Setup Fee: $${this.currentPricing.setupFees}`);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+            // Prepare quote data in format expected by ShopWorks guide generator
+            const quoteData = {
+                QuoteID: this.quoteService.generateQuoteID(),
+                CustomerName: document.getElementById('customer-name')?.value.trim() || 'Customer',
+                products: [],
+                TotalQuantity: this.currentPricing.totalQuantity || 0,
+                SubtotalAmount: subtotalBeforeTax,      // Full subtotal including all fees
+                SalesTaxAmount: salesTax,               // 10.1% calculated tax
+                TotalAmount: grandTotalWithTax,         // Total with tax included
+                SetupFees: this.currentPricing.setupFees || 0,
+                SmallBatchFee: this.currentPricing.ltmFee || 0,
+                TotalColors: this.calculateTotalColors(),
+                SetupBreakdown: this.getSetupBreakdown(),
+                Notes: document.getElementById('customer-notes')?.value.trim() || ''
+            };
+
+            // BUG FIX: Create lookup map of pricing data by product (styleNumber + color)
+            const pricingLookup = {};
+
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🔍 PRICING LOOKUP CREATION');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[ScreenPrintQuoteBuilder] currentPricing exists?', !!this.currentPricing);
+            console.log('[ScreenPrintQuoteBuilder] productPricing exists?', !!this.currentPricing?.productPricing);
+            console.log('[ScreenPrintQuoteBuilder] productPricing array:', this.currentPricing?.productPricing);
+
+            if (this.currentPricing && this.currentPricing.productPricing) {
+                this.currentPricing.productPricing.forEach((pricingData, index) => {
+                    const key = `${pricingData.styleNumber}-${pricingData.color}`;
+                    pricingLookup[key] = pricingData;
+                    console.log(`[ScreenPrintQuoteBuilder] Pricing Lookup [${index}]:`, {
+                        key,
+                        styleNumber: pricingData.styleNumber,
+                        color: pricingData.color,
+                        perShirtTotal: pricingData.perShirtTotal,
+                        finalUnitPrice: pricingData.finalUnitPrice,
+                        finalLineTotal: pricingData.finalLineTotal,
+                        quantity: pricingData.quantity
+                    });
+                });
+            } else {
+                console.error('❌ [ScreenPrintQuoteBuilder] CRITICAL: currentPricing or productPricing is missing!');
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Created pricing lookup map:', pricingLookup);
+            console.log('[ScreenPrintQuoteBuilder] Lookup map keys:', Object.keys(pricingLookup));
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+            // Convert each product into the format ShopWorks generator expects
+            this.products.forEach((product, productIndex) => {
+                console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                console.log(`📦 PROCESSING PRODUCT [${productIndex}]`);
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                console.log('[ScreenPrintQuoteBuilder] Product object:', product);
+                console.log('[ScreenPrintQuoteBuilder] product.styleNumber:', product.styleNumber);
+                console.log('[ScreenPrintQuoteBuilder] product.color:', product.color);
+                console.log('[ScreenPrintQuoteBuilder] product.sizeBreakdown:', product.sizeBreakdown);
+
+                // Build size breakdown object
+                const sizeBreakdown = {};
+                let totalQuantity = 0;
+
+                if (product.sizeBreakdown) {
+                    Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                        if (qty > 0) {
+                            sizeBreakdown[size] = qty;
+                            totalQuantity += parseInt(qty);
+                        }
+                    });
+                }
+
+                console.log('[ScreenPrintQuoteBuilder] Built sizeBreakdown:', sizeBreakdown);
+                console.log('[ScreenPrintQuoteBuilder] totalQuantity:', totalQuantity);
+
+                // BUG FIX: Find matching pricing data for this product
+                const pricingKey = `${product.styleNumber}-${product.color}`;
+                const pricingMatch = pricingLookup[pricingKey];
+
+                console.log('[ScreenPrintQuoteBuilder] Looking for pricing with key:', pricingKey);
+                console.log('[ScreenPrintQuoteBuilder] Available keys in lookup:', Object.keys(pricingLookup));
+                console.log('[ScreenPrintQuoteBuilder] Found pricing match:', pricingMatch);
+
+                if (!pricingMatch) {
+                    console.error(`❌ [ScreenPrintQuoteBuilder] CRITICAL: No pricing match found for key "${pricingKey}"`);
+                    console.error('[ScreenPrintQuoteBuilder] This will result in $0.00 pricing!');
+                } else {
+                    console.log('✅ [ScreenPrintQuoteBuilder] Pricing match found successfully');
+                }
+
+                // Build print locations array for description
+                const printLocations = [];
+                if (this.printSetup.front && this.printSetup.frontColors > 0) {
+                    printLocations.push({
+                        name: 'Full Front',
+                        colors: this.printSetup.frontColors
+                    });
+                }
+                if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                    this.printSetup.additionalLocations.forEach(loc => {
+                        printLocations.push({
+                            name: loc.location,
+                            colors: loc.colors
+                        });
+                    });
+                }
+
+                console.log('[ScreenPrintQuoteBuilder] printSetup.front:', this.printSetup.front);
+                console.log('[ScreenPrintQuoteBuilder] printSetup.frontColors:', this.printSetup.frontColors);
+                console.log('[ScreenPrintQuoteBuilder] printSetup.additionalLocations:', this.printSetup.additionalLocations);
+                console.log('[ScreenPrintQuoteBuilder] Built print locations:', printLocations);
+
+                // BUG FIX: Use pricing data from currentPricing instead of product object
+                const baseUnitPrice = pricingMatch ? pricingMatch.perShirtTotal : 0;
+                const finalUnitPrice = pricingMatch ? pricingMatch.finalUnitPrice : 0;
+                const lineTotal = pricingMatch ? pricingMatch.finalLineTotal : 0;
+
+                console.log('[ScreenPrintQuoteBuilder] Extracting pricing values:');
+                console.log('  - pricingMatch.perShirtTotal:', pricingMatch?.perShirtTotal);
+                console.log('  - pricingMatch.finalUnitPrice:', pricingMatch?.finalUnitPrice);
+                console.log('  - pricingMatch.finalLineTotal:', pricingMatch?.finalLineTotal);
+                console.log('[ScreenPrintQuoteBuilder] Final pricing values:', {
+                    baseUnitPrice,
+                    finalUnitPrice,
+                    lineTotal
+                });
+
+                if (baseUnitPrice === 0 || finalUnitPrice === 0 || lineTotal === 0) {
+                    console.error('❌ [ScreenPrintQuoteBuilder] WARNING: One or more pricing values is $0.00!');
+                }
+
+                // CHANGE #1: Extract size-specific unit prices from pricingMatch
+                const sizesPricing = {};
+                if (pricingMatch && pricingMatch.sizesPricing) {
+                    console.log('[ScreenPrintQuoteBuilder] Extracting size-specific pricing from pricingMatch.sizesPricing...');
+                    Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
+                        sizesPricing[size] = priceData.unitPrice;
+                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)}`);
+                    });
+                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted:', sizesPricing);
+                } else {
+                    console.warn('⚠️ [ScreenPrintQuoteBuilder] No sizesPricing data found in pricingMatch');
+                }
+
+                const productForShopWorks = {
+                    StyleNumber: product.styleNumber || '',
+                    ProductName: product.productName || product.name || '',
+                    Color: product.color || '',
+                    ColorCode: '',
+                    SizeBreakdown: sizeBreakdown,
+                    Quantity: totalQuantity,
+                    BaseUnitPrice: baseUnitPrice,
+                    FinalUnitPrice: finalUnitPrice,
+                    LineTotal: lineTotal,
+                    PrintLocations: printLocations,
+                    SizesPricing: sizesPricing  // CHANGE #2: Pass size-specific pricing to ShopWorks generator
+                };
+
+                console.log('[ScreenPrintQuoteBuilder] Product object being added to quoteData:', productForShopWorks);
+                quoteData.products.push(productForShopWorks);
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+            });
+
+            console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📋 FINAL QUOTE DATA FOR SHOPWORKS');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[ScreenPrintQuoteBuilder] Prepared quote data for ShopWorks:', quoteData);
+            console.log('[ScreenPrintQuoteBuilder] QuoteID:', quoteData.QuoteID);
+            console.log('[ScreenPrintQuoteBuilder] TotalQuantity:', quoteData.TotalQuantity);
+            console.log('[ScreenPrintQuoteBuilder] TotalColors:', quoteData.TotalColors);
+            console.log('[ScreenPrintQuoteBuilder] SetupBreakdown:', quoteData.SetupBreakdown);
+            console.log('[ScreenPrintQuoteBuilder] Products array length:', quoteData.products.length);
+            console.log('[ScreenPrintQuoteBuilder] First product detail:', JSON.stringify(quoteData.products[0], null, 2));
+            console.log('[ScreenPrintQuoteBuilder] First product SizeBreakdown:', quoteData.products[0]?.SizeBreakdown);
+            console.log('[ScreenPrintQuoteBuilder] First product BaseUnitPrice:', quoteData.products[0]?.BaseUnitPrice);
+            console.log('[ScreenPrintQuoteBuilder] First product FinalUnitPrice:', quoteData.products[0]?.FinalUnitPrice);
+            console.log('[ScreenPrintQuoteBuilder] First product LineTotal:', quoteData.products[0]?.LineTotal);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+            // Generate and open the guide using screen print specific generator
+            const generator = new ScreenPrintShopWorksGuideGenerator();
+            generator.generateGuide(quoteData);
+        }
+
+        /**
+         * Calculate total number of unique colors across all locations
+         */
+        calculateTotalColors() {
+            let total = 0;
+            let frontEffective = 0;
+            const additionalEffective = [];
+
+            // Front: ink colors + underbase (if dark garment)
+            if (this.printSetup.frontColors && this.printSetup.frontColors > 0) {
+                frontEffective = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffective += 1;  // Add white underbase for dark garments
+                }
+                total += frontEffective;
+            }
+
+            // Additional locations: ink colors + underbase per location (if dark garment)
+            if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                this.printSetup.additionalLocations.forEach(loc => {
+                    if (loc.colors > 0) {
+                        let locEffective = loc.colors;
+                        if (this.printSetup.isDarkGarment) {
+                            locEffective += 1;  // Add underbase for each location
+                        }
+                        total += locEffective;
+                        additionalEffective.push({location: loc.location, effective: locEffective});
+                    }
+                });
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] calculateTotalColors:', {
+                frontInkColors: this.printSetup.frontColors,
+                frontUnderbase: this.printSetup.isDarkGarment && this.printSetup.frontColors > 0 ? 1 : 0,
+                frontEffectiveColors: frontEffective,
+                additionalLocations: additionalEffective,
+                isDarkGarment: this.printSetup.isDarkGarment,
+                totalEffectiveColors: total
+            });
+
+            return total;
+        }
+
+        /**
+         * Get setup fee breakdown by location
+         * Enhanced to include safety stripes information
+         * Returns EFFECTIVE colors (ink colors + underbase for dark garments)
+         */
+        getSetupBreakdown() {
+            const breakdown = {};
+
+            // Front: effective colors (ink + underbase if dark)
+            if (this.printSetup.frontColors && this.printSetup.frontColors > 0) {
+                let effectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    effectiveColors += 1;  // Add underbase
+                }
+
+                breakdown['Front'] = {
+                    colors: effectiveColors,  // Effective colors (with underbase)
+                    hasSafetyStripes: this.printSetup.frontHasSafetyStripes || false
+                };
+            }
+
+            // Additional locations: effective colors per location
+            if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                this.printSetup.additionalLocations.forEach(loc => {
+                    if (loc.colors > 0) {
+                        let effectiveColors = loc.colors;
+                        if (this.printSetup.isDarkGarment) {
+                            effectiveColors += 1;  // Add underbase
+                        }
+
+                        breakdown[loc.location] = {
+                            colors: effectiveColors,  // Effective colors (with underbase)
+                            hasSafetyStripes: loc.hasSafetyStripes || false
+                        };
+                    }
+                });
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] getSetupBreakdown (with underbase & safety stripes):', breakdown);
+
+            return breakdown;
+        }
+
 
         navigateToPhase(phase) {
             document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('active'));

@@ -98,6 +98,10 @@ class ShopWorksGuideGenerator {
         const products = quoteData.products || [quoteData];
 
         products.forEach(product => {
+            console.log('[ShopWorksGuide] Processing product:', product);
+            console.log('[ShopWorksGuide] product.SizeBreakdown type:', typeof product.SizeBreakdown);
+            console.log('[ShopWorksGuide] product.SizeBreakdown value:', product.SizeBreakdown);
+
             // Parse size breakdown
             let sizeBreakdown = {};
             if (typeof product.SizeBreakdown === 'string') {
@@ -109,6 +113,9 @@ class ShopWorksGuideGenerator {
             } else if (typeof product.SizeBreakdown === 'object') {
                 sizeBreakdown = product.SizeBreakdown;
             }
+
+            console.log('[ShopWorksGuide] Parsed sizeBreakdown:', sizeBreakdown);
+            console.log('[ShopWorksGuide] sizeBreakdown keys:', Object.keys(sizeBreakdown));
 
             // Separate standard sizes from oversizes
             const standardSizes = {};
@@ -246,11 +253,20 @@ class ShopWorksGuideGenerator {
 
     /**
      * Get price for specific size (handles size upcharges if needed)
+     * CHANGE #3: Enhanced to use size-specific pricing when available
      */
     getPriceForSize(size, product) {
-        // For now, use base price for all sizes
-        // Could enhance later to pull size-specific pricing if available
-        return parseFloat(product.BaseUnitPrice || product.FinalUnitPrice || 0);
+        // First, check if size-specific pricing is available
+        if (product.SizesPricing && product.SizesPricing[size]) {
+            const sizePrice = parseFloat(product.SizesPricing[size]);
+            console.log(`[ShopWorksGuide] Using size-specific price for ${size}: $${sizePrice.toFixed(2)}`);
+            return sizePrice;
+        }
+
+        // Fall back to base price if size-specific pricing not available
+        const basePrice = parseFloat(product.BaseUnitPrice || product.FinalUnitPrice || 0);
+        console.log(`[ShopWorksGuide] Using base price for ${size}: $${basePrice.toFixed(2)}`);
+        return basePrice;
     }
 
     /**
@@ -262,8 +278,11 @@ class ShopWorksGuideGenerator {
         const quoteID = quoteData.QuoteID || quoteData.quoteID || 'N/A';
         const totalQty = quoteData.TotalQuantity || lineItems.reduce((sum, item) => sum + item.lineQty, 0);
         const subtotal = quoteData.SubtotalAmount || lineItems.reduce((sum, item) => sum + item.lineTotal, 0);
-        const total = quoteData.TotalAmount || subtotal;
-        const tax = total - subtotal;
+
+        // Calculate 10.1% Milton, WA sales tax
+        // Use passed tax amount if available, otherwise calculate from subtotal
+        const tax = quoteData.SalesTaxAmount || (subtotal * 0.101);
+        const total = quoteData.TotalAmount || (subtotal + tax);
 
         return `<!DOCTYPE html>
 <html lang="en">
