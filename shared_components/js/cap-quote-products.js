@@ -12,9 +12,60 @@ class CapProductLineManager {
         this.currentProduct = null;
         this.availableSizes = [];
         this.logos = []; // Will be populated from LogoManager
-        
+
+        // Initialize exact match search (optimized for sales reps)
+        this.exactMatchSearch = null; // Will be initialized when search is called
+
         this.initializeEvents();
         console.log('[CapProductLineManager] Initialized');
+    }
+
+    /**
+     * Initialize the exact match search module with callbacks
+     */
+    initializeExactMatchSearch(onExactMatch, onSuggestions) {
+        if (!window.ExactMatchSearch) {
+            console.error('[CapProductLineManager] ExactMatchSearch module not loaded!');
+            return false;
+        }
+
+        this.exactMatchSearch = new window.ExactMatchSearch({
+            apiBase: this.baseURL,
+            onExactMatch: onExactMatch,
+            onSuggestions: onSuggestions,
+            filterFunction: (item) => {
+                // Cap embroidery ONLY structured caps (exclude beanies/knits)
+                return this.isStructuredCap(item);
+            }
+        });
+
+        console.log('[CapProductLineManager] Exact match search initialized');
+        return true;
+    }
+
+    /**
+     * Search for products using exact match optimization
+     * This is the new method - auto-loads exact matches
+     */
+    searchWithExactMatch(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[CapProductLineManager] Exact match search not initialized. Call initializeExactMatchSearch() first.');
+            return;
+        }
+
+        this.exactMatchSearch.search(query);
+    }
+
+    /**
+     * Immediate search (for Enter key press)
+     */
+    searchImmediate(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[CapProductLineManager] Exact match search not initialized.');
+            return;
+        }
+
+        this.exactMatchSearch.searchImmediate(query);
     }
     
     /**
@@ -88,7 +139,8 @@ class CapProductLineManager {
     }
     
     /**
-     * Handle style number search with cap filtering
+     * LEGACY: Handle style number search with cap filtering
+     * NOTE: This is kept for backwards compatibility but new code should use searchWithExactMatch()
      */
     async handleStyleSearch(query) {
         const suggestionsDiv = document.getElementById('style-suggestions');

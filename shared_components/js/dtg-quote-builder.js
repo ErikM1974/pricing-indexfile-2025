@@ -165,9 +165,55 @@ class DTGQuoteBuilder {
 
         this.continueToProductsBtn.addEventListener('click', () => this.moveToPhase(2));
 
-        // Product phase
+        // Initialize exact match search for sales reps
+        this.productsManager.initializeExactMatchSearch(
+            // Callback for exact matches - auto-load product
+            (product) => {
+                console.log('[DTGQuoteBuilder] Exact match found, auto-loading:', product.value);
+                this.styleSearch.value = product.value;
+                this.loadProductColors(product.value);
+            },
+            // Callback for suggestions list
+            (products) => {
+                if (products.length === 0) {
+                    this.styleSuggestions.innerHTML = '';
+                    this.styleSuggestions.style.display = 'none';
+                    return;
+                }
+
+                this.styleSuggestions.innerHTML = products.map(product => `
+                    <div class="suggestion-item" data-style="${product.value}">
+                        <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                this.styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.styleSearch.value = item.dataset.style;
+                        this.styleSuggestions.style.display = 'none';
+                        this.loadProductColors(item.dataset.style);
+                    });
+                });
+
+                this.styleSuggestions.style.display = 'block';
+            }
+        );
+
+        // Product phase - use exact match search
         this.styleSearch.addEventListener('input', (e) => this.handleStyleSearch(e));
-        this.styleSearch.addEventListener('focus', () => this.styleSuggestions.style.display = 'block');
+        this.styleSearch.addEventListener('keydown', (e) => {
+            // Enter key = immediate search (no debounce)
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = e.target.value.trim();
+                if (query.length >= 2) {
+                    this.productsManager.searchImmediate(query);
+                }
+            }
+        });
+
+        // Hide suggestions when clicking outside
         document.addEventListener('click', (e) => {
             if (!this.styleSearch.contains(e.target) && !this.styleSuggestions.contains(e.target)) {
                 this.styleSuggestions.style.display = 'none';
@@ -178,14 +224,14 @@ class DTGQuoteBuilder {
         this.addToQuoteBtn.addEventListener('click', () => this.addProductToQuote());
         this.backToLocationBtn.addEventListener('click', () => this.moveToPhase(1));
         this.continueToReviewBtn.addEventListener('click', () => this.moveToPhase(3));
-        
+
         // Review phase
         this.backToProductsBtn.addEventListener('click', () => this.moveToPhase(2));
         this.saveQuoteBtn.addEventListener('click', () => this.saveQuote());
         this.printQuoteBtn.addEventListener('click', () => this.printQuote());
-        
+
         // Customer info auto-save
-        [this.customerName, this.customerEmail, this.companyName, 
+        [this.customerName, this.customerEmail, this.companyName,
          this.customerPhone, this.projectName, this.specialNotes].forEach(input => {
             input.addEventListener('change', () => this.updateQuoteSummary());
         });
@@ -377,44 +423,20 @@ class DTGQuoteBuilder {
     }
     
     /**
-     * Handle style search
+     * Handle style search - uses exact match search for sales reps
      */
     async handleStyleSearch(event) {
         const query = event.target.value.trim();
-        
+
         if (query.length < 2) {
             this.styleSuggestions.innerHTML = '';
             this.styleSuggestions.style.display = 'none';
             return;
         }
-        
-        try {
-            const results = await this.productsManager.searchProducts(query);
-            
-            if (results.length > 0) {
-                this.styleSuggestions.innerHTML = results.map(product => `
-                    <div class="suggestion-item" data-style="${product.value || product.styleNumber}">
-                        <strong>${product.value || product.styleNumber}</strong> - ${product.label ? product.label.split(' - ')[1] || product.label : product.productName || ''}
-                    </div>
-                `).join('');
-                
-                // Add click handlers
-                this.styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.styleSearch.value = item.dataset.style;
-                        this.styleSuggestions.style.display = 'none';
-                        this.loadProductColors(item.dataset.style);
-                    });
-                });
-                
-                this.styleSuggestions.style.display = 'block';
-            } else {
-                this.styleSuggestions.innerHTML = '<div class="no-results">No products found</div>';
-                this.styleSuggestions.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('[DTGQuoteBuilder] Search error:', error);
-        }
+
+        // Use the exact match search module (initialized in bindEvents)
+        // This will auto-load exact matches and show suggestions for partial matches
+        this.productsManager.searchWithExactMatch(query);
     }
     
     /**

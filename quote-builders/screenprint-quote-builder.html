@@ -1694,6 +1694,10 @@
     </div>
 
     <!-- Services -->
+
+    <!-- Exact Match Search Module (must load BEFORE inline quote builder) -->
+    <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
+
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
@@ -1718,6 +1722,9 @@
 
             // Search state
             this.lastSearchTerm = '';  // Track last searched term to prevent re-searching
+
+            // Initialize exact match search (optimized for sales reps)
+            this.exactMatchSearch = null; // Will be initialized in initializeEventListeners()
 
             // Services
             this.quoteService = new ScreenPrintQuoteService();
@@ -1956,37 +1963,86 @@
             });
             document.getElementById('back-to-products').addEventListener('click', () => this.navigateToPhase(2));
 
-            // Product search with debouncing
-            const styleSearch = document.getElementById('style-search');
-            styleSearch.addEventListener('input', (e) => {
-                // Skip if we're setting the value programmatically
-                if (this.isSettingValue) {
-                    return;
-                }
+            // NEW: Initialize exact match search for sales reps (optimized for known style numbers)
+            if (window.ExactMatchSearch) {
+                this.exactMatchSearch = new window.ExactMatchSearch({
+                    apiBase: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+                    onExactMatch: (product) => {
+                        console.log('[ScreenPrintQuoteBuilder] Exact match found, auto-loading:', product.value);
+                        const styleSearch = document.getElementById('style-search');
+                        if (styleSearch) {
+                            styleSearch.value = product.value;
+                        }
+                        this.selectProductStyle(product.value);
+                    },
+                    onSuggestions: (products) => {
+                        const styleSuggestions = document.getElementById('style-suggestions');
+                        if (!styleSuggestions) return;
 
-                const term = e.target.value.trim();
+                        if (products.length === 0) {
+                            styleSuggestions.innerHTML = '';
+                            styleSuggestions.style.display = 'none';
+                            return;
+                        }
 
-                // Skip if the term hasn't changed (prevents re-searching while scrolling dropdown)
-                if (term === this.lastSearchTerm) {
-                    return;
-                }
+                        // Show screenprint products (no filtering - all products allowed)
+                        styleSuggestions.innerHTML = products.map(product => `
+                            <div class="suggestion-item" data-style="${product.value}">
+                                <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                            </div>
+                        `).join('');
 
-                // Clear existing timer
-                if (this.searchDebounceTimer) {
-                    clearTimeout(this.searchDebounceTimer);
-                }
+                        // Add click handlers
+                        styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const styleSearch = document.getElementById('style-search');
+                                if (styleSearch) {
+                                    styleSearch.value = item.dataset.style;
+                                }
+                                styleSuggestions.style.display = 'none';
+                                this.selectProductStyle(item.dataset.style);
+                            });
+                        });
 
-                if (term.length >= 2) {
-                    // Debounce: wait 300ms before searching
-                    this.searchDebounceTimer = setTimeout(() => {
-                        this.lastSearchTerm = term;  // Track what we searched for
-                        this.searchProducts(term);
-                    }, 300);
-                } else {
-                    this.lastSearchTerm = '';  // Reset when clearing search
-                    document.getElementById('style-suggestions').style.display = 'none';
+                        styleSuggestions.style.display = 'block';
+                    },
+                    filterFunction: null // Screenprint works on all products
+                });
+
+                console.log('[ScreenPrintQuoteBuilder] Exact match search initialized');
+
+                // Add exact match search listener to style search input
+                const styleSearch = document.getElementById('style-search');
+                if (styleSearch) {
+                    // Add exact match search listener directly (overrides default behavior)
+                    styleSearch.addEventListener('input', (e) => {
+                        const query = e.target.value.trim();
+                        if (query.length < 2) {
+                            const suggestions = document.getElementById('style-suggestions');
+                            if (suggestions) {
+                                suggestions.innerHTML = '';
+                                suggestions.style.display = 'none';
+                            }
+                            return;
+                        }
+                        // Use exact match search
+                        this.exactMatchSearch.search(query);
+                    });
+
+                    // Add Enter key support for immediate search
+                    styleSearch.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const query = e.target.value.trim();
+                            if (query.length >= 2) {
+                                this.exactMatchSearch.searchImmediate(query);
+                            }
+                        }
+                    });
                 }
-            });
+            } else {
+                console.error('[ScreenPrintQuoteBuilder] ExactMatchSearch module not loaded!');
+            }
 
             // Close suggestions dropdown when clicking outside
             document.addEventListener('click', (e) => {
@@ -3123,18 +3179,23 @@
         }
     }
 
-    const screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+    let screenPrintQuoteBuilder;
 
-    // Initialize color button states on page load
-    screenPrintQuoteBuilder.updateColorButtonStates();
+    // Wait for DOM to be ready before initializing
+    document.addEventListener('DOMContentLoaded', function() {
+        screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+
+        // Initialize color button states after DOM is ready
+        screenPrintQuoteBuilder.updateColorButtonStates();
+
+        console.log('✅ Screen Print Quote Builder initialized - using screenprint-pricing-v2.js for pricing');
+    });
 
     function newQuote() {
         if (confirm('Start a new quote?')) {
             location.reload();
         }
     }
-
-    console.log('✅ Screen Print Quote Builder loaded - using screenprint-pricing-v2.js for pricing');
     </script>
 </body>
 </html>

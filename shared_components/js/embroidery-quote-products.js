@@ -11,8 +11,59 @@ class ProductLineManager {
         this.currentProduct = null;
         this.availableSizes = [];
         this.logos = []; // Will be populated from LogoManager
-        
+
+        // Initialize exact match search (optimized for sales reps)
+        this.exactMatchSearch = null; // Will be initialized when search is called
+
         this.initializeEvents();
+    }
+
+    /**
+     * Initialize the exact match search module with callbacks
+     */
+    initializeExactMatchSearch(onExactMatch, onSuggestions) {
+        if (!window.ExactMatchSearch) {
+            console.error('[ProductLineManager] ExactMatchSearch module not loaded!');
+            return false;
+        }
+
+        this.exactMatchSearch = new window.ExactMatchSearch({
+            apiBase: this.baseURL,
+            onExactMatch: onExactMatch,
+            onSuggestions: onSuggestions,
+            filterFunction: (item) => {
+                // Embroidery works on apparel but not structured caps
+                return this.isAllowedProduct(item);
+            }
+        });
+
+        console.log('[ProductLineManager] Exact match search initialized');
+        return true;
+    }
+
+    /**
+     * Search for products using exact match optimization
+     * This is the new method - auto-loads exact matches
+     */
+    searchWithExactMatch(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[ProductLineManager] Exact match search not initialized. Call initializeExactMatchSearch() first.');
+            return;
+        }
+
+        this.exactMatchSearch.search(query);
+    }
+
+    /**
+     * Immediate search (for Enter key press)
+     */
+    searchImmediate(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[ProductLineManager] Exact match search not initialized.');
+            return;
+        }
+
+        this.exactMatchSearch.searchImmediate(query);
     }
     
     /**
@@ -79,7 +130,8 @@ class ProductLineManager {
     }
     
     /**
-     * Handle style number search
+     * LEGACY: Handle style number search
+     * NOTE: This is kept for backwards compatibility but new code should use searchWithExactMatch()
      */
     async handleStyleSearch(query) {
         const suggestionsDiv = document.getElementById('style-suggestions');

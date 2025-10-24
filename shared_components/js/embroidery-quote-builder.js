@@ -105,7 +105,94 @@ class EmbroideryQuoteBuilder {
                 this.toggleSaveSendSection();
             });
         }
-        
+
+        // NEW: Initialize exact match search for sales reps (optimized for known style numbers)
+        this.productLineManager.initializeExactMatchSearch(
+            // Callback for exact matches - auto-load product
+            (product) => {
+                console.log('[EmbroideryQuoteBuilder] Exact match found, auto-loading:', product.value);
+                const styleSearch = document.getElementById('style-search');
+                if (styleSearch) {
+                    styleSearch.value = product.value;
+                }
+                this.productLineManager.loadProductDetails(product.value);
+            },
+            // Callback for suggestions list
+            (products) => {
+                const styleSuggestions = document.getElementById('style-suggestions');
+                if (!styleSuggestions) return;
+
+                if (products.length === 0) {
+                    styleSuggestions.innerHTML = '';
+                    styleSuggestions.style.display = 'none';
+                    return;
+                }
+
+                // Add note about beanies if any are present
+                const hasBeanies = products.some(item =>
+                    (item.label || '').toLowerCase().includes('beanie')
+                );
+
+                const noteHtml = hasBeanies
+                    ? '<div class="autocomplete-note" style="padding: 8px; background: #f0f9ff; color: #0369a1; font-size: 12px; border-bottom: 1px solid #e0e7ff;">Note: Beanies use flat embroidery pricing</div>'
+                    : '';
+
+                styleSuggestions.innerHTML = noteHtml + products.map(product => `
+                    <div class="suggestion-item" data-style="${product.value}">
+                        <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const styleSearch = document.getElementById('style-search');
+                        if (styleSearch) {
+                            styleSearch.value = item.dataset.style;
+                        }
+                        styleSuggestions.style.display = 'none';
+                        this.productLineManager.loadProductDetails(item.dataset.style);
+                    });
+                });
+
+                styleSuggestions.style.display = 'block';
+            }
+        );
+
+        // NEW: Override ProductLineManager's input event listener to use exact match search
+        const styleSearch = document.getElementById('style-search');
+        if (styleSearch) {
+            // Remove old event listener by cloning (replaces all listeners)
+            const newStyleSearch = styleSearch.cloneNode(true);
+            styleSearch.parentNode.replaceChild(newStyleSearch, styleSearch);
+
+            // Add exact match search listener
+            newStyleSearch.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    const suggestions = document.getElementById('style-suggestions');
+                    if (suggestions) {
+                        suggestions.innerHTML = '';
+                        suggestions.style.display = 'none';
+                    }
+                    return;
+                }
+                // Use exact match search
+                this.productLineManager.searchWithExactMatch(query);
+            });
+
+            // NEW: Add Enter key support for immediate search
+            newStyleSearch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = e.target.value.trim();
+                    if (query.length >= 2) {
+                        this.productLineManager.searchImmediate(query);
+                    }
+                }
+            });
+        }
+
         // Hide suggestions when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#style-search') && !e.target.closest('#style-suggestions')) {

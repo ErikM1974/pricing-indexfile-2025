@@ -121,10 +121,105 @@ class CapQuoteBuilder {
         window.addEventListener('capLogosChanged', (e) => {
             this.handleLogosChanged(e.detail);
         });
-        
+
         window.addEventListener('capProductsChanged', (e) => {
             this.handleProductsChanged(e.detail);
         });
+
+        // NEW: Initialize exact match search for sales reps (optimized for known style numbers)
+        if (window.capProductLineManager) {
+            window.capProductLineManager.initializeExactMatchSearch(
+                // Callback for exact matches - auto-load product
+                (product) => {
+                    console.log('[CapQuoteBuilder] Exact match found, auto-loading:', product.value);
+                    const styleSearch = document.getElementById('style-search');
+                    if (styleSearch) {
+                        styleSearch.value = product.value;
+                    }
+                    window.capProductLineManager.loadProductDetails(product.value);
+                },
+                // Callback for suggestions list
+                (products) => {
+                    const styleSuggestions = document.getElementById('style-suggestions');
+                    if (!styleSuggestions) return;
+
+                    if (products.length === 0) {
+                        styleSuggestions.innerHTML = '';
+                        styleSuggestions.style.display = 'none';
+                        return;
+                    }
+
+                    // Show cap products with helpful note
+                    const noteHtml = `
+                        <div class="autocomplete-note" style="padding: 8px; background: #f0f9ff; color: #0369a1; font-size: 12px; border-bottom: 1px solid #e0e7ff;">
+                            <i class="fas fa-hat-cowboy"></i> Structured caps only (beanies/knits use embroidery calculator)
+                        </div>
+                    `;
+
+                    styleSuggestions.innerHTML = noteHtml + products.map(product => `
+                        <div class="suggestion-item" data-style="${product.value}">
+                            <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                        </div>
+                    `).join('');
+
+                    // Add click handlers
+                    styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const styleSearch = document.getElementById('style-search');
+                            if (styleSearch) {
+                                styleSearch.value = item.dataset.style;
+                            }
+                            styleSuggestions.style.display = 'none';
+                            window.capProductLineManager.loadProductDetails(item.dataset.style);
+                        });
+                    });
+
+                    styleSuggestions.style.display = 'block';
+                }
+            );
+
+            // NEW: Override CapProductLineManager's input event listener to use exact match search
+            const styleSearch = document.getElementById('style-search');
+            if (styleSearch) {
+                // Remove old event listener by cloning (replaces all listeners)
+                const newStyleSearch = styleSearch.cloneNode(true);
+                styleSearch.parentNode.replaceChild(newStyleSearch, styleSearch);
+
+                // Add exact match search listener
+                newStyleSearch.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    if (query.length < 2) {
+                        const suggestions = document.getElementById('style-suggestions');
+                        if (suggestions) {
+                            suggestions.innerHTML = '';
+                            suggestions.style.display = 'none';
+                        }
+                        return;
+                    }
+                    // Use exact match search
+                    window.capProductLineManager.searchWithExactMatch(query);
+                });
+
+                // NEW: Add Enter key support for immediate search
+                newStyleSearch.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = e.target.value.trim();
+                        if (query.length >= 2) {
+                            window.capProductLineManager.searchImmediate(query);
+                        }
+                    }
+                });
+
+                // Hide suggestions when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#style-search') && !e.target.closest('#style-suggestions')) {
+                        const suggestions = document.getElementById('style-suggestions');
+                        if (suggestions) suggestions.style.display = 'none';
+                    }
+                });
+            }
+        }
     }
     
     /**
