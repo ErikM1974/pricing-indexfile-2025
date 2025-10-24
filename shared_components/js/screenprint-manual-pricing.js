@@ -57,7 +57,7 @@ class ScreenPrintManualPricing {
 
         // State - single source of truth
         this.state = {
-            quantity: 37, // Default to tier 2 (37-72 pieces)
+            quantity: 37, // Default to tier 2 (37-71 pieces)
             frontColors: 1,
             frontHasSafetyStripes: false,
             additionalLocations: [], // [{location: 'back', colors: 2, hasSafetyStripes: false}, ...]
@@ -279,13 +279,13 @@ class ScreenPrintManualPricing {
                             <small>+ $75 Small Batch Fee</small>
                         </button>
 
-                        <button class="sp-tier-button selected" id="sp-tier-37-72" data-tier="37-72">
-                            37-72 pieces
+                        <button class="sp-tier-button selected" id="sp-tier-37-71" data-tier="37-71">
+                            37-71 pieces
                             <small>+ $50 Small Batch Fee</small>
                         </button>
 
-                        <button class="sp-tier-button" id="sp-tier-73-144" data-tier="73-144">
-                            73-144 pieces
+                        <button class="sp-tier-button" id="sp-tier-72-144" data-tier="72-144">
+                            72-144 pieces
                         </button>
 
                         <button class="sp-tier-button" id="sp-tier-145-576" data-tier="145-576">
@@ -459,8 +459,8 @@ class ScreenPrintManualPricing {
         // NEW: Tier Buttons (Ed Lacey's structure)
         const tierButtons = [
             { id: 'sp-tier-24-36', tier: '24-36', qty: 24 },
-            { id: 'sp-tier-37-72', tier: '37-72', qty: 37 },
-            { id: 'sp-tier-73-144', tier: '73-144', qty: 73 },
+            { id: 'sp-tier-37-71', tier: '37-71', qty: 37 },
+            { id: 'sp-tier-72-144', tier: '72-144', qty: 72 },
             { id: 'sp-tier-145-576', tier: '145-576', qty: 145 }
         ];
 
@@ -858,8 +858,8 @@ class ScreenPrintManualPricing {
     isQuantityInTier(quantity) {
         const tiers = [
             { id: '24-36', min: 24, max: 36 },
-            { id: '37-72', min: 37, max: 72 },
-            { id: '73-144', min: 73, max: 144 },
+            { id: '37-71', min: 37, max: 71 },
+            { id: '72-144', min: 72, max: 144 },
             { id: '145-576', min: 145, max: 576 }
         ];
 
@@ -2269,7 +2269,7 @@ class ScreenPrintManualPricing {
         // Diagnostic: Check if 6-color pricing exists
         console.log('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
         console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?',
-            !!(data.finalPrices?.PrimaryLocation?.["37-72"]?.["6"]));
+            !!(data.finalPrices?.PrimaryLocation?.["37-71"]?.["6"]));
         console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?',
             !!(data.primaryLocationPricing?.["6"]));
 

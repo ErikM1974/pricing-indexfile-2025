@@ -74,7 +74,7 @@ class ScreenPrintPricing {
 
         // State - single source of truth
         this.state = {
-            quantity: 37, // Default to tier 2 (37-72 pieces)
+            quantity: 37, // Default to tier 2 (37-71 pieces)
             frontColors: 1,
             frontHasSafetyStripes: false,
             additionalLocations: [], // [{location: 'back', colors: 2, hasSafetyStripes: false}, ...]
@@ -85,7 +85,7 @@ class ScreenPrintPricing {
             pricingData: null,
             masterBundle: null,
             safetyStripeSurcharge: 2.00,
-            expandedLTMTier: null  // Track which LTM tier is expanded ('24-36' or '37-72')
+            expandedLTMTier: null  // Track which LTM tier is expanded ('24-36' or '37-71')
         };
 
         // DOM elements cache
@@ -261,18 +261,18 @@ class ScreenPrintPricing {
                             </small>
                         </div>
 
-                        <button class="sp-tier-button universal-tier-button selected" id="sp-tier-37-72" data-tier="37-72">
-                            37-72 pieces
+                        <button class="sp-tier-button universal-tier-button selected" id="sp-tier-37-71" data-tier="37-71">
+                            37-71 pieces
                             <br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">+ $50 Small Batch Fee</small>
                         </button>
 
-                        <!-- Separate input container for 37-72 tier -->
+                        <!-- Separate input container for 37-71 tier -->
                         <div class="sp-quantity-input-container-2 universal-quantity-input-container show">
                             <label class="sp-quantity-input-label universal-quantity-input-label">
-                                <i class="fas fa-calculator"></i> Enter Exact Quantity (37-72 pieces):
+                                <i class="fas fa-calculator"></i> Enter Exact Quantity (37-71 pieces):
                             </label>
                             <input type="number" id="sp-qty-tier-2" class="sp-quantity-input universal-quantity-input"
-                                   min="37" max="72" value="37" placeholder="Enter 37-72">
+                                   min="37" max="71" value="37" placeholder="Enter 37-71">
                             <small class="sp-quantity-hint universal-quantity-hint">
                                 <i class="fas fa-info-circle"></i>
                                 Required for accurate $50 fee distribution:
@@ -280,8 +280,8 @@ class ScreenPrintPricing {
                             </small>
                         </div>
 
-                        <button class="sp-tier-button universal-tier-button" id="sp-tier-73-144" data-tier="73-144">
-                            73-144 pieces
+                        <button class="sp-tier-button universal-tier-button" id="sp-tier-72-144" data-tier="72-144">
+                            72-144 pieces
                         </button>
 
                         <button class="sp-tier-button universal-tier-button" id="sp-tier-145-576" data-tier="145-576">
@@ -447,8 +447,8 @@ class ScreenPrintPricing {
         // NEW: Tier Buttons (Ed Lacey's structure)
         const tierButtons = [
             { id: 'sp-tier-24-36', tier: '24-36', qty: 24 },
-            { id: 'sp-tier-37-72', tier: '37-72', qty: 37 },
-            { id: 'sp-tier-73-144', tier: '73-144', qty: 73 },
+            { id: 'sp-tier-37-71', tier: '37-71', qty: 37 },
+            { id: 'sp-tier-72-144', tier: '72-144', qty: 72 },
             { id: 'sp-tier-145-576', tier: '145-576', qty: 145 }
         ];
 
@@ -464,7 +464,7 @@ class ScreenPrintPricing {
                 this.selectQuantityTier(tier, qty);
 
                 // Expand if it's an LTM tier
-                if (tier === '24-36' || tier === '37-72') {
+                if (tier === '24-36' || tier === '37-71') {
                     this.expandLTMTier(tier, qty);
                 }
             });
@@ -500,7 +500,7 @@ class ScreenPrintPricing {
         if (qtyInput2) {
             qtyInput2.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value) || 37;
-                const clamped = Math.max(37, Math.min(72, value));
+                const clamped = Math.max(37, Math.min(71, value));
                 if (value !== clamped) {
                     e.target.value = clamped;
                 }
@@ -515,7 +515,7 @@ class ScreenPrintPricing {
 
             qtyInput2.addEventListener('change', (e) => {
                 const value = parseInt(e.target.value) || 37;
-                const clamped = Math.max(37, Math.min(72, value));
+                const clamped = Math.max(37, Math.min(71, value));
                 e.target.value = clamped;
             });
         }
@@ -1037,8 +1037,8 @@ class ScreenPrintPricing {
     isQuantityInTier(quantity) {
         const tiers = [
             { id: '24-36', min: 24, max: 36 },
-            { id: '37-72', min: 37, max: 72 },
-            { id: '73-144', min: 73, max: 144 },
+            { id: '37-71', min: 37, max: 71 },
+            { id: '72-144', min: 72, max: 144 },
             { id: '145-576', min: 145, max: 576 }
         ];
 
@@ -1221,7 +1221,7 @@ class ScreenPrintPricing {
 
             // For LTM tiers with quantity input, show exact quantity
             let tierText;
-            if (this.state.selectedTier === '24-36' || this.state.selectedTier === '37-72') {
+            if (this.state.selectedTier === '24-36' || this.state.selectedTier === '37-71') {
                 tierText = `${this.state.selectedTier} pieces (${this.state.quantity} selected)`;
             } else {
                 tierText = max >= 576

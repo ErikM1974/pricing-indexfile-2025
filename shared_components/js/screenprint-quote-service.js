@@ -227,8 +227,8 @@ class ScreenPrintQuoteService {
      */
     getPricingTier(quantity) {
         if (quantity >= 13 && quantity <= 36) return '13-36';
-        if (quantity >= 37 && quantity <= 72) return '37-72';
-        if (quantity >= 73 && quantity <= 144) return '73-144';
+        if (quantity >= 37 && quantity <= 71) return '37-71';
+        if (quantity >= 72 && quantity <= 144) return '72-144';
         if (quantity >= 145) return '145-576';
         return '13-36'; // Default to tier 1
     }

@@ -457,9 +457,9 @@ class ScreenPrintPricingCalculator {
         
         // Fallback to standard tiers if no API data (should not happen)
         console.warn('[getPricingTier] No tier data available, using fallback');
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity < 13) return '1-12';
+        if (quantity < 37) return '13-36';
+        if (quantity < 72) return '37-71';
         return '72+';
     }
 

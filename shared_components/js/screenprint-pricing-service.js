@@ -399,9 +399,9 @@ class ScreenPrintPricingService {
                             finalPrices[locationType][tierLabel][colorCount][sizeInfo.size] = roundedTotal;
 
                             // 🔍 DETAILED TRACE: Log one complete example to verify full calculation
-                            if (tierLabel === '37-72' && colorCount === '2' && sizeInfo.size === 'M') {
+                            if (tierLabel === '37-71' && colorCount === '2' && sizeInfo.size === 'M') {
                                 console.log('\n🔍 ═══════════════════════════════════════════════════════════');
-                                console.log('🔍 COMPLETE CALCULATION TRACE (37-72 tier, 2 colors, size M):');
+                                console.log('🔍 COMPLETE CALCULATION TRACE (37-71 tier, 2 colors, size M):');
                                 console.log('🔍 ═══════════════════════════════════════════════════════════');
                                 console.log('🔍 Step 1 - Input Values:');
                                 console.log('🔍   • Base garment cost: $' + standardGarmentCost.toFixed(2));
