@@ -17,6 +17,12 @@ This documentation has been reorganized into modular components for better perfo
 ├── CLAUDE_ARCHITECTURE.md            # System architecture patterns
 ├── CLAUDE_PATTERNS.md                # Code patterns and solutions
 ├── PRICING_MANUAL_CORE.md            # Manual pricing calculator core
+├── SHOPWORKS_EDP_INTEGRATION.md      # ShopWorks EDP integration & pricing sync
+├── QUOTE_BUILDER_GUIDE.md            # Complete quote builder development guide
+├── PRICING_CALCULATOR_GUIDE.md       # Pricing calculator development guide
+├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
+├── STAFF_DIRECTORY.md                # Staff contact information
+├── DATABASE_PATTERNS.md              # Database schema patterns
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
@@ -96,6 +102,12 @@ This documentation has been reorganized into modular components for better perfo
 1. Check **[CLAUDE_PATTERNS.md](./CLAUDE_PATTERNS.md)** for common solutions
 2. Review error handling patterns
 3. Use debug utilities and console commands
+
+### "I need to create ShopWorks EDP integration"
+1. Read **[SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md)** - Complete guide
+2. Understand the SizesPricing pattern (source of truth)
+3. Apply verification checklist to ensure pricing synchronization
+4. Reference implementation examples for your quote builder type
 
 ## 🔑 Key Configuration Values
 
