@@ -18,6 +18,7 @@
 8. [Applying to Other Quote Builders](#applying-to-other-quote-builders)
 9. [Testing & Debugging](#testing--debugging)
 10. [Reference Implementation](#reference-implementation)
+11. [CATALOG_COLOR Implementation](#catalog_color-implementation)
 
 ---
 
@@ -1402,6 +1403,505 @@ Size05_Req>> 7
 
 ---
 
+## CATALOG_COLOR Implementation
+
+### Overview
+
+**Problem:** ShopWorks EDP import requires product colors in **CATALOG_COLOR** format (e.g., "Hthr Dk Ch Brn") instead of **COLOR_NAME** format (e.g., "Heather Dark Chocolate Brown") for accurate product matching in their inventory system.
+
+**Scope:** This implementation affects **only** the EDP text generation. The Quote Builder UI and ShopWorks Guide PDF continue to use COLOR_NAME for better readability.
+
+**Implementation Date:** October 25, 2025
+**Git Commits:** be2222b, 05b58ae, 7177fcf
+**Files Modified:** 3 files, 9 total changes
+
+---
+
+### The Color Format Problem
+
+When the Color Swatches API returns product color information, it provides **two formats**:
+
+```json
+{
+  "COLOR_NAME": "Heather Dark Chocolate Brown",    // User-friendly display
+  "CATALOG_COLOR": "Hthr Dk Ch Brn"               // ShopWorks catalog format
+}
+```
+
+**Before Implementation:**
+- Quote Builder used COLOR_NAME for everything
+- EDP text output: `PartColor>> Heather Dark Chocolate Brown`
+- ShopWorks couldn't match to inventory (expected catalog format)
+
+**After Implementation:**
+- Quote Builder uses COLOR_NAME for display
+- EDP text output: `PartColor>> Hthr Dk Ch Brn`
+- ShopWorks successfully matches to inventory ✅
+
+---
+
+### Three-Commit Implementation
+
+#### Commit 1: Initial CATALOG_COLOR Infrastructure (be2222b)
+
+**Purpose:** Add catalogColor field throughout the data flow chain
+
+**Changes:**
+1. Modified `selectColor()` to accept both `colorName` and `catalogColor` parameters
+2. Added `catalogColor` field to `currentProduct` object
+3. Updated color swatch click handlers to pass both formats
+4. Added `CatalogColor` field to ShopWorks data structures
+5. Modified EDP generator to prefer `catalogColor` with fallback to `color`
+
+**Files Modified:**
+- `quote-builders/screenprint-quote-builder.html` (3 changes)
+- `shared_components/js/shopworks-guide-generator.js` (2 changes)
+- `shared_components/js/shopworks-edp-generator.js` (1 change)
+
+**Key Code Pattern:**
+```javascript
+// Color swatch click handler
+swatchEl.onclick = () => this.selectColor(
+    swatch.COLOR_NAME,      // For display
+    swatch.CATALOG_COLOR,   // For ShopWorks
+    swatchEl
+);
+
+// EDP generator fallback pattern
+edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
+```
+
+#### Commit 2: Auto-load CatalogColor Population (05b58ae)
+
+**Purpose:** Handle auto-loaded products (exact match search) that bypass color swatch clicks
+
+**Problem Discovered:**
+- When user types exact style number (e.g., "PC54"), product auto-loads
+- Auto-load bypassed color swatch click handler
+- `catalogColor` field was undefined for auto-loaded products
+- Console showed: `"CatalogColor": ""` (empty string)
+
+**Solution:**
+Created helper function to look up CATALOG_COLOR from the stored color swatches array:
+
+```javascript
+getCatalogColorFromSwatches(colorName) {
+    if (!this.currentProduct || !this.currentProduct.colorSwatches) {
+        console.warn('[CatalogColor] No color swatches data available');
+        return '';
+    }
+
+    // Find the swatch that matches the COLOR_NAME
+    const swatch = this.currentProduct.colorSwatches.find(s =>
+        s.COLOR_NAME === colorName
+    );
+
+    if (swatch && swatch.CATALOG_COLOR) {
+        console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
+        return swatch.CATALOG_COLOR;
+    } else {
+        console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
+        return '';
+    }
+}
+```
+
+**Modified `loadProductDetails()`:**
+```javascript
+// Store color information (both formats)
+this.currentProduct.color = color;  // COLOR_NAME for display
+
+// CRITICAL FIX: Look up and store catalogColor even when auto-loading
+const catalogColor = this.getCatalogColorFromSwatches(color);
+this.currentProduct.catalogColor = catalogColor;
+
+console.log(`[loadProductDetails] Stored colors - Display: "${color}", Catalog: "${catalogColor}"`);
+```
+
+**Files Modified:**
+- `quote-builders/screenprint-quote-builder.html` (2 changes: helper function + loadProductDetails)
+
+#### Commit 3: Complete Data Flow Chain (7177fcf)
+
+**Purpose:** Fix the missing link where `catalogColor` wasn't being copied to product objects
+
+**Problem Discovered:**
+- Console logs showed successful catalogColor lookup: ✅
+  ```
+  [CatalogColor] Found match: "Dark Chocolate Brown" → "Dk Choc Brown"
+  [loadProductDetails] Stored colors - Display: "Dark Chocolate Brown", Catalog: "Dk Choc Brown"
+  ```
+- But EDP text still showed COLOR_NAME: ❌
+  ```
+  PartColor>> Dark Chocolate Brown
+  ```
+
+**Root Cause:**
+The `addProductToQuote()` function created product objects with only the `color` field, NOT the `catalogColor` field:
+
+```javascript
+// BEFORE (missing catalogColor):
+const product = {
+    styleNumber: this.currentProduct.styleNumber,
+    productName: this.currentProduct.details.PRODUCT_TITLE || '',
+    color: this.currentProduct.color,              // ✅ Has this
+    colorSwatchImage: this.currentProduct.colorSwatchImage || '',
+    sizeBreakdown: sizeBreakdown,
+    quantity: totalQuantity
+    // ❌ MISSING: catalogColor field
+};
+```
+
+**Solution:**
+Added one line to copy `catalogColor` from `currentProduct` to the product object:
+
+```javascript
+// AFTER (complete):
+const product = {
+    styleNumber: this.currentProduct.styleNumber,
+    productName: this.currentProduct.details.PRODUCT_TITLE || '',
+    color: this.currentProduct.color,
+    catalogColor: this.currentProduct.catalogColor,  // ✅ ADDED THIS LINE
+    colorSwatchImage: this.currentProduct.colorSwatchImage || '',
+    sizeBreakdown: sizeBreakdown,
+    quantity: totalQuantity
+};
+```
+
+**Files Modified:**
+- `quote-builders/screenprint-quote-builder.html` (1 change at line 2691)
+
+---
+
+### Complete Data Flow Chain
+
+The catalogColor now flows through the entire system:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ 1. Color Swatches API                                   │
+│    Returns both COLOR_NAME and CATALOG_COLOR           │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 2. loadProductDetails() / selectColor()                 │
+│    getCatalogColorFromSwatches("Dark Chocolate Brown")  │
+│    → Returns "Dk Choc Brown"                            │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 3. currentProduct Object                                │
+│    currentProduct.color = "Dark Chocolate Brown"        │
+│    currentProduct.catalogColor = "Dk Choc Brown" ✅     │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 4. addProductToQuote()                                  │
+│    product.color = currentProduct.color                 │
+│    product.catalogColor = currentProduct.catalogColor ✅│
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 5. this.products Array                                  │
+│    Stores product objects with both color formats       │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 6. generateEDPText()                                    │
+│    quoteData.products.push({                            │
+│        CatalogColor: product.catalogColor || '' ✅      │
+│    })                                                   │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 7. Guide Generator (shopworks-guide-generator.js)       │
+│    lineItem.catalogColor = product.CatalogColor ✅      │
+└────────────────────┬────────────────────────────────────┘
+                     ↓
+┌─────────────────────────────────────────────────────────┐
+│ 8. EDP Generator (shopworks-edp-generator.js)           │
+│    PartColor>> ${item.catalogColor || item.color}       │
+│    → Outputs "Dk Choc Brown" ✅                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Testing & Verification
+
+#### Console Log Verification
+
+**Successful catalogColor lookup:**
+```javascript
+[CatalogColor] Found match: "Heather Dark Chocolate Brown" → "Hthr Dk Ch Brn"
+[loadProductDetails] Stored colors - Display: "Heather Dark Chocolate Brown", Catalog: "Hthr Dk Ch Brn"
+```
+
+**Product object verification:**
+```javascript
+{
+    styleNumber: "PC54",
+    color: "Heather Dark Chocolate Brown",        // Display
+    catalogColor: "Hthr Dk Ch Brn",              // ShopWorks ✅
+    // ... other fields
+}
+```
+
+#### EDP Text Verification
+
+**Before Implementation:**
+```
+PartNumber>> PC54
+PartColor>> Heather Dark Chocolate Brown    ❌ Wrong format
+```
+
+**After Implementation:**
+```
+PartNumber>> PC54
+PartColor>> Hthr Dk Ch Brn                  ✅ Correct format
+```
+
+**Setup Charge (correctly remains empty):**
+```
+PartNumber>> SPSU
+PartColor>>                                  ✅ Empty (as intended)
+```
+
+#### ShopWorks Import Verification
+
+**Test Date:** October 25, 2025
+
+**Import Results:**
+- ✅ All product colors imported successfully
+- ✅ Catalog colors matched to ShopWorks inventory
+- ✅ All pricing calculations verified correct
+- ✅ Setup charges imported without color (correct)
+
+**Known Behavior: Visual Truncation**
+
+ShopWorks grid view may **visually truncate** long catalog colors due to column width:
+
+| Part Number | Color in Grid | Actual Stored Value |
+|-------------|---------------|---------------------|
+| PC54 | **Hthr Dk** | Hthr Dk Ch Brn ✅ |
+| PC61 | **Ath.** | Ath. Maroon ✅ |
+
+**This is display-only truncation** - the full catalog color is correctly stored in the ShopWorks database. You can verify by:
+1. Double-clicking the product row to view details
+2. Widening the Color column in the grid view
+3. Checking the database record directly
+
+---
+
+### Setup Charge Behavior
+
+Setup charges (part number SPSU) are **service line items**, not physical products, so they intentionally have **no color**.
+
+**Setup Charge Creation:**
+```javascript
+// From screenprint-shopworks-guide-generator.js line 64-68
+const spsuItem = {
+    lineQty: '',
+    partNumber: 'SPSU',
+    colorRange: '',
+    color: '',                    // Intentionally empty ✅
+    catalogColor: '',             // Also empty ✅
+    description: 'New Screen Set Up Charge: 8 colors...'
+};
+```
+
+**EDP Output:**
+```
+---- Start Product ----
+PartNumber>> SPSU
+PartColorRange>>
+PartColor>>                       ✅ Empty (correct for setup charges)
+cur_UnitPriceUserEntered>> 30.00
+```
+
+**The fallback pattern handles this correctly:**
+```javascript
+edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
+//                   ↑ undefined        ↑ ''         ↑ fallback: ''
+//                   Result: Empty string ✅
+```
+
+---
+
+### Code Patterns for Future Use
+
+#### Pattern 1: Helper Function for Catalog Color Lookup
+
+```javascript
+/**
+ * Look up CATALOG_COLOR from color swatches array
+ * Used for auto-loaded products that bypass swatch clicks
+ */
+getCatalogColorFromSwatches(colorName) {
+    if (!this.currentProduct || !this.currentProduct.colorSwatches) {
+        console.warn('[CatalogColor] No color swatches data available');
+        return '';
+    }
+
+    const swatch = this.currentProduct.colorSwatches.find(s =>
+        s.COLOR_NAME === colorName
+    );
+
+    if (swatch && swatch.CATALOG_COLOR) {
+        console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
+        return swatch.CATALOG_COLOR;
+    } else {
+        console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
+        return '';
+    }
+}
+```
+
+#### Pattern 2: Always Populate Both Color Formats
+
+```javascript
+// When loading product details
+this.currentProduct.color = colorName;                              // Display
+this.currentProduct.catalogColor = this.getCatalogColorFromSwatches(colorName); // ShopWorks
+```
+
+#### Pattern 3: Copy catalogColor to Product Objects
+
+```javascript
+// When adding product to quote
+const product = {
+    // ... other fields
+    color: this.currentProduct.color,                    // Display format
+    catalogColor: this.currentProduct.catalogColor,      // ShopWorks format
+};
+```
+
+#### Pattern 4: EDP Generator Fallback
+
+```javascript
+// EDP generator always uses fallback pattern
+edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
+//                   ↑ Prefer catalog  ↑ Fallback  ↑ Final fallback
+```
+
+---
+
+### Applying to Other Quote Builders
+
+This pattern can be applied to **any quote builder that generates EDP text**:
+
+- ✅ Screen Print (implemented)
+- ⏳ DTG Quote Builder (can apply same pattern)
+- ⏳ Embroidery Quote Builder (can apply same pattern)
+- ⏳ Cap Embroidery Quote Builder (can apply same pattern)
+
+**Implementation Checklist for Other Quote Builders:**
+
+1. **Add Helper Function:**
+   - Copy `getCatalogColorFromSwatches()` to quote builder
+
+2. **Modify Color Selection:**
+   - Update `selectColor()` to accept catalogColor parameter
+   - Update color swatch click handlers to pass both formats
+
+3. **Modify loadProductDetails():**
+   - Call `getCatalogColorFromSwatches()` to populate catalogColor
+   - Store both `color` and `catalogColor` in `currentProduct`
+
+4. **Modify addProductToQuote():**
+   - Add `catalogColor` field to product object
+
+5. **Update Guide Generator:**
+   - Add `catalogColor` field to line item creation
+   - Use same fallback pattern: `product.CatalogColor || product.catalogColor || ''`
+
+6. **Update EDP Generator:**
+   - Modify PartColor field to use: `item.catalogColor || item.color || ''`
+
+7. **Test:**
+   - Verify console logs show successful catalogColor lookup
+   - Check EDP text shows CATALOG_COLOR format
+   - Import test file into ShopWorks
+   - Verify products match to inventory
+
+---
+
+### Troubleshooting
+
+#### Issue: catalogColor is Empty in Console
+
+**Symptoms:**
+```javascript
+console.log(product.catalogColor);  // ""
+```
+
+**Possible Causes:**
+1. Color swatches API didn't return CATALOG_COLOR field
+2. getCatalogColorFromSwatches() couldn't find matching swatch
+3. catalogColor not copied in addProductToQuote()
+
+**Solution:**
+- Check console for `[CatalogColor]` log messages
+- Verify colorSwatches array is populated
+- Check exact spelling of COLOR_NAME (case-sensitive)
+
+#### Issue: EDP Still Shows COLOR_NAME
+
+**Symptoms:**
+```
+PartColor>> Dark Chocolate Brown    ❌ Should be "Dk Choc Brown"
+```
+
+**Possible Causes:**
+1. catalogColor not in product object (check addProductToQuote)
+2. catalogColor not passed to quoteData
+3. catalogColor not passed to line items
+
+**Solution:**
+- Trace data flow: currentProduct → product → quoteData → lineItem
+- Add console.log at each step to verify catalogColor is present
+- Check for typos: `catalogColor` vs `CatalogColor` (case matters)
+
+#### Issue: Setup Charges Have Unexpected Color
+
+**Symptoms:**
+```
+PartNumber>> SPSU
+PartColor>> Hthr Dk Ch Brn    ❌ Should be empty
+```
+
+**Solution:**
+Setup charges should be created with empty color fields:
+```javascript
+const spsuItem = {
+    color: '',
+    catalogColor: ''
+};
+```
+
+---
+
+### Performance & Maintenance Notes
+
+**API Calls:**
+- No additional API calls required
+- CATALOG_COLOR comes from existing Color Swatches API
+- Color swatches are already fetched during product load
+
+**Memory Impact:**
+- Adds one string field (`catalogColor`) per product
+- Negligible memory impact (< 50 bytes per product)
+
+**Maintenance:**
+- If Caspio changes CATALOG_COLOR format, only need to update color swatches API
+- No code changes required (just data format in API response)
+
+**Cache Considerations:**
+- Color swatches are cached with product details
+- catalogColor lookup uses cached data (no extra API calls)
+
+---
+
 ## Summary
 
 ### Key Takeaways
@@ -1411,6 +1911,7 @@ Size05_Req>> 7
 3. **Always include all cost components** - Base + decorations + additional locations + LTM
 4. **Verify across all three systems** - Order Summary, ShopWorks Guide, EDP import must match
 5. **Penny rounding is acceptable** - $0.10-0.20 total difference due to rounding is normal
+6. **Use CATALOG_COLOR in EDP text** - ShopWorks requires catalog format for product matching (Section 11)
 
 ### Universal Application
 
@@ -1432,7 +1933,8 @@ When adding new quote builders:
 ---
 
 **For questions or issues, reference:**
-- Git commits: c96bff3, c0f9286
+- Git commits for pricing sync: c96bff3, c0f9286, 6c194ba
+- Git commits for CATALOG_COLOR: be2222b, 05b58ae, 7177fcf
 - Console log patterns in Testing section
 - Verification checklist above
 - Implementation details for your specific quote builder type
