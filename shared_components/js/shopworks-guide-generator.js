@@ -147,8 +147,8 @@ class ShopWorksGuideGenerator {
                     color: product.Color || product.color || '',
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks(standardSizes),
-                    manualPrice: parseFloat(product.BaseUnitPrice || product.FinalUnitPrice || 0),
-                    calcPrice: 'On',
+                    manualPrice: parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0),
+                    calcPrice: 'Off',  // Changed to Off since we're using final price with LTM included
                     lineTotal: this.calculateLineTotal(standardSizes, product)
                 });
             }
@@ -166,7 +166,7 @@ class ShopWorksGuideGenerator {
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks({ [size]: qty }),
                     manualPrice: this.getPriceForSize(size, product),
-                    calcPrice: 'On',
+                    calcPrice: 'Off',  // Changed to Off since we're using final price with LTM included
                     lineTotal: qty * this.getPriceForSize(size, product)
                 });
             });
@@ -247,7 +247,7 @@ class ShopWorksGuideGenerator {
      */
     calculateLineTotal(sizes, product) {
         const totalQty = Object.values(sizes).reduce((a, b) => a + b, 0);
-        const price = parseFloat(product.BaseUnitPrice || product.FinalUnitPrice || 0);
+        const price = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
         return totalQty * price;
     }
 
@@ -263,10 +263,10 @@ class ShopWorksGuideGenerator {
             return sizePrice;
         }
 
-        // Fall back to base price if size-specific pricing not available
-        const basePrice = parseFloat(product.BaseUnitPrice || product.FinalUnitPrice || 0);
-        console.log(`[ShopWorksGuide] Using base price for ${size}: $${basePrice.toFixed(2)}`);
-        return basePrice;
+        // Fall back to final price (includes LTM) if size-specific pricing not available
+        const finalPrice = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
+        console.log(`[ShopWorksGuide] Using final price for ${size}: $${finalPrice.toFixed(2)}`);
+        return finalPrice;
     }
 
     /**

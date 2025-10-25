@@ -3488,14 +3488,19 @@
                 }
 
                 // CHANGE #1: Extract size-specific unit prices from pricingMatch
+                // IMPORTANT: Add LTM impact to each size-specific price for ShopWorks
                 const sizesPricing = {};
+                const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
                 if (pricingMatch && pricingMatch.sizesPricing) {
                     console.log('[ScreenPrintQuoteBuilder] Extracting size-specific pricing from pricingMatch.sizesPricing...');
+                    console.log('[ScreenPrintQuoteBuilder] Adding LTM impact of $' + ltmImpact.toFixed(2) + ' per piece to each size');
                     Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-                        sizesPricing[size] = priceData.unitPrice;
-                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)}`);
+                        // Add LTM impact to size-specific pricing for ShopWorks
+                        const priceWithLTM = priceData.unitPrice + ltmImpact;
+                        sizesPricing[size] = priceWithLTM;
+                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)} + $${ltmImpact.toFixed(2)} LTM = $${priceWithLTM.toFixed(2)}`);
                     });
-                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted:', sizesPricing);
+                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted (with LTM):', sizesPricing);
                 } else {
                     console.warn('⚠️ [ScreenPrintQuoteBuilder] No sizesPricing data found in pricingMatch');
                 }
@@ -3601,13 +3606,15 @@
                 const finalUnitPrice = pricingMatch ? pricingMatch.finalUnitPrice : 0;
                 const lineTotal = pricingMatch ? pricingMatch.finalLineTotal : 0;
 
+
                 const sizesPricing = {};
+                const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
                 if (pricingMatch && pricingMatch.sizesPricing) {
                     Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-                        sizesPricing[size] = priceData.unitPrice;
+                        // Add LTM impact to size-specific pricing for EDP
+                        sizesPricing[size] = priceData.unitPrice + ltmImpact;
                     });
                 }
-
                 const printLocations = [];
                 if (this.printSetup.front && this.printSetup.frontColors > 0) {
                     printLocations.push({
