@@ -3488,19 +3488,21 @@
                 }
 
                 // CHANGE #1: Extract size-specific unit prices from pricingMatch
-                // IMPORTANT: Add LTM impact to each size-specific price for ShopWorks
+                // IMPORTANT: Include additional locations cost + LTM impact for complete pricing
                 const sizesPricing = {};
                 const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
+                const additionalCostPerPiece = pricingMatch?.additionalCost || 0;  // Get additional locations cost
                 if (pricingMatch && pricingMatch.sizesPricing) {
                     console.log('[ScreenPrintQuoteBuilder] Extracting size-specific pricing from pricingMatch.sizesPricing...');
-                    console.log('[ScreenPrintQuoteBuilder] Adding LTM impact of $' + ltmImpact.toFixed(2) + ' per piece to each size');
+                    console.log('[ScreenPrintQuoteBuilder] Additional locations cost per piece: $' + additionalCostPerPiece.toFixed(2));
+                    console.log('[ScreenPrintQuoteBuilder] LTM impact per piece: $' + ltmImpact.toFixed(2));
                     Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-                        // Add LTM impact to size-specific pricing for ShopWorks
-                        const priceWithLTM = priceData.unitPrice + ltmImpact;
-                        sizesPricing[size] = priceWithLTM;
-                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)} + $${ltmImpact.toFixed(2)} LTM = $${priceWithLTM.toFixed(2)}`);
+                        // Complete price = base + safety stripes + additional locations + LTM
+                        const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
+                        sizesPricing[size] = completePrice;
+                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)} (base+safety) + $${additionalCostPerPiece.toFixed(2)} (add'l loc) + $${ltmImpact.toFixed(2)} (LTM) = $${completePrice.toFixed(2)}`);
                     });
-                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted (with LTM):', sizesPricing);
+                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted (complete):', sizesPricing);
                 } else {
                     console.warn('⚠️ [ScreenPrintQuoteBuilder] No sizesPricing data found in pricingMatch');
                 }
@@ -3609,10 +3611,11 @@
 
                 const sizesPricing = {};
                 const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
+                const additionalCostPerPiece = pricingMatch?.additionalCost || 0;  // Get additional locations cost
                 if (pricingMatch && pricingMatch.sizesPricing) {
                     Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-                        // Add LTM impact to size-specific pricing for EDP
-                        sizesPricing[size] = priceData.unitPrice + ltmImpact;
+                        // Complete price = base + safety stripes + additional locations + LTM
+                        sizesPricing[size] = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
                     });
                 }
                 const printLocations = [];
