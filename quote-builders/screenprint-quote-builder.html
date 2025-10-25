@@ -1694,6 +1694,9 @@
                 <button id="shopworks-guide-btn" class="btn btn-success" style="background: #2d5f3f; border-color: #2d5f3f;" title="Quick pricing export (no save required)">
                     <i class="fas fa-file-pdf"></i> ShopWorks Entry Guide
                 </button>
+                <button id="shopworks-edp-btn" class="btn btn-primary" title="Generate EDP text for ShopWorks import">
+                    <i class="fas fa-file-code"></i> Generate EDP
+                </button>
                 <button id="new-quote-btn" class="btn btn-secondary">
                     <i class="fas fa-plus"></i> New Quote
                 </button>
@@ -1725,6 +1728,39 @@
         </div>
     </div>
 
+    <!-- EDP Modal -->
+    <div id="edp-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; width: 90%;">
+            <div class="modal-header" style="background: #2d5f3f; color: white;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-file-code"></i>
+                    <h2 style="margin: 0;">Inksoft EDP Import</h2>
+                </div>
+                <button class="modal-close" onclick="document.getElementById('edp-modal').style.display='none'" style="color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Quote ID:</strong> <span id="edp-quote-id"></span></p>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                    Copy this text and paste into ShopWorks: <strong>File → Import → EDP Text Import</strong>
+                </p>
+                <textarea id="edp-text"
+                          readonly
+                          style="width: 100%; height: 450px; font-family: 'Courier New', Consolas, monospace; font-size: 12px; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; resize: vertical; background: #f9fafb;">
+                </textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="window.edpGenerator.copyToClipboard()" class="btn btn-success">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button onclick="document.getElementById('edp-modal').style.display='none'" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Services -->
 
     <!-- Exact Match Search Module (must load BEFORE inline quote builder) -->
@@ -1735,6 +1771,7 @@
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
     <script src="/shared_components/js/shopworks-guide-generator.js"></script>
     <script src="/shared_components/js/screenprint-shopworks-guide-generator.js"></script>
+    <script src="/shared_components/js/shopworks-edp-generator.js"></script>
 
     <script>
     class ScreenPrintQuoteBuilder {
@@ -2130,6 +2167,12 @@
             const shopworksBtn = document.getElementById('shopworks-guide-btn');
             if (shopworksBtn) {
                 shopworksBtn.addEventListener('click', () => this.generateShopWorksGuide());
+            }
+
+            // ShopWorks EDP Generator
+            const edpBtn = document.getElementById('shopworks-edp-btn');
+            if (edpBtn) {
+                edpBtn.addEventListener('click', () => this.generateEDPText());
             }
 
             // New Quote button
@@ -3495,6 +3538,114 @@
             // Generate and open the guide using screen print specific generator
             const generator = new ScreenPrintShopWorksGuideGenerator();
             generator.generateGuide(quoteData);
+        }
+
+        /**
+         * Generate ShopWorks EDP text for importing quote into ShopWorks
+         */
+        generateEDPText() {
+            if (!this.currentPricing || this.products.length === 0) {
+                alert('Please complete your quote first by adding products.');
+                return;
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Generating EDP text...');
+
+            // Reuse same quote data preparation as ShopWorks guide
+            const subtotalBeforeTax = this.currentPricing.subtotal + this.currentPricing.setupFees + (this.currentPricing.ltmFee || 0);
+            const salesTax = subtotalBeforeTax * 0.101;
+            const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
+            const quoteData = {
+                QuoteID: this.quoteService.generateQuoteID(),
+                CustomerName: document.getElementById('customer-name')?.value.trim() || 'Customer',
+                products: [],
+                TotalQuantity: this.currentPricing.totalQuantity || 0,
+                SubtotalAmount: subtotalBeforeTax,
+                SalesTaxAmount: salesTax,
+                TotalAmount: grandTotalWithTax,
+                SetupFees: this.currentPricing.setupFees || 0,
+                SmallBatchFee: this.currentPricing.ltmFee || 0,
+                TotalColors: this.calculateTotalColors(),
+                SetupBreakdown: this.getSetupBreakdown(),
+                Notes: document.getElementById('customer-notes')?.value.trim() || ''
+            };
+
+            // Create pricing lookup (same as ShopWorks guide)
+            const pricingLookup = {};
+            if (this.currentPricing && this.currentPricing.productPricing) {
+                this.currentPricing.productPricing.forEach((pricingData) => {
+                    const key = `${pricingData.styleNumber}-${pricingData.color}`;
+                    pricingLookup[key] = pricingData;
+                });
+            }
+
+            // Convert products (same logic as ShopWorks guide)
+            this.products.forEach((product) => {
+                const sizeBreakdown = {};
+                let totalQuantity = 0;
+
+                if (product.sizeBreakdown) {
+                    Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                        if (qty > 0) {
+                            sizeBreakdown[size] = qty;
+                            totalQuantity += parseInt(qty);
+                        }
+                    });
+                }
+
+                const pricingKey = `${product.styleNumber}-${product.color}`;
+                const pricingMatch = pricingLookup[pricingKey];
+
+                const baseUnitPrice = pricingMatch ? pricingMatch.perShirtTotal : 0;
+                const finalUnitPrice = pricingMatch ? pricingMatch.finalUnitPrice : 0;
+                const lineTotal = pricingMatch ? pricingMatch.finalLineTotal : 0;
+
+                const sizesPricing = {};
+                if (pricingMatch && pricingMatch.sizesPricing) {
+                    Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
+                        sizesPricing[size] = priceData.unitPrice;
+                    });
+                }
+
+                const printLocations = [];
+                if (this.printSetup.front && this.printSetup.frontColors > 0) {
+                    printLocations.push({
+                        name: 'Full Front',
+                        colors: this.printSetup.frontColors
+                    });
+                }
+                if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                    this.printSetup.additionalLocations.forEach(loc => {
+                        printLocations.push({
+                            name: loc.location,
+                            colors: loc.colors
+                        });
+                    });
+                }
+
+                quoteData.products.push({
+                    StyleNumber: product.styleNumber || '',
+                    ProductName: product.productName || product.name || '',
+                    Color: product.color || '',
+                    ColorCode: '',
+                    SizeBreakdown: sizeBreakdown,
+                    Quantity: totalQuantity,
+                    BaseUnitPrice: baseUnitPrice,
+                    FinalUnitPrice: finalUnitPrice,
+                    LineTotal: lineTotal,
+                    PrintLocations: printLocations,
+                    SizesPricing: sizesPricing
+                });
+            });
+
+            console.log('[ScreenPrintQuoteBuilder] Prepared quote data for EDP:', quoteData);
+
+            // Generate EDP using EDP generator
+            if (!window.edpGenerator) {
+                window.edpGenerator = new ShopWorksEDPGenerator();
+            }
+            window.edpGenerator.generateEDP(quoteData);
         }
 
         /**
