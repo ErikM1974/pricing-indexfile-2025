@@ -2564,6 +2564,31 @@
             await this.loadProductDetails(colorName);
         }
 
+        /**
+         * Helper: Lookup CATALOG_COLOR from colorSwatches data
+         * @param {string} colorName - The COLOR_NAME to look up
+         * @returns {string} The CATALOG_COLOR, or empty string if not found
+         */
+        getCatalogColorFromSwatches(colorName) {
+            if (!this.currentProduct || !this.currentProduct.colorSwatches) {
+                console.warn('[CatalogColor] No color swatches data available');
+                return '';
+            }
+
+            // Find the swatch that matches the COLOR_NAME
+            const swatch = this.currentProduct.colorSwatches.find(s =>
+                s.COLOR_NAME === colorName
+            );
+
+            if (swatch && swatch.CATALOG_COLOR) {
+                console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
+                return swatch.CATALOG_COLOR;
+            } else {
+                console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
+                return '';
+            }
+        }
+
         async loadProductDetails(colorName) {
             // Color is passed from selectColor(), or get from hidden input
             const color = colorName || document.getElementById('selected-color').value;
@@ -2608,7 +2633,16 @@
                     sizeInputsContainer.appendChild(sizeGroup);
                 });
 
-                this.currentProduct.color = color;
+                // Store color information (both formats)
+                this.currentProduct.color = color;  // COLOR_NAME for display
+
+                // CRITICAL FIX: Look up and store catalogColor even when auto-loading
+                // This ensures catalogColor is populated whether color is clicked or auto-loaded
+                const catalogColor = this.getCatalogColorFromSwatches(color);
+                this.currentProduct.catalogColor = catalogColor;
+
+                console.log(`[loadProductDetails] Stored colors - Display: "${color}", Catalog: "${catalogColor}"`);
+
                 this.currentProduct.sizes = displaySizes;
 
                 // Show the size section
