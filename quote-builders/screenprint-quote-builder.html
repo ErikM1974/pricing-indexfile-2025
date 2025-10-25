@@ -2486,7 +2486,7 @@
             swatches.forEach(swatch => {
                 const swatchEl = document.createElement('div');
                 swatchEl.className = 'color-swatch';
-                swatchEl.onclick = () => this.selectColor(swatch.COLOR_NAME, swatchEl);
+                swatchEl.onclick = () => this.selectColor(swatch.COLOR_NAME, swatch.CATALOG_COLOR, swatchEl);
 
                 swatchEl.innerHTML = `
                     <img class="color-swatch-image" src="${swatch.COLOR_SQUARE_IMAGE}" alt="${swatch.COLOR_NAME}">
@@ -2536,14 +2536,15 @@
             container.style.display = 'grid';
         }
 
-        async selectColor(colorName, swatchElement) {
+        async selectColor(colorName, catalogColor, swatchElement) {
             // Update visual selection
             document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
             swatchElement.classList.add('selected');
 
             // Store selected color and swatch image
             document.getElementById('selected-color').value = colorName;
-            this.currentProduct.color = colorName;
+            this.currentProduct.color = colorName;  // For display (COLOR_NAME)
+            this.currentProduct.catalogColor = catalogColor;  // For ShopWorks (CATALOG_COLOR)
 
             // Store swatch image from the clicked element
             const swatchImage = swatchElement.querySelector('.color-swatch-image');
@@ -3511,6 +3512,7 @@
                     StyleNumber: product.styleNumber || '',
                     ProductName: product.productName || product.name || '',
                     Color: product.color || '',
+                    CatalogColor: product.catalogColor || '',  // ShopWorks catalog color format
                     ColorCode: '',
                     SizeBreakdown: sizeBreakdown,
                     Quantity: totalQuantity,
@@ -3638,6 +3640,7 @@
                     StyleNumber: product.styleNumber || '',
                     ProductName: product.productName || product.name || '',
                     Color: product.color || '',
+                    CatalogColor: product.catalogColor || '',  // ShopWorks catalog color format
                     ColorCode: '',
                     SizeBreakdown: sizeBreakdown,
                     Quantity: totalQuantity,

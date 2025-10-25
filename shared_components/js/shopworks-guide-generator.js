@@ -145,6 +145,7 @@ class ShopWorksGuideGenerator {
                     partNumber: product.StyleNumber || product.styleNumber,
                     colorRange: '',
                     color: product.Color || product.color || '',
+                    catalogColor: product.CatalogColor || product.catalogColor || '',  // ShopWorks catalog color format
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks(standardSizes),
                     manualPrice: this.getStandardSizePrice(standardSizes, product),
@@ -163,6 +164,7 @@ class ShopWorksGuideGenerator {
                     partNumber: `${basePartNumber}${suffix}`,
                     colorRange: '',
                     color: product.Color || product.color || '',
+                    catalogColor: product.CatalogColor || product.catalogColor || '',  // ShopWorks catalog color format
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks({ [size]: qty }),
                     manualPrice: this.getPriceForSize(size, product),

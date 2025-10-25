@@ -110,7 +110,8 @@ class ShopWorksEDPGenerator {
         edp += `PartColorRange>>\n`;
 
         // Part Color (optional but usually present)
-        edp += `PartColor>> ${item.color || ''}\n`;
+        // Use catalogColor (ShopWorks format) if available, fallback to color for backwards compatibility
+        edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
 
         // Unit Price (required)
         const unitPrice = item.manualPrice !== undefined && item.manualPrice !== null
