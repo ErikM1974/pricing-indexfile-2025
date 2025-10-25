@@ -75,6 +75,17 @@ class ShopWorksEDPGenerator {
         edp += `id_OrderType>> ${this.config.orderType}\n`;
         edp += `id_Customer>> ${this.config.customerId}\n`;
         edp += `Company>> ${this.config.company}\n`;
+
+        // Business terms and shipping
+        edp += `TermsName>> Pay On Pickup\n`;
+        edp += `CustomerPurchaseOrder>> Screenprint\n`;
+        edp += `CustomerServiceRep>> N/A\n`;
+        edp += `date_OrderRequestedToShip>> ${this.calculateRequestedShipDate()}\n`;
+
+        // Department notes
+        edp += `NotesToArt>> ${this.generateArtNotes(quoteData)}\n`;
+        edp += `NotesToProduction>> ${this.generateProductionNotes(quoteData)}\n`;
+
         edp += '---- End Order ----\n\n';
 
         // Customer Block (Inksoft format)
@@ -85,7 +96,7 @@ class ShopWorksEDPGenerator {
         // Product Blocks (one per line item - preserves size-specific pricing)
         lineItems.forEach((item, index) => {
             console.log(`[ShopWorksEDP] Converting line item ${index + 1}:`, item.partNumber);
-            edp += this.convertLineItemToEDP(item);
+            edp += this.convertLineItemToEDP(item, quoteData);
         });
 
         return edp;
@@ -94,13 +105,14 @@ class ShopWorksEDPGenerator {
     /**
      * Convert a single line item to EDP Product block
      * @param {Object} item - Line item from guide generator
+     * @param {Object} quoteData - Original quote data (for OrderInstructions generation)
      * @returns {string} EDP Product block text
      *
      * CRITICAL: Field order and completeness matters for ShopWorks import!
      * All 6 size fields MUST be present (even if empty) or import will be corrupted.
      * Field order must match working Inksoft examples exactly.
      */
-    convertLineItemToEDP(item) {
+    convertLineItemToEDP(item, quoteData) {
         let edp = '---- Start Product ----\n';
 
         // Part Number (required)
@@ -119,8 +131,8 @@ class ShopWorksEDPGenerator {
             : '0.00';
         edp += `cur_UnitPriceUserEntered>> ${unitPrice}\n`;
 
-        // Order Instructions (empty but required)
-        edp += `OrderInstructions>>\n`;
+        // Order Instructions - What's being printed on this product
+        edp += `OrderInstructions>> ${this.generateOrderInstructions(quoteData)}\n`;
 
         // Size Matrix - ALL 6 FIELDS MUST BE PRESENT (empty if no quantity)
         // This is CRITICAL - omitting fields causes ShopWorks to misalign data
@@ -193,6 +205,189 @@ class ShopWorksEDPGenerator {
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         return `${month}/${day}/${year}`;
+    }
+
+    /**
+     * Calculate requested ship date (2 weeks from today, avoiding weekends)
+     * @returns {string} Date in MM/DD/YYYY format
+     */
+    calculateRequestedShipDate() {
+        const today = new Date();
+        const shipDate = new Date(today);
+        shipDate.setDate(shipDate.getDate() + 14); // Add 2 weeks
+
+        // Check if weekend and adjust
+        const dayOfWeek = shipDate.getDay();
+        if (dayOfWeek === 6) {      // Saturday -> Monday
+            shipDate.setDate(shipDate.getDate() + 2);
+        } else if (dayOfWeek === 0) { // Sunday -> Monday
+            shipDate.setDate(shipDate.getDate() + 1);
+        }
+
+        // Format as MM/DD/YYYY
+        const year = shipDate.getFullYear();
+        const month = String(shipDate.getMonth() + 1).padStart(2, '0');
+        const day = String(shipDate.getDate()).padStart(2, '0');
+        return `${month}/${day}/${year}`;
+    }
+
+    /**
+     * Convert location code to display name
+     * Matches the mapping in screenprint-quote-builder.html
+     */
+    getLocationName(code) {
+        const locationNames = {
+            'Front': 'Front',           // Already friendly
+            'back': 'Full Back',
+            'left-sleeve': 'Left Sleeve',
+            'right-sleeve': 'Right Sleeve',
+            'custom': 'Custom Location'
+        };
+        return locationNames[code] || code;
+    }
+
+    /**
+     * Generate NotesToArt field - Information for art department (Steve)
+     * Includes garment details, colors, print locations, and screen requirements
+     */
+    generateArtNotes(quoteData) {
+        let notes = `SCREEN PRINT ART REQUEST - Quote #${quoteData.QuoteID}<cr>`;
+        notes += `Customer: ${quoteData.CustomerName}<cr><cr>`;
+
+        // GARMENTS TO PRINT
+        notes += `GARMENTS TO PRINT:<cr>`;
+        if (quoteData.products && quoteData.products.length > 0) {
+            quoteData.products.forEach(product => {
+                // Format: "24 pcs PC54 Black (S:6, M:6, L:6, XL:6)"
+                const sizeBreakdown = product.SizeBreakdown || product.sizes || {};
+                const sizeStr = Object.entries(sizeBreakdown)
+                    .filter(([size, qty]) => qty > 0)
+                    .map(([size, qty]) => `${size}:${qty}`)
+                    .join(', ');
+
+                notes += `- ${product.Quantity} pcs ${product.StyleNumber} ${product.Color}`;
+                if (sizeStr) {
+                    notes += ` (${sizeStr})`;
+                }
+                notes += `<cr>`;
+            });
+        }
+        notes += `<cr>`;
+
+        // PRINT LOCATIONS & COLORS
+        notes += `PRINT LOCATIONS & COLORS:<cr>`;
+        const setupBreakdown = quoteData.SetupBreakdown || {};
+
+        Object.entries(setupBreakdown).forEach(([location, details]) => {
+            const locationName = this.getLocationName(location);
+            const inkColors = details.colors - (quoteData.isDarkGarment ? 1 : 0); // Subtract underbase to get ink colors
+
+            notes += `${locationName}:<cr>`;
+            notes += `  - ${inkColors} ink color${inkColors !== 1 ? 's' : ''}`;
+            if (details.hasSafetyStripes) {
+                notes += ` + Safety Stripes`;
+            }
+            notes += `<cr>`;
+
+            if (quoteData.isDarkGarment || details.colors > inkColors) {
+                notes += `  - Requires underbase (dark garments)<cr>`;
+            }
+            notes += `<cr>`;
+        });
+
+        // SCREEN REQUIREMENTS
+        notes += `SCREEN REQUIREMENTS:<cr>`;
+        let totalScreens = 0;
+        Object.entries(setupBreakdown).forEach(([location, details]) => {
+            const locationName = this.getLocationName(location);
+            const screens = details.colors;
+            totalScreens += screens;
+
+            const inkColors = screens - (quoteData.isDarkGarment ? 1 : 0);
+            notes += `${locationName}: ${screens} screens`;
+            if (quoteData.isDarkGarment && screens > 0) {
+                notes += ` (${inkColors} color${inkColors !== 1 ? 's' : ''} + 1 underbase)`;
+            }
+            notes += `<cr>`;
+        });
+        notes += `Total Screens: ${totalScreens}<cr><cr>`;
+
+        // GARMENT TYPE
+        const garmentType = quoteData.isDarkGarment ? 'Dark garments (underbase required for all locations)' : 'Light garments';
+        notes += `GARMENT TYPE: ${garmentType}<cr><cr>`;
+
+        notes += `Please prepare artwork and screens for all locations listed above.`;
+
+        return notes;
+    }
+
+    /**
+     * Generate NotesToProduction field - Instructions for print shop
+     * Includes setup details, screen counts, and special requirements
+     */
+    generateProductionNotes(quoteData) {
+        let notes = `PRINT SETUP DETAILS:<cr>`;
+
+        const setupBreakdown = quoteData.SetupBreakdown || {};
+
+        // Detail each location's setup
+        Object.entries(setupBreakdown).forEach(([location, details]) => {
+            const locationName = this.getLocationName(location);
+            const totalScreens = details.colors;
+            const inkColors = totalScreens - (quoteData.isDarkGarment ? 1 : 0);
+            const setupFee = totalScreens * 30;
+
+            notes += `${locationName}: ${inkColors} color${inkColors !== 1 ? 's' : ''}`;
+            if (quoteData.isDarkGarment) {
+                notes += ` + 1 underbase`;
+            }
+            notes += ` (${totalScreens} total screen${totalScreens !== 1 ? 's' : ''})`;
+            if (details.hasSafetyStripes) {
+                notes += ` - Safety Stripes included`;
+            }
+            notes += `<cr>`;
+        });
+
+        notes += `<cr>`;
+
+        // Setup fee summary
+        notes += `Total Setup Fee: $${(quoteData.SetupFees || 0).toFixed(2)}<cr>`;
+
+        // Garment type note
+        const garmentType = quoteData.isDarkGarment ? 'Dark Garment (underbase required for all locations)' : 'Light Garment';
+        notes += `Garment Type: ${garmentType}`;
+
+        return notes;
+    }
+
+    /**
+     * Generate OrderInstructions field - What's being printed on this product
+     * Shows print locations, color counts, and special features (safety stripes)
+     *
+     * Example outputs:
+     * - "Print Front: 3 colors, Print Back: 2 colors"
+     * - "Print Front: 4 colors (includes Safety Stripes)"
+     * - "Print Left Sleeve: 1 color"
+     */
+    generateOrderInstructions(quoteData) {
+        const setupBreakdown = quoteData.SetupBreakdown || {};
+        const instructions = [];
+
+        Object.entries(setupBreakdown).forEach(([location, details]) => {
+            const locationName = this.getLocationName(location);
+            // Exclude underbase from color count (same logic as NotesToArt)
+            const colorCount = details.colors - (quoteData.isDarkGarment ? 1 : 0);
+
+            let instruction = `Print ${locationName}: ${colorCount} color${colorCount !== 1 ? 's' : ''}`;
+
+            if (details.hasSafetyStripes) {
+                instruction += ' (includes Safety Stripes)';
+            }
+
+            instructions.push(instruction);
+        });
+
+        return instructions.join(', ');
     }
 
     /**

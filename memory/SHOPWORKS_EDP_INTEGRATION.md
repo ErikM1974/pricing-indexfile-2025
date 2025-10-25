@@ -1902,6 +1902,489 @@ const spsuItem = {
 
 ---
 
+## Section 12: Complete EDP Field Reference
+
+### Overview
+
+This section documents ALL available EDP fields from the ShopWorks EDP specification. Use this as a reference when considering adding new fields to your EDP implementation.
+
+**Currently Implemented Blocks:**
+- ✅ Order Block (12 of ~37 fields)
+- ✅ Customer Block (1 of ~30 fields)
+- ⚠️ Product Block (19 of 19 implemented fields - COMPLETE)
+- ❌ Contact Block (0 fields - UNUSED)
+- ❌ Design Block (0 fields - UNUSED, HIGH VALUE for screen print)
+- ❌ Payment Block (0 fields - UNUSED)
+
+### Order Block Fields
+
+**Status: Partially Implemented (12 of ~37 fields)**
+
+#### Currently Implemented (12 fields)
+```javascript
+ExtOrderID           // Quote ID from calculator
+ExtSource            // "SP Quote"
+date_OrderPlaced     // Today's date in MM/DD/YYYY format
+id_OrderType         // 13 (Screen Print)
+id_Customer          // 3739 (Northwest Custom Apparel)
+Company              // "Northwest Custom Apparel"
+TermsName            // "Pay On Pickup"
+CustomerPurchaseOrder // "Screenprint"
+CustomerServiceRep   // "N/A"
+date_OrderRequestedToShip // Calculated 2 weeks ahead, avoids weekends
+NotesToArt           // Comprehensive art instructions
+NotesToProduction    // Production setup details
+```
+
+#### High Priority - Consider Adding (8 fields)
+```javascript
+// Shipping Information
+ShipToCompany        // Customer's company name
+ShipToAddress1       // Street address
+ShipToAddress2       // Suite/unit number
+ShipToCity           // City
+ShipToState          // State abbreviation
+ShipToZip            // ZIP code
+ShipToCountry        // Country (default "USA")
+
+// Customer Communication
+CustomerEmail        // For order notifications
+```
+
+**Implementation Example:**
+```javascript
+// In convertToEDPFormat() Order Block section:
+edp += `ShipToCompany>> ${quoteData.CompanyName || ''}\n`;
+edp += `ShipToAddress1>> ${quoteData.ShippingAddress || ''}\n`;
+edp += `ShipToCity>> ${quoteData.ShippingCity || ''}\n`;
+edp += `ShipToState>> ${quoteData.ShippingState || ''}\n`;
+edp += `ShipToZip>> ${quoteData.ShippingZip || ''}\n`;
+edp += `CustomerEmail>> ${quoteData.CustomerEmail || ''}\n`;
+```
+
+#### Medium Priority - Optional Enhancement (9 fields)
+```javascript
+// Additional Order Details
+OrderNotes           // General order notes
+ShipMethod           // "UPS Ground", "FedEx", etc.
+ShipAccountNumber    // Carrier account number
+date_OrderDesired    // Customer's desired delivery date
+DateIssued           // Order creation date (alternative to date_OrderPlaced)
+
+// Tracking
+ExtInventoryGroup    // External inventory group ID
+ExtCustomerID        // External customer system ID
+ExtContactID         // External contact system ID
+ExtSource2           // Secondary source identifier
+```
+
+#### Low Priority - Advanced Features (8 fields)
+```javascript
+// Workflow
+id_Workcenter        // ShopWorks workcenter assignment
+IsWebOrder           // "Yes" or "No"
+IsInternational      // "Yes" or "No"
+
+// Financial
+DiscountPercent      // Percentage discount
+DiscountAmount       // Dollar amount discount
+TaxExempt            // "Yes" or "No"
+
+// System
+id_OrderSource       // Order source type ID
+OrderGroup           // Group/batch identifier
+```
+
+### Customer Block Fields
+
+**Status: Minimal Implementation (1 of ~30 fields)**
+
+#### Currently Implemented (1 field)
+```javascript
+id_Customer          // 3739 (Northwest Custom Apparel)
+```
+
+#### High Priority - Consider Adding (7 fields)
+```javascript
+// Primary Contact
+Company              // Customer company name
+ContactName          // Primary contact person
+Email                // Primary email
+Phone                // Primary phone
+Address1             // Street address
+City                 // City
+State                // State abbreviation
+Zip                  // ZIP code
+```
+
+**Implementation Example:**
+```javascript
+// Add to Customer Block:
+edp += '---- Start Customer ----\n';
+edp += `id_Customer>> ${this.config.customerId}\n`;
+edp += `Company>> ${quoteData.CompanyName || ''}\n`;
+edp += `ContactName>> ${quoteData.CustomerName || ''}\n`;
+edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
+edp += `Phone>> ${quoteData.Phone || ''}\n`;
+edp += `Address1>> ${quoteData.ShippingAddress || ''}\n`;
+edp += `City>> ${quoteData.ShippingCity || ''}\n`;
+edp += `State>> ${quoteData.ShippingState || ''}\n`;
+edp += `Zip>> ${quoteData.ShippingZip || ''}\n`;
+edp += '---- End Customer ----\n\n';
+```
+
+#### Medium Priority - Optional Enhancement (12 fields)
+```javascript
+// Additional Contact
+Address2             // Suite/unit
+Country              // Country name
+ContactTitle         // Job title
+Fax                  // Fax number
+Website              // Company website
+TaxID                // Tax ID number
+
+// Communication Preferences
+EmailArt             // Art department email
+EmailBilling         // Billing department email
+EmailOrders          // Order notifications email
+EmailShipping        // Shipping notifications email
+
+// Account Settings
+AccountNumber        // Customer account number
+PriceLevel           // Price tier/level
+```
+
+#### Low Priority - Advanced Features (10 fields)
+```javascript
+// Sales Territory
+SalesRep             // Sales representative name
+Territory            // Sales territory
+Channel              // Sales channel
+
+// Account Status
+CreditLimit          // Credit limit amount
+CreditStatus         // Credit standing
+Terms                // Payment terms
+
+// System
+ExtCustomerID        // External system customer ID
+CustomerGroup        // Customer grouping
+IsActive             // Active status
+DateAdded            // Account creation date
+```
+
+### Contact Block Fields
+
+**Status: NOT IMPLEMENTED - UNUSED BLOCK**
+
+#### High Priority - Consider Adding (8 fields)
+```javascript
+// Contact Information
+id_Customer          // Links to Customer block
+ContactName          // Full name
+ContactTitle         // Job title
+Email                // Email address
+Phone                // Phone number
+PhoneExt             // Extension
+Mobile               // Mobile number
+Fax                  // Fax number
+```
+
+**Use Case:** Multiple contacts per customer (purchasing, receiving, accounts payable)
+
+**Implementation Example:**
+```javascript
+// Add Contact Block after Customer Block:
+edp += '---- Start Contact ----\n';
+edp += `id_Customer>> ${this.config.customerId}\n`;
+edp += `ContactName>> ${quoteData.ContactName || quoteData.CustomerName}\n`;
+edp += `ContactTitle>> ${quoteData.ContactTitle || ''}\n`;
+edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
+edp += `Phone>> ${quoteData.Phone || ''}\n`;
+edp += '---- End Contact ----\n\n';
+```
+
+### Design Block Fields
+
+**Status: NOT IMPLEMENTED - UNUSED BLOCK (HIGH VALUE FOR SCREEN PRINT)**
+
+#### High Priority - Screen Print Designs (10+ fields)
+```javascript
+// Design Identification
+DesignNumber         // Unique design identifier
+DesignName           // Design description
+DesignNotes          // Design instructions
+
+// Art Files
+ArtworkFilename      // Primary artwork file
+ArtworkLocation      // File path or URL
+VectorFile           // Vector artwork file
+ProofFile            // Proof image file
+
+// Colors and Specs
+Colors               // Number of colors
+ColorList            // Comma-separated color names
+StitchCount          // For embroidery (if applicable)
+
+// Status
+DesignStatus         // "Approved", "Pending", "Revision"
+ArtProofSent         // Date proof was sent
+ArtProofApproved     // Date proof was approved
+```
+
+**Use Case:** Track artwork and design approvals per order
+
+**Implementation Example:**
+```javascript
+// Add Design Block after Customer/Contact Blocks:
+edp += '---- Start Design ----\n';
+edp += `DesignNumber>> SP-${quoteData.QuoteID}\n`;
+edp += `DesignName>> ${quoteData.DesignName || 'Screen Print Design'}\n`;
+edp += `Colors>> ${quoteData.TotalColors || 0}\n`;
+
+// Build color list from setup breakdown
+const colorList = [];
+Object.entries(quoteData.SetupBreakdown || {}).forEach(([location, details]) => {
+    const locationName = this.getLocationName(location);
+    const inkColors = details.colors - (quoteData.isDarkGarment ? 1 : 0);
+    colorList.push(`${locationName}: ${inkColors} colors`);
+});
+edp += `ColorList>> ${colorList.join(', ')}\n`;
+
+edp += `DesignNotes>> ${this.generateArtNotes(quoteData)}\n`;
+edp += `DesignStatus>> Pending\n`;
+edp += '---- End Design ----\n\n';
+```
+
+#### Medium Priority - Advanced Design Features (5 fields)
+```javascript
+// Design Management
+Designer             // Artist/designer name
+DateDesigned         // Design creation date
+RevisionNumber       // Design version
+OriginalDesignID     // Links to original design for revisions
+DesignCategory       // Design type/category
+```
+
+### Product Block Fields
+
+**Status: FULLY IMPLEMENTED (19 of 19 fields)**
+
+#### Currently Implemented - All Fields ✅
+```javascript
+// Product Identification
+PartNumber           // Style number (e.g., "PC61")
+PartColorRange       // (empty but required)
+PartColor            // Catalog color (e.g., "Black")
+PartDescription      // Product description
+
+// Pricing
+cur_UnitPriceUserEntered  // Final unit price
+cur_UnitCost              // Cost (set to 0.00 for quotes)
+
+// Instructions
+OrderInstructions    // (empty but required)
+
+// Size Matrix (ALL 6 REQUIRED)
+Size01_Req           // S column
+Size02_Req           // M column
+Size03_Req           // LG column
+Size04_Req           // XL column
+Size05_Req           // XXL column (2XL)
+Size06_Req           // XXXL column (3XL+)
+
+// Settings
+sts_Prod_Product_Override      // Product override flag
+sts_EnableCommission           // Commission setting
+id_ProductClass                // Product class ID
+sts_Prod_SalesTax_Override     // Tax override
+sts_EnableTax01                // Tax flags
+sts_EnableTax02
+sts_EnableTax03
+sts_EnableTax04
+
+// Secondary Units (all empty but required)
+sts_Prod_SecondaryUnits_Override
+sts_UseSecondaryUnits
+Units_Qty
+Units_Type
+Units_Area1
+Units_Area2
+Units_UnitsPricing
+Units_UnitsPurchasing
+Units_UnitsPurchasingExtraPercent
+Units_UnitsPurchasingExtraRound
+
+// Behavior (all empty but required)
+sts_Prod_Behavior_Override
+sts_ProductSource_Supplied
+sts_ProductSource_Purchase
+sts_ProductSource_Inventory
+sts_Production_Designs
+sts_Production_Subcontract
+sts_Production_Components
+sts_Storage_Ship
+sts_Storage_Inventory
+sts_Invoicing_Invoice
+```
+
+**Note:** Product block is complete. No additional fields recommended unless ShopWorks adds new capabilities.
+
+### Payment Block Fields
+
+**Status: NOT IMPLEMENTED - UNUSED BLOCK**
+
+#### High Priority - Payment Tracking (5 fields)
+```javascript
+// Payment Information
+PaymentMethod        // "Credit Card", "Check", "Net 30", etc.
+PaymentAmount        // Payment amount
+PaymentDate          // Date payment received
+PaymentReference     // Check number, transaction ID
+PaymentStatus        // "Pending", "Received", "Cleared"
+```
+
+**Use Case:** Track deposit payments for large orders
+
+**Implementation Example:**
+```javascript
+// Add Payment Block after Product blocks:
+edp += '---- Start Payment ----\n';
+edp += `PaymentMethod>> ${quoteData.PaymentMethod || 'Net 30'}\n`;
+edp += `PaymentStatus>> Pending\n`;
+edp += '---- End Payment ----\n\n';
+```
+
+#### Medium Priority - Payment Details (4 fields)
+```javascript
+// Payment Processing
+PaymentProcessor     // "Stripe", "PayPal", etc.
+AuthorizationCode    // CC authorization code
+Last4Digits          // Last 4 of card (for reference)
+TransactionID        // Processor transaction ID
+```
+
+### Implementation Priority Guide
+
+#### Immediate Value (Implement Next)
+1. **Shipping Address Fields** (Order Block) - Essential for production
+2. **Customer Email** (Order/Customer Block) - Order notifications
+3. **Design Block** - HIGH VALUE for screen print workflow, tracks artwork approvals
+
+#### High Value (Plan for Future)
+4. **Contact Block** - Multiple contacts per customer
+5. **Payment Block** - Track deposits and payment status
+6. **Extended Customer Info** - Complete customer profiles
+
+#### Nice to Have (Lower Priority)
+7. **Advanced Order Fields** - Workflow automation
+8. **Financial Fields** - Discounts, tax exemptions
+9. **System Integration Fields** - External system linking
+
+### Adding New Fields - Code Template
+
+```javascript
+// 1. Add to Order Block (in convertToEDPFormat method):
+edp += `NewFieldName>> ${quoteData.NewFieldSource || 'default value'}\n`;
+
+// 2. Ensure quoteData includes the field (in quote builder):
+const quoteData = {
+    // ... existing fields
+    NewFieldSource: document.getElementById('new-field-input')?.value || ''
+};
+
+// 3. Test the EDP output contains the field:
+console.log('[EDP] Generated EDP:', edpText);
+// Look for: "NewFieldName>> [expected value]"
+```
+
+### Field Naming Conventions
+
+**ShopWorks EDP follows these patterns:**
+- `id_` prefix = Numeric ID fields (e.g., `id_Customer`)
+- `date_` prefix = Date fields in MM/DD/YYYY format
+- `cur_` prefix = Currency fields (e.g., `cur_UnitPrice`)
+- `sts_` prefix = Status/boolean fields (e.g., `sts_EnableTax01`)
+- `_Req` suffix = Required field (e.g., `Size01_Req`)
+
+### Testing New Fields
+
+When adding new fields:
+
+1. **Generate test EDP:**
+   ```javascript
+   // In browser console:
+   const edpText = window.shopWorksEDPGenerator.generateEDP(testQuoteData);
+   console.log(edpText);
+   ```
+
+2. **Verify field appears in output:**
+   ```
+   ---- Start Order ----
+   NewFieldName>> expected value
+   ```
+
+3. **Test import in ShopWorks:**
+   - Import EDP file into ShopWorks test environment
+   - Verify field populates correct database column
+   - Check field appears in order record
+
+4. **Validate data format:**
+   - Dates: MM/DD/YYYY (no time)
+   - Currency: XX.XX (two decimals)
+   - Yes/No fields: "Yes" or "No" (not 1/0)
+
+### Field Documentation Template
+
+When documenting new fields you implement:
+
+```javascript
+/**
+ * [FieldName] - [Brief description]
+ *
+ * @block [Order/Customer/Contact/Design/Product/Payment]
+ * @format [String/Number/Date/Boolean]
+ * @required [Yes/No]
+ * @default [Default value or ""]
+ * @example "[Sample value]"
+ *
+ * Use Case: [When/why to use this field]
+ * Implementation: [Code location and pattern]
+ * ShopWorks Import: [Which field this populates in ShopWorks]
+ */
+```
+
+### Complete Field Counts
+
+| Block | Implemented | Available | Completion % |
+|-------|-------------|-----------|--------------|
+| Order | 12 | ~37 | 32% |
+| Customer | 1 | ~30 | 3% |
+| Contact | 0 | ~8 | 0% |
+| Design | 0 | ~10 | 0% |
+| Product | 19 | 19 | 100% ✅ |
+| Payment | 0 | ~9 | 0% |
+| **TOTAL** | **32** | **~113** | **28%** |
+
+### Next Steps for Enhancement
+
+Consider implementing fields in this order:
+
+**Phase 1 (Immediate):**
+- Shipping address (Order Block: 6 fields)
+- Customer email (Order Block: 1 field)
+
+**Phase 2 (High Value):**
+- Design Block (10 fields) - Major workflow improvement for screen print
+- Extended customer info (Customer Block: 7 fields)
+
+**Phase 3 (Future):**
+- Contact Block (8 fields)
+- Payment Block (5 fields)
+- Advanced order fields as needed
+
+---
+
 ## Summary
 
 ### Key Takeaways

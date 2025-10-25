@@ -3406,6 +3406,7 @@
                 SmallBatchFee: this.currentPricing.ltmFee || 0,
                 TotalColors: this.calculateTotalColors(),
                 SetupBreakdown: this.getSetupBreakdown(),
+                isDarkGarment: this.printSetup.isDarkGarment,  // For EDP art/production notes
                 Notes: document.getElementById('customer-notes')?.value.trim() || ''
             };
 
@@ -3612,6 +3613,7 @@
                 SmallBatchFee: this.currentPricing.ltmFee || 0,
                 TotalColors: this.calculateTotalColors(),
                 SetupBreakdown: this.getSetupBreakdown(),
+                isDarkGarment: this.printSetup.isDarkGarment,  // For EDP art/production notes
                 Notes: document.getElementById('customer-notes')?.value.trim() || ''
             };
 
