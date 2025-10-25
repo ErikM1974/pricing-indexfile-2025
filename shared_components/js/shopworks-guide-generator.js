@@ -147,7 +147,7 @@ class ShopWorksGuideGenerator {
                     color: product.Color || product.color || '',
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks(standardSizes),
-                    manualPrice: parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0),
+                    manualPrice: this.getStandardSizePrice(standardSizes, product),
                     calcPrice: 'Off',  // Changed to Off since we're using final price with LTM included
                     lineTotal: this.calculateLineTotal(standardSizes, product)
                 });
@@ -244,10 +244,25 @@ class ShopWorksGuideGenerator {
 
     /**
      * Calculate line total for a group of sizes
+     * Uses size-specific pricing when available to ensure accuracy
      */
     calculateLineTotal(sizes, product) {
+        // If we have size-specific pricing, calculate total by summing each size
+        if (product.SizesPricing) {
+            let total = 0;
+            Object.entries(sizes).forEach(([size, qty]) => {
+                const price = this.getPriceForSize(size, product);
+                total += qty * price;
+                console.log(`[ShopWorksGuide] Line total calculation for ${size}: ${qty} × $${price.toFixed(2)} = $${(qty * price).toFixed(2)}`);
+            });
+            console.log(`[ShopWorksGuide] Total line total: $${total.toFixed(2)}`);
+            return total;
+        }
+
+        // Fallback to using average price if size-specific pricing not available
         const totalQty = Object.values(sizes).reduce((a, b) => a + b, 0);
         const price = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
+        console.log(`[ShopWorksGuide] Using average price: ${totalQty} × $${price.toFixed(2)} = $${(totalQty * price).toFixed(2)}`);
         return totalQty * price;
     }
 
@@ -267,6 +282,28 @@ class ShopWorksGuideGenerator {
         const finalPrice = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
         console.log(`[ShopWorksGuide] Using final price for ${size}: $${finalPrice.toFixed(2)}`);
         return finalPrice;
+    }
+
+    /**
+     * Get the price for standard sizes (S/M/L/XL)
+     * Since all standard sizes have the same price, we can use any of them
+     * @param {Object} standardSizes - Object with standard size breakdown
+     * @param {Object} product - Product object with pricing data
+     * @returns {number} Price per piece for standard sizes
+     */
+    getStandardSizePrice(standardSizes, product) {
+        // Find first available standard size to get the price
+        const firstSize = Object.keys(standardSizes).find(size => standardSizes[size] > 0);
+
+        if (firstSize) {
+            const price = this.getPriceForSize(firstSize, product);
+            console.log(`[ShopWorksGuide] Using standard size price from ${firstSize}: $${price.toFixed(2)}`);
+            return price;
+        }
+
+        // Fallback to FinalUnitPrice if no sizes found (shouldn't happen)
+        console.warn('[ShopWorksGuide] No standard sizes found, falling back to FinalUnitPrice');
+        return parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
     }
 
     /**
