@@ -23,11 +23,18 @@ This documentation has been reorganized into modular components for better perfo
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── DATABASE_PATTERNS.md              # Database schema patterns
+├── MANAGEORDERS_INTEGRATION.md       # ManageOrders API integration (customer autocomplete)
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
 │   ├── orders-quotes-api.md         # Orders & quote management
 │   └── utility-api.md               # Utilities & reference data
+├── /manageorders/                    # ManageOrders API documentation
+│   ├── OVERVIEW.md                  # Architecture & authentication
+│   ├── CUSTOMER_AUTOCOMPLETE.md     # Current implementation guide
+│   ├── API_REFERENCE.md             # Complete Swagger spec (10 endpoints)
+│   ├── SERVER_PROXY.md              # caspio-pricing-proxy implementation
+│   └── FUTURE_INTEGRATIONS.md       # Roadmap & future features
 └── /templates/                       # Calculator templates
     ├── manual-calculator-template.md     # Manual pricing template
     ├── contract-calculator-template.md   # Contract pricing template
@@ -43,12 +50,23 @@ This documentation has been reorganized into modular components for better perfo
 ## 🎯 Quick Navigation Guide
 
 ### For API Integration
+
+#### Caspio Pricing Proxy API
 1. Start with **[CASPIO_API_CORE.md](./CASPIO_API_CORE.md)** - Core concepts, authentication, communication protocols
 2. Review specific endpoint modules in **/api/** based on your needs:
    - **[products-api.md](./api/products-api.md)** - Product catalog and search
    - **[cart-pricing-api.md](./api/cart-pricing-api.md)** - Shopping cart and pricing bundles
    - **[orders-quotes-api.md](./api/orders-quotes-api.md)** - Order processing and quotes
    - **[utility-api.md](./api/utility-api.md)** - Helper endpoints and reference data
+
+#### ManageOrders API (ShopWorks Integration)
+1. Start with **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview and navigation
+2. Review specific integration guides in **/manageorders/** based on your needs:
+   - **[OVERVIEW.md](./manageorders/OVERVIEW.md)** - System architecture and authentication
+   - **[CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Current implementation
+   - **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** - Complete Swagger spec (10 endpoints)
+   - **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** - Proxy server implementation
+   - **[FUTURE_INTEGRATIONS.md](./manageorders/FUTURE_INTEGRATIONS.md)** - Future features & roadmap
 
 ### For System Architecture
 1. **[CLAUDE_ARCHITECTURE.md](./CLAUDE_ARCHITECTURE.md)** - Advanced architecture patterns
@@ -109,6 +127,18 @@ This documentation has been reorganized into modular components for better perfo
 3. Apply verification checklist to ensure pricing synchronization
 4. Reference implementation examples for your quote builder type
 
+### "I need to add customer autocomplete to a quote builder"
+1. Read **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview and current implementation
+2. Review **[CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Step-by-step implementation guide
+3. Copy integration code from Screen Print Quote Builder example
+4. Test with console commands and manual testing checklist
+
+### "I need to integrate ManageOrders API features"
+1. Check **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** for available endpoints (10 total)
+2. Review **[FUTURE_INTEGRATIONS.md](./manageorders/FUTURE_INTEGRATIONS.md)** for implementation examples
+3. Study **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** for server-side patterns
+4. Follow security best practices from **[OVERVIEW.md](./manageorders/OVERVIEW.md)**
+
 ## 🔑 Key Configuration Values
 
 ### API Configuration
@@ -161,6 +191,7 @@ PATCH  - Embroidered Emblems
 | CLAUDE.md | 46.9k chars | 3 files | ~25k chars |
 | MANUAL_PRICING_CALCULATOR_GUIDE.md | 41.7k chars | 4 files | ~12k chars |
 | SHOPWORKS_EDP_INTEGRATION.md | 158k chars | 8 files | ~40k chars (PRODUCT_BLOCK.md) |
+| MANAGEORDERS_INTEGRATION.md | N/A (new) | 6 files | ~25k chars (API_REFERENCE.md) |
 
 **Result:** All files now under 40k character threshold for optimal Claude performance ✅
 
@@ -169,6 +200,12 @@ PATCH  - Embroidered Emblems
 - Core file reduced from 158KB → ~25KB (navigation hub)
 - 7 specialized files in /edp/ directory (each < 40KB)
 - **53% context reduction** when querying specific blocks
+
+**Latest Addition (2025-01-27):**
+- Created ManageOrders API documentation (6 files, ~65k total)
+- Includes complete Swagger specification (10 endpoints, 89 fields)
+- Modular structure: Overview, Autocomplete, API Reference, Server Proxy, Future Integrations
+- Production-ready customer autocomplete documentation
 
 ## 🔗 Related Documentation
 
@@ -182,6 +219,7 @@ PATCH  - Embroidered Emblems
 - **BUNDLE_CALCULATOR_GUIDE.md** - Guide for promotional bundles
 - **STAFF_DIRECTORY.md** - Staff contact information
 - **DATABASE_PATTERNS.md** - Database schema and patterns
+- **MANAGEORDERS_INTEGRATION.md** - ShopWorks ManageOrders API integration guide
 - **FILE_UPLOAD_API_REQUIREMENTS.md** - File upload specifications
 
 ## 💡 Best Practices

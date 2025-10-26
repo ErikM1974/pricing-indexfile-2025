@@ -1284,6 +1284,117 @@
     #summary-phase #quote-summary {
         display: block !important;
     }
+
+    /* ===================================================================
+       MANAGEORDERS AUTOCOMPLETE STYLES
+       2025-10-26: Customer autocomplete for company name field
+       =================================================================== */
+
+    /* Autocomplete Container */
+    .autocomplete-container {
+        position: relative;
+    }
+
+    .autocomplete-wrapper {
+        position: relative;
+    }
+
+    /* Autocomplete Dropdown */
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 350px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: -1px;
+    }
+
+    .autocomplete-dropdown.show {
+        display: block;
+    }
+
+    /* Autocomplete Items */
+    .autocomplete-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.15s ease;
+    }
+
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+        background: #f9fafb;
+    }
+
+    .autocomplete-item-company {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .autocomplete-item-details {
+        font-size: 13px;
+        color: #6b7280;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .autocomplete-item-detail {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .autocomplete-item-detail i {
+        width: 14px;
+        text-align: center;
+        opacity: 0.7;
+    }
+
+    /* No Results / Loading */
+    .autocomplete-no-results,
+    .autocomplete-loading-item {
+        padding: 16px;
+        text-align: center;
+        color: #6b7280;
+        font-style: italic;
+    }
+
+    .autocomplete-loading-item {
+        color: #3a7c52;
+        font-style: normal;
+    }
+
+    /* Scrollbar Styling */
+    .autocomplete-dropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-track {
+        background: #f9fafb;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
     </style>
 
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -1642,9 +1753,20 @@
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="company-name">Company Name</label>
-                        <input type="text" id="company-name" class="form-control">
+                    <div class="form-group autocomplete-container">
+                        <label for="company-name">
+                            Company Name
+                            <span class="autocomplete-status" style="font-size: 12px; color: #6b7280; margin-left: 8px;">
+                                <i class="fas fa-sync fa-spin" style="display:none;" id="autocomplete-loading"></i>
+                                <span id="autocomplete-count" style="display:none;"></span>
+                            </span>
+                        </label>
+                        <div class="autocomplete-wrapper" style="position: relative;">
+                            <input type="text" id="company-name" class="form-control"
+                                   placeholder="Start typing company name..."
+                                   autocomplete="off">
+                            <div id="company-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="sales-rep">Sales Representative</label>
@@ -1769,6 +1891,7 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
+    <script src="/shared_components/js/manageorders-customer-service.js"></script>
     <script src="/shared_components/js/shopworks-guide-generator.js"></script>
     <script src="/shared_components/js/screenprint-shopworks-guide-generator.js"></script>
     <script src="/shared_components/js/shopworks-edp-generator.js"></script>
@@ -3813,6 +3936,197 @@
 
         console.log('✅ Screen Print Quote Builder initialized - using screenprint-pricing-v2.js for pricing');
     });
+
+    // ===================================================================
+    // MANAGEORDERS CUSTOMER AUTOCOMPLETE INITIALIZATION
+    // 2025-10-26: Initialize customer service and setup autocomplete
+    // ===================================================================
+
+    let customerService;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('[ManageOrders] Initializing customer autocomplete...');
+
+        const loadingIcon = document.getElementById('autocomplete-loading');
+        const countSpan = document.getElementById('autocomplete-count');
+
+        try {
+            // Show loading indicator
+            if (loadingIcon) loadingIcon.style.display = 'inline-block';
+
+            // Initialize customer service
+            customerService = new ManageOrdersCustomerService();
+            await customerService.initialize();
+
+            // Show customer count
+            if (countSpan) {
+                countSpan.textContent = `(${customerService.customers.length} companies available)`;
+                countSpan.style.display = 'inline';
+            }
+
+            console.log('[ManageOrders] ✓ Initialized with', customerService.customers.length, 'customers');
+
+            // Setup autocomplete
+            setupCompanyAutocomplete();
+
+        } catch (error) {
+            console.error('[ManageOrders] ✗ Failed to initialize:', error);
+            // Fallback to manual entry - no breaking changes
+            if (countSpan) {
+                countSpan.textContent = '(manual entry)';
+                countSpan.style.display = 'inline';
+                countSpan.style.color = '#9ca3af';
+            }
+        } finally {
+            if (loadingIcon) loadingIcon.style.display = 'none';
+        }
+    });
+
+    function setupCompanyAutocomplete() {
+        const input = document.getElementById('company-name');
+        const dropdown = document.getElementById('company-autocomplete-dropdown');
+
+        if (!input || !dropdown || !customerService) {
+            console.warn('[ManageOrders] Autocomplete elements not found or service unavailable');
+            return;
+        }
+
+        // Search on input with debounce
+        input.addEventListener('input', debounce((e) => {
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const results = customerService.searchCustomers(query);
+            displayAutocompleteResults(results, dropdown);
+        }, 200));
+
+        // Close dropdown on ESC
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        console.log('[ManageOrders] ✓ Autocomplete event listeners attached');
+    }
+
+    function displayAutocompleteResults(customers, dropdown) {
+        if (!customers || customers.length === 0) {
+            dropdown.innerHTML = '<div class="autocomplete-no-results">No matching customers found. You can still type manually.</div>';
+            dropdown.classList.add('show');
+            return;
+        }
+
+        // Generate HTML for results (limit to 10)
+        const html = customers.slice(0, 10).map(customer => {
+            const fullName = `${customer.ContactFirstName} ${customer.ContactLastName}`.trim();
+            const email = customer.ContactEmail ? customer.ContactEmail.replace(/\r/g, '').trim() : '';
+            const phone = customer.ContactPhone || '';
+
+            return `
+                <div class="autocomplete-item" data-customer-id="${customer.id_Customer}">
+                    <div class="autocomplete-item-company">${escapeHtml(customer.CustomerName)}</div>
+                    <div class="autocomplete-item-details">
+                        ${fullName ? `<span class="autocomplete-item-detail"><i class="fas fa-user"></i> ${escapeHtml(fullName)}</span>` : ''}
+                        ${email ? `<span class="autocomplete-item-detail"><i class="fas fa-envelope"></i> ${escapeHtml(email)}</span>` : ''}
+                        ${phone ? `<span class="autocomplete-item-detail"><i class="fas fa-phone"></i> ${escapeHtml(phone)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        dropdown.innerHTML = html;
+
+        // Add click handlers for each result
+        dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const customerId = parseInt(item.dataset.customerId);
+                const customer = customerService.getCustomerById(customerId);
+                if (customer) {
+                    populateCustomerFields(customer);
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        dropdown.classList.add('show');
+    }
+
+    function populateCustomerFields(customer) {
+        // Company name
+        const companyInput = document.getElementById('company-name');
+        if (companyInput) companyInput.value = customer.CustomerName;
+
+        // Customer name (first + last)
+        const fullName = `${customer.ContactFirstName} ${customer.ContactLastName}`.trim();
+        const nameInput = document.getElementById('customer-name');
+        if (nameInput) nameInput.value = fullName;
+
+        // Email (clean up \r characters)
+        if (customer.ContactEmail) {
+            const cleanEmail = customer.ContactEmail.replace(/\r/g, '').trim();
+            const emailInput = document.getElementById('customer-email');
+            if (emailInput) emailInput.value = cleanEmail;
+        }
+
+        // Phone
+        if (customer.ContactPhone) {
+            const phoneInput = document.getElementById('customer-phone');
+            if (phoneInput) phoneInput.value = customer.ContactPhone;
+        }
+
+        // Sales rep (map name to email)
+        if (customer.CustomerServiceRep) {
+            const repEmail = mapSalesRepToEmail(customer.CustomerServiceRep);
+            if (repEmail) {
+                const salesRepSelect = document.getElementById('sales-rep');
+                if (salesRepSelect) salesRepSelect.value = repEmail;
+            }
+        }
+
+        console.log('[ManageOrders] ✓ Auto-populated customer:', customer.CustomerName);
+    }
+
+    function mapSalesRepToEmail(repName) {
+        const mapping = {
+            'Nika Lao': 'nika@nwcustomapparel.com',
+            'Taneisha Clark': 'taneisha@nwcustomapparel.com',
+            'Ruth Nhong': 'ruth@nwcustomapparel.com',
+            'Erik Mickelson': 'erik@nwcustomapparel.com',
+            'Adriyella': 'adriyella@nwcustomapparel.com',
+            'Bradley Wright': 'bradley@nwcustomapparel.com',
+            'Jim Mickelson': 'jim@nwcustomapparel.com',
+            'Steve Deland': 'art@nwcustomapparel.com'
+        };
+        return mapping[repName] || null;
+    }
+
+    // Debounce helper function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // HTML escape helper to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
     function newQuote() {
         if (confirm('Start a new quote?')) {
