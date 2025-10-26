@@ -1,6 +1,6 @@
 # ShopWorks EDP Integration & Pricing Synchronization Guide
 
-**Last Updated:** 2025-10-25
+**Last Updated:** 2025-10-26
 **Purpose:** Complete guide for maintaining pricing synchronization across Quote Builder, ShopWorks Guide, and EDP import
 **Applies To:** Screen Print, DTG, Embroidery, and Cap Embroidery quote builders
 
@@ -1909,262 +1909,1364 @@ const spsuItem = {
 This section documents ALL available EDP fields from the ShopWorks EDP specification. Use this as a reference when considering adding new fields to your EDP implementation.
 
 **Currently Implemented Blocks:**
-- ✅ Order Block (12 of ~37 fields)
-- ✅ Customer Block (1 of ~30 fields)
+- ✅ Order Block (12 of 44 fields implemented, ALL 44 documented)
+- ✅ Customer Block (1 of 44 fields implemented, ALL 44 documented)
+- ✅ Contact Block (0 of 10 fields implemented, ALL 10 documented)
+- ✅ Design Block (0 of 11 fields implemented, ALL 11 documented - HIGH VALUE)
 - ⚠️ Product Block (19 of 19 implemented fields - COMPLETE)
-- ❌ Contact Block (0 fields - UNUSED)
-- ❌ Design Block (0 fields - UNUSED, HIGH VALUE for screen print)
-- ❌ Payment Block (0 fields - UNUSED)
+- ✅ Payment Block (0 of 8 fields implemented, ALL 8 documented - FUTURE STRIPE INTEGRATION)
 
 ### Order Block Fields
 
-**Status: Partially Implemented (12 of ~37 fields)**
+**Status: PARTIALLY IMPLEMENTED - READY FOR FULL IMPLEMENTATION**
 
-#### Currently Implemented (12 fields)
+**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
+
+**Documentation Source:** ShopWorks OnSite 7 Order Block field mapping specification
+
+**Architecture:** Order Block is organized into **6 SubBlocks** in OnSite 7
+
+**🔄 IMPORTANT: This Order Block structure is SHARED across ALL quote builders**
+- ✅ Screen Print Quote Builder
+- ✅ DTG Quote Builder
+- ✅ Embroidery Quote Builder
+- ✅ Cap Embroidery Quote Builder
+- ✅ All future quote builders
+
+**What changes between quote builders:**
+- `id_OrderType` value (13 for Screen Print, 15 for DTG, 17 for Embroidery, etc.)
+- `ExtSource` identifier ("SP Quote", "DTG Quote", "EMB Quote", etc.)
+- Notes content (art/production instructions are method-specific)
+
+**What stays the same across ALL quote builders:**
+- All field names and structure
+- All address fields
+- All date fields and formats
+- Payment terms, sales tax, shipping fields
+
+---
+
+#### Order Block Structure (44 Total Fields)
+
+The Order Block in ShopWorks OnSite 7 uses a SubBlock architecture to organize order-related fields.
+
+**SubBlock Overview:**
+1. **ID SubBlock** (4 fields) - External identification and order type
+2. **Details SubBlock** (8 fields) - Order details, terms, and settings
+3. **Dates SubBlock** (3 fields) - Order dates and deadlines
+4. **Sales Tax SubBlock** (10 fields) - Tax calculation and overrides
+5. **Shipping SubBlock** (11 fields) - Shipping address and method
+6. **Notes SubBlock** (7 fields) - Department-specific instructions
+
+---
+
+#### SubBlock 1: ID SubBlock (4 fields)
+
+**Purpose:** External order identification and order type classification
+
 ```javascript
-ExtOrderID           // Quote ID from calculator
-ExtSource            // "SP Quote"
-date_OrderPlaced     // Today's date in MM/DD/YYYY format
-id_OrderType         // 13 (Screen Print)
-id_Customer          // 3739 (Northwest Custom Apparel)
-Company              // "Northwest Custom Apparel"
-TermsName            // "Pay On Pickup"
-CustomerPurchaseOrder // "Screenprint"
-CustomerServiceRep   // "N/A"
-date_OrderRequestedToShip // Calculated 2 weeks ahead, avoids weekends
-NotesToArt           // Comprehensive art instructions
-NotesToProduction    // Production setup details
+// OnSite 7 Field Names
+ExtOrderID              // External order/quote ID
+ExtSource               // Source system identifier
+date_External           // NEW in OnSite 7 - External system date
+id_OrderType            // ShopWorks order type ID
 ```
 
-#### High Priority - Consider Adding (8 fields)
-```javascript
-// Shipping Information
-ShipToCompany        // Customer's company name
-ShipToAddress1       // Street address
-ShipToAddress2       // Suite/unit number
-ShipToCity           // City
-ShipToState          // State abbreviation
-ShipToZip            // ZIP code
-ShipToCountry        // Country (default "USA")
+**OnSite 6.1 → OnSite 7 Field Mapping:**
 
-// Customer Communication
-CustomerEmail        // For order notifications
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `ExtOrderID` | ExtOrderID | Quote ID from calculator |
+| `ExtSource` | ExtSource | Source identifier |
+| `date_External` | Date External | **NEW in OnSite 7** - External order date |
+| `id_OrderType` | # Order Type 2 | Numeric order type ID |
+
+**Use Cases:**
+- `ExtOrderID` - Quote ID from calculator (e.g., "SP0127-1", "DTG0127-2", "EMB0127-3")
+- `ExtSource` - Source identifier (e.g., "SP Quote", "DTG Quote", "EMB Quote", "CAP Quote")
+- `date_External` - External system order date (NEW in OnSite 7)
+- `id_OrderType` - ShopWorks order type ID:
+  - 13 = Screen Print
+  - 15 = DTG (Direct-to-Garment)
+  - 17 = Embroidery
+  - 18 = Cap Embroidery
+  - *(Contact ShopWorks for complete list)*
+
+**Currently Implemented:** ✅ All 4 fields
+
+---
+
+#### SubBlock 2: Details SubBlock (8 fields)
+
+**Purpose:** Order details, payment terms, customer service, and order status
+
+```javascript
+// OnSite 7 Field Names
+CustomerPurchaseOrder   // Customer's PO number
+TermsName               // Payment terms
+CustomerServiceRep      // Assigned sales representative
+CustomerType            // NEW in OnSite 7 - Customer classification
+id_CompanyLocation      // NEW in OnSite 7 - Company location ID
+id_SalesStatus          // NEW in OnSite 7 - Sales pipeline status
+sts_CommishAllow        // NEW in OnSite 7 - Allow commission (Yes/No)
+HoldOrderText           // NEW in OnSite 7 - Order hold reason/notes
 ```
 
-**Implementation Example:**
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `CustomerPurchaseOrder` | # Purchase Order | Customer's PO number |
+| `TermsName` | Terms | Payment terms |
+| `CustomerServiceRep` | Salesperson | Sales rep (renamed in OnSite 7) |
+| `CustomerType` | Customer Type | **NEW in OnSite 7** - Customer classification |
+| `id_CompanyLocation` | Code To Location | **NEW in OnSite 7** - Location ID |
+| `id_SalesStatus` | *(NEW)* | **NEW in OnSite 7** - Sales status |
+| `sts_CommishAllow` | ? Commission Order | **NEW in OnSite 7** - Commission flag |
+| `HoldOrderText` | *(NEW)* | **NEW in OnSite 7** - Hold reason |
+
+**Use Cases:**
+- `CustomerPurchaseOrder` - Customer's PO number for tracking (e.g., "Screenprint", "DTG Order", "Embroidery")
+- `TermsName` - Payment terms: "Net 30", "Pay On Pickup", "COD", "Prepay"
+- `CustomerServiceRep` - Assigned sales rep (e.g., "Ruth Nhong", "Nika Lao", "N/A")
+- `CustomerType` - Customer classification (NEW in OnSite 7)
+- `id_CompanyLocation` - Multi-location customers, branch/division tracking (NEW in OnSite 7)
+- `id_SalesStatus` - Sales pipeline status ID (NEW in OnSite 7)
+- `sts_CommishAllow` - Allow commission on this order: "Yes" or "No"
+- `HoldOrderText` - Reason for order hold, special instructions (NEW in OnSite 7)
+
+**Currently Implemented:** ✅ CustomerPurchaseOrder, TermsName, CustomerServiceRep (3 of 8 fields)
+
+---
+
+#### SubBlock 3: Dates SubBlock (3 fields)
+
+**Purpose:** Order dates, shipping dates, and deadlines
+
 ```javascript
-// In convertToEDPFormat() Order Block section:
-edp += `ShipToCompany>> ${quoteData.CompanyName || ''}\n`;
-edp += `ShipToAddress1>> ${quoteData.ShippingAddress || ''}\n`;
-edp += `ShipToCity>> ${quoteData.ShippingCity || ''}\n`;
-edp += `ShipToState>> ${quoteData.ShippingState || ''}\n`;
-edp += `ShipToZip>> ${quoteData.ShippingZip || ''}\n`;
-edp += `CustomerEmail>> ${quoteData.CustomerEmail || ''}\n`;
+// OnSite 7 Field Names
+date_OrderPlaced          // Order placement date
+date_OrderRequestedToShip // Requested ship date
+date_OrderDropDead        // NEW in OnSite 7 - Absolute deadline date
 ```
 
-#### Medium Priority - Optional Enhancement (9 fields)
-```javascript
-// Additional Order Details
-OrderNotes           // General order notes
-ShipMethod           // "UPS Ground", "FedEx", etc.
-ShipAccountNumber    // Carrier account number
-date_OrderDesired    // Customer's desired delivery date
-DateIssued           // Order creation date (alternative to date_OrderPlaced)
+**OnSite 6.1 → OnSite 7 Field Mapping:**
 
-// Tracking
-ExtInventoryGroup    // External inventory group ID
-ExtCustomerID        // External customer system ID
-ExtContactID         // External contact system ID
-ExtSource2           // Secondary source identifier
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `date_OrderPlaced` | Date Order Placed | Order creation date |
+| `date_OrderRequestedToShip` | Date To Ship | Customer requested ship date |
+| `date_OrderDropDead` | Date Drop Dead | **NEW in OnSite 7** - Absolute deadline |
+
+**Use Cases:**
+- `date_OrderPlaced` - Today's date when quote is created (MM/DD/YYYY format, no time)
+- `date_OrderRequestedToShip` - Customer requested delivery date (auto-calculated 2 weeks ahead, avoids weekends)
+- `date_OrderDropDead` - Absolute deadline date, cannot ship after this (NEW in OnSite 7)
+
+**Date Format:** MM/DD/YYYY (no time component, e.g., "01/27/2025")
+
+**Currently Implemented:** ✅ date_OrderPlaced, date_OrderRequestedToShip (2 of 3 fields)
+
+---
+
+#### SubBlock 4: Sales Tax SubBlock (10 fields)
+
+**Purpose:** Sales tax calculation, exemptions, and GL account mapping
+
+```javascript
+// OnSite 7 Field Names (Tax Settings)
+sts_Order_SalesTax_Override // NEW in OnSite 7 - Override customer tax settings
+sts_ApplySalesTax01         // NEW in OnSite 7 - Apply tax jurisdiction 1
+sts_ApplySalesTax02         // NEW in OnSite 7 - Apply tax jurisdiction 2
+sts_ApplySalesTax03         // NEW in OnSite 7 - Apply tax jurisdiction 3
+sts_ApplySalesTax04         // NEW in OnSite 7 - Apply tax jurisdiction 4
+
+// GL Account Mapping
+coa_AccountSalesTax01       // GL account for sales tax 1
+coa_AccountSalesTax02       // GL account for sales tax 2
+coa_AccountSalesTax03       // NEW in OnSite 7 - GL account for sales tax 3
+coa_AccountSalesTax04       // NEW in OnSite 7 - GL account for sales tax 4
+
+// Additional Tax Settings
+sts_ShippingTaxable         // NEW in OnSite 7 - Charge tax on shipping (Yes/No)
 ```
 
-#### Low Priority - Advanced Features (8 fields)
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `sts_Order_SalesTax_Override` | *(NEW)* | **NEW in OnSite 7** - Override tax settings |
+| `sts_ApplySalesTax01` | *(NEW)* | **NEW in OnSite 7** - Apply tax 1 |
+| `sts_ApplySalesTax02` | *(NEW)* | **NEW in OnSite 7** - Apply tax 2 |
+| `sts_ApplySalesTax03` | *(NEW)* | **NEW in OnSite 7** - Apply tax 3 |
+| `sts_ApplySalesTax04` | *(NEW)* | **NEW in OnSite 7** - Apply tax 4 |
+| `coa_AccountSalesTax01` | # Account Sales Tax 1 | GL account |
+| `coa_AccountSalesTax02` | # Account Sales Tax 2 | GL account |
+| `coa_AccountSalesTax03` | *(NEW)* | **NEW in OnSite 7** - GL account 3 |
+| `coa_AccountSalesTax04` | *(NEW)* | **NEW in OnSite 7** - GL account 4 |
+| `sts_ShippingTaxable` | *(NEW)* | **NEW in OnSite 7** - Tax shipping |
+
+**Use Cases:**
+- `sts_Order_SalesTax_Override` - Override customer's default tax settings for this order: "Yes" or "No"
+- `sts_ApplySalesTax01-04` - Apply each tax jurisdiction (Yes/No) - supports up to 4 different taxes
+- `coa_AccountSalesTax01-04` - GL account codes for each tax type for proper accounting
+- `sts_ShippingTaxable` - Charge tax on shipping fees for this order: "Yes" or "No" (varies by state)
+
+**Currently Implemented:** ❌ 0 of 10 fields (ready for implementation)
+
+---
+
+#### SubBlock 5: Shipping SubBlock (11 fields)
+
+**Purpose:** Shipping address, carrier method, and shipping charges
+
 ```javascript
-// Workflow
-id_Workcenter        // ShopWorks workcenter assignment
-IsWebOrder           // "Yes" or "No"
-IsInternational      // "Yes" or "No"
+// OnSite 7 Field Names (Shipping Address)
+AddressDescription        // NEW in OnSite 7 - Address label/description
+AddressCompany            // Company name for shipping
+Address1                  // Street address line 1
+Address2                  // Street address line 2
+AddressCity               // City
+AddressState              // State abbreviation
+AddressZip                // ZIP/postal code
+AddressCountry            // NEW in OnSite 7 - Country
 
-// Financial
-DiscountPercent      // Percentage discount
-DiscountAmount       // Dollar amount discount
-TaxExempt            // "Yes" or "No"
+// Shipping Method & Charges
+ShipMethod                // Carrier/method
+cur_Shipping              // Shipping charges amount
 
-// System
-id_OrderSource       // Order source type ID
-OrderGroup           // Group/batch identifier
+// Settings
+sts_Order_ShipAddress_Add // NEW in OnSite 7 - Add address to customer (Yes/No)
 ```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `AddressDescription` | *(NEW)* | **NEW in OnSite 7** - Address label |
+| `AddressCompany` | Ship Company | Company name |
+| `Address1` | Ship Address 1 | Street address |
+| `Address2` | Ship Address 2 | Suite/unit |
+| `AddressCity` | Ship City | City |
+| `AddressState` | Ship State | State abbreviation |
+| `AddressZip` | Ship Zip | ZIP code |
+| `AddressCountry` | *(NEW)* | **NEW in OnSite 7** - Country |
+| `ShipMethod` | Ship Via | Carrier method |
+| `cur_Shipping` | $ Shipping | Shipping charges |
+| `sts_Order_ShipAddress_Add` | *(NEW)* | **NEW in OnSite 7** - Add to address book |
+
+**Use Cases:**
+- `AddressDescription` - Label: "Shipping", "Delivery", "Will Call", "Main Office" (NEW in OnSite 7)
+- Complete shipping address fields for delivery
+- `AddressCountry` - International shipping support (default "USA") (NEW in OnSite 7)
+- `ShipMethod` - Carrier/method: "UPS Ground", "FedEx", "USPS", "Will Call", "Customer Pickup"
+- `cur_Shipping` - Shipping charges amount (decimal, e.g., "15.50")
+- `sts_Order_ShipAddress_Add` - Add this address to customer's address book: "Yes" or "No"
+
+**Currently Implemented:** ❌ 0 of 11 fields (ready for implementation)
+
+---
+
+#### SubBlock 6: Notes SubBlock (7 fields)
+
+**Purpose:** Department-specific instructions and notes
+
+```javascript
+// OnSite 7 Field Names
+NotesToArt              // Art department instructions
+NotesToProduction       // Production setup instructions
+NotesToReceiving        // Receiving department notes
+NotesToPurchasing       // Purchasing department notes
+NotesToShipping         // Shipping instructions
+NotesToAccounting       // Billing/accounting notes
+NotesToPurchasingSub    // NEW in OnSite 7 - Subcontractor purchasing notes
+```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `NotesToArt` | Notes To Art | Art instructions |
+| `NotesToProduction` | Notes To Production | Production instructions |
+| `NotesToReceiving` | Notes To Receiving | Receiving notes |
+| `NotesToPurchasing` | Notes to Purchasing | Purchasing notes |
+| `NotesToShipping` | Notes to Shipping | Shipping instructions |
+| `NotesToAccounting` | Notes To Accounts Receivable | Accounting notes |
+| `NotesToPurchasingSub` | *(NEW)* | **NEW in OnSite 7** - Subcontractor notes |
+
+**Use Cases:**
+- `NotesToArt` - Art department instructions (colors, locations, special effects, artwork files)
+- `NotesToProduction` - Production setup instructions (equipment, materials, special handling, setup details)
+- `NotesToReceiving` - Receiving instructions (inspection requirements, storage)
+- `NotesToPurchasing` - Purchasing department notes (special orders, vendor info)
+- `NotesToShipping` - Shipping instructions (packaging, delivery notes, special handling)
+- `NotesToAccounting` - Billing/accounting notes (payment terms, special billing)
+- `NotesToPurchasingSub` - Subcontractor purchasing notes (NEW in OnSite 7)
+
+**Currently Implemented:** ✅ NotesToArt, NotesToProduction (2 of 7 fields)
+
+---
+
+#### Complete Implementation Example
+
+**Full Order Block with All SubBlocks (Shared Across ALL Quote Builders):**
+
+```javascript
+// Order Block - Complete implementation
+// This structure is IDENTICAL for Screen Print, DTG, Embroidery, Cap, etc.
+edp += '---- Start Order ----\n';
+
+// ===== SubBlock 1: ID =====
+edp += `ExtOrderID>> ${quoteData.QuoteID}\n`;  // "SP0127-1", "DTG0127-2", etc.
+edp += `ExtSource>> ${quoteData.QuoteSource}\n`;  // "SP Quote", "DTG Quote", etc.
+edp += `date_External>> ${quoteData.ExternalDate || ''}\n`;
+edp += `id_OrderType>> ${this.config.orderTypeId}\n`;  // 13, 15, 17, etc.
+
+// ===== SubBlock 2: Details =====
+edp += `CustomerPurchaseOrder>> ${quoteData.CustomerPO || quoteData.QuoteType}\n`;
+edp += `TermsName>> ${quoteData.PaymentTerms || 'Pay On Pickup'}\n`;
+edp += `CustomerServiceRep>> ${quoteData.SalesRep || 'N/A'}\n`;
+edp += `CustomerType>> ${quoteData.CustomerType || ''}\n`;
+edp += `id_CompanyLocation>> ${quoteData.CompanyLocation || ''}\n`;
+edp += `id_SalesStatus>> ${quoteData.SalesStatus || ''}\n`;
+edp += `sts_CommishAllow>> ${quoteData.CommissionAllowed ? 'Yes' : 'No'}\n`;
+edp += `HoldOrderText>> ${quoteData.HoldReason || ''}\n`;
+
+// ===== SubBlock 3: Dates =====
+edp += `date_OrderPlaced>> ${this.formatDate(new Date())}\n`;
+edp += `date_OrderRequestedToShip>> ${this.calculateShipDate()}\n`;
+edp += `date_OrderDropDead>> ${quoteData.DropDeadDate || ''}\n`;
+
+// ===== SubBlock 4: Sales Tax =====
+edp += `sts_Order_SalesTax_Override>> ${quoteData.TaxOverride ? 'Yes' : 'No'}\n`;
+edp += `sts_ApplySalesTax01>> ${quoteData.ApplySalesTax ? 'Yes' : 'No'}\n`;
+edp += `sts_ApplySalesTax02>> No\n`;
+edp += `sts_ApplySalesTax03>> No\n`;
+edp += `sts_ApplySalesTax04>> No\n`;
+edp += `coa_AccountSalesTax01>> ${quoteData.SalesTaxAccount || ''}\n`;
+edp += `coa_AccountSalesTax02>> \n`;
+edp += `coa_AccountSalesTax03>> \n`;
+edp += `coa_AccountSalesTax04>> \n`;
+edp += `sts_ShippingTaxable>> ${quoteData.ShippingTaxable ? 'Yes' : 'No'}\n`;
+
+// ===== SubBlock 5: Shipping =====
+edp += `AddressDescription>> ${quoteData.ShippingAddressDesc || 'Shipping'}\n`;
+edp += `AddressCompany>> ${quoteData.ShippingCompany || quoteData.CompanyName}\n`;
+edp += `Address1>> ${quoteData.ShippingAddress1 || ''}\n`;
+edp += `Address2>> ${quoteData.ShippingAddress2 || ''}\n`;
+edp += `AddressCity>> ${quoteData.ShippingCity || ''}\n`;
+edp += `AddressState>> ${quoteData.ShippingState || ''}\n`;
+edp += `AddressZip>> ${quoteData.ShippingZip || ''}\n`;
+edp += `AddressCountry>> ${quoteData.ShippingCountry || 'USA'}\n`;
+edp += `ShipMethod>> ${quoteData.ShipMethod || 'Will Call'}\n`;
+edp += `cur_Shipping>> ${quoteData.ShippingCharges || '0.00'}\n`;
+edp += `sts_Order_ShipAddress_Add>> ${quoteData.AddShipAddress ? 'Yes' : 'No'}\n`;
+
+// ===== SubBlock 6: Notes =====
+// THESE ARE METHOD-SPECIFIC - Content changes, field names stay the same
+edp += `NotesToArt>> ${this.generateArtNotes(quoteData)}\n`;  // Different per method
+edp += `NotesToProduction>> ${this.generateProductionNotes(quoteData)}\n`;  // Different per method
+edp += `NotesToReceiving>> ${quoteData.ReceivingNotes || ''}\n`;
+edp += `NotesToPurchasing>> ${quoteData.PurchasingNotes || ''}\n`;
+edp += `NotesToShipping>> ${quoteData.ShippingNotes || ''}\n`;
+edp += `NotesToAccounting>> ${quoteData.AccountingNotes || ''}\n`;
+edp += `NotesToPurchasingSub>> ${quoteData.SubcontractorNotes || ''}\n`;
+
+edp += '---- End Order ----\n\n';
+```
+
+---
+
+#### Method-Specific Variations
+
+**What Changes Between Quote Builders:**
+
+```javascript
+// ========================================
+// Configuration per quote builder type
+// ========================================
+
+// Screen Print Quote Builder
+const screenPrintConfig = {
+    orderTypeId: 13,
+    quoteSource: 'SP Quote',
+    quotePrefix: 'SP',
+    generateArtNotes: generateScreenPrintArtNotes,
+    generateProductionNotes: generateScreenPrintProductionNotes
+};
+
+// DTG Quote Builder
+const dtgConfig = {
+    orderTypeId: 15,
+    quoteSource: 'DTG Quote',
+    quotePrefix: 'DTG',
+    generateArtNotes: generateDTGArtNotes,
+    generateProductionNotes: generateDTGProductionNotes
+};
+
+// Embroidery Quote Builder
+const embroideryConfig = {
+    orderTypeId: 17,
+    quoteSource: 'EMB Quote',
+    quotePrefix: 'EMB',
+    generateArtNotes: generateEmbroideryArtNotes,
+    generateProductionNotes: generateEmbroideryProductionNotes
+};
+
+// Cap Embroidery Quote Builder
+const capConfig = {
+    orderTypeId: 18,
+    quoteSource: 'CAP Quote',
+    quotePrefix: 'CAP',
+    generateArtNotes: generateCapEmbroideryArtNotes,
+    generateProductionNotes: generateCapEmbroideryProductionNotes
+};
+
+// ========================================
+// What's SHARED across ALL quote builders
+// ========================================
+// ✅ All 44 Order Block field names
+// ✅ All SubBlock structures
+// ✅ Date formats (MM/DD/YYYY)
+// ✅ Boolean formats (Yes/No)
+// ✅ Address fields
+// ✅ Payment terms
+// ✅ Sales tax fields
+// ✅ Shipping fields
+
+// ========================================
+// What's DIFFERENT per quote builder
+// ========================================
+// ❌ id_OrderType value (13, 15, 17, 18, etc.)
+// ❌ ExtSource identifier ("SP Quote", "DTG Quote", etc.)
+// ❌ NotesToArt content (method-specific instructions)
+// ❌ NotesToProduction content (method-specific setup)
+```
+
+---
+
+#### Quote Builder Integration Examples
+
+**Screen Print Quote Builder:**
+```javascript
+const quoteData = {
+    QuoteID: 'SP0127-1',
+    QuoteSource: 'SP Quote',
+    QuoteType: 'Screenprint',
+    SalesRep: 'Ruth Nhong',
+    PaymentTerms: 'Pay On Pickup',
+
+    // Shipping (same fields for all builders)
+    ShippingAddress1: '123 Main St',
+    ShippingCity: 'Seattle',
+    ShippingState: 'WA',
+    ShippingZip: '98101',
+    ShipMethod: 'Will Call',
+
+    // Notes (content is method-specific)
+    // Generated by: generateScreenPrintArtNotes()
+    // Generated by: generateScreenPrintProductionNotes()
+};
+```
+
+**DTG Quote Builder (SAME STRUCTURE):**
+```javascript
+const quoteData = {
+    QuoteID: 'DTG0127-1',  // Different prefix
+    QuoteSource: 'DTG Quote',  // Different source
+    QuoteType: 'Direct to Garment',
+    SalesRep: 'Ruth Nhong',  // Same field
+    PaymentTerms: 'Pay On Pickup',  // Same field
+
+    // Shipping (IDENTICAL FIELDS)
+    ShippingAddress1: '123 Main St',
+    ShippingCity: 'Seattle',
+    ShippingState: 'WA',
+    ShippingZip: '98101',
+    ShipMethod: 'Will Call',
+
+    // Notes (different content, same field names)
+    // Generated by: generateDTGArtNotes()
+    // Generated by: generateDTGProductionNotes()
+};
+```
+
+**Embroidery Quote Builder (SAME STRUCTURE):**
+```javascript
+const quoteData = {
+    QuoteID: 'EMB0127-1',  // Different prefix
+    QuoteSource: 'EMB Quote',  // Different source
+    QuoteType: 'Embroidery',
+    SalesRep: 'Ruth Nhong',  // Same field
+    PaymentTerms: 'Pay On Pickup',  // Same field
+
+    // ... ALL OTHER FIELDS IDENTICAL STRUCTURE
+};
+```
+
+---
+
+#### Recommended Implementation Phases
+
+**Phase 1: Essential Fields (All Quote Builders) - Immediate**
+- ID SubBlock: All 4 fields ✅ (already implemented)
+- Details SubBlock: CustomerPurchaseOrder, TermsName, CustomerServiceRep ✅ (already implemented)
+- Dates SubBlock: date_OrderPlaced, date_OrderRequestedToShip ✅ (already implemented)
+- Shipping SubBlock: Address fields (8 fields)
+- Notes SubBlock: NotesToArt, NotesToProduction ✅ (already implemented)
+
+**Phase 2: Enhanced Features (Week 1-2)**
+- Details SubBlock: CustomerType, id_CompanyLocation
+- Dates SubBlock: date_OrderDropDead
+- Shipping SubBlock: ShipMethod, cur_Shipping, AddressDescription, AddressCountry
+- Sales Tax SubBlock: sts_ApplySalesTax01, sts_ShippingTaxable
+- Notes SubBlock: NotesToShipping
+
+**Phase 3: Advanced Features (Future)**
+- Details SubBlock: id_SalesStatus, sts_CommishAllow, HoldOrderText
+- Sales Tax SubBlock: All tax override and multi-jurisdiction fields (10 fields)
+- Shipping SubBlock: sts_Order_ShipAddress_Add
+- Notes SubBlock: NotesToReceiving, NotesToPurchasing, NotesToAccounting, NotesToPurchasingSub
 
 ### Customer Block Fields
 
-**Status: Minimal Implementation (1 of ~30 fields)**
+**Status: NOT IMPLEMENTED - READY FOR IMPLEMENTATION**
 
-#### Currently Implemented (1 field)
+**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
+
+**Documentation Source:** ShopWorks OnSite 7 Customer Block field mapping specification
+
+**Architecture:** Customer Block is organized into **6 SubBlocks** in OnSite 7
+
+#### Customer Block Structure (44 Total Fields)
+
+The Customer Block in ShopWorks OnSite 7 uses a SubBlock architecture to organize related fields. This replaces the flat structure in OnSite 6.1.
+
+**SubBlock Overview:**
+1. **Details SubBlock** (6 fields) - Company identification and core info
+2. **Address SubBlock** (8 fields) - Billing address information
+3. **Sales Tax SubBlock** (10 fields) - Tax calculation and exemptions
+4. **Price Calculator SubBlock** (3 fields) - Pricing and discount levels
+5. **Profile SubBlock** (7 fields) - Customer classification and tracking
+6. **Custom Fields SubBlock** (10 fields) - Flexible custom data storage
+
+---
+
+#### SubBlock 1: Details SubBlock (6 fields)
+
+**Purpose:** Core customer identification and business information
+
 ```javascript
-id_Customer          // 3739 (Northwest Custom Apparel)
+// OnSite 7 Field Names
+ExtCustomerID         // External customer ID
+id_Customer           // ShopWorks customer ID (required)
+Company               // Company name
+id_CompanyLocation    // NEW in OnSite 7 - Company location/branch ID
+Terms                 // NEW in OnSite 7 - Payment terms
+WebsiteURL            // NEW in OnSite 7 - Customer website
+EmailMain             // NEW in OnSite 7 - Primary business email
 ```
 
-#### High Priority - Consider Adding (7 fields)
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `ExtCustomerID` | ExtCustID | Standard field |
+| `id_Customer` | # Customer | Required, numeric ID |
+| `Company` | Company | Standard field |
+| `id_CompanyLocation` | *(NEW)* | **New in OnSite 7** - Multi-location support |
+| `Terms` | *(NEW)* | **New in OnSite 7** - Payment terms |
+| `WebsiteURL` | *(NEW)* | **New in OnSite 7** - Customer website |
+| `EmailMain` | *(NEW)* | **New in OnSite 7** - Primary business email |
+
+**Use Cases:**
+- `id_CompanyLocation` - Track multi-location customers (branches, divisions, warehouses)
+- `Terms` - Payment terms: "Net 30", "Net 60", "COD", "Prepay", "Credit Card"
+- `WebsiteURL` - Customer's website for reference/verification
+- `EmailMain` - Primary business email (may differ from contact person email)
+
+---
+
+#### SubBlock 2: Address SubBlock (8 fields)
+
+**Purpose:** Customer billing address information
+
 ```javascript
-// Primary Contact
-Company              // Customer company name
-ContactName          // Primary contact person
-Email                // Primary email
-Phone                // Primary phone
-Address1             // Street address
-City                 // City
-State                // State abbreviation
-Zip                  // ZIP code
+// OnSite 7 Field Names
+AddressDescription    // NEW in OnSite 7 - Address label/description
+AddressCompany        // Company name for this address
+Address1              // Street address line 1
+Address2              // Street address line 2 (suite/unit)
+AddressCity           // City
+AddressState          // State abbreviation
+AddressZip            // ZIP/postal code
+AddressCountry        // NEW in OnSite 7 - Country
 ```
 
-**Implementation Example:**
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `AddressDescription` | *(NEW)* | **New in OnSite 7** - "Billing", "Main Office", etc. |
+| `AddressCompany` | Bill Company | Standard field |
+| `Address1` | Bill Address 1 | Standard field |
+| `Address2` | Bill Address 2 | Standard field |
+| `AddressCity` | Bill City | Standard field |
+| `AddressState` | Bill State | Standard field |
+| `AddressZip` | BillZip | Standard field |
+| `AddressCountry` | *(NEW)* | **New in OnSite 7** - International customers |
+
+**Use Cases:**
+- `AddressDescription` - Label for address: "Billing", "Headquarters", "Main Office"
+- `AddressCountry` - International customers (default "USA" for domestic)
+
+---
+
+#### SubBlock 3: Sales Tax SubBlock (10 fields)
+
+**Purpose:** Sales tax calculation, exemptions, and GL account mapping
+
 ```javascript
-// Add to Customer Block:
+// OnSite 7 Field Names (Tax Application)
+sts_ApplySalesTax01   // Apply sales tax jurisdiction 1 (Yes/No)
+sts_ApplySalesTax02   // Apply sales tax jurisdiction 2 (Yes/No)
+sts_ApplySalesTax03   // Apply sales tax jurisdiction 3 (Yes/No)
+sts_ApplySalesTax04   // Apply sales tax jurisdiction 4 (Yes/No)
+
+// GL Account Mapping
+coa_AccountSalesTax01 // GL account for sales tax 1
+coa_AccountSalesTax02 // GL account for sales tax 2
+coa_AccountSalesTax03 // NEW in OnSite 7 - GL account for sales tax 3
+coa_AccountSalesTax04 // NEW in OnSite 7 - GL account for sales tax 4
+
+// Additional Tax Settings
+sts_ShippingTaxable   // NEW in OnSite 7 - Charge tax on shipping (Yes/No)
+TaxExemptNumber       // Tax exemption certificate number
+```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `sts_ApplySalesTax01` | ? Pay Sales Tax | Boolean field |
+| `sts_ApplySalesTax02` | ? Pay Sales Tax | Boolean field |
+| `sts_ApplySalesTax03` | ? Pay Sales Tax | Boolean field |
+| `sts_ApplySalesTax04` | ? Pay Sales Tax | Boolean field |
+| `coa_AccountSalesTax01` | # Account Sales Tax 1 | GL account reference |
+| `coa_AccountSalesTax02` | # Account Sales Tax 2 | GL account reference |
+| `coa_AccountSalesTax03` | *(NEW)* | **New in OnSite 7** - Third tax jurisdiction |
+| `coa_AccountSalesTax04` | *(NEW)* | **New in OnSite 7** - Fourth tax jurisdiction |
+| `sts_ShippingTaxable` | *(NEW)* | **New in OnSite 7** - Tax shipping charges |
+| `TaxExemptNumber` | Tax Exempt # | Standard field |
+
+**Use Cases:**
+- Support for up to **4 different tax jurisdictions** (city, county, state, special district)
+- `sts_ShippingTaxable` - Whether to charge tax on shipping fees (varies by state)
+- `TaxExemptNumber` - Store tax exemption certificate number for resellers/nonprofits
+- `coa_AccountSalesTax##` - Map to specific GL accounts for proper accounting
+
+---
+
+#### SubBlock 4: Price Calculator SubBlock (3 fields)
+
+**Purpose:** Customer pricing tiers and default price calculators
+
+```javascript
+// OnSite 7 Field Names
+id_DiscountLevel      // NEW in OnSite 7 - Discount level/pricing tier
+id_DefaultCalculator1 // NEW in OnSite 7 - Primary default pricing calculator
+id_DefaultCalculator2 // NEW in OnSite 7 - Secondary default pricing calculator
+```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `id_DiscountLevel` | *(NEW)* | **New in OnSite 7** - Pricing tier assignment |
+| `id_DefaultCalculator1` | *(NEW)* | **New in OnSite 7** - Default pricing method |
+| `id_DefaultCalculator2` | *(NEW)* | **New in OnSite 7** - Alternate pricing method |
+
+**Use Cases:**
+- `id_DiscountLevel` - Customer's pricing tier: "Retail", "Wholesale", "VIP", "Contract"
+- `id_DefaultCalculator1` - Primary pricing method for this customer
+- `id_DefaultCalculator2` - Alternate/backup pricing method
+
+---
+
+#### SubBlock 5: Profile SubBlock (7 fields)
+
+**Purpose:** Customer classification, sales tracking, and business intelligence
+
+```javascript
+// OnSite 7 Field Names
+CustomerServiceRep    // Assigned sales representative
+CustomerType          // NEW in OnSite 7 - Customer classification
+CustomerSource        // NEW in OnSite 7 - Lead source
+ReferenceFrom         // NEW in OnSite 7 - Referral source
+SICCode               // NEW in OnSite 7 - Standard Industrial Classification code
+SICDescription        // NEW in OnSite 7 - SIC code description
+n_EmployeeCount       // NEW in OnSite 7 - Company size (employee count)
+```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `CustomerServiceRep` | Salesperson | **Renamed** in OnSite 7 |
+| `CustomerType` | *(NEW)* | **New in OnSite 7** - Customer classification |
+| `CustomerSource` | *(NEW)* | **New in OnSite 7** - Lead source tracking |
+| `ReferenceFrom` | *(NEW)* | **New in OnSite 7** - Referral tracking |
+| `SICCode` | *(NEW)* | **New in OnSite 7** - Industry classification |
+| `SICDescription` | *(NEW)* | **New in OnSite 7** - Industry description |
+| `n_EmployeeCount` | *(NEW)* | **New in OnSite 7** - Company size indicator |
+
+**Use Cases:**
+- `CustomerServiceRep` - Assigned sales rep for this account (replaces "Salesperson")
+- `CustomerType` - "Retail", "Wholesale", "Corporate", "Government", "Nonprofit"
+- `CustomerSource` - Lead source: "Referral", "Web", "Trade Show", "Cold Call"
+- `ReferenceFrom` - Who referred this customer (tracking for commission/thank you)
+- `SICCode` - Standard Industrial Classification for industry vertical tracking
+- `n_EmployeeCount` - Company size for segmentation and targeting
+
+---
+
+#### SubBlock 6: Custom Fields SubBlock (10 fields)
+
+**Purpose:** Flexible custom data storage for customer-specific information
+
+```javascript
+// OnSite 7 Field Names (all NEW in OnSite 7)
+CustomField01         // Custom field 1
+CustomField02         // Custom field 2
+CustomField03         // Custom field 3
+CustomField04         // Custom field 4
+CustomField05         // Custom field 5
+CustomField06         // Custom field 6
+CustomField07         // Custom field 7
+CustomField08         // Custom field 8
+CustomField09         // Custom field 9
+CustomField10         // Custom field 10
+```
+
+**OnSite 6.1 → OnSite 7 Field Mapping:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `CustomField01` - `CustomField10` | *(NEW)* | **All new in OnSite 7** - Flexible data storage |
+
+**Use Cases:**
+- Store customer-specific data that doesn't fit standard fields
+- Examples: PO requirements, special instructions, account numbers, preferences
+- Customizable labels in ShopWorks for each field
+- Can be used for: Delivery instructions, special handling notes, internal notes
+
+---
+
+#### Complete Implementation Example
+
+**Full Customer Block with All SubBlocks:**
+
+```javascript
+// Customer Block - Complete implementation
 edp += '---- Start Customer ----\n';
+
+// ===== SubBlock 1: Details =====
+edp += `ExtCustomerID>> ${quoteData.ExtCustomerID || ''}\n`;
 edp += `id_Customer>> ${this.config.customerId}\n`;
 edp += `Company>> ${quoteData.CompanyName || ''}\n`;
-edp += `ContactName>> ${quoteData.CustomerName || ''}\n`;
-edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
-edp += `Phone>> ${quoteData.Phone || ''}\n`;
-edp += `Address1>> ${quoteData.ShippingAddress || ''}\n`;
-edp += `City>> ${quoteData.ShippingCity || ''}\n`;
-edp += `State>> ${quoteData.ShippingState || ''}\n`;
-edp += `Zip>> ${quoteData.ShippingZip || ''}\n`;
+edp += `id_CompanyLocation>> ${quoteData.CompanyLocation || ''}\n`;
+edp += `Terms>> ${quoteData.PaymentTerms || 'Net 30'}\n`;
+edp += `WebsiteURL>> ${quoteData.WebsiteURL || ''}\n`;
+edp += `EmailMain>> ${quoteData.CustomerEmail || ''}\n`;
+
+// ===== SubBlock 2: Address =====
+edp += `AddressDescription>> ${quoteData.AddressDescription || 'Billing'}\n`;
+edp += `AddressCompany>> ${quoteData.CompanyName || ''}\n`;
+edp += `Address1>> ${quoteData.BillingAddress1 || ''}\n`;
+edp += `Address2>> ${quoteData.BillingAddress2 || ''}\n`;
+edp += `AddressCity>> ${quoteData.BillingCity || ''}\n`;
+edp += `AddressState>> ${quoteData.BillingState || ''}\n`;
+edp += `AddressZip>> ${quoteData.BillingZip || ''}\n`;
+edp += `AddressCountry>> ${quoteData.BillingCountry || 'USA'}\n`;
+
+// ===== SubBlock 3: Sales Tax =====
+edp += `sts_ApplySalesTax01>> ${quoteData.ApplySalesTax ? 'Yes' : 'No'}\n`;
+edp += `sts_ApplySalesTax02>> No\n`;
+edp += `sts_ApplySalesTax03>> No\n`;
+edp += `sts_ApplySalesTax04>> No\n`;
+edp += `coa_AccountSalesTax01>> ${quoteData.SalesTaxAccount || ''}\n`;
+edp += `coa_AccountSalesTax02>> \n`;
+edp += `coa_AccountSalesTax03>> \n`;
+edp += `coa_AccountSalesTax04>> \n`;
+edp += `sts_ShippingTaxable>> ${quoteData.ShippingTaxable ? 'Yes' : 'No'}\n`;
+edp += `TaxExemptNumber>> ${quoteData.TaxExemptNumber || ''}\n`;
+
+// ===== SubBlock 4: Price Calculator =====
+edp += `id_DiscountLevel>> ${quoteData.DiscountLevel || ''}\n`;
+edp += `id_DefaultCalculator1>> ${quoteData.DefaultCalculator || ''}\n`;
+edp += `id_DefaultCalculator2>> \n`;
+
+// ===== SubBlock 5: Profile =====
+edp += `CustomerServiceRep>> ${quoteData.SalesRep || ''}\n`;
+edp += `CustomerType>> ${quoteData.CustomerType || ''}\n`;
+edp += `CustomerSource>> ${quoteData.CustomerSource || ''}\n`;
+edp += `ReferenceFrom>> ${quoteData.ReferenceFrom || ''}\n`;
+edp += `SICCode>> ${quoteData.SICCode || ''}\n`;
+edp += `SICDescription>> ${quoteData.SICDescription || ''}\n`;
+edp += `n_EmployeeCount>> ${quoteData.EmployeeCount || ''}\n`;
+
+// ===== SubBlock 6: Custom Fields =====
+edp += `CustomField01>> ${quoteData.CustomField01 || ''}\n`;
+edp += `CustomField02>> ${quoteData.CustomField02 || ''}\n`;
+edp += `CustomField03>> ${quoteData.CustomField03 || ''}\n`;
+edp += `CustomField04>> ${quoteData.CustomField04 || ''}\n`;
+edp += `CustomField05>> ${quoteData.CustomField05 || ''}\n`;
+edp += `CustomField06>> ${quoteData.CustomField06 || ''}\n`;
+edp += `CustomField07>> ${quoteData.CustomField07 || ''}\n`;
+edp += `CustomField08>> ${quoteData.CustomField08 || ''}\n`;
+edp += `CustomField09>> ${quoteData.CustomField09 || ''}\n`;
+edp += `CustomField10>> ${quoteData.CustomField10 || ''}\n`;
+
 edp += '---- End Customer ----\n\n';
 ```
 
-#### Medium Priority - Optional Enhancement (12 fields)
+---
+
+#### Quote Builder Integration Example
+
+**Collect comprehensive customer data in quote builder forms:**
+
 ```javascript
-// Additional Contact
-Address2             // Suite/unit
-Country              // Country name
-ContactTitle         // Job title
-Fax                  // Fax number
-Website              // Company website
-TaxID                // Tax ID number
+// Build complete customer data object
+const quoteData = {
+    // SubBlock 1: Details
+    ExtCustomerID: document.getElementById('ext-customer-id')?.value || '',
+    CompanyName: document.getElementById('company-name')?.value || '',
+    CompanyLocation: document.getElementById('company-location')?.value || '',
+    PaymentTerms: document.getElementById('payment-terms')?.value || 'Net 30',
+    WebsiteURL: document.getElementById('website-url')?.value || '',
+    CustomerEmail: document.getElementById('customer-email')?.value || '',
 
-// Communication Preferences
-EmailArt             // Art department email
-EmailBilling         // Billing department email
-EmailOrders          // Order notifications email
-EmailShipping        // Shipping notifications email
+    // SubBlock 2: Address
+    AddressDescription: document.getElementById('address-description')?.value || 'Billing',
+    BillingAddress1: document.getElementById('billing-address-1')?.value || '',
+    BillingAddress2: document.getElementById('billing-address-2')?.value || '',
+    BillingCity: document.getElementById('billing-city')?.value || '',
+    BillingState: document.getElementById('billing-state')?.value || '',
+    BillingZip: document.getElementById('billing-zip')?.value || '',
+    BillingCountry: document.getElementById('billing-country')?.value || 'USA',
 
-// Account Settings
-AccountNumber        // Customer account number
-PriceLevel           // Price tier/level
+    // SubBlock 3: Sales Tax
+    ApplySalesTax: document.getElementById('apply-sales-tax')?.checked || false,
+    ShippingTaxable: document.getElementById('shipping-taxable')?.checked || false,
+    TaxExemptNumber: document.getElementById('tax-exempt-number')?.value || '',
+    SalesTaxAccount: document.getElementById('sales-tax-account')?.value || '',
+
+    // SubBlock 4: Price Calculator
+    DiscountLevel: document.getElementById('discount-level')?.value || '',
+    DefaultCalculator: document.getElementById('default-calculator')?.value || '',
+
+    // SubBlock 5: Profile
+    SalesRep: document.getElementById('sales-rep')?.value || '',
+    CustomerType: document.getElementById('customer-type')?.value || '',
+    CustomerSource: document.getElementById('customer-source')?.value || '',
+    ReferenceFrom: document.getElementById('reference-from')?.value || '',
+    SICCode: document.getElementById('sic-code')?.value || '',
+    SICDescription: document.getElementById('sic-description')?.value || '',
+    EmployeeCount: document.getElementById('employee-count')?.value || '',
+
+    // SubBlock 6: Custom Fields
+    CustomField01: document.getElementById('custom-field-01')?.value || '',
+    CustomField02: document.getElementById('custom-field-02')?.value || ''
+    // ... additional custom fields as needed
+};
 ```
 
-#### Low Priority - Advanced Features (10 fields)
-```javascript
-// Sales Territory
-SalesRep             // Sales representative name
-Territory            // Sales territory
-Channel              // Sales channel
+---
 
-// Account Status
-CreditLimit          // Credit limit amount
-CreditStatus         // Credit standing
-Terms                // Payment terms
+#### Recommended Implementation Phases
 
-// System
-ExtCustomerID        // External system customer ID
-CustomerGroup        // Customer grouping
-IsActive             // Active status
-DateAdded            // Account creation date
-```
+**Phase 1: Essential Fields (Immediate)**
+- Details SubBlock: `Company`, `Terms`, `EmailMain`
+- Address SubBlock: All 8 fields
+- Profile SubBlock: `CustomerServiceRep`
+
+**Phase 2: Enhanced Features (Week 1-2)**
+- Sales Tax SubBlock: `sts_ApplySalesTax01`, `TaxExemptNumber`, `sts_ShippingTaxable`
+- Profile SubBlock: `CustomerType`, `CustomerSource`
+- Details SubBlock: `WebsiteURL`
+
+**Phase 3: Advanced Features (Future)**
+- Price Calculator SubBlock: All 3 fields
+- Sales Tax SubBlock: Multiple tax jurisdictions (02-04)
+- Profile SubBlock: `SICCode`, `SICDescription`, `n_EmployeeCount`
+- Custom Fields SubBlock: As needed for specific use cases
 
 ### Contact Block Fields
 
-**Status: NOT IMPLEMENTED - UNUSED BLOCK**
+**Status: NOT IMPLEMENTED - READY FOR IMPLEMENTATION**
 
-#### High Priority - Consider Adding (8 fields)
+**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
+
+**Documentation Source:** ShopWorks OnSite 7 field mapping specification
+
+#### OnSite 7 Contact Block Fields (10 fields)
+
 ```javascript
-// Contact Information
-id_Customer          // Links to Customer block
-ContactName          // Full name
-ContactTitle         // Job title
-Email                // Email address
-Phone                // Phone number
-PhoneExt             // Extension
-Mobile               // Mobile number
+// Contact Information (OnSite 7 field names)
+id_Customer          // Links to Customer block (required)
+NameFirst            // Contact first name
+NameLast             // Contact last name
+Department           // NEW in OnSite 7 - Department/division
+Title                // Job title
+Phone                // Primary phone number
 Fax                  // Fax number
+Email                // Email address
+
+// Contact Preferences (boolean fields)
+sts_EnableBulkEmail  // "? Receive Email" - opt-in for bulk emails (Yes/No)
+sts_Contact_Add      // "? Add Contact" - flag to add contact (Yes/No)
 ```
 
-**Use Case:** Multiple contacts per customer (purchasing, receiving, accounts payable)
+#### OnSite 6.1 → OnSite 7 Field Mapping
+
+| OnSite 7 Field Name | OnSite 6.1 Field Name | Notes |
+|---------------------|----------------------|-------|
+| `NameFirst` | Contact First Name | Standard field |
+| `NameLast` | Contact Last Name | Standard field |
+| `Department` | *(NEW - no equivalent)* | **New in OnSite 7** |
+| `Title` | Contact Title | Standard field |
+| `Phone` | Contact Phone | Standard field |
+| *(deprecated)* | Secondary_Phone | **Removed in OnSite 7** |
+| `Fax` | Contact Fax | Standard field |
+| `Email` | Contact Email | Standard field |
+| `sts_EnableBulkEmail` | ? Receive Email | Boolean/checkbox field |
+| `sts_Contact_Add` | ? Add Contact | Boolean/checkbox field |
+
+**Field Naming Notes:**
+- **`?` prefix in OnSite 6.1**: Indicates checkbox/boolean fields
+- **`sts_` prefix in OnSite 7**: Standard prefix for status/boolean fields
+- **Department**: New field in OnSite 7 for organizational structure
+- **Secondary_Phone**: Existed in OnSite 6.1 but deprecated in OnSite 7
+
+**Use Case:** Multiple contacts per customer (purchasing, receiving, accounts payable, production coordination)
 
 **Implementation Example:**
 ```javascript
 // Add Contact Block after Customer Block:
 edp += '---- Start Contact ----\n';
 edp += `id_Customer>> ${this.config.customerId}\n`;
-edp += `ContactName>> ${quoteData.ContactName || quoteData.CustomerName}\n`;
-edp += `ContactTitle>> ${quoteData.ContactTitle || ''}\n`;
-edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
+edp += `NameFirst>> ${quoteData.ContactFirstName || ''}\n`;
+edp += `NameLast>> ${quoteData.ContactLastName || ''}\n`;
+edp += `Department>> ${quoteData.ContactDepartment || ''}\n`;  // NEW in OnSite 7
+edp += `Title>> ${quoteData.ContactTitle || ''}\n`;
 edp += `Phone>> ${quoteData.Phone || ''}\n`;
+edp += `Fax>> ${quoteData.ContactFax || ''}\n`;
+edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
+edp += `sts_EnableBulkEmail>> ${quoteData.ReceiveEmail ? 'Yes' : 'No'}\n`;
+edp += `sts_Contact_Add>> Yes\n`;  // Default to Yes for new contacts
 edp += '---- End Contact ----\n\n';
+```
+
+**Quote Builder Integration:**
+```javascript
+// Collect contact information in quote builder form:
+const quoteData = {
+    // ... other fields
+    ContactFirstName: document.getElementById('contact-first-name')?.value || '',
+    ContactLastName: document.getElementById('contact-last-name')?.value || '',
+    ContactDepartment: document.getElementById('contact-department')?.value || '',
+    ContactTitle: document.getElementById('contact-title')?.value || '',
+    Phone: document.getElementById('customer-phone')?.value || '',
+    ContactFax: document.getElementById('contact-fax')?.value || '',
+    CustomerEmail: document.getElementById('customer-email')?.value || '',
+    ReceiveEmail: document.getElementById('receive-email')?.checked || false
+};
 ```
 
 ### Design Block Fields
 
-**Status: NOT IMPLEMENTED - UNUSED BLOCK (HIGH VALUE FOR SCREEN PRINT)**
+**Status: NOT IMPLEMENTED - HIGH VALUE FOR SCREEN PRINT WORKFLOW**
 
-#### High Priority - Screen Print Designs (10+ fields)
+**🎨 Purpose:** Track artwork specifications, color counts, and design details for production. Critical for screen print and embroidery workflows to ensure accurate design reproduction.
+
+---
+
+#### OnSite 7 Field Specifications (11 Fields in 3 SubBlocks)
+
+##### SubBlock 1: Design (4 Fields)
+
+| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
+|---------------------|----------------------|------|---------|
+| `ExtDesignID` | `ExtDesignID` | String | External design identifier |
+| `id_Design` | `# Design` | Number | Internal ShopWorks design ID |
+| `id_DesignType` | `# Design Type` | Number | Design type code (1=Screen Print, 2=Embroidery, etc.) |
+| `DesignName` | `Design Title` | String | Design name/description |
+
+**All 4 fields existed in OnSite 6.1** (field names changed but functionality same)
+
+##### SubBlock 2: Location (5 Fields)
+
+| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
+|---------------------|----------------------|------|---------|
+| `Location` | `Location` | String | Print/embroidery location on garment |
+| `ColorsTotal` | `N` | Number | Total number of colors in design |
+| `FlashesTotal` | *(NEW in OnSite 7)* | Number | Total number of flashes (underbase/specialty) |
+| `StitchesTotal` | `# Stitches` | Number | Total stitch count (embroidery) |
+| `DesignCode` | `# Design Code` | String | Internal design code reference |
+
+**1 NEW field in OnSite 7:** `FlashesTotal` - Critical for screen print flash/underbase tracking
+
+##### SubBlock 3: Color (2 Fields - Repeatable)
+
+| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
+|---------------------|----------------------|------|---------|
+| `Color` | `Color` | String | Individual color name |
+| `Map` | `Map` | String | Color mapping/matching reference |
+
+**Both fields existed in OnSite 6.1** (repeat these fields for EACH color in the design)
+
+---
+
+#### EDP Design Block Implementation Example
+
 ```javascript
-// Design Identification
-DesignNumber         // Unique design identifier
-DesignName           // Design description
-DesignNotes          // Design instructions
+// Complete Design Block with all 3 SubBlocks
+// NOTE: Can have MULTIPLE Design Blocks per order (one per location/design)
 
-// Art Files
-ArtworkFilename      // Primary artwork file
-ArtworkLocation      // File path or URL
-VectorFile           // Vector artwork file
-ProofFile            // Proof image file
-
-// Colors and Specs
-Colors               // Number of colors
-ColorList            // Comma-separated color names
-StitchCount          // For embroidery (if applicable)
-
-// Status
-DesignStatus         // "Approved", "Pending", "Revision"
-ArtProofSent         // Date proof was sent
-ArtProofApproved     // Date proof was approved
-```
-
-**Use Case:** Track artwork and design approvals per order
-
-**Implementation Example:**
-```javascript
-// Add Design Block after Customer/Contact Blocks:
 edp += '---- Start Design ----\n';
-edp += `DesignNumber>> SP-${quoteData.QuoteID}\n`;
-edp += `DesignName>> ${quoteData.DesignName || 'Screen Print Design'}\n`;
-edp += `Colors>> ${quoteData.TotalColors || 0}\n`;
 
-// Build color list from setup breakdown
-const colorList = [];
-Object.entries(quoteData.SetupBreakdown || {}).forEach(([location, details]) => {
-    const locationName = this.getLocationName(location);
-    const inkColors = details.colors - (quoteData.isDarkGarment ? 1 : 0);
-    colorList.push(`${locationName}: ${inkColors} colors`);
-});
-edp += `ColorList>> ${colorList.join(', ')}\n`;
+// ===== SubBlock 1: Design =====
+edp += `ExtDesignID>> SP-DESIGN-${quoteData.QuoteID}-FRONT\n`;
+edp += `id_Design>> \n`;  // Leave blank for new designs (ShopWorks assigns)
+edp += `id_DesignType>> 1\n`;  // 1=Screen Print, 2=Embroidery
+edp += `DesignName>> ${quoteData.CompanyName || 'Customer'} - Front Logo\n`;
 
-edp += `DesignNotes>> ${this.generateArtNotes(quoteData)}\n`;
-edp += `DesignStatus>> Pending\n`;
+// ===== SubBlock 2: Location =====
+edp += `Location>> Front\n`;
+edp += `ColorsTotal>> 4\n`;  // Total ink colors
+edp += `FlashesTotal>> 1\n`;  // Underbase flash count
+edp += `StitchesTotal>> 0\n`;  // 0 for screen print
+edp += `DesignCode>> SP-${quoteData.QuoteID}\n`;
+
+// ===== SubBlock 3: Color (repeat for each color) =====
+edp += `Color>> White (Underbase)\n`;
+edp += `Map>> Pantone White\n`;
+
+edp += `Color>> PMS 185 Red\n`;
+edp += `Map>> Pantone 185\n`;
+
+edp += `Color>> PMS 286 Blue\n`;
+edp += `Map>> Pantone 286\n`;
+
+edp += `Color>> Black\n`;
+edp += `Map>> Pantone Black\n`;
+
+edp += '---- End Design ----\n\n';
+
+// For multi-location orders, add additional Design Blocks:
+edp += '---- Start Design ----\n';
+edp += `ExtDesignID>> SP-DESIGN-${quoteData.QuoteID}-BACK\n`;
+edp += `id_DesignType>> 1\n`;
+edp += `DesignName>> ${quoteData.CompanyName || 'Customer'} - Back Design\n`;
+edp += `Location>> Full Back\n`;
+edp += `ColorsTotal>> 2\n`;
+edp += `FlashesTotal>> 0\n`;  // No underbase needed
+// ... (repeat Color SubBlock for back design colors)
 edp += '---- End Design ----\n\n';
 ```
 
-#### Medium Priority - Advanced Design Features (5 fields)
+---
+
+#### Use Cases for Design Block
+
+##### Screen Print Workflow
+
+**Primary Use Cases:**
+1. **Color Specification** - Track exact ink colors per location
+2. **Flash Tracking** - Record underbase and specialty flashes for production
+3. **Multi-Location Designs** - Separate Design Block for front, back, sleeves, etc.
+4. **Art File Reference** - Link EDP to artwork files via `ExtDesignID`
+
+**Example: 4-Color Front + 2-Color Back**
+- Design Block 1: Front - 4 colors (3 + underbase), 1 flash
+- Design Block 2: Back - 2 colors, 0 flashes
+
+##### Embroidery Workflow
+
+**Primary Use Cases:**
+1. **Stitch Count Tracking** - Record total stitches for pricing verification
+2. **Thread Colors** - Document each thread color via Color SubBlock
+3. **Logo Placement** - Location field specifies exact placement
+4. **Digitization Reference** - Link to digitized design files
+
+**Example: Left Chest Logo**
+- Design Block: Left Chest - 8,500 stitches, 4 thread colors
+
+##### DTG Workflow
+
+**Primary Use Cases:**
+1. **Design Identification** - Reference artwork files
+2. **Location Tracking** - Full front, full back, etc.
+3. **Minimal Color Info** - DTG is full-color, so Color SubBlock often skipped
+
+**Example: Full Front Photo**
+- Design Block: Full Front - Design name references file, no color breakdown needed
+
+---
+
+#### Method-Specific Implementation Patterns
+
+##### Screen Print Quote Builder Integration
+
 ```javascript
-// Design Management
-Designer             // Artist/designer name
-DateDesigned         // Design creation date
-RevisionNumber       // Design version
-OriginalDesignID     // Links to original design for revisions
-DesignCategory       // Design type/category
+// Extract design info from existing screen print quote data
+function generateDesignBlocks(quoteData) {
+    const edpDesigns = [];
+
+    // Iterate through each print location in the quote
+    Object.entries(quoteData.SetupBreakdown || {}).forEach(([locationCode, setupDetails]) => {
+        const locationName = getLocationName(locationCode);  // "Front", "Back", etc.
+
+        // Calculate colors and flashes
+        const totalColors = setupDetails.colors;
+        const hasUnderbase = quoteData.isDarkGarment && setupDetails.needsUnderbase;
+        const flashCount = hasUnderbase ? 1 : 0;
+        const inkColors = totalColors - (hasUnderbase ? 1 : 0);
+
+        // Build Design Block
+        let designEDP = '---- Start Design ----\n';
+        designEDP += `ExtDesignID>> SP-${quoteData.QuoteID}-${locationCode}\n`;
+        designEDP += `id_DesignType>> 1\n`;  // Screen Print
+        designEDP += `DesignName>> ${quoteData.CompanyName} - ${locationName}\n`;
+        designEDP += `Location>> ${locationName}\n`;
+        designEDP += `ColorsTotal>> ${totalColors}\n`;
+        designEDP += `FlashesTotal>> ${flashCount}\n`;
+        designEDP += `StitchesTotal>> 0\n`;
+        designEDP += `DesignCode>> SP-${quoteData.QuoteID}\n`;
+
+        // Add color details if available
+        if (hasUnderbase) {
+            designEDP += `Color>> White Underbase\n`;
+            designEDP += `Map>> \n`;
+        }
+
+        designEDP += '---- End Design ----\n\n';
+        edpDesigns.push(designEDP);
+    });
+
+    return edpDesigns.join('');
+}
 ```
+
+##### Embroidery Quote Builder Integration
+
+```javascript
+// Extract design info from embroidery quote
+function generateEmbroideryDesign(quoteData) {
+    let edp = '---- Start Design ----\n';
+
+    edp += `ExtDesignID>> EMB-${quoteData.QuoteID}\n`;
+    edp += `id_DesignType>> 2\n`;  // Embroidery
+    edp += `DesignName>> ${quoteData.DesignName || 'Embroidered Logo'}\n`;
+    edp += `Location>> ${quoteData.Location || 'Left Chest'}\n`;
+    edp += `ColorsTotal>> ${quoteData.ThreadColors || 0}\n`;
+    edp += `FlashesTotal>> 0\n`;  // N/A for embroidery
+    edp += `StitchesTotal>> ${quoteData.StitchCount || 0}\n`;
+    edp += `DesignCode>> EMB-${quoteData.QuoteID}\n`;
+
+    // Add thread colors if specified
+    if (quoteData.ThreadColorList) {
+        quoteData.ThreadColorList.forEach(threadColor => {
+            edp += `Color>> ${threadColor.name}\n`;
+            edp += `Map>> ${threadColor.code || ''}\n`;
+        });
+    }
+
+    edp += '---- End Design ----\n\n';
+    return edp;
+}
+```
+
+---
+
+#### What Changes vs. What Stays the Same (Across Quote Builders)
+
+**Same Design Block Structure for ALL Quote Builders:**
+- ✅ Screen Print Quote Builder
+- ✅ DTG Quote Builder
+- ✅ Embroidery Quote Builder
+- ✅ Cap Embroidery Quote Builder
+- ✅ All future quote builders
+
+**What's Identical:**
+- All 11 field names and 3 SubBlock structure
+- EDP Block delimiters (`---- Start Design ----` / `---- End Design ----`)
+- Field format and data types
+- Multiple Design Block pattern for multi-location orders
+
+**What Varies by Quote Builder:**
+
+| Field | Screen Print | Embroidery | DTG |
+|-------|-------------|------------|-----|
+| `id_DesignType` | 1 | 2 | (TBD) |
+| `ColorsTotal` | Ink colors (3-6 typical) | Thread colors (1-15) | Often skipped |
+| `FlashesTotal` | 0-2 (underbase/specialty) | 0 (N/A) | 0 (N/A) |
+| `StitchesTotal` | 0 (N/A) | 5,000-15,000 typical | 0 (N/A) |
+| `Color` SubBlock | Ink color names | Thread color names | Often skipped |
+
+---
+
+#### Design Type IDs Reference
+
+| ID | Design Type | Used By |
+|----|-------------|---------|
+| 1 | Screen Print | Screen Print Quote Builder |
+| 2 | Embroidery | Embroidery & Cap Quote Builders |
+| 3 | Vinyl/Heat Transfer | DTF Quote Builder |
+| 4 | Direct-to-Garment | DTG Quote Builder |
+| 5 | Sublimation | Future builders |
+
+**Note:** Confirm these ID values with your ShopWorks configuration as they may vary by setup.
+
+---
+
+#### Multi-Location Design Pattern
+
+**Critical Pattern:** When an order has designs in multiple locations (Front + Back, Chest + Sleeve, etc.), create **separate Design Blocks** for each location:
+
+```javascript
+// Order with Front AND Back designs:
+
+// Design Block #1 - Front
+edp += '---- Start Design ----\n';
+edp += `ExtDesignID>> SP-${quoteID}-FRONT\n`;
+edp += `Location>> Front\n`;
+edp += `ColorsTotal>> 4\n`;
+// ... front design details
+edp += '---- End Design ----\n\n';
+
+// Design Block #2 - Back
+edp += '---- Start Design ----\n';
+edp += `ExtDesignID>> SP-${quoteID}-BACK\n`;
+edp += `Location>> Full Back\n`;
+edp += `ColorsTotal>> 2\n`;
+// ... back design details
+edp += '---- End Design ----\n\n';
+```
+
+**Why Multiple Blocks?**
+- Each location may have different color counts
+- Different flash requirements per location
+- Separate artwork files per location
+- Individual production tracking per design
+
+---
+
+#### Color SubBlock Best Practices
+
+**When to Use Color SubBlock:**
+1. **Screen Print:** List each ink color (including underbase)
+2. **Embroidery:** List each thread color with color codes
+3. **DTG:** Usually skip (full-color process)
+
+**How to Populate:**
+```javascript
+// Screen Print Example - Extract from setup breakdown
+const colors = [
+    { name: 'White Underbase', map: 'Pantone White' },
+    { name: 'Red', map: 'PMS 185' },
+    { name: 'Blue', map: 'PMS 286' },
+    { name: 'Black', map: 'Pantone Black' }
+];
+
+colors.forEach(colorInfo => {
+    edp += `Color>> ${colorInfo.name}\n`;
+    edp += `Map>> ${colorInfo.map}\n`;
+});
+
+// Embroidery Example - From thread specifications
+const threads = [
+    { name: 'Navy Blue', map: 'Isacord 3554' },
+    { name: 'White', map: 'Isacord 0015' },
+    { name: 'Red', map: 'Isacord 1902' }
+];
+
+threads.forEach(thread => {
+    edp += `Color>> ${thread.name}\n`;
+    edp += `Map>> ${thread.map}\n`;
+});
+```
+
+---
+
+#### Important Implementation Notes
+
+1. **Design Block is OPTIONAL** - Not required for basic order import, but highly valuable for production workflow
+
+2. **Multiple Designs per Order** - Add as many Design Blocks as needed (one per location/design)
+
+3. **External Design ID Pattern** - Use consistent naming: `[METHOD]-[QUOTEID]-[LOCATION]`
+   - Example: `SP-0127-1-FRONT`, `EMB-0127-2-LEFTCHEST`
+
+4. **Leave `id_Design` Blank** - For new designs, ShopWorks will auto-assign the internal ID on import
+
+5. **Flash Count Calculation** - For screen print:
+   - Dark garments with underbase: Usually 1 flash
+   - Safety stripes (reflective): May add 1+ flashes
+   - Specialty inks: May require additional flashes
+
+6. **Stitch Count Sources** - For embroidery:
+   - From pricing tier selection (5K, 10K, etc.)
+   - From digitizer's stitch count report
+   - From design file metadata
+
+7. **Color Mapping** - The `Map` field links to:
+   - Pantone color matching system (screen print)
+   - Thread manufacturer codes (embroidery)
+   - Color swatch libraries (general reference)
+
+---
+
+#### Benefits of Implementing Design Block
+
+**For Production Team:**
+- ✅ Exact color specifications (no guessing)
+- ✅ Flash requirements clearly documented
+- ✅ Stitch counts for time estimation
+- ✅ Design file references for artwork retrieval
+
+**For Art Department:**
+- ✅ Track which designs are approved
+- ✅ Link artwork files to orders
+- ✅ Color matching specifications
+- ✅ Design revision history
+
+**For Quality Control:**
+- ✅ Verify color accuracy against specs
+- ✅ Confirm flash/underbase application
+- ✅ Check stitch density
+- ✅ Match finished product to design intent
+
+**For Workflow Automation:**
+- ✅ Auto-route orders based on design complexity
+- ✅ Calculate production time from stitch counts
+- ✅ Alert when design approval pending
+- ✅ Track design reuse across orders
+
+---
+
+#### Additional Notes
+
+**Current Status:** Design Block fields are documented but not implemented. Orders currently import without design specifications.
+
+**Future Implementation Priority:** HIGH VALUE for screen print workflow improvement. Consider implementing after Contact and Customer blocks.
+
+**Related Systems:**
+- Art approval workflow
+- Design file management
+- Color matching systems
+- Production scheduling
 
 ### Product Block Fields
 
@@ -2183,7 +3285,7 @@ cur_UnitPriceUserEntered  // Final unit price
 cur_UnitCost              // Cost (set to 0.00 for quotes)
 
 // Instructions
-OrderInstructions    // (empty but required)
+OrderInstructions    // Print locations and colors (NEW in OnSite 7)
 
 // Size Matrix (ALL 6 REQUIRED)
 Size01_Req           // S column
@@ -2232,54 +3334,264 @@ sts_Invoicing_Invoice
 
 ### Payment Block Fields
 
-**Status: NOT IMPLEMENTED - UNUSED BLOCK**
+**Status: NOT IMPLEMENTED - FUTURE STRIPE INTEGRATION PLANNED**
 
-#### High Priority - Payment Tracking (5 fields)
-```javascript
-// Payment Information
-PaymentMethod        // "Credit Card", "Check", "Net 30", etc.
-PaymentAmount        // Payment amount
-PaymentDate          // Date payment received
-PaymentReference     // Check number, transaction ID
-PaymentStatus        // "Pending", "Received", "Cleared"
+**🚀 Future Goal:** Enable customers to pay for quotes online via Stripe.com, with secure payment tracking in ShopWorks EDP.
+
+---
+
+#### OnSite 7 Field Specifications (8 Fields)
+
+| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose | Security Level |
+|---------------------|----------------------|------|---------|----------------|
+| `date_Payment` | *(NEW in OnSite 7)* | Date | Payment date | ✅ Safe |
+| `cur_Payment` | *(NEW in OnSite 7)* | Currency | Payment amount | ✅ Safe |
+| `PaymentType` | *(NEW in OnSite 7)* | String | Payment method | ✅ Safe |
+| `PaymentNumber` | *(NEW in OnSite 7)* | String | Transaction reference | ✅ Safe (Stripe Charge ID) |
+| `Card_Name_First` | *(NEW in OnSite 7)* | String | Cardholder first name | ⚠️ PII but not PCI |
+| `Card_Name_Last` | *(NEW in OnSite 7)* | String | Cardholder last name | ⚠️ PII but not PCI |
+| `Card_Exp_Date` | *(NEW in OnSite 7)* | String | Card expiration | 🚫 **LEAVE BLANK - PCI SENSITIVE** |
+| `Notes` | *(NEW in OnSite 7)* | Text | Payment notes | ✅ Safe (non-sensitive details) |
+
+**Important:** All 8 fields are NEW in OnSite 7. Payment Block was not available in OnSite 6.1.
+
+---
+
+#### 🔒 Critical Security Principle for Payment Integration
+
+**NEVER store sensitive credit card data in your database or EDP files.**
+
+✅ **What Stripe Handles (PCI Compliant Storage):**
+- Full credit card numbers
+- CVV/CVC security codes
+- Card expiration dates
+- Card PINs
+
+✅ **What's SAFE to Store in EDP:**
+- Stripe Charge ID (e.g., `ch_3ABC123xyz`) in `PaymentNumber` field
+- Payment amount and date
+- Cardholder name (from billing info)
+- Last 4 digits of card (Stripe provides this)
+- Card brand (Visa, Mastercard, etc.)
+
+🚫 **What to NEVER Store:**
+- Full card number
+- CVV/CVC code
+- Card expiration date (even though OnSite 7 has `Card_Exp_Date` field - LEAVE IT BLANK)
+
+---
+
+#### 🚀 Future: Stripe Payment Integration Architecture
+
+**Overview:** When ready to implement, this architecture enables customers to pay for quotes (Screen Print, DTG, Embroidery, Cap) online with credit cards via Stripe, with payment transactions automatically recorded in ShopWorks.
+
+**Core Workflow:**
+
+```
+1. Customer Reviews Quote → Sees total: $550.00
+
+2. Customer Clicks "Pay with Credit Card" → Redirects to Stripe Checkout (Stripe-hosted, PCI compliant)
+
+3. Customer Enters Card Details → Stripe securely processes payment
+   - NWCA never sees or stores card details
+   - Stripe returns Charge ID: ch_3ABC123xyz
+
+4. Stripe Webhook Notification → Triggers EDP Payment Block generation
+   - Payment date: 01/27/2025
+   - Payment amount: $550.00
+   - Stripe Charge ID: ch_3ABC123xyz
+   - Card: Visa ****4242 (last 4 digits only)
+
+5. EDP Auto-Generated → Payment Block ready for ShopWorks import
+
+6. Quote Marked as "Paid" → Database updated, accounting notified
+
+7. ShopWorks Import → Payment recorded with Stripe reference
 ```
 
-**Use Case:** Track deposit payments for large orders
+**Key Benefits:**
+- ✅ PCI DSS Level 1 Compliance (Stripe certified)
+- ✅ Fraud detection with Stripe Radar
+- ✅ 3D Secure for international cards
+- ✅ Refund capability via Charge ID (no card details needed)
+- ✅ Customer sees professional Stripe checkout
+- ✅ Automatic receipt emails from Stripe
 
-**Implementation Example:**
+---
+
+#### EDP Payment Block Implementation Example (Future)
+
 ```javascript
-// Add Payment Block after Product blocks:
+// After successful Stripe payment, generate Payment Block:
+
 edp += '---- Start Payment ----\n';
-edp += `PaymentMethod>> ${quoteData.PaymentMethod || 'Net 30'}\n`;
-edp += `PaymentStatus>> Pending\n`;
+edp += `date_Payment>> 01/27/2025\n`;
+edp += `cur_Payment>> 550.00\n`;
+edp += `PaymentType>> Stripe Credit Card\n`;
+edp += `PaymentNumber>> ch_3ABC123xyz\n`;  // Stripe Charge ID - enables refunds
+edp += `Card_Name_First>> John\n`;
+edp += `Card_Name_Last>> Smith\n`;
+edp += `Card_Exp_Date>> \n`;  // INTENTIONALLY BLANK - DO NOT STORE for security
+edp += `Notes>> Stripe payment for Quote SP0127-1. Card: Visa ****4242. Customer: john@company.com\n`;
 edp += '---- End Payment ----\n\n';
 ```
 
-#### Medium Priority - Payment Details (4 fields)
-```javascript
-// Payment Processing
-PaymentProcessor     // "Stripe", "PayPal", etc.
-AuthorizationCode    // CC authorization code
-Last4Digits          // Last 4 of card (for reference)
-TransactionID        // Processor transaction ID
-```
+**Field Usage:**
+- `date_Payment`: Use MM/DD/YYYY format (matches ShopWorks standard)
+- `cur_Payment`: Payment amount in dollars (e.g., 550.00)
+- `PaymentType`: "Stripe Credit Card" (identifies payment processor)
+- `PaymentNumber`: **Stripe Charge ID** (critical for refunds - e.g., `ch_3ABC123xyz`)
+- `Card_Name_First` / `Card_Name_Last`: From Stripe billing details
+- `Card_Exp_Date`: **LEAVE BLANK** - Never store expiration for PCI compliance
+- `Notes`: Non-sensitive details (last 4 digits, card brand, quote reference)
+
+---
+
+#### Use Cases for Stripe Payment Integration
+
+1. **Pay for Quotes** - Customer pays for Screen Print, DTG, Embroidery, or Cap quotes online
+2. **Deposit Payments** - Require 50% deposit before production on large orders
+3. **Full Payment Before Production** - For new customers or rush orders
+4. **Online Store Integration** - Future webstore customers pay at checkout
+5. **Invoice Payments** - Email payment link for outstanding invoices
+
+---
+
+#### Technical Components Needed for Implementation (When Ready)
+
+**Frontend (Quote Builders):**
+- Stripe.js library integration
+- "Pay with Credit Card" button in review phase
+- Payment success/failure handling
+- Redirect to Stripe Checkout
+
+**Backend (Heroku Proxy Server):**
+- Stripe webhook endpoint (`/api/stripe/webhook`)
+- Webhook signature verification (security)
+- EDP Payment Block generation on successful payment
+- Database update: Mark quote as "Paid"
+- Email notification to accounting with EDP text
+
+**Database Schema Updates:**
+- Add payment fields to `quote_sessions` table:
+  - `PaymentStatus` ("Unpaid", "Paid", "Refunded")
+  - `PaymentMethod` ("Stripe Credit Card", "Net 30")
+  - `StripeChargeID` (e.g., "ch_3ABC123xyz")
+  - `PaymentDate` (timestamp)
+  - `EDPPaymentGenerated` (boolean)
+
+**Stripe Account Setup:**
+- Create Stripe account at stripe.com
+- Get API keys (test and live)
+- Configure webhook endpoint
+- Set up email receipts
+- Enable fraud detection (Stripe Radar)
+
+---
+
+#### What Changes vs. What Stays the Same (Across Quote Builders)
+
+**Same Payment Block Structure for ALL Quote Builders:**
+- ✅ Screen Print Quote Builder
+- ✅ DTG Quote Builder
+- ✅ Embroidery Quote Builder
+- ✅ Cap Embroidery Quote Builder
+- ✅ All future quote builders
+
+**What's Identical:**
+- All 8 Payment Block field names
+- Security rules (never store card details)
+- Stripe Charge ID pattern
+- Date and currency formats
+- EDP Block structure
+
+**What Varies by Quote Builder:**
+- `Notes` field content: References specific quote ID (SP0127-1, DTG0127-1, etc.)
+- Payment amount: Calculated from that builder's pricing
+- Quote metadata: Stored in Stripe for reference
+
+---
+
+#### Security & Compliance Resources
+
+**PCI Compliance:**
+- Stripe is PCI DSS Level 1 certified (highest level)
+- By using Stripe Checkout, you avoid PCI compliance requirements
+- Never handle raw card data = automatic compliance
+
+**Stripe Documentation:**
+- Stripe Checkout: https://stripe.com/docs/payments/checkout
+- Webhooks: https://stripe.com/docs/webhooks
+- Security: https://stripe.com/docs/security
+
+**Best Practices:**
+- Always verify webhook signatures
+- Use HTTPS for all payment pages
+- Log payment events for auditing
+- Test in Stripe test mode before going live
+- Set up fraud detection rules in Stripe Dashboard
+
+---
+
+#### Implementation Timeline (When Ready)
+
+**Phase 1: Proof of Concept (1-2 weeks)**
+- Set up Stripe test account
+- Implement basic checkout flow for one quote builder
+- Test webhook handler
+- Generate test EDP Payment Blocks
+- Manual import into ShopWorks test environment
+
+**Phase 2: Production Rollout (2-3 weeks)**
+- Roll out to all quote builders (Screen Print, DTG, Embroidery, Cap)
+- Add payment status tracking in database
+- Create admin dashboard for paid vs. unpaid quotes
+- Implement email notifications for accounting
+- Test refund workflow
+
+**Phase 3: Advanced Features (Future)**
+- Auto-import EDP to ShopWorks (if API available)
+- Payment plans / deposit options
+- Automatic payment reminders for unpaid quotes
+- Customer payment history portal
+- Subscription billing for webstores
+
+---
+
+#### Additional Notes
+
+**Current Status:** Payment Block fields are documented but not implemented. All quotes currently use "Net 30" payment terms with manual processing.
+
+**Future Decision Points:**
+- When to require payment vs. offering terms?
+- Deposit percentage for large orders?
+- Payment deadline after quote generation?
+- Auto-decline quotes unpaid after X days?
+
+**Related Documentation:**
+- For full Stripe integration code examples, see conversation history from 2025-10-26
+- Includes complete webhook handler, service layer, and security implementation
+- Architecture supports quotes, orders, and future webstore transactions
 
 ### Implementation Priority Guide
 
 #### Immediate Value (Implement Next)
-1. **Shipping Address Fields** (Order Block) - Essential for production
+1. **Shipping Address Fields** (Order Block - Shipping SubBlock: 11 fields) - Essential for production ✅ Documented
 2. **Customer Email** (Order/Customer Block) - Order notifications
-3. **Design Block** - HIGH VALUE for screen print workflow, tracks artwork approvals
 
-#### High Value (Plan for Future)
-4. **Contact Block** - Multiple contacts per customer
-5. **Payment Block** - Track deposits and payment status
-6. **Extended Customer Info** - Complete customer profiles
+#### High Value (Ready to Implement)
+3. **Design Block (11 fields)** - HIGH VALUE for screen print workflow ✅ Documented (3 SubBlocks)
+4. **Contact Block (10 fields)** - Multiple contacts per customer ✅ Documented
+5. **Extended Customer Info** - Complete customer profiles (Customer Block SubBlocks) ✅ Documented
+6. **Extended Order Info** - Complete order details (Order Block SubBlocks) ✅ Documented
+
+#### Future Enhancements
+7. **Payment Block with Stripe Integration (8 fields)** - Online credit card payments ✅ Documented (future implementation)
 
 #### Nice to Have (Lower Priority)
-7. **Advanced Order Fields** - Workflow automation
-8. **Financial Fields** - Discounts, tax exemptions
-9. **System Integration Fields** - External system linking
+9. **Advanced Order Fields** - Workflow automation
+10. **Financial Fields** - Discounts, tax exemptions
+11. **System Integration Fields** - External system linking
 
 ### Adding New Fields - Code Template
 
@@ -2356,31 +3668,36 @@ When documenting new fields you implement:
 
 ### Complete Field Counts
 
-| Block | Implemented | Available | Completion % |
-|-------|-------------|-----------|--------------|
-| Order | 12 | ~37 | 32% |
-| Customer | 1 | ~30 | 3% |
-| Contact | 0 | ~8 | 0% |
-| Design | 0 | ~10 | 0% |
-| Product | 19 | 19 | 100% ✅ |
-| Payment | 0 | ~9 | 0% |
-| **TOTAL** | **32** | **~113** | **28%** |
+| Block | Implemented | Available | Completion % | Documentation Status |
+|-------|-------------|-----------|--------------|---------------------|
+| Order | 12 | 44 | 27% | **✅ ALL 44 fields documented** (6 SubBlocks) |
+| Customer | 1 | 44 | 2% | **✅ ALL 44 fields documented** (6 SubBlocks) |
+| Contact | 0 | 10 | 0% | **✅ ALL 10 fields documented** |
+| Design | 0 | 11 | 0% | **✅ ALL 11 fields documented** (3 SubBlocks - HIGH VALUE) |
+| Product | 19 | 19 | 100% ✅ | **✅ Complete** |
+| Payment | 0 | 8 | 0% | **✅ ALL 8 fields documented** (Future Stripe) |
+| **TOTAL** | **32** | **~146** | **22%** | **121 of ~146 fields documented (83%)** |
 
 ### Next Steps for Enhancement
 
 Consider implementing fields in this order:
 
-**Phase 1 (Immediate):**
-- Shipping address (Order Block: 6 fields)
+**Phase 1 (Immediate - Next 1-2 Weeks):**
+- **Customer Block - Details SubBlock (6 fields)** - Company info, terms, email ✅ Documented
+- **Customer Block - Address SubBlock (8 fields)** - Billing address ✅ Documented
+- **Contact Block (10 fields)** - Contact person details ✅ Documented
+- **Order Block - Shipping SubBlock (11 fields)** - Shipping address ✅ Documented
+
+**Phase 2 (High Value - Week 2-4):**
+- **Design Block (11 fields in 3 SubBlocks)** - Major workflow improvement for screen print ✅ Documented
+- **Customer Block - Sales Tax SubBlock (10 fields)** - Tax calculation ✅ Documented
+- **Customer Block - Profile SubBlock (7 fields)** - Sales rep, customer type ✅ Documented
 - Customer email (Order Block: 1 field)
 
-**Phase 2 (High Value):**
-- Design Block (10 fields) - Major workflow improvement for screen print
-- Extended customer info (Customer Block: 7 fields)
-
-**Phase 3 (Future):**
-- Contact Block (8 fields)
-- Payment Block (5 fields)
+**Phase 3 (Advanced Features - Future):**
+- **Customer Block - Price Calculator SubBlock (3 fields)** - Pricing tiers ✅ Documented
+- **Customer Block - Custom Fields SubBlock (10 fields)** - Flexible data ✅ Documented
+- **Payment Block (8 fields)** - Stripe payment integration ✅ Documented
 - Advanced order fields as needed
 
 ---
