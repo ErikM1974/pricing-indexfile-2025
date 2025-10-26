@@ -160,8 +160,15 @@ PATCH  - Embroidered Emblems
 | CASPIO_API_TEMPLATE.md | 55.3k chars | 5 files | ~20k chars |
 | CLAUDE.md | 46.9k chars | 3 files | ~25k chars |
 | MANUAL_PRICING_CALCULATOR_GUIDE.md | 41.7k chars | 4 files | ~12k chars |
+| SHOPWORKS_EDP_INTEGRATION.md | 158k chars | 8 files | ~40k chars (PRODUCT_BLOCK.md) |
 
 **Result:** All files now under 40k character threshold for optimal Claude performance ✅
+
+**Latest Optimization (2025-10-26):**
+- Split massive 158KB ShopWorks EDP file into 8 modular files
+- Core file reduced from 158KB → ~25KB (navigation hub)
+- 7 specialized files in /edp/ directory (each < 40KB)
+- **53% context reduction** when querying specific blocks
 
 ## 🔗 Related Documentation
 

@@ -1,3744 +1,591 @@
-# ShopWorks EDP Integration & Pricing Synchronization Guide
+# ShopWorks EDP Integration - Core Guide
 
 **Last Updated:** 2025-10-26
-**Purpose:** Complete guide for maintaining pricing synchronization across Quote Builder, ShopWorks Guide, and EDP import
-**Applies To:** Screen Print, DTG, Embroidery, and Cap Embroidery quote builders
+**Purpose:** Master navigation and overview for ShopWorks OnSite 7 EDP integration
+**Status:** Production-ready for Screen Print Quote Builder
 
 ---
 
-## 📋 Table of Contents
+## 📋 Quick Navigation
 
-1. [Overview & Purpose](#overview--purpose)
-2. [Three-System Architecture](#three-system-architecture)
-3. [Key Components](#key-components)
-4. [The SizesPricing Pattern](#the-sizespricing-pattern)
-5. [Problems & Solutions](#problems--solutions)
-6. [Implementation Details](#implementation-details)
-7. [Verification Checklist](#verification-checklist)
-8. [Applying to Other Quote Builders](#applying-to-other-quote-builders)
-9. [Testing & Debugging](#testing--debugging)
-10. [Reference Implementation](#reference-implementation)
-11. [CATALOG_COLOR Implementation](#catalog_color-implementation)
+### Block Documentation (Detailed Field Specifications)
+- **[Order Block](edp/ORDER_BLOCK.md)** - 44 fields in 6 SubBlocks
+- **[Customer Block](edp/CUSTOMER_BLOCK.md)** - 44 fields in 6 SubBlocks
+- **[Contact Block](edp/CONTACT_BLOCK.md)** - 10 fields (simplest block)
+- **[Design Block](edp/DESIGN_BLOCK.md)** - 11 fields in 3 SubBlocks (HIGH VALUE)
+- **[Product Block](edp/PRODUCT_BLOCK.md)** - 41 fields in 5 SubBlocks (**CRITICAL** - includes CATALOG_COLOR)
+- **[Payment Block](edp/PAYMENT_BLOCK.md)** - 8 fields (FUTURE: Stripe integration)
 
----
-
-## Overview & Purpose
-
-### What is ShopWorks EDP Integration?
-
-ShopWorks is a production management system used by NWCA for order processing. The **EDP (Electronic Data Processing)** format is a text-based import format that allows quotes to be imported directly into ShopWorks from our quote builders.
-
-### Why Pricing Synchronization is Critical
-
-When a customer quote is generated, the pricing MUST match exactly across three systems:
-
-1. **Quote Builder Order Summary** - What the customer sees
-2. **ShopWorks Data Entry Guide** - PDF given to production team
-3. **ShopWorks EDP Import** - Data imported into production system
-
-**If these don't match:**
-- Production team enters wrong prices
-- Customer gets billed incorrectly
-- Margins are calculated wrong
-- Trust is lost
-
-### The "Source of Truth" Hierarchy
-
-```
-Quote Builder Order Summary (Size & Options Breakdown)
-           ↓
-    Source of Truth
-           ↓
-    ┌──────┴──────┐
-    ↓             ↓
-ShopWorks      EDP Import
-Guide (PDF)    (Text File)
-```
-
-**The Order Summary breakdown is ALWAYS correct** - it shows exactly what pricing calculations produced. All other outputs must match this.
+### Implementation Guides
+- **[Pricing Synchronization Guide](edp/PRICING_SYNC_GUIDE.md)** - SizesPricing pattern, three-system sync
 
 ---
 
-## Three-System Architecture
+## 🎯 Overview
 
-### System 1: Quote Builder Order Summary
+### What is ShopWorks EDP?
 
-**File:** `quote-builders/screenprint-quote-builder.html` (or dtg, embroidery, cap)
+**EDP (Electronic Data Processing)** is ShopWorks' text-based format for importing quotes and orders into their OnSite 7 production management system.
 
-**Purpose:** User-facing quote generation with real-time pricing
+**Current Implementation:** Screen Print Quote Builder → ShopWorks OnSite 7
+**Future Implementation:** DTG, Embroidery, Cap quote builders
 
-**Key Features:**
-- Displays per-size pricing breakdown
-- Shows all price components (base + safety stripes + additional locations + LTM fee)
-- Provides detailed transparency to customer
+### Why EDP Integration Matters
 
-**Example Output:**
+**Problem Without EDP:**
+1. Sales rep generates quote in browser calculator
+2. **Manual re-entry** into ShopWorks (prone to errors)
+3. Pricing discrepancies between quote and production
+4. Lost time and potential errors
+
+**Solution With EDP:**
+1. Sales rep generates quote in browser calculator
+2. **One-click EDP export** (text file)
+3. Import directly into ShopWorks
+4. Pricing, products, sizes all match exactly ✅
+
+### Three-System Architecture
+
 ```
-PC54 - Heather Royal
-Size Distribution:
-S/M/L/XL: (25 total)
-$16.00 + $4.00 safety + $14.50 add'l locations + $0.89 Small Batch Fee = $35.39/pc
+┌─────────────────────────────────────────────────────────────┐
+│                    Quote Builder                            │
+│  (Browser-based calculator - what customer sees)            │
+│                                                             │
+│  Calculates pricing → Displays Order Summary               │
+│  ↓                                                          │
+│  Generates SizesPricing object (source of truth)           │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+        ┌────────────────┴────────────────┐
+        ↓                                 ↓
+┌───────────────────┐           ┌────────────────────┐
+│ ShopWorks Guide   │           │    EDP Import      │
+│ (PDF for manual   │           │ (Electronic data   │
+│  entry)           │           │  import)           │
+│                   │           │                    │
+│ Uses SizesPricing │           │ Uses SizesPricing  │
+│ for line items    │           │ for unit prices    │
+└───────────────────┘           └────────────────────┘
 ```
 
-### System 2: ShopWorks Data Entry Guide
+**Key Insight:** All three systems pull from the SAME pricing data structure (`SizesPricing`), ensuring synchronization.
 
-**Generated By:** `screenprint-shopworks-guide-generator.js`
+---
 
-**Purpose:** Printable PDF for production team data entry
+## 🏗️ EDP Block Architecture
 
-**Key Features:**
-- Line-by-line breakdown for ShopWorks
-- Setup charge (SPSU) on line 1
-- Standard sizes grouped on one line
-- Oversizes get individual lines with suffix (_2X, _3X, etc.)
+### OnSite 7 Structure
 
-**Example Output:**
+ShopWorks OnSite 7 organizes EDP data into **6 blocks**:
+
+| Block | Fields | SubBlocks | Status | Priority |
+|-------|--------|-----------|--------|----------|
+| **Order** | 44 | 6 | ✅ Partially implemented | High |
+| **Customer** | 44 | 6 | ✅ Partially implemented | High |
+| **Contact** | 10 | None | 📝 Documented | Medium |
+| **Design** | 11 | 3 | 📝 Documented | High Value |
+| **Product** | 41 | 5 | ✅ **FULLY IMPLEMENTED** | **CRITICAL** |
+| **Payment** | 8 | None | 📝 Documented | Future |
+
+**Total:** 158 fields available across all blocks
+
+**Currently Using:** ~32 fields (20% of available fields)
+
+**Implementation Status:**
+- ✅ Screen Print Quote Builder: Product Block (complete), Order Block (partial), Customer Block (partial)
+- ⏳ DTG Quote Builder: Ready to implement (same field structure)
+- ⏳ Embroidery Quote Builder: Ready to implement (same field structure)
+- ⏳ Cap Quote Builder: Ready to implement (same field structure)
+
+### SubBlock Architecture
+
+OnSite 7 uses **SubBlocks** to organize related fields within each block:
+
+**Example: Product Block SubBlocks**
+1. **Product SubBlock** (6 fields) - Core product info and pricing
+2. **Size Distribution SubBlock** (6 fields) - Quantity by size
+3. **Sales Tax Override SubBlock** (8 fields) - Tax calculations
+4. **Secondary Units SubBlock** (10 fields) - Alternate measurements
+5. **Behavior SubBlock** (11 fields) - Product sourcing flags
+
+**Why SubBlocks Matter:** They provide logical grouping and ensure fields are processed in the correct order during import.
+
+---
+
+## 🚨 Critical Concepts
+
+### 1. CATALOG_COLOR (Most Critical Field)
+
+**Location:** [Product Block](edp/PRODUCT_BLOCK.md#catalog-color)
+
+**The Problem:**
+```javascript
+// ❌ WRONG - Using display color
+PartColor>> Forest Green         // Display name from vendor
 ```
-Line | Part Number | Manual Price | Sizes
------|-------------|--------------|------------------
-1    | SPSU        | $30.00       | 11 setups
-2    | PC54        | $35.39       | S:3 M:12 L:3 XL:7
-3    | PC54_2X     | $37.39       | 2XL:7
+
+**What happens:**
+- ✅ Quote imports successfully (no error)
+- ❌ ShopWorks shows "Product not found in catalog"
+- ❌ Pricing doesn't sync from ShopWorks pricing tables
+- ❌ Inventory doesn't decrement properly
+
+**The Solution:**
+```javascript
+// ✅ CORRECT - Using exact ShopWorks catalog name
+PartColor>> Forest                // Exact match to ShopWorks catalog
 ```
 
-### System 3: ShopWorks EDP Import
+**Implementation:** See complete [CATALOG_COLOR documentation](edp/PRODUCT_BLOCK.md#catalog-color)
 
-**Generated By:** `shopworks-edp-generator.js`
+---
 
-**Purpose:** Text file that can be imported directly into ShopWorks
+### 2. SizesPricing Pattern (Pricing Synchronization)
 
-**Key Features:**
-- Structured text format with field delimiters
-- Each product is a separate `---- Start Product ----` block
-- Prices stored in `cur_UnitPriceUserEntered` field
-- Sizes mapped to ShopWorks size columns (Size01_Req, Size02_Req, etc.)
+**Location:** [Pricing Synchronization Guide](edp/PRICING_SYNC_GUIDE.md)
 
-**Example Output:**
+**The Challenge:** Ensure pricing matches EXACTLY across three systems:
+1. Quote Builder Order Summary
+2. ShopWorks Guide PDF
+3. EDP Import
+
+**The Solution:** `SizesPricing` object as single source of truth:
+
+```javascript
+const sizesPricing = {
+    'S': 35.39,    // Complete final price for Small
+    'M': 35.39,    // Complete final price for Medium
+    'L': 35.39,    // Complete final price for Large
+    'XL': 35.39,   // Complete final price for XL
+    '2XL': 37.39,  // Complete final price for 2XL ($2 upcharge)
+    '3XL': 38.39   // Complete final price for 3XL ($3 upcharge)
+};
 ```
+
+**Each price includes:**
+- Base garment cost with margin
+- Primary decoration cost
+- Additional locations cost
+- Safety stripes (if applicable)
+- LTM fee impact (if quantity < 24)
+
+**Why It Matters:** Prevents discrepancies between Order Summary ($35.39) and ShopWorks import ($35.83).
+
+**Implementation:** See complete [SizesPricing guide](edp/PRICING_SYNC_GUIDE.md)
+
+---
+
+### 3. OnSite 6.1 → OnSite 7 Migration
+
+**Key Changes:**
+- Field names changed (e.g., `# Design` → `id_Design`)
+- New fields added (e.g., `FlashesTotal`, `Department`)
+- Some fields deprecated (e.g., `Secondary_Phone`)
+
+**All block documentation includes field mapping tables** showing:
+- OnSite 7 field name (current)
+- OnSite 6.1 field name (legacy)
+- Migration notes
+
+**Example from Design Block:**
+
+| OnSite 7 Field | OnSite 6.1 Field | Notes |
+|----------------|------------------|-------|
+| `FlashesTotal` | *(NEW in OnSite 7)* | Track underbase flashes |
+| `ColorsTotal` | `N` | Renamed but same function |
+
+---
+
+## 🔧 Implementation Patterns
+
+### Complete EDP Structure
+
+```
+---- Start Order ----
+[Order Block fields]
+---- End Order ----
+
+---- Start Customer ----
+[Customer Block fields]
+---- End Customer ----
+
+---- Start Contact ----
+[Contact Block fields]
+---- End Contact ----
+
+---- Start Design ----
+[Design Block fields]
+---- End Design ----
+
+---- Start Product ----
+[Product Block fields]
+---- End Product ----
+
+---- Start Payment ----
+[Payment Block fields]
+---- End Payment ----
+```
+
+### Minimal Working Implementation
+
+**Currently implemented in Screen Print Quote Builder:**
+
+```javascript
+// Order Block (12 fields)
+---- Start Order ----
+ExtOrderID>> SP0127-1
+ExtSource>> SP Quote
+id_OrderType>> 13
+CustomerPurchaseOrder>> Screen Print - SP0127-1
+// ... 8 more fields
+---- End Order ----
+
+// Customer Block (1 field)
+---- Start Customer ----
+id_Customer>> 123
+---- End Customer ----
+
+// Product Block (19 fields per product) - COMPLETE
 ---- Start Product ----
 PartNumber>> PC54
+PartColor>> Forest
 cur_UnitPriceUserEntered>> 35.39
 Size01_Req>> 3
 Size02_Req>> 12
-Size03_Req>> 3
-Size04_Req>> 7
+// ... 14 more fields
 ---- End Product ----
 ```
 
-### Data Flow Diagram
-
-```
-User Creates Quote
-       ↓
-calculateProductPricing()
-       ↓
-   sizesPricing object created
-   {S: 35.39, M: 35.39, L: 35.39, XL: 35.39, 2XL: 37.39, ...}
-       ↓
-   ┌──────────────┴──────────────┐
-   ↓                             ↓
-Order Summary               Product data prepared
-(Display to user)           with SizesPricing attached
-   ↓                             ↓
-                    ┌────────────┴────────────┐
-                    ↓                         ↓
-          ShopWorks Guide Generator    EDP Generator
-                    ↓                         ↓
-              Uses SizesPricing         Uses SizesPricing
-              for manual prices         for unit prices
-                    ↓                         ↓
-                 PDF Export              Text Export
-```
+**Result:** Successfully imports into ShopWorks OnSite 7 ✅
 
 ---
 
-## Key Components
-
-### Component 1: Quote Builder HTML
-
-**File:** `quote-builders/screenprint-quote-builder.html`
-
-**Key Functions:**
-
-#### `calculateProductPricing(product, quantity)`
-**Location:** Lines 3043-3158
-**Purpose:** Calculate per-size pricing including all components
-
-**What It Does:**
-1. Gets base garment price for each size
-2. Adds safety stripes surcharge per location ($2/location)
-3. Creates `sizesPricing` object with per-size totals
-4. Calculates additional locations cost separately
-5. Returns complete pricing structure
-
-**Critical Output:**
-```javascript
-{
-  sizesPricing: {
-    S: { quantity: 3, basePrice: 16.00, safetyStripesPerPiece: 4.00, unitPrice: 20.00, subtotal: 60.00 },
-    M: { quantity: 12, basePrice: 16.00, safetyStripesPerPiece: 4.00, unitPrice: 20.00, subtotal: 240.00 },
-    // ...
-  },
-  additionalCost: 14.50,  // Per-piece cost for back + left-sleeve
-  perShirtTotal: 34.50    // Average across all sizes (base + safety + additional)
-}
-```
-
-#### ShopWorks Guide Generation Section
-**Location:** Lines 3490-3527
-**Purpose:** Extract size-specific pricing for ShopWorks output
-
-**Critical Code:**
-```javascript
-// IMPORTANT: Include additional locations cost + LTM impact for complete pricing
-const sizesPricing = {};
-const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
-const additionalCostPerPiece = pricingMatch?.additionalCost || 0;
-
-if (pricingMatch && pricingMatch.sizesPricing) {
-    Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-        // Complete price = base + safety stripes + additional locations + LTM
-        const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
-        sizesPricing[size] = completePrice;
-    });
-}
-```
-
-**Why This Matters:**
-- `priceData.unitPrice` = base garment + safety stripes ONLY
-- Must add `additionalCostPerPiece` (back, sleeves, etc.)
-- Must add `ltmImpact` (Small Batch Fee distributed per piece)
-- Result: Complete final price matching Order Summary
-
-#### Product Data Structure
-**Location:** Lines 3508-3524
-**Purpose:** Package all data for ShopWorks generators
-
-**Key Fields:**
-```javascript
-const productForShopWorks = {
-    StyleNumber: product.styleNumber,
-    ProductName: product.productName,
-    Color: product.color,
-    SizeBreakdown: sizeBreakdown,        // {S: 3, M: 12, L: 3, XL: 7, ...}
-    Quantity: totalQuantity,              // 33
-    BaseUnitPrice: baseUnitPrice,         // 35.015 (average without LTM)
-    FinalUnitPrice: finalUnitPrice,       // 35.908 (average WITH LTM)
-    LineTotal: lineTotal,                 // 1184.96
-    PrintLocations: printLocations,       // [{name: "back", colors: 3}, ...]
-    SizesPricing: sizesPricing           // {S: 35.39, M: 35.39, ...} ← CRITICAL
-};
-```
-
-**SizesPricing is the SOURCE OF TRUTH** - Contains already-correct final prices for each size.
-
-### Component 2: Base Generator Class
-
-**File:** `shared_components/js/shopworks-guide-generator.js`
-
-**Purpose:** Base class that converts quote data into ShopWorks line items
-
-#### `parseQuoteIntoLineItems(products)`
-**Location:** Lines 94-185
-**Purpose:** Main parsing logic for all product types
-
-**Key Pattern:**
-1. Separates standard sizes (S/M/L/XL) from oversizes (2XL+)
-2. Groups standard sizes into one line
-3. Creates separate lines for each oversize with suffix
-
-**Standard Sizes Logic:**
-```javascript
-// Line 1: Standard sizes grouped together
-if (Object.keys(standardSizes).length > 0) {
-    const totalStandardQty = Object.values(standardSizes).reduce((a, b) => a + b, 0);
-
-    items.push({
-        lineQty: totalStandardQty,
-        partNumber: product.StyleNumber,
-        sizes: this.formatSizesForShopWorks(standardSizes),
-        manualPrice: this.getStandardSizePrice(standardSizes, product),  // ← Uses SizesPricing
-        calcPrice: 'Off',
-        lineTotal: this.calculateLineTotal(standardSizes, product)
-    });
-}
-```
-
-**Oversize Logic:**
-```javascript
-// Lines 2+: Each oversize gets its own line
-Object.entries(oversizes).forEach(([size, qty]) => {
-    const suffix = this.partNumberSuffixMap[size] || `_${size}`;
-
-    items.push({
-        lineQty: qty,
-        partNumber: `${basePartNumber}${suffix}`,
-        sizes: this.formatSizesForShopWorks({ [size]: qty }),
-        manualPrice: this.getPriceForSize(size, product),  // ← Uses SizesPricing
-        calcPrice: 'Off',
-        lineTotal: qty * this.getPriceForSize(size, product)
-    });
-});
-```
-
-#### `getStandardSizePrice(standardSizes, product)`
-**Location:** Lines 279-292
-**Purpose:** Get price for standard sizes from SizesPricing
-
-**Implementation:**
-```javascript
-getStandardSizePrice(standardSizes, product) {
-    // Find first available standard size to get the price
-    const firstSize = Object.keys(standardSizes).find(size => standardSizes[size] > 0);
-
-    if (firstSize) {
-        const price = this.getPriceForSize(firstSize, product);
-        console.log(`[ShopWorksGuide] Using standard size price from ${firstSize}: $${price.toFixed(2)}`);
-        return price;
-    }
-
-    // Fallback to FinalUnitPrice if no sizes found (shouldn't happen)
-    console.warn('[ShopWorksGuide] No standard sizes found, falling back to FinalUnitPrice');
-    return parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-}
-```
-
-**Why This Works:**
-- All standard sizes (S/M/L/XL) have the SAME price
-- Picks any one (typically first) and gets its price from `SizesPricing`
-- Avoids using weighted average `FinalUnitPrice`
-
-#### `getPriceForSize(size, product)`
-**Location:** Lines 269-278
-**Purpose:** Get size-specific price with fallback
-
-**Implementation:**
-```javascript
-getPriceForSize(size, product) {
-    // First, check if size-specific pricing is available
-    if (product.SizesPricing && product.SizesPricing[size]) {
-        const sizePrice = parseFloat(product.SizesPricing[size]);
-        console.log(`[ShopWorksGuide] Using size-specific price for ${size}: $${sizePrice.toFixed(2)}`);
-        return sizePrice;
-    }
-
-    // Fall back to final price (includes LTM) if size-specific pricing not available
-    const finalPrice = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-    console.log(`[ShopWorksGuide] Using final price for ${size}: $${finalPrice.toFixed(2)}`);
-    return finalPrice;
-}
-```
-
-**Priority Order:**
-1. Try `product.SizesPricing[size]` ← Preferred (already-correct price)
-2. Fall back to `product.FinalUnitPrice` ← Only if SizesPricing missing
-3. Last resort: `product.BaseUnitPrice`
-
-#### `calculateLineTotal(sizes, product)`
-**Location:** Lines 245-267
-**Purpose:** Calculate accurate line total using size-specific pricing
-
-**Implementation:**
-```javascript
-calculateLineTotal(sizes, product) {
-    // If we have size-specific pricing, calculate total by summing each size
-    if (product.SizesPricing) {
-        let total = 0;
-        Object.entries(sizes).forEach(([size, qty]) => {
-            const price = this.getPriceForSize(size, product);
-            total += qty * price;
-            console.log(`[ShopWorksGuide] Line total calculation for ${size}: ${qty} × $${price.toFixed(2)} = $${(qty * price).toFixed(2)}`);
-        });
-        console.log(`[ShopWorksGuide] Total line total: $${total.toFixed(2)}`);
-        return total;
-    }
-
-    // Fallback to using average price if size-specific pricing not available
-    const totalQty = Object.values(sizes).reduce((a, b) => a + b, 0);
-    const price = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-    console.log(`[ShopWorksGuide] Using average price: ${totalQty} × $${price.toFixed(2)} = $${(totalQty * price).toFixed(2)}`);
-    return totalQty * price;
-}
-```
-
-**Why This Is Critical:**
-- Standard sizes can have mixed size distribution (e.g., 3 S, 12 M, 3 L, 7 XL)
-- All share same price ($35.39) but different quantities
-- Total = (3 × $35.39) + (12 × $35.39) + (3 × $35.39) + (7 × $35.39) = $884.82
-- More accurate than: 25 × $35.908 (weighted average) = $897.70
-
-### Component 3: Screen Print Specific Generator
-
-**File:** `shared_components/js/screenprint-shopworks-guide-generator.js`
-
-**Purpose:** Adds screen print specific features to base generator
-
-**Key Additions:**
-1. **SPSU Line Item** - Setup charge as first line
-2. **Enhanced Descriptions** - Adds print location details to descriptions
-
-#### SPSU Setup Line
-**Location:** Lines 51-84
-**Purpose:** Calculate and add setup charge
-
-**Pattern:**
-```javascript
-if (quoteData.TotalColors && quoteData.TotalColors > 0) {
-    const setupCount = quoteData.TotalColors;
-    const setupTotal = setupCount * 30;  // $30 per screen
-
-    items.unshift({  // Add as FIRST line
-        lineQty: setupCount,
-        partNumber: 'SPSU',
-        colorRange: '',
-        color: '',
-        description: `New Screen Set Up Charge: ${setupCount} colors (...)`,
-        sizes: { 'S': setupCount },  // Quantity shows in S column
-        manualPrice: 30.00,
-        calcPrice: 'Off',
-        lineTotal: setupTotal
-    });
-}
-```
-
-#### Enhanced Descriptions
-**Location:** Lines 103-117
-**Purpose:** Add print location details to product descriptions
-
-**Example Transformation:**
-```
-BEFORE: Port & Co Core Cotton Tee. PC54
-AFTER:  Port & Co Core Cotton Tee. PC54 + Front (4c + Safety Stripes) + back (4c + Safety Stripes) + left-sleeve (3c)
-```
-
-### Component 4: EDP Generator
-
-**File:** `shared_components/js/shopworks-edp-generator.js`
-
-**Purpose:** Convert ShopWorks line items to EDP text format
-
-**Key Features:**
-- Uses same line items from ShopWorks guide generator
-- Transforms to ShopWorks import format
-- Maps sizes to ShopWorks size columns
-- Preserves all pricing from `manualPrice` field
-
-**Size Mapping:**
-```javascript
-const sizeColumnMap = {
-    'S': 'Size01_Req',
-    'M': 'Size02_Req',
-    'L': 'Size03_Req',
-    'XL': 'Size04_Req',
-    '2XL': 'Size05_Req',
-    'XXL': 'Size05_Req',
-    '3XL': 'Size06_Req',
-    'XXXL': 'Size06_Req'
-};
-```
-
----
-
-## The SizesPricing Pattern
-
-### What is SizesPricing?
-
-`SizesPricing` is a JavaScript object that contains the **already-calculated final price** for each individual size, including all components.
-
-**Structure:**
-```javascript
-{
-  "S": 35.39,    // Final price for Small (base + safety + add'l locations + LTM)
-  "M": 35.39,    // Final price for Medium
-  "L": 35.39,    // Final price for Large
-  "XL": 35.39,   // Final price for Extra Large
-  "2XL": 37.39,  // Final price for 2XL (includes $2 upcharge)
-  "3XL": 38.39   // Final price for 3XL (includes $3 upcharge)
-}
-```
-
-### Why It's the Source of Truth
-
-`SizesPricing` contains prices that have ALREADY been calculated with:
-
-✅ **Base Garment Cost** - From API (e.g., PC54 = $16.00 for S/M/L/XL)
-✅ **Safety Stripes Surcharge** - $2/location × 2 locations = $4.00
-✅ **Additional Locations Cost** - $7.50/location × 2 locations = $14.50
-✅ **Small Batch Fee (LTM)** - $50 ÷ 56 pieces = $0.89/piece
-✅ **Size Upcharges** - 2XL +$2.00, 3XL +$3.00, etc.
-
-**No recalculation needed** - Just read the value!
-
-### Size-Specific vs Weighted Average
-
-#### ❌ Weighted Average (WRONG for standard sizes line)
-
-```javascript
-// WRONG APPROACH:
-const FinalUnitPrice = TotalCost ÷ TotalPieces
-
-// Example with mixed sizes:
-// 25 standard @ $35.39 = $884.75
-// 11 oversizes @ $37.39-$43.39 = $814.25
-// Total: $1699 ÷ 40 pieces = $42.475
-
-manualPrice: product.FinalUnitPrice  // $42.48 ← WRONG for standard sizes!
-```
-
-**Problem:** Standard sizes (S/M/L/XL) all cost $35.39 each, but weighted average is $42.48 because it includes expensive oversizes.
-
-#### ✅ Size-Specific Pricing (CORRECT)
-
-```javascript
-// CORRECT APPROACH:
-const manualPrice = product.SizesPricing['M']  // $35.39 ← Read directly!
-
-// Or use helper:
-const manualPrice = this.getStandardSizePrice(standardSizes, product)
-```
-
-**Why This Works:** `SizesPricing` has individual prices for each size. Since all standard sizes cost the same ($35.39), we can use any one.
-
-### How SizesPricing is Built
-
-**In Quote Builder** (`screenprint-quote-builder.html` lines 3490-3505):
-
-```javascript
-// 1. Extract size-specific pricing from calculation results
-const sizesPricing = {};
-const ltmImpact = 0.89;  // $50 ÷ 56 = $0.89/piece
-const additionalCostPerPiece = 14.50;  // Back + left-sleeve
-
-// 2. Loop through each size from calculation
-Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
-    // priceData.unitPrice = base ($16) + safety stripes ($4) = $20
-    const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
-    // completePrice = $20 + $14.50 + $0.89 = $35.39
-
-    sizesPricing[size] = completePrice;
-});
-
-// 3. Attach to product
-product.SizesPricing = sizesPricing;  // {S: 35.39, M: 35.39, ...}
-```
-
-**Result:** Every downstream system can now read `product.SizesPricing[size]` to get the correct final price!
-
----
-
-## Problems & Solutions
-
-### Problem #1: Missing Additional Locations Cost
-
-#### The Issue
-
-**Discovered:** 2025-10-25
-**Symptom:** ShopWorks showed $28.73/pc, but Order Summary showed $28.50/pc
-
-**Root Cause:**
-
-In `screenprint-quote-builder.html` lines 3499 and 3617, the code was:
-```javascript
-const priceWithLTM = priceData.unitPrice + ltmImpact;
-sizesPricing[size] = priceWithLTM;
-```
-
-**What was included:**
-- ✅ Base garment cost ($16.00)
-- ✅ Safety stripes ($4.00)
-- ✅ LTM fee ($0.89)
-
-**What was missing:**
-- ❌ Additional locations cost ($7.50)
-
-**Calculation:**
-```
-$16.00 (base) + $4.00 (safety) + $0.89 (LTM) = $20.89  ← Missing $7.50!
-Should be: $16.00 + $4.00 + $7.50 + $0.89 = $28.39
-```
-
-#### The Fix
-
-**Git Commit:** `c96bff3`
-
-**Changes:**
-```javascript
-// BEFORE:
-const priceWithLTM = priceData.unitPrice + ltmImpact;
-
-// AFTER:
-const additionalCostPerPiece = pricingMatch?.additionalCost || 0;
-const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
-```
-
-**Applied to two locations:**
-1. ShopWorks Guide generation (lines 3490-3508)
-2. EDP generation (lines 3612-3620)
-
-**Result:** ✅ All prices now included all components
-
-### Problem #2: Standard Sizes Using Weighted Average
-
-#### The Issue
-
-**Discovered:** 2025-10-25
-**Symptom:** ShopWorks showed $42.48/pc for standard sizes, but Order Summary showed $41.75/pc
-
-**Discrepancy:** $0.73/piece ($42.48 - $41.75 = $0.73)
-
-**Root Cause:**
-
-In `shopworks-guide-generator.js` line 150:
-```javascript
-manualPrice: parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0)
-```
-
-**What `FinalUnitPrice` represents:**
-```
-Total order cost ÷ Total pieces = Weighted average of ALL sizes
-
-Example:
-27 standard @ $41.75 = $1,127.25
-11 oversizes @ $43.75 = $481.25
-1 oversize @ $44.75 = $44.75
-1 oversize @ $45.75 = $45.75
-─────────────────────────────────
-40 pieces total = $1,699.00
-
-$1,699 ÷ 40 = $42.475 average
-```
-
-**The Problem:** Standard sizes (S/M/L/XL) actually cost $41.75 each, but `FinalUnitPrice` is pulling the average UP because of expensive oversizes.
-
-**Oversizes were correct** because they used `getPriceForSize(size, product)` which reads from `SizesPricing`.
-
-#### The Fix
-
-**Git Commit:** `c0f9286`
-
-**Change 1: Added `getStandardSizePrice()` method**
-
-**Location:** `shopworks-guide-generator.js` lines 272-292
-
-```javascript
-/**
- * Get the price for standard sizes (S/M/L/XL)
- * Since all standard sizes have the same price, we can use any of them
- */
-getStandardSizePrice(standardSizes, product) {
-    // Find first available standard size to get the price
-    const firstSize = Object.keys(standardSizes).find(size => standardSizes[size] > 0);
-
-    if (firstSize) {
-        const price = this.getPriceForSize(firstSize, product);
-        console.log(`[ShopWorksGuide] Using standard size price from ${firstSize}: $${price.toFixed(2)}`);
-        return price;
-    }
-
-    // Fallback to FinalUnitPrice if no sizes found (shouldn't happen)
-    console.warn('[ShopWorksGuide] No standard sizes found, falling back to FinalUnitPrice');
-    return parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-}
-```
-
-**How it works:**
-1. Finds first standard size with quantity > 0 (e.g., "M")
-2. Calls `getPriceForSize("M", product)` → reads `product.SizesPricing["M"]`
-3. Returns $41.75 (the correct price from source of truth)
-
-**Change 2: Updated standard sizes line**
-
-**Location:** Line 150
-
-```javascript
-// BEFORE:
-manualPrice: parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0)
-
-// AFTER:
-manualPrice: this.getStandardSizePrice(standardSizes, product)
-```
-
-**Change 3: Enhanced `calculateLineTotal()` for accuracy**
-
-**Location:** Lines 245-267
-
-```javascript
-calculateLineTotal(sizes, product) {
-    // If we have size-specific pricing, calculate total by summing each size
-    if (product.SizesPricing) {
-        let total = 0;
-        Object.entries(sizes).forEach(([size, qty]) => {
-            const price = this.getPriceForSize(size, product);
-            total += qty * price;
-            console.log(`[ShopWorksGuide] Line total calculation for ${size}: ${qty} × $${price.toFixed(2)} = $${(qty * price).toFixed(2)}`);
-        });
-        console.log(`[ShopWorksGuide] Total line total: $${total.toFixed(2)}`);
-        return total;
-    }
-
-    // Fallback to using average price if size-specific pricing not available
-    const totalQty = Object.values(sizes).reduce((a, b) => a + b, 0);
-    const price = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-    return totalQty * price;
-}
-```
-
-**Why this matters:**
-- Calculates total as sum of (quantity × price) for each size individually
-- More accurate than (total quantity) × (average price)
-- Handles mixed size distributions correctly
-
-**Result:** ✅ Standard sizes now show $41.75/pc (matching Order Summary exactly)
-
----
-
-## Implementation Details
-
-### Complete Implementation Flow
-
-#### Step 1: Quote Builder Calculates Pricing
-
-**File:** `screenprint-quote-builder.html`
-
-```javascript
-// Calculate base pricing for each size
-const productPricing = calculateProductPricing(product, totalQuantity);
-
-// Result structure:
-{
-  sizesPricing: {
-    S: { unitPrice: 20.00, quantity: 3 },  // base + safety stripes
-    M: { unitPrice: 20.00, quantity: 12 },
-    // ...
-  },
-  additionalCost: 14.50,  // per-piece cost for additional locations
-  perShirtTotal: 34.50    // average
-}
-```
-
-#### Step 2: Add LTM Fee and Complete Pricing
-
-```javascript
-// Calculate LTM impact
-const ltmFee = 50.00;  // Standard fee
-const totalPieces = 56;
-const ltmImpact = ltmFee / totalPieces;  // $0.89 per piece
-
-// Build complete SizesPricing
-const sizesPricing = {};
-Object.entries(productPricing.sizesPricing).forEach(([size, priceData]) => {
-    const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
-    sizesPricing[size] = completePrice;
-});
-
-// Result:
-// {S: 35.39, M: 35.39, L: 35.39, XL: 35.39, 2XL: 37.39, 3XL: 38.39}
-```
-
-#### Step 3: Attach to Product Data
-
-```javascript
-const productForShopWorks = {
-    StyleNumber: 'PC54',
-    Color: 'Heather Royal',
-    SizeBreakdown: {S: 3, M: 12, L: 3, XL: 7, '2XL': 7, '3XL': 1},
-    Quantity: 33,
-    BaseUnitPrice: 35.015,     // Average without LTM
-    FinalUnitPrice: 35.908,    // Average WITH LTM
-    SizesPricing: sizesPricing  // ← THE SOURCE OF TRUTH
-};
-```
-
-#### Step 4: Generator Extracts Prices
-
-```javascript
-// In shopworks-guide-generator.js
-
-// For standard sizes line:
-const standardPrice = this.getStandardSizePrice(standardSizes, product);
-// → Reads product.SizesPricing['M'] → $35.39
-
-// For oversize lines:
-const oversizePrice = this.getPriceForSize('2XL', product);
-// → Reads product.SizesPricing['2XL'] → $37.39
-```
-
-#### Step 5: Generate Outputs
-
-**ShopWorks Guide:**
-```
-Line | Part Number | Manual Price
------|-------------|-------------
-2    | PC54        | $35.39       ← From getStandardSizePrice()
-3    | PC54_2X     | $37.39       ← From getPriceForSize('2XL')
-```
-
-**EDP Text:**
-```
----- Start Product ----
-PartNumber>> PC54
-cur_UnitPriceUserEntered>> 35.39  ← From manualPrice field
----- End Product ----
-```
-
-### Console Log Pattern
-
-When system is working correctly, you'll see:
-
-```javascript
-[ShopWorksGuide] Using standard size price from S: $35.39
-[ShopWorksGuide] Line total calculation for S: 3 × $35.39 = $106.18
-[ShopWorksGuide] Line total calculation for M: 12 × $35.39 = $424.71
-[ShopWorksGuide] Line total calculation for L: 3 × $35.39 = $106.18
-[ShopWorksGuide] Line total calculation for XL: 7 × $35.39 = $247.75
-[ShopWorksGuide] Total line total: $884.82
-
-[ShopWorksGuide] Using size-specific price for 2XL: $37.39
-[ShopWorksGuide] Using size-specific price for 3XL: $38.39
-```
-
-**Key Indicators:**
-- ✅ "Using standard size price from [SIZE]" - Shows it's reading from SizesPricing
-- ✅ Individual line total calculations - Shows per-size multiplication
-- ✅ Prices match Order Summary exactly
-
-**Red Flags:**
-- ❌ "Using final price for [SIZE]" - Falling back to average (SizesPricing missing)
-- ❌ "Using average price" in line total - Using weighted average instead of sum
-- ❌ Prices don't match Order Summary
-
----
-
-## Verification Checklist
-
-Use this checklist every time you generate a quote to ensure pricing synchronization:
-
-### ✅ Order Summary Verification
-
-**Location:** Quote Builder "Review & Export" section
-
-**Check:**
-1. Each size shows complete breakdown:
-   - Base garment cost
-   - Safety stripes (if applicable)
-   - Additional locations (if applicable)
-   - Small Batch Fee
-   - **Final price per piece**
-
-2. Prices make logical sense:
-   - Standard sizes should all have same price
-   - Oversizes should be higher (base garment upcharge)
-   - Final price = sum of all components
-
-**Example:**
-```
-S/M/L/XL: $16.00 + $4.00 + $14.50 + $0.89 = $35.39/pc ✓
-2XL: $18.00 + $4.00 + $14.50 + $0.89 = $37.39/pc ✓
-```
-
-### ✅ ShopWorks Guide Verification
-
-**Location:** PDF popup window
-
-**Check:**
-1. **SPSU Line (Line 1):**
-   - Correct number of colors/screens
-   - $30.00 per screen
-   - Total = screens × $30
-
-2. **Standard Sizes Line:**
-   - Part Number = base style (e.g., PC54)
-   - Manual Price matches Order Summary standard size price EXACTLY
-   - Size distribution correct (S:3 M:12 L:3 XL:7)
-   - Line Total = sum of (qty × price) for each size
-
-3. **Oversize Lines:**
-   - Part Number has suffix (PC54_2X, PC54_3X, etc.)
-   - Manual Price matches Order Summary oversize price EXACTLY
-   - Quantities correct
-   - Line Total = qty × price
-
-4. **Calc. Price Column:**
-   - Should show "Off" for all lines (manual pricing mode)
-
-**Example Verification:**
-```
-Order Summary shows: S/M/L/XL @ $35.39/pc
-ShopWorks Guide Line 2: PC54 | $35.39 | S:3 M:12 L:3 XL:7
-✓ MATCH
-
-Order Summary shows: 2XL @ $37.39/pc
-ShopWorks Guide Line 3: PC54_2X | $37.39 | 2XL:7
-✓ MATCH
-```
-
-### ✅ EDP Import Verification
-
-**Location:** Text file popup or console output
-
-**Check:**
-1. **Each Product Block:**
-   - `PartNumber` matches ShopWorks Guide
-   - `cur_UnitPriceUserEntered` matches ShopWorks Manual Price EXACTLY
-   - Size columns (Size01_Req, etc.) match quantity distribution
-   - `PartDescription` includes print location details
-
-**Example Verification:**
-```
-ShopWorks Guide: PC54 | $35.39
-EDP Text: cur_UnitPriceUserEntered>> 35.39
-✓ MATCH
-
-ShopWorks Guide: PC54_2X | $37.39
-EDP Text: cur_UnitPriceUserEntered>> 37.39
-✓ MATCH
-```
-
-### ✅ ShopWorks Import Verification
-
-**Location:** ShopWorks application after importing EDP file
-
-**Check:**
-1. All line items imported correctly
-2. Manual Price column matches EDP values
-3. Size distribution matches
-4. Calc. Price shows "Off"
-5. **Subtotal matches Order Summary grand total** (within $0.20 due to penny rounding)
-
-**Acceptable Rounding:**
-- Individual line totals: Within $0.01-0.02 per line
-- Grand total: Within $0.10-0.20 total
-
-**Example:**
-```
-Order Summary Total: $2394.00
-ShopWorks Import Subtotal: $2393.84
-Difference: $0.16 ✓ ACCEPTABLE (penny rounding across 10 lines)
-```
-
-### ✅ Console Log Verification
-
-**Location:** Browser Developer Tools (F12) → Console tab
-
-**Check for these log patterns:**
-
-```javascript
-✓ [ShopWorksGuide] Using standard size price from S: $35.39
-✓ [ShopWorksGuide] Using size-specific price for 2XL: $37.39
-✓ [ShopWorksGuide] Line total calculation for S: 3 × $35.39 = $106.18
-```
-
-**Red flags:**
-```javascript
-✗ [ShopWorksGuide] Using final price for M: $42.48
-✗ [ShopWorksGuide] Using average price: 25 × $42.48 = $1062.00
-```
-
-### 🚨 Common Discrepancies
-
-| Issue | Order Summary | ShopWorks | Likely Cause |
-|-------|---------------|-----------|--------------|
-| Missing add'l locations | $41.75 | $27.25 | additionalCostPerPiece not included |
-| Using weighted average | $41.75 | $42.48 | FinalUnitPrice instead of SizesPricing |
-| Missing LTM fee | $41.75 | $40.86 | ltmImpact not added |
-| Wrong oversize upcharge | $43.75 | $41.75 | Size-specific price not extracted |
-
----
-
-## Applying to Other Quote Builders
-
-The same pricing synchronization pattern can be applied to:
-- DTG Quote Builder
-- Embroidery Quote Builder
-- Cap Embroidery Quote Builder
-
-### Universal Pattern
-
-All quote builders follow this structure:
-
-#### 1. Build SizesPricing Object
-
-**In Quote Builder HTML:**
-```javascript
-// Calculate pricing for each size
-const sizesPricing = {};
-
-Object.entries(calculatedPricing.sizesPricing).forEach(([size, priceData]) => {
-    // Add all components
-    let finalPrice = priceData.unitPrice;  // Base + primary decoration
-
-    if (hasAdditionalLocations) {
-        finalPrice += additionalCostPerPiece;
-    }
-
-    if (hasLTMFee) {
-        finalPrice += ltmImpact;
-    }
-
-    sizesPricing[size] = finalPrice;
-});
-
-// Attach to product
-product.SizesPricing = sizesPricing;
-```
-
-#### 2. Pass to ShopWorks Generator
-
-```javascript
-const productForShopWorks = {
-    // ... other fields
-    SizesPricing: sizesPricing  // Always include this
-};
-
-// Generate guide
-const guide = new ShopWorksGuideGenerator();
-const lineItems = guide.parseQuoteIntoLineItems([productForShopWorks]);
-```
-
-#### 3. Generator Uses SizesPricing
-
-**Base generator (shopworks-guide-generator.js) already has:**
-- `getStandardSizePrice()` - Reads from SizesPricing for standard sizes
-- `getPriceForSize()` - Reads from SizesPricing for any size
-- `calculateLineTotal()` - Sums individual (qty × price) when SizesPricing available
-
-**No changes needed to generator classes!**
-
-### DTG Quote Builder Adaptation
-
-**File:** `quote-builders/dtg-quote-builder.html`
-
-**Key Differences:**
-- DTG uses single location pricing (not Front + additional)
-- Combo locations (LC_FB, FF_FB) sum two locations
-- Size upcharges applied to base garment cost
-
-**Implementation:**
-```javascript
-// DTG pricing includes everything in one calculation
-const sizesPricing = {};
-const ltmImpact = ltmFee / totalQuantity;
-
-Object.entries(dtgPricing.sizesPricing).forEach(([size, priceData]) => {
-    // DTG priceData.unitPrice already includes:
-    // - Base garment with margin
-    // - Print cost for selected location
-    // - Combo location costs if applicable
-
-    const finalPrice = priceData.unitPrice + ltmImpact;
-    sizesPricing[size] = finalPrice;
-});
-
-product.SizesPricing = sizesPricing;
-```
-
-**Verification:**
-```
-DTG Left Chest + Full Back (combo):
-Base: $5.70 + Print LC: $6.00 + Print FB: $8.00 = $19.70
-Add LTM: $19.70 + $2.08 = $21.78/pc
-
-SizesPricing: {S: 21.78, M: 21.78, ...}
-ShopWorks: Should show $21.78 for standard sizes line
-```
-
-### Embroidery Quote Builder Adaptation
-
-**File:** `quote-builders/embroidery-quote-builder.html`
-
-**Key Differences:**
-- Embroidery uses stitch count tiers
-- No safety stripes
-- Setup based on stitch count, not colors
-
-**Implementation:**
-```javascript
-const sizesPricing = {};
-const ltmImpact = ltmFee / totalQuantity;
-
-Object.entries(embPricing.sizesPricing).forEach(([size, priceData]) => {
-    // Embroidery priceData.unitPrice includes:
-    // - Base garment with margin
-    // - Embroidery cost based on stitch count
-    // - Additional location costs if multiple locations
-
-    const finalPrice = priceData.unitPrice + ltmImpact;
-    sizesPricing[size] = finalPrice;
-});
-
-product.SizesPricing = sizesPricing;
-```
-
-### Cap Embroidery Quote Builder Adaptation
-
-**File:** `quote-builders/cap-embroidery-quote-builder.html`
-
-**Key Differences:**
-- Caps don't have size distribution (one size fits most)
-- May have structured vs unstructured variants
-- Can have 3D puff embroidery option
-
-**Implementation:**
-```javascript
-// For caps, SizesPricing might have just one entry
-const sizesPricing = {
-    'OS': finalCapPrice  // One Size
-};
-
-// Or if tracking structured/unstructured:
-const sizesPricing = {
-    'STR': structuredPrice,   // Structured
-    'UNS': unstructuredPrice  // Unstructured
-};
-
-product.SizesPricing = sizesPricing;
-```
-
-### Checklist for Adapting Other Builders
-
-- [ ] Identify where pricing is calculated (usually `calculateProductPricing()` function)
-- [ ] Ensure all cost components are included in calculation
-- [ ] Build `SizesPricing` object with complete final prices
-- [ ] Calculate LTM impact and add to each size
-- [ ] Attach `SizesPricing` to product object before passing to generator
-- [ ] Test with complex quote (multiple sizes, additional locations, LTM fee)
-- [ ] Verify console logs show "Using size-specific price"
-- [ ] Compare Order Summary vs ShopWorks Guide vs EDP import
-
----
-
-## Testing & Debugging
-
-### Browser Console Commands
-
-Open Developer Tools (F12) and use these commands:
-
-#### Check SizesPricing Object
-
-```javascript
-// View current pricing data
-console.log(window.screenPrintQuoteBuilder.currentPricing);
-
-// Check specific product's SizesPricing
-const products = window.screenPrintQuoteBuilder.currentPricing.productPricing;
-console.table(products[0].sizesPricing);
-```
-
-#### Test Generator Directly
-
-```javascript
-// Get generator instance
-const generator = new ShopWorksGuideGenerator();
-
-// Test with sample product
-const testProduct = {
-    StyleNumber: 'PC54',
-    SizeBreakdown: {S: 3, M: 12, L: 3, XL: 7, '2XL': 7},
-    SizesPricing: {S: 35.39, M: 35.39, L: 35.39, XL: 35.39, '2XL': 37.39}
-};
-
-const lineItems = generator.parseQuoteIntoLineItems([testProduct]);
-console.table(lineItems);
-```
-
-#### Verify Price Extraction
-
-```javascript
-// Test getStandardSizePrice
-const generator = new ShopWorksGuideGenerator();
-const price = generator.getStandardSizePrice(
-    {S: 3, M: 12},
-    {SizesPricing: {S: 35.39, M: 35.39}}
-);
-console.log('Standard price:', price);  // Should be 35.39
-
-// Test getPriceForSize
-const oversizePrice = generator.getPriceForSize('2XL', {
-    SizesPricing: {'2XL': 37.39}
-});
-console.log('2XL price:', oversizePrice);  // Should be 37.39
-```
-
-### Debugging Pricing Discrepancies
-
-#### Step 1: Identify Which Component is Wrong
-
-```javascript
-// Check Order Summary calculation
-console.log('Base:', basePrice);
-console.log('Safety Stripes:', safetyStripesTotal);
-console.log('Additional Locations:', additionalLocationsTotal);
-console.log('LTM Fee:', ltmFee);
-console.log('Expected Total:', basePrice + safetyStripesTotal + additionalLocationsTotal + ltmFee);
-```
-
-#### Step 2: Check SizesPricing Was Built
-
-```javascript
-// After quote generation
-const product = screenPrintQuoteBuilder.currentPricing.productPricing[0];
-console.log('Has SizesPricing?', !!product.SizesPricing);
-console.log('SizesPricing:', product.SizesPricing);
-```
-
-#### Step 3: Verify Generator Reads SizesPricing
-
-Look for console logs:
-```
-[ShopWorksGuide] Using standard size price from M: $35.39  ← Good
-[ShopWorksGuide] Using final price for M: $42.48  ← Bad (falling back)
-```
-
-If seeing "Using final price", check:
-1. Is `product.SizesPricing` defined?
-2. Does it have the size key? (`product.SizesPricing['M']`)
-3. Is the value a number? (not string or object)
-
-#### Step 4: Compare Calculation Methods
-
-```javascript
-// Method 1: Weighted average (WRONG for standard sizes)
-const totalCost = products.reduce((sum, p) => sum + p.lineTotal, 0);
-const totalQty = products.reduce((sum, p) => sum + p.quantity, 0);
-const averagePrice = totalCost / totalQty;
-console.log('Average price:', averagePrice);
-
-// Method 2: Size-specific (CORRECT)
-const standardSizes = {S: 3, M: 12, L: 3, XL: 7};
-const pricePerSize = 35.39;
-const total = Object.values(standardSizes).reduce((sum, qty) => sum + (qty * pricePerSize), 0);
-console.log('Size-specific total:', total);
-console.log('Difference:', Math.abs(total - (25 * averagePrice)));
-```
-
-### Common Issues & Fixes
-
-#### Issue: "SizesPricing is undefined"
-
-**Cause:** Quote builder didn't attach SizesPricing to product
-
-**Fix:**
-```javascript
-// In quote builder, after calculating pricing:
-product.SizesPricing = sizesPricing;  // Make sure this line exists!
-```
-
-#### Issue: Prices in SizesPricing are objects, not numbers
-
-**Cause:** Passing entire priceData object instead of just the price
-
-**Bad:**
-```javascript
-sizesPricing[size] = priceData;  // Object: {unitPrice: 35.39, quantity: 3, ...}
-```
-
-**Good:**
-```javascript
-sizesPricing[size] = priceData.unitPrice + additionalCost + ltmImpact;  // Number: 35.39
-```
-
-#### Issue: Console shows "Using final price" instead of "Using size-specific price"
-
-**Cause:** SizesPricing exists but doesn't have the specific size
-
-**Debug:**
-```javascript
-console.log('Available sizes in SizesPricing:', Object.keys(product.SizesPricing));
-console.log('Trying to get size:', size);
-console.log('Size exists?', size in product.SizesPricing);
-```
-
-**Common cause:** Size naming mismatch (e.g., "XXL" vs "2XL")
-
-#### Issue: Line totals don't sum to grand total
-
-**Cause:** Penny rounding accumulation
-
-**This is normal!** Each line rounds to 2 decimals, so:
-```
-Line 1: 3 × $35.39 = $106.17 (actually $106.17)
-Line 2: 12 × $35.39 = $424.68 (actually $424.68)
-Sum: $530.85
-Actual: 15 × $35.39 = $530.85
-Difference: $0.00 ← Perfect
-
-BUT across 10+ lines, can accumulate to $0.10-0.20 difference.
-This is ACCEPTABLE and EXPECTED.
-```
-
----
-
-## Reference Implementation
-
-### Git Commits
-
-#### Commit 1: c96bff3 - Include additional locations cost
-**Date:** 2025-10-25
-**Files Modified:** `screenprint-quote-builder.html`
-**Lines Changed:** 3490-3508, 3612-3620
-
-**What Changed:**
-```javascript
-// Added extraction of additional locations cost
-const additionalCostPerPiece = pricingMatch?.additionalCost || 0;
-
-// Updated calculation to include all components
-const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
-```
-
-**Impact:** Fixed $7.50 discrepancy where additional locations were missing
-
-#### Commit 2: c0f9286 - Use size-specific pricing for standard sizes
-**Date:** 2025-10-25
-**Files Modified:** `shopworks-guide-generator.js`
-**Lines Changed:** 150, 245-267, 272-292
-
-**What Changed:**
-1. Added `getStandardSizePrice()` method
-2. Updated line 150 to use new method instead of FinalUnitPrice
-3. Enhanced `calculateLineTotal()` to sum individual (qty × price)
-
-**Impact:** Fixed $0.73 discrepancy where standard sizes were using weighted average
-
-### Before & After Examples
-
-#### Example 1: Screen Print with Additional Locations
-
-**Before Fix (c96bff3):**
-```
-Order Summary: $28.50/pc
-ShopWorks: $28.73/pc
-Discrepancy: $0.23
-```
-
-**After Fix:**
-```
-Order Summary: $28.50/pc
-ShopWorks: $28.50/pc
-Discrepancy: $0.00 ✓
-```
-
-#### Example 2: Mixed Size Order
-
-**Before Fix (c0f9286):**
-```
-Order Summary S/M/L/XL: $41.75/pc
-ShopWorks Standard Line: $42.48/pc
-Discrepancy: $0.73
-```
-
-**After Fix:**
-```
-Order Summary S/M/L/XL: $41.75/pc
-ShopWorks Standard Line: $41.75/pc
-Discrepancy: $0.00 ✓
-```
-
-### Complete Working Example
-
-#### Quote Parameters
-- **Products:** PC54 Heather Royal, PC61 Cardinal
-- **Total Quantity:** 56 pieces (triggers LTM fee)
-- **Print Setup:**
-  - Front: 3 colors + 1 underbase + Safety Stripes
-  - Back: 3 colors + 1 underbase + Safety Stripes
-  - Left Sleeve: 2 colors + 1 underbase
-
-#### Order Summary Output
-```
-PC54 - Heather Royal (33 pieces)
-S/M/L/XL (25 total): $16.00 + $4.00 safety + $14.50 add'l + $0.89 LTM = $35.39/pc
-2XL (7 total): $18.00 + $4.00 safety + $14.50 add'l + $0.89 LTM = $37.39/pc
-3XL (1 total): $19.00 + $4.00 safety + $14.50 add'l + $0.89 LTM = $38.39/pc
-
-PC61 - Cardinal (23 pieces)
-S/M/L/XL (11 total): $17.00 + $4.00 safety + $14.50 add'l + $0.89 LTM = $36.39/pc
-2XL-6XL: $38.39, $39.39, $40.39, $42.39, $43.39/pc
-```
-
-#### ShopWorks Guide Output
-```
-Line | Qty | Part Number | Manual Price | Sizes              | Line Total
------|-----|-------------|--------------|--------------------|-----------
-1    | 11  | SPSU        | $30.00       | 11                 | $330.00
-2    | 25  | PC54        | $35.39       | S:3 M:12 L:3 XL:7  | $884.75
-3    | 7   | PC54_2X     | $37.39       | 2XL:7              | $261.73
-4    | 1   | PC54_3X     | $38.39       | 3XL:1              | $38.39
-5    | 11  | PC61        | $36.39       | S:3 M:3 L:3 XL:2   | $400.29
-6    | 4   | PC61_2X     | $38.39       | 2XL:4              | $153.56
-7    | 3   | PC61_3X     | $39.39       | 3XL:3              | $118.17
-8    | 3   | PC61_4X     | $40.39       | 4XL:3              | $121.17
-9    | 1   | PC61_5X     | $42.39       | 5XL:1              | $42.39
-10   | 1   | PC61_6X     | $43.39       | 6XL:1              | $43.39
-                                                     Subtotal: $2393.84
-```
-
-#### EDP Import Output
-```
----- Start Product ----
-PartNumber>> PC54
-cur_UnitPriceUserEntered>> 35.39
-Size01_Req>> 3
-Size02_Req>> 12
-Size03_Req>> 3
-Size04_Req>> 7
----- End Product ----
-
----- Start Product ----
-PartNumber>> PC54_2X
-cur_UnitPriceUserEntered>> 37.39
-Size05_Req>> 7
----- End Product ----
-```
-
-#### Verification Results
-```
-✅ All per-piece prices match exactly
-✅ Setup fee correct ($330.00)
-✅ Line totals within $0.02 (penny rounding)
-✅ Grand total within $0.16 (acceptable)
-✅ Console logs show "Using size-specific price"
-✅ ShopWorks import successful
-```
-
----
-
-## CATALOG_COLOR Implementation
-
-### Overview
-
-**Problem:** ShopWorks EDP import requires product colors in **CATALOG_COLOR** format (e.g., "Hthr Dk Ch Brn") instead of **COLOR_NAME** format (e.g., "Heather Dark Chocolate Brown") for accurate product matching in their inventory system.
-
-**Scope:** This implementation affects **only** the EDP text generation. The Quote Builder UI and ShopWorks Guide PDF continue to use COLOR_NAME for better readability.
-
-**Implementation Date:** October 25, 2025
-**Git Commits:** be2222b, 05b58ae, 7177fcf
-**Files Modified:** 3 files, 9 total changes
-
----
-
-### The Color Format Problem
-
-When the Color Swatches API returns product color information, it provides **two formats**:
-
-```json
-{
-  "COLOR_NAME": "Heather Dark Chocolate Brown",    // User-friendly display
-  "CATALOG_COLOR": "Hthr Dk Ch Brn"               // ShopWorks catalog format
-}
-```
-
-**Before Implementation:**
-- Quote Builder used COLOR_NAME for everything
-- EDP text output: `PartColor>> Heather Dark Chocolate Brown`
-- ShopWorks couldn't match to inventory (expected catalog format)
-
-**After Implementation:**
-- Quote Builder uses COLOR_NAME for display
-- EDP text output: `PartColor>> Hthr Dk Ch Brn`
-- ShopWorks successfully matches to inventory ✅
-
----
-
-### Three-Commit Implementation
-
-#### Commit 1: Initial CATALOG_COLOR Infrastructure (be2222b)
-
-**Purpose:** Add catalogColor field throughout the data flow chain
-
-**Changes:**
-1. Modified `selectColor()` to accept both `colorName` and `catalogColor` parameters
-2. Added `catalogColor` field to `currentProduct` object
-3. Updated color swatch click handlers to pass both formats
-4. Added `CatalogColor` field to ShopWorks data structures
-5. Modified EDP generator to prefer `catalogColor` with fallback to `color`
-
-**Files Modified:**
-- `quote-builders/screenprint-quote-builder.html` (3 changes)
-- `shared_components/js/shopworks-guide-generator.js` (2 changes)
-- `shared_components/js/shopworks-edp-generator.js` (1 change)
-
-**Key Code Pattern:**
-```javascript
-// Color swatch click handler
-swatchEl.onclick = () => this.selectColor(
-    swatch.COLOR_NAME,      // For display
-    swatch.CATALOG_COLOR,   // For ShopWorks
-    swatchEl
-);
-
-// EDP generator fallback pattern
-edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
-```
-
-#### Commit 2: Auto-load CatalogColor Population (05b58ae)
-
-**Purpose:** Handle auto-loaded products (exact match search) that bypass color swatch clicks
-
-**Problem Discovered:**
-- When user types exact style number (e.g., "PC54"), product auto-loads
-- Auto-load bypassed color swatch click handler
-- `catalogColor` field was undefined for auto-loaded products
-- Console showed: `"CatalogColor": ""` (empty string)
-
-**Solution:**
-Created helper function to look up CATALOG_COLOR from the stored color swatches array:
-
-```javascript
-getCatalogColorFromSwatches(colorName) {
-    if (!this.currentProduct || !this.currentProduct.colorSwatches) {
-        console.warn('[CatalogColor] No color swatches data available');
-        return '';
-    }
-
-    // Find the swatch that matches the COLOR_NAME
-    const swatch = this.currentProduct.colorSwatches.find(s =>
-        s.COLOR_NAME === colorName
-    );
-
-    if (swatch && swatch.CATALOG_COLOR) {
-        console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
-        return swatch.CATALOG_COLOR;
-    } else {
-        console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
-        return '';
-    }
-}
-```
-
-**Modified `loadProductDetails()`:**
-```javascript
-// Store color information (both formats)
-this.currentProduct.color = color;  // COLOR_NAME for display
-
-// CRITICAL FIX: Look up and store catalogColor even when auto-loading
-const catalogColor = this.getCatalogColorFromSwatches(color);
-this.currentProduct.catalogColor = catalogColor;
-
-console.log(`[loadProductDetails] Stored colors - Display: "${color}", Catalog: "${catalogColor}"`);
-```
-
-**Files Modified:**
-- `quote-builders/screenprint-quote-builder.html` (2 changes: helper function + loadProductDetails)
-
-#### Commit 3: Complete Data Flow Chain (7177fcf)
-
-**Purpose:** Fix the missing link where `catalogColor` wasn't being copied to product objects
-
-**Problem Discovered:**
-- Console logs showed successful catalogColor lookup: ✅
-  ```
-  [CatalogColor] Found match: "Dark Chocolate Brown" → "Dk Choc Brown"
-  [loadProductDetails] Stored colors - Display: "Dark Chocolate Brown", Catalog: "Dk Choc Brown"
-  ```
-- But EDP text still showed COLOR_NAME: ❌
-  ```
-  PartColor>> Dark Chocolate Brown
-  ```
-
-**Root Cause:**
-The `addProductToQuote()` function created product objects with only the `color` field, NOT the `catalogColor` field:
-
-```javascript
-// BEFORE (missing catalogColor):
-const product = {
-    styleNumber: this.currentProduct.styleNumber,
-    productName: this.currentProduct.details.PRODUCT_TITLE || '',
-    color: this.currentProduct.color,              // ✅ Has this
-    colorSwatchImage: this.currentProduct.colorSwatchImage || '',
-    sizeBreakdown: sizeBreakdown,
-    quantity: totalQuantity
-    // ❌ MISSING: catalogColor field
-};
-```
-
-**Solution:**
-Added one line to copy `catalogColor` from `currentProduct` to the product object:
-
-```javascript
-// AFTER (complete):
-const product = {
-    styleNumber: this.currentProduct.styleNumber,
-    productName: this.currentProduct.details.PRODUCT_TITLE || '',
-    color: this.currentProduct.color,
-    catalogColor: this.currentProduct.catalogColor,  // ✅ ADDED THIS LINE
-    colorSwatchImage: this.currentProduct.colorSwatchImage || '',
-    sizeBreakdown: sizeBreakdown,
-    quantity: totalQuantity
-};
-```
-
-**Files Modified:**
-- `quote-builders/screenprint-quote-builder.html` (1 change at line 2691)
-
----
-
-### Complete Data Flow Chain
-
-The catalogColor now flows through the entire system:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│ 1. Color Swatches API                                   │
-│    Returns both COLOR_NAME and CATALOG_COLOR           │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 2. loadProductDetails() / selectColor()                 │
-│    getCatalogColorFromSwatches("Dark Chocolate Brown")  │
-│    → Returns "Dk Choc Brown"                            │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 3. currentProduct Object                                │
-│    currentProduct.color = "Dark Chocolate Brown"        │
-│    currentProduct.catalogColor = "Dk Choc Brown" ✅     │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 4. addProductToQuote()                                  │
-│    product.color = currentProduct.color                 │
-│    product.catalogColor = currentProduct.catalogColor ✅│
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 5. this.products Array                                  │
-│    Stores product objects with both color formats       │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 6. generateEDPText()                                    │
-│    quoteData.products.push({                            │
-│        CatalogColor: product.catalogColor || '' ✅      │
-│    })                                                   │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 7. Guide Generator (shopworks-guide-generator.js)       │
-│    lineItem.catalogColor = product.CatalogColor ✅      │
-└────────────────────┬────────────────────────────────────┘
-                     ↓
-┌─────────────────────────────────────────────────────────┐
-│ 8. EDP Generator (shopworks-edp-generator.js)           │
-│    PartColor>> ${item.catalogColor || item.color}       │
-│    → Outputs "Dk Choc Brown" ✅                         │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-### Testing & Verification
-
-#### Console Log Verification
-
-**Successful catalogColor lookup:**
-```javascript
-[CatalogColor] Found match: "Heather Dark Chocolate Brown" → "Hthr Dk Ch Brn"
-[loadProductDetails] Stored colors - Display: "Heather Dark Chocolate Brown", Catalog: "Hthr Dk Ch Brn"
-```
-
-**Product object verification:**
-```javascript
-{
-    styleNumber: "PC54",
-    color: "Heather Dark Chocolate Brown",        // Display
-    catalogColor: "Hthr Dk Ch Brn",              // ShopWorks ✅
-    // ... other fields
-}
-```
-
-#### EDP Text Verification
-
-**Before Implementation:**
-```
-PartNumber>> PC54
-PartColor>> Heather Dark Chocolate Brown    ❌ Wrong format
-```
-
-**After Implementation:**
-```
-PartNumber>> PC54
-PartColor>> Hthr Dk Ch Brn                  ✅ Correct format
-```
-
-**Setup Charge (correctly remains empty):**
-```
-PartNumber>> SPSU
-PartColor>>                                  ✅ Empty (as intended)
-```
-
-#### ShopWorks Import Verification
-
-**Test Date:** October 25, 2025
-
-**Import Results:**
-- ✅ All product colors imported successfully
-- ✅ Catalog colors matched to ShopWorks inventory
-- ✅ All pricing calculations verified correct
-- ✅ Setup charges imported without color (correct)
-
-**Known Behavior: Visual Truncation**
-
-ShopWorks grid view may **visually truncate** long catalog colors due to column width:
-
-| Part Number | Color in Grid | Actual Stored Value |
-|-------------|---------------|---------------------|
-| PC54 | **Hthr Dk** | Hthr Dk Ch Brn ✅ |
-| PC61 | **Ath.** | Ath. Maroon ✅ |
-
-**This is display-only truncation** - the full catalog color is correctly stored in the ShopWorks database. You can verify by:
-1. Double-clicking the product row to view details
-2. Widening the Color column in the grid view
-3. Checking the database record directly
-
----
-
-### Setup Charge Behavior
-
-Setup charges (part number SPSU) are **service line items**, not physical products, so they intentionally have **no color**.
-
-**Setup Charge Creation:**
-```javascript
-// From screenprint-shopworks-guide-generator.js line 64-68
-const spsuItem = {
-    lineQty: '',
-    partNumber: 'SPSU',
-    colorRange: '',
-    color: '',                    // Intentionally empty ✅
-    catalogColor: '',             // Also empty ✅
-    description: 'New Screen Set Up Charge: 8 colors...'
-};
-```
-
-**EDP Output:**
-```
----- Start Product ----
-PartNumber>> SPSU
-PartColorRange>>
-PartColor>>                       ✅ Empty (correct for setup charges)
-cur_UnitPriceUserEntered>> 30.00
-```
-
-**The fallback pattern handles this correctly:**
-```javascript
-edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
-//                   ↑ undefined        ↑ ''         ↑ fallback: ''
-//                   Result: Empty string ✅
-```
-
----
-
-### Code Patterns for Future Use
-
-#### Pattern 1: Helper Function for Catalog Color Lookup
-
-```javascript
-/**
- * Look up CATALOG_COLOR from color swatches array
- * Used for auto-loaded products that bypass swatch clicks
- */
-getCatalogColorFromSwatches(colorName) {
-    if (!this.currentProduct || !this.currentProduct.colorSwatches) {
-        console.warn('[CatalogColor] No color swatches data available');
-        return '';
-    }
-
-    const swatch = this.currentProduct.colorSwatches.find(s =>
-        s.COLOR_NAME === colorName
-    );
-
-    if (swatch && swatch.CATALOG_COLOR) {
-        console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
-        return swatch.CATALOG_COLOR;
-    } else {
-        console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
-        return '';
-    }
-}
-```
-
-#### Pattern 2: Always Populate Both Color Formats
-
-```javascript
-// When loading product details
-this.currentProduct.color = colorName;                              // Display
-this.currentProduct.catalogColor = this.getCatalogColorFromSwatches(colorName); // ShopWorks
-```
-
-#### Pattern 3: Copy catalogColor to Product Objects
-
-```javascript
-// When adding product to quote
-const product = {
-    // ... other fields
-    color: this.currentProduct.color,                    // Display format
-    catalogColor: this.currentProduct.catalogColor,      // ShopWorks format
-};
-```
-
-#### Pattern 4: EDP Generator Fallback
-
-```javascript
-// EDP generator always uses fallback pattern
-edp += `PartColor>> ${item.catalogColor || item.color || ''}\n`;
-//                   ↑ Prefer catalog  ↑ Fallback  ↑ Final fallback
-```
-
----
-
-### Applying to Other Quote Builders
-
-This pattern can be applied to **any quote builder that generates EDP text**:
-
-- ✅ Screen Print (implemented)
-- ⏳ DTG Quote Builder (can apply same pattern)
-- ⏳ Embroidery Quote Builder (can apply same pattern)
-- ⏳ Cap Embroidery Quote Builder (can apply same pattern)
-
-**Implementation Checklist for Other Quote Builders:**
-
-1. **Add Helper Function:**
-   - Copy `getCatalogColorFromSwatches()` to quote builder
-
-2. **Modify Color Selection:**
-   - Update `selectColor()` to accept catalogColor parameter
-   - Update color swatch click handlers to pass both formats
-
-3. **Modify loadProductDetails():**
-   - Call `getCatalogColorFromSwatches()` to populate catalogColor
-   - Store both `color` and `catalogColor` in `currentProduct`
-
-4. **Modify addProductToQuote():**
-   - Add `catalogColor` field to product object
-
-5. **Update Guide Generator:**
-   - Add `catalogColor` field to line item creation
-   - Use same fallback pattern: `product.CatalogColor || product.catalogColor || ''`
-
-6. **Update EDP Generator:**
-   - Modify PartColor field to use: `item.catalogColor || item.color || ''`
-
-7. **Test:**
-   - Verify console logs show successful catalogColor lookup
-   - Check EDP text shows CATALOG_COLOR format
-   - Import test file into ShopWorks
-   - Verify products match to inventory
-
----
-
-### Troubleshooting
-
-#### Issue: catalogColor is Empty in Console
-
-**Symptoms:**
-```javascript
-console.log(product.catalogColor);  // ""
-```
-
-**Possible Causes:**
-1. Color swatches API didn't return CATALOG_COLOR field
-2. getCatalogColorFromSwatches() couldn't find matching swatch
-3. catalogColor not copied in addProductToQuote()
-
-**Solution:**
-- Check console for `[CatalogColor]` log messages
-- Verify colorSwatches array is populated
-- Check exact spelling of COLOR_NAME (case-sensitive)
-
-#### Issue: EDP Still Shows COLOR_NAME
-
-**Symptoms:**
-```
-PartColor>> Dark Chocolate Brown    ❌ Should be "Dk Choc Brown"
-```
-
-**Possible Causes:**
-1. catalogColor not in product object (check addProductToQuote)
-2. catalogColor not passed to quoteData
-3. catalogColor not passed to line items
-
-**Solution:**
-- Trace data flow: currentProduct → product → quoteData → lineItem
-- Add console.log at each step to verify catalogColor is present
-- Check for typos: `catalogColor` vs `CatalogColor` (case matters)
-
-#### Issue: Setup Charges Have Unexpected Color
-
-**Symptoms:**
-```
-PartNumber>> SPSU
-PartColor>> Hthr Dk Ch Brn    ❌ Should be empty
-```
-
-**Solution:**
-Setup charges should be created with empty color fields:
-```javascript
-const spsuItem = {
-    color: '',
-    catalogColor: ''
-};
-```
-
----
-
-### Performance & Maintenance Notes
-
-**API Calls:**
-- No additional API calls required
-- CATALOG_COLOR comes from existing Color Swatches API
-- Color swatches are already fetched during product load
-
-**Memory Impact:**
-- Adds one string field (`catalogColor`) per product
-- Negligible memory impact (< 50 bytes per product)
-
-**Maintenance:**
-- If Caspio changes CATALOG_COLOR format, only need to update color swatches API
-- No code changes required (just data format in API response)
-
-**Cache Considerations:**
-- Color swatches are cached with product details
-- catalogColor lookup uses cached data (no extra API calls)
-
----
-
-## Section 12: Complete EDP Field Reference
-
-### Overview
-
-This section documents ALL available EDP fields from the ShopWorks EDP specification. Use this as a reference when considering adding new fields to your EDP implementation.
-
-**Currently Implemented Blocks:**
-- ✅ Order Block (12 of 44 fields implemented, ALL 44 documented)
-- ✅ Customer Block (1 of 44 fields implemented, ALL 44 documented)
-- ✅ Contact Block (0 of 10 fields implemented, ALL 10 documented)
-- ✅ Design Block (0 of 11 fields implemented, ALL 11 documented - HIGH VALUE)
-- ⚠️ Product Block (19 of 19 implemented fields - COMPLETE)
-- ✅ Payment Block (0 of 8 fields implemented, ALL 8 documented - FUTURE STRIPE INTEGRATION)
-
-### Order Block Fields
-
-**Status: PARTIALLY IMPLEMENTED - READY FOR FULL IMPLEMENTATION**
-
-**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
-
-**Documentation Source:** ShopWorks OnSite 7 Order Block field mapping specification
-
-**Architecture:** Order Block is organized into **6 SubBlocks** in OnSite 7
-
-**🔄 IMPORTANT: This Order Block structure is SHARED across ALL quote builders**
-- ✅ Screen Print Quote Builder
-- ✅ DTG Quote Builder
-- ✅ Embroidery Quote Builder
-- ✅ Cap Embroidery Quote Builder
-- ✅ All future quote builders
-
-**What changes between quote builders:**
-- `id_OrderType` value (13 for Screen Print, 15 for DTG, 17 for Embroidery, etc.)
-- `ExtSource` identifier ("SP Quote", "DTG Quote", "EMB Quote", etc.)
-- Notes content (art/production instructions are method-specific)
-
-**What stays the same across ALL quote builders:**
-- All field names and structure
-- All address fields
-- All date fields and formats
-- Payment terms, sales tax, shipping fields
-
----
-
-#### Order Block Structure (44 Total Fields)
-
-The Order Block in ShopWorks OnSite 7 uses a SubBlock architecture to organize order-related fields.
-
-**SubBlock Overview:**
-1. **ID SubBlock** (4 fields) - External identification and order type
-2. **Details SubBlock** (8 fields) - Order details, terms, and settings
-3. **Dates SubBlock** (3 fields) - Order dates and deadlines
-4. **Sales Tax SubBlock** (10 fields) - Tax calculation and overrides
-5. **Shipping SubBlock** (11 fields) - Shipping address and method
-6. **Notes SubBlock** (7 fields) - Department-specific instructions
-
----
-
-#### SubBlock 1: ID SubBlock (4 fields)
-
-**Purpose:** External order identification and order type classification
-
-```javascript
-// OnSite 7 Field Names
-ExtOrderID              // External order/quote ID
-ExtSource               // Source system identifier
-date_External           // NEW in OnSite 7 - External system date
-id_OrderType            // ShopWorks order type ID
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `ExtOrderID` | ExtOrderID | Quote ID from calculator |
-| `ExtSource` | ExtSource | Source identifier |
-| `date_External` | Date External | **NEW in OnSite 7** - External order date |
-| `id_OrderType` | # Order Type 2 | Numeric order type ID |
-
-**Use Cases:**
-- `ExtOrderID` - Quote ID from calculator (e.g., "SP0127-1", "DTG0127-2", "EMB0127-3")
-- `ExtSource` - Source identifier (e.g., "SP Quote", "DTG Quote", "EMB Quote", "CAP Quote")
-- `date_External` - External system order date (NEW in OnSite 7)
-- `id_OrderType` - ShopWorks order type ID:
-  - 13 = Screen Print
-  - 15 = DTG (Direct-to-Garment)
-  - 17 = Embroidery
-  - 18 = Cap Embroidery
-  - *(Contact ShopWorks for complete list)*
-
-**Currently Implemented:** ✅ All 4 fields
-
----
-
-#### SubBlock 2: Details SubBlock (8 fields)
-
-**Purpose:** Order details, payment terms, customer service, and order status
-
-```javascript
-// OnSite 7 Field Names
-CustomerPurchaseOrder   // Customer's PO number
-TermsName               // Payment terms
-CustomerServiceRep      // Assigned sales representative
-CustomerType            // NEW in OnSite 7 - Customer classification
-id_CompanyLocation      // NEW in OnSite 7 - Company location ID
-id_SalesStatus          // NEW in OnSite 7 - Sales pipeline status
-sts_CommishAllow        // NEW in OnSite 7 - Allow commission (Yes/No)
-HoldOrderText           // NEW in OnSite 7 - Order hold reason/notes
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `CustomerPurchaseOrder` | # Purchase Order | Customer's PO number |
-| `TermsName` | Terms | Payment terms |
-| `CustomerServiceRep` | Salesperson | Sales rep (renamed in OnSite 7) |
-| `CustomerType` | Customer Type | **NEW in OnSite 7** - Customer classification |
-| `id_CompanyLocation` | Code To Location | **NEW in OnSite 7** - Location ID |
-| `id_SalesStatus` | *(NEW)* | **NEW in OnSite 7** - Sales status |
-| `sts_CommishAllow` | ? Commission Order | **NEW in OnSite 7** - Commission flag |
-| `HoldOrderText` | *(NEW)* | **NEW in OnSite 7** - Hold reason |
-
-**Use Cases:**
-- `CustomerPurchaseOrder` - Customer's PO number for tracking (e.g., "Screenprint", "DTG Order", "Embroidery")
-- `TermsName` - Payment terms: "Net 30", "Pay On Pickup", "COD", "Prepay"
-- `CustomerServiceRep` - Assigned sales rep (e.g., "Ruth Nhong", "Nika Lao", "N/A")
-- `CustomerType` - Customer classification (NEW in OnSite 7)
-- `id_CompanyLocation` - Multi-location customers, branch/division tracking (NEW in OnSite 7)
-- `id_SalesStatus` - Sales pipeline status ID (NEW in OnSite 7)
-- `sts_CommishAllow` - Allow commission on this order: "Yes" or "No"
-- `HoldOrderText` - Reason for order hold, special instructions (NEW in OnSite 7)
-
-**Currently Implemented:** ✅ CustomerPurchaseOrder, TermsName, CustomerServiceRep (3 of 8 fields)
-
----
-
-#### SubBlock 3: Dates SubBlock (3 fields)
-
-**Purpose:** Order dates, shipping dates, and deadlines
-
-```javascript
-// OnSite 7 Field Names
-date_OrderPlaced          // Order placement date
-date_OrderRequestedToShip // Requested ship date
-date_OrderDropDead        // NEW in OnSite 7 - Absolute deadline date
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `date_OrderPlaced` | Date Order Placed | Order creation date |
-| `date_OrderRequestedToShip` | Date To Ship | Customer requested ship date |
-| `date_OrderDropDead` | Date Drop Dead | **NEW in OnSite 7** - Absolute deadline |
-
-**Use Cases:**
-- `date_OrderPlaced` - Today's date when quote is created (MM/DD/YYYY format, no time)
-- `date_OrderRequestedToShip` - Customer requested delivery date (auto-calculated 2 weeks ahead, avoids weekends)
-- `date_OrderDropDead` - Absolute deadline date, cannot ship after this (NEW in OnSite 7)
-
-**Date Format:** MM/DD/YYYY (no time component, e.g., "01/27/2025")
-
-**Currently Implemented:** ✅ date_OrderPlaced, date_OrderRequestedToShip (2 of 3 fields)
-
----
-
-#### SubBlock 4: Sales Tax SubBlock (10 fields)
-
-**Purpose:** Sales tax calculation, exemptions, and GL account mapping
-
-```javascript
-// OnSite 7 Field Names (Tax Settings)
-sts_Order_SalesTax_Override // NEW in OnSite 7 - Override customer tax settings
-sts_ApplySalesTax01         // NEW in OnSite 7 - Apply tax jurisdiction 1
-sts_ApplySalesTax02         // NEW in OnSite 7 - Apply tax jurisdiction 2
-sts_ApplySalesTax03         // NEW in OnSite 7 - Apply tax jurisdiction 3
-sts_ApplySalesTax04         // NEW in OnSite 7 - Apply tax jurisdiction 4
-
-// GL Account Mapping
-coa_AccountSalesTax01       // GL account for sales tax 1
-coa_AccountSalesTax02       // GL account for sales tax 2
-coa_AccountSalesTax03       // NEW in OnSite 7 - GL account for sales tax 3
-coa_AccountSalesTax04       // NEW in OnSite 7 - GL account for sales tax 4
-
-// Additional Tax Settings
-sts_ShippingTaxable         // NEW in OnSite 7 - Charge tax on shipping (Yes/No)
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `sts_Order_SalesTax_Override` | *(NEW)* | **NEW in OnSite 7** - Override tax settings |
-| `sts_ApplySalesTax01` | *(NEW)* | **NEW in OnSite 7** - Apply tax 1 |
-| `sts_ApplySalesTax02` | *(NEW)* | **NEW in OnSite 7** - Apply tax 2 |
-| `sts_ApplySalesTax03` | *(NEW)* | **NEW in OnSite 7** - Apply tax 3 |
-| `sts_ApplySalesTax04` | *(NEW)* | **NEW in OnSite 7** - Apply tax 4 |
-| `coa_AccountSalesTax01` | # Account Sales Tax 1 | GL account |
-| `coa_AccountSalesTax02` | # Account Sales Tax 2 | GL account |
-| `coa_AccountSalesTax03` | *(NEW)* | **NEW in OnSite 7** - GL account 3 |
-| `coa_AccountSalesTax04` | *(NEW)* | **NEW in OnSite 7** - GL account 4 |
-| `sts_ShippingTaxable` | *(NEW)* | **NEW in OnSite 7** - Tax shipping |
-
-**Use Cases:**
-- `sts_Order_SalesTax_Override` - Override customer's default tax settings for this order: "Yes" or "No"
-- `sts_ApplySalesTax01-04` - Apply each tax jurisdiction (Yes/No) - supports up to 4 different taxes
-- `coa_AccountSalesTax01-04` - GL account codes for each tax type for proper accounting
-- `sts_ShippingTaxable` - Charge tax on shipping fees for this order: "Yes" or "No" (varies by state)
-
-**Currently Implemented:** ❌ 0 of 10 fields (ready for implementation)
-
----
-
-#### SubBlock 5: Shipping SubBlock (11 fields)
-
-**Purpose:** Shipping address, carrier method, and shipping charges
-
-```javascript
-// OnSite 7 Field Names (Shipping Address)
-AddressDescription        // NEW in OnSite 7 - Address label/description
-AddressCompany            // Company name for shipping
-Address1                  // Street address line 1
-Address2                  // Street address line 2
-AddressCity               // City
-AddressState              // State abbreviation
-AddressZip                // ZIP/postal code
-AddressCountry            // NEW in OnSite 7 - Country
-
-// Shipping Method & Charges
-ShipMethod                // Carrier/method
-cur_Shipping              // Shipping charges amount
-
-// Settings
-sts_Order_ShipAddress_Add // NEW in OnSite 7 - Add address to customer (Yes/No)
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `AddressDescription` | *(NEW)* | **NEW in OnSite 7** - Address label |
-| `AddressCompany` | Ship Company | Company name |
-| `Address1` | Ship Address 1 | Street address |
-| `Address2` | Ship Address 2 | Suite/unit |
-| `AddressCity` | Ship City | City |
-| `AddressState` | Ship State | State abbreviation |
-| `AddressZip` | Ship Zip | ZIP code |
-| `AddressCountry` | *(NEW)* | **NEW in OnSite 7** - Country |
-| `ShipMethod` | Ship Via | Carrier method |
-| `cur_Shipping` | $ Shipping | Shipping charges |
-| `sts_Order_ShipAddress_Add` | *(NEW)* | **NEW in OnSite 7** - Add to address book |
-
-**Use Cases:**
-- `AddressDescription` - Label: "Shipping", "Delivery", "Will Call", "Main Office" (NEW in OnSite 7)
-- Complete shipping address fields for delivery
-- `AddressCountry` - International shipping support (default "USA") (NEW in OnSite 7)
-- `ShipMethod` - Carrier/method: "UPS Ground", "FedEx", "USPS", "Will Call", "Customer Pickup"
-- `cur_Shipping` - Shipping charges amount (decimal, e.g., "15.50")
-- `sts_Order_ShipAddress_Add` - Add this address to customer's address book: "Yes" or "No"
-
-**Currently Implemented:** ❌ 0 of 11 fields (ready for implementation)
-
----
-
-#### SubBlock 6: Notes SubBlock (7 fields)
-
-**Purpose:** Department-specific instructions and notes
-
-```javascript
-// OnSite 7 Field Names
-NotesToArt              // Art department instructions
-NotesToProduction       // Production setup instructions
-NotesToReceiving        // Receiving department notes
-NotesToPurchasing       // Purchasing department notes
-NotesToShipping         // Shipping instructions
-NotesToAccounting       // Billing/accounting notes
-NotesToPurchasingSub    // NEW in OnSite 7 - Subcontractor purchasing notes
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `NotesToArt` | Notes To Art | Art instructions |
-| `NotesToProduction` | Notes To Production | Production instructions |
-| `NotesToReceiving` | Notes To Receiving | Receiving notes |
-| `NotesToPurchasing` | Notes to Purchasing | Purchasing notes |
-| `NotesToShipping` | Notes to Shipping | Shipping instructions |
-| `NotesToAccounting` | Notes To Accounts Receivable | Accounting notes |
-| `NotesToPurchasingSub` | *(NEW)* | **NEW in OnSite 7** - Subcontractor notes |
-
-**Use Cases:**
-- `NotesToArt` - Art department instructions (colors, locations, special effects, artwork files)
-- `NotesToProduction` - Production setup instructions (equipment, materials, special handling, setup details)
-- `NotesToReceiving` - Receiving instructions (inspection requirements, storage)
-- `NotesToPurchasing` - Purchasing department notes (special orders, vendor info)
-- `NotesToShipping` - Shipping instructions (packaging, delivery notes, special handling)
-- `NotesToAccounting` - Billing/accounting notes (payment terms, special billing)
-- `NotesToPurchasingSub` - Subcontractor purchasing notes (NEW in OnSite 7)
-
-**Currently Implemented:** ✅ NotesToArt, NotesToProduction (2 of 7 fields)
-
----
-
-#### Complete Implementation Example
-
-**Full Order Block with All SubBlocks (Shared Across ALL Quote Builders):**
-
-```javascript
-// Order Block - Complete implementation
-// This structure is IDENTICAL for Screen Print, DTG, Embroidery, Cap, etc.
-edp += '---- Start Order ----\n';
-
-// ===== SubBlock 1: ID =====
-edp += `ExtOrderID>> ${quoteData.QuoteID}\n`;  // "SP0127-1", "DTG0127-2", etc.
-edp += `ExtSource>> ${quoteData.QuoteSource}\n`;  // "SP Quote", "DTG Quote", etc.
-edp += `date_External>> ${quoteData.ExternalDate || ''}\n`;
-edp += `id_OrderType>> ${this.config.orderTypeId}\n`;  // 13, 15, 17, etc.
-
-// ===== SubBlock 2: Details =====
-edp += `CustomerPurchaseOrder>> ${quoteData.CustomerPO || quoteData.QuoteType}\n`;
-edp += `TermsName>> ${quoteData.PaymentTerms || 'Pay On Pickup'}\n`;
-edp += `CustomerServiceRep>> ${quoteData.SalesRep || 'N/A'}\n`;
-edp += `CustomerType>> ${quoteData.CustomerType || ''}\n`;
-edp += `id_CompanyLocation>> ${quoteData.CompanyLocation || ''}\n`;
-edp += `id_SalesStatus>> ${quoteData.SalesStatus || ''}\n`;
-edp += `sts_CommishAllow>> ${quoteData.CommissionAllowed ? 'Yes' : 'No'}\n`;
-edp += `HoldOrderText>> ${quoteData.HoldReason || ''}\n`;
-
-// ===== SubBlock 3: Dates =====
-edp += `date_OrderPlaced>> ${this.formatDate(new Date())}\n`;
-edp += `date_OrderRequestedToShip>> ${this.calculateShipDate()}\n`;
-edp += `date_OrderDropDead>> ${quoteData.DropDeadDate || ''}\n`;
-
-// ===== SubBlock 4: Sales Tax =====
-edp += `sts_Order_SalesTax_Override>> ${quoteData.TaxOverride ? 'Yes' : 'No'}\n`;
-edp += `sts_ApplySalesTax01>> ${quoteData.ApplySalesTax ? 'Yes' : 'No'}\n`;
-edp += `sts_ApplySalesTax02>> No\n`;
-edp += `sts_ApplySalesTax03>> No\n`;
-edp += `sts_ApplySalesTax04>> No\n`;
-edp += `coa_AccountSalesTax01>> ${quoteData.SalesTaxAccount || ''}\n`;
-edp += `coa_AccountSalesTax02>> \n`;
-edp += `coa_AccountSalesTax03>> \n`;
-edp += `coa_AccountSalesTax04>> \n`;
-edp += `sts_ShippingTaxable>> ${quoteData.ShippingTaxable ? 'Yes' : 'No'}\n`;
-
-// ===== SubBlock 5: Shipping =====
-edp += `AddressDescription>> ${quoteData.ShippingAddressDesc || 'Shipping'}\n`;
-edp += `AddressCompany>> ${quoteData.ShippingCompany || quoteData.CompanyName}\n`;
-edp += `Address1>> ${quoteData.ShippingAddress1 || ''}\n`;
-edp += `Address2>> ${quoteData.ShippingAddress2 || ''}\n`;
-edp += `AddressCity>> ${quoteData.ShippingCity || ''}\n`;
-edp += `AddressState>> ${quoteData.ShippingState || ''}\n`;
-edp += `AddressZip>> ${quoteData.ShippingZip || ''}\n`;
-edp += `AddressCountry>> ${quoteData.ShippingCountry || 'USA'}\n`;
-edp += `ShipMethod>> ${quoteData.ShipMethod || 'Will Call'}\n`;
-edp += `cur_Shipping>> ${quoteData.ShippingCharges || '0.00'}\n`;
-edp += `sts_Order_ShipAddress_Add>> ${quoteData.AddShipAddress ? 'Yes' : 'No'}\n`;
-
-// ===== SubBlock 6: Notes =====
-// THESE ARE METHOD-SPECIFIC - Content changes, field names stay the same
-edp += `NotesToArt>> ${this.generateArtNotes(quoteData)}\n`;  // Different per method
-edp += `NotesToProduction>> ${this.generateProductionNotes(quoteData)}\n`;  // Different per method
-edp += `NotesToReceiving>> ${quoteData.ReceivingNotes || ''}\n`;
-edp += `NotesToPurchasing>> ${quoteData.PurchasingNotes || ''}\n`;
-edp += `NotesToShipping>> ${quoteData.ShippingNotes || ''}\n`;
-edp += `NotesToAccounting>> ${quoteData.AccountingNotes || ''}\n`;
-edp += `NotesToPurchasingSub>> ${quoteData.SubcontractorNotes || ''}\n`;
-
-edp += '---- End Order ----\n\n';
-```
-
----
-
-#### Method-Specific Variations
-
-**What Changes Between Quote Builders:**
-
-```javascript
-// ========================================
-// Configuration per quote builder type
-// ========================================
-
-// Screen Print Quote Builder
-const screenPrintConfig = {
-    orderTypeId: 13,
-    quoteSource: 'SP Quote',
-    quotePrefix: 'SP',
-    generateArtNotes: generateScreenPrintArtNotes,
-    generateProductionNotes: generateScreenPrintProductionNotes
-};
-
-// DTG Quote Builder
-const dtgConfig = {
-    orderTypeId: 15,
-    quoteSource: 'DTG Quote',
-    quotePrefix: 'DTG',
-    generateArtNotes: generateDTGArtNotes,
-    generateProductionNotes: generateDTGProductionNotes
-};
-
-// Embroidery Quote Builder
-const embroideryConfig = {
-    orderTypeId: 17,
-    quoteSource: 'EMB Quote',
-    quotePrefix: 'EMB',
-    generateArtNotes: generateEmbroideryArtNotes,
-    generateProductionNotes: generateEmbroideryProductionNotes
-};
-
-// Cap Embroidery Quote Builder
-const capConfig = {
-    orderTypeId: 18,
-    quoteSource: 'CAP Quote',
-    quotePrefix: 'CAP',
-    generateArtNotes: generateCapEmbroideryArtNotes,
-    generateProductionNotes: generateCapEmbroideryProductionNotes
-};
-
-// ========================================
-// What's SHARED across ALL quote builders
-// ========================================
-// ✅ All 44 Order Block field names
-// ✅ All SubBlock structures
-// ✅ Date formats (MM/DD/YYYY)
-// ✅ Boolean formats (Yes/No)
-// ✅ Address fields
-// ✅ Payment terms
-// ✅ Sales tax fields
-// ✅ Shipping fields
-
-// ========================================
-// What's DIFFERENT per quote builder
-// ========================================
-// ❌ id_OrderType value (13, 15, 17, 18, etc.)
-// ❌ ExtSource identifier ("SP Quote", "DTG Quote", etc.)
-// ❌ NotesToArt content (method-specific instructions)
-// ❌ NotesToProduction content (method-specific setup)
-```
-
----
-
-#### Quote Builder Integration Examples
-
-**Screen Print Quote Builder:**
-```javascript
-const quoteData = {
-    QuoteID: 'SP0127-1',
-    QuoteSource: 'SP Quote',
-    QuoteType: 'Screenprint',
-    SalesRep: 'Ruth Nhong',
-    PaymentTerms: 'Pay On Pickup',
-
-    // Shipping (same fields for all builders)
-    ShippingAddress1: '123 Main St',
-    ShippingCity: 'Seattle',
-    ShippingState: 'WA',
-    ShippingZip: '98101',
-    ShipMethod: 'Will Call',
-
-    // Notes (content is method-specific)
-    // Generated by: generateScreenPrintArtNotes()
-    // Generated by: generateScreenPrintProductionNotes()
-};
-```
-
-**DTG Quote Builder (SAME STRUCTURE):**
-```javascript
-const quoteData = {
-    QuoteID: 'DTG0127-1',  // Different prefix
-    QuoteSource: 'DTG Quote',  // Different source
-    QuoteType: 'Direct to Garment',
-    SalesRep: 'Ruth Nhong',  // Same field
-    PaymentTerms: 'Pay On Pickup',  // Same field
-
-    // Shipping (IDENTICAL FIELDS)
-    ShippingAddress1: '123 Main St',
-    ShippingCity: 'Seattle',
-    ShippingState: 'WA',
-    ShippingZip: '98101',
-    ShipMethod: 'Will Call',
-
-    // Notes (different content, same field names)
-    // Generated by: generateDTGArtNotes()
-    // Generated by: generateDTGProductionNotes()
-};
-```
-
-**Embroidery Quote Builder (SAME STRUCTURE):**
-```javascript
-const quoteData = {
-    QuoteID: 'EMB0127-1',  // Different prefix
-    QuoteSource: 'EMB Quote',  // Different source
-    QuoteType: 'Embroidery',
-    SalesRep: 'Ruth Nhong',  // Same field
-    PaymentTerms: 'Pay On Pickup',  // Same field
-
-    // ... ALL OTHER FIELDS IDENTICAL STRUCTURE
-};
-```
-
----
-
-#### Recommended Implementation Phases
-
-**Phase 1: Essential Fields (All Quote Builders) - Immediate**
-- ID SubBlock: All 4 fields ✅ (already implemented)
-- Details SubBlock: CustomerPurchaseOrder, TermsName, CustomerServiceRep ✅ (already implemented)
-- Dates SubBlock: date_OrderPlaced, date_OrderRequestedToShip ✅ (already implemented)
-- Shipping SubBlock: Address fields (8 fields)
-- Notes SubBlock: NotesToArt, NotesToProduction ✅ (already implemented)
-
-**Phase 2: Enhanced Features (Week 1-2)**
-- Details SubBlock: CustomerType, id_CompanyLocation
-- Dates SubBlock: date_OrderDropDead
-- Shipping SubBlock: ShipMethod, cur_Shipping, AddressDescription, AddressCountry
-- Sales Tax SubBlock: sts_ApplySalesTax01, sts_ShippingTaxable
-- Notes SubBlock: NotesToShipping
-
-**Phase 3: Advanced Features (Future)**
-- Details SubBlock: id_SalesStatus, sts_CommishAllow, HoldOrderText
-- Sales Tax SubBlock: All tax override and multi-jurisdiction fields (10 fields)
-- Shipping SubBlock: sts_Order_ShipAddress_Add
-- Notes SubBlock: NotesToReceiving, NotesToPurchasing, NotesToAccounting, NotesToPurchasingSub
-
-### Customer Block Fields
-
-**Status: NOT IMPLEMENTED - READY FOR IMPLEMENTATION**
-
-**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
-
-**Documentation Source:** ShopWorks OnSite 7 Customer Block field mapping specification
-
-**Architecture:** Customer Block is organized into **6 SubBlocks** in OnSite 7
-
-#### Customer Block Structure (44 Total Fields)
-
-The Customer Block in ShopWorks OnSite 7 uses a SubBlock architecture to organize related fields. This replaces the flat structure in OnSite 6.1.
-
-**SubBlock Overview:**
-1. **Details SubBlock** (6 fields) - Company identification and core info
-2. **Address SubBlock** (8 fields) - Billing address information
-3. **Sales Tax SubBlock** (10 fields) - Tax calculation and exemptions
-4. **Price Calculator SubBlock** (3 fields) - Pricing and discount levels
-5. **Profile SubBlock** (7 fields) - Customer classification and tracking
-6. **Custom Fields SubBlock** (10 fields) - Flexible custom data storage
-
----
-
-#### SubBlock 1: Details SubBlock (6 fields)
-
-**Purpose:** Core customer identification and business information
-
-```javascript
-// OnSite 7 Field Names
-ExtCustomerID         // External customer ID
-id_Customer           // ShopWorks customer ID (required)
-Company               // Company name
-id_CompanyLocation    // NEW in OnSite 7 - Company location/branch ID
-Terms                 // NEW in OnSite 7 - Payment terms
-WebsiteURL            // NEW in OnSite 7 - Customer website
-EmailMain             // NEW in OnSite 7 - Primary business email
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `ExtCustomerID` | ExtCustID | Standard field |
-| `id_Customer` | # Customer | Required, numeric ID |
-| `Company` | Company | Standard field |
-| `id_CompanyLocation` | *(NEW)* | **New in OnSite 7** - Multi-location support |
-| `Terms` | *(NEW)* | **New in OnSite 7** - Payment terms |
-| `WebsiteURL` | *(NEW)* | **New in OnSite 7** - Customer website |
-| `EmailMain` | *(NEW)* | **New in OnSite 7** - Primary business email |
-
-**Use Cases:**
-- `id_CompanyLocation` - Track multi-location customers (branches, divisions, warehouses)
-- `Terms` - Payment terms: "Net 30", "Net 60", "COD", "Prepay", "Credit Card"
-- `WebsiteURL` - Customer's website for reference/verification
-- `EmailMain` - Primary business email (may differ from contact person email)
-
----
-
-#### SubBlock 2: Address SubBlock (8 fields)
-
-**Purpose:** Customer billing address information
-
-```javascript
-// OnSite 7 Field Names
-AddressDescription    // NEW in OnSite 7 - Address label/description
-AddressCompany        // Company name for this address
-Address1              // Street address line 1
-Address2              // Street address line 2 (suite/unit)
-AddressCity           // City
-AddressState          // State abbreviation
-AddressZip            // ZIP/postal code
-AddressCountry        // NEW in OnSite 7 - Country
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `AddressDescription` | *(NEW)* | **New in OnSite 7** - "Billing", "Main Office", etc. |
-| `AddressCompany` | Bill Company | Standard field |
-| `Address1` | Bill Address 1 | Standard field |
-| `Address2` | Bill Address 2 | Standard field |
-| `AddressCity` | Bill City | Standard field |
-| `AddressState` | Bill State | Standard field |
-| `AddressZip` | BillZip | Standard field |
-| `AddressCountry` | *(NEW)* | **New in OnSite 7** - International customers |
-
-**Use Cases:**
-- `AddressDescription` - Label for address: "Billing", "Headquarters", "Main Office"
-- `AddressCountry` - International customers (default "USA" for domestic)
-
----
-
-#### SubBlock 3: Sales Tax SubBlock (10 fields)
-
-**Purpose:** Sales tax calculation, exemptions, and GL account mapping
-
-```javascript
-// OnSite 7 Field Names (Tax Application)
-sts_ApplySalesTax01   // Apply sales tax jurisdiction 1 (Yes/No)
-sts_ApplySalesTax02   // Apply sales tax jurisdiction 2 (Yes/No)
-sts_ApplySalesTax03   // Apply sales tax jurisdiction 3 (Yes/No)
-sts_ApplySalesTax04   // Apply sales tax jurisdiction 4 (Yes/No)
-
-// GL Account Mapping
-coa_AccountSalesTax01 // GL account for sales tax 1
-coa_AccountSalesTax02 // GL account for sales tax 2
-coa_AccountSalesTax03 // NEW in OnSite 7 - GL account for sales tax 3
-coa_AccountSalesTax04 // NEW in OnSite 7 - GL account for sales tax 4
-
-// Additional Tax Settings
-sts_ShippingTaxable   // NEW in OnSite 7 - Charge tax on shipping (Yes/No)
-TaxExemptNumber       // Tax exemption certificate number
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `sts_ApplySalesTax01` | ? Pay Sales Tax | Boolean field |
-| `sts_ApplySalesTax02` | ? Pay Sales Tax | Boolean field |
-| `sts_ApplySalesTax03` | ? Pay Sales Tax | Boolean field |
-| `sts_ApplySalesTax04` | ? Pay Sales Tax | Boolean field |
-| `coa_AccountSalesTax01` | # Account Sales Tax 1 | GL account reference |
-| `coa_AccountSalesTax02` | # Account Sales Tax 2 | GL account reference |
-| `coa_AccountSalesTax03` | *(NEW)* | **New in OnSite 7** - Third tax jurisdiction |
-| `coa_AccountSalesTax04` | *(NEW)* | **New in OnSite 7** - Fourth tax jurisdiction |
-| `sts_ShippingTaxable` | *(NEW)* | **New in OnSite 7** - Tax shipping charges |
-| `TaxExemptNumber` | Tax Exempt # | Standard field |
-
-**Use Cases:**
-- Support for up to **4 different tax jurisdictions** (city, county, state, special district)
-- `sts_ShippingTaxable` - Whether to charge tax on shipping fees (varies by state)
-- `TaxExemptNumber` - Store tax exemption certificate number for resellers/nonprofits
-- `coa_AccountSalesTax##` - Map to specific GL accounts for proper accounting
-
----
-
-#### SubBlock 4: Price Calculator SubBlock (3 fields)
-
-**Purpose:** Customer pricing tiers and default price calculators
-
-```javascript
-// OnSite 7 Field Names
-id_DiscountLevel      // NEW in OnSite 7 - Discount level/pricing tier
-id_DefaultCalculator1 // NEW in OnSite 7 - Primary default pricing calculator
-id_DefaultCalculator2 // NEW in OnSite 7 - Secondary default pricing calculator
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `id_DiscountLevel` | *(NEW)* | **New in OnSite 7** - Pricing tier assignment |
-| `id_DefaultCalculator1` | *(NEW)* | **New in OnSite 7** - Default pricing method |
-| `id_DefaultCalculator2` | *(NEW)* | **New in OnSite 7** - Alternate pricing method |
-
-**Use Cases:**
-- `id_DiscountLevel` - Customer's pricing tier: "Retail", "Wholesale", "VIP", "Contract"
-- `id_DefaultCalculator1` - Primary pricing method for this customer
-- `id_DefaultCalculator2` - Alternate/backup pricing method
-
----
-
-#### SubBlock 5: Profile SubBlock (7 fields)
-
-**Purpose:** Customer classification, sales tracking, and business intelligence
-
-```javascript
-// OnSite 7 Field Names
-CustomerServiceRep    // Assigned sales representative
-CustomerType          // NEW in OnSite 7 - Customer classification
-CustomerSource        // NEW in OnSite 7 - Lead source
-ReferenceFrom         // NEW in OnSite 7 - Referral source
-SICCode               // NEW in OnSite 7 - Standard Industrial Classification code
-SICDescription        // NEW in OnSite 7 - SIC code description
-n_EmployeeCount       // NEW in OnSite 7 - Company size (employee count)
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `CustomerServiceRep` | Salesperson | **Renamed** in OnSite 7 |
-| `CustomerType` | *(NEW)* | **New in OnSite 7** - Customer classification |
-| `CustomerSource` | *(NEW)* | **New in OnSite 7** - Lead source tracking |
-| `ReferenceFrom` | *(NEW)* | **New in OnSite 7** - Referral tracking |
-| `SICCode` | *(NEW)* | **New in OnSite 7** - Industry classification |
-| `SICDescription` | *(NEW)* | **New in OnSite 7** - Industry description |
-| `n_EmployeeCount` | *(NEW)* | **New in OnSite 7** - Company size indicator |
-
-**Use Cases:**
-- `CustomerServiceRep` - Assigned sales rep for this account (replaces "Salesperson")
-- `CustomerType` - "Retail", "Wholesale", "Corporate", "Government", "Nonprofit"
-- `CustomerSource` - Lead source: "Referral", "Web", "Trade Show", "Cold Call"
-- `ReferenceFrom` - Who referred this customer (tracking for commission/thank you)
-- `SICCode` - Standard Industrial Classification for industry vertical tracking
-- `n_EmployeeCount` - Company size for segmentation and targeting
-
----
-
-#### SubBlock 6: Custom Fields SubBlock (10 fields)
-
-**Purpose:** Flexible custom data storage for customer-specific information
-
-```javascript
-// OnSite 7 Field Names (all NEW in OnSite 7)
-CustomField01         // Custom field 1
-CustomField02         // Custom field 2
-CustomField03         // Custom field 3
-CustomField04         // Custom field 4
-CustomField05         // Custom field 5
-CustomField06         // Custom field 6
-CustomField07         // Custom field 7
-CustomField08         // Custom field 8
-CustomField09         // Custom field 9
-CustomField10         // Custom field 10
-```
-
-**OnSite 6.1 → OnSite 7 Field Mapping:**
-
-| OnSite 7 Field | OnSite 6.1 Field | Notes |
-|----------------|------------------|-------|
-| `CustomField01` - `CustomField10` | *(NEW)* | **All new in OnSite 7** - Flexible data storage |
-
-**Use Cases:**
-- Store customer-specific data that doesn't fit standard fields
-- Examples: PO requirements, special instructions, account numbers, preferences
-- Customizable labels in ShopWorks for each field
-- Can be used for: Delivery instructions, special handling notes, internal notes
-
----
-
-#### Complete Implementation Example
-
-**Full Customer Block with All SubBlocks:**
-
-```javascript
-// Customer Block - Complete implementation
-edp += '---- Start Customer ----\n';
-
-// ===== SubBlock 1: Details =====
-edp += `ExtCustomerID>> ${quoteData.ExtCustomerID || ''}\n`;
-edp += `id_Customer>> ${this.config.customerId}\n`;
-edp += `Company>> ${quoteData.CompanyName || ''}\n`;
-edp += `id_CompanyLocation>> ${quoteData.CompanyLocation || ''}\n`;
-edp += `Terms>> ${quoteData.PaymentTerms || 'Net 30'}\n`;
-edp += `WebsiteURL>> ${quoteData.WebsiteURL || ''}\n`;
-edp += `EmailMain>> ${quoteData.CustomerEmail || ''}\n`;
-
-// ===== SubBlock 2: Address =====
-edp += `AddressDescription>> ${quoteData.AddressDescription || 'Billing'}\n`;
-edp += `AddressCompany>> ${quoteData.CompanyName || ''}\n`;
-edp += `Address1>> ${quoteData.BillingAddress1 || ''}\n`;
-edp += `Address2>> ${quoteData.BillingAddress2 || ''}\n`;
-edp += `AddressCity>> ${quoteData.BillingCity || ''}\n`;
-edp += `AddressState>> ${quoteData.BillingState || ''}\n`;
-edp += `AddressZip>> ${quoteData.BillingZip || ''}\n`;
-edp += `AddressCountry>> ${quoteData.BillingCountry || 'USA'}\n`;
-
-// ===== SubBlock 3: Sales Tax =====
-edp += `sts_ApplySalesTax01>> ${quoteData.ApplySalesTax ? 'Yes' : 'No'}\n`;
-edp += `sts_ApplySalesTax02>> No\n`;
-edp += `sts_ApplySalesTax03>> No\n`;
-edp += `sts_ApplySalesTax04>> No\n`;
-edp += `coa_AccountSalesTax01>> ${quoteData.SalesTaxAccount || ''}\n`;
-edp += `coa_AccountSalesTax02>> \n`;
-edp += `coa_AccountSalesTax03>> \n`;
-edp += `coa_AccountSalesTax04>> \n`;
-edp += `sts_ShippingTaxable>> ${quoteData.ShippingTaxable ? 'Yes' : 'No'}\n`;
-edp += `TaxExemptNumber>> ${quoteData.TaxExemptNumber || ''}\n`;
-
-// ===== SubBlock 4: Price Calculator =====
-edp += `id_DiscountLevel>> ${quoteData.DiscountLevel || ''}\n`;
-edp += `id_DefaultCalculator1>> ${quoteData.DefaultCalculator || ''}\n`;
-edp += `id_DefaultCalculator2>> \n`;
-
-// ===== SubBlock 5: Profile =====
-edp += `CustomerServiceRep>> ${quoteData.SalesRep || ''}\n`;
-edp += `CustomerType>> ${quoteData.CustomerType || ''}\n`;
-edp += `CustomerSource>> ${quoteData.CustomerSource || ''}\n`;
-edp += `ReferenceFrom>> ${quoteData.ReferenceFrom || ''}\n`;
-edp += `SICCode>> ${quoteData.SICCode || ''}\n`;
-edp += `SICDescription>> ${quoteData.SICDescription || ''}\n`;
-edp += `n_EmployeeCount>> ${quoteData.EmployeeCount || ''}\n`;
-
-// ===== SubBlock 6: Custom Fields =====
-edp += `CustomField01>> ${quoteData.CustomField01 || ''}\n`;
-edp += `CustomField02>> ${quoteData.CustomField02 || ''}\n`;
-edp += `CustomField03>> ${quoteData.CustomField03 || ''}\n`;
-edp += `CustomField04>> ${quoteData.CustomField04 || ''}\n`;
-edp += `CustomField05>> ${quoteData.CustomField05 || ''}\n`;
-edp += `CustomField06>> ${quoteData.CustomField06 || ''}\n`;
-edp += `CustomField07>> ${quoteData.CustomField07 || ''}\n`;
-edp += `CustomField08>> ${quoteData.CustomField08 || ''}\n`;
-edp += `CustomField09>> ${quoteData.CustomField09 || ''}\n`;
-edp += `CustomField10>> ${quoteData.CustomField10 || ''}\n`;
-
-edp += '---- End Customer ----\n\n';
-```
-
----
-
-#### Quote Builder Integration Example
-
-**Collect comprehensive customer data in quote builder forms:**
-
-```javascript
-// Build complete customer data object
-const quoteData = {
-    // SubBlock 1: Details
-    ExtCustomerID: document.getElementById('ext-customer-id')?.value || '',
-    CompanyName: document.getElementById('company-name')?.value || '',
-    CompanyLocation: document.getElementById('company-location')?.value || '',
-    PaymentTerms: document.getElementById('payment-terms')?.value || 'Net 30',
-    WebsiteURL: document.getElementById('website-url')?.value || '',
-    CustomerEmail: document.getElementById('customer-email')?.value || '',
-
-    // SubBlock 2: Address
-    AddressDescription: document.getElementById('address-description')?.value || 'Billing',
-    BillingAddress1: document.getElementById('billing-address-1')?.value || '',
-    BillingAddress2: document.getElementById('billing-address-2')?.value || '',
-    BillingCity: document.getElementById('billing-city')?.value || '',
-    BillingState: document.getElementById('billing-state')?.value || '',
-    BillingZip: document.getElementById('billing-zip')?.value || '',
-    BillingCountry: document.getElementById('billing-country')?.value || 'USA',
-
-    // SubBlock 3: Sales Tax
-    ApplySalesTax: document.getElementById('apply-sales-tax')?.checked || false,
-    ShippingTaxable: document.getElementById('shipping-taxable')?.checked || false,
-    TaxExemptNumber: document.getElementById('tax-exempt-number')?.value || '',
-    SalesTaxAccount: document.getElementById('sales-tax-account')?.value || '',
-
-    // SubBlock 4: Price Calculator
-    DiscountLevel: document.getElementById('discount-level')?.value || '',
-    DefaultCalculator: document.getElementById('default-calculator')?.value || '',
-
-    // SubBlock 5: Profile
-    SalesRep: document.getElementById('sales-rep')?.value || '',
-    CustomerType: document.getElementById('customer-type')?.value || '',
-    CustomerSource: document.getElementById('customer-source')?.value || '',
-    ReferenceFrom: document.getElementById('reference-from')?.value || '',
-    SICCode: document.getElementById('sic-code')?.value || '',
-    SICDescription: document.getElementById('sic-description')?.value || '',
-    EmployeeCount: document.getElementById('employee-count')?.value || '',
-
-    // SubBlock 6: Custom Fields
-    CustomField01: document.getElementById('custom-field-01')?.value || '',
-    CustomField02: document.getElementById('custom-field-02')?.value || ''
-    // ... additional custom fields as needed
-};
-```
-
----
-
-#### Recommended Implementation Phases
-
-**Phase 1: Essential Fields (Immediate)**
-- Details SubBlock: `Company`, `Terms`, `EmailMain`
-- Address SubBlock: All 8 fields
-- Profile SubBlock: `CustomerServiceRep`
-
-**Phase 2: Enhanced Features (Week 1-2)**
-- Sales Tax SubBlock: `sts_ApplySalesTax01`, `TaxExemptNumber`, `sts_ShippingTaxable`
-- Profile SubBlock: `CustomerType`, `CustomerSource`
-- Details SubBlock: `WebsiteURL`
-
-**Phase 3: Advanced Features (Future)**
-- Price Calculator SubBlock: All 3 fields
-- Sales Tax SubBlock: Multiple tax jurisdictions (02-04)
-- Profile SubBlock: `SICCode`, `SICDescription`, `n_EmployeeCount`
-- Custom Fields SubBlock: As needed for specific use cases
-
-### Contact Block Fields
-
-**Status: NOT IMPLEMENTED - READY FOR IMPLEMENTATION**
-
-**OnSite Version:** OnSite 7 (upgraded from OnSite 6.1)
-
-**Documentation Source:** ShopWorks OnSite 7 field mapping specification
-
-#### OnSite 7 Contact Block Fields (10 fields)
-
-```javascript
-// Contact Information (OnSite 7 field names)
-id_Customer          // Links to Customer block (required)
-NameFirst            // Contact first name
-NameLast             // Contact last name
-Department           // NEW in OnSite 7 - Department/division
-Title                // Job title
-Phone                // Primary phone number
-Fax                  // Fax number
-Email                // Email address
-
-// Contact Preferences (boolean fields)
-sts_EnableBulkEmail  // "? Receive Email" - opt-in for bulk emails (Yes/No)
-sts_Contact_Add      // "? Add Contact" - flag to add contact (Yes/No)
-```
-
-#### OnSite 6.1 → OnSite 7 Field Mapping
-
-| OnSite 7 Field Name | OnSite 6.1 Field Name | Notes |
-|---------------------|----------------------|-------|
-| `NameFirst` | Contact First Name | Standard field |
-| `NameLast` | Contact Last Name | Standard field |
-| `Department` | *(NEW - no equivalent)* | **New in OnSite 7** |
-| `Title` | Contact Title | Standard field |
-| `Phone` | Contact Phone | Standard field |
-| *(deprecated)* | Secondary_Phone | **Removed in OnSite 7** |
-| `Fax` | Contact Fax | Standard field |
-| `Email` | Contact Email | Standard field |
-| `sts_EnableBulkEmail` | ? Receive Email | Boolean/checkbox field |
-| `sts_Contact_Add` | ? Add Contact | Boolean/checkbox field |
-
-**Field Naming Notes:**
-- **`?` prefix in OnSite 6.1**: Indicates checkbox/boolean fields
-- **`sts_` prefix in OnSite 7**: Standard prefix for status/boolean fields
-- **Department**: New field in OnSite 7 for organizational structure
-- **Secondary_Phone**: Existed in OnSite 6.1 but deprecated in OnSite 7
-
-**Use Case:** Multiple contacts per customer (purchasing, receiving, accounts payable, production coordination)
-
-**Implementation Example:**
-```javascript
-// Add Contact Block after Customer Block:
-edp += '---- Start Contact ----\n';
-edp += `id_Customer>> ${this.config.customerId}\n`;
-edp += `NameFirst>> ${quoteData.ContactFirstName || ''}\n`;
-edp += `NameLast>> ${quoteData.ContactLastName || ''}\n`;
-edp += `Department>> ${quoteData.ContactDepartment || ''}\n`;  // NEW in OnSite 7
-edp += `Title>> ${quoteData.ContactTitle || ''}\n`;
-edp += `Phone>> ${quoteData.Phone || ''}\n`;
-edp += `Fax>> ${quoteData.ContactFax || ''}\n`;
-edp += `Email>> ${quoteData.CustomerEmail || ''}\n`;
-edp += `sts_EnableBulkEmail>> ${quoteData.ReceiveEmail ? 'Yes' : 'No'}\n`;
-edp += `sts_Contact_Add>> Yes\n`;  // Default to Yes for new contacts
-edp += '---- End Contact ----\n\n';
-```
-
-**Quote Builder Integration:**
-```javascript
-// Collect contact information in quote builder form:
-const quoteData = {
-    // ... other fields
-    ContactFirstName: document.getElementById('contact-first-name')?.value || '',
-    ContactLastName: document.getElementById('contact-last-name')?.value || '',
-    ContactDepartment: document.getElementById('contact-department')?.value || '',
-    ContactTitle: document.getElementById('contact-title')?.value || '',
-    Phone: document.getElementById('customer-phone')?.value || '',
-    ContactFax: document.getElementById('contact-fax')?.value || '',
-    CustomerEmail: document.getElementById('customer-email')?.value || '',
-    ReceiveEmail: document.getElementById('receive-email')?.checked || false
-};
-```
-
-### Design Block Fields
-
-**Status: NOT IMPLEMENTED - HIGH VALUE FOR SCREEN PRINT WORKFLOW**
-
-**🎨 Purpose:** Track artwork specifications, color counts, and design details for production. Critical for screen print and embroidery workflows to ensure accurate design reproduction.
-
----
-
-#### OnSite 7 Field Specifications (11 Fields in 3 SubBlocks)
-
-##### SubBlock 1: Design (4 Fields)
-
-| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
-|---------------------|----------------------|------|---------|
-| `ExtDesignID` | `ExtDesignID` | String | External design identifier |
-| `id_Design` | `# Design` | Number | Internal ShopWorks design ID |
-| `id_DesignType` | `# Design Type` | Number | Design type code (1=Screen Print, 2=Embroidery, etc.) |
-| `DesignName` | `Design Title` | String | Design name/description |
-
-**All 4 fields existed in OnSite 6.1** (field names changed but functionality same)
-
-##### SubBlock 2: Location (5 Fields)
-
-| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
-|---------------------|----------------------|------|---------|
-| `Location` | `Location` | String | Print/embroidery location on garment |
-| `ColorsTotal` | `N` | Number | Total number of colors in design |
-| `FlashesTotal` | *(NEW in OnSite 7)* | Number | Total number of flashes (underbase/specialty) |
-| `StitchesTotal` | `# Stitches` | Number | Total stitch count (embroidery) |
-| `DesignCode` | `# Design Code` | String | Internal design code reference |
-
-**1 NEW field in OnSite 7:** `FlashesTotal` - Critical for screen print flash/underbase tracking
-
-##### SubBlock 3: Color (2 Fields - Repeatable)
-
-| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose |
-|---------------------|----------------------|------|---------|
-| `Color` | `Color` | String | Individual color name |
-| `Map` | `Map` | String | Color mapping/matching reference |
-
-**Both fields existed in OnSite 6.1** (repeat these fields for EACH color in the design)
-
----
-
-#### EDP Design Block Implementation Example
-
-```javascript
-// Complete Design Block with all 3 SubBlocks
-// NOTE: Can have MULTIPLE Design Blocks per order (one per location/design)
-
-edp += '---- Start Design ----\n';
-
-// ===== SubBlock 1: Design =====
-edp += `ExtDesignID>> SP-DESIGN-${quoteData.QuoteID}-FRONT\n`;
-edp += `id_Design>> \n`;  // Leave blank for new designs (ShopWorks assigns)
-edp += `id_DesignType>> 1\n`;  // 1=Screen Print, 2=Embroidery
-edp += `DesignName>> ${quoteData.CompanyName || 'Customer'} - Front Logo\n`;
-
-// ===== SubBlock 2: Location =====
-edp += `Location>> Front\n`;
-edp += `ColorsTotal>> 4\n`;  // Total ink colors
-edp += `FlashesTotal>> 1\n`;  // Underbase flash count
-edp += `StitchesTotal>> 0\n`;  // 0 for screen print
-edp += `DesignCode>> SP-${quoteData.QuoteID}\n`;
-
-// ===== SubBlock 3: Color (repeat for each color) =====
-edp += `Color>> White (Underbase)\n`;
-edp += `Map>> Pantone White\n`;
-
-edp += `Color>> PMS 185 Red\n`;
-edp += `Map>> Pantone 185\n`;
-
-edp += `Color>> PMS 286 Blue\n`;
-edp += `Map>> Pantone 286\n`;
-
-edp += `Color>> Black\n`;
-edp += `Map>> Pantone Black\n`;
-
-edp += '---- End Design ----\n\n';
-
-// For multi-location orders, add additional Design Blocks:
-edp += '---- Start Design ----\n';
-edp += `ExtDesignID>> SP-DESIGN-${quoteData.QuoteID}-BACK\n`;
-edp += `id_DesignType>> 1\n`;
-edp += `DesignName>> ${quoteData.CompanyName || 'Customer'} - Back Design\n`;
-edp += `Location>> Full Back\n`;
-edp += `ColorsTotal>> 2\n`;
-edp += `FlashesTotal>> 0\n`;  // No underbase needed
-// ... (repeat Color SubBlock for back design colors)
-edp += '---- End Design ----\n\n';
-```
-
----
-
-#### Use Cases for Design Block
-
-##### Screen Print Workflow
-
-**Primary Use Cases:**
-1. **Color Specification** - Track exact ink colors per location
-2. **Flash Tracking** - Record underbase and specialty flashes for production
-3. **Multi-Location Designs** - Separate Design Block for front, back, sleeves, etc.
-4. **Art File Reference** - Link EDP to artwork files via `ExtDesignID`
-
-**Example: 4-Color Front + 2-Color Back**
-- Design Block 1: Front - 4 colors (3 + underbase), 1 flash
-- Design Block 2: Back - 2 colors, 0 flashes
-
-##### Embroidery Workflow
-
-**Primary Use Cases:**
-1. **Stitch Count Tracking** - Record total stitches for pricing verification
-2. **Thread Colors** - Document each thread color via Color SubBlock
-3. **Logo Placement** - Location field specifies exact placement
-4. **Digitization Reference** - Link to digitized design files
-
-**Example: Left Chest Logo**
-- Design Block: Left Chest - 8,500 stitches, 4 thread colors
-
-##### DTG Workflow
-
-**Primary Use Cases:**
-1. **Design Identification** - Reference artwork files
-2. **Location Tracking** - Full front, full back, etc.
-3. **Minimal Color Info** - DTG is full-color, so Color SubBlock often skipped
-
-**Example: Full Front Photo**
-- Design Block: Full Front - Design name references file, no color breakdown needed
-
----
-
-#### Method-Specific Implementation Patterns
-
-##### Screen Print Quote Builder Integration
-
-```javascript
-// Extract design info from existing screen print quote data
-function generateDesignBlocks(quoteData) {
-    const edpDesigns = [];
-
-    // Iterate through each print location in the quote
-    Object.entries(quoteData.SetupBreakdown || {}).forEach(([locationCode, setupDetails]) => {
-        const locationName = getLocationName(locationCode);  // "Front", "Back", etc.
-
-        // Calculate colors and flashes
-        const totalColors = setupDetails.colors;
-        const hasUnderbase = quoteData.isDarkGarment && setupDetails.needsUnderbase;
-        const flashCount = hasUnderbase ? 1 : 0;
-        const inkColors = totalColors - (hasUnderbase ? 1 : 0);
-
-        // Build Design Block
-        let designEDP = '---- Start Design ----\n';
-        designEDP += `ExtDesignID>> SP-${quoteData.QuoteID}-${locationCode}\n`;
-        designEDP += `id_DesignType>> 1\n`;  // Screen Print
-        designEDP += `DesignName>> ${quoteData.CompanyName} - ${locationName}\n`;
-        designEDP += `Location>> ${locationName}\n`;
-        designEDP += `ColorsTotal>> ${totalColors}\n`;
-        designEDP += `FlashesTotal>> ${flashCount}\n`;
-        designEDP += `StitchesTotal>> 0\n`;
-        designEDP += `DesignCode>> SP-${quoteData.QuoteID}\n`;
-
-        // Add color details if available
-        if (hasUnderbase) {
-            designEDP += `Color>> White Underbase\n`;
-            designEDP += `Map>> \n`;
-        }
-
-        designEDP += '---- End Design ----\n\n';
-        edpDesigns.push(designEDP);
-    });
-
-    return edpDesigns.join('');
-}
-```
-
-##### Embroidery Quote Builder Integration
-
-```javascript
-// Extract design info from embroidery quote
-function generateEmbroideryDesign(quoteData) {
-    let edp = '---- Start Design ----\n';
-
-    edp += `ExtDesignID>> EMB-${quoteData.QuoteID}\n`;
-    edp += `id_DesignType>> 2\n`;  // Embroidery
-    edp += `DesignName>> ${quoteData.DesignName || 'Embroidered Logo'}\n`;
-    edp += `Location>> ${quoteData.Location || 'Left Chest'}\n`;
-    edp += `ColorsTotal>> ${quoteData.ThreadColors || 0}\n`;
-    edp += `FlashesTotal>> 0\n`;  // N/A for embroidery
-    edp += `StitchesTotal>> ${quoteData.StitchCount || 0}\n`;
-    edp += `DesignCode>> EMB-${quoteData.QuoteID}\n`;
-
-    // Add thread colors if specified
-    if (quoteData.ThreadColorList) {
-        quoteData.ThreadColorList.forEach(threadColor => {
-            edp += `Color>> ${threadColor.name}\n`;
-            edp += `Map>> ${threadColor.code || ''}\n`;
-        });
-    }
-
-    edp += '---- End Design ----\n\n';
-    return edp;
-}
-```
-
----
-
-#### What Changes vs. What Stays the Same (Across Quote Builders)
-
-**Same Design Block Structure for ALL Quote Builders:**
-- ✅ Screen Print Quote Builder
-- ✅ DTG Quote Builder
-- ✅ Embroidery Quote Builder
-- ✅ Cap Embroidery Quote Builder
-- ✅ All future quote builders
-
-**What's Identical:**
-- All 11 field names and 3 SubBlock structure
-- EDP Block delimiters (`---- Start Design ----` / `---- End Design ----`)
-- Field format and data types
-- Multiple Design Block pattern for multi-location orders
-
-**What Varies by Quote Builder:**
-
-| Field | Screen Print | Embroidery | DTG |
-|-------|-------------|------------|-----|
-| `id_DesignType` | 1 | 2 | (TBD) |
-| `ColorsTotal` | Ink colors (3-6 typical) | Thread colors (1-15) | Often skipped |
-| `FlashesTotal` | 0-2 (underbase/specialty) | 0 (N/A) | 0 (N/A) |
-| `StitchesTotal` | 0 (N/A) | 5,000-15,000 typical | 0 (N/A) |
-| `Color` SubBlock | Ink color names | Thread color names | Often skipped |
-
----
-
-#### Design Type IDs Reference
-
-| ID | Design Type | Used By |
-|----|-------------|---------|
-| 1 | Screen Print | Screen Print Quote Builder |
-| 2 | Embroidery | Embroidery & Cap Quote Builders |
-| 3 | Vinyl/Heat Transfer | DTF Quote Builder |
-| 4 | Direct-to-Garment | DTG Quote Builder |
-| 5 | Sublimation | Future builders |
-
-**Note:** Confirm these ID values with your ShopWorks configuration as they may vary by setup.
-
----
-
-#### Multi-Location Design Pattern
-
-**Critical Pattern:** When an order has designs in multiple locations (Front + Back, Chest + Sleeve, etc.), create **separate Design Blocks** for each location:
-
-```javascript
-// Order with Front AND Back designs:
-
-// Design Block #1 - Front
-edp += '---- Start Design ----\n';
-edp += `ExtDesignID>> SP-${quoteID}-FRONT\n`;
-edp += `Location>> Front\n`;
-edp += `ColorsTotal>> 4\n`;
-// ... front design details
-edp += '---- End Design ----\n\n';
-
-// Design Block #2 - Back
-edp += '---- Start Design ----\n';
-edp += `ExtDesignID>> SP-${quoteID}-BACK\n`;
-edp += `Location>> Full Back\n`;
-edp += `ColorsTotal>> 2\n`;
-// ... back design details
-edp += '---- End Design ----\n\n';
-```
-
-**Why Multiple Blocks?**
-- Each location may have different color counts
-- Different flash requirements per location
-- Separate artwork files per location
-- Individual production tracking per design
-
----
-
-#### Color SubBlock Best Practices
-
-**When to Use Color SubBlock:**
-1. **Screen Print:** List each ink color (including underbase)
-2. **Embroidery:** List each thread color with color codes
-3. **DTG:** Usually skip (full-color process)
-
-**How to Populate:**
-```javascript
-// Screen Print Example - Extract from setup breakdown
-const colors = [
-    { name: 'White Underbase', map: 'Pantone White' },
-    { name: 'Red', map: 'PMS 185' },
-    { name: 'Blue', map: 'PMS 286' },
-    { name: 'Black', map: 'Pantone Black' }
-];
-
-colors.forEach(colorInfo => {
-    edp += `Color>> ${colorInfo.name}\n`;
-    edp += `Map>> ${colorInfo.map}\n`;
-});
-
-// Embroidery Example - From thread specifications
-const threads = [
-    { name: 'Navy Blue', map: 'Isacord 3554' },
-    { name: 'White', map: 'Isacord 0015' },
-    { name: 'Red', map: 'Isacord 1902' }
-];
-
-threads.forEach(thread => {
-    edp += `Color>> ${thread.name}\n`;
-    edp += `Map>> ${thread.map}\n`;
-});
-```
-
----
-
-#### Important Implementation Notes
-
-1. **Design Block is OPTIONAL** - Not required for basic order import, but highly valuable for production workflow
-
-2. **Multiple Designs per Order** - Add as many Design Blocks as needed (one per location/design)
-
-3. **External Design ID Pattern** - Use consistent naming: `[METHOD]-[QUOTEID]-[LOCATION]`
-   - Example: `SP-0127-1-FRONT`, `EMB-0127-2-LEFTCHEST`
-
-4. **Leave `id_Design` Blank** - For new designs, ShopWorks will auto-assign the internal ID on import
-
-5. **Flash Count Calculation** - For screen print:
-   - Dark garments with underbase: Usually 1 flash
-   - Safety stripes (reflective): May add 1+ flashes
-   - Specialty inks: May require additional flashes
-
-6. **Stitch Count Sources** - For embroidery:
-   - From pricing tier selection (5K, 10K, etc.)
-   - From digitizer's stitch count report
-   - From design file metadata
-
-7. **Color Mapping** - The `Map` field links to:
-   - Pantone color matching system (screen print)
-   - Thread manufacturer codes (embroidery)
-   - Color swatch libraries (general reference)
-
----
-
-#### Benefits of Implementing Design Block
-
-**For Production Team:**
-- ✅ Exact color specifications (no guessing)
-- ✅ Flash requirements clearly documented
-- ✅ Stitch counts for time estimation
-- ✅ Design file references for artwork retrieval
-
-**For Art Department:**
-- ✅ Track which designs are approved
-- ✅ Link artwork files to orders
-- ✅ Color matching specifications
-- ✅ Design revision history
-
-**For Quality Control:**
-- ✅ Verify color accuracy against specs
-- ✅ Confirm flash/underbase application
-- ✅ Check stitch density
-- ✅ Match finished product to design intent
-
-**For Workflow Automation:**
-- ✅ Auto-route orders based on design complexity
-- ✅ Calculate production time from stitch counts
-- ✅ Alert when design approval pending
-- ✅ Track design reuse across orders
-
----
-
-#### Additional Notes
-
-**Current Status:** Design Block fields are documented but not implemented. Orders currently import without design specifications.
-
-**Future Implementation Priority:** HIGH VALUE for screen print workflow improvement. Consider implementing after Contact and Customer blocks.
-
-**Related Systems:**
-- Art approval workflow
-- Design file management
-- Color matching systems
-- Production scheduling
-
-### Product Block Fields
-
-**Status: FULLY IMPLEMENTED (19 of 19 fields)**
-
-#### Currently Implemented - All Fields ✅
-```javascript
-// Product Identification
-PartNumber           // Style number (e.g., "PC61")
-PartColorRange       // (empty but required)
-PartColor            // Catalog color (e.g., "Black")
-PartDescription      // Product description
-
-// Pricing
-cur_UnitPriceUserEntered  // Final unit price
-cur_UnitCost              // Cost (set to 0.00 for quotes)
-
-// Instructions
-OrderInstructions    // Print locations and colors (NEW in OnSite 7)
-
-// Size Matrix (ALL 6 REQUIRED)
-Size01_Req           // S column
-Size02_Req           // M column
-Size03_Req           // LG column
-Size04_Req           // XL column
-Size05_Req           // XXL column (2XL)
-Size06_Req           // XXXL column (3XL+)
-
-// Settings
-sts_Prod_Product_Override      // Product override flag
-sts_EnableCommission           // Commission setting
-id_ProductClass                // Product class ID
-sts_Prod_SalesTax_Override     // Tax override
-sts_EnableTax01                // Tax flags
-sts_EnableTax02
-sts_EnableTax03
-sts_EnableTax04
-
-// Secondary Units (all empty but required)
-sts_Prod_SecondaryUnits_Override
-sts_UseSecondaryUnits
-Units_Qty
-Units_Type
-Units_Area1
-Units_Area2
-Units_UnitsPricing
-Units_UnitsPurchasing
-Units_UnitsPurchasingExtraPercent
-Units_UnitsPurchasingExtraRound
-
-// Behavior (all empty but required)
-sts_Prod_Behavior_Override
-sts_ProductSource_Supplied
-sts_ProductSource_Purchase
-sts_ProductSource_Inventory
-sts_Production_Designs
-sts_Production_Subcontract
-sts_Production_Components
-sts_Storage_Ship
-sts_Storage_Inventory
-sts_Invoicing_Invoice
-```
-
-**Note:** Product block is complete. No additional fields recommended unless ShopWorks adds new capabilities.
-
-### Payment Block Fields
-
-**Status: NOT IMPLEMENTED - FUTURE STRIPE INTEGRATION PLANNED**
-
-**🚀 Future Goal:** Enable customers to pay for quotes online via Stripe.com, with secure payment tracking in ShopWorks EDP.
-
----
-
-#### OnSite 7 Field Specifications (8 Fields)
-
-| OnSite 7 Field Name | OnSite 6.1 Field Name | Type | Purpose | Security Level |
-|---------------------|----------------------|------|---------|----------------|
-| `date_Payment` | *(NEW in OnSite 7)* | Date | Payment date | ✅ Safe |
-| `cur_Payment` | *(NEW in OnSite 7)* | Currency | Payment amount | ✅ Safe |
-| `PaymentType` | *(NEW in OnSite 7)* | String | Payment method | ✅ Safe |
-| `PaymentNumber` | *(NEW in OnSite 7)* | String | Transaction reference | ✅ Safe (Stripe Charge ID) |
-| `Card_Name_First` | *(NEW in OnSite 7)* | String | Cardholder first name | ⚠️ PII but not PCI |
-| `Card_Name_Last` | *(NEW in OnSite 7)* | String | Cardholder last name | ⚠️ PII but not PCI |
-| `Card_Exp_Date` | *(NEW in OnSite 7)* | String | Card expiration | 🚫 **LEAVE BLANK - PCI SENSITIVE** |
-| `Notes` | *(NEW in OnSite 7)* | Text | Payment notes | ✅ Safe (non-sensitive details) |
-
-**Important:** All 8 fields are NEW in OnSite 7. Payment Block was not available in OnSite 6.1.
-
----
-
-#### 🔒 Critical Security Principle for Payment Integration
-
-**NEVER store sensitive credit card data in your database or EDP files.**
-
-✅ **What Stripe Handles (PCI Compliant Storage):**
-- Full credit card numbers
-- CVV/CVC security codes
-- Card expiration dates
-- Card PINs
-
-✅ **What's SAFE to Store in EDP:**
-- Stripe Charge ID (e.g., `ch_3ABC123xyz`) in `PaymentNumber` field
-- Payment amount and date
-- Cardholder name (from billing info)
-- Last 4 digits of card (Stripe provides this)
-- Card brand (Visa, Mastercard, etc.)
-
-🚫 **What to NEVER Store:**
-- Full card number
-- CVV/CVC code
-- Card expiration date (even though OnSite 7 has `Card_Exp_Date` field - LEAVE IT BLANK)
-
----
-
-#### 🚀 Future: Stripe Payment Integration Architecture
-
-**Overview:** When ready to implement, this architecture enables customers to pay for quotes (Screen Print, DTG, Embroidery, Cap) online with credit cards via Stripe, with payment transactions automatically recorded in ShopWorks.
-
-**Core Workflow:**
-
-```
-1. Customer Reviews Quote → Sees total: $550.00
-
-2. Customer Clicks "Pay with Credit Card" → Redirects to Stripe Checkout (Stripe-hosted, PCI compliant)
-
-3. Customer Enters Card Details → Stripe securely processes payment
-   - NWCA never sees or stores card details
-   - Stripe returns Charge ID: ch_3ABC123xyz
-
-4. Stripe Webhook Notification → Triggers EDP Payment Block generation
-   - Payment date: 01/27/2025
-   - Payment amount: $550.00
-   - Stripe Charge ID: ch_3ABC123xyz
-   - Card: Visa ****4242 (last 4 digits only)
-
-5. EDP Auto-Generated → Payment Block ready for ShopWorks import
-
-6. Quote Marked as "Paid" → Database updated, accounting notified
-
-7. ShopWorks Import → Payment recorded with Stripe reference
-```
-
-**Key Benefits:**
-- ✅ PCI DSS Level 1 Compliance (Stripe certified)
-- ✅ Fraud detection with Stripe Radar
-- ✅ 3D Secure for international cards
-- ✅ Refund capability via Charge ID (no card details needed)
-- ✅ Customer sees professional Stripe checkout
-- ✅ Automatic receipt emails from Stripe
-
----
-
-#### EDP Payment Block Implementation Example (Future)
-
-```javascript
-// After successful Stripe payment, generate Payment Block:
-
-edp += '---- Start Payment ----\n';
-edp += `date_Payment>> 01/27/2025\n`;
-edp += `cur_Payment>> 550.00\n`;
-edp += `PaymentType>> Stripe Credit Card\n`;
-edp += `PaymentNumber>> ch_3ABC123xyz\n`;  // Stripe Charge ID - enables refunds
-edp += `Card_Name_First>> John\n`;
-edp += `Card_Name_Last>> Smith\n`;
-edp += `Card_Exp_Date>> \n`;  // INTENTIONALLY BLANK - DO NOT STORE for security
-edp += `Notes>> Stripe payment for Quote SP0127-1. Card: Visa ****4242. Customer: john@company.com\n`;
-edp += '---- End Payment ----\n\n';
-```
-
-**Field Usage:**
-- `date_Payment`: Use MM/DD/YYYY format (matches ShopWorks standard)
-- `cur_Payment`: Payment amount in dollars (e.g., 550.00)
-- `PaymentType`: "Stripe Credit Card" (identifies payment processor)
-- `PaymentNumber`: **Stripe Charge ID** (critical for refunds - e.g., `ch_3ABC123xyz`)
-- `Card_Name_First` / `Card_Name_Last`: From Stripe billing details
-- `Card_Exp_Date`: **LEAVE BLANK** - Never store expiration for PCI compliance
-- `Notes`: Non-sensitive details (last 4 digits, card brand, quote reference)
-
----
-
-#### Use Cases for Stripe Payment Integration
-
-1. **Pay for Quotes** - Customer pays for Screen Print, DTG, Embroidery, or Cap quotes online
-2. **Deposit Payments** - Require 50% deposit before production on large orders
-3. **Full Payment Before Production** - For new customers or rush orders
-4. **Online Store Integration** - Future webstore customers pay at checkout
-5. **Invoice Payments** - Email payment link for outstanding invoices
-
----
-
-#### Technical Components Needed for Implementation (When Ready)
-
-**Frontend (Quote Builders):**
-- Stripe.js library integration
-- "Pay with Credit Card" button in review phase
-- Payment success/failure handling
-- Redirect to Stripe Checkout
-
-**Backend (Heroku Proxy Server):**
-- Stripe webhook endpoint (`/api/stripe/webhook`)
-- Webhook signature verification (security)
-- EDP Payment Block generation on successful payment
-- Database update: Mark quote as "Paid"
-- Email notification to accounting with EDP text
-
-**Database Schema Updates:**
-- Add payment fields to `quote_sessions` table:
-  - `PaymentStatus` ("Unpaid", "Paid", "Refunded")
-  - `PaymentMethod` ("Stripe Credit Card", "Net 30")
-  - `StripeChargeID` (e.g., "ch_3ABC123xyz")
-  - `PaymentDate` (timestamp)
-  - `EDPPaymentGenerated` (boolean)
-
-**Stripe Account Setup:**
-- Create Stripe account at stripe.com
-- Get API keys (test and live)
-- Configure webhook endpoint
-- Set up email receipts
-- Enable fraud detection (Stripe Radar)
-
----
-
-#### What Changes vs. What Stays the Same (Across Quote Builders)
-
-**Same Payment Block Structure for ALL Quote Builders:**
-- ✅ Screen Print Quote Builder
-- ✅ DTG Quote Builder
-- ✅ Embroidery Quote Builder
-- ✅ Cap Embroidery Quote Builder
-- ✅ All future quote builders
-
-**What's Identical:**
-- All 8 Payment Block field names
-- Security rules (never store card details)
-- Stripe Charge ID pattern
-- Date and currency formats
-- EDP Block structure
-
-**What Varies by Quote Builder:**
-- `Notes` field content: References specific quote ID (SP0127-1, DTG0127-1, etc.)
-- Payment amount: Calculated from that builder's pricing
-- Quote metadata: Stored in Stripe for reference
-
----
-
-#### Security & Compliance Resources
-
-**PCI Compliance:**
-- Stripe is PCI DSS Level 1 certified (highest level)
-- By using Stripe Checkout, you avoid PCI compliance requirements
-- Never handle raw card data = automatic compliance
-
-**Stripe Documentation:**
-- Stripe Checkout: https://stripe.com/docs/payments/checkout
-- Webhooks: https://stripe.com/docs/webhooks
-- Security: https://stripe.com/docs/security
-
-**Best Practices:**
-- Always verify webhook signatures
-- Use HTTPS for all payment pages
-- Log payment events for auditing
-- Test in Stripe test mode before going live
-- Set up fraud detection rules in Stripe Dashboard
-
----
-
-#### Implementation Timeline (When Ready)
-
-**Phase 1: Proof of Concept (1-2 weeks)**
-- Set up Stripe test account
-- Implement basic checkout flow for one quote builder
-- Test webhook handler
-- Generate test EDP Payment Blocks
-- Manual import into ShopWorks test environment
-
-**Phase 2: Production Rollout (2-3 weeks)**
-- Roll out to all quote builders (Screen Print, DTG, Embroidery, Cap)
-- Add payment status tracking in database
-- Create admin dashboard for paid vs. unpaid quotes
-- Implement email notifications for accounting
-- Test refund workflow
-
-**Phase 3: Advanced Features (Future)**
-- Auto-import EDP to ShopWorks (if API available)
-- Payment plans / deposit options
-- Automatic payment reminders for unpaid quotes
-- Customer payment history portal
-- Subscription billing for webstores
-
----
-
-#### Additional Notes
-
-**Current Status:** Payment Block fields are documented but not implemented. All quotes currently use "Net 30" payment terms with manual processing.
-
-**Future Decision Points:**
-- When to require payment vs. offering terms?
-- Deposit percentage for large orders?
-- Payment deadline after quote generation?
-- Auto-decline quotes unpaid after X days?
-
-**Related Documentation:**
-- For full Stripe integration code examples, see conversation history from 2025-10-26
-- Includes complete webhook handler, service layer, and security implementation
-- Architecture supports quotes, orders, and future webstore transactions
+## 📊 Field Count Summary
+
+### Current Implementation vs Available
+
+| Block | Implemented | Available | Percentage | Priority Next |
+|-------|-------------|-----------|------------|---------------|
+| Order | 12 | 44 | 27% | Shipping address (11 fields) |
+| Customer | 1 | 44 | 2% | Customer details (6 fields) |
+| Contact | 0 | 10 | 0% | Basic contact info (5 fields) |
+| Design | 0 | 11 | 0% | **HIGH VALUE** - Design specs |
+| **Product** | **19** | **41** | **46%** | **Size overrides (optional)** |
+| Payment | 0 | 8 | 0% | **FUTURE** - Stripe integration |
+| **Total** | **32** | **158** | **20%** | |
 
 ### Implementation Priority Guide
 
-#### Immediate Value (Implement Next)
-1. **Shipping Address Fields** (Order Block - Shipping SubBlock: 11 fields) - Essential for production ✅ Documented
-2. **Customer Email** (Order/Customer Block) - Order notifications
+**Phase 1: Essential (Current)**
+- ✅ Order Block: Basic order identification
+- ✅ Customer Block: Customer ID linking
+- ✅ Product Block: **Complete implementation** ✅
 
-#### High Value (Ready to Implement)
-3. **Design Block (11 fields)** - HIGH VALUE for screen print workflow ✅ Documented (3 SubBlocks)
-4. **Contact Block (10 fields)** - Multiple contacts per customer ✅ Documented
-5. **Extended Customer Info** - Complete customer profiles (Customer Block SubBlocks) ✅ Documented
-6. **Extended Order Info** - Complete order details (Order Block SubBlocks) ✅ Documented
+**Phase 2: High Value (Next)**
+- Design Block: Track artwork specs (colors, flashes, stitches)
+- Contact Block: Contact person information
+- Order Block: Complete shipping address
 
-#### Future Enhancements
-7. **Payment Block with Stripe Integration (8 fields)** - Online credit card payments ✅ Documented (future implementation)
+**Phase 3: Enhancement (Later)**
+- Customer Block: Full customer details
+- Order Block: Sales tax overrides
+- Product Block: Size-specific overrides
 
-#### Nice to Have (Lower Priority)
-9. **Advanced Order Fields** - Workflow automation
-10. **Financial Fields** - Discounts, tax exemptions
-11. **System Integration Fields** - External system linking
+**Phase 4: Future (Planned)**
+- Payment Block: Stripe payment integration
+- Order Block: Advanced tax calculations
 
-### Adding New Fields - Code Template
+---
 
-```javascript
-// 1. Add to Order Block (in convertToEDPFormat method):
-edp += `NewFieldName>> ${quoteData.NewFieldSource || 'default value'}\n`;
+## 🎯 Quick Start Guide
 
-// 2. Ensure quoteData includes the field (in quote builder):
-const quoteData = {
-    // ... existing fields
-    NewFieldSource: document.getElementById('new-field-input')?.value || ''
-};
+### For New Quote Builder Implementation
 
-// 3. Test the EDP output contains the field:
-console.log('[EDP] Generated EDP:', edpText);
-// Look for: "NewFieldName>> [expected value]"
-```
+1. **Read Core Concepts:**
+   - [CATALOG_COLOR documentation](edp/PRODUCT_BLOCK.md#catalog-color)
+   - [SizesPricing pattern](edp/PRICING_SYNC_GUIDE.md)
 
-### Field Naming Conventions
+2. **Implement Product Block:**
+   - See [Product Block complete guide](edp/PRODUCT_BLOCK.md)
+   - This is the MOST CRITICAL block (pricing, products, sizes)
 
-**ShopWorks EDP follows these patterns:**
-- `id_` prefix = Numeric ID fields (e.g., `id_Customer`)
-- `date_` prefix = Date fields in MM/DD/YYYY format
-- `cur_` prefix = Currency fields (e.g., `cur_UnitPrice`)
-- `sts_` prefix = Status/boolean fields (e.g., `sts_EnableTax01`)
-- `_Req` suffix = Required field (e.g., `Size01_Req`)
+3. **Add Order & Customer Blocks:**
+   - See [Order Block](edp/ORDER_BLOCK.md) for order identification
+   - See [Customer Block](edp/CUSTOMER_BLOCK.md) for customer linking
 
-### Testing New Fields
+4. **Test Import:**
+   - Generate EDP text from quote
+   - Import into ShopWorks OnSite 7
+   - Verify pricing matches exactly
 
-When adding new fields:
+5. **Enhance Gradually:**
+   - Add Design Block for artwork tracking
+   - Add Contact Block for contact info
+   - Add remaining Order Block fields as needed
 
-1. **Generate test EDP:**
+### For Debugging Pricing Discrepancies
+
+1. **Check Order Summary:**
+   - Verify all cost components are included
+   - Check LTM fee calculation
+
+2. **Check SizesPricing Object:**
    ```javascript
-   // In browser console:
-   const edpText = window.shopWorksEDPGenerator.generateEDP(testQuoteData);
-   console.log(edpText);
+   console.log(product.SizesPricing);
+   // Should show: {S: 35.39, M: 35.39, L: 35.39, XL: 35.39, '2XL': 37.39}
    ```
 
-2. **Verify field appears in output:**
-   ```
-   ---- Start Order ----
-   NewFieldName>> expected value
-   ```
+3. **Check Console Logs:**
+   - Look for: `[ShopWorksGuide] Using standard size price from S: $35.39` ✅
+   - Avoid: `[ShopWorksGuide] Using final price` ❌
 
-3. **Test import in ShopWorks:**
-   - Import EDP file into ShopWorks test environment
-   - Verify field populates correct database column
-   - Check field appears in order record
+4. **Compare All Three Systems:**
+   - Order Summary total
+   - ShopWorks Guide subtotal (within $0.20)
+   - EDP import verification
 
-4. **Validate data format:**
-   - Dates: MM/DD/YYYY (no time)
-   - Currency: XX.XX (two decimals)
-   - Yes/No fields: "Yes" or "No" (not 1/0)
+**Full debugging guide:** See [Pricing Sync Guide](edp/PRICING_SYNC_GUIDE.md#testing-debugging)
 
-### Field Documentation Template
+---
 
-When documenting new fields you implement:
+## 📚 Complete Block Documentation
 
-```javascript
-/**
- * [FieldName] - [Brief description]
- *
- * @block [Order/Customer/Contact/Design/Product/Payment]
- * @format [String/Number/Date/Boolean]
- * @required [Yes/No]
- * @default [Default value or ""]
- * @example "[Sample value]"
- *
- * Use Case: [When/why to use this field]
- * Implementation: [Code location and pattern]
- * ShopWorks Import: [Which field this populates in ShopWorks]
- */
+### Block-Specific Guides
+
+Each block has detailed documentation with:
+- Complete field specifications
+- SubBlock architecture
+- OnSite 6.1 → OnSite 7 field mapping
+- Implementation examples
+- Use cases by quote builder type
+
+**Click any block below for complete documentation:**
+
+1. **[Order Block (ORDER_BLOCK.md)](edp/ORDER_BLOCK.md)**
+   - 44 fields organized into 6 SubBlocks
+   - Order identification, dates, shipping, notes
+   - Shared across ALL quote builders
+   - Status: Partially implemented (12 of 44 fields)
+
+2. **[Customer Block (CUSTOMER_BLOCK.md)](edp/CUSTOMER_BLOCK.md)**
+   - 44 fields organized into 6 SubBlocks
+   - Company details, address, tax settings
+   - Links to ShopWorks customer database
+   - Status: Partially implemented (1 of 44 fields)
+
+3. **[Contact Block (CONTACT_BLOCK.md)](edp/CONTACT_BLOCK.md)**
+   - 10 fields (no SubBlocks)
+   - Contact person information
+   - NEW Department field in OnSite 7
+   - Status: Documented, ready for implementation
+
+4. **[Design Block (DESIGN_BLOCK.md)](edp/DESIGN_BLOCK.md)**
+   - 11 fields organized into 3 SubBlocks
+   - Artwork specifications (colors, flashes, stitches)
+   - **HIGH VALUE** for production workflow
+   - Status: Documented, ready for implementation
+
+5. **[Product Block (PRODUCT_BLOCK.md)](edp/PRODUCT_BLOCK.md)** ⭐ **MOST CRITICAL**
+   - 41 fields organized into 5 SubBlocks
+   - Product details, pricing, sizes
+   - **Includes critical CATALOG_COLOR documentation**
+   - Status: ✅ FULLY IMPLEMENTED (19 essential fields)
+
+6. **[Payment Block (PAYMENT_BLOCK.md)](edp/PAYMENT_BLOCK.md)**
+   - 8 fields (no SubBlocks)
+   - Payment tracking (FUTURE: Stripe integration)
+   - Security best practices documented
+   - Status: Documented for future implementation
+
+### Implementation Guides
+
+**[Pricing Synchronization Guide (PRICING_SYNC_GUIDE.md)](edp/PRICING_SYNC_GUIDE.md)**
+- SizesPricing pattern (source of truth)
+- Three-system synchronization
+- Problems solved (additional locations, weighted average)
+- Testing and debugging procedures
+- Implementation for all quote builder types
+
+---
+
+## 🔍 Key Features by Quote Builder Type
+
+### Shared Across ALL Builders
+
+**Order Block:**
+- ExtOrderID format: `[PREFIX][MMDD]-sequence`
+- Order type IDs (13=Screen Print, 15=DTG, 17=Embroidery, 18=Cap)
+- All address and date fields
+
+**Customer Block:**
+- Customer ID linking
+- Company and address information
+- Tax settings
+
+**Contact Block:**
+- Contact person details
+- Department (NEW in OnSite 7)
+
+**Product Block:**
+- CATALOG_COLOR requirement
+- Size distribution (6 standard sizes)
+- Unit pricing
+
+### Method-Specific Differences
+
+**Screen Print:**
+- Design Block: Color count, flash tracking
+- Multiple print locations (Front, Back, Sleeves)
+- Safety stripes cost component
+
+**DTG (Direct-to-Garment):**
+- Design Block: Location specifications
+- Combo locations (LC_FB, FF_FB)
+- No setup fees (per piece pricing)
+
+**Embroidery:**
+- Design Block: Stitch count tracking
+- Thread color specifications
+- Stitch-based pricing tiers
+
+**Cap Embroidery:**
+- Design Block: Logo placement
+- One size or structured/unstructured variants
+- 3D puff embroidery option
+
+---
+
+## 🛠️ Technical Implementation
+
+### File Structure
+
+```
+/quote-builders/
+  screenprint-quote-builder.html          # Quote builder with EDP generation
+  dtg-quote-builder.html                  # Ready for EDP implementation
+  embroidery-quote-builder.html           # Ready for EDP implementation
+  cap-embroidery-quote-builder.html       # Ready for EDP implementation
+
+/shared_components/js/
+  shopworks-guide-generator.js            # Generates ShopWorks Guide PDF
+  shopworks-edp-generator.js              # Generates EDP text
+  screenprint-shopworks-guide-generator.js # Screen print specific guide
 ```
 
-### Complete Field Counts
+### Generator Architecture
 
-| Block | Implemented | Available | Completion % | Documentation Status |
-|-------|-------------|-----------|--------------|---------------------|
-| Order | 12 | 44 | 27% | **✅ ALL 44 fields documented** (6 SubBlocks) |
-| Customer | 1 | 44 | 2% | **✅ ALL 44 fields documented** (6 SubBlocks) |
-| Contact | 0 | 10 | 0% | **✅ ALL 10 fields documented** |
-| Design | 0 | 11 | 0% | **✅ ALL 11 fields documented** (3 SubBlocks - HIGH VALUE) |
-| Product | 19 | 19 | 100% ✅ | **✅ Complete** |
-| Payment | 0 | 8 | 0% | **✅ ALL 8 fields documented** (Future Stripe) |
-| **TOTAL** | **32** | **~146** | **22%** | **121 of ~146 fields documented (83%)** |
+**ShopWorks Guide Generator:**
+- Parses products into line items
+- Separates standard sizes vs oversized
+- Uses SizesPricing for accurate pricing
+- Generates PDF guide for manual entry
 
-### Next Steps for Enhancement
+**EDP Generator:**
+- Converts line items to EDP text format
+- Applies block structure with delimiters
+- Uses CATALOG_COLOR for product matching
+- Outputs importable .txt file
 
-Consider implementing fields in this order:
+### Key Methods
 
-**Phase 1 (Immediate - Next 1-2 Weeks):**
-- **Customer Block - Details SubBlock (6 fields)** - Company info, terms, email ✅ Documented
-- **Customer Block - Address SubBlock (8 fields)** - Billing address ✅ Documented
-- **Contact Block (10 fields)** - Contact person details ✅ Documented
-- **Order Block - Shipping SubBlock (11 fields)** - Shipping address ✅ Documented
+```javascript
+// From shopworks-guide-generator.js
+getStandardSizePrice(sizeBreakdown, product)  // Extract standard size price
+getPriceForSize(size, product)                // Get size-specific price
+calculateLineTotal(sizes, price, product)     // Sum individual (qty × price)
 
-**Phase 2 (High Value - Week 2-4):**
-- **Design Block (11 fields in 3 SubBlocks)** - Major workflow improvement for screen print ✅ Documented
-- **Customer Block - Sales Tax SubBlock (10 fields)** - Tax calculation ✅ Documented
-- **Customer Block - Profile SubBlock (7 fields)** - Sales rep, customer type ✅ Documented
-- Customer email (Order Block: 1 field)
-
-**Phase 3 (Advanced Features - Future):**
-- **Customer Block - Price Calculator SubBlock (3 fields)** - Pricing tiers ✅ Documented
-- **Customer Block - Custom Fields SubBlock (10 fields)** - Flexible data ✅ Documented
-- **Payment Block (8 fields)** - Stripe payment integration ✅ Documented
-- Advanced order fields as needed
+// From shopworks-edp-generator.js
+generateOrderBlock(quoteData)                 // Create Order Block text
+generateCustomerBlock(quoteData)              // Create Customer Block text
+generateProductBlock(item, lineNumber)        // Create Product Block text
+```
 
 ---
 
-## Summary
+## 📝 Next Steps
 
-### Key Takeaways
+### Immediate (High Priority)
 
-1. **SizesPricing is the source of truth** - Contains already-calculated final prices for each size
-2. **Never use weighted average for standard sizes** - They all cost the same, use `getStandardSizePrice()`
-3. **Always include all cost components** - Base + decorations + additional locations + LTM
-4. **Verify across all three systems** - Order Summary, ShopWorks Guide, EDP import must match
-5. **Penny rounding is acceptable** - $0.10-0.20 total difference due to rounding is normal
-6. **Use CATALOG_COLOR in EDP text** - ShopWorks requires catalog format for product matching (Section 11)
+1. **Implement Design Block** - HIGH VALUE for production workflow
+   - Track color specifications
+   - Flash/underbase requirements
+   - Stitch counts for embroidery
+   - See [Design Block guide](edp/DESIGN_BLOCK.md)
 
-### Universal Application
+2. **Complete Contact Block** - Medium priority
+   - Add contact person information
+   - Department field (new in OnSite 7)
+   - See [Contact Block guide](edp/CONTACT_BLOCK.md)
 
-This pattern works for:
-- ✅ Screen Print Quote Builder (implemented)
-- ✅ DTG Quote Builder (can apply same pattern)
-- ✅ Embroidery Quote Builder (can apply same pattern)
-- ✅ Cap Embroidery Quote Builder (can apply same pattern)
+3. **Expand Order Block** - Complete shipping address
+   - Add 11 shipping address fields
+   - Enhance with date fields
+   - See [Order Block guide](edp/ORDER_BLOCK.md)
 
-### Maintenance
+### Future Enhancements
 
-When adding new quote builders:
-1. Calculate complete pricing for each size
-2. Build SizesPricing object with final prices
-3. Attach to product before passing to generator
-4. Generators will automatically use size-specific pricing
-5. Test with verification checklist
+1. **Complete Customer Block** - Full customer details
+   - Address information
+   - Tax settings
+   - Price tier assignments
+
+2. **Payment Block** - Stripe integration
+   - Online payment processing
+   - Automatic payment tracking
+   - PCI-compliant security
+
+3. **Extend to Other Quote Builders**
+   - DTG Quote Builder
+   - Embroidery Quote Builder
+   - Cap Embroidery Quote Builder
 
 ---
 
-**For questions or issues, reference:**
-- Git commits for pricing sync: c96bff3, c0f9286, 6c194ba
-- Git commits for CATALOG_COLOR: be2222b, 05b58ae, 7177fcf
-- Console log patterns in Testing section
-- Verification checklist above
-- Implementation details for your specific quote builder type
+## 📞 Support & Resources
 
-**Last Updated:** 2025-10-25
-**Maintained By:** NWCA Development Team
-**Related Documentation:** QUOTE_BUILDER_GUIDE.md, CLAUDE_ARCHITECTURE.md, DATABASE_PATTERNS.md
+### Documentation Quick Links
+
+- **Block Documentation:** [/memory/edp/](edp/)
+- **Pricing Sync:** [PRICING_SYNC_GUIDE.md](edp/PRICING_SYNC_GUIDE.md)
+- **Product Block (Critical):** [PRODUCT_BLOCK.md](edp/PRODUCT_BLOCK.md)
+
+### ShopWorks Resources
+
+- **OnSite 7 Documentation:** Contact ShopWorks support
+- **Order Type IDs:** Configured in your ShopWorks system
+- **CATALOG_COLOR Mapping:** From ShopWorks product database
+
+### Internal Resources
+
+- **Implementation Examples:** See Screen Print Quote Builder
+- **Testing Procedures:** See Pricing Sync Guide
+- **Git History:** Commits c96bff3, c0f9286, be2222b, 05b58ae, 7177fcf
+
+---
+
+## 🎉 Success Metrics
+
+### Current Implementation (Screen Print)
+
+✅ **Product Block:** 19 of 19 essential fields implemented
+✅ **Pricing Sync:** Order Summary matches ShopWorks within $0.20
+✅ **CATALOG_COLOR:** Successfully links to ShopWorks inventory
+✅ **Import Success:** EDP imports without errors
+✅ **Production Ready:** Screen Print quotes fully operational
+
+### Next Milestones
+
+- [ ] Design Block implementation (HIGH VALUE)
+- [ ] Contact Block implementation
+- [ ] Complete Order Block (shipping address)
+- [ ] DTG Quote Builder EDP export
+- [ ] Embroidery Quote Builder EDP export
+- [ ] Cap Quote Builder EDP export
+
+---
+
+**Documentation Type:** Master navigation and overview
+**Related Files:** All block documentation in [/memory/edp/](edp/) directory
+**Last Updated:** 2025-10-26
+**Version:** OnSite 7
+**Status:** Production-ready, continuously enhanced

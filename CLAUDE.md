@@ -567,6 +567,16 @@ For detailed configuration management patterns and environment detection, see **
 - **@memory/STAFF_DIRECTORY.md** - Staff emails for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema patterns
 
+### 🏭 ShopWorks EDP Integration
+- **@memory/SHOPWORKS_EDP_INTEGRATION.md** - Master navigation (~25KB navigation hub)
+- **@memory/edp/** - Block documentation (7 specialized files, each < 40KB)
+  - PRODUCT_BLOCK.md - **CRITICAL** - Includes CATALOG_COLOR field specification
+  - PRICING_SYNC_GUIDE.md - SizesPricing pattern for three-system synchronization
+  - ORDER_BLOCK.md, CUSTOMER_BLOCK.md, CONTACT_BLOCK.md, DESIGN_BLOCK.md, PAYMENT_BLOCK.md
+
+**Status:** ✅ Production-ready for Screen Print Quote Builder
+**Key Concepts:** CATALOG_COLOR (must match ShopWorks catalog exactly), SizesPricing (pricing sync source of truth)
+
 ### 🧮 Active Calculators & Quote Builders
 - **DTG** - Direct-to-garment contract pricing
 - **RICH** - Richardson caps
