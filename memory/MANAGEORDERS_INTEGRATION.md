@@ -1,8 +1,8 @@
 # ManageOrders API Integration - Core Guide
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-10-26
 **Purpose:** Master navigation and overview for ShopWorks ManageOrders REST API integration
-**Status:** Production-ready for Customer Autocomplete (Screen Print Quote Builder)
+**Status:** Production-ready - Full ERP integration with 11 endpoints
 
 ---
 
@@ -10,10 +10,10 @@
 
 ### Implementation Guides
 - **[Overview & Architecture](manageorders/OVERVIEW.md)** - System architecture, authentication flow, getting started
-- **[Customer Autocomplete](manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Complete implementation guide for current feature
-- **[API Reference](manageorders/API_REFERENCE.md)** - Complete Swagger specification (10 endpoints)
+- **[Customer Autocomplete](manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Complete implementation guide for customer autocomplete feature
+- **[API Reference](manageorders/API_REFERENCE.md)** - Complete API specification (11 endpoints, all production-ready)
 - **[Server Proxy](manageorders/SERVER_PROXY.md)** - caspio-pricing-proxy implementation details
-- **[Future Integrations](manageorders/FUTURE_INTEGRATIONS.md)** - Order history, inventory sync, payment tracking
+- **[Integration Examples](manageorders/INTEGRATION_EXAMPLES.md)** - Working code examples for orders, inventory, payments, tracking
 
 ---
 
@@ -23,9 +23,9 @@
 
 **ManageOrders** is ShopWorks' REST API that provides programmatic access to order, customer, inventory, and payment data from their OnSite 7 production management system.
 
-**Current Implementation:** Customer Autocomplete in Screen Print Quote Builder
-**API Endpoints Used:** 1 of 10 available endpoints
-**Status:** ✅ Production-ready with 389 customers cached
+**Current Implementation:** Full ERP integration via caspio-pricing-proxy
+**API Endpoints Available:** 11 of 11 endpoints - All production-ready
+**Status:** ✅ Fully implemented with intelligent caching strategy
 
 ### Why ManageOrders Integration Matters
 
@@ -60,10 +60,10 @@
 │  caspio-pricing-proxy         │         │
 │  (Heroku server)              │         │
 │                               │         │
-│  /api/manageorders/customers  │         │
+│  /api/manageorders/*          │         │
 │  - Token caching (1 hour)     │         │
-│  - Customer caching (1 day)   │         │
-│  - Rate limiting (10/min)     │         │
+│  - Intelligent caching        │         │
+│  - Rate limiting (30/min)     │         │
 └────────────────┬──────────────┘         │
                  ↓                        ↓
     ┌────────────┴────────────┐    [Cached Data]
@@ -83,28 +83,32 @@
 
 ## 🔧 Available Endpoints
 
-### Currently Implemented ✅
+### ⭐ Critical Production Endpoints
 
-| Endpoint | Method | Purpose | Status |
-|----------|--------|---------|--------|
-| `/api/orders` | GET | Fetch orders → Extract unique customers | ✅ Deployed |
+| Endpoint | Cache | Purpose | Priority |
+|----------|-------|---------|----------|
+| `inventorylevels` | 5 min | Real-time stock levels | **CRITICAL** for webstore |
+| `tracking` | 15 min | Shipment tracking | **HIGH** for customer portal |
+| `orders` (query) | 1 hour | Order searches | **HIGH** for sales tools |
+| `payments` (query) | 1 hour | Payment status | **MEDIUM** for accounting |
 
-**Proxy Endpoint:** `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/customers`
+### All Production Endpoints ✅
 
-### Available for Future Use 📝
+**Base URL:** `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/`
 
-| Category | Endpoints | Use Cases |
-|----------|-----------|-----------|
-| **Authentication** | `POST /api/signin` | Required for all API calls |
-| **Orders** | `GET /api/orders`<br>`POST /api/orders`<br>`PUT /api/orders/{id}`<br>`DELETE /api/orders/{id}` | Order history, quote conversion tracking |
-| **Order Line Items** | `GET /api/lineItems` | Product breakdown, reorder suggestions |
-| **Order Shipments** | `GET /api/shipments` | Delivery tracking |
-| **Order Payments** | `GET /api/payments` | Payment status, invoice reconciliation |
-| **Inventory** | `GET /api/inventoryLevels` | Real-time stock availability |
+| Category | Endpoints | Status |
+|----------|-----------|--------|
+| **Customers** | `customers` | ✅ Deployed (customer autocomplete) |
+| **Orders** | `orders` (query), `orders/:order_no`, `getorderno/:ext_id` | ✅ Deployed (3 endpoints) |
+| **Line Items** | `lineitems/:order_no` | ✅ Deployed (product details) |
+| **Payments** | `payments` (query), `payments/:order_no` | ✅ Deployed (2 endpoints) |
+| **Tracking** | `tracking` (query), `tracking/:order_no` | ✅ Deployed (2 endpoints) |
+| **Inventory** | `inventorylevels` | ✅ Deployed (real-time stock) |
+| **Debug** | `cache-info` | ✅ Deployed (cache diagnostics) |
 
-**Total Available:** 10 endpoints
-**Currently Using:** 1 endpoint (10%)
-**Documentation:** Complete Swagger specification in [API Reference](manageorders/API_REFERENCE.md)
+**Total Endpoints:** 11 production-ready endpoints
+**Rate Limiting:** 30 requests/minute per IP
+**Documentation:** Complete API specification in [API Reference](manageorders/API_REFERENCE.md)
 
 ---
 
@@ -188,7 +192,7 @@
 - Tokens never sent to browser
 
 **Layer 3: Rate Limiting**
-- 10 requests/minute per IP
+- 30 requests/minute per IP
 - Prevents abuse and accidental DoS
 - Returns 429 status on limit exceeded
 
@@ -211,7 +215,33 @@
 **Files Created:** 2 (service + integration)
 **Lines of Code:** ~440 lines
 
-### Phase 2: Rollout to Other Quote Builders 📝 PLANNED
+### Phase 2: Complete ERP Integration ✅ COMPLETE
+
+**Status:** All 11 endpoints deployed and production-ready
+**Completion Date:** 2025-10-26
+**Endpoints Deployed:** 11 (customers, orders, line items, payments, tracking, inventory)
+**Caching Strategy:** Intelligent per-endpoint caching (5min to 24hr)
+
+**Available Integrations:**
+- ✅ Customer autocomplete (live in Screen Print Quote Builder)
+- ✅ Order history lookup (query and detail endpoints)
+- ✅ Real-time inventory (5-minute cache, CRITICAL for webstore)
+- ✅ Payment tracking (query and detail endpoints)
+- ✅ Shipment tracking (15-minute cache)
+- ✅ Quote-to-order mapping (`ExtOrderID` → `OrderNo`)
+
+### Phase 3: Application Development 📝 READY
+
+**Use Cases Ready to Build:**
+1. **Webstore Real-Time Inventory** - Show live stock levels during product selection
+2. **Customer Portal** - Order history, tracking, and payment status
+3. **Sales Dashboard** - Order search and customer history lookup
+4. **Accounting Dashboard** - Payment tracking and invoice reconciliation
+5. **Order Status Widget** - Embed in any page for customer self-service
+
+**Complete working examples:** See [Integration Examples](manageorders/INTEGRATION_EXAMPLES.md)
+
+### Phase 4: Rollout Customer Autocomplete 📝 PLANNED
 
 **Target Quote Builders:**
 - DTG Quote Builder
@@ -221,42 +251,6 @@
 
 **Effort:** Low (reuse existing service)
 **Timeline:** 1-2 hours per quote builder
-
-### Phase 3: Order History Lookup 📝 FUTURE
-
-**Use Case:** Sales rep wants to see customer's previous orders
-**Implementation:**
-- Add "View Order History" button next to autocomplete
-- Fetch orders filtered by `id_Customer`
-- Display modal with recent orders
-
-**Endpoints Required:**
-- `GET /api/orders?id_Customer={id}` (already available)
-- `GET /api/lineItems?id_Order={id}` (for order details)
-
-### Phase 4: Inventory Integration 📝 FUTURE
-
-**Use Case:** Show real-time stock availability for products
-**Implementation:**
-- Fetch inventory levels during product selection
-- Display "In Stock: 500" badge on product cards
-- Warn when quantity exceeds available inventory
-
-**Endpoints Required:**
-- `GET /api/inventoryLevels?styleNumber={style}`
-
-### Phase 5: Payment Tracking 📝 FUTURE
-
-**Use Case:** Track quote conversion and payment status
-**Implementation:**
-- Link quote to order via `ExtOrderID`
-- Check payment status when viewing quote
-- Display "Paid", "Pending", or "Past Due"
-
-**Endpoints Required:**
-- `GET /api/payments?id_Order={id}`
-
-**Complete roadmap:** See [Future Integrations](manageorders/FUTURE_INTEGRATIONS.md)
 
 ---
 
@@ -339,12 +333,13 @@ console.log('Cache age (hours):', (age / 1000 / 60 / 60).toFixed(2));
 
 ### Next Milestones
 
-- [ ] Rollout to DTG Quote Builder
-- [ ] Rollout to Embroidery Quote Builder
-- [ ] Rollout to Cap Quote Builder
-- [ ] Implement order history lookup
-- [ ] Implement inventory integration
-- [ ] Implement payment tracking
+- [ ] Build webstore real-time inventory integration
+- [ ] Build customer portal with order history and tracking
+- [ ] Build sales dashboard with order search
+- [ ] Build accounting dashboard with payment tracking
+- [ ] Rollout customer autocomplete to DTG Quote Builder
+- [ ] Rollout customer autocomplete to Embroidery Quote Builder
+- [ ] Rollout customer autocomplete to Cap Quote Builder
 
 ---
 
@@ -395,5 +390,5 @@ const status = customerService.getStatus();
 
 **Documentation Type:** Master navigation and overview
 **Related Files:** All documentation files in [/memory/manageorders/](manageorders/) directory
-**Last Updated:** 2025-01-27
-**Status:** Production-ready, actively expanded
+**Last Updated:** 2025-10-26
+**Status:** Full ERP integration - 11 endpoints production-ready

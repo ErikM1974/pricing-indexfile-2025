@@ -1,10 +1,10 @@
 # ManageOrders API - Complete Reference
 
 **Last Updated:** 2025-01-27
-**Purpose:** Complete Swagger/OpenAPI specification for ShopWorks ManageOrders API
+**Purpose:** Complete API specification for caspio-pricing-proxy ManageOrders endpoints
 **Parent Document:** [MANAGEORDERS_INTEGRATION.md](../MANAGEORDERS_INTEGRATION.md)
 **API Version:** 1.0
-**Base URL:** `https://your-shopworks-server.com` (replace with your server)
+**Base URL:** `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
 
 ---
 
@@ -13,12 +13,14 @@
 1. [API Overview](#api-overview)
 2. [Authentication](#authentication)
 3. [Common Response Codes](#common-response-codes)
-4. [Orders Endpoints](#orders-endpoints)
-5. [Line Items Endpoints](#line-items-endpoints)
-6. [Shipments Endpoints](#shipments-endpoints)
+4. [Customers Endpoint](#customers-endpoint)
+5. [Orders Endpoints](#orders-endpoints)
+6. [Line Items Endpoint](#line-items-endpoint)
 7. [Payments Endpoints](#payments-endpoints)
-8. [Inventory Endpoints](#inventory-endpoints)
-9. [Data Structures](#data-structures)
+8. [Tracking Endpoints](#tracking-endpoints)
+9. [Inventory Endpoint](#inventory-endpoint)
+10. [Caching & Performance](#caching-performance)
+11. [Data Structures](#data-structures)
 
 ---
 
@@ -29,87 +31,68 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: ManageOrders API
-  description: REST API for ShopWorks OnSite 7 production management system
+  title: ManageOrders Proxy API
+  description: Proxy server for ShopWorks OnSite 7 ManageOrders API with intelligent caching
   version: 1.0
   contact:
-    name: ShopWorks Support
-    url: https://www.shopworks.com
+    name: NWCA Development Team
 servers:
-  - url: https://your-shopworks-server.com
-    description: Your ShopWorks OnSite 7 server
+  - url: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
+    description: Heroku production proxy server
 ```
 
 ### Endpoint Categories
 
-| Category | Endpoints | Purpose | Current Use |
-|----------|-----------|---------|-------------|
-| Authentication | 1 | Get JWT token for API access | ✅ Used |
-| Orders | 4 | CRUD operations on orders | ✅ Read-only |
-| Line Items | 1 | Product line items within orders | 📝 Available |
-| Shipments | 1 | Delivery tracking information | 📝 Available |
-| Payments | 1 | Invoice and payment status | 📝 Available |
-| Inventory | 1 | Product availability and stock levels | 📝 Available |
+| Category | Endpoints | Cache Duration | Purpose | Status |
+|----------|-----------|----------------|---------|--------|
+| Customers | 1 | 24 hours | Unique customer list for autocomplete | ✅ Production |
+| Orders | 3 | 1 hour / 24 hours | Order queries and lookups | ✅ Production |
+| Line Items | 1 | 24 hours | Product details within orders | ✅ Production |
+| Payments | 2 | 1 hour / 24 hours | Payment and invoice tracking | ✅ Production |
+| Tracking | 2 | 15 minutes | Shipment tracking | ✅ Production |
+| Inventory | 1 | **5 minutes** | Real-time stock levels ⭐ | ✅ Production |
+| Utilities | 1 | None | Cache diagnostics | ✅ Production |
 
-**Total Endpoints:** 10
-**Currently Implemented:** 2 (Authentication + Orders GET)
+**Total Endpoints:** 11
+**All Implemented and Production-Ready** ✅
+
+### Key Features
+
+- **No Authentication Required** - Browser can call directly (credentials managed server-side)
+- **Intelligent Caching** - 5 minutes to 24 hours based on data volatility
+- **Rate Limiting** - 30 requests/minute per IP
+- **Cache Bypass** - Add `?refresh=true` to force fresh data
+- **CORS Enabled** - Authorized origins only
 
 ---
 
 ## Authentication
 
-### POST /api/signin
+### Server-Side Only
 
-**Description:** Authenticate with ManageOrders API and receive JWT token
+**IMPORTANT:** All ManageOrders API authentication is handled server-side by the proxy. Browser applications require **no authentication** to call these endpoints.
 
-**Request:**
-```http
-POST /api/signin HTTP/1.1
-Content-Type: application/json
+**Server-Side Flow:**
+1. Proxy receives request from browser
+2. Checks token cache (1-hour TTL)
+3. If expired, authenticates with ShopWorks ManageOrders API
+4. Caches new token server-side
+5. Makes authenticated request to ShopWorks
+6. Returns data to browser (never exposes token)
 
-{
-  "username": "your_api_username",
-  "password": "your_api_password"
-}
-```
+**Security Benefits:**
+- ✅ No credentials in browser code
+- ✅ No tokens sent to client
+- ✅ Reduced authentication API calls (1-hour token cache)
+- ✅ CORS protection limits access to authorized origins
 
-**Response (200 OK):**
-```json
-{
-  "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expires_in": 3600,
-  "token_type": "Bearer"
-}
-```
-
-**Response Fields:**
-- `id_token` (string): JWT token for authenticated requests
-- `expires_in` (integer): Token lifetime in seconds (3600 = 1 hour)
-- `token_type` (string): Always "Bearer"
-
-**Error Responses:**
-
-**401 Unauthorized:**
-```json
-{
-  "error": "Unauthorized",
-  "message": "Invalid username or password"
-}
-```
-
-**Example Usage:**
+**Browser Usage:**
 ```javascript
-const response = await fetch('https://your-server.com/api/signin', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        username: 'api_readonly',
-        password: 'secure_password'
-    })
-});
-
+// No auth headers needed!
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/customers'
+);
 const data = await response.json();
-const token = data.id_token;
 ```
 
 ---
@@ -119,644 +102,819 @@ const token = data.id_token;
 | Code | Status | Description |
 |------|--------|-------------|
 | 200 | OK | Request succeeded |
-| 201 | Created | Resource created (POST) |
-| 204 | No Content | Delete succeeded |
-| 400 | Bad Request | Invalid request parameters |
-| 401 | Unauthorized | Missing or invalid token |
+| 304 | Not Modified | Cache still valid (ETag match) |
+| 400 | Bad Request | Invalid query parameters |
 | 404 | Not Found | Resource doesn't exist |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error |
+| 429 | Too Many Requests | Rate limit exceeded (30/min) |
+| 500 | Internal Server Error | Proxy or ShopWorks error |
+| 502 | Bad Gateway | ShopWorks API unavailable |
+
+---
+
+## Customers Endpoint
+
+### GET /api/manageorders/customers
+
+**Description:** Get unique customers from last 60 days of orders for autocomplete functionality
+
+**Cache Duration:** 24 hours (data changes slowly)
+
+**Headers:**
+```http
+GET /api/manageorders/customers HTTP/1.1
+```
+
+**Query Parameters:** None
+
+**Response (200 OK):**
+```json
+{
+  "customers": [
+    {
+      "id_Customer": 123,
+      "CustomerName": "Arrow Lumber and Hardware",
+      "ContactFirstName": "John",
+      "ContactLastName": "Smith",
+      "ContactEmail": "john@arrowlumber.com",
+      "ContactPhone": "253-555-1234",
+      "CustomerServiceRep": "Nika Lao"
+    }
+  ],
+  "count": 389,
+  "metadata": {
+    "dateRange": "Last 60 days",
+    "cached": true,
+    "cacheAge": "2 hours"
+  }
+}
+```
+
+**Example Usage:**
+```javascript
+// Initialize customer service
+const service = new ManageOrdersCustomerService();
+await service.initialize();
+
+// Search customers
+const results = service.searchCustomers('arrow');
+// Returns matching customers sorted by relevance
+```
+
+**Use Cases:**
+- Customer autocomplete in quote builders
+- Customer search in order forms
+- Sales rep customer lists
+
+**Implementation:** See [CUSTOMER_AUTOCOMPLETE.md](CUSTOMER_AUTOCOMPLETE.md)
 
 ---
 
 ## Orders Endpoints
 
-### GET /api/orders
+### GET /api/manageorders/orders
 
-**Description:** Retrieve list of orders with optional filtering
+**Description:** Query orders with date range and customer filters
+
+**Cache Duration:** 1 hour (intraday changes possible)
 
 **Headers:**
 ```http
-Authorization: Bearer {token}
-Content-Type: application/json
+GET /api/manageorders/orders?date_Ordered_start=2025-01-01&date_Ordered_end=2025-01-27 HTTP/1.1
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description | Example |
 |-----------|------|----------|-------------|---------|
-| `fromDate` | string | No | Filter orders from date (ISO 8601) | `2025-01-01` |
-| `toDate` | string | No | Filter orders to date (ISO 8601) | `2025-01-27` |
+| `date_Ordered_start` | string | No | Start of order date range (YYYY-MM-DD) | `2025-01-01` |
+| `date_Ordered_end` | string | No | End of order date range (YYYY-MM-DD) | `2025-01-27` |
+| `date_Invoiced_start` | string | No | Start of invoice date range | `2025-01-01` |
+| `date_Invoiced_end` | string | No | End of invoice date range | `2025-01-27` |
+| `date_Shipped_start` | string | No | Start of ship date range | `2025-01-01` |
+| `date_Shipped_end` | string | No | End of ship date range | `2025-01-27` |
 | `id_Customer` | integer | No | Filter by customer ID | `123` |
-| `id_OrderType` | integer | No | Filter by order type | `13` |
-| `Status` | string | No | Filter by status | `Open`, `Complete` |
-
-**Request Example:**
-```http
-GET /api/orders?fromDate=2024-12-01&toDate=2025-01-27 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-```
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id_Order": 12345,
-    "ExtOrderID": "SP0127-1",
-    "id_Customer": 456,
-    "CustomerName": "Arrow Lumber and Hardware",
-    "ContactFirstName": "John",
-    "ContactLastName": "Smith",
-    "ContactEmail": "john@arrowlumber.com",
-    "ContactPhone": "253-555-1234",
-    "CustomerServiceRep": "Nika Lao",
-    "OrderDate": "2025-01-27T10:30:00",
-    "DueDate": "2025-02-05T17:00:00",
-    "Status": "Open",
-    "Subtotal": 500.00,
-    "Tax": 45.00,
-    "Total": 545.00,
-    "Notes": "Rush order - need by Feb 5",
-
-    // Additional order fields (see Data Structures section)
-    "id_OrderType": 13,
-    "CustomerPO": "PO-2025-001",
-    "ShipToName": "John Smith",
-    "ShipToStreet": "123 Main St",
-    "ShipToCity": "Seattle",
-    "ShipToState": "WA",
-    "ShipToZIP": "98101",
-    "ShipToCountry": "USA",
-    "ShippingMethod": "UPS Ground",
-    "TrackingNumber": "",
-    "ShipDate": null,
-    "InvoiceNumber": "",
-    "InvoiceDate": null,
-    "Terms": "Net 30",
-    "SalesTaxRate": 0.09,
-    "SalesTaxAmount": 45.00,
-    "DiscountPercent": 0,
-    "DiscountAmount": 0,
-    "ShippingCharge": 0,
-    "OrderSource": "Web Quote",
-    "CreatedBy": "sales@nwcustomapparel.com",
-    "CreatedDate": "2025-01-27T10:30:00",
-    "ModifiedBy": "sales@nwcustomapparel.com",
-    "ModifiedDate": "2025-01-27T10:30:00"
-  }
-]
-```
-
-**Complete Order Object Fields: 54 fields** (see [Order Data Structure](#order-data-structure))
-
----
-
-### POST /api/orders
-
-**Description:** Create a new order
-
-**Headers:**
-```http
-Authorization: Bearer {token}
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
 {
-  "ExtOrderID": "DTG0127-5",
-  "id_Customer": 456,
-  "id_OrderType": 15,
-  "CustomerPO": "Web Quote - DTG0127-5",
-  "OrderDate": "2025-01-27T10:30:00",
-  "DueDate": "2025-02-10T17:00:00",
-  "Status": "Open",
-  "Subtotal": 850.00,
-  "Tax": 76.50,
-  "Total": 926.50,
-  "Notes": "Direct-to-garment printing on black shirts",
-  "ShipToName": "Jane Doe",
-  "ShipToStreet": "456 Oak Ave",
-  "ShipToCity": "Tacoma",
-  "ShipToState": "WA",
-  "ShipToZIP": "98402",
-  "ShippingMethod": "Standard",
-  "OrderSource": "Web Quote Builder"
+  "result": [
+    {
+      "order_no": 12345,
+      "ext_order_id": "SP0127-1",
+      "id_Customer": 123,
+      "CustomerName": "Arrow Lumber and Hardware",
+      "date_Ordered": "2025-01-27",
+      "date_Due": "2025-02-05",
+      "date_InHand": "2025-02-04",
+      "date_Shipped": null,
+      "date_Invoiced": null,
+      "Subtotal": 500.00,
+      "SalesTax": 45.00,
+      "Shipping": 0.00,
+      "Total": 545.00,
+      "Status": "Open",
+      "Notes": "Rush order - need by Feb 5"
+    }
+  ],
+  "count": 1,
+  "cached": true
 }
 ```
 
-**Response (201 Created):**
-```json
-{
-  "id_Order": 12346,
-  "ExtOrderID": "DTG0127-5",
-  "message": "Order created successfully"
-}
+**Cache Bypass:**
+```javascript
+// Force fresh data
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders?refresh=true'
+);
 ```
 
 ---
 
-### PUT /api/orders/{id}
+### GET /api/manageorders/orders/:order_no
 
-**Description:** Update an existing order
+**Description:** Get specific order by order number
 
-**Headers:**
-```http
-Authorization: Bearer {token}
-Content-Type: application/json
-```
+**Cache Duration:** 24 hours (historical data)
 
 **Path Parameters:**
-- `id` (integer): Order ID (`id_Order`)
+- `order_no` (integer): ShopWorks order number
 
-**Request Body:** (partial updates supported)
-```json
-{
-  "Status": "In Production",
-  "Notes": "Started production on 2025-01-28",
-  "TrackingNumber": "1Z999AA10123456784"
-}
+**Request Example:**
+```http
+GET /api/manageorders/orders/12345 HTTP/1.1
 ```
 
 **Response (200 OK):**
 ```json
 {
-  "id_Order": 12345,
-  "message": "Order updated successfully"
+  "result": [
+    {
+      "order_no": 12345,
+      "ext_order_id": "SP0127-1",
+      "id_Customer": 123,
+      "CustomerName": "Arrow Lumber and Hardware",
+      "ContactName": "John Smith",
+      "ContactEmail": "john@arrowlumber.com",
+      "ContactPhone": "253-555-1234",
+      "date_Ordered": "2025-01-27",
+      "date_Due": "2025-02-05",
+      "Subtotal": 500.00,
+      "Total": 545.00,
+      "Status": "Open"
+    }
+  ]
 }
 ```
 
 ---
 
-### DELETE /api/orders/{id}
+### GET /api/manageorders/getorderno/:ext_order_id
 
-**Description:** Delete an order (soft delete - marks as canceled)
+**Description:** Map external order ID (quote ID) to ShopWorks order number
 
-**Headers:**
-```http
-Authorization: Bearer {token}
-```
+**Cache Duration:** 24 hours (mapping doesn't change)
 
 **Path Parameters:**
-- `id` (integer): Order ID (`id_Order`)
-
-**Response (204 No Content):** Empty body
-
----
-
-## Line Items Endpoints
-
-### GET /api/lineItems
-
-**Description:** Retrieve line items (products) for orders
-
-**Headers:**
-```http
-Authorization: Bearer {token}
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| `id_Order` | integer | Yes | Order ID to fetch line items | `12345` |
+- `ext_order_id` (string): External order ID from quote system (e.g., "SP0127-1")
 
 **Request Example:**
 ```http
-GET /api/lineItems?id_Order=12345 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+GET /api/manageorders/getorderno/SP0127-1 HTTP/1.1
 ```
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id_LineItem": 67890,
-    "id_Order": 12345,
-    "LineNumber": 1,
-    "ProductDescription": "Gildan 5000 - Black T-Shirt",
-    "StyleNumber": "G5000",
-    "Color": "Black",
-    "Quantity": 48,
-    "UnitPrice": 10.50,
-    "TotalPrice": 504.00,
-    "PrintLocation": "Full Front",
-    "PrintMethod": "DTG",
-    "Notes": "White ink on black",
-
-    // Size breakdown (JSON string)
-    "SizeBreakdown": "{\"S\":6,\"M\":12,\"L\":18,\"XL\":12}",
-
-    // Additional line item fields
-    "ProductCategory": "Apparel",
-    "VendorSKU": "G5000-BLK",
-    "Weight": 0.35,
-    "Cost": 5.25,
-    "Margin": 100.00,
-    "TaxExempt": false,
-    "DiscountPercent": 0,
-    "DiscountAmount": 0,
-    "CreatedDate": "2025-01-27T10:30:00"
-  }
-]
+{
+  "result": [
+    {
+      "order_no": 12345,
+      "ext_order_id": "SP0127-1"
+    }
+  ]
+}
 ```
 
-**Complete LineItem Object Fields: 18 fields** (see [LineItem Data Structure](#lineitem-data-structure))
+**Use Case:**
+```javascript
+// Customer has quote ID, need to look up order status
+async function findOrderByQuoteID(quoteID) {
+  // Step 1: Get ShopWorks order number
+  const mappingResponse = await fetch(
+    `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/getorderno/${quoteID}`
+  );
+  const mappingData = await mappingResponse.json();
+
+  if (!mappingData.result || mappingData.result.length === 0) {
+    return { error: 'Quote not found in ShopWorks' };
+  }
+
+  const orderNo = mappingData.result[0].order_no;
+
+  // Step 2: Get full order details
+  const orderResponse = await fetch(
+    `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/${orderNo}`
+  );
+  return await orderResponse.json();
+}
+```
 
 ---
 
-## Shipments Endpoints
+## Line Items Endpoint
 
-### GET /api/shipments
+### GET /api/manageorders/lineitems/:order_no
 
-**Description:** Retrieve shipment tracking information
+**Description:** Get product line items for a specific order
 
-**Headers:**
-```http
-Authorization: Bearer {token}
-```
+**Cache Duration:** 24 hours (historical data)
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| `id_Order` | integer | No | Filter by order ID | `12345` |
-| `fromDate` | string | No | Filter from ship date | `2025-01-01` |
-| `toDate` | string | No | Filter to ship date | `2025-01-27` |
+**Path Parameters:**
+- `order_no` (integer): ShopWorks order number
 
 **Request Example:**
 ```http
-GET /api/shipments?id_Order=12345 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+GET /api/manageorders/lineitems/12345 HTTP/1.1
 ```
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id_Shipment": 789,
-    "id_Order": 12345,
-    "ShipDate": "2025-02-03T14:30:00",
-    "Carrier": "UPS",
-    "ShippingMethod": "Ground",
-    "TrackingNumber": "1Z999AA10123456784",
-    "ShippingCost": 15.50,
-    "Weight": 5.2,
-    "PackageCount": 1,
-    "ShipToName": "John Smith",
-    "ShipToStreet": "123 Main St",
-    "ShipToCity": "Seattle",
-    "ShipToState": "WA",
-    "ShipToZIP": "98101",
-    "EstimatedDelivery": "2025-02-08T17:00:00",
-    "ActualDelivery": null,
-    "Status": "In Transit",
-    "Notes": "Signature required",
-    "CreatedDate": "2025-02-03T14:30:00"
-  }
-]
+{
+  "result": [
+    {
+      "line_no": 1,
+      "order_no": 12345,
+      "PartNumber": "PC54",
+      "Color": "Forest",
+      "Description": "Port & Company Core Cotton Tee - Forest Green",
+      "Size01": 3,
+      "Size02": 12,
+      "Size03": 18,
+      "Size04": 12,
+      "Size05": 3,
+      "Size06": 0,
+      "Quantity": 48,
+      "UnitPrice": 10.50,
+      "ExtPrice": 504.00,
+      "Notes": "Screen print front and back"
+    }
+  ]
+}
+```
+
+**Size Field Mapping:**
+
+| Field | Size | Common Label |
+|-------|------|--------------|
+| `Size01` | XS | Extra Small |
+| `Size02` | S | Small |
+| `Size03` | M | Medium |
+| `Size04` | L | Large |
+| `Size05` | XL | Extra Large |
+| `Size06` | 2XL | 2X Large |
+
+**Example: Calculate Size Distribution:**
+```javascript
+function parseSizeBreakdown(lineItem) {
+  return {
+    'XS': lineItem.Size01 || 0,
+    'S': lineItem.Size02 || 0,
+    'M': lineItem.Size03 || 0,
+    'L': lineItem.Size04 || 0,
+    'XL': lineItem.Size05 || 0,
+    '2XL': lineItem.Size06 || 0
+  };
+}
 ```
 
 ---
 
 ## Payments Endpoints
 
-### GET /api/payments
+### GET /api/manageorders/payments
 
-**Description:** Retrieve payment and invoice information
+**Description:** Query payments with date range filters
 
-**Headers:**
-```http
-Authorization: Bearer {token}
-```
+**Cache Duration:** 1 hour (intraday changes)
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description | Example |
 |-----------|------|----------|-------------|---------|
-| `id_Order` | integer | No | Filter by order ID | `12345` |
-| `id_Customer` | integer | No | Filter by customer ID | `456` |
-| `Status` | string | No | Filter by payment status | `Paid`, `Pending`, `Overdue` |
+| `date_start` | string | No | Start date (YYYY-MM-DD) | `2025-01-01` |
+| `date_end` | string | No | End date (YYYY-MM-DD) | `2025-01-27` |
 
 **Request Example:**
 ```http
-GET /api/payments?id_Order=12345 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+GET /api/manageorders/payments?date_start=2025-01-01&date_end=2025-01-27 HTTP/1.1
 ```
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id_Payment": 567,
-    "id_Order": 12345,
-    "id_Customer": 456,
-    "InvoiceNumber": "INV-2025-0127",
-    "InvoiceDate": "2025-01-27T10:30:00",
-    "InvoiceAmount": 545.00,
-    "AmountPaid": 545.00,
-    "Balance": 0.00,
-    "PaymentDate": "2025-01-29T09:15:00",
-    "PaymentMethod": "Credit Card",
-    "PaymentReference": "CH_3abc123xyz",
-    "Status": "Paid",
-    "DueDate": "2025-02-26T17:00:00",
-    "Terms": "Net 30",
-    "Notes": "Paid via Stripe",
-    "CreatedDate": "2025-01-27T10:30:00",
-    "ModifiedDate": "2025-01-29T09:15:00"
-  }
-]
+{
+  "result": [
+    {
+      "order_no": 12345,
+      "InvoiceNumber": "INV-2025-0127",
+      "InvoiceDate": "2025-01-27",
+      "InvoiceAmount": 545.00,
+      "AmountPaid": 545.00,
+      "Balance": 0.00,
+      "PaymentDate": "2025-01-29",
+      "PaymentMethod": "Credit Card",
+      "Status": "Paid"
+    }
+  ]
+}
 ```
 
 ---
 
-## Inventory Endpoints
+### GET /api/manageorders/payments/:order_no
 
-### GET /api/inventoryLevels
+**Description:** Get payments for specific order
 
-**Description:** Retrieve product inventory levels and availability
+**Cache Duration:** 24 hours (historical data)
 
-**Headers:**
+**Path Parameters:**
+- `order_no` (integer): ShopWorks order number
+
+**Request Example:**
 ```http
-Authorization: Bearer {token}
+GET /api/manageorders/payments/12345 HTTP/1.1
 ```
+
+**Response (200 OK):**
+```json
+{
+  "result": [
+    {
+      "order_no": 12345,
+      "InvoiceNumber": "INV-2025-0127",
+      "InvoiceAmount": 545.00,
+      "AmountPaid": 545.00,
+      "Balance": 0.00,
+      "PaymentDate": "2025-01-29",
+      "Status": "Paid"
+    }
+  ]
+}
+```
+
+---
+
+## Tracking Endpoints
+
+### GET /api/manageorders/tracking
+
+**Description:** Query shipment tracking with date range filters
+
+**Cache Duration:** 15 minutes (updates during shipping)
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description | Example |
 |-----------|------|----------|-------------|---------|
-| `styleNumber` | string | No | Filter by product style | `G5000` |
-| `color` | string | No | Filter by color | `Black` |
-| `location` | string | No | Filter by warehouse location | `Main Warehouse` |
+| `date_start` | string | No | Start date (YYYY-MM-DD) | `2025-01-01` |
+| `date_end` | string | No | End date (YYYY-MM-DD) | `2025-01-27` |
 
 **Request Example:**
 ```http
-GET /api/inventoryLevels?styleNumber=G5000&color=Black HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+GET /api/manageorders/tracking?date_start=2025-01-20&date_end=2025-01-27 HTTP/1.1
 ```
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id_InventoryLevel": 1001,
-    "StyleNumber": "G5000",
-    "Color": "Black",
-    "Size": "Medium",
-    "Location": "Main Warehouse",
-    "QuantityOnHand": 500,
-    "QuantityAvailable": 450,
-    "QuantityReserved": 50,
-    "QuantityOnOrder": 1000,
-    "ReorderPoint": 200,
-    "ReorderQuantity": 500,
-    "Cost": 5.25,
-    "AverageCost": 5.18,
-    "LastReceived": "2025-01-15T10:00:00",
-    "LastSold": "2025-01-26T14:30:00",
-    "Notes": "Popular size",
-    "CreatedDate": "2024-01-01T00:00:00",
-    "ModifiedDate": "2025-01-26T14:30:00"
-  }
-]
+{
+  "result": [
+    {
+      "order_no": 12345,
+      "ShipDate": "2025-01-26",
+      "Carrier": "UPS",
+      "TrackingNumber": "1Z999AA10123456784",
+      "EstimatedDelivery": "2025-01-30",
+      "Status": "In Transit"
+    }
+  ]
+}
 ```
 
-**Complete InventoryLevel Object Fields: 17 fields** (see [InventoryLevel Data Structure](#inventorylevel-data-structure))
+---
+
+### GET /api/manageorders/tracking/:order_no
+
+**Description:** Get tracking for specific order
+
+**Cache Duration:** 15 minutes (updates frequently)
+
+**Path Parameters:**
+- `order_no` (integer): ShopWorks order number
+
+**Request Example:**
+```http
+GET /api/manageorders/tracking/12345 HTTP/1.1
+```
+
+**Response (200 OK):**
+```json
+{
+  "result": [
+    {
+      "order_no": 12345,
+      "ShipDate": "2025-01-26",
+      "Carrier": "UPS",
+      "TrackingNumber": "1Z999AA10123456784",
+      "Status": "Delivered"
+    }
+  ]
+}
+```
+
+---
+
+## Inventory Endpoint
+
+### GET /api/manageorders/inventorylevels
+
+**Description:** ⭐ Real-time inventory levels with 5-minute cache (CRITICAL for webstore)
+
+**Cache Duration:** **5 minutes** (most aggressive caching for real-time needs)
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| `PartNumber` | string | No | Filter by style/part number | `PC54` |
+| `Color` | string | No | Filter by exact color name | `Jet Black` |
+| `ColorRange` | string | No | Filter by color range | `Black` |
+| `SKU` | string | No | Filter by vendor SKU | `PC54-BLK-M` |
+| `VendorName` | string | No | Filter by vendor | `Port & Company` |
+
+**Request Example:**
+```http
+GET /api/manageorders/inventorylevels?PartNumber=PC54&Color=Jet%20Black HTTP/1.1
+```
+
+**Response (200 OK):**
+```json
+{
+  "result": [
+    {
+      "Color": "Jet Black",
+      "PartNumber": "PC54",
+      "Size01": 4,
+      "Size02": 10,
+      "Size03": 11,
+      "Size04": 79,
+      "Size05": 0,
+      "Size06": 0,
+      "Description": "Port & Company Core Cotton Tee",
+      "VendorName": "Port & Company",
+      "SKU": "PC54-BLK"
+    }
+  ],
+  "cached": true,
+  "cacheAge": "3 minutes"
+}
+```
+
+**Size Field Mapping (Same as Line Items):**
+
+| Field | Size |
+|-------|------|
+| `Size01` | XS |
+| `Size02` | S |
+| `Size03` | M |
+| `Size04` | L |
+| `Size05` | XL |
+| `Size06` | 2XL |
+
+**Example: Check Stock Availability:**
+```javascript
+async function checkInventory(partNumber, color) {
+  const response = await fetch(
+    `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=${partNumber}&Color=${encodeURIComponent(color)}`
+  );
+  const data = await response.json();
+
+  if (!data.result || data.result.length === 0) {
+    return { available: false, message: 'Product not found' };
+  }
+
+  const inventory = data.result[0];
+  const totalStock =
+    (inventory.Size01 || 0) +
+    (inventory.Size02 || 0) +
+    (inventory.Size03 || 0) +
+    (inventory.Size04 || 0) +
+    (inventory.Size05 || 0) +
+    (inventory.Size06 || 0);
+
+  return {
+    available: totalStock > 0,
+    totalStock: totalStock,
+    sizeBreakdown: {
+      'XS': inventory.Size01 || 0,
+      'S': inventory.Size02 || 0,
+      'M': inventory.Size03 || 0,
+      'L': inventory.Size04 || 0,
+      'XL': inventory.Size05 || 0,
+      '2XL': inventory.Size06 || 0
+    },
+    cacheAge: data.cacheAge
+  };
+}
+
+// Usage in webstore
+const stock = await checkInventory('PC54', 'Jet Black');
+if (!stock.available) {
+  showOutOfStockMessage();
+} else {
+  enableSizeSelector(stock.sizeBreakdown);
+}
+```
+
+**Webstore Integration Pattern:**
+```javascript
+// Check inventory before allowing "Add to Cart"
+document.getElementById('addToCart').addEventListener('click', async () => {
+  const partNumber = document.getElementById('styleSelect').value;
+  const color = document.getElementById('colorSelect').value;
+
+  const stock = await checkInventory(partNumber, color);
+
+  if (!stock.available) {
+    alert('This product is currently out of stock. Please choose another color or contact us.');
+    return;
+  }
+
+  // Show size selector with only available sizes
+  showSizeSelector(stock.sizeBreakdown);
+});
+```
+
+---
+
+## Caching & Performance
+
+### GET /api/manageorders/cache-info
+
+**Description:** Debug endpoint showing cache status for all ManageOrders endpoints
+
+**Cache Duration:** None (always fresh)
+
+**Request Example:**
+```http
+GET /api/manageorders/cache-info HTTP/1.1
+```
+
+**Response (200 OK):**
+```json
+{
+  "customers": {
+    "cached": true,
+    "age": "2 hours 15 minutes",
+    "size": "45 KB",
+    "ttl": "24 hours"
+  },
+  "orders": {
+    "cached": false,
+    "message": "No cached data",
+    "ttl": "1 hour"
+  },
+  "inventorylevels": {
+    "cached": true,
+    "age": "3 minutes",
+    "size": "120 KB",
+    "ttl": "5 minutes"
+  }
+}
+```
+
+### Cache Strategy Summary
+
+| Endpoint | Cache Duration | Rationale |
+|----------|----------------|-----------|
+| `inventorylevels` | **5 minutes** | Real-time stock critical for webstore |
+| `tracking` | 15 minutes | Updates during shipping day |
+| `tracking/:order_no` | 15 minutes | Same as tracking queries |
+| `orders` (query) | 1 hour | Intraday changes possible |
+| `payments` (query) | 1 hour | Payment status can change |
+| `orders/:order_no` | 24 hours | Historical data stable |
+| `getorderno/:ext_id` | 24 hours | Mapping doesn't change |
+| `lineitems/:order_no` | 24 hours | Order contents final |
+| `payments/:order_no` | 24 hours | Payment history stable |
+| `customers` | 24 hours | Customer list changes slowly |
+
+### Cache Bypass
+
+**Force Fresh Data:**
+```javascript
+// Add ?refresh=true to any endpoint
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&refresh=true'
+);
+```
+
+**When to Use Cache Bypass:**
+- User clicks "Refresh" button
+- Critical decision (e.g., final checkout)
+- Debugging cache issues
+- Testing new integrations
+
+**When NOT to Use:**
+- Regular page loads (wastes API quota)
+- Autocomplete searches (use cached data)
+- Display-only information
 
 ---
 
 ## Data Structures
 
-### Order Data Structure
-
-**Complete Order Object (54 fields):**
+### Customer Object
 
 ```javascript
 {
-  // Core Identification (4 fields)
-  "id_Order": 12345,              // Primary key (integer)
-  "ExtOrderID": "SP0127-1",       // External/web quote ID (string)
-  "id_Customer": 456,             // Foreign key to customer (integer)
-  "id_OrderType": 13,             // Order type ID (integer)
-
-  // Customer Information (7 fields)
+  "id_Customer": 123,              // Primary key
   "CustomerName": "Arrow Lumber and Hardware",
   "ContactFirstName": "John",
   "ContactLastName": "Smith",
   "ContactEmail": "john@arrowlumber.com",
   "ContactPhone": "253-555-1234",
-  "CustomerStreet": "123 Main St",
-  "CustomerCity": "Seattle",
-  "CustomerState": "WA",
-  "CustomerZIP": "98101",
-  "CustomerCountry": "USA",
+  "CustomerServiceRep": "Nika Lao"
+}
+```
 
-  // Sales Rep & Source (3 fields)
-  "CustomerServiceRep": "Nika Lao",
-  "OrderSource": "Web Quote",     // e.g., "Web Quote", "Phone", "Email"
-  "CustomerPO": "PO-2025-001",    // Customer purchase order number
+### Order Object
 
-  // Dates (6 fields)
-  "OrderDate": "2025-01-27T10:30:00",
-  "DueDate": "2025-02-05T17:00:00",
-  "InHandDate": "2025-02-04T17:00:00",  // When customer needs it
-  "ShipDate": null,
-  "InvoiceDate": null,
-  "CreatedDate": "2025-01-27T10:30:00",
-  "ModifiedDate": "2025-01-27T10:30:00",
-
-  // Status & Tracking (4 fields)
-  "Status": "Open",               // Open, In Production, Complete, Shipped, Canceled
-  "InvoiceNumber": "",
-  "TrackingNumber": "",
-  "PONumber": "",                 // Internal PO number
-
-  // Shipping Address (8 fields)
-  "ShipToName": "John Smith",
-  "ShipToCompany": "Arrow Lumber",
-  "ShipToStreet": "123 Main St",
-  "ShipToCity": "Seattle",
-  "ShipToState": "WA",
-  "ShipToZIP": "98101",
-  "ShipToCountry": "USA",
-  "ShipToPhone": "253-555-1234",
-
-  // Shipping Details (2 fields)
-  "ShippingMethod": "UPS Ground",
-  "ShippingCharge": 0.00,
-
-  // Financial Details (9 fields)
+```javascript
+{
+  "order_no": 12345,               // ShopWorks order number
+  "ext_order_id": "SP0127-1",      // External/quote ID
+  "id_Customer": 123,
+  "CustomerName": "Arrow Lumber and Hardware",
+  "ContactName": "John Smith",
+  "ContactEmail": "john@arrowlumber.com",
+  "ContactPhone": "253-555-1234",
+  "date_Ordered": "2025-01-27",
+  "date_Due": "2025-02-05",
+  "date_InHand": "2025-02-04",
+  "date_Shipped": null,
+  "date_Invoiced": null,
   "Subtotal": 500.00,
-  "Tax": 45.00,
+  "SalesTax": 45.00,
+  "Shipping": 0.00,
   "Total": 545.00,
-  "SalesTaxRate": 0.09,
-  "SalesTaxAmount": 45.00,
-  "DiscountPercent": 0,
-  "DiscountAmount": 0,
-  "Terms": "Net 30",               // Payment terms
-  "CreditLimit": 5000.00,
-
-  // Production & Notes (5 fields)
-  "Notes": "Rush order - need by Feb 5",
-  "ProductionNotes": "Use black ink on white shirts",
-  "ShippingNotes": "Call before delivery",
-  "InternalNotes": "VIP customer",
-  "SpecialInstructions": "Signature required",
-
-  // Audit Fields (2 fields)
-  "CreatedBy": "sales@nwcustomapparel.com",
-  "ModifiedBy": "sales@nwcustomapparel.com",
-
-  // Department & Priority (2 fields)
-  "Department": "Screen Print",    // NEW in OnSite 7
-  "Priority": "Rush"               // Standard, Rush, Super Rush
+  "Status": "Open",
+  "Notes": "Rush order - need by Feb 5"
 }
 ```
 
-### LineItem Data Structure
-
-**Complete LineItem Object (18 fields):**
+### Line Item Object
 
 ```javascript
 {
-  // Core Identification (3 fields)
-  "id_LineItem": 67890,
-  "id_Order": 12345,
-  "LineNumber": 1,
-
-  // Product Information (5 fields)
-  "ProductDescription": "Gildan 5000 - Black T-Shirt",
-  "StyleNumber": "G5000",
-  "Color": "Black",
-  "ProductCategory": "Apparel",
-  "VendorSKU": "G5000-BLK",
-
-  // Quantity & Sizing (2 fields)
+  "line_no": 1,
+  "order_no": 12345,
+  "PartNumber": "PC54",
+  "Color": "Forest",
+  "Description": "Port & Company Core Cotton Tee - Forest Green",
+  "Size01": 3,    // XS
+  "Size02": 12,   // S
+  "Size03": 18,   // M
+  "Size04": 12,   // L
+  "Size05": 3,    // XL
+  "Size06": 0,    // 2XL
   "Quantity": 48,
-  "SizeBreakdown": "{\"S\":6,\"M\":12,\"L\":18,\"XL\":12}",  // JSON string
-
-  // Pricing (5 fields)
   "UnitPrice": 10.50,
-  "TotalPrice": 504.00,
-  "Cost": 5.25,                    // Wholesale cost
-  "Margin": 100.00,                // Margin percentage
-  "DiscountPercent": 0,
-  "DiscountAmount": 0,
-
-  // Production Details (6 fields)
-  "PrintLocation": "Full Front",
-  "PrintMethod": "DTG",
-  "PrintColors": "White",
-  "StitchCount": 0,                // For embroidery
-  "ThreadColors": "",              // For embroidery
-  "Notes": "White ink on black",
-
-  // Additional Details (3 fields)
-  "Weight": 0.35,                  // Pounds per item
-  "TaxExempt": false,
-  "CreatedDate": "2025-01-27T10:30:00"
+  "ExtPrice": 504.00,
+  "Notes": "Screen print front and back"
 }
 ```
 
-### InventoryLevel Data Structure
-
-**Complete InventoryLevel Object (17 fields):**
+### Inventory Object
 
 ```javascript
 {
-  // Core Identification (5 fields)
-  "id_InventoryLevel": 1001,
-  "StyleNumber": "G5000",
-  "Color": "Black",
-  "Size": "Medium",
-  "Location": "Main Warehouse",
-
-  // Stock Levels (4 fields)
-  "QuantityOnHand": 500,          // Physical inventory
-  "QuantityAvailable": 450,        // Available for sale (OnHand - Reserved)
-  "QuantityReserved": 50,          // Reserved for orders
-  "QuantityOnOrder": 1000,         // Incoming from vendor
-
-  // Reorder Information (2 fields)
-  "ReorderPoint": 200,             // When to reorder
-  "ReorderQuantity": 500,          // How much to reorder
-
-  // Cost Information (2 fields)
-  "Cost": 5.25,                    // Current cost
-  "AverageCost": 5.18,             // Average cost over time
-
-  // Activity Tracking (2 fields)
-  "LastReceived": "2025-01-15T10:00:00",
-  "LastSold": "2025-01-26T14:30:00",
-
-  // Metadata (3 fields)
-  "Notes": "Popular size",
-  "CreatedDate": "2024-01-01T00:00:00",
-  "ModifiedDate": "2025-01-26T14:30:00"
+  "Color": "Jet Black",
+  "PartNumber": "PC54",
+  "Size01": 4,    // XS quantity
+  "Size02": 10,   // S quantity
+  "Size03": 11,   // M quantity
+  "Size04": 79,   // L quantity
+  "Size05": 0,    // XL quantity (OUT OF STOCK)
+  "Size06": 0,    // 2XL quantity (OUT OF STOCK)
+  "Description": "Port & Company Core Cotton Tee",
+  "VendorName": "Port & Company",
+  "SKU": "PC54-BLK"
 }
 ```
 
----
+### Payment Object
 
-## Order Type IDs
+```javascript
+{
+  "order_no": 12345,
+  "InvoiceNumber": "INV-2025-0127",
+  "InvoiceDate": "2025-01-27",
+  "InvoiceAmount": 545.00,
+  "AmountPaid": 545.00,
+  "Balance": 0.00,
+  "PaymentDate": "2025-01-29",
+  "PaymentMethod": "Credit Card",
+  "Status": "Paid"
+}
+```
 
-Common order type IDs in ShopWorks OnSite 7:
+### Tracking Object
 
-| ID | Type | Description |
-|----|------|-------------|
-| 13 | Screen Print | Screen printing orders |
-| 15 | DTG | Direct-to-garment printing |
-| 17 | Embroidery | Embroidery orders |
-| 18 | Cap | Cap embroidery |
-| 20 | Promotional | Promotional products |
-
-**Note:** Order type IDs are configured in your ShopWorks system and may vary.
+```javascript
+{
+  "order_no": 12345,
+  "ShipDate": "2025-01-26",
+  "Carrier": "UPS",
+  "TrackingNumber": "1Z999AA10123456784",
+  "EstimatedDelivery": "2025-01-30",
+  "Status": "In Transit"
+}
+```
 
 ---
 
 ## Rate Limits
 
-**Recommended Rate Limits:**
-- 10 requests per minute per IP (authentication endpoint)
-- 60 requests per minute per IP (data endpoints)
-- 1000 requests per hour per IP (total across all endpoints)
+**Current Limits:**
+- 30 requests per minute per IP
+- Applies to all ManageOrders endpoints
+- Resets every 60 seconds
 
 **Rate Limit Headers:**
 ```http
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 45
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 25
 X-RateLimit-Reset: 1706371200
 ```
 
----
+**429 Response:**
+```json
+{
+  "error": "Too many ManageOrders requests",
+  "message": "Please try again later",
+  "retryAfter": 45
+}
+```
 
-## Security Best Practices
-
-### Token Management
-
-**DO:**
-- ✅ Cache tokens server-side (reduce authentication calls)
-- ✅ Refresh tokens before expiration (within last 5 minutes)
-- ✅ Use HTTPS for all API calls
-- ✅ Store credentials in environment variables only
-
-**DON'T:**
-- ❌ Send tokens to browser/client
-- ❌ Hard-code credentials in any file
-- ❌ Share tokens between different applications
-- ❌ Log tokens in console or files
-
-### API Key Rotation
-
-Rotate API credentials every 90 days:
-1. Create new API user in ShopWorks
-2. Update environment variables
-3. Test new credentials
-4. Deactivate old API user
+**Best Practices:**
+- Use caching aggressively (don't bypass unnecessarily)
+- Batch requests when possible
+- Use sessionStorage to cache customer list browser-side (24 hours)
 
 ---
 
-**Documentation Type:** Complete API Reference (Swagger Specification)
+## Security & CORS
+
+### CORS Configuration
+
+**Allowed Origins:**
+- `https://www.nwcustomapparel.com`
+- `https://teamnwca.com`
+- `http://localhost:3000` (development only)
+
+**Allowed Methods:**
+- `GET` only (read-only API)
+
+**Credentials:**
+- Not allowed (authentication handled server-side)
+
+### Security Features
+
+- ✅ No credentials exposed to browser
+- ✅ JWT tokens cached server-side only (1-hour TTL)
+- ✅ Rate limiting prevents abuse
+- ✅ CORS restrictions limit access
+- ✅ All traffic over HTTPS
+
+---
+
+## Integration Examples
+
+### Customer Autocomplete (Complete)
+See [CUSTOMER_AUTOCOMPLETE.md](CUSTOMER_AUTOCOMPLETE.md)
+
+### Order Status Lookup
+See [INTEGRATION_EXAMPLES.md](INTEGRATION_EXAMPLES.md#order-status-lookup)
+
+### Real-Time Inventory Webstore
+See [INTEGRATION_EXAMPLES.md](INTEGRATION_EXAMPLES.md#webstore-inventory)
+
+### Payment Status Dashboard
+See [INTEGRATION_EXAMPLES.md](INTEGRATION_EXAMPLES.md#payment-dashboard)
+
+### Shipment Tracking Widget
+See [INTEGRATION_EXAMPLES.md](INTEGRATION_EXAMPLES.md#tracking-widget)
+
+---
+
+**Documentation Type:** Complete API Reference
 **Parent Document:** [MANAGEORDERS_INTEGRATION.md](../MANAGEORDERS_INTEGRATION.md)
-**Related:** [Overview](OVERVIEW.md) | [Customer Autocomplete](CUSTOMER_AUTOCOMPLETE.md)
+**Related:** [Overview](OVERVIEW.md) | [Integration Examples](INTEGRATION_EXAMPLES.md) | [Customer Autocomplete](CUSTOMER_AUTOCOMPLETE.md)

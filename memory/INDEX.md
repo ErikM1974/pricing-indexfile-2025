@@ -23,7 +23,7 @@ This documentation has been reorganized into modular components for better perfo
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── DATABASE_PATTERNS.md              # Database schema patterns
-├── MANAGEORDERS_INTEGRATION.md       # ManageOrders API integration (customer autocomplete)
+├── MANAGEORDERS_INTEGRATION.md       # ManageOrders API integration (11 endpoints - full ERP)
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
@@ -31,10 +31,10 @@ This documentation has been reorganized into modular components for better perfo
 │   └── utility-api.md               # Utilities & reference data
 ├── /manageorders/                    # ManageOrders API documentation
 │   ├── OVERVIEW.md                  # Architecture & authentication
-│   ├── CUSTOMER_AUTOCOMPLETE.md     # Current implementation guide
-│   ├── API_REFERENCE.md             # Complete Swagger spec (10 endpoints)
+│   ├── CUSTOMER_AUTOCOMPLETE.md     # Customer autocomplete implementation
+│   ├── API_REFERENCE.md             # Complete API spec (11 endpoints)
 │   ├── SERVER_PROXY.md              # caspio-pricing-proxy implementation
-│   └── FUTURE_INTEGRATIONS.md       # Roadmap & future features
+│   └── INTEGRATION_EXAMPLES.md      # Working code examples (orders, inventory, payments)
 └── /templates/                       # Calculator templates
     ├── manual-calculator-template.md     # Manual pricing template
     ├── contract-calculator-template.md   # Contract pricing template
@@ -60,13 +60,13 @@ This documentation has been reorganized into modular components for better perfo
    - **[utility-api.md](./api/utility-api.md)** - Helper endpoints and reference data
 
 #### ManageOrders API (ShopWorks Integration)
-1. Start with **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview and navigation
+1. Start with **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview and navigation (11 endpoints)
 2. Review specific integration guides in **/manageorders/** based on your needs:
    - **[OVERVIEW.md](./manageorders/OVERVIEW.md)** - System architecture and authentication
-   - **[CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Current implementation
-   - **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** - Complete Swagger spec (10 endpoints)
-   - **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** - Proxy server implementation
-   - **[FUTURE_INTEGRATIONS.md](./manageorders/FUTURE_INTEGRATIONS.md)** - Future features & roadmap
+   - **[CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Customer autocomplete (live)
+   - **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** - Complete API spec (11 endpoints)
+   - **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** - Intelligent caching strategy
+   - **[INTEGRATION_EXAMPLES.md](./manageorders/INTEGRATION_EXAMPLES.md)** - Working code examples
 
 ### For System Architecture
 1. **[CLAUDE_ARCHITECTURE.md](./CLAUDE_ARCHITECTURE.md)** - Advanced architecture patterns
@@ -128,15 +128,19 @@ This documentation has been reorganized into modular components for better perfo
 4. Reference implementation examples for your quote builder type
 
 ### "I need to add customer autocomplete to a quote builder"
-1. Read **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview and current implementation
+1. Read **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview (11 endpoints available)
 2. Review **[CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md)** - Step-by-step implementation guide
 3. Copy integration code from Screen Print Quote Builder example
 4. Test with console commands and manual testing checklist
 
-### "I need to integrate ManageOrders API features"
-1. Check **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** for available endpoints (10 total)
-2. Review **[FUTURE_INTEGRATIONS.md](./manageorders/FUTURE_INTEGRATIONS.md)** for implementation examples
-3. Study **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** for server-side patterns
+### "I need to build apps with ManageOrders API"
+1. Check **[API_REFERENCE.md](./manageorders/API_REFERENCE.md)** for all 11 endpoints
+2. Review **[INTEGRATION_EXAMPLES.md](./manageorders/INTEGRATION_EXAMPLES.md)** for working code examples:
+   - Webstore real-time inventory (5-minute cache) - CRITICAL
+   - Customer portal (order history, tracking, payments)
+   - Sales dashboard (order search and lookup)
+   - Accounting dashboard (payment tracking)
+3. Study **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** for intelligent caching strategy
 4. Follow security best practices from **[OVERVIEW.md](./manageorders/OVERVIEW.md)**
 
 ## 🔑 Key Configuration Values

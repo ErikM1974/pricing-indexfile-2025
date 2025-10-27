@@ -1,7 +1,7 @@
 # ManageOrders API - Overview & Architecture
 
-**Last Updated:** 2025-01-27
-**Purpose:** System architecture, authentication flow, and getting started guide
+**Last Updated:** 2025-10-26
+**Purpose:** System architecture, authentication flow, and getting started guide (11 endpoints)
 **Parent Document:** [MANAGEORDERS_INTEGRATION.md](../MANAGEORDERS_INTEGRATION.md)
 
 ---
@@ -39,13 +39,13 @@
 - Payments (invoices, payment status)
 - Inventory (stock levels, product availability)
 
-**Potential Use Cases:**
-1. Customer autocomplete in quote builders ✅ **IMPLEMENTED**
-2. Order history lookup for sales reps
-3. Real-time inventory availability
-4. Payment status tracking
-5. Shipment tracking integration
-6. Automated reorder suggestions
+**Implemented Use Cases:**
+1. Customer autocomplete in quote builders ✅ **LIVE**
+2. Order history lookup for sales reps ✅ **READY**
+3. Real-time inventory availability ✅ **READY** (5-minute cache)
+4. Payment status tracking ✅ **READY**
+5. Shipment tracking integration ✅ **READY** (15-minute cache)
+6. Quote-to-order conversion mapping ✅ **READY**
 
 ### Why Use the API?
 
@@ -87,10 +87,10 @@
 │  ────────────────────────────────────────────────────────   │
 │                                                             │
 │  Heroku Server (Node.js + Express)                         │
-│  └─ /api/manageorders/customers endpoint                   │
+│  └─ /api/manageorders/* (11 endpoints)                     │
 │     ├─ Token caching (1-hour TTL, in-memory)               │
-│     ├─ Customer data caching (1-day TTL, in-memory)        │
-│     ├─ Rate limiting (10 requests/minute)                  │
+│     ├─ Intelligent caching (5min to 24hr per endpoint)     │
+│     ├─ Rate limiting (30 requests/minute)                  │
 │     ├─ CORS restrictions (authorized origins only)         │
 │     └─ Error handling with fallback responses              │
 │                                                             │
@@ -102,12 +102,12 @@
 │  ────────────────────────────────────────────────────────   │
 │                                                             │
 │  ShopWorks REST API                                         │
-│  └─ 10 available endpoints                                  │
+│  └─ All endpoints fully proxied                            │
 │     ├─ POST /api/signin (authentication)                   │
-│     ├─ GET  /api/orders (order data)                       │
+│     ├─ GET  /api/orders (order queries & details)          │
 │     ├─ GET  /api/lineItems (product details)               │
 │     ├─ GET  /api/shipments (delivery tracking)             │
-│     ├─ GET  /api/payments (invoice status)                 │
+│     ├─ GET  /api/payments (payment queries & history)      │
 │     └─ GET  /api/inventoryLevels (stock data)              │
 │                                                             │
 │  Security: JWT tokens, role-based access control           │

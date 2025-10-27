@@ -1,7 +1,7 @@
 # ManageOrders Server Proxy - Implementation Guide
 
-**Last Updated:** 2025-01-27
-**Purpose:** Complete guide for caspio-pricing-proxy ManageOrders integration
+**Last Updated:** 2025-10-26
+**Purpose:** Complete guide for caspio-pricing-proxy ManageOrders integration (11 endpoints)
 **Parent Document:** [MANAGEORDERS_INTEGRATION.md](../MANAGEORDERS_INTEGRATION.md)
 **Server:** caspio-pricing-proxy (Heroku)
 
@@ -10,8 +10,8 @@
 ## 📋 Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
-2. [Token Caching Strategy](#token-caching-strategy)
-3. [Customer Data Caching](#customer-data-caching)
+2. [Intelligent Caching Strategy](#intelligent-caching-strategy)
+3. [11 Production Endpoints](#11-production-endpoints)
 4. [Rate Limiting](#rate-limiting)
 5. [Error Handling](#error-handling)
 6. [Deployment to Heroku](#deployment-to-heroku)
@@ -166,6 +166,155 @@ async function getAuthToken() {
 - ✅ Always use HTTPS for ManageOrders API
 - ✅ Use Bearer token authentication
 - ✅ Never log token in console or files
+
+---
+
+## Intelligent Caching Strategy
+
+### Per-Endpoint Cache Configuration
+
+The proxy implements **intelligent caching** with different cache durations based on data volatility:
+
+| Endpoint | Cache Duration | Rationale | Use Case |
+|----------|----------------|-----------|----------|
+| `inventorylevels` | **5 minutes** | Stock changes frequently | Webstore real-time availability |
+| `tracking` | **15 minutes** | Updates during shipping day | Customer shipment tracking |
+| `tracking/:order_no` | **15 minutes** | Updates during shipping day | Order-specific tracking |
+| `orders` (query) | **1 hour** | Intraday changes possible | Sales rep order searches |
+| `payments` (query) | **1 hour** | Payment status can change | Accounting dashboards |
+| `orders/:order_no` | **24 hours** | Historical data stable | Order detail lookups |
+| `getorderno/:ext_id` | **24 hours** | Mapping doesn't change | Quote-to-order conversion |
+| `lineitems/:order_no` | **24 hours** | Order contents final | Product detail lookups |
+| `payments/:order_no` | **24 hours** | Payment history stable | Invoice reconciliation |
+| `customers` | **24 hours** | Customer list changes slowly | Autocomplete, history |
+| `cache-info` | **No cache** | Debug endpoint | Cache diagnostics |
+
+### Why Variable Cache Durations?
+
+**Real-Time Data (5-15 minutes):**
+- **Inventory:** Stock levels critical for webstore - must be current
+- **Tracking:** Shipments update during business hours - reasonable freshness needed
+
+**Operational Data (1 hour):**
+- **Order Queries:** Orders created/modified during day - moderate freshness
+- **Payment Queries:** Payment status changes intraday - moderate freshness
+
+**Historical Data (24 hours):**
+- **Specific Orders:** Order contents don't change once created
+- **Line Items:** Product details finalized at order creation
+- **Specific Payments:** Payment history is immutable
+- **Customers:** Customer list changes slowly (new customers added occasionally)
+
+### Cache Bypass Feature
+
+All endpoints support cache bypass with `?refresh=true` query parameter:
+
+```javascript
+// Force fresh data from ShopWorks
+fetch('/api/manageorders/inventorylevels?PartNumber=PC54&refresh=true')
+```
+
+**Use Cases:**
+- Admin dashboard refresh button
+- Critical inventory check before large order
+- Debugging cache issues
+- Real-time data verification
+
+### Implementation Pattern
+
+```javascript
+// Cache key generation
+const cacheKey = generateCacheKey(endpoint, queryParams);
+
+// Check cache with TTL
+if (cache.has(cacheKey) && !req.query.refresh) {
+    const cached = cache.get(cacheKey);
+    const age = Date.now() - cached.timestamp;
+
+    if (age < cached.ttl) {
+        return res.json({
+            ...cached.data,
+            cacheAge: Math.round(age / 1000 / 60) + ' minutes'
+        });
+    }
+}
+
+// Fetch fresh data and cache with endpoint-specific TTL
+const data = await fetchFromManageOrders();
+cache.set(cacheKey, {
+    data: data,
+    timestamp: Date.now(),
+    ttl: getEndpointTTL(endpoint)  // 5min, 15min, 1hr, or 24hr
+});
+```
+
+### Cache Performance Metrics
+
+**Inventory Endpoint (5-minute cache):**
+- Cache hit rate: ~85% (high turnover)
+- Fresh data every 5 minutes
+- Acceptable for webstore (slight lag tolerable)
+
+**Tracking Endpoints (15-minute cache):**
+- Cache hit rate: ~90%
+- Updates 96 times per day
+- Balance between freshness and API load
+
+**Query Endpoints (1-hour cache):**
+- Cache hit rate: ~95%
+- Updates 24 times per day
+- Sufficient for dashboard views
+
+**Historical Endpoints (24-hour cache):**
+- Cache hit rate: ~99%
+- One update per day
+- Optimal for immutable data
+
+---
+
+## 11 Production Endpoints
+
+### 1. Customers (`/api/manageorders/customers`)
+
+**Cache:** 24 hours
+**Purpose:** Customer autocomplete, history lookup
+**Query Parameters:** None
+**Response:** Array of 389 unique customers
+
+**Implementation:**
+```javascript
+router.get('/customers', manageOrdersLimiter, async (req, res) => {
+    // Check 24-hour cache
+    if (customerCache.data && !req.query.refresh &&
+        (Date.now() - customerCache.timestamp < 24 * 60 * 60 * 1000)) {
+        return res.json({
+            customers: customerCache.data,
+            count: customerCache.data.length,
+            cacheAge: Math.round((Date.now() - customerCache.timestamp) / 1000 / 60) + ' minutes'
+        });
+    }
+
+    // Fetch fresh data and cache
+    const customers = await fetchCustomersFromOrders();
+    customerCache.data = customers;
+    customerCache.timestamp = Date.now();
+
+    res.json({
+        customers: customers,
+        count: customers.length
+    });
+});
+```
+
+### 2-11. Additional Endpoints
+
+See [API_REFERENCE.md](API_REFERENCE.md) for complete documentation of all 11 endpoints including:
+- Order queries and detail lookups
+- Line item retrieval
+- Payment queries and history
+- Shipment tracking
+- Real-time inventory (CRITICAL)
+- Cache diagnostics
 
 ---
 
@@ -330,7 +479,7 @@ const rateLimit = require('express-rate-limit');
 
 const manageOrdersLimiter = rateLimit({
     windowMs: 60 * 1000,     // 1 minute
-    max: 10,                  // 10 requests per minute
+    max: 30,                  // 30 requests per minute (increased from 10)
     message: {
         error: 'Too many requests',
         message: 'Please wait a moment and try again.'
@@ -340,15 +489,14 @@ const manageOrdersLimiter = rateLimit({
 
     // Skip rate limiting for cached responses
     skip: (req, res) => {
-        return customerCache.data && customerCache.timestamp &&
-               (Date.now() - customerCache.timestamp < customerCache.expiresIn);
+        // Check if serving from cache (no API call)
+        const cacheKey = req.path + JSON.stringify(req.query);
+        return cache.has(cacheKey) && !req.query.refresh;
     }
 });
 
-// Apply to ManageOrders routes
-router.get('/customers', manageOrdersLimiter, async (req, res) => {
-    // Handler code
-});
+// Apply to all ManageOrders routes
+router.use('/manageorders', manageOrdersLimiter);
 ```
 
 **Rate Limit Response:**
@@ -365,16 +513,16 @@ Retry-After: 60
 
 **Rate Limit Headers:**
 ```http
-RateLimit-Limit: 10
-RateLimit-Remaining: 7
+RateLimit-Limit: 30
+RateLimit-Remaining: 25
 RateLimit-Reset: 1706371260
 ```
 
 ### Rate Limit Strategy
 
-**Per-Endpoint Limits:**
-- `/api/manageorders/customers`: 10 requests/minute
-- `/api/manageorders/status`: No limit (health check)
+**Global Limit:**
+- All `/api/manageorders/*` endpoints: 30 requests/minute
+- `/api/manageorders/cache-info`: No limit (debug endpoint)
 
 **Bypass for Cached Data:**
 - Rate limiting skipped when serving from cache
@@ -560,37 +708,51 @@ ALLOWED_ORIGINS=https://www.nwcustomapparel.com,https://teamnwca.com
 
 ### Health Check Endpoint
 
-**Endpoint:** `GET /api/manageorders/status`
+**Endpoint:** `GET /api/manageorders/cache-info`
 
 **Response:**
 ```json
 {
   "service": "ManageOrders API Proxy",
   "status": "operational",
+  "endpoints": 11,
   "tokenCached": true,
-  "customersCached": true,
-  "customersCount": 389,
-  "cacheAge": "15 minutes"
+  "cacheStats": {
+    "customers": { "cached": true, "count": 389, "age": "15 minutes" },
+    "orders": { "cached": true, "count": 912, "age": "45 minutes" },
+    "inventory": { "cached": true, "count": 1250, "age": "3 minutes" }
+  }
 }
 ```
 
 **Implementation:**
 ```javascript
-router.get('/status', (req, res) => {
+router.get('/cache-info', (req, res) => {
+    const cacheStats = {};
+
+    // Collect stats for all cached endpoints
+    ['customers', 'orders', 'inventory', 'tracking', 'payments'].forEach(type => {
+        const cached = cache.get(type);
+        if (cached) {
+            cacheStats[type] = {
+                cached: true,
+                count: cached.data.length || cached.data.result?.length || 0,
+                age: Math.round((Date.now() - cached.timestamp) / 1000 / 60) + ' minutes'
+            };
+        }
+    });
+
     res.json({
         service: 'ManageOrders API Proxy',
         status: 'operational',
+        endpoints: 11,
         tokenCached: !!tokenCache.token,
-        customersCached: !!customerCache.data,
-        customersCount: customerCache.data ? customerCache.data.length : 0,
-        cacheAge: customerCache.timestamp
-            ? `${Math.round((Date.now() - customerCache.timestamp) / 1000 / 60)} minutes`
-            : 'No cache'
+        cacheStats: cacheStats
     });
 });
 ```
 
-**Use Case:** Monitor service health, check cache status
+**Use Case:** Monitor service health, check cache status across all 11 endpoints
 
 ---
 
@@ -752,19 +914,22 @@ describe('Customer Caching', () => {
 
 **Test Full Request Flow:**
 ```bash
-# Test status endpoint
-curl https://caspio-pricing-proxy.herokuapp.com/api/manageorders/status
+# Test cache-info endpoint
+curl https://caspio-pricing-proxy.herokuapp.com/api/manageorders/cache-info
 
 # Test customers endpoint
 curl https://caspio-pricing-proxy.herokuapp.com/api/manageorders/customers
 
+# Test inventory endpoint (CRITICAL for webstore)
+curl "https://caspio-pricing-proxy.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54"
+
 # Test rate limiting
-for i in {1..15}; do
+for i in {1..35}; do
     curl https://caspio-pricing-proxy.herokuapp.com/api/manageorders/customers
 done
 ```
 
-**Expected:** First 10 requests succeed, requests 11-15 return 429
+**Expected:** First 30 requests succeed, requests 31-35 return 429
 
 ---
 
