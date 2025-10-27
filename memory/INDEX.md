@@ -1,6 +1,6 @@
 # 📚 NWCA Documentation Index
 
-**Last Updated:** 2025-01-28
+**Last Updated:** 2025-10-27
 **Purpose:** Master navigation for all documentation files
 **Performance Note:** All files optimized to stay under 40k character limit for optimal Claude performance
 
@@ -23,7 +23,8 @@ This documentation has been reorganized into modular components for better perfo
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── DATABASE_PATTERNS.md              # Database schema patterns
-├── MANAGEORDERS_INTEGRATION.md       # ManageOrders API integration (11 endpoints - full ERP)
+├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints - read data)
+├── MANAGEORDERS_PUSH_WEBSTORE.md    # ManageOrders PUSH API (4 endpoints - create orders)
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
@@ -142,6 +143,18 @@ This documentation has been reorganized into modular components for better perfo
    - Accounting dashboard (payment tracking)
 3. Study **[SERVER_PROXY.md](./manageorders/SERVER_PROXY.md)** for intelligent caching strategy
 4. Follow security best practices from **[OVERVIEW.md](./manageorders/OVERVIEW.md)**
+
+### "I need to build a webstore that sends orders to ShopWorks OnSite"
+1. Read **[MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md)** - PUSH API reference guide
+2. Review complete developer guide: `caspio-pricing-proxy/memory/ONLINE_STORE_DEVELOPER_GUIDE.md`
+3. Understand PUSH vs PULL API differences:
+   - **PULL API:** Read data (inventory, orders, tracking) - 11 endpoints
+   - **PUSH API:** Create orders (webstore checkout) - 4 endpoints
+4. Build complete webstore:
+   - Phase 1: Product display with real-time inventory (PULL API)
+   - Phase 2: Checkout with automatic order creation (PUSH API)
+   - Phase 3: Order tracking for customers (PULL API)
+5. Test with `isTest: true` flag before going live
 
 ## 🔑 Key Configuration Values
 

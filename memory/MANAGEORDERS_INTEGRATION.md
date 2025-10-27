@@ -241,6 +241,99 @@
 
 **Complete working examples:** See [Integration Examples](manageorders/INTEGRATION_EXAMPLES.md)
 
+---
+
+## 🚀 ManageOrders PUSH API - Online Store Integration
+
+### PUSH API vs PULL API
+
+**PULL API (Reading Data - Phase 1-3 above):**
+- 11 GET endpoints for reading data from ShopWorks
+- Use cases: Display inventory, show order history, track shipments
+- Caching: 5 minutes to 24 hours (depending on data volatility)
+
+**PUSH API (Creating Orders - NEW):**
+- 4 endpoints for creating orders in ShopWorks
+- Use cases: Webstore checkout, mobile app orders, bulk imports
+- No caching (writes must be immediate)
+
+### Complete PUSH API Documentation
+
+**Quick Reference:** See [ManageOrders PUSH API Guide](MANAGEORDERS_PUSH_WEBSTORE.md)
+
+**Complete Developer Guide:** `caspio-pricing-proxy/memory/ONLINE_STORE_DEVELOPER_GUIDE.md`
+
+### Key PUSH API Endpoints
+
+```
+POST   /api/manageorders/orders/create          Create new order
+GET    /api/manageorders/orders/verify/:id      Verify order was created
+POST   /api/manageorders/auth/test              Test API credentials
+GET    /api/manageorders/push/health            Health check
+```
+
+### Minimal Order Example
+
+```javascript
+const order = {
+  "orderNumber": "WEB-12345",
+  "customer": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "360-555-1234"
+  },
+  "lineItems": [
+    {
+      "partNumber": "PC54",
+      "description": "Port & Company Core Cotton Tee",
+      "color": "Red",
+      "size": "L",
+      "quantity": 12,
+      "price": 8.50
+    }
+  ],
+  "shipping": {
+    "address1": "123 Main St",
+    "city": "Seattle",
+    "state": "WA",
+    "zip": "98101",
+    "country": "USA"
+  }
+};
+
+// Create order
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order)
+  }
+);
+
+const result = await response.json();
+console.log('Order created:', result.orderNumber); // "NWCA-12345"
+```
+
+### Complete Webstore Architecture
+
+**Phase 1: Product Display (PULL API)**
+- Fetch products and check real-time inventory
+- Display "In Stock" / "Out of Stock" status
+
+**Phase 2: Checkout (PUSH API)**
+- Customer completes checkout
+- Order automatically created in ShopWorks OnSite
+
+**Phase 3: Order Tracking (PULL API)**
+- Customer tracks order status
+- View shipment tracking information
+
+**See [PUSH API Guide](MANAGEORDERS_PUSH_WEBSTORE.md) for complete implementation details**
+
+---
+
 ### Phase 4: Rollout Customer Autocomplete 📝 PLANNED
 
 **Target Quote Builders:**

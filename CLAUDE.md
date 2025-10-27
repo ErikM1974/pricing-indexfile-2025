@@ -286,6 +286,17 @@ For reusable code templates including API fetch patterns, Quote service template
 - **Quote Pattern**: `[PREFIX][MMDD]-seq` (e.g., DTG0130-1)
 - **Full API Documentation**: @memory/CASPIO_API_CORE.md (56 endpoints, modularized in @memory/api/)
 
+### 📊 ManageOrders API (ShopWorks Integration)
+- **PULL API (Read Data)**: 11 endpoints for reading from ShopWorks OnSite 7
+  - Real-time inventory (5-minute cache) - **CRITICAL** for webstores
+  - Customer data, orders, payments, tracking
+  - Full documentation: @memory/MANAGEORDERS_INTEGRATION.md
+- **PUSH API (Create Orders)**: 4 endpoints for writing orders to ShopWorks
+  - Webstore checkout → automatic order creation in OnSite
+  - POST /api/manageorders/orders/create
+  - Full documentation: @memory/MANAGEORDERS_PUSH_WEBSTORE.md
+  - Complete developer guide: caspio-pricing-proxy/memory/ONLINE_STORE_DEVELOPER_GUIDE.md
+
 ### 📍 Important Notes:
 1. **New Pages**: Must add to route config and restart server with Erik
    - Pages in `/pages/` directory need explicit routes in server.js
