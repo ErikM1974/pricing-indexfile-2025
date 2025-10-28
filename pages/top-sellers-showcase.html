@@ -2283,6 +2283,10 @@
                     <i class="fas fa-sparkles"></i>
                     <span>Brinton's Fresh Picks 2025</span>
                 </button>
+                <button class="filter-btn" data-type="newProducts">
+                    <i class="fas fa-star"></i>
+                    <span>New Products</span>
+                </button>
             </div>
         </div>
     </div>
@@ -2721,6 +2725,24 @@
                         allProducts.push({...product, type: category});
                     }
                 }
+            } else if (type === 'newProducts') {
+                // Fetch new products from API
+                try {
+                    const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?isNew=true&limit=100');
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Convert API products to our format
+                        allProducts = data.products.map(product => ({
+                            style: product.style,
+                            description: product.title,
+                            brand: product.brand,
+                            type: 'newProducts'
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error fetching new products:', error);
+                    allProducts = []; // Graceful failure
+                }
             } else {
                 // Load specific category
                 if (completeTopSellers[type]) {
@@ -3064,7 +3086,8 @@
                 'screenprint': 'Best for Screen Print',
                 'embroidery': 'Best for Embroidery',
                 'caps': 'Top Selling Cap',
-                'freshPicks': "Brinton's Pick"
+                'freshPicks': "Brinton's Pick",
+                'newProducts': "New Product"
             };
             return types[type] || 'Top Seller';
         }
