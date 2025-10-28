@@ -328,6 +328,10 @@
                         <span>Subtotal (<span id="itemCount">0</span> items):</span>
                         <span id="subtotal">$0.00</span>
                     </div>
+                    <div class="summary-line" id="salesTaxLine" style="display: none;">
+                        <span>Sales Tax (WA 10.1%):</span>
+                        <span id="salesTax">$0.00</span>
+                    </div>
                     <div class="summary-line total">
                         <span>Total:</span>
                         <span id="total">$0.00</span>
@@ -434,10 +438,24 @@
                 samplesList.appendChild(sampleItem);
             });
 
+            // Calculate sales tax (Washington State 10.1%)
+            const salesTaxRate = 0.101;
+            const salesTax = subtotal * salesTaxRate;
+            const total = subtotal + salesTax;
+
             // Update summary
             document.getElementById('itemCount').textContent = samples.length;
             document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`;
+
+            // Show sales tax if there are paid samples
+            if (hasPaidSamples && subtotal > 0) {
+                document.getElementById('salesTaxLine').style.display = 'flex';
+                document.getElementById('salesTax').textContent = `$${salesTax.toFixed(2)}`;
+                document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+            } else {
+                document.getElementById('salesTaxLine').style.display = 'none';
+                document.getElementById('total').textContent = `$${subtotal.toFixed(2)}`;
+            }
 
             // Show appropriate notice
             if (hasPaidSamples) {

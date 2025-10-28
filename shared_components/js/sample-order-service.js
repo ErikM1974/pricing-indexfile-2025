@@ -159,12 +159,19 @@ class SampleOrderService {
             // Calculate FREE vs PAID totals
             const freeItems = samples.filter(s => (s.type === 'free' || !s.type));
             const paidItems = samples.filter(s => s.type === 'paid');
-            const totalPaid = paidItems.reduce((sum, item) => sum + (item.price || 0), 0);
+            const subtotal = paidItems.reduce((sum, item) => sum + (item.price || 0), 0);
+
+            // Calculate Washington State Sales Tax (10.1%)
+            const salesTaxRate = 0.101;
+            const salesTax = subtotal * salesTaxRate;
+            const total = subtotal + salesTax;
 
             console.log('[SampleOrderService] Order breakdown:', {
                 freeItems: freeItems.length,
                 paidItems: paidItems.length,
-                totalPaid: totalPaid.toFixed(2)
+                subtotal: subtotal.toFixed(2),
+                salesTax: salesTax.toFixed(2),
+                total: total.toFixed(2)
             });
 
             // Build ManageOrders order object
@@ -176,9 +183,14 @@ class SampleOrderService {
                 // Order-level fields for ShopWorks invoice
                 purchaseOrderNumber: `SAMPLE-${orderNumber}`,  // Shows in PO Number field
                 salesRep: 'Erik Mickelson',                    // Shows in Salesperson field
-                terms: totalPaid > 0
-                    ? `MIXED ORDER - Invoice $${totalPaid.toFixed(2)}`
+                terms: subtotal > 0
+                    ? `MIXED ORDER - Invoice $${total.toFixed(2)} (incl. tax)`
                     : 'FREE SAMPLE',                           // Shows in Terms field
+
+                // Sales tax (Washington State 10.1% - GL Account 2200)
+                salesTax: parseFloat(salesTax.toFixed(2)),
+                salesTaxRate: salesTaxRate,
+                salesTaxAccount: '2200',  // Washington State Sales Tax liability account
 
                 customer: {
                     firstName: formData.firstName,
@@ -204,8 +216,8 @@ class SampleOrderService {
 
                 notes: [{
                     type: 'Notes On Order',
-                    text: totalPaid > 0
-                        ? `MIXED ORDER - ${paidItems.length} PAID ($${totalPaid.toFixed(2)}) + ${freeItems.length} FREE - ${formData.company || formData.lastName}`
+                    text: subtotal > 0
+                        ? `MIXED ORDER - ${paidItems.length} PAID ($${subtotal.toFixed(2)} + $${salesTax.toFixed(2)} tax = $${total.toFixed(2)}) + ${freeItems.length} FREE - ${formData.company || formData.lastName}`
                         : `FREE SAMPLE - Top Sellers Showcase - ${formData.company || formData.lastName}`
                 }]
             };
