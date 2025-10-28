@@ -590,6 +590,86 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Size & Quantity Selection Styles */
+        .size-quantity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .size-quantity-item {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.2s;
+            background: white;
+            cursor: pointer;
+        }
+
+        .size-quantity-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .size-quantity-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(76, 179, 84, 0.05);
+        }
+
+        .size-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quantity-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .size-quantity-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
@@ -670,6 +750,28 @@
             <div class="thumbnail-strip" id="thumbnailStrip">
                 <!-- Thumbnails will be added dynamically -->
             </div>
+
+            <!-- Size & Quantity Selection (for sample mode) - MOVED HERE -->
+            <div class="size-quantity-section" id="sizeQuantitySection" style="display: none; margin-top: 1rem; margin-bottom: 2rem;">
+                <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <i class="fas fa-info-circle" style="color: #f59e0b; margin-right: 0.5rem;"></i>
+                    <strong>Free Sample Policy:</strong> Free samples are limited to 3 items per order. Orders exceeding this limit will be reviewed by our sales team.
+                </div>
+                <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text-primary);">Select Sizes & Quantities</h3>
+
+                <div class="size-quantity-grid" id="sizeQuantityGrid">
+                    <!-- Dynamically populated with available sizes -->
+                </div>
+
+                <div class="sample-summary" id="sampleSummary" style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 8px; border: 2px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> samples</strong>
+                        <button id="addToCartBtn" class="btn btn-primary" onclick="addToSampleCart()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                            <i class="fas fa-shopping-cart"></i> Add to Sample Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="product-info">
@@ -717,7 +819,7 @@
                 </div>
             </div>
 
-            <div class="cta-section">
+            <div class="cta-section" id="ctaSection">
                 <h3>Ready to Order?</h3>
                 <p>Get a custom quote for this product with your logo or design</p>
                 <div class="cta-buttons">
@@ -765,6 +867,7 @@
                 style: params.get('style'),
                 name: params.get('name'),
                 type: params.get('type'),
+                mode: params.get('mode'),
                 ref: params.get('ref')
             };
         }
@@ -1146,6 +1249,59 @@
             });
         }
 
+        // ==============================================
+        // DEBUG UTILITIES - Sample Order Flow Tracking
+        // ==============================================
+        window.SAMPLE_DEBUG = {
+            enabled: true,  // Set to false to disable debug logging
+
+            // Log size update with formatted output
+            logSizeUpdate: function(size, oldQty, newQty, selectedSamples) {
+                if (!this.enabled) return;
+                console.group(`🔄 [Size Update] ${size}`);
+                console.log('Old Quantity:', oldQty);
+                console.log('New Quantity:', newQty);
+                console.log('All Selected Sizes:', selectedSamples);
+                console.log('Total Selected:', Object.values(selectedSamples).reduce((sum, q) => sum + q, 0));
+                console.groupEnd();
+            },
+
+            // Log cart payload before adding
+            logCartPayload: function(cartItem, existingCart) {
+                if (!this.enabled) return;
+                console.group('📦 [Add to Cart] Payload');
+                console.log('New Item:', JSON.stringify(cartItem, null, 2));
+                console.log('Existing Cart:', existingCart);
+                console.log('Cart Size After Add:', existingCart.length + 1);
+                console.groupEnd();
+            },
+
+            // Log sessionStorage state
+            logStorageState: function() {
+                if (!this.enabled) return;
+                const stored = sessionStorage.getItem('sampleCart');
+                console.group('💾 [SessionStorage] Current State');
+                console.log('Raw JSON:', stored);
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        console.table(parsed.map((item, i) => ({
+                            Index: i,
+                            Style: item.style,
+                            Color: item.color,
+                            Sizes: JSON.stringify(item.sizes),
+                            AddedAt: new Date(item.addedAt).toLocaleTimeString()
+                        })));
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                    }
+                } else {
+                    console.log('Cart is empty');
+                }
+                console.groupEnd();
+            }
+        };
+
         // Request quote function
         function requestQuote() {
             const params = getUrlParams();
@@ -1166,8 +1322,332 @@
             `;
         }
 
+        // Sample mode state
+        let sampleMode = false;
+        let selectedSamples = {};
+
+        // Check if page is in sample mode
+        function checkSampleMode() {
+            const params = getUrlParams();
+            sampleMode = params.mode === 'sample';
+
+            console.log('[Sample Mode Debug]', {
+                allParams: params,
+                mode: params.mode,
+                sampleMode: sampleMode,
+                ctaElement: document.getElementById('ctaSection'),
+                sizeQuantityElement: document.getElementById('sizeQuantitySection')
+            });
+
+            if (sampleMode) {
+                // Hide CTA section, show size/quantity section
+                document.getElementById('ctaSection').style.display = 'none';
+                document.getElementById('sizeQuantitySection').style.display = 'block';
+
+                // Populate available sizes
+                populateSizeQuantityGrid();
+            }
+        }
+
+        // Populate size/quantity selection grid
+        async function populateSizeQuantityGrid() {
+            const params = getUrlParams();
+            const gridContainer = document.getElementById('sizeQuantityGrid');
+
+            // Get current color from loaded products
+            const currentColor = currentProducts[selectedColorIndex]?.CATALOG_COLOR || '';
+
+            // Fetch available sizes from API
+            try {
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${params.style}&catalogColor=${currentColor}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const sizes = Object.keys(data.basePrices || {});
+
+                    if (sizes.length === 0) {
+                        // Use standard sizes as fallback
+                        displayStandardSizes(gridContainer);
+                    } else {
+                        displaySizes(gridContainer, sizes);
+                    }
+                } else {
+                    displayStandardSizes(gridContainer);
+                }
+            } catch (error) {
+                console.error('Error fetching sizes:', error);
+                displayStandardSizes(gridContainer);
+            }
+        }
+
+        // Display sizes in grid
+        function displaySizes(container, sizes) {
+            container.innerHTML = '';
+
+            sizes.forEach(size => {
+                const sizeItem = document.createElement('div');
+                sizeItem.className = 'size-quantity-item';
+                sizeItem.setAttribute('data-size', size);
+
+                sizeItem.innerHTML = `
+                    <div class="size-label">${size}</div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity('${size}', -1)">−</button>
+                        <span class="quantity-value" id="qty-${size}">0</span>
+                        <button class="quantity-btn" onclick="updateQuantity('${size}', 1)">+</button>
+                    </div>
+                `;
+
+                container.appendChild(sizeItem);
+            });
+        }
+
+        // Display standard sizes as fallback
+        function displayStandardSizes(container) {
+            const standardSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            displaySizes(container, standardSizes);
+        }
+
+        // Update quantity for a size
+        function updateQuantity(size, delta) {
+            const oldQty = selectedSamples[size] || 0;
+            const newQty = Math.max(0, oldQty + delta); // Just prevent negative
+
+            // DEBUG: Log size update
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logSizeUpdate(size, oldQty, newQty, {...selectedSamples, [size]: newQty});
+            }
+
+            // Update quantity
+            if (newQty === 0) {
+                delete selectedSamples[size];
+            } else {
+                selectedSamples[size] = newQty;
+            }
+
+            // Update UI
+            document.getElementById(`qty-${size}`).textContent = newQty;
+
+            // Update parent container selection state
+            const sizeItem = document.querySelector(`[data-size="${size}"]`);
+            if (newQty > 0) {
+                sizeItem.classList.add('selected');
+            } else {
+                sizeItem.classList.remove('selected');
+            }
+
+            updateSampleSummary();
+        }
+
+        // Update sample summary and button state
+        function updateSampleSummary() {
+            const totalSelected = Object.values(selectedSamples).reduce((sum, qty) => sum + qty, 0);
+            document.getElementById('selectedCount').textContent = totalSelected;
+
+            // Enable button if ANY samples selected
+            const addButton = document.getElementById('addToCartBtn');
+            if (totalSelected > 0) {
+                addButton.disabled = false;
+                addButton.style.opacity = '1';
+                addButton.style.cursor = 'pointer';
+            } else {
+                addButton.disabled = true;
+                addButton.style.opacity = '0.5';
+                addButton.style.cursor = 'not-allowed';
+            }
+        }
+
+        // Add samples to cart
+        function addToSampleCart() {
+            const params = getUrlParams();
+            const product = currentProducts[selectedColorIndex];
+
+            // DEBUG: Start add-to-cart group
+            if (window.SAMPLE_DEBUG?.enabled) {
+                console.group('🛒 [Sample Mode] Adding to Cart');
+                console.log('URL Params:', params);
+                console.log('Selected Product:', product);
+                console.log('Selected Samples:', selectedSamples);
+            }
+
+            // FIXED: Explicitly read from sessionStorage, ignore any global sampleCart
+            let cartArray = [];
+            try {
+                const stored = sessionStorage.getItem('sampleCart');
+                cartArray = stored ? JSON.parse(stored) : [];
+
+                // Ensure it's actually an array
+                if (!Array.isArray(cartArray)) {
+                    console.warn('[Sample Mode] Invalid cart data in storage, resetting to empty array');
+                    cartArray = [];
+                }
+            } catch (e) {
+                console.error('[Sample Mode] Error parsing cart:', e);
+                cartArray = [];
+            }
+
+            // Create cart item
+            const cartItem = {
+                style: params.style,
+                name: params.name,
+                color: product.COLOR_NAME,
+                catalogColor: product.CATALOG_COLOR,
+                imageUrl: product.FRONT_MODEL || product.FRONT_FLAT || '',
+                sizes: { ...selectedSamples },
+                type: params.type,
+                price: 0.01,          // Nominal price for free samples
+                sampleType: 'free',   // For ShopWorks categorization
+                addedAt: new Date().toISOString()
+            };
+
+            // DEBUG: Log payload
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logCartPayload(cartItem, cartArray);
+            }
+
+            // Add to cart
+            cartArray.push(cartItem);
+            sessionStorage.setItem('sampleCart', JSON.stringify(cartArray));
+
+            console.log('[Sample Mode] Added to cart:', cartItem);
+            console.log('[Sample Mode] Cart now has', cartArray.length, 'items');
+
+            // DEBUG: Log storage state
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logStorageState();
+                console.groupEnd();
+            }
+
+            // Show success message
+            showSuccessMessage();
+        }
+
+        // Show success message
+        function showSuccessMessage() {
+            const summary = document.getElementById('sampleSummary');
+            const originalContent = summary.innerHTML;
+
+            summary.innerHTML = `
+                <div style="text-align: center; color: var(--primary-color);">
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <div><strong>Added to Sample Cart!</strong></div>
+                    <div style="margin-top: 0.5rem;">
+                        <a href="/sample-cart.html" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                            View Cart & Checkout
+                        </a>
+                        <button onclick="resetForAnotherSample()" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem; margin-left: 0.5rem;">
+                            Add Another Sample
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reset for another sample
+        function resetForAnotherSample() {
+            selectedSamples = {};
+
+            // Reset all quantities in UI
+            document.querySelectorAll('.quantity-value').forEach(el => {
+                el.textContent = '0';
+            });
+
+            // Remove selection styling
+            document.querySelectorAll('.size-quantity-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            updateSampleSummary();
+
+            // Restore summary content
+            const summary = document.getElementById('sampleSummary');
+            summary.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> samples</strong>
+                    <button id="addToCartBtn" class="btn btn-primary" onclick="addToSampleCart()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        <i class="fas fa-shopping-cart"></i> Add to Sample Cart
+                    </button>
+                </div>
+            `;
+        }
+
+        // ==============================================
+        // DEBUG HELPERS - Console Utilities
+        // ==============================================
+        window.DEBUG_HELPERS = {
+            // View current cart
+            viewCart: () => {
+                const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+                console.table(cart.map((item, i) => ({
+                    Index: i,
+                    Style: item.style,
+                    Name: item.name,
+                    Color: item.color,
+                    Sizes: JSON.stringify(item.sizes)
+                })));
+                return cart;
+            },
+
+            // Clear cart
+            clearCart: () => {
+                sessionStorage.removeItem('sampleCart');
+                console.log('✅ Cart cleared');
+            },
+
+            // Toggle debug mode
+            toggleDebug: () => {
+                if (window.SAMPLE_DEBUG) window.SAMPLE_DEBUG.enabled = !window.SAMPLE_DEBUG.enabled;
+                if (window.CART_DEBUG) window.CART_DEBUG.enabled = !window.CART_DEBUG.enabled;
+                const enabled = window.SAMPLE_DEBUG?.enabled || window.CART_DEBUG?.enabled;
+                console.log('🔧 Debug mode:', enabled ? 'ENABLED' : 'DISABLED');
+                return enabled;
+            },
+
+            // Export cart as JSON
+            exportCart: () => {
+                const cart = sessionStorage.getItem('sampleCart');
+                console.log('📋 Cart JSON:', cart);
+                return cart;
+            },
+
+            // Simulate adding a sample
+            testAddSample: (style = 'PC54', color = 'Red', sizes = {M: 1, L: 1}) => {
+                const testItem = {
+                    style: style,
+                    name: 'Test Product',
+                    color: color,
+                    catalogColor: color,
+                    imageUrl: '',
+                    sizes: sizes,
+                    type: 'shirt',
+                    price: 0.01,
+                    sampleType: 'free',
+                    addedAt: new Date().toISOString()
+                };
+
+                let cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+                cart.push(testItem);
+                sessionStorage.setItem('sampleCart', JSON.stringify(cart));
+                console.log('✅ Test sample added:', testItem);
+                console.log('📊 Cart now has', cart.length, 'items');
+                return testItem;
+            }
+        };
+
         // Initialize on load
-        window.addEventListener('DOMContentLoaded', initializePage);
+        window.addEventListener('DOMContentLoaded', async function() {
+            await initializePage();
+            checkSampleMode();
+
+            // Log available debug helpers
+            console.log('%c🔧 Debug Helpers Available', 'font-weight: bold; font-size: 14px; color: #2196F3');
+            console.log('%c  DEBUG_HELPERS.viewCart()', 'color: #4CAF50', '- View cart contents');
+            console.log('%c  DEBUG_HELPERS.clearCart()', 'color: #4CAF50', '- Clear cart');
+            console.log('%c  DEBUG_HELPERS.toggleDebug()', 'color: #4CAF50', '- Enable/disable debug logs');
+            console.log('%c  DEBUG_HELPERS.exportCart()', 'color: #4CAF50', '- Export cart JSON');
+            console.log('%c  DEBUG_HELPERS.testAddSample()', 'color: #4CAF50', '- Add test sample');
+            console.log('%c  window.SAMPLE_DEBUG.enabled', 'color: #FF9800', '- Current state:', window.SAMPLE_DEBUG?.enabled);
+        });
     </script>
 </body>
 </html>

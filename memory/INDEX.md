@@ -25,6 +25,7 @@ This documentation has been reorganized into modular components for better perfo
 ├── DATABASE_PATTERNS.md              # Database schema patterns
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints - read data)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md    # ManageOrders PUSH API (4 endpoints - create orders)
+├── MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md  # Complete Swagger field reference (158+ fields)
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
@@ -156,6 +157,20 @@ This documentation has been reorganized into modular components for better perfo
    - Phase 3: Order tracking for customers (PULL API)
 5. Test with `isTest: true` flag before going live
 
+### "I need to enhance my ManageOrders PUSH API integration"
+1. Read **[MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md](./MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md)** - Complete Swagger specification
+2. Review current implementation status (158+ fields documented):
+   - Order-Level Fields: 23 total (12 currently used)
+   - Line Item Fields: 18 per item (8 currently used)
+   - Design Block: ~27 nested fields (future use)
+   - Payment Block: 12 per payment (future use)
+3. Choose enhancement phase:
+   - **Phase 1:** Quick wins (custom fields, additional notes)
+   - **Phase 2:** Major features (design tracking, extended shipping)
+   - **Phase 3:** Advanced (payment integration, attachments)
+4. Use implementation snippets from documentation
+5. Test field population in ShopWorks after hourly import
+
 ## 🔑 Key Configuration Values
 
 ### API Configuration
@@ -224,6 +239,13 @@ PATCH  - Embroidered Emblems
 - Modular structure: Overview, Autocomplete, API Reference, Server Proxy, Future Integrations
 - Production-ready customer autocomplete documentation
 
+**Latest Addition (2025-10-27):**
+- Created complete ManageOrders PUSH API field reference
+- Documents all 158+ available Swagger fields
+- Field mapping guide (Your Field → Proxy Field → Swagger Field)
+- Implementation snippets and troubleshooting guide
+- Three-phase enhancement roadmap
+
 ## 🔗 Related Documentation
 
 ### Active Development Files (in root)
@@ -237,6 +259,7 @@ PATCH  - Embroidered Emblems
 - **STAFF_DIRECTORY.md** - Staff contact information
 - **DATABASE_PATTERNS.md** - Database schema and patterns
 - **MANAGEORDERS_INTEGRATION.md** - ShopWorks ManageOrders API integration guide
+- **MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md** - Complete Swagger field reference
 - **FILE_UPLOAD_API_REQUIREMENTS.md** - File upload specifications
 
 ## 💡 Best Practices

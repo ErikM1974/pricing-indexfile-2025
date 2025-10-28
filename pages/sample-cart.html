@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Cart - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- EmailJS for sample request notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Sample Order Service for ShopWorks Integration -->
+    <script src="../shared_components/js/sample-order-service.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 2px solid var(--primary-color);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .company-logo {
+            height: 50px;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .contact-info a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .contact-info a:hover {
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .cart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-details h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-details .item-style {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-details .item-color {
+            display: inline-block;
+            background: var(--bg-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-sizes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .size-badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .item-remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: opacity 0.2s;
+        }
+
+        .item-remove:hover {
+            opacity: 0.7;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-secondary);
+        }
+
+        .empty-cart i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .success-message {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .success-message h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-message p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                gap: 1rem;
+            }
+
+            .item-remove {
+                grid-column: 2;
+                text-align: right;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/top-sellers-showcase.html">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="company-logo">
+            </a>
+            <div class="contact-info">
+                <a href="tel:253-922-5793">
+                    <i class="fas fa-phone"></i>
+                    253-922-5793
+                </a>
+                <a href="mailto:sales@nwcustomapparel.com">
+                    <i class="fas fa-envelope"></i>
+                    sales@nwcustomapparel.com
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Cart Section -->
+        <div id="cartContainer">
+            <h1 class="page-title">Your Sample Cart</h1>
+            <p class="page-subtitle">Review your selected samples and complete the form below to submit your request.</p>
+
+            <div class="cart-section">
+                <div id="cartItems">
+                    <!-- Cart items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="form-section" id="contactForm">
+                <h2><i class="fas fa-user"></i> Contact Information</h2>
+                <form id="sampleRequestForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>
+                                Full Name <span class="required">*</span>
+                            </label>
+                            <input type="text" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Email <span class="required">*</span>
+                            </label>
+                            <input type="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Phone <span class="required">*</span>
+                            </label>
+                            <input type="tel" name="phone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Company
+                            </label>
+                            <input type="text" name="company">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Street Address <span class="required">*</span>
+                            </label>
+                            <input type="text" name="address1" required placeholder="123 Main St">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Apt/Suite
+                            </label>
+                            <input type="text" name="address2" placeholder="Apt 4B">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                City <span class="required">*</span>
+                            </label>
+                            <input type="text" name="city" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                State <span class="required">*</span>
+                            </label>
+                            <input type="text" name="state" required placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                ZIP Code <span class="required">*</span>
+                            </label>
+                            <input type="text" name="zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>
+                                Additional Notes
+                            </label>
+                            <textarea name="notes" placeholder="Any specific requirements or questions..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Sample Request
+                        </button>
+                        <a href="/top-sellers-showcase.html" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Continue Shopping
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <h2>Sample Request Submitted!</h2>
+            <p>Thank you for your request. We'll process your samples and be in touch shortly.</p>
+            <p><strong>Confirmation ID:</strong> <span id="confirmationId"></span></p>
+            <div class="button-group" style="justify-content: center;">
+                <a href="/top-sellers-showcase.html" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    Back to Top Sellers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
+        // Initialize Sample Order Service
+        const sampleOrderService = new SampleOrderService();
+        window.sampleOrderService = sampleOrderService;
+        console.log('[Sample Cart] Service initialized');
+
+        // ==============================================
+        // DEBUG UTILITIES - Sample Cart & Checkout
+        // ==============================================
+        window.CART_DEBUG = {
+            enabled: true,
+
+            // Log cart load from sessionStorage
+            logCartLoad: function(cart) {
+                if (!this.enabled) return;
+                console.group('📥 [Cart Load] From SessionStorage');
+                console.log('Items Count:', cart.length);
+                console.table(cart.map((item, i) => ({
+                    Index: i,
+                    Style: item.style,
+                    Name: item.name,
+                    Color: item.color,
+                    Sizes: Object.entries(item.sizes).map(([s,q]) => `${s}:${q}`).join(', '),
+                    Type: item.sampleType || 'free'
+                })));
+                console.groupEnd();
+            },
+
+            // Log form data before submission
+            logFormSubmission: function(customerData, samplesForService) {
+                if (!this.enabled) return;
+                console.group('📤 [Form Submit] Order Data');
+                console.log('Customer Data:', JSON.stringify(customerData, null, 2));
+                console.log('Samples for Service:', JSON.stringify(samplesForService, null, 2));
+                console.log('Total Items:', samplesForService.length);
+                console.groupEnd();
+            },
+
+            // Log API request
+            logAPIRequest: function(endpoint, payload) {
+                if (!this.enabled) return;
+                console.group('🌐 [API Request] ManageOrders PUSH');
+                console.log('Endpoint:', endpoint);
+                console.log('Payload:', JSON.stringify(payload, null, 2));
+                console.log('Timestamp:', new Date().toISOString());
+                console.groupEnd();
+            },
+
+            // Log API response
+            logAPIResponse: function(response, data) {
+                if (!this.enabled) return;
+                console.group('✅ [API Response] ManageOrders');
+                console.log('Status:', response.status, response.statusText);
+                console.log('Data:', JSON.stringify(data, null, 2));
+                console.groupEnd();
+            }
+        };
+
+        // Load and display cart items
+        function loadCart() {
+            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+
+            // DEBUG: Log cart load
+            if (window.CART_DEBUG) {
+                window.CART_DEBUG.logCartLoad(cart);
+            }
+
+            const container = document.getElementById('cartItems');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Your sample cart is empty</h3>
+                        <p>Add some samples from our Top Sellers page!</p>
+                        <a href="/top-sellers-showcase.html" class="btn btn-primary" style="margin-top: 1rem;">
+                            Browse Products
+                        </a>
+                    </div>
+                `;
+                // Hide contact form
+                document.getElementById('contactForm').style.display = 'none';
+                return;
+            }
+
+            // Display cart items
+            container.innerHTML = cart.map((item, index) => {
+                const sizesDisplay = Object.entries(item.sizes)
+                    .filter(([size, qty]) => qty > 0)
+                    .map(([size, qty]) => `<span class="size-badge">${size} (${qty})</span>`)
+                    .join('');
+
+                return `
+                    <div class="cart-item" data-index="${index}">
+                        <img src="${item.imageUrl || 'https://via.placeholder.com/100'}" alt="${item.name}" class="item-image">
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <div class="item-style">Style: ${item.style}</div>
+                            <div class="item-color">Color: ${item.color}</div>
+                            <div class="item-sizes">${sizesDisplay}</div>
+                        </div>
+                        <div class="item-remove" onclick="removeItem(${index})">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Remove item from cart
+        function removeItem(index) {
+            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+            cart.splice(index, 1);
+            sessionStorage.setItem('sampleCart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Handle form submission
+        document.getElementById('sampleRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+
+            // Split name into first/last
+            const fullName = formData.get('name').trim();
+            const nameParts = fullName.split(' ');
+            const firstName = nameParts[0];
+            const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+
+            // Prepare customer data for ShopWorks
+            const customerData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company') || '',
+                address1: formData.get('address1'),
+                address2: formData.get('address2') || '',
+                city: formData.get('city'),
+                state: formData.get('state').toUpperCase(),
+                zip: formData.get('zip'),
+                notes: formData.get('notes') || ''
+            };
+
+            // Transform cart items to individual size entries (one sample per size)
+            const samplesForService = [];
+            cart.forEach(item => {
+                Object.entries(item.sizes).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        // Create separate entries for each quantity
+                        for (let i = 0; i < qty; i++) {
+                            samplesForService.push({
+                                style: item.style,
+                                name: item.name,
+                                color: item.color,
+                                catalogColor: item.catalogColor,
+                                size: size,
+                                price: item.price || 0.01,
+                                type: item.sampleType || 'free'
+                            });
+                        }
+                    }
+                });
+            });
+
+            console.log('[Sample Cart] Submitting order with:', {
+                customer: customerData,
+                sampleCount: samplesForService.length
+            });
+
+            // DEBUG: Log form submission
+            if (window.CART_DEBUG) {
+                window.CART_DEBUG.logFormSubmission(customerData, samplesForService);
+            }
+
+            // Disable submit button
+            const submitBtn = e.target.querySelector('[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                let shopWorksOrderNumber = null;
+
+                // Send to ShopWorks
+                if (window.sampleOrderService) {
+                    const result = await window.sampleOrderService.submitSampleOrder(
+                        customerData,
+                        samplesForService
+                    );
+
+                    if (!result.success) {
+                        throw new Error(`ShopWorks submission failed: ${result.error || result.message}`);
+                    }
+
+                    shopWorksOrderNumber = result.orderNumber;
+                    console.log('[Sample Cart] ✅ Order created in ShopWorks:', shopWorksOrderNumber);
+                }
+
+                // Send email notification (using simple template for now)
+                const emailData = {
+                    to_name: 'Northwest Custom Apparel',
+                    from_name: fullName,
+                    from_email: customerData.email,
+                    from_phone: customerData.phone,
+                    from_company: customerData.company,
+                    message: customerData.notes,
+                    order_number: shopWorksOrderNumber || 'PENDING',
+                    samples: cart.map(item => {
+                        const sizes = Object.entries(item.sizes)
+                            .filter(([s, q]) => q > 0)
+                            .map(([s, q]) => `${s} (${q})`)
+                            .join(', ');
+                        return `${item.name} (${item.style}) - ${item.color} - Sizes: ${sizes}`;
+                    }).join('\n')
+                };
+
+                // Try to send email (don't fail if this errors)
+                try {
+                    await emailjs.send('service_1c4k67j', 'template_sample_request', emailData);
+                    console.log('[Sample Cart] ✅ Email notification sent');
+                } catch (emailError) {
+                    console.warn('[Sample Cart] ⚠️ Email failed but order was created:', emailError);
+                }
+
+                // Clear cart
+                sessionStorage.removeItem('sampleCart');
+
+                // Show success message
+                document.getElementById('cartContainer').style.display = 'none';
+                document.getElementById('confirmationId').textContent = shopWorksOrderNumber || 'SR-' + Date.now().toString().slice(-6);
+                document.getElementById('successMessage').classList.add('show');
+
+            } catch (error) {
+                console.error('[Sample Cart] ❌ Error submitting order:', error);
+                alert('There was an error submitting your order. Please try again or call us at 253-922-5793.\n\nError: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Sample Request';
+            }
+        });
+
+        // Load cart on page load
+        loadCart();
+    </script>
+</body>
+</html>
