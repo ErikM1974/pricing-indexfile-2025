@@ -1,0 +1,239 @@
+======================================================================
+TOP SELLERS VALIDATION REPORT
+======================================================================
+
+Generated: 2025-10-28 10:47:38
+
+SUMMARY STATISTICS
+----------------------------------------------------------------------
+Total Products Original: 38
+Total Products Cleaned: 35
+Duplicates Removed: 3
+Unique Styles: 33
+Found In Api: 0
+Not Found In Api: 35
+Match Rate: 0.0%
+Already Best Sellers: 0
+Need Best Seller Flag: 0
+Discontinued: 0
+
+
+PRODUCTS BY DECORATION METHOD
+----------------------------------------------------------------------
+Embroidery: 14
+Screenprint: 12
+Caps: 9
+
+
+PRODUCTS NOT FOUND IN API
+----------------------------------------------------------------------
+
+Style: 18500
+  Original: 18500
+  Description: Gildan - Heavy Blend Hooded Sweatshirt
+  Order Type: Screenprinting
+  Detected Vendor: Unknown
+
+Style: 2000
+  Original: 2000
+  Description: Gildan - Ultra Cotton 100 Us Cotton T-Shirt
+  Order Type: Screenprinting
+  Detected Vendor: Unknown
+
+Style: 267020
+  Original: 267020
+  Description: Nike Dri-Fit Classic Polo
+  Order Type: Custom Embroidery
+  Detected Vendor: Unknown
+
+Style: BC3001
+  Original: BC3001
+  Description: BellaCanvas  Unisex Jersey Short Sleeve Tee
+  Order Type: Screenprinting
+  Detected Vendor: Bella+Canvas
+
+Style: C110
+  Original: C110_OSFA
+  Description: Port Authority Flexfit 110 Mesh Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: C112
+  Original: C112_OSFA
+  Description: Port Authority Snapback Trucker Cap
+  Order Type: Custom Embroidery
+  Detected Vendor: Richardson/Port Authority
+
+Style: C112
+  Original: C112_OSFA
+  Description: Port Authority Snapback Trucker Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: C865
+  Original: C865_L/XL
+  Description: Port Authority Flexfit Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: CP82
+  Original: CP82_OSFA
+  Description: Port  Companybrushed Twill Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: CP83
+  Original: CP83_OSFA
+  Description: Port  Company -Two-Tone Pigment-Dyed Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: CP90
+  Original: CP90_OSFA
+  Description: Port  Companyknit Cap
+  Order Type: Cap Order
+  Detected Vendor: Richardson/Port Authority
+
+Style: CP90
+  Original: CP90_OSFA
+  Description: Port  Companyknit Cap
+  Order Type: Screenprinting
+  Detected Vendor: Richardson/Port Authority
+
+Style: CT100617
+  Original: CT100617
+  Description: Carhartt  Rain Defender  Paxton Heavyweight Hooded Zip Mock Sweatshirt
+  Order Type: Custom Embroidery
+  Detected Vendor: Carhartt
+
+Style: CT103828
+  Original: CT103828
+  Description: Carhartt Duck Detroit Jacket
+  Order Type: Custom Embroidery
+  Detected Vendor: Carhartt
+
+Style: CT104597
+  Original: CT104597_OSFA
+  Description: Carhartt Watch Cap 2.0
+  Order Type: Custom Embroidery
+  Detected Vendor: Carhartt
+
+Style: CT104670
+  Original: CT104670
+  Description: Carhartt Storm Defender Shoreline Jacket
+  Order Type: Custom Embroidery
+  Detected Vendor: Carhartt
+
+Style: CTK121
+  Original: CTK121
+  Description: Carhartt  Midweight Hooded Sweatshirt
+  Order Type: Custom Embroidery
+  Detected Vendor: Carhartt
+
+Style: DT6100
+  Original: DT6100
+  Description: District V.i.t.fleece Hoodie
+  Order Type: Screenprinting
+  Detected Vendor: District
+
+Style: EB532
+  Original: EB532
+  Description: Eddie Bauer Shaded Crosshatch Soft Shell Jacket
+  Order Type: Custom Embroidery
+  Detected Vendor: Eddie Bauer
+
+Style: EB550
+  Original: EB550
+  Description: Eddie Bauer - Rain Jacket (cream logo)
+  Order Type: Custom Embroidery
+  Detected Vendor: Eddie Bauer
+
+Style: NE1000
+  Original: NE1000
+  Description: New Era - Structured Stretch Cotton Cap
+  Order Type: Cap Order
+  Detected Vendor: Nike/New Era
+
+Style: NE200
+  Original: NE200_OSFA
+  Description: New Era - Adjustable Structured Cap
+  Order Type: Cap Order
+  Detected Vendor: Nike/New Era
+
+Style: NKDC1963
+  Original: NKDC1963
+  Description: Nike Dri-Fit Micro Pique 2.0 Polo
+  Order Type: Custom Embroidery
+  Detected Vendor: Nike/New Era
+
+Style: PC54
+  Original: PC54
+  Description: Port  Company - Core Cotton Tee
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC55
+  Original: PC55
+  Description: Port  Company - Core Blend Tee
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC55P
+  Original: PC55P
+  Description: Port  Company - Core Blend Pocket Tee
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC600
+  Original: PC600
+  Description: Port  Company Bouncer Tee
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC61
+  Original: PC61
+  Description: Port  Company - Essential Tee.
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC78H
+  Original: PC78H
+  Description: Port  Company - Core Fleece Pullover Hooded Sweatshirt
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: PC90H
+  Original: PC90H
+  Description: Port  Company -  Essential Fleece Pullover Hooded Sweatshirt
+  Order Type: Screenprinting
+  Detected Vendor: Port & Company
+
+Style: S608
+  Original: S608
+  Description: Port Authority Long Sleeve Easy Care Shirt
+  Order Type: Custom Embroidery
+  Detected Vendor: Port Authority
+
+Style: ST253
+  Original: ST253
+  Description: Sport-Tek 1/4-Zip Sweatshirt
+  Order Type: Custom Embroidery
+  Detected Vendor: Sport-Tek
+
+Style: ST650
+  Original: ST650
+  Description: Sport-Tek Micropique Sport-Wick Polo
+  Order Type: Custom Embroidery
+  Detected Vendor: Sport-Tek
+
+Style: ST850
+  Original: ST850
+  Description: Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover
+  Order Type: Custom Embroidery
+  Detected Vendor: Sport-Tek
+
+Style: TM1MU423
+  Original: TM1MU423_OSFA
+  Description: Travismathew Cruz Trucker Cap
+  Order Type: Cap Order
+  Detected Vendor: TravisMathew
