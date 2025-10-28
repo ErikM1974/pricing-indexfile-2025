@@ -1391,19 +1391,38 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    const sizes = Object.keys(data.basePrices || {});
+
+                    // Handle array response (API returns array of color variants)
+                    let sizes = [];
+                    if (Array.isArray(data) && data.length > 0) {
+                        // Get sizes from first color variant (all colors have same sizes)
+                        sizes = Object.keys(data[0].basePrices || {});
+                        console.log(`[SizeGrid] Style ${params.style}: Received array of ${data.length} colors, extracting sizes from first:`, sizes);
+                    } else if (data.basePrices) {
+                        // Fallback: single object format (shouldn't happen but handle it)
+                        sizes = Object.keys(data.basePrices || {});
+                        console.log(`[SizeGrid] Style ${params.style}: Received single object, sizes:`, sizes);
+                    }
+
+                    console.log(`[SizeGrid] Style ${params.style}: Final size count: ${sizes.length}`, sizes);
 
                     if (sizes.length === 0) {
-                        // Use standard sizes as fallback
+                        console.warn('[SizeGrid] No sizes from API, using standard sizes as fallback');
                         displayStandardSizes(gridContainer);
+                    } else if (sizes.length === 1) {
+                        // Single size product (caps, one-size items)
+                        console.log('[SizeGrid] Single-size product detected');
+                        displaySizes(gridContainer, sizes);
                     } else {
+                        // Multiple sizes
                         displaySizes(gridContainer, sizes);
                     }
                 } else {
+                    console.error('[SizeGrid] API response not OK:', response.status);
                     displayStandardSizes(gridContainer);
                 }
             } catch (error) {
-                console.error('Error fetching sizes:', error);
+                console.error('[SizeGrid] Error fetching sizes:', error);
                 displayStandardSizes(gridContainer);
             }
         }
@@ -1509,11 +1528,21 @@
             let cartArray = [];
             try {
                 const stored = sessionStorage.getItem('sampleCart');
-                cartArray = stored ? JSON.parse(stored) : [];
+                if (stored) {
+                    const parsed = JSON.parse(stored);
 
-                // Ensure it's actually an array
-                if (!Array.isArray(cartArray)) {
-                    console.warn('[Sample Mode] Invalid cart data in storage, resetting to empty array');
+                    // Handle both old (array) and new (nested) formats
+                    if (Array.isArray(parsed)) {
+                        // Old format: plain array
+                        cartArray = parsed;
+                    } else if (parsed && parsed.samples && Array.isArray(parsed.samples)) {
+                        // New format: {samples: [...]}
+                        cartArray = parsed.samples;
+                    } else {
+                        console.warn('[Sample Mode] Unrecognized cart format, resetting to empty array');
+                        cartArray = [];
+                    }
+                } else {
                     cartArray = [];
                 }
             } catch (e) {
@@ -1542,7 +1571,13 @@
 
             // Add to cart
             cartArray.push(cartItem);
-            sessionStorage.setItem('sampleCart', JSON.stringify(cartArray));
+
+            // Save with nested structure for checkout compatibility
+            const cartData = {
+                samples: cartArray,
+                timestamp: new Date().toISOString()
+            };
+            sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
 
             console.log('[Sample Mode] Added to cart:', cartItem);
             console.log('[Sample Mode] Cart now has', cartArray.length, 'items');

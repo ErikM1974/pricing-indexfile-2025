@@ -2780,13 +2780,18 @@
                     }
                     
                     const colorsToShow = uniqueColors.slice(0, 5);
-                    
+
+                    // Detect Richardson products (not in Sanmar API)
+                    const isRichardson = product.brand?.toLowerCase().includes('richardson') ||
+                                       product.style === '112' ||
+                                       product.description?.toLowerCase().includes('richardson');
+
                     card.onclick = () => navigateToProduct(product);
-                    
+
                     // Check for image override first
-                    const imageUrl = imageOverrides[product.style] || 
-                                    firstProduct.FRONT_MODEL || 
-                                    firstProduct.FRONT_FLAT || 
+                    const imageUrl = imageOverrides[product.style] ||
+                                    firstProduct.FRONT_MODEL ||
+                                    firstProduct.FRONT_FLAT ||
                                     firstProduct.PRODUCT_IMAGE;
                     
                     card.innerHTML = `
@@ -2810,9 +2815,17 @@
                                 ` : ''}
                             </div>
                             <div class="product-actions">
-                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending" onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
-                                    <i class="fas fa-box-open"></i> Request Sample
-                                </button>
+                                ${isRichardson ? `
+                                    <button class="btn-sample" disabled style="opacity: 0.5; cursor: not-allowed;"
+                                            title="Richardson samples not available online - Call 253-922-5793">
+                                        <i class="fas fa-phone"></i> Call for Sample
+                                    </button>
+                                ` : `
+                                    <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
+                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
+                                        <i class="fas fa-box-open"></i> Request Sample
+                                    </button>
+                                `}
                             </div>
                         </div>
                     `;
@@ -2820,7 +2833,12 @@
                     // Product without API data - check for image override or use placeholder
                     const brandStyle = brandPlaceholders[product.brand] || brandPlaceholders['Generic'];
                     const overrideImage = imageOverrides[product.style];
-                    
+
+                    // Detect Richardson products (not in Sanmar API)
+                    const isRichardson = product.brand?.toLowerCase().includes('richardson') ||
+                                       product.style === '112' ||
+                                       product.description?.toLowerCase().includes('richardson');
+
                     card.onclick = () => navigateToProduct(product);
                     
                     // If we have an override image, use it; otherwise use the brand placeholder
@@ -2853,9 +2871,17 @@
                                 Premium ${product.brand} Product
                             </div>
                             <div class="product-actions">
-                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending" onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '')">
-                                    <i class="fas fa-box-open"></i> Request Sample
-                                </button>
+                                ${isRichardson ? `
+                                    <button class="btn-sample" disabled style="opacity: 0.5; cursor: not-allowed;"
+                                            title="Richardson samples not available online - Call 253-922-5793">
+                                        <i class="fas fa-phone"></i> Call for Sample
+                                    </button>
+                                ` : `
+                                    <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
+                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '')">
+                                        <i class="fas fa-box-open"></i> Request Sample
+                                    </button>
+                                `}
                             </div>
                         </div>
                     `;
@@ -2920,23 +2946,16 @@
                 return;
             }
 
-            // Check if we have custom description for this product
-            const customDesc = productDescriptions[product.style];
-
-            if (customDesc) {
-                // Show custom product modal for other products with descriptions
-                showProductModal(product, customDesc);
-            } else {
-                // Original navigation for other products
-                const params = new URLSearchParams({
-                    style: product.style,
-                    name: product.description,
-                    type: product.type,
-                    brand: product.brand,
-                    ref: 'showcase'
-                });
-                window.location.href = `/top-sellers-product.html?${params}`;
-            }
+            // Always navigate to product page for unified experience
+            // (Modal removed - user wanted single navigation path)
+            const params = new URLSearchParams({
+                style: product.style,
+                name: product.description,
+                type: product.type,
+                brand: product.brand,
+                ref: 'showcase'
+            });
+            window.location.href = `/top-sellers-product.html?${params}`;
         }
         
         // Show product modal for items with custom descriptions
@@ -3117,9 +3136,6 @@
             window.addEventListener('openSampleModal', (e) => {
                 openSampleModal(e.detail.samples);
             });
-            
-            // Handle form submission
-            document.getElementById('sampleRequestForm').addEventListener('submit', handleSampleFormSubmit);
         });
         
         // Handle sample request button click
@@ -3349,13 +3365,6 @@
                 submitBtn.innerHTML = originalButtonText;
             }
         }
-        
-        // Modal close on outside click
-        document.getElementById('sampleRequestModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSampleModal();
-            }
-        });
     </script>
 </body>
 </html>

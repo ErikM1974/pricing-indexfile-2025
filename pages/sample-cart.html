@@ -551,9 +551,32 @@
             }
         };
 
+        // Helper function to safely read cart from storage
+        function getCartSamples() {
+            try {
+                const stored = sessionStorage.getItem('sampleCart');
+                if (!stored) return [];
+
+                const parsed = JSON.parse(stored);
+
+                // Handle both old (array) and new (nested) formats
+                if (Array.isArray(parsed)) {
+                    return parsed; // Old format
+                } else if (parsed && parsed.samples && Array.isArray(parsed.samples)) {
+                    return parsed.samples; // New format
+                } else {
+                    console.warn('[Cart] Unrecognized cart format');
+                    return [];
+                }
+            } catch (e) {
+                console.error('[Cart] Error parsing cart:', e);
+                return [];
+            }
+        }
+
         // Load and display cart items
         function loadCart() {
-            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+            const cart = getCartSamples();
 
             // DEBUG: Log cart load
             if (window.CART_DEBUG) {
@@ -610,9 +633,15 @@
 
         // Remove item from cart
         function removeItem(index) {
-            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+            const cart = getCartSamples();
             cart.splice(index, 1);
-            sessionStorage.setItem('sampleCart', JSON.stringify(cart));
+
+            // Save with nested structure
+            const cartData = {
+                samples: cart,
+                timestamp: new Date().toISOString()
+            };
+            sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
             loadCart();
         }
 
@@ -621,7 +650,7 @@
             e.preventDefault();
 
             const formData = new FormData(e.target);
-            const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+            const cart = getCartSamples();
 
             // Split name into first/last
             const fullName = formData.get('name').trim();
