@@ -17,7 +17,14 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
+    <!-- Cart Drawer Component -->
+    <link rel="stylesheet" href="../shared_components/css/cart-drawer.css">
+    <script src="../shared_components/js/cart-drawer.js"></script>
+
+    <!-- Sample Order Service for ShopWorks Integration -->
+    <script src="../shared_components/js/sample-order-service.js"></script>
+
     <style>
         :root {
             --primary-color: #4cb354;
@@ -858,6 +865,132 @@
     <!-- Product Recommendations Service -->
     <script src="../shared_components/js/product-recommendations.js"></script>
 
+    <!-- Sample Cart Functionality -->
+    <script>
+        // Embedded sample cart functionality
+        class SampleCart {
+            constructor() {
+                this.maxSamples = null; // No hard limit - 3 samples recommended for best experience
+
+                // Load cart with backward compatibility
+                const cartData = sessionStorage.getItem('sampleCart');
+                if (cartData) {
+                    try {
+                        const parsed = JSON.parse(cartData);
+                        // New format: {samples: [...]}
+                        // Old format: [...]
+                        this.samples = Array.isArray(parsed) ? parsed : (parsed.samples || []);
+                    } catch (e) {
+                        console.error('[SampleCart] Error parsing cart data:', e);
+                        this.samples = [];
+                    }
+                } else {
+                    this.samples = [];
+                }
+
+                this.eligibilityCache = {};
+                this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                this.initializeUI();
+                this.bindEvents();
+            }
+
+            initializeUI() {
+                if (!document.getElementById('sampleCartWidget')) {
+                    const widget = document.createElement('div');
+                    widget.id = 'sampleCartWidget';
+                    widget.className = 'sample-cart-widget';
+                    widget.setAttribute('role', 'button');
+                    widget.setAttribute('tabindex', '0');
+                    widget.innerHTML = `
+                        <div class="sample-cart-icon">
+                            <i class="fas fa-box-open"></i>
+                            <span class="sample-count-badge">${this.samples.length}</span>
+                        </div>
+                        <span class="sample-cart-label">Sample Cart</span>
+                    `;
+
+                    // Add to header's contact-info section (top-right position)
+                    const contactInfo = document.querySelector('.contact-info');
+                    if (contactInfo) {
+                        contactInfo.appendChild(widget);
+                    } else {
+                        // Fallback: add to body if header not found
+                        document.body.appendChild(widget);
+                    }
+                }
+                this.updateUI();
+            }
+
+            bindEvents() {
+                const widget = document.getElementById('sampleCartWidget');
+                if (widget) {
+                    // Click handler
+                    widget.addEventListener('click', () => {
+                        if (window.cartDrawer) {
+                            window.cartDrawer.open();
+                        }
+                    });
+
+                    // Keyboard support (Enter/Space)
+                    widget.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (window.cartDrawer) {
+                                window.cartDrawer.open();
+                            }
+                        }
+                    });
+                }
+
+                // Listen for storage events (cart updates from other tabs)
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'sampleCart') {
+                        this.loadCart();
+                        this.updateUI();
+                    }
+                });
+            }
+
+            loadCart() {
+                const cartData = sessionStorage.getItem('sampleCart');
+                if (cartData) {
+                    try {
+                        const parsed = JSON.parse(cartData);
+                        this.samples = Array.isArray(parsed) ? parsed : (parsed.samples || []);
+                    } catch (e) {
+                        this.samples = [];
+                    }
+                } else {
+                    this.samples = [];
+                }
+            }
+
+            updateUI() {
+                const widget = document.getElementById('sampleCartWidget');
+                if (!widget) return;
+
+                const badge = widget.querySelector('.sample-count-badge');
+                if (badge) {
+                    badge.textContent = this.samples.length;
+                }
+
+                // Show/hide widget based on cart contents
+                if (this.samples.length > 0) {
+                    widget.style.display = 'flex';
+                } else {
+                    widget.style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize sample cart when DOM is ready
+        let sampleCart = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            sampleCart = new SampleCart();
+            window.sampleCart = sampleCart; // Make globally accessible
+        });
+    </script>
+
     <script>
         // Global variables for product state
         let currentProducts = [];
@@ -1264,6 +1397,14 @@
                 };
 
                 console.log('[ProductPage] Getting recommendations for:', productContext);
+
+                // Safety check: Ensure recommendations service is loaded
+                if (!window.productRecommendations) {
+                    console.warn('[ProductPage] Product recommendations service not loaded');
+                    grid.innerHTML = '';
+                    relatedSection.style.display = 'none';
+                    return;
+                }
 
                 // Get recommendations from service
                 const recommendations = await window.productRecommendations.getRecommendations(productContext);

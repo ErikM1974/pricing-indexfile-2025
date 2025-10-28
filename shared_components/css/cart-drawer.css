@@ -164,13 +164,13 @@
 }
 
 /* ===== Color Swatches ===== */
-.color-swatches {
+.cart-drawer .color-swatches {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.color-swatch {
+.cart-drawer .color-swatch {
     width: 50px;
     height: 50px;
     border-radius: 8px;
@@ -184,17 +184,17 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.color-swatch:hover {
+.cart-drawer .color-swatch:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.color-swatch.selected {
+.cart-drawer .color-swatch.selected {
     border-color: #2d5f3f;
     box-shadow: 0 0 0 2px white, 0 0 0 4px #2d5f3f;
 }
 
-.color-check {
+.cart-drawer .color-check {
     color: white;
     font-size: 20px;
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
@@ -202,18 +202,18 @@
     transition: opacity 0.2s;
 }
 
-.color-swatch.selected .color-check {
+.cart-drawer .color-swatch.selected .color-check {
     opacity: 1;
 }
 
 /* ===== Size Buttons ===== */
-.size-buttons {
+.cart-drawer .size-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     gap: 10px;
 }
 
-.size-button {
+.cart-drawer .size-button {
     padding: 12px;
     border: 2px solid #ddd;
     background: white;
@@ -226,12 +226,12 @@
     text-align: center;
 }
 
-.size-button:hover {
+.cart-drawer .size-button:hover {
     border-color: #2d5f3f;
     background: #f0f8f4;
 }
 
-.size-button.selected {
+.cart-drawer .size-button.selected {
     border-color: #2d5f3f;
     background: #2d5f3f;
     color: white;
@@ -453,11 +453,11 @@
         height: 100px;
     }
 
-    .color-swatches {
+    .cart-drawer .color-swatches {
         justify-content: center;
     }
 
-    .size-buttons {
+    .cart-drawer .size-buttons {
         grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
         gap: 8px;
     }
@@ -508,8 +508,8 @@
 @media (prefers-reduced-motion: reduce) {
     .cart-drawer,
     .drawer-overlay,
-    .color-swatch,
-    .size-button,
+    .cart-drawer .color-swatch,
+    .cart-drawer .size-button,
     .cart-item,
     .drawer-toast {
         transition: none;
