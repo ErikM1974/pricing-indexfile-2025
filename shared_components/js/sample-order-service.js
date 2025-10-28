@@ -14,44 +14,6 @@ class SampleOrderService {
         this.emailServiceId = 'service_1c4k67j';
         this.emailPublicKey = '4qSbDO-SQs19TbP80';
 
-        // Part number suffix mapping (ShopWorks format)
-        // IMPORTANT: ShopWorks uses mixed conventions - Port & Co: _XXL, Jerzees: _2X
-        // Copied from shopworks-guide-generator.js for consistency
-        this.partNumberSuffixMap = {
-            // Standard sizes: NO suffix (S, M, L, XL ONLY)
-            'S': '',
-            'M': '',
-            'L': '',
-            'XL': '',
-            // Extra Small and XXL oversizes
-            'XS': '_XS',
-            'XXL': '_XXL',  // Port & Co uses _XXL
-            // Oversizes: _2X format
-            '2XL': '_2X',   // Some brands use _2X (same as XXL)
-            '3XL': '_3X',
-            '4XL': '_4X',
-            '5XL': '_5X',
-            '6XL': '_6X',
-            '7XL': '_7X',
-            '8XL': '_8X',
-            '9XL': '_9X',
-            '10XL': '_10X',
-            // Tall sizes: Keep full suffix
-            'LT': 'T_LT',
-            'XLT': 'T_XLT',
-            '2XLT': 'T_2XLT',
-            '3XLT': 'T_3XLT',
-            '4XLT': 'T_4XLT',
-            '5XLT': 'T_5XLT',
-            // Big sizes: B_ prefix
-            '1XB': 'B_1XB',
-            '2XB': 'B_2XB',
-            '3XB': 'B_3XB',
-            '4XB': 'B_4XB',
-            '5XB': 'B_5XB',
-            '6XB': 'B_6XB'
-        };
-
         // Initialize EmailJS if available
         if (typeof emailjs !== 'undefined') {
             emailjs.init(this.emailPublicKey);
@@ -94,8 +56,8 @@ class SampleOrderService {
     }
 
     /**
-     * Expand a sample cart item into multiple line items with proper part number suffixes
-     * Mirrors the logic from shopworks-guide-generator.js for consistency
+     * Expand a sample cart item into multiple line items
+     * ShopWorks Size Translation Table handles size suffix conversion internally
      *
      * @param {Object} sample - Sample cart item with sizes object
      * @param {string} sample.style - Base part number (e.g., "PC54")
@@ -116,23 +78,19 @@ class SampleOrderService {
         Object.entries(sample.sizes || {}).forEach(([size, qty]) => {
             if (!qty || qty === 0) return;
 
-            // Get suffix (empty string for standard sizes S/M/L/XL, _2X for oversizes)
-            const suffix = this.partNumberSuffixMap[size] || `_${size}`;
-            const partNumber = `${basePartNumber}${suffix}`;
-
             const lineItem = {
-                partNumber: partNumber,           // "PC54" or "PC54_2X" or "PC54_3X"
+                partNumber: basePartNumber,       // Just "PC54" - ShopWorks handles size suffixes
                 description: sample.name,
                 color: sample.catalogColor,       // CRITICAL: Use CATALOG_COLOR for ShopWorks
-                size: size,                       // "S", "M", "L", "XL", "2XL", etc.
+                size: size,                       // "S", "M", "L", "XL", "2XL", etc. in separate field
                 quantity: parseInt(qty),          // Actual quantity for this size
-                price: sample.price || 0.01,      // Nominal price or actual paid price
+                price: parseFloat(sample.price) || 0,  // Use actual price, no hardcoded fallback
                 notes: (sample.type === 'paid' && sample.price > 0)
                     ? `PAID SAMPLE - Invoice customer $${sample.price.toFixed(2)}`
                     : 'FREE SAMPLE'
             };
 
-            console.log(`  → ${partNumber} (${size}): ${qty} units`);
+            console.log(`  → ${basePartNumber} (${size}): ${qty} units`);
             lineItems.push(lineItem);
         });
 

@@ -585,6 +585,9 @@
                     .map(([size, qty]) => `<span class="size-badge">${size} (${qty})</span>`)
                     .join('');
 
+                const totalQty = Object.values(item.sizes).reduce((sum, qty) => sum + qty, 0);
+                const itemPrice = parseFloat(item.price) || 0;
+
                 return `
                     <div class="cart-item" data-index="${index}">
                         <img src="${item.imageUrl || 'https://via.placeholder.com/100'}" alt="${item.name}" class="item-image">
@@ -592,7 +595,10 @@
                             <h3>${item.name}</h3>
                             <div class="item-style">Style: ${item.style}</div>
                             <div class="item-color">Color: ${item.color}</div>
-                            <div class="item-sizes">${sizesDisplay}</div>
+                            <div class="item-sizes">Sizes: ${sizesDisplay}</div>
+                            <div class="item-price" style="margin-top: 0.5rem; font-weight: 600; color: var(--primary-color);">
+                                ${totalQty} ${totalQty === 1 ? 'item' : 'items'} × $${itemPrice.toFixed(2)} = $${(totalQty * itemPrice).toFixed(2)}
+                            </div>
                         </div>
                         <div class="item-remove" onclick="removeItem(${index})">
                             <i class="fas fa-times"></i>

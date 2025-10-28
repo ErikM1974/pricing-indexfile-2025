@@ -20,14 +20,37 @@
     
     <!-- EmailJS for sample request notifications -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
+
+    <!-- Cart Drawer Component -->
+    <link rel="stylesheet" href="../shared_components/css/cart-drawer.css">
+    <script src="../shared_components/js/cart-drawer.js"></script>
+
+    <!-- Sample Order Service for ShopWorks Integration -->
+    <script src="../shared_components/js/sample-order-service.js"></script>
+
     <!-- Embed Sample Request functionality directly to avoid path issues -->
     <script>
         // Embedded sample cart functionality  
         class SampleCart {
             constructor() {
                 this.maxSamples = 3;
-                this.samples = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+
+                // Load cart with backward compatibility
+                const cartData = sessionStorage.getItem('sampleCart');
+                if (cartData) {
+                    try {
+                        const parsed = JSON.parse(cartData);
+                        // New format: {samples: [...]}
+                        // Old format: [...]
+                        this.samples = Array.isArray(parsed) ? parsed : (parsed.samples || []);
+                    } catch (e) {
+                        console.error('[SampleCart] Error parsing cart data:', e);
+                        this.samples = [];
+                    }
+                } else {
+                    this.samples = [];
+                }
+
                 this.eligibilityCache = {};
                 this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
                 this.initializeUI();
@@ -59,7 +82,12 @@
             bindEvents() {
                 const widget = document.getElementById('sampleCartWidget');
                 if (widget) {
-                    widget.addEventListener('click', () => this.openSampleModal());
+                    widget.addEventListener('click', () => {
+                        // Open drawer to view cart
+                        if (window.cartDrawer) {
+                            window.cartDrawer.open();
+                        }
+                    });
                 }
             }
 
@@ -96,21 +124,49 @@
                     }
                     
                     // Extract available colors and sizes from all items
-                    const colors = [];
+                    const colorNames = new Set();
                     const sizesSet = new Set();
-                    
+
                     data.forEach(item => {
                         if (item.color) {
-                            colors.push({
-                                name: item.color,
-                                code: item.color.toUpperCase().replace(/\s+/g, '_')
-                            });
+                            colorNames.add(item.color);
                         }
                         // Get sizes from basePrices keys
                         Object.keys(item.basePrices || {}).forEach(size => {
                             sizesSet.add(size);
                         });
                     });
+
+                    // Fetch CATALOG_COLOR values from color swatches API
+                    let colors = [];
+                    try {
+                        const swatchResponse = await fetch(`${this.apiBase}/api/color-swatches?styleNumber=${styleNumber}`);
+                        if (swatchResponse.ok) {
+                            const swatches = await swatchResponse.json();
+                            colors = swatches.map(swatch => ({
+                                name: swatch.COLOR_NAME,           // Display name
+                                catalogColor: swatch.CATALOG_COLOR, // ShopWorks internal name
+                                swatchUrl: swatch.COLOR_SQUARE_IMAGE // Sanmar swatch image URL
+                            })).filter(color => colorNames.has(color.name));
+                            console.log(`  → Fetched ${colors.length} colors with CATALOG_COLOR mapping`);
+                        } else {
+                            // Fallback to simple color array if API fails
+                            console.warn(`  → Color swatches API failed, using fallback`);
+                            colors = Array.from(colorNames).map(name => ({
+                                name: name,
+                                catalogColor: name, // Use display name as fallback
+                                swatchUrl: null     // No image available for fallback
+                            }));
+                        }
+                    } catch (swatchError) {
+                        // Fallback to simple color array
+                        console.warn(`  → Error fetching color swatches:`, swatchError);
+                        colors = Array.from(colorNames).map(name => ({
+                            name: name,
+                            catalogColor: name, // Use display name as fallback
+                            swatchUrl: null     // No image available for fallback
+                        }));
+                    }
                     
                     const sizes = Array.from(sizesSet).sort((a, b) => {
                         // Sort sizes logically
@@ -174,6 +230,7 @@
                     imageUrl: product.imageUrl || '',
                     color: product.color || '',  // Store actual color name
                     colorCode: product.colorCode || '',  // Store color code
+                    catalogColor: product.catalogColor || product.color || '',  // ShopWorks catalog color (CRITICAL!)
                     size: product.size || '',  // Store selected size
                     price: product.price || 0,
                     type: product.type || 'free',
@@ -195,18 +252,30 @@
                 return true;
             }
 
-            removeSample(styleNumber) {
-                const index = this.samples.findIndex(s => s.style === styleNumber);
-                if (index !== -1) {
+            removeSample(styleNumberOrIndex) {
+                let index;
+
+                // Support both styleNumber (string) and index (number)
+                if (typeof styleNumberOrIndex === 'number') {
+                    index = styleNumberOrIndex;
+                } else {
+                    index = this.samples.findIndex(s => s.style === styleNumberOrIndex);
+                }
+
+                if (index !== -1 && index < this.samples.length) {
                     const removed = this.samples.splice(index, 1)[0];
                     this.save();
                     this.updateUI();
                     this.showNotification(`${removed.name} removed from samples`, 'info');
-                    
+
                     if (this.samples.length === 0) {
                         this.hideWidget();
                     }
+
+                    return true;
                 }
+
+                return false;
             }
 
             clearCart() {
@@ -217,7 +286,11 @@
             }
 
             save() {
-                sessionStorage.setItem('sampleCart', JSON.stringify(this.samples));
+                // Save in structured format for checkout-review.html compatibility
+                sessionStorage.setItem('sampleCart', JSON.stringify({
+                    samples: this.samples,
+                    updatedAt: new Date().toISOString()
+                }));
             }
 
             updateUI() {
@@ -276,9 +349,10 @@
             }
 
             openSampleModal() {
-                window.dispatchEvent(new CustomEvent('openSampleModal', {
-                    detail: { samples: this.samples }
-                }));
+                // Open drawer to view cart
+                if (window.cartDrawer) {
+                    window.cartDrawer.open();
+                }
             }
 
             showNotification(message, type = 'info') {
@@ -2267,149 +2341,6 @@
         </div>
     </footer>
 
-    <!-- Sample Request Modal -->
-    <div id="sampleRequestModal" class="sample-modal">
-        <div class="sample-modal-content">
-            <div class="sample-modal-header">
-                <h2 class="sample-modal-title">Complete Your Sample Request</h2>
-                <p class="sample-modal-subtitle">We'll send these samples to you for FREE!</p>
-                <button class="sample-modal-close" onclick="closeSampleModal()">&times;</button>
-            </div>
-            <div class="sample-modal-body">
-                <!-- Selected samples -->
-                <div class="selected-samples">
-                    <h3>Selected Samples (<span id="sampleCount">0</span>/3)</h3>
-                    <div id="selectedSamplesList">
-                        <!-- Samples will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <!-- Contact form -->
-                <form id="sampleRequestForm" class="sample-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="sampleName">Your Name *</label>
-                            <input type="text" id="sampleName" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="sampleEmail">Email Address *</label>
-                            <input type="email" id="sampleEmail" name="email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="samplePhone">Phone Number</label>
-                            <input type="tel" id="samplePhone" name="phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="sampleCompany">Company Name</label>
-                            <input type="text" id="sampleCompany" name="company">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="projectType">What type of decoration are you interested in? *</label>
-                        <select id="projectType" name="projectType" required>
-                            <option value="">Select decoration type...</option>
-                            <option value="Screen Printing">Screen Printing</option>
-                            <option value="DTG Printing">DTG (Direct to Garment) Printing</option>
-                            <option value="Embroidery">Embroidery</option>
-                            <option value="Heat Transfer">Heat Transfer</option>
-                            <option value="Not Sure Yet">Not Sure Yet</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="estimatedQuantity">Estimated Quantity Needed</label>
-                            <select id="estimatedQuantity" name="estimatedQuantity">
-                                <option value="">Select quantity...</option>
-                                <option value="1-24">1-24 pieces</option>
-                                <option value="25-49">25-49 pieces</option>
-                                <option value="50-99">50-99 pieces</option>
-                                <option value="100-249">100-249 pieces</option>
-                                <option value="250-499">250-499 pieces</option>
-                                <option value="500+">500+ pieces</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="timeline">When do you need these?</label>
-                            <select id="timeline" name="timeline">
-                                <option value="">Select timeline...</option>
-                                <option value="ASAP">ASAP</option>
-                                <option value="Within 1 week">Within 1 week</option>
-                                <option value="Within 2 weeks">Within 2 weeks</option>
-                                <option value="Within 1 month">Within 1 month</option>
-                                <option value="Just researching">Just researching</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="sampleNotes">Additional Notes (optional)</label>
-                        <textarea id="sampleNotes" name="notes" rows="3" placeholder="Tell us about your project or any specific requirements..."></textarea>
-                    </div>
-                    
-                    <!-- Delivery Method -->
-                    <div class="form-group">
-                        <label>How would you like to receive your samples? *</label>
-                        <div class="delivery-options">
-                            <label class="radio-option">
-                                <input type="radio" name="deliveryMethod" value="pickup" checked onchange="toggleShippingFields()">
-                                <span class="radio-label">
-                                    <i class="fas fa-store"></i> Pickup at NWCA (FREE)
-                                    <small>2025 Freeman Road East, Milton, WA | Mon-Fri 9AM-5PM</small>
-                                </span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="deliveryMethod" value="ship" onchange="toggleShippingFields()">
-                                <span class="radio-label">
-                                    <i class="fas fa-shipping-fast"></i> Ship to me (+$10.00)
-                                    <small>2-3 business days via USPS/UPS</small>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Shipping Address (hidden by default) -->
-                    <div id="shippingFields" style="display: none;">
-                        <h4 style="margin: 1.5rem 0 1rem 0;">Shipping Address</h4>
-                        <div class="form-group">
-                            <label for="shippingAddress">Street Address *</label>
-                            <input type="text" id="shippingAddress" name="shippingAddress" placeholder="123 Main Street">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="shippingCity">City *</label>
-                                <input type="text" id="shippingCity" name="shippingCity" placeholder="Seattle">
-                            </div>
-                            <div class="form-group" style="width: 30%;">
-                                <label for="shippingState">State *</label>
-                                <input type="text" id="shippingState" name="shippingState" placeholder="WA" maxlength="2">
-                            </div>
-                            <div class="form-group" style="width: 30%;">
-                                <label for="shippingZip">ZIP *</label>
-                                <input type="text" id="shippingZip" name="shippingZip" placeholder="98101" pattern="[0-9]{5}">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Total Display -->
-                    <div class="order-total-display" id="orderTotalDisplay" style="display: none;">
-                        <h4>Order Summary</h4>
-                        <div class="total-line"><span>Samples:</span> <span id="samplesSubtotal">$0.00</span></div>
-                        <div class="total-line" id="shippingLine" style="display: none;"><span>Shipping:</span> <span>$10.00</span></div>
-                        <div class="total-line total-final"><span>Total to Collect:</span> <span id="finalTotal">$0.00</span></div>
-                    </div>
-                    
-                    <button type="submit" class="form-submit" id="submitSampleRequest">
-                        <i class="fas fa-paper-plane"></i> <span id="submitButtonText">Request Free Samples</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script>
         // Complete top sellers data - ALL 60 products
@@ -3192,74 +3123,40 @@
         });
         
         // Handle sample request button click
-        function handleSampleRequest(styleNumber, productName, imageUrl) {
-            if (!window.sampleCart) return;
-            
-            // Get the button to retrieve pricing info
-            const button = event.target.closest('.btn-sample');
-            const samplePrice = parseFloat(button.dataset.samplePrice) || 0;
-            const sampleType = button.dataset.sampleType || 'free';
-            
-            // Check if already in cart
-            const cartSummary = window.sampleCart.getCartSummary();
-            const existingItem = cartSummary.items.find(item => item.style === styleNumber);
-            
-            if (existingItem) {
-                // Remove from cart
-                window.sampleCart.removeSample(styleNumber);
-                return;
-            }
-            
-            // Get cached eligibility data with colors/sizes
-            const eligibilityData = window.sampleCart.eligibilityCache[styleNumber];
-            if (!eligibilityData || !eligibilityData.colors || eligibilityData.colors.length === 0 || 
-                !eligibilityData.sizes || eligibilityData.sizes.length === 0) {
-                // Try to fetch the data if not available
-                console.log('No color/size data cached for', styleNumber, '- fetching...');
-                
-                // Show loading indicator
-                const button = event.target.closest('.btn-sample');
-                if (button) {
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        async function handleSampleRequest(styleNumber, productName, imageUrl) {
+            // Navigate to product detail page in sample mode
+            // Determine product type from current tab filter
+            let productType = 'dtg'; // default
+
+            // Check active tab to determine type
+            const activeTab = document.querySelector('.filter-option.active');
+            if (activeTab) {
+                const tabText = activeTab.textContent.trim().toLowerCase();
+                if (tabText.includes('screen print')) {
+                    productType = 'screenprint';
+                } else if (tabText.includes('embroidery')) {
+                    productType = 'embroidery';
+                } else if (tabText.includes('caps')) {
+                    productType = 'caps';
                 }
-                
-                // Fetch the eligibility data
-                window.sampleCart.checkEligibility(styleNumber).then(data => {
-                    // Re-enable button
-                    if (button) {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
-                    }
-                    
-                    if (data.eligible && data.colors && data.colors.length > 0 && 
-                        data.sizes && data.sizes.length > 0) {
-                        // Update button with pricing info
-                        if (button) {
-                            button.dataset.samplePrice = data.price || 0;
-                            button.dataset.sampleType = data.type || 'free';
-                        }
-                        // Now show the modal with the fetched data
-                        showSampleSelectionModal(styleNumber, productName, imageUrl, 
-                                                data.price, data.type, data);
-                    } else {
-                        // Can't get data - show error
-                        console.error('Unable to get color/size options for', styleNumber, data);
-                        alert('Unable to load color/size options for this product. Please try again or contact customer service.');
-                    }
-                }).catch(error => {
-                    console.error('Error fetching eligibility data:', error);
-                    if (button) {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fas fa-box-open"></i> Request Sample';
-                    }
-                    alert('Error loading product options. Please try again.');
-                });
-                return;
             }
-            
-            // Show color/size selection modal
-            showSampleSelectionModal(styleNumber, productName, imageUrl, samplePrice, sampleType, eligibilityData);
+
+            // Get price from eligibility check
+            let price = 0;
+            let sampleType = 'free';
+            if (window.sampleCart) {
+                const eligibility = await window.sampleCart.checkEligibility(styleNumber);
+                if (eligibility.eligible) {
+                    price = eligibility.price || 0;
+                    sampleType = eligibility.type || 'free';
+                }
+            }
+
+            // Build URL for product detail page with sample mode AND price
+            const url = `top-sellers-product.html?style=${encodeURIComponent(styleNumber)}&name=${encodeURIComponent(productName)}&type=${productType}&mode=sample&price=${price}&sampleType=${sampleType}`;
+
+            // Navigate to product detail page
+            window.location.href = url;
         }
         
         // Show modal for color/size selection
@@ -3270,248 +3167,32 @@
                 alert('Unable to load color options for this product. Please try again or contact customer service.');
                 return;
             }
-            
+
             if (!eligibilityData.sizes || eligibilityData.sizes.length === 0) {
                 console.error('No sizes available for', styleNumber);
                 alert('Unable to load size options for this product. Please try again or contact customer service.');
                 return;
             }
-            
-            // Create a simple selection modal
-            const modal = document.createElement('div');
-            modal.className = 'sample-selection-modal';
-            modal.innerHTML = `
-                <div class="sample-selection-content">
-                    <h3>Select Options for ${productName}</h3>
-                    <p>Style #${styleNumber}</p>
-                    ${price > 0 ? `<p style="color: #dc2626; font-weight: 500;">Sample Price: $${price.toFixed(2)}</p>` : '<p style="color: #10b981; font-weight: 500;">FREE Sample</p>'}
-                    
-                    <div class="selection-group">
-                        <label>Color: <span style="color: red;">*</span></label>
-                        <select id="sampleColorSelect" required>
-                            <option value="">Choose color...</option>
-                            ${eligibilityData.colors.map(c => 
-                                `<option value="${c.code || c.name}">${c.name}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="selection-group">
-                        <label>Size: <span style="color: red;">*</span></label>
-                        <select id="sampleSizeSelect" required>
-                            <option value="">Choose size...</option>
-                            ${eligibilityData.sizes.map(s => 
-                                `<option value="${s}">${s}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="selection-actions">
-                        <button onclick="cancelSampleSelection()" class="btn-cancel">Cancel</button>
-                        <button onclick="confirmSampleSelection('${styleNumber}', '${productName.replace(/'/g, "\\'")}', '${imageUrl}', ${price}, '${type}')" class="btn-confirm">
-                            Add to Samples
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        
-        // Cancel selection
-        function cancelSampleSelection() {
-            const modal = document.querySelector('.sample-selection-modal');
-            if (modal) {
-                modal.classList.remove('active');
-                setTimeout(() => modal.remove(), 300);
-            }
-        }
-        
-        // Confirm selection and add to cart
-        function confirmSampleSelection(styleNumber, productName, imageUrl, price, type) {
-            const colorSelect = document.getElementById('sampleColorSelect');
-            const sizeSelect = document.getElementById('sampleSizeSelect');
-            
-            if (!colorSelect.value || !sizeSelect.value) {
-                alert('Please select both color and size');
-                return;
-            }
-            
-            const selectedColor = colorSelect.options[colorSelect.selectedIndex].text;
-            const selectedSize = sizeSelect.value;
-            
-            // Add to cart with selections
-            window.sampleCart.addSample({
-                style: styleNumber,
-                name: productName,
-                description: productName,
-                imageUrl: imageUrl,
-                price: price,
-                type: type,
-                color: selectedColor,
-                colorCode: colorSelect.value,
-                size: selectedSize
-            });
-            
-            // Close modal
-            cancelSampleSelection();
-        }
-        
-        // Open sample modal
-        function openSampleModal(samples) {
-            const modal = document.getElementById('sampleRequestModal');
-            const samplesList = document.getElementById('selectedSamplesList');
-            const sampleCount = document.getElementById('sampleCount');
-            
-            // Update sample count
-            sampleCount.textContent = samples.length;
-            
-            // Clear and populate samples list
-            samplesList.innerHTML = '';
-            let totalSamplesCost = 0;
-            
-            samples.forEach(sample => {
-                // Add to total if it's a paid sample
-                if (sample.price > 0) {
-                    totalSamplesCost += sample.price;
-                }
-                
-                const sampleItem = document.createElement('div');
-                sampleItem.className = 'sample-item';
-                sampleItem.innerHTML = `
-                    <div class="sample-item-image">
-                        ${sample.imageUrl ? 
-                            `<img src="${sample.imageUrl}" alt="${sample.name}">` :
-                            `<i class="fas fa-tshirt" style="font-size: 2rem; color: var(--text-secondary);"></i>`
-                        }
-                    </div>
-                    <div class="sample-item-info">
-                        <div class="sample-item-name">${sample.name}</div>
-                        <div class="sample-item-style">Style #${sample.style}</div>
-                        <div class="sample-item-details">
-                            ${sample.color ? `Color: ${sample.color}` : '<span style="color: #dc2626;">⚠️ No color selected</span>'} 
-                            ${sample.size ? `| Size: ${sample.size}` : '| <span style="color: #dc2626;">⚠️ No size selected</span>'}
-                            ${sample.price > 0 ? `| $${sample.price.toFixed(2)}` : '| FREE'}
-                        </div>
-                    </div>
-                    <button class="sample-item-remove" onclick="removeSampleFromModal('${sample.style}')" title="Remove">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                samplesList.appendChild(sampleItem);
-            });
-            
-            // Update order total display
-            updateOrderTotal(totalSamplesCost);
-            
-            // Show modal
-            modal.classList.add('active');
-        }
-        
-        // Close sample modal
-        function closeSampleModal() {
-            document.getElementById('sampleRequestModal').classList.remove('active');
-        }
-        
-        // Toggle shipping fields based on delivery method
-        function toggleShippingFields() {
-            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
-            const shippingFields = document.getElementById('shippingFields');
-            const shippingLine = document.getElementById('shippingLine');
-            
-            if (deliveryMethod === 'ship') {
-                shippingFields.style.display = 'block';
-                shippingLine.style.display = 'flex';
-                // Make shipping fields required
-                document.getElementById('shippingAddress').required = true;
-                document.getElementById('shippingCity').required = true;
-                document.getElementById('shippingState').required = true;
-                document.getElementById('shippingZip').required = true;
-            } else {
-                shippingFields.style.display = 'none';
-                shippingLine.style.display = 'none';
-                // Remove required from shipping fields
-                document.getElementById('shippingAddress').required = false;
-                document.getElementById('shippingCity').required = false;
-                document.getElementById('shippingState').required = false;
-                document.getElementById('shippingZip').required = false;
-            }
-            
-            // Recalculate total
-            const currentSamplesTotal = parseFloat(document.getElementById('samplesSubtotal').textContent.replace('$', '')) || 0;
-            updateOrderTotal(currentSamplesTotal);
-        }
-        
-        // Update order total display
-        function updateOrderTotal(samplesCost) {
-            const orderTotalDisplay = document.getElementById('orderTotalDisplay');
-            const samplesSubtotal = document.getElementById('samplesSubtotal');
-            const finalTotal = document.getElementById('finalTotal');
-            const submitButtonText = document.getElementById('submitButtonText');
-            const shippingLine = document.getElementById('shippingLine');
-            
-            // Get delivery method
-            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
-            const shippingCost = deliveryMethod === 'ship' ? 10.00 : 0;
-            
-            // Calculate tax (10.1% Milton sales tax on taxable items)
-            const taxRate = 0.101;
-            const taxableAmount = samplesCost + shippingCost;
-            const salesTax = taxableAmount > 0 ? taxableAmount * taxRate : 0;
-            const total = taxableAmount + salesTax;
-            
-            // Update display
-            samplesSubtotal.textContent = `$${samplesCost.toFixed(2)}`;
-            
-            // Add or update tax line if needed
-            let taxLine = document.getElementById('taxLine');
-            if (salesTax > 0) {
-                if (!taxLine) {
-                    taxLine = document.createElement('div');
-                    taxLine.id = 'taxLine';
-                    taxLine.className = 'total-line';
-                    taxLine.innerHTML = `<span>Tax (10.1%):</span> <span id="taxAmount">$${salesTax.toFixed(2)}</span>`;
-                    // Insert before final total
-                    const finalTotalLine = document.querySelector('.total-line.total-final');
-                    finalTotalLine.parentNode.insertBefore(taxLine, finalTotalLine);
-                } else {
-                    document.getElementById('taxAmount').textContent = `$${salesTax.toFixed(2)}`;
-                }
-                taxLine.style.display = 'flex';
-            } else if (taxLine) {
-                taxLine.style.display = 'none';
-            }
-            
-            finalTotal.textContent = `$${total.toFixed(2)}`;
-            
-            // Show/hide order total display and update button text
-            if (total > 0) {
-                orderTotalDisplay.style.display = 'block';
-                submitButtonText.textContent = `Submit Sample Order ($${total.toFixed(2)})`;
-            } else {
-                if (window.sampleCart && window.sampleCart.samples.length > 0) {
-                    // Has free samples
-                    orderTotalDisplay.style.display = 'none';
-                    submitButtonText.textContent = 'Request Free Samples';
-                } else {
-                    orderTotalDisplay.style.display = 'none';
-                    submitButtonText.textContent = 'Request Samples';
-                }
-            }
-        }
-        
-        // Remove sample from modal
-        function removeSampleFromModal(styleNumber) {
-            if (window.sampleCart) {
-                window.sampleCart.removeSample(styleNumber);
-                // Refresh modal
-                const cartSummary = window.sampleCart.getCartSummary();
-                if (cartSummary.items.length > 0) {
-                    openSampleModal(cartSummary.items);
-                } else {
-                    closeSampleModal();
-                }
+
+            // Open drawer with product selection
+            if (window.cartDrawer) {
+                const productData = {
+                    style: styleNumber,
+                    name: productName,
+                    description: '',
+                    imageUrl: imageUrl,
+                    price: price || 0,
+                    type: type || 'free',
+                    colors: eligibilityData.colors.map(c => ({
+                        name: c.name,
+                        code: c.name,
+                        catalogColor: c.catalogColor || c.name,
+                        swatchUrl: c.swatchUrl // Sanmar swatch image URL
+                    })),
+                    sizes: eligibilityData.sizes
+                };
+
+                window.cartDrawer.open(productData);
             }
         }
         
@@ -3530,7 +3211,8 @@
                 
                 // Get form data
                 const formData = {
-                    name: document.getElementById('sampleName').value,
+                    firstName: document.getElementById('sampleFirstName').value,
+                    lastName: document.getElementById('sampleLastName').value,
                     email: document.getElementById('sampleEmail').value,
                     phone: document.getElementById('samplePhone').value,
                     company: document.getElementById('sampleCompany').value,
@@ -3540,13 +3222,23 @@
                     notes: document.getElementById('sampleNotes').value,
                     deliveryMethod: deliveryMethod
                 };
-                
-                // Add shipping address if needed
+
+                // Validate shipping fields if ship method selected
                 if (deliveryMethod === 'ship') {
-                    formData.shippingAddress = document.getElementById('shippingAddress').value;
-                    formData.shippingCity = document.getElementById('shippingCity').value;
-                    formData.shippingState = document.getElementById('shippingState').value;
-                    formData.shippingZip = document.getElementById('shippingZip').value;
+                    formData.address1 = document.getElementById('shippingAddress1').value;
+                    formData.address2 = document.getElementById('shippingAddress2').value || '';
+                    formData.city = document.getElementById('shippingCity').value;
+                    formData.state = document.getElementById('shippingState').value;
+                    formData.zip = document.getElementById('shippingZip').value;
+
+                    // Validate required shipping fields
+                    if (!formData.address1 || !formData.city || !formData.state || !formData.zip) {
+                        alert('Please fill out all required shipping address fields');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalButtonText;
+                        return;
+                    }
+
                     formData.shippingCost = 10.00;
                 } else {
                     formData.shippingCost = 0;
@@ -3611,10 +3303,12 @@
                     }
                 };
                 
-                // Save to database
-                const result = await sampleRequestService.saveSampleRequest(formData, cartSummary.items);
-                
+                // Submit order to ShopWorks via sample-order-service.js
+                console.log('[Sample Order] Submitting order to ShopWorks...');
+                const result = await window.sampleOrderService.submitOrder(formData, cartSummary.items);
+
                 if (result.success) {
+                    console.log('[Sample Order] Order submitted successfully:', result.orderNumber);
                     // Show success message
                     let message;
                     if (formData.totalAmount > 0) {
@@ -3628,9 +3322,9 @@
                         breakdown += `\n────────────────`;
                         breakdown += `\nTotal: $${formData.totalAmount.toFixed(2)}`;
                         
-                        message = `Success! Your sample request ${result.requestID} has been submitted.\n\n${breakdown}\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nAn account executive will contact you to process payment.`;
+                        message = `Success! Your sample order ${result.orderNumber} has been submitted to our production system.\n\n${breakdown}\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nAn account executive will contact you to process payment.`;
                     } else {
-                        message = `Success! Your free sample request ${result.requestID} has been submitted.\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}`;
+                        message = `Success! Your FREE sample order ${result.orderNumber} has been submitted to our production system.\n\n${deliveryMethod === 'ship' ? 'We\'ll ship your samples within 2 business days.' : 'Your samples will be ready for pickup within 2 business days.'}\n\nYou'll receive a confirmation email shortly.`;
                     }
                     
                     alert(message);

@@ -753,11 +753,16 @@
 
             <!-- Size & Quantity Selection (for sample mode) - MOVED HERE -->
             <div class="size-quantity-section" id="sizeQuantitySection" style="display: none; margin-top: 1rem; margin-bottom: 2rem;">
-                <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                    <i class="fas fa-info-circle" style="color: #f59e0b; margin-right: 0.5rem;"></i>
-                    <strong>Free Sample Policy:</strong> Free samples are limited to 3 items per order. Orders exceeding this limit will be reviewed by our sales team.
-                </div>
                 <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text-primary);">Select Sizes & Quantities</h3>
+
+                <!-- Current Color Indicator -->
+                <div id="currentColorIndicator" style="background: var(--bg-color); padding: 0.75rem; margin-bottom: 1rem; border-radius: 8px; border-left: 4px solid var(--primary-color); display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-palette" style="color: var(--primary-color); font-size: 1.125rem;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Current Color</div>
+                        <div id="currentColorName" style="font-weight: 600; color: var(--text-primary); font-size: 1rem;">Loading...</div>
+                    </div>
+                </div>
 
                 <div class="size-quantity-grid" id="sizeQuantityGrid">
                     <!-- Dynamically populated with available sizes -->
@@ -765,9 +770,9 @@
 
                 <div class="sample-summary" id="sampleSummary" style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 8px; border: 2px solid var(--border-color);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> samples</strong>
+                        <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> items</strong>
                         <button id="addToCartBtn" class="btn btn-primary" onclick="addToSampleCart()" disabled style="opacity: 0.5; cursor: not-allowed;">
-                            <i class="fas fa-shopping-cart"></i> Add to Sample Cart
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
                     </div>
                 </div>
@@ -868,7 +873,9 @@
                 name: params.get('name'),
                 type: params.get('type'),
                 mode: params.get('mode'),
-                ref: params.get('ref')
+                ref: params.get('ref'),
+                price: params.get('price'),
+                sampleType: params.get('sampleType')
             };
         }
 
@@ -1014,7 +1021,7 @@
         function selectColor(colorIndex) {
             selectedColorIndex = colorIndex;
             const product = currentProducts[colorIndex];
-            
+
             // Update active swatch
             document.querySelectorAll('.color-swatch').forEach((swatch, index) => {
                 if (parseInt(swatch.dataset.colorIndex) === colorIndex) {
@@ -1023,20 +1030,30 @@
                     swatch.classList.remove('active');
                 }
             });
-            
+
             // Collect available images for this color
             availableImages = {};
             if (product.FRONT_MODEL) availableImages['model-front'] = product.FRONT_MODEL;
             if (product.BACK_MODEL) availableImages['model-back'] = product.BACK_MODEL;
             if (product.FRONT_FLAT) availableImages['flat-front'] = product.FRONT_FLAT;
             if (product.BACK_FLAT) availableImages['flat-back'] = product.BACK_FLAT;
-            
+
             // Reset to front model view when changing colors
             currentImageType = Object.keys(availableImages)[0] || 'model-front';
-            
+
             // Update displays with new color's images
             updateMainImage();
             createThumbnails();
+
+            // In sample mode, update color indicator and reset size selections
+            const params = getUrlParams();
+            if (params.mode === 'sample') {
+                updateColorIndicator();
+                // Reset size selections when switching colors
+                selectedSamples = {};
+                updateSampleSummary();
+                populateSizeQuantityGrid();
+            }
         }
         
         // Update the main image display
@@ -1344,8 +1361,19 @@
                 document.getElementById('ctaSection').style.display = 'none';
                 document.getElementById('sizeQuantitySection').style.display = 'block';
 
+                // Update color indicator
+                updateColorIndicator();
+
                 // Populate available sizes
                 populateSizeQuantityGrid();
+            }
+        }
+
+        // Update color indicator with current selection
+        function updateColorIndicator() {
+            const colorNameEl = document.getElementById('currentColorName');
+            if (colorNameEl && currentProducts[selectedColorIndex]) {
+                colorNameEl.textContent = currentProducts[selectedColorIndex].COLOR_NAME;
             }
         }
 
@@ -1442,18 +1470,25 @@
         // Update sample summary and button state
         function updateSampleSummary() {
             const totalSelected = Object.values(selectedSamples).reduce((sum, qty) => sum + qty, 0);
-            document.getElementById('selectedCount').textContent = totalSelected;
+
+            // Add null check to prevent errors after success message
+            const selectedCountEl = document.getElementById('selectedCount');
+            if (selectedCountEl) {
+                selectedCountEl.textContent = totalSelected;
+            }
 
             // Enable button if ANY samples selected
             const addButton = document.getElementById('addToCartBtn');
-            if (totalSelected > 0) {
-                addButton.disabled = false;
-                addButton.style.opacity = '1';
-                addButton.style.cursor = 'pointer';
-            } else {
-                addButton.disabled = true;
-                addButton.style.opacity = '0.5';
-                addButton.style.cursor = 'not-allowed';
+            if (addButton) {
+                if (totalSelected > 0) {
+                    addButton.disabled = false;
+                    addButton.style.opacity = '1';
+                    addButton.style.cursor = 'pointer';
+                } else {
+                    addButton.disabled = true;
+                    addButton.style.opacity = '0.5';
+                    addButton.style.cursor = 'not-allowed';
+                }
             }
         }
 
@@ -1494,9 +1529,9 @@
                 catalogColor: product.CATALOG_COLOR,
                 imageUrl: product.FRONT_MODEL || product.FRONT_FLAT || '',
                 sizes: { ...selectedSamples },
-                type: params.type,
-                price: 0.01,          // Nominal price for free samples
-                sampleType: 'free',   // For ShopWorks categorization
+                type: params.sampleType || params.type || 'free',  // Use sampleType from URL
+                price: parseFloat(params.price) || 0,  // Use actual price from URL
+                sampleType: params.sampleType || 'free',  // For ShopWorks categorization
                 addedAt: new Date().toISOString()
             };
 
@@ -1530,13 +1565,13 @@
             summary.innerHTML = `
                 <div style="text-align: center; color: var(--primary-color);">
                     <i class="fas fa-check-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                    <div><strong>Added to Sample Cart!</strong></div>
+                    <div><strong>Added to Cart!</strong></div>
                     <div style="margin-top: 0.5rem;">
                         <a href="/sample-cart.html" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
-                            View Cart & Checkout
+                            View Cart
                         </a>
-                        <button onclick="resetForAnotherSample()" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem; margin-left: 0.5rem;">
-                            Add Another Sample
+                        <button onclick="resetForAnotherSample()" style="font-size: 0.9rem; padding: 0.5rem 1rem; margin-left: 0.5rem; background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-plus"></i> Add Another Color
                         </button>
                     </div>
                 </div>

@@ -344,14 +344,14 @@
                 <!-- Free Samples Notice -->
                 <div id="freeNotice" class="payment-notice" style="display: none; background: #d4edda; border-color: #c3e6cb;">
                     <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                    <strong>Free Samples!</strong><br>
-                    Your samples are FREE. We'll ship them to you at no charge.
+                    <strong>Free Shipping!</strong><br>
+                    All samples ship free - no shipping charges.
                 </div>
             </div>
 
             <!-- Submit Button -->
             <button type="button" class="btn-submit" id="submitOrder">
-                <i class="fas fa-paper-plane"></i> Submit Sample Request
+                <i class="fas fa-paper-plane"></i> Submit Order
             </button>
         </div>
 
@@ -396,12 +396,20 @@
             let hasPaidSamples = false;
 
             samples.forEach((sample, index) => {
-                const samplePrice = sample.price || 0;
-                subtotal += samplePrice;
+                const totalQty = Object.values(sample.sizes || {}).reduce((sum, qty) => sum + qty, 0);
+                const samplePrice = parseFloat(sample.price) || 0;
+                const itemTotal = totalQty * samplePrice;
+                subtotal += itemTotal;
 
                 if (samplePrice > 0) {
                     hasPaidSamples = true;
                 }
+
+                // Format size breakdown
+                const sizesDisplay = Object.entries(sample.sizes || {})
+                    .filter(([size, qty]) => qty > 0)
+                    .map(([size, qty]) => `${size} (${qty})`)
+                    .join(', ');
 
                 const sampleItem = document.createElement('div');
                 sampleItem.className = 'sample-item';
@@ -413,12 +421,15 @@
                     <div class="sample-item-info">
                         <div class="sample-item-name">${sample.name}</div>
                         <div class="sample-item-details">
-                            Style: ${sample.style} | Color: ${sample.color} | Size: ${sample.size}
+                            Style: ${sample.style} | Color: ${sample.color}
+                        </div>
+                        <div class="sample-item-details">
+                            Sizes: ${sizesDisplay}
+                        </div>
+                        <div class="sample-item-details" style="font-weight: 600; color: var(--primary-color, #2d5f3f); margin-top: 0.25rem;">
+                            ${totalQty} ${totalQty === 1 ? 'item' : 'items'} × $${samplePrice.toFixed(2)} = $${itemTotal.toFixed(2)}
                         </div>
                     </div>
-                    <span class="sample-item-badge ${samplePrice > 0 ? 'badge-paid' : 'badge-free'}">
-                        ${samplePrice > 0 ? `$${samplePrice.toFixed(2)}` : 'FREE'}
-                    </span>
                 `;
                 samplesList.appendChild(sampleItem);
             });
