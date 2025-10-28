@@ -321,32 +321,25 @@ class SampleOrderService {
 
     /**
      * Send email notification to Erik about new sample order
+     * Simplified: Just order number + "Check ShopWorks" (single source of truth)
      *
      * @param {string} orderNumber - ShopWorks order number
      * @param {Object} customerData - Customer information
-     * @param {Array} samples - Sample items ordered
+     * @param {Array} samples - Sample items (not included in email - check ShopWorks)
      */
     async sendEmailNotification(orderNumber, customerData, samples) {
         try {
             console.log('[SampleOrderService] Sending email notification to Erik');
 
-            // Format samples list for email
-            const samplesList = samples.map(s =>
-                `${s.name}\n  Color: ${s.color}\n  Size: ${s.size}`
-            ).join('\n\n');
-
+            // Simplified email: Order number + directive to check ShopWorks
+            // ShopWorks is single source of truth for all order details
             const emailData = {
                 to_email: 'erik@nwcustomapparel.com',
                 to_name: 'Erik',
-                subject: `New Sample Order - ${customerData.company || customerData.lastName}`,
+                subject: `Sample Order ${orderNumber} - ${customerData.company || customerData.lastName}`,
                 order_number: orderNumber,
-                customer_name: `${customerData.firstName} ${customerData.lastName}`,
-                company: customerData.company || 'Individual',
-                email: customerData.email,
-                phone: customerData.phone,
-                shipping_address: `${customerData.address1}${customerData.address2 ? ', ' + customerData.address2 : ''}, ${customerData.city}, ${customerData.state} ${customerData.zip}`,
-                samples_list: samplesList,
-                sample_count: samples.length,
+                company: customerData.company || customerData.lastName,
+                message: 'A new sample order has been submitted. View complete order details, line items, and shipping information in ShopWorks OnSite.',
                 order_date: new Date().toLocaleDateString()
             };
 
