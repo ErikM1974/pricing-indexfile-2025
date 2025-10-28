@@ -824,17 +824,14 @@
                 </div>
             </div>
 
+            <!-- CTA Section: Simplified for sample ordering -->
             <div class="cta-section" id="ctaSection">
-                <h3>Ready to Order?</h3>
-                <p>Get a custom quote for this product with your logo or design</p>
+                <h3>Questions?</h3>
+                <p>Call us for product details, bulk pricing, or custom decoration options</p>
                 <div class="cta-buttons">
-                    <button class="btn btn-primary" onclick="requestQuote()">
-                        <i class="fas fa-calculator"></i>
-                        Request Custom Quote
-                    </button>
-                    <a href="tel:253-922-5793" class="btn btn-secondary">
+                    <a href="tel:253-922-5793" class="btn btn-primary">
                         <i class="fas fa-phone"></i>
-                        Call Us Now
+                        Call Us: 253-922-5793
                     </a>
                 </div>
             </div>
@@ -843,9 +840,9 @@
 
     <!-- Related Products -->
     <section class="related-section" id="relatedSection" style="display: none;">
-        <h2>Other Popular Choices</h2>
+        <h2>You Might Also Like</h2>
         <div class="related-grid" id="relatedGrid">
-            <!-- Related products will be inserted here -->
+            <!-- Smart recommendations will be inserted here -->
         </div>
     </section>
 
@@ -857,6 +854,9 @@
             <p>Family Owned and Operated Since 1977</p>
         </div>
     </footer>
+
+    <!-- Product Recommendations Service -->
+    <script src="../shared_components/js/product-recommendations.js"></script>
 
     <script>
         // Global variables for product state
@@ -1236,34 +1236,99 @@
             return types[type] || 'Custom Decoration';
         }
 
-        // Load related products
+        // Load smart API-driven product recommendations
         async function loadRelatedProducts(type) {
-            // For now, show static related products
-            // In future, fetch from API based on type
-            const relatedProducts = [
-                { style: 'PC54', name: 'Core Cotton Tee', type: 'T-Shirts' },
-                { style: 'PC90H', name: 'Essential Fleece Hoodie', type: 'Sweatshirts' },
-                { style: 'C112', name: 'Snapback Trucker Cap', type: 'Caps' }
-            ];
+            try {
+                const grid = document.getElementById('relatedGrid');
+                const relatedSection = document.getElementById('relatedSection');
 
-            const grid = document.getElementById('relatedGrid');
-            relatedProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'related-card';
-                card.onclick = () => {
-                    window.location.href = `?style=${product.style}&name=${encodeURIComponent(product.name)}&type=${type}`;
+                // Show loading state
+                grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i><p style="margin-top: 1rem;">Loading recommendations...</p></div>';
+
+                // Get current product data
+                const params = getUrlParams();
+                const currentProduct = currentProducts[selectedColorIndex] || currentProducts[0];
+
+                if (!currentProduct) {
+                    console.warn('[ProductPage] No current product data available');
+                    grid.innerHTML = '';
+                    relatedSection.style.display = 'none';
+                    return;
+                }
+
+                // Build product context for recommendations
+                const productContext = {
+                    style: currentProduct.STYLE || params.style,
+                    category: currentProduct.CATEGORY_NAME || 'Apparel',
+                    brand: currentProduct.BRAND_NAME || ''
                 };
-                card.innerHTML = `
-                    <div class="related-image">
-                        <i class="fas fa-tshirt" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.3;"></i>
-                    </div>
-                    <div class="related-content">
-                        <div class="related-title">${product.name}</div>
-                        <div class="related-style">Style #${product.style}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
+
+                console.log('[ProductPage] Getting recommendations for:', productContext);
+
+                // Get recommendations from service
+                const recommendations = await window.productRecommendations.getRecommendations(productContext);
+
+                // Clear loading state
+                grid.innerHTML = '';
+
+                if (recommendations.length === 0) {
+                    console.warn('[ProductPage] No recommendations found');
+                    relatedSection.style.display = 'none';
+                    return;
+                }
+
+                // Display each recommendation
+                recommendations.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'related-card';
+                    card.onclick = () => navigateToProduct(product, type);
+
+                    // Build image HTML (use product image or fallback icon)
+                    const imageHTML = product.imageUrl
+                        ? `<img src="${product.imageUrl}" alt="${product.title}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">`
+                        : `<i class="fas fa-tshirt" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.3;"></i>`;
+
+                    // Build best seller badge
+                    const bestSellerBadge = (product.isBestSeller === true || product.isBestSeller === 'true')
+                        ? '<span class="badge-best-seller" style="position: absolute; top: 0.5rem; right: 0.5rem; background: gold; color: #000; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">⭐ Best Seller</span>'
+                        : '';
+
+                    card.innerHTML = `
+                        <div class="related-image" style="position: relative;">
+                            ${imageHTML}
+                            ${bestSellerBadge}
+                        </div>
+                        <div class="related-content">
+                            <div class="related-title">${product.title || product.name}</div>
+                            <div class="related-style">Style #${product.style}</div>
+                            ${product.category ? `<div class="related-category" style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">${product.category}</div>` : ''}
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                // Show section
+                relatedSection.style.display = 'block';
+
+                console.log(`[ProductPage] Displayed ${recommendations.length} recommendations`);
+
+            } catch (error) {
+                console.error('[ProductPage] Error loading recommendations:', error);
+                // Hide section on error
+                document.getElementById('relatedSection').style.display = 'none';
+            }
+        }
+
+        // Navigate to recommended product
+        function navigateToProduct(product, type) {
+            const params = new URLSearchParams({
+                style: product.style,
+                name: product.title || product.name,
+                type: type,
+                ref: 'recommendations'
             });
+            window.location.href = `${window.location.pathname}?${params}`;
         }
 
         // ==============================================
