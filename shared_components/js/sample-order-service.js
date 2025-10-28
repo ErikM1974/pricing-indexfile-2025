@@ -183,9 +183,7 @@ class SampleOrderService {
                 // Order-level fields for ShopWorks invoice
                 purchaseOrderNumber: `SAMPLE-${orderNumber}`,  // Shows in PO Number field
                 salesRep: 'Erik Mickelson',                    // Shows in Salesperson field
-                terms: subtotal > 0
-                    ? `MIXED ORDER - Invoice $${total.toFixed(2)} (incl. tax)`
-                    : 'FREE SAMPLE',                           // Shows in Terms field
+                terms: subtotal > 0 ? 'Prepaid' : 'FREE SAMPLE',  // Payment terms (not invoice amount)
 
                 // Sales tax (Washington State 10.1% - GL Account 2200)
                 salesTax: parseFloat(salesTax.toFixed(2)),
