@@ -72,6 +72,16 @@ class SampleOrderService {
         const lineItems = [];
         const basePartNumber = sample.style;
 
+        // Defensive check: Validate sizes object
+        if (!sample.sizes || typeof sample.sizes !== 'object' || Array.isArray(sample.sizes)) {
+            console.warn('[SampleOrderService] Sample missing valid sizes object:', {
+                style: sample.style,
+                name: sample.name,
+                sizes: sample.sizes
+            });
+            return [];
+        }
+
         console.log(`[SampleOrderService] Expanding ${basePartNumber} into line items:`, sample.sizes);
 
         // Each size becomes a separate line item
@@ -174,6 +184,20 @@ class SampleOrderService {
                 total: total.toFixed(2)
             });
 
+            // Expand each sample into multiple line items (one per size with proper suffixes)
+            const lineItems = samples.flatMap(sample => this.expandSampleIntoLineItems(sample));
+
+            // CRITICAL VALIDATION: Ensure we have at least one line item before sending to API
+            if (lineItems.length === 0) {
+                console.error('[SampleOrderService] No valid line items generated. Samples:', samples);
+                throw new Error('No valid items in cart. Each sample must have at least one size with quantity > 0. Please check your cart and try again.');
+            }
+
+            console.log('[SampleOrderService] Generated line items:', {
+                count: lineItems.length,
+                items: lineItems.map(item => `${item.partNumber} ${item.size} x${item.quantity}`)
+            });
+
             // Build ManageOrders order object
             const order = {
                 orderNumber: orderNumber,
@@ -209,8 +233,8 @@ class SampleOrderService {
                     method: 'UPS Ground'  // Shows in Ship Method field
                 },
 
-                // Expand each sample into multiple line items (one per size with proper suffixes)
-                lineItems: samples.flatMap(sample => this.expandSampleIntoLineItems(sample)),
+                // Use pre-validated lineItems array
+                lineItems: lineItems,
 
                 notes: [{
                     type: 'Notes On Order',
