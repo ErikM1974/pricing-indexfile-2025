@@ -1,0 +1,53 @@
+NEW PRODUCTS VALIDATION REPORT
+================================
+Date: 2025-10-28
+Python Script: scripts/process-new-products.py
+
+SUMMARY
+-------
+Total products in Python script: 60
+Products found in Sanmar database: 21 (35%)
+Products NOT in database: 39 (65%)
+Products successfully marked as new: 21 (100% of found)
+
+BREAKDOWN BY VENDOR
+-------------------
+Eddie Bauer (EB): 4 found / 11 not found
+   Found: EB120, EB121, EB201, EB202
+   Missing: EB122-EB133
+
+District (DT): 4 found / 7 not found
+   Found: DT620, DT624, DT626, DT715
+   Missing: DT700-DT770, DT625
+
+Carhartt (CT/CTK): 5 found / 5 not found
+   Found: CT100617, CT103828, CT104597, CT104670, CTK121
+   Missing: CTB100632, CTB109900, CTG100893, CTC05, CTC04, CTC1001
+
+Sport-Tek (ST): 4 found / 4 not found
+   Found: ST850, ST851, ST860, ST861
+   Missing: ST880, ST881, ST890, ST891
+
+New Era (NE): 1 found / 2 not found
+   Found: NE410
+   Missing: NE411, NE412
+
+Port Authority (C): 0 found / 4 not found
+   Missing: C136, C138, C141, C144
+
+The North Face (NF): 0 found / 2 not found
+   Missing: NF0A7V85, NF0A84JZ
+
+OGIO (OG): 0 found / 1 not found
+   Missing: OG710
+
+Brooks Brothers (BB): 1 found / 0 missing
+   Found: BB18200
+
+CornerStone (CS): 2 found / 0 missing
+   Found: CS410, CS415
+
+CONCLUSION
+----------
+All 21 products that exist in Sanmar database are now marked as new.
+The 39 missing products require investigation with vendor catalogs.
