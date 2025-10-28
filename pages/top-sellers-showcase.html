@@ -30,10 +30,10 @@
 
     <!-- Embed Sample Request functionality directly to avoid path issues -->
     <script>
-        // Embedded sample cart functionality  
+        // Embedded sample cart functionality
         class SampleCart {
             constructor() {
-                this.maxSamples = 3;
+                this.maxSamples = null; // No hard limit - 3 samples recommended for best experience
 
                 // Load cart with backward compatibility
                 const cartData = sessionStorage.getItem('sampleCart');
@@ -62,19 +62,24 @@
                     const widget = document.createElement('div');
                     widget.id = 'sampleCartWidget';
                     widget.className = 'sample-cart-widget';
+                    widget.setAttribute('role', 'button');
+                    widget.setAttribute('tabindex', '0');
                     widget.innerHTML = `
-                        <div class="sample-cart-inner">
-                            <div class="sample-cart-icon">
-                                <i class="fas fa-box-open"></i>
-                                <span class="sample-count-badge">${this.samples.length}</span>
-                            </div>
-                            <div class="sample-cart-text">
-                                <span class="sample-cart-label">Samples</span>
-                                <span class="sample-cart-status">${this.samples.length}/${this.maxSamples}</span>
-                            </div>
+                        <div class="sample-cart-icon">
+                            <i class="fas fa-box-open"></i>
+                            <span class="sample-count-badge">${this.samples.length}</span>
                         </div>
+                        <span class="sample-cart-label">Sample Cart</span>
                     `;
-                    document.body.appendChild(widget);
+
+                    // Add to header's contact-header section (top-right position)
+                    const contactHeader = document.querySelector('.contact-header');
+                    if (contactHeader) {
+                        contactHeader.appendChild(widget);
+                    } else {
+                        // Fallback: add to body if header not found
+                        document.body.appendChild(widget);
+                    }
                 }
                 this.updateUI();
             }
@@ -82,10 +87,20 @@
             bindEvents() {
                 const widget = document.getElementById('sampleCartWidget');
                 if (widget) {
+                    // Click handler
                     widget.addEventListener('click', () => {
-                        // Open drawer to view cart
                         if (window.cartDrawer) {
                             window.cartDrawer.open();
+                        }
+                    });
+
+                    // Keyboard support (Enter/Space)
+                    widget.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (window.cartDrawer) {
+                                window.cartDrawer.open();
+                            }
                         }
                     });
                 }
@@ -213,11 +228,7 @@
             }
 
             addSample(product) {
-                if (this.samples.length >= this.maxSamples) {
-                    this.showNotification(`Maximum ${this.maxSamples} samples per request`, 'warning');
-                    return false;
-                }
-
+                // Check for duplicate
                 if (this.samples.find(s => s.style === product.style)) {
                     this.showNotification('This item is already in your sample cart', 'info');
                     return false;
@@ -300,17 +311,15 @@
                     badge.style.display = this.samples.length > 0 ? 'flex' : 'none';
                 }
 
-                const status = document.querySelector('.sample-cart-status');
-                if (status) {
-                    status.textContent = `${this.samples.length}/${this.maxSamples}`;
-                }
-
                 const widget = document.getElementById('sampleCartWidget');
                 if (widget) {
+                    // Update ARIA label for accessibility
+                    const itemText = this.samples.length === 1 ? 'item' : 'items';
+                    widget.setAttribute('aria-label', `Sample cart with ${this.samples.length} ${itemText}`);
+
+                    // Show widget
                     if (this.samples.length > 0) {
-                        widget.style.display = 'block';
-                        widget.classList.add('sample-cart-bounce');
-                        setTimeout(() => widget.classList.remove('sample-cart-bounce'), 600);
+                        widget.style.display = 'flex'; // Changed from 'block' to 'flex'
                     }
                 }
 
@@ -375,9 +384,7 @@
             getCartSummary() {
                 return {
                     items: this.samples,
-                    count: this.samples.length,
-                    remaining: this.maxSamples - this.samples.length,
-                    isFull: this.samples.length >= this.maxSamples
+                    count: this.samples.length
                 };
             }
 
@@ -1668,42 +1675,40 @@
         }
         
         /* Sample Cart Widget */
+        /* Sample Cart - Header Integrated */
         .sample-cart-widget {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 60px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 4px 20px rgba(76, 179, 84, 0.3);
-            cursor: pointer;
-            z-index: 1000;
-            display: none;
-            transition: all 0.3s ease;
-        }
-        
-        .sample-cart-widget:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 30px rgba(76, 179, 84, 0.4);
-        }
-        
-        .sample-cart-inner {
-            display: flex;
+            display: none; /* Hidden until items added */
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--primary-color, #2d5f3f);
+            color: white;
+            transition: background 0.2s ease; /* Simple transition */
+            font-size: 0.95rem;
+            margin-left: 0.5rem;
         }
-        
+
+        .sample-cart-widget:hover {
+            background: #1f4229; /* Slightly darker on hover */
+        }
+
+        .sample-cart-widget:focus {
+            outline: 2px solid #4CAF50;
+            outline-offset: 2px;
+        }
+
         .sample-cart-icon {
             position: relative;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
-        
+
         .sample-count-badge {
             position: absolute;
             top: -8px;
             right: -8px;
-            background: #ff4444;
+            background: #ff6b6b;
             color: white;
             border-radius: 50%;
             width: 20px;
@@ -1712,46 +1717,27 @@
             align-items: center;
             justify-content: center;
             font-size: 0.75rem;
-            font-weight: bold;
-        }
-        
-        .sample-cart-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .sample-cart-label {
             font-weight: 600;
-            font-size: 0.875rem;
         }
-        
-        .sample-cart-status {
-            font-size: 0.75rem;
-            opacity: 0.9;
+
+        .sample-cart-label {
+            font-weight: 500;
+            font-size: 0.95rem;
         }
-        
-        /* Animation for widget */
-        @keyframes sampleCartBounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .sample-cart-bounce {
-            animation: sampleCartBounce 0.6s ease;
-        }
-        
-        .sample-cart-show {
-            animation: slideInRight 0.3s ease;
-        }
-        
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+
+        /* Mobile: Keep simple */
+        @media (max-width: 768px) {
+            .sample-cart-widget {
+                padding: 0.5rem 0.75rem;
+                gap: 0.4rem;
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+
+            .sample-cart-label {
+                font-size: 0.9rem;
+            }
+
+            .sample-cart-icon {
+                font-size: 1.1rem;
             }
         }
         
