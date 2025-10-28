@@ -1404,7 +1404,21 @@
                         console.log(`[SizeGrid] Style ${params.style}: Received single object, sizes:`, sizes);
                     }
 
-                    console.log(`[SizeGrid] Style ${params.style}: Final size count: ${sizes.length}`, sizes);
+                    // Sort sizes in logical order (XS → S → M → L → XL → 2XL → 3XL → 4XL → Tall sizes)
+                    const sizeOrder = {
+                        'OSFA': 0,  // One-size-fits-all comes first
+                        'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5,
+                        '2XL': 6, '3XL': 7, '4XL': 8, '5XL': 9, '6XL': 10,
+                        'LT': 11, 'XLT': 12, '2XLT': 13, '3XLT': 14, '4XLT': 15, '5XLT': 16
+                    };
+
+                    sizes.sort((a, b) => {
+                        const orderA = sizeOrder[a] !== undefined ? sizeOrder[a] : 999;
+                        const orderB = sizeOrder[b] !== undefined ? sizeOrder[b] : 999;
+                        return orderA - orderB;
+                    });
+
+                    console.log(`[SizeGrid] Style ${params.style}: Final size count: ${sizes.length} (sorted)`, sizes);
 
                     if (sizes.length === 0) {
                         console.warn('[SizeGrid] No sizes from API, using standard sizes as fallback');
