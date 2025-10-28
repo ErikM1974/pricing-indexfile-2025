@@ -114,7 +114,7 @@ class StyleCleaner:
         elif style_upper.startswith('BC'):
             return 'Bella+Canvas'
         elif style_upper.startswith('C') and not style_upper.startswith('CT'):
-            return 'Richardson/Port Authority'
+            return 'Port Authority'
         elif style_upper.startswith('CT'):
             return 'Carhartt'
         elif style_upper.startswith('DT'):
