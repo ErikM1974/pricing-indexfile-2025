@@ -460,28 +460,8 @@
                             <input type="text" name="zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
                         </div>
 
-n                        <div class="form-group">
-                            <label>
-                                Country <span class="required">*</span>
-                            </label>
-                            <select name="country" required class="form-control">
-                                <option value="USA" selected>United States</option>
-                                <option value="Canada">Canada</option>
-                                <option value="Mexico">Mexico</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>
-                                Shipping Method <span class="required">*</span>
-                            </label>
-                            <select name="shippingMethod" required class="form-control">
-                                <option value="UPS Ground" selected>UPS Ground (5-7 business days)</option>
-                                <option value="USPS Priority">USPS Priority (2-3 business days)</option>
-                                <option value="UPS 2nd Day">UPS 2nd Day (2 business days)</option>
-                                <option value="UPS Next Day">UPS Next Day (1 business day)</option>
-                            </select>
-                        </div>
+                        <!-- Shipping Method: Hidden field defaulting to UPS Ground -->
+                        <input type="hidden" name="shippingMethod" value="UPS Ground">
                         <div class="form-group full-width">
                             <label>
                                 Additional Notes
@@ -700,7 +680,6 @@ n                        <div class="form-group">
                 shippingMethod: formData.get('shippingMethod') || 'UPS Ground',
                 notes: formData.get('notes') || ''
             };
-            };
 
             // Pass samples with sizes object intact (service will expand into line items)
             const samplesForService = cart.map(item => ({
@@ -749,7 +728,7 @@ n                        <div class="form-group">
                 // Send email notification (using simple template for now)
                 const emailData = {
                     to_name: 'Northwest Custom Apparel',
-                    from_name: fullName,
+                    from_name: `${firstName} ${lastName}`,
                     from_email: customerData.email,
                     from_phone: customerData.phone,
                     from_company: customerData.company,

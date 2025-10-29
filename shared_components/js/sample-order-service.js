@@ -208,7 +208,7 @@ class SampleOrderService {
                 isTest: false,  // Production mode (change to true for testing)
 
                 // Order-level fields for ShopWorks invoice
-                purchaseOrderNumber: `SAMPLE-${orderNumber}`,  // Shows in PO Number field
+                purchaseOrderNumber: orderNumber,  // Already includes SAMPLE- prefix from generateOrderNumber()
                 salesRep: 'Erik Mickelson',                    // Shows in Salesperson field
                 terms: subtotal > 0 ? 'Prepaid' : 'FREE SAMPLE',  // Payment terms (not invoice amount)
 
@@ -226,7 +226,7 @@ class SampleOrderService {
                 },
 
                 shipping: {
-                    company: formData.company || `${formData.firstName} ${formData.lastName}`,
+                    company: formData.company || `${(formData.firstName || '').trim()} ${(formData.lastName || '').trim()}`.trim(),
                     address1: formData.address1,
                     address2: formData.address2 || '',
                     city: formData.city,
