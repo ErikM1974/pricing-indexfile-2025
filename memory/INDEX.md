@@ -1,6 +1,6 @@
 # 📚 NWCA Documentation Index
 
-**Last Updated:** 2025-10-27
+**Last Updated:** 2025-10-29
 **Purpose:** Master navigation for all documentation files
 **Performance Note:** All files optimized to stay under 40k character limit for optimal Claude performance
 
@@ -25,18 +25,26 @@ This documentation has been reorganized into modular components for better perfo
 ├── DATABASE_PATTERNS.md              # Database schema patterns
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints - read data)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md    # ManageOrders PUSH API (4 endpoints - create orders)
-├── MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md  # Complete Swagger field reference (158+ fields)
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
 │   ├── orders-quotes-api.md         # Orders & quote management
 │   └── utility-api.md               # Utilities & reference data
-├── /manageorders/                    # ManageOrders API documentation
+├── /manageorders/                    # ManageOrders PULL API documentation
 │   ├── OVERVIEW.md                  # Architecture & authentication
 │   ├── CUSTOMER_AUTOCOMPLETE.md     # Customer autocomplete implementation
 │   ├── API_REFERENCE.md             # Complete API spec (11 endpoints)
 │   ├── SERVER_PROXY.md              # caspio-pricing-proxy implementation
 │   └── INTEGRATION_EXAMPLES.md      # Working code examples (orders, inventory, payments)
+├── /manageorders-push/               # ManageOrders PUSH API field documentation (NEW - 165 fields)
+│   ├── FIELD_REFERENCE_CORE.md      # Master navigation hub (~15k)
+│   ├── ORDER_FIELDS.md              # Order-Level + Customer (54 fields)
+│   ├── PRODUCT_FIELDS.md            # Line Items + Design (47 fields)
+│   ├── PAYMENT_SHIPPING_FIELDS.md   # Payment/Shipping/Notes/Attachments (34 fields)
+│   ├── FORM_DEVELOPMENT_GUIDE.md    # Custom form patterns (v2.0)
+│   ├── IMPLEMENTATION_EXAMPLES.md   # Working code snippets
+│   ├── ENHANCEMENT_ROADMAP.md       # Phase planning & future features
+│   └── TROUBLESHOOTING.md           # Common issues & solutions
 └── /templates/                       # Calculator templates
     ├── manual-calculator-template.md     # Manual pricing template
     ├── contract-calculator-template.md   # Contract pricing template
@@ -168,18 +176,24 @@ This documentation has been reorganized into modular components for better perfo
 5. Test with `isTest: true` flag before going live
 
 ### "I need to enhance my ManageOrders PUSH API integration"
-1. Read **[MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md](./MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md)** - Complete Swagger specification
-2. Review current implementation status (158+ fields documented):
-   - Order-Level Fields: 23 total (12 currently used)
-   - Line Item Fields: 18 per item (8 currently used)
-   - Design Block: ~27 nested fields (future use)
-   - Payment Block: 12 per payment (future use)
-3. Choose enhancement phase:
-   - **Phase 1:** Quick wins (custom fields, additional notes)
+1. Start with **[manageorders-push/FIELD_REFERENCE_CORE.md](./manageorders-push/FIELD_REFERENCE_CORE.md)** - Master navigation (165 fields, 100% Swagger coverage)
+2. Review field specifications by category:
+   - **[ORDER_FIELDS.md](./manageorders-push/ORDER_FIELDS.md)** - Order-level & customer (54 fields: 27 order + 27 customer)
+   - **[PRODUCT_FIELDS.md](./manageorders-push/PRODUCT_FIELDS.md)** - Line items & design (47 fields: 20 line items + 27 design nested)
+   - **[PAYMENT_SHIPPING_FIELDS.md](./manageorders-push/PAYMENT_SHIPPING_FIELDS.md)** - Auxiliary blocks (34 fields total)
+3. Build custom forms with **[FORM_DEVELOPMENT_GUIDE.md](./manageorders-push/FORM_DEVELOPMENT_GUIDE.md)**:
+   - Pattern 1: Basic Sample Request Form
+   - Pattern 2: Billing/Shipping Address Separation
+   - Pattern 3: File Upload Integration (v1.1.0 - unlimited files, 20+ types)
+   - Pattern 4: Customer Autocomplete (389 customers, 24-hour cache)
+   - Pattern 5: Real-Time Inventory Check (5-minute cache)
+4. Copy working code from **[IMPLEMENTATION_EXAMPLES.md](./manageorders-push/IMPLEMENTATION_EXAMPLES.md)**
+5. Choose enhancement phase from **[ENHANCEMENT_ROADMAP.md](./manageorders-push/ENHANCEMENT_ROADMAP.md)**:
+   - **Phase 1:** Quick wins (9 custom fields ready - no API changes needed)
    - **Phase 2:** Major features (design tracking, extended shipping)
    - **Phase 3:** Advanced (payment integration, attachments)
-4. Use implementation snippets from documentation
-5. Test field population in ShopWorks after hourly import
+6. Debug with **[TROUBLESHOOTING.md](./manageorders-push/TROUBLESHOOTING.md)**
+7. Test field population in ShopWorks after hourly import
 
 ## 🔑 Key Configuration Values
 
@@ -249,12 +263,15 @@ PATCH  - Embroidered Emblems
 - Modular structure: Overview, Autocomplete, API Reference, Server Proxy, Future Integrations
 - Production-ready customer autocomplete documentation
 
-**Latest Addition (2025-10-27):**
-- Created complete ManageOrders PUSH API field reference
-- Documents all 158+ available Swagger fields
-- Field mapping guide (Your Field → Proxy Field → Swagger Field)
-- Implementation snippets and troubleshooting guide
-- Three-phase enhancement roadmap
+**Latest Addition (2025-10-27 → 2025-10-29):**
+- Created complete ManageOrders PUSH API field reference (v2.0.0)
+- Added real-world validation from production order
+- Added 7 missing Swagger fields (158 → 165 fields, 100% coverage)
+- Added Form Development Guide (file upload, autocomplete, inventory)
+- Split into 8 modular files for optimal performance (v2.0.1)
+  - FIELD_REFERENCE_CORE.md (master navigation hub)
+  - 3 field specification files
+  - 4 implementation guide files
 
 ## 🔗 Related Documentation
 
@@ -268,8 +285,9 @@ PATCH  - Embroidered Emblems
 - **BUNDLE_CALCULATOR_GUIDE.md** - Guide for promotional bundles
 - **STAFF_DIRECTORY.md** - Staff contact information
 - **DATABASE_PATTERNS.md** - Database schema and patterns
-- **MANAGEORDERS_INTEGRATION.md** - ShopWorks ManageOrders API integration guide
-- **MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md** - Complete Swagger field reference
+- **MANAGEORDERS_INTEGRATION.md** - ShopWorks ManageOrders PULL API guide (11 endpoints)
+- **MANAGEORDERS_PUSH_WEBSTORE.md** - ShopWorks ManageOrders PUSH API reference (4 endpoints)
+- **manageorders-push/** - Modular field reference (8 files, 165 fields documented)
 - **FILE_UPLOAD_API_REQUIREMENTS.md** - File upload specifications
 
 ## 💡 Best Practices

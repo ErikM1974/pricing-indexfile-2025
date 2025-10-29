@@ -1,5 +1,26 @@
 # ManageOrders PUSH API - Complete Field Reference
 
+> **⚠️ DEPRECATED - This file has been split for better performance**
+>
+> **New Location:** [/memory/manageorders-push/](manageorders-push/)
+>
+> This 85KB monolithic file (212% over Claude's 40k optimal threshold) has been split into 8 modular files for better performance and navigation:
+>
+> - **[FIELD_REFERENCE_CORE.md](manageorders-push/FIELD_REFERENCE_CORE.md)** - Master navigation hub (~15k)
+> - **[ORDER_FIELDS.md](manageorders-push/ORDER_FIELDS.md)** - Order & Customer fields (54 fields)
+> - **[PRODUCT_FIELDS.md](manageorders-push/PRODUCT_FIELDS.md)** - Line Items & Design fields (47 fields)
+> - **[PAYMENT_SHIPPING_FIELDS.md](manageorders-push/PAYMENT_SHIPPING_FIELDS.md)** - Payment/Shipping/Notes/Attachments (34 fields)
+> - **[FORM_DEVELOPMENT_GUIDE.md](manageorders-push/FORM_DEVELOPMENT_GUIDE.md)** - Custom form patterns
+> - **[IMPLEMENTATION_EXAMPLES.md](manageorders-push/IMPLEMENTATION_EXAMPLES.md)** - Working code snippets
+> - **[ENHANCEMENT_ROADMAP.md](manageorders-push/ENHANCEMENT_ROADMAP.md)** - Phase planning
+> - **[TROUBLESHOOTING.md](manageorders-push/TROUBLESHOOTING.md)** - Common issues & solutions
+>
+> **Migration Date:** October 29, 2025 (v2.0.0 → v2.0.1)
+>
+> This file is kept for reference but should not be updated. All future changes go to the modular structure.
+
+---
+
 **Version:** 2.0.0
 **Last Updated:** October 29, 2025
 **Source:** ShopWorks ManageOrders Swagger Specification + Real-World Production Order NWCA-SAMPLE-1029-2-842

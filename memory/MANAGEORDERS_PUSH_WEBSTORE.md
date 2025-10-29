@@ -1,6 +1,6 @@
 # ManageOrders PUSH API - Webstore Integration Reference
 
-**Last Updated:** 2025-10-27
+**Last Updated:** 2025-10-29
 **Purpose:** Reference guide for creating orders in ShopWorks OnSite using the ManageOrders PUSH API
 **Status:** Production-ready for online store integration
 
@@ -14,6 +14,16 @@
 - **[ManageOrders PULL API](MANAGEORDERS_INTEGRATION.md)** - Reading data from ShopWorks (11 endpoints)
 - **[API Reference](manageorders/API_REFERENCE.md)** - Complete PULL API endpoint specifications
 - **[Integration Examples](manageorders/INTEGRATION_EXAMPLES.md)** - Working code for inventory, orders, tracking
+
+**Field Reference (165 Fields - 100% Swagger Coverage):**
+- **[Field Reference Core](manageorders-push/FIELD_REFERENCE_CORE.md)** - Master navigation hub for all PUSH API fields
+- **[Order Fields](manageorders-push/ORDER_FIELDS.md)** - Order-level & customer fields (54 fields)
+- **[Product Fields](manageorders-push/PRODUCT_FIELDS.md)** - Line items & design fields (47 fields)
+- **[Payment/Shipping Fields](manageorders-push/PAYMENT_SHIPPING_FIELDS.md)** - Auxiliary blocks (34 fields)
+- **[Form Development Guide](manageorders-push/FORM_DEVELOPMENT_GUIDE.md)** - Custom form patterns (file upload, autocomplete, inventory)
+- **[Implementation Examples](manageorders-push/IMPLEMENTATION_EXAMPLES.md)** - Working code snippets
+- **[Enhancement Roadmap](manageorders-push/ENHANCEMENT_ROADMAP.md)** - Phase planning for future features
+- **[Troubleshooting](manageorders-push/TROUBLESHOOTING.md)** - Common issues & solutions
 
 ---
 
