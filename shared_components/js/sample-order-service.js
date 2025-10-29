@@ -229,8 +229,8 @@ class SampleOrderService {
                     city: formData.city,
                     state: formData.state,
                     zip: formData.zip,
-                    country: 'USA',
-                    method: 'UPS Ground'  // Shows in Ship Method field
+                    country: formData.country || 'USA',
+                    method: formData.shippingMethod || 'UPS Ground'  // Shows in Ship Method field
                 },
 
                 // Use pre-validated lineItems array

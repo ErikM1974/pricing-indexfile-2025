@@ -392,9 +392,16 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>
-                                Full Name <span class="required">*</span>
+                                First Name <span class="required">*</span>
                             </label>
-                            <input type="text" name="name" required>
+                            <input type="text" name="firstName" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Last Name <span class="required">*</span>
+                            </label>
+                            <input type="text" name="lastName" required>
                         </div>
 
                         <div class="form-group">
@@ -453,6 +460,28 @@
                             <input type="text" name="zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
                         </div>
 
+n                        <div class="form-group">
+                            <label>
+                                Country <span class="required">*</span>
+                            </label>
+                            <select name="country" required class="form-control">
+                                <option value="USA" selected>United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Mexico">Mexico</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>
+                                Shipping Method <span class="required">*</span>
+                            </label>
+                            <select name="shippingMethod" required class="form-control">
+                                <option value="UPS Ground" selected>UPS Ground (5-7 business days)</option>
+                                <option value="USPS Priority">USPS Priority (2-3 business days)</option>
+                                <option value="UPS 2nd Day">UPS 2nd Day (2 business days)</option>
+                                <option value="UPS Next Day">UPS Next Day (1 business day)</option>
+                            </select>
+                        </div>
                         <div class="form-group full-width">
                             <label>
                                 Additional Notes
@@ -651,12 +680,9 @@
 
             const formData = new FormData(e.target);
             const cart = getCartSamples();
-
-            // Split name into first/last
-            const fullName = formData.get('name').trim();
-            const nameParts = fullName.split(' ');
-            const firstName = nameParts[0];
-            const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+            // Get customer data from form (no splitting needed - separate fields now)
+            const firstName = formData.get('firstName').trim();
+            const lastName = formData.get('lastName').trim();
 
             // Prepare customer data for ShopWorks
             const customerData = {
@@ -670,29 +696,22 @@
                 city: formData.get('city'),
                 state: formData.get('state').toUpperCase(),
                 zip: formData.get('zip'),
+                country: formData.get('country') || 'USA',
+                shippingMethod: formData.get('shippingMethod') || 'UPS Ground',
                 notes: formData.get('notes') || ''
             };
+            };
 
-            // Transform cart items to individual size entries (one sample per size)
-            const samplesForService = [];
-            cart.forEach(item => {
-                Object.entries(item.sizes).forEach(([size, qty]) => {
-                    if (qty > 0) {
-                        // Create separate entries for each quantity
-                        for (let i = 0; i < qty; i++) {
-                            samplesForService.push({
-                                style: item.style,
-                                name: item.name,
-                                color: item.color,
-                                catalogColor: item.catalogColor,
-                                size: size,
-                                price: item.price || 0.01,
-                                type: item.sampleType || 'free'
-                            });
-                        }
-                    }
-                });
-            });
+            // Pass samples with sizes object intact (service will expand into line items)
+            const samplesForService = cart.map(item => ({
+                style: item.style,
+                name: item.name,
+                color: item.color,
+                catalogColor: item.catalogColor,
+                sizes: item.sizes,  // Keep as object {S: 1, M: 2, L: 1} or {OSFA: 1}
+                price: item.price || 0,  // Use 0 not 0.01 for consistency
+                type: item.sampleType || 'free'
+            }));
 
             console.log('[Sample Cart] Submitting order with:', {
                 customer: customerData,
