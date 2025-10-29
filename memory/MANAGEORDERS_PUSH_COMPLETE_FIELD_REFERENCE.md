@@ -1010,56 +1010,517 @@ size: "Size03"  // May cause issues
 
 ---
 
+## Enhancement Roadmap for Sample Orders
+
+### Overview
+
+This roadmap shows which of the 158 available ManageOrders fields should be added next to improve sample order tracking and workflow integration. Each phase includes:
+- **Fields to add** - Which fields from the Swagger spec
+- **Business value** - Why these fields matter
+- **Implementation effort** - Estimated dev time
+- **Code examples** - Ready-to-use snippets
+
+---
+
+### Phase 1: Quick Wins (Next Sprint)
+
+**Timeline:** 1-2 days
+**Value:** ⭐⭐⭐⭐⭐ **VERY HIGH** - Immediate tracking improvements
+**Effort:** 🔨 **LOW** - Simple additions to existing code
+
+#### 1.1: Line Item Custom Fields (5 fields)
+
+**Fields to Add:**
+- `CustomField01` - Sample type indicator
+- `CustomField02` - Source tracking
+- `CustomField03` - Submission date
+- `CustomField04` - Free vs Paid flag
+- `CustomField05` - Color mapping log
+
+**Business Value:**
+- Track sample lifecycle from request to fulfillment
+- Identify trends in sample sources
+- Audit trail for free sample approvals
+- Troubleshoot color matching issues
+
+**Implementation:**
+
+```javascript
+// In sample-order-service.js
+lineItems: samples.map(sample => ({
+  partNumber: sample.style,
+  description: sample.name,
+  color: sample.catalogColor,
+  size: sample.size || 'OSFA',
+  quantity: 1,
+  price: 0.01,
+
+  // ADD THESE 5 FIELDS
+  customFields: {
+    CustomField01: 'FREE SAMPLE',
+    CustomField02: 'Top Sellers Showcase',
+    CustomField03: new Date().toLocaleDateString(),
+    CustomField04: sample.type || 'free',
+    CustomField05: `${sample.displayColor} → ${sample.catalogColor}`
+  }
+}))
+```
+
+**Proxy Changes Required:**
+```javascript
+// In caspio-pricing-proxy/lib/manageorders-push-client.js
+// Add to transformLineItems() function (around line 230)
+
+lineItem.CustomField01 = item.customFields?.CustomField01 || '';
+lineItem.CustomField02 = item.customFields?.CustomField02 || '';
+lineItem.CustomField03 = item.customFields?.CustomField03 || '';
+lineItem.CustomField04 = item.customFields?.CustomField04 || '';
+lineItem.CustomField05 = item.customFields?.CustomField05 || '';
+```
+
+**Verification:**
+1. Submit sample order with custom fields
+2. Wait for hourly import
+3. Open order in OnSite → check line item details
+4. Custom fields should appear in line item custom field section
+
+---
+
+#### 1.2: Enhanced Notes (3 new note types)
+
+**Fields to Add:**
+- `Notes To Shipping` - Shipping instructions
+- `Notes To Production` - Production notes
+- `Notes To Art` - Design specifications (if applicable)
+
+**Business Value:**
+- Reduce verbal communication overhead
+- Clear instructions for each department
+- Faster sample fulfillment
+- Better customer service
+
+**Implementation:**
+
+```javascript
+// In sample-order-service.js
+notes: [
+  {
+    type: 'Notes On Order',
+    text: `FREE SAMPLE REQUEST
+Company: ${formData.company || 'Individual'}
+Contact: ${formData.firstName} ${formData.lastName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Submitted: ${new Date().toLocaleString()}
+Source: Top Sellers Showcase
+Sample Count: ${samples.length}`
+  },
+  {
+    type: 'Notes To Shipping',
+    text: 'FREE SAMPLE - Expedite if possible. No signature required. Use standard packaging.'
+  },
+  {
+    type: 'Notes To Production',
+    text: 'FREE SAMPLE - Standard turnaround acceptable. No special handling required. Mark as SAMPLE on packaging.'
+  }
+]
+```
+
+**No Proxy Changes Required** - Notes already supported
+
+**Verification:**
+1. Submit sample order with multiple notes
+2. Check OnSite order → each note type appears in correct section
+3. Notes should be visible to appropriate departments
+
+---
+
+#### 1.3: Customer Date Fields (1 field)
+
+**Field to Add:**
+- `requestedShipDate` - When customer wants samples
+
+**Business Value:**
+- Prioritize urgent sample requests
+- Manage customer expectations
+- Track on-time fulfillment rate
+
+**Implementation:**
+
+```javascript
+// In sample-cart.html - Add date picker
+<label for="requestedDate">When do you need these samples?</label>
+<input type="date"
+       id="requestedDate"
+       name="requestedDate"
+       min="<%= new Date().toISOString().split('T')[0] %>"
+       class="form-control">
+
+// In sample-order-service.js
+const order = {
+  orderNumber: quoteId,
+  orderDate: new Date().toISOString().split('T')[0],
+  requestedShipDate: formData.requestedDate || null, // ADD THIS
+  // ... rest of fields
+};
+```
+
+**Proxy Changes Required:**
+```javascript
+// In caspio-pricing-proxy/lib/manageorders-push-client.js
+// Add to transformOrderData() function (around line 85)
+
+if (orderData.requestedShipDate) {
+  manageOrdersOrder.date_OrderRequestedToShip = formatDateForOnSite(orderData.requestedShipDate);
+}
+```
+
+**Verification:**
+1. Select requested date in sample form
+2. Submit order
+3. Check OnSite order → "Requested Ship Date" field populated
+
+---
+
+### Phase 2: Medium-Term Enhancements (1-2 Weeks)
+
+**Timeline:** 1-2 weeks
+**Value:** ⭐⭐⭐⭐ **HIGH** - Improved workflow integration
+**Effort:** 🔨🔨 **MEDIUM** - Requires coordination with ShopWorks setup
+
+#### 2.1: Customer Company Information (6 fields)
+
+**Fields to Add (to Customer Block):**
+- `CompanyName` - Company name
+- `MainEmail` - Primary company email
+- `WebSite` - Company website
+- `CustomerSource` - "Web Sample Request"
+- `CustomerType` - "Sample Request"
+- `SalesGroup` - Assigned sales team
+
+**Business Value:**
+- Create new customers automatically from sample requests
+- Better lead tracking and conversion
+- Link samples to companies for follow-up
+- Sales team assignment
+
+**Why Not Currently Used:** All orders go to Customer #2791 (web orders). This enhancement would create unique customer records for companies.
+
+**Implementation Decision Required:**
+- Option A: Keep using Customer #2791 (simpler)
+- Option B: Create new customers from sample requests (better tracking)
+
+**Implementation (Option B):**
+
+```javascript
+// In sample-order-service.js
+const order = {
+  orderNumber: quoteId,
+  orderDate: new Date().toISOString().split('T')[0],
+
+  customer: {
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    email: formData.email,
+    phone: formData.phone,
+    company: formData.company,
+
+    // ADD THESE FOR NEW CUSTOMER CREATION
+    companyInfo: {
+      companyName: formData.company,
+      mainEmail: formData.email,
+      website: formData.website || '',
+      customerSource: 'Web Sample Request',
+      customerType: 'Sample Request',
+      salesGroup: 'Web Sales'
+    }
+  },
+
+  // ... rest of order
+};
+```
+
+**Proxy Changes Required:**
+```javascript
+// In caspio-pricing-proxy/lib/manageorders-push-client.js
+// Modify Customer block creation (lines 117-156)
+
+if (orderData.customer?.companyInfo) {
+  manageOrdersOrder.Customer = {
+    // Existing billing fields...
+
+    // ADD THESE
+    CompanyName: orderData.customer.companyInfo.companyName || '',
+    MainEmail: orderData.customer.companyInfo.mainEmail || '',
+    WebSite: orderData.customer.companyInfo.website || '',
+    CustomerSource: orderData.customer.companyInfo.customerSource || '',
+    CustomerType: orderData.customer.companyInfo.customerType || '',
+    SalesGroup: orderData.customer.companyInfo.salesGroup || ''
+  };
+}
+```
+
+**ShopWorks Configuration Required:**
+- Decide whether to create new customers or continue using #2791
+- If creating new customers, configure auto-assignment rules
+- Set up customer type "Sample Request" in OnSite
+
+---
+
+#### 2.2: Billing Address Tracking (7 fields)
+
+**Fields to Add (to Customer Block):**
+- `BillingCompany` - Bill-to company
+- `BillingAddress01` - Bill-to street
+- `BillingAddress02` - Bill-to suite/apt
+- `BillingCity` - Bill-to city
+- `BillingState` - Bill-to state
+- `BillingZip` - Bill-to ZIP
+- `BillingCountry` - Bill-to country
+
+**Business Value:**
+- Track where invoices should go (for paid samples)
+- Separate billing address from shipping address
+- Required for international samples
+
+**Why Not Currently Used:** All samples are free (no billing needed)
+
+**Implementation (When Paid Samples Added):**
+
+```javascript
+// In sample-cart.html - Add billing address section
+<div id="billing-section">
+  <h3>Billing Address</h3>
+  <input type="text" name="billing_company" placeholder="Company Name">
+  <input type="text" name="billing_address1" placeholder="Street Address">
+  <input type="text" name="billing_address2" placeholder="Suite/Apt">
+  <input type="text" name="billing_city" placeholder="City">
+  <select name="billing_state"><!-- states --></select>
+  <input type="text" name="billing_zip" placeholder="ZIP">
+
+  <label>
+    <input type="checkbox" id="sameasshipping" checked>
+    Billing address same as shipping
+  </label>
+</div>
+
+// In sample-order-service.js
+const order = {
+  // ... other fields
+
+  billing: {
+    company: formData.billing_company,
+    address1: formData.billing_address1,
+    address2: formData.billing_address2,
+    city: formData.billing_city,
+    state: formData.billing_state,
+    zip: formData.billing_zip,
+    country: 'USA'
+  },
+
+  // ... rest of order
+};
+```
+
+**Proxy Changes Required:**
+```javascript
+// Already implemented in v1.1.0! See lines 117-123 of manageorders-push-client.js
+// No changes needed - just pass billing object and proxy handles it
+```
+
+---
+
+### Phase 3: Long-Term Features (Future Quarters)
+
+**Timeline:** 2-3 months
+**Value:** ⭐⭐⭐ **MEDIUM** - Nice-to-have features
+**Effort:** 🔨🔨🔨 **HIGH** - Complex integrations
+
+#### 3.1: Design Block Integration
+
+**Fields to Add (nested structure):**
+- Design-Level: `DesignName`, `ExtDesignID`, `id_Artist`
+- Location-Level: `Location`, `TotalColors`, `TotalStitches`, `ImageURL`
+- Details-Level: `Color`, `Text`, `ParameterValue`
+
+**Business Value:**
+- Track artwork for samples (if customer provides logo)
+- Link design files to sample orders
+- Production reference for decorated samples
+- Design approval workflow
+
+**Implementation:**
+```javascript
+// When customer uploads logo for sample decoration
+designs: [{
+  name: "Company Logo",
+  externalId: `SAMPLE-DESIGN-${Date.now()}`,
+  imageUrl: uploadedFileUrl,
+  locations: [{
+    location: "Left Chest",
+    stitches: "5000",
+    imageUrl: uploadedFileUrl,
+    notes: "Standard logo placement for sample"
+  }]
+}]
+```
+
+**Use Case:** Customer requests samples with their logo embroidered/printed to evaluate quality
+
+---
+
+#### 3.2: Payment Integration (Paid Samples)
+
+**Fields to Add:**
+- `date_Payment` - Payment date
+- `Amount` - Payment amount
+- `Status` - "success"
+- `Gateway` - "Stripe"
+- `AuthCode` - Stripe charge ID
+- `AccountNumber` - Last 4 of card
+- `CreditCardCompany` - "Visa"
+
+**Business Value:**
+- Support paid sample programs ($X per sample)
+- Automatic payment tracking
+- Reconciliation for accounting
+- Prevent free sample abuse
+
+**Implementation:**
+```javascript
+// After successful Stripe payment
+payments: [{
+  date: new Date().toISOString().split('T')[0],
+  amount: stripeCharge.amount / 100,
+  status: "success",
+  gateway: "Stripe",
+  authCode: stripeCharge.id,
+  accountNumber: `****${stripeCharge.payment_method_details.card.last4}`,
+  cardCompany: stripeCharge.payment_method_details.card.brand
+}]
+```
+
+**Use Case:** Switch from 100% free samples to $5/sample program
+
+---
+
+#### 3.3: Attachments (Design Files)
+
+**Fields to Add:**
+- `MediaURL` - URL to design file
+- `MediaName` - File display name
+- `LinkNote` - Description
+
+**Business Value:**
+- Attach customer's logo files to sample order
+- Production can access files directly from OnSite
+- No manual file transfer needed
+
+**Implementation:**
+```javascript
+attachments: [{
+  mediaURL: s3Url,
+  mediaName: "Company Logo - Vector",
+  linkNote: "Customer provided logo for sample decoration"
+}]
+```
+
+**Use Case:** Customer uploads logo for decorated sample evaluation
+
+---
+
 ## Next Steps & Future Enhancements
 
-### Phase 2: Quick Wins (High Value, Low Effort)
+### Implementation Priority Matrix
 
-**Priority 1: Line Item Custom Fields**
-- Add `CustomField01-05` to track:
-  - Sample type (FREE vs PAID)
-  - Source (Top Sellers Showcase, etc.)
-  - Submission date
-  - Color mapping log
-  - Special handling flags
+| Enhancement | Business Value | Implementation Effort | Priority | Timeline |
+|-------------|----------------|-----------------------|----------|----------|
+| **Line Item Custom Fields** | ⭐⭐⭐⭐⭐ | 🔨 Low | **P0** | Next Sprint |
+| **Enhanced Notes** | ⭐⭐⭐⭐⭐ | 🔨 Low | **P0** | Next Sprint |
+| **Requested Ship Date** | ⭐⭐⭐⭐ | 🔨 Low | **P1** | Next Sprint |
+| **Customer Company Info** | ⭐⭐⭐⭐ | 🔨🔨 Medium | **P2** | 1-2 Weeks |
+| **Billing Address** | ⭐⭐⭐ | 🔨 Low* | **P2** | 1-2 Weeks |
+| **Design Block** | ⭐⭐⭐ | 🔨🔨🔨 High | **P3** | Future |
+| **Payment Integration** | ⭐⭐⭐ | 🔨🔨🔨 High | **P3** | Future |
+| **Attachments** | ⭐⭐ | 🔨🔨 Medium | **P4** | Future |
 
-**Priority 2: Enhanced Notes**
-- Use all 8 note types:
-  - Notes On Order (already using)
-  - Notes To Shipping (expedite instructions)
-  - Notes To Production (special handling)
-  - Notes To Art (design specifications)
+*Already implemented in proxy v1.1.0 - just needs frontend work
 
-**Priority 3: Date Fields**
-- Add `requestedShipDate` (customer requested date)
-- Add `dropDeadDate` (deadline for event)
+---
 
-### Phase 3: Major Features
+### Quick Start: Implementing Phase 1 (This Week)
 
-**Design Block Integration**
-- Track artwork specifications
-- Link design files
-- Record color counts, stitch counts
-- Multiple locations per design
-- Image URL references
+**Step 1: Update Frontend** (sample-order-service.js)
+```javascript
+// Add custom fields to line items
+customFields: {
+  CustomField01: 'FREE SAMPLE',
+  CustomField02: 'Top Sellers Showcase',
+  CustomField03: new Date().toLocaleDateString(),
+  CustomField04: 'free',
+  CustomField05: `${sample.displayColor} → ${sample.catalogColor}`
+}
 
-**Payment Integration**
-- Stripe payment tracking
-- PayPal payment tracking
-- Payment status updates
-- Processing fee tracking
-- Auth code storage
+// Add enhanced notes
+notes: [
+  { type: 'Notes On Order', text: '...' },
+  { type: 'Notes To Shipping', text: '...' },
+  { type: 'Notes To Production', text: '...' }
+]
+```
 
-**Customer Block (If Creating New Customers)**
-- Company information
-- Billing address
-- Tax settings
-- Custom fields for segmentation
+**Step 2: Update Proxy** (caspio-pricing-proxy)
+```javascript
+// In manageorders-push-client.js, transformLineItems() function
+lineItem.CustomField01 = item.customFields?.CustomField01 || '';
+lineItem.CustomField02 = item.customFields?.CustomField02 || '';
+lineItem.CustomField03 = item.customFields?.CustomField03 || '';
+lineItem.CustomField04 = item.customFields?.CustomField04 || '';
+lineItem.CustomField05 = item.customFields?.CustomField05 || '';
+```
 
-**Attachments**
-- Design file links
-- Mockup images
-- Approval documents
-- Reference materials
+**Step 3: Test**
+1. Submit sample order
+2. Check console logs for custom fields
+3. Wait for hourly import
+4. Verify fields appear in OnSite
+
+**Step 4: Monitor**
+- First 10 orders: Check every field manually
+- Next 100 orders: Spot check
+- Ongoing: Review monthly for data quality
+
+---
+
+### Measuring Success
+
+**Phase 1 Metrics:**
+- ✅ 100% of sample orders have custom field data
+- ✅ Notes reach correct departments automatically
+- ✅ Requested ship dates tracked for 90%+ of orders
+
+**Phase 2 Metrics:**
+- ✅ Sample-to-customer conversion tracking functional
+- ✅ Billing addresses captured for paid samples
+- ✅ Sales team can identify sample sources
+
+**Phase 3 Metrics:**
+- ✅ Design files attached to 50%+ of decorated samples
+- ✅ Payment integration live for paid sample program
+- ✅ Zero manual data entry for sample orders
+
+---
+
+### Additional Resources
+
+**For Developers:**
+- Complete Swagger field specs in this document
+- Working code examples in Implementation Snippets section
+- Proxy transformation logic in caspio-pricing-proxy repository
+
+**For Business Users:**
+- SAMPLE_ORDER_TESTING_GUIDE.md - Step-by-step testing procedures
+- MANAGEORDERS_PUSH_INTEGRATION.md - Complete API documentation
 
 ---
 
