@@ -2733,11 +2733,11 @@
                         const result = await response.json();
                         // Handle wrapped response structure (result.data.products)
                         const products = result.data?.products || result.products || [];
-                        // Convert API products to our format
+                        // Convert API products to our format with comprehensive fallbacks
                         allProducts = products.map(product => ({
-                            style: product.style,
-                            description: product.title,
-                            brand: product.brand,
+                            style: product.style || 'UNKNOWN',
+                            description: product.title || product.description || 'Unknown Product',
+                            brand: product.brand || 'Unknown Brand',
                             type: 'newProducts'
                         }));
                     }
@@ -2854,13 +2854,13 @@
                     card.innerHTML = `
                         <div class="product-image">
                             <div class="product-badge">${decorationType}</div>
-                            <img src="${imageUrl}" 
-                                 alt="${product.description}"
+                            <img src="${imageUrl}"
+                                 alt="${product.description || 'Product Image'}"
                                  onerror="this.src='${firstProduct.PRODUCT_IMAGE || ''}'">
                         </div>
                         <div class="product-info">
                             <div class="product-style">Style #${product.style}</div>
-                            <div class="product-name">${product.description}</div>
+                            <div class="product-name">${product.description || 'Unknown Product'}</div>
                             <div class="color-swatches">
                                 ${colorsToShow.map(c => `
                                     <div class="color-swatch" title="${c.COLOR_NAME}">
@@ -2879,7 +2879,7 @@
                                     </button>
                                 ` : `
                                     <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
-                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
+                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
                                         <i class="fas fa-box-open"></i> Request Sample
                                     </button>
                                 `}
@@ -2903,8 +2903,8 @@
                         card.innerHTML = `
                             <div class="product-image">
                                 <div class="product-badge">${decorationType}</div>
-                                <img src="${overrideImage}" 
-                                     alt="${product.description}"
+                                <img src="${overrideImage}"
+                                     alt="${product.description || 'Product Image'}"
                                      onerror="this.style.display='none'">
                             </div>
                         `;
@@ -2922,7 +2922,7 @@
                     card.innerHTML += `
                         <div class="product-info">
                             <div class="product-style">Style #${product.style}</div>
-                            <div class="product-name">${product.description}</div>
+                            <div class="product-name">${product.description || 'Unknown Product'}</div>
                             <div style="padding: 0.75rem 0; text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
                                 <i class="fas fa-award" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
                                 Premium ${product.brand} Product
@@ -2935,7 +2935,7 @@
                                     </button>
                                 ` : `
                                     <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
-                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${product.description.replace(/'/g, "\\'")}', '')">
+                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '')">
                                         <i class="fas fa-box-open"></i> Request Sample
                                     </button>
                                 `}
