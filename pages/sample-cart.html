@@ -350,6 +350,65 @@
                 width: 100%;
             }
         }
+
+        /* ==============================================
+           BILLING/SHIPPING ADDRESS STYLING
+           ============================================== */
+
+        /* Same as billing checkbox container */
+        .same-as-billing-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .checkbox-label span {
+            user-select: none;
+        }
+
+        /* Smooth transition for shipping section */
+        .shipping-address-section {
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+            overflow: hidden;
+        }
+
+        .shipping-address-section[style*="display: none"] {
+            opacity: 0;
+            max-height: 0;
+        }
+
+        /* Section headers styling */
+        .form-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary, #333);
+        }
+
+        .form-section h2 i {
+            color: var(--primary-color, #2d5f3f);
+        }
     </style>
 </head>
 <body>
@@ -438,39 +497,90 @@
                             </select>
                         </div>
 
+                        <!-- BILLING ADDRESS SECTION -->
+                        <h2 style="margin-top: 2rem;"><i class="fas fa-credit-card"></i> Billing Address</h2>
+
                         <div class="form-group">
                             <label>
                                 Street Address <span class="required">*</span>
                             </label>
-                            <input type="text" name="address1" required placeholder="123 Main St">
+                            <input type="text" name="billing_address1" id="billing-address1" required placeholder="123 Main St">
                         </div>
 
                         <div class="form-group">
                             <label>
                                 Apt/Suite
                             </label>
-                            <input type="text" name="address2" placeholder="Apt 4B">
+                            <input type="text" name="billing_address2" id="billing-address2" placeholder="Apt 4B">
                         </div>
 
                         <div class="form-group">
                             <label>
                                 City <span class="required">*</span>
                             </label>
-                            <input type="text" name="city" required>
+                            <input type="text" name="billing_city" id="billing-city" required>
                         </div>
 
                         <div class="form-group">
                             <label>
                                 State <span class="required">*</span>
                             </label>
-                            <input type="text" name="state" required placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
+                            <input type="text" name="billing_state" id="billing-state" required placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
                         </div>
 
                         <div class="form-group">
                             <label>
                                 ZIP Code <span class="required">*</span>
                             </label>
-                            <input type="text" name="zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
+                            <input type="text" name="billing_zip" id="billing-zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
+                        </div>
+
+                        <!-- SAME AS BILLING CHECKBOX -->
+                        <div class="form-group full-width same-as-billing-container">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="same-as-billing" checked>
+                                <span>Ship to the same address</span>
+                            </label>
+                        </div>
+
+                        <!-- SHIPPING ADDRESS SECTION (hidden by default) -->
+                        <div id="shipping-section" class="shipping-address-section" style="display: none;">
+                            <h2><i class="fas fa-shipping-fast"></i> Shipping Address</h2>
+
+                            <div class="form-group">
+                                <label>
+                                    Street Address
+                                </label>
+                                <input type="text" name="shipping_address1" id="shipping-address1" placeholder="123 Main St">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    Apt/Suite
+                                </label>
+                                <input type="text" name="shipping_address2" id="shipping-address2" placeholder="Apt 4B">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    City
+                                </label>
+                                <input type="text" name="shipping_city" id="shipping-city">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    State
+                                </label>
+                                <input type="text" name="shipping_state" id="shipping-state" placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    ZIP Code
+                                </label>
+                                <input type="text" name="shipping_zip" id="shipping-zip" placeholder="98101" pattern="\d{5}" maxlength="5">
+                            </div>
                         </div>
 
                         <!-- Shipping Method: Hidden field defaulting to UPS Ground -->
@@ -667,9 +777,54 @@
             loadCart();
         }
 
+        // ==============================================
+        // BILLING/SHIPPING ADDRESS MANAGEMENT
+        // ==============================================
+
+        // Copy billing address to shipping address
+        function copyBillingToShipping() {
+            const fields = ['address1', 'address2', 'city', 'state', 'zip'];
+            fields.forEach(field => {
+                const billingValue = document.getElementById(`billing-${field}`).value;
+                document.getElementById(`shipping-${field}`).value = billingValue;
+            });
+            console.log('[Address] Copied billing to shipping');
+        }
+
+        // Toggle shipping section visibility
+        document.getElementById('same-as-billing').addEventListener('change', function() {
+            const shippingSection = document.getElementById('shipping-section');
+
+            if (this.checked) {
+                // Hide shipping section and copy billing data
+                shippingSection.style.display = 'none';
+                copyBillingToShipping();
+                console.log('[Address] Shipping address hidden (same as billing)');
+            } else {
+                // Show shipping section
+                shippingSection.style.display = 'block';
+                console.log('[Address] Shipping address shown (different from billing)');
+            }
+        });
+
+        // Auto-copy billing to shipping as user types (if checkbox is checked)
+        ['address1', 'address2', 'city', 'state', 'zip'].forEach(field => {
+            document.getElementById(`billing-${field}`).addEventListener('blur', function() {
+                if (document.getElementById('same-as-billing').checked) {
+                    copyBillingToShipping();
+                }
+            });
+        });
+
         // Handle form submission
         document.getElementById('sampleRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            // Ensure shipping fields are populated before submission
+            const sameAsBilling = document.getElementById('same-as-billing').checked;
+            if (sameAsBilling) {
+                copyBillingToShipping();
+            }
 
             const formData = new FormData(e.target);
             const cart = getCartSamples();
@@ -677,19 +832,29 @@
             const firstName = formData.get('firstName').trim();
             const lastName = formData.get('lastName').trim();
 
-            // Prepare customer data for ShopWorks
+            // Prepare customer data for ShopWorks (with separate billing & shipping)
             const customerData = {
                 firstName: firstName,
                 lastName: lastName,
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 company: formData.get('company') || '',
-                address1: formData.get('address1'),
-                address2: formData.get('address2') || '',
-                city: formData.get('city'),
-                state: formData.get('state').toUpperCase(),
-                zip: formData.get('zip'),
-                country: formData.get('country') || 'USA',
+                salesRep: formData.get('salesRep') || 'House',
+
+                // Billing address
+                billing_address1: formData.get('billing_address1'),
+                billing_address2: formData.get('billing_address2') || '',
+                billing_city: formData.get('billing_city'),
+                billing_state: formData.get('billing_state').toUpperCase(),
+                billing_zip: formData.get('billing_zip'),
+
+                // Shipping address
+                shipping_address1: formData.get('shipping_address1'),
+                shipping_address2: formData.get('shipping_address2') || '',
+                shipping_city: formData.get('shipping_city'),
+                shipping_state: formData.get('shipping_state').toUpperCase(),
+                shipping_zip: formData.get('shipping_zip'),
+
                 shippingMethod: formData.get('shippingMethod') || 'UPS Ground',
                 notes: formData.get('notes') || ''
             };

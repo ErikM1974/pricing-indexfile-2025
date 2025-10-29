@@ -225,13 +225,25 @@ class SampleOrderService {
                     company: formData.company || ''
                 },
 
+                // Billing address (separate from shipping for proper invoicing)
+                billing: {
+                    company: formData.billing_company || formData.company || `${(formData.firstName || '').trim()} ${(formData.lastName || '').trim()}`.trim(),
+                    address1: formData.billing_address1,
+                    address2: formData.billing_address2 || '',
+                    city: formData.billing_city,
+                    state: formData.billing_state,
+                    zip: formData.billing_zip,
+                    country: 'USA'
+                },
+
+                // Shipping address (can be same as billing or different)
                 shipping: {
-                    company: formData.company || `${(formData.firstName || '').trim()} ${(formData.lastName || '').trim()}`.trim(),
-                    address1: formData.address1,
-                    address2: formData.address2 || '',
-                    city: formData.city,
-                    state: formData.state,
-                    zip: formData.zip,
+                    company: formData.shipping_company || formData.company || `${(formData.firstName || '').trim()} ${(formData.lastName || '').trim()}`.trim(),
+                    address1: formData.shipping_address1,
+                    address2: formData.shipping_address2 || '',
+                    city: formData.shipping_city,
+                    state: formData.shipping_state,
+                    zip: formData.shipping_zip,
                     country: formData.country || 'USA',
                     method: formData.shippingMethod || 'UPS Ground'  // Shows in Ship Method field
                 },
