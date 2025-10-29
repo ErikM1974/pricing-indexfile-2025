@@ -113,6 +113,16 @@ This documentation has been reorganized into modular components for better perfo
 2. Find your endpoints in **/api/** directory
 3. Use patterns from **[CLAUDE_PATTERNS.md](./CLAUDE_PATTERNS.md)**
 
+### "I need to add/remove products from New Products showcase"
+1. Read workflow guide in **CLAUDE.md** § "Managing 'New Products' Showcase"
+2. Use quick reference curl commands for common operations:
+   - **Add products:** `POST /api/admin/products/mark-as-new`
+   - **Remove all:** `POST /api/admin/products/clear-isnew`
+   - **Check current:** `GET /api/products/new`
+3. Review complete endpoint documentation in **[products-api.md](./api/products-api.md)** → "New Products Management"
+4. Wait 5 minutes for cache after changes (or force browser refresh)
+5. Verify on website: `/pages/top-sellers-showcase.html` → "New Products" button
+
 ### "I need to understand the system architecture"
 1. Start with **[CLAUDE_ARCHITECTURE.md](./CLAUDE_ARCHITECTURE.md)**
 2. Review adapter pattern if working with pricing

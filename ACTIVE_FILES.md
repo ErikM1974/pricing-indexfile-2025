@@ -43,7 +43,7 @@
 | `/pages/resources.html` | Resources page | Various | ✅ Active |
 | `/pages/sale.html` | Sale page | Various | ✅ Active |
 | `/pages/webstore-info.html` | Webstore information | Various | ✅ Active |
-| `/pages/top-sellers-showcase.html` | Top sellers showcase | Various | ✅ Active |
+| `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 
 ## 📊 Calculators & Quote Builders

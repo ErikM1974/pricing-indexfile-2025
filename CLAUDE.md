@@ -380,6 +380,196 @@ grep -r "253-922-5793\|caspio\|herokuapp" --include="*.js"
    git commit -m "Add [feature]: [what it does and why]"
    ```
 
+## 🆕 Managing "New Products" Showcase (API-Driven Feature)
+
+### Overview
+The "New Products" filter button on Top Sellers Showcase is **API-driven** - products automatically appear when marked with `IsNew` flag in database. This is the **only dynamic filter** (all other categories use static hardcoded arrays).
+
+**Key Architectural Difference:**
+- **Other Filters** (Bestsellers, T-Shirts, Polos, etc.): Static arrays in `top-sellers-showcase.html`
+- **New Products Filter**: Dynamic API query to `/api/products/new`
+
+### Quick Reference Commands
+
+```bash
+# Add single new product
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-new" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["NE215"]}'
+
+# Add multiple new products
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-new" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["EB120", "EB121", "DT620", "NE410", "ST850"]}'
+
+# Remove all new products (reset)
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-isnew" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+# Check current new products
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new"
+
+# Remove single product (option 1 - direct update)
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/NE215" \
+  -H "Content-Type: application/json" \
+  -d '{"IsNew": 0}'
+```
+
+### Complete Workflow
+
+**Scenario 1: Add Products to "New Products" Section**
+
+1. **Identify products** by style number (e.g., NE215, EB120, DT620)
+2. **Mark as new** using bulk endpoint:
+   ```bash
+   curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-new" \
+     -H "Content-Type: application/json" \
+     -d '{"styles": ["NE215", "EB120", "DT620"]}'
+   ```
+3. **Wait 5 minutes** for API cache to expire (or force browser refresh)
+4. **Verify** by visiting `http://localhost:3000/pages/top-sellers-showcase.html` and clicking "New Products" button
+
+**Scenario 2: Replace All New Products**
+
+1. **Clear existing** new products:
+   ```bash
+   curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-isnew" \
+     -H "Content-Type: application/json" \
+     -d '{"confirm": true}'
+   ```
+2. **Mark new set**:
+   ```bash
+   curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-new" \
+     -H "Content-Type: application/json" \
+     -d '{"styles": ["EB120", "EB121", "DT620", "NE410"]}'
+   ```
+3. **Wait 5 minutes** for cache
+4. **Verify** on website
+
+**Scenario 3: Remove Single Product**
+
+```bash
+# Option A: Direct update (fastest)
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/NE215" \
+  -H "Content-Type: application/json" \
+  -d '{"IsNew": 0}'
+
+# Option B: Clear all and re-mark others
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-isnew" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-new" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["EB120", "EB121", "DT620"]}'
+```
+
+### How It Works
+
+**Frontend Implementation** (`/pages/top-sellers-showcase.html`):
+
+```javascript
+// When "New Products" button clicked
+if (type === 'newProducts') {
+    // Fetch from API (NOT hardcoded array)
+    const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new?limit=100');
+    const result = await response.json();
+    const products = result.products || [];
+
+    // Group by style (eliminate color duplicates)
+    const uniqueProducts = new Map();
+    products.forEach(p => {
+        if (!uniqueProducts.has(p.STYLE)) {
+            uniqueProducts.set(p.STYLE, p);
+        }
+    });
+
+    // Filter out DISCONTINUED products
+    const activeProducts = Array.from(uniqueProducts.values()).filter(p =>
+        !p.PRODUCT_TITLE?.includes('DISCONTINUED') &&
+        !p.PRODUCT_DESCRIPTION?.includes('DISCONTINUED')
+    );
+
+    // Display product cards
+    allProducts = activeProducts.map(product => ({
+        style: product.STYLE,
+        description: product.PRODUCT_TITLE?.split('.')[0]?.trim(),
+        brand: product.MILL,
+        imageUrl: product.COLOR_PRODUCT_IMAGE || product.PRODUCT_IMAGE || product.THUMBNAIL_IMAGE
+    }));
+}
+```
+
+**Backend API** (`/api/products/new`):
+- Queries Caspio database for products where `IsNew=1`
+- Returns all color variants (frontend deduplicates)
+- 5-minute server-side cache
+- No authentication required
+
+### Available Endpoints
+
+| Endpoint | Method | Purpose | Auth |
+|----------|--------|---------|------|
+| `/api/products/new` | GET | Get new products | No |
+| `/api/product-details` | GET | Get product info | No |
+| `/api/products/{style}` | PUT | Update product | No |
+| `/api/admin/products/mark-as-new` | POST | Mark as new (bulk) | No |
+| `/api/admin/products/clear-isnew` | POST | Clear all IsNew flags | No |
+| `/api/tables/{table}/fields` | POST | Create field (infrastructure) | No |
+| `/api/tables/{table}/fields/{field}` | GET | Get field schema | No |
+
+**Complete endpoint documentation:** See `memory/api/products-api.md` → "New Products Management" section
+
+### Important Behaviors
+
+1. **Cache Delay**: Changes take up to 5 minutes to appear (server cache TTL)
+2. **Deduplication**: Frontend groups color variants by style number (one card per style)
+3. **Auto-Filtering**: DISCONTINUED products excluded automatically
+4. **Image Priority**: COLOR_PRODUCT_IMAGE → PRODUCT_IMAGE → THUMBNAIL_IMAGE → brand placeholder
+5. **No Database Changes Needed**: Just toggle `IsNew` flag, no code changes required
+
+### Troubleshooting
+
+**Problem: Products not appearing after marking as new**
+- ✅ Wait 5 minutes for cache (or force browser refresh: Ctrl+Shift+R)
+- ✅ Verify product not DISCONTINUED: `curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=NE215"`
+- ✅ Check API response: `curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new"`
+- ✅ Check browser console for JavaScript errors
+
+**Problem: Wrong products showing**
+- ✅ Use clear-isnew endpoint to reset all
+- ✅ Re-mark only desired products
+- ✅ Verify which products marked: `curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new"`
+
+**Problem: Images not loading**
+- ✅ Check product has image URL in Caspio database
+- ✅ Verify URL is accessible
+- ✅ Fallback to brand placeholder if no image
+
+### Testing Checklist
+
+Before marking task complete:
+
+- [ ] Products marked via API: `curl -X POST .../mark-as-new`
+- [ ] Waited 5 minutes for cache (or tested with force refresh)
+- [ ] Verified on website: `/pages/top-sellers-showcase.html`
+- [ ] Clicked "New Products" button
+- [ ] Confirmed correct products display
+- [ ] Checked images loading properly
+- [ ] Verified DISCONTINUED products filtered out
+- [ ] No JavaScript errors in browser console
+
+### Future Enhancements
+
+**Current State:** Basic IsNew flag with manual API management
+**Potential Future Features:**
+- Admin UI for marking products (no curl commands needed)
+- Scheduled auto-expiration (e.g., remove after 30 days)
+- Product launch calendar integration
+- A/B testing for product showcases
+- Analytics tracking for "New Products" clicks
+
 ## 📊 Data Flow Documentation
 
 ### How Data Flows Through the System
