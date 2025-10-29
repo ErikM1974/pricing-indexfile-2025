@@ -209,7 +209,7 @@ class SampleOrderService {
 
                 // Order-level fields for ShopWorks invoice
                 purchaseOrderNumber: orderNumber,  // Already includes SAMPLE- prefix from generateOrderNumber()
-                salesRep: 'Erik Mickelson',                    // Shows in Salesperson field
+                salesRep: formData.salesRep || 'House',  // Dynamic from dropdown, defaults to House
                 terms: subtotal > 0 ? 'Prepaid' : 'FREE SAMPLE',  // Payment terms (not invoice amount)
 
                 // Sales tax (Washington State 10.1% - GL Account 2200)
