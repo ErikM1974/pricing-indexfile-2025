@@ -2730,9 +2730,11 @@
                 try {
                     const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search?isNew=true&limit=100');
                     if (response.ok) {
-                        const data = await response.json();
+                        const result = await response.json();
+                        // Handle wrapped response structure (result.data.products)
+                        const products = result.data?.products || result.products || [];
                         // Convert API products to our format
-                        allProducts = data.products.map(product => ({
+                        allProducts = products.map(product => ({
                             style: product.style,
                             description: product.title,
                             brand: product.brand,
