@@ -26,8 +26,9 @@ class SampleOrderService {
     }
 
     /**
-     * Generate sample order number: SAMPLE-MMDD-sequence
-     * Format: SAMPLE-1027-1 (first sample on Oct 27)
+     * Generate sample order number: SAMPLE-MMDD-sequence-milliseconds
+     * Format: SAMPLE-1027-1-347 (first sample on Oct 27, at 347ms)
+     * Uses localStorage for cross-tab coordination and millisecond suffix for uniqueness
      *
      * @returns {string} Order number
      */
@@ -36,20 +37,22 @@ class SampleOrderService {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
 
-        // Daily sequence from sessionStorage (resets each day)
+        // Daily sequence from localStorage (shared across tabs, resets each day)
         const dateKey = `${month}${day}`;
         const storageKey = `sample_order_seq_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
+        let sequence = parseInt(localStorage.getItem(storageKey) || '0') + 1;
+        localStorage.setItem(storageKey, sequence.toString());
 
         // Clean up old sequences (keep only today's)
-        for (let key in sessionStorage) {
+        for (let key in localStorage) {
             if (key.startsWith('sample_order_seq_') && key !== storageKey) {
-                sessionStorage.removeItem(key);
+                localStorage.removeItem(key);
             }
         }
 
-        const orderNumber = `SAMPLE-${month}${day}-${sequence}`;
+        // Add millisecond timestamp suffix for uniqueness (prevents simultaneous user collisions)
+        const ms = String(now.getMilliseconds()).padStart(3, '0');
+        const orderNumber = `SAMPLE-${month}${day}-${sequence}-${ms}`;
         console.log('[SampleOrderService] Generated order number:', orderNumber);
 
         return orderNumber;
