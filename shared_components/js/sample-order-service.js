@@ -200,8 +200,8 @@ class SampleOrderService {
             // This ensures tax automatically displays in OnSite without manual customer re-selection
             if (salesTax > 0) {
                 lineItems.push({
-                    partNumber: 'Tax',                           // Must match ShopWorks "Tax Line Item" config
-                    description: 'Washington State Sales Tax',   // Must match ShopWorks config
+                    partNumber: 'Tax_10.1',                      // Must match ShopWorks "Tax Line Item" config
+                    description: 'City of Milton Sales Tax 10.1%', // Must match ShopWorks config
                     color: '',
                     size: null,                                  // No size for tax line item
                     quantity: 1,
@@ -210,7 +210,8 @@ class SampleOrderService {
                 });
 
                 console.log('[SampleOrderService] ✅ Added tax line item:', {
-                    partNumber: 'Tax',
+                    partNumber: 'Tax_10.1',
+                    description: 'City of Milton Sales Tax 10.1%',
                     price: salesTax.toFixed(2),
                     rate: `${(salesTaxRate * 100).toFixed(1)}%`
                 });
@@ -238,10 +239,9 @@ class SampleOrderService {
                 salesRep: formData.salesRep || 'House',  // Dynamic from dropdown, defaults to House
                 terms: subtotal > 0 ? 'Prepaid' : 'FREE SAMPLE',  // Payment terms (not invoice amount)
 
-                // Sales tax (Washington State 10.1% - GL Account 2200)
-                salesTax: parseFloat(salesTax.toFixed(2)),
-                salesTaxRate: salesTaxRate,
-                salesTaxAccount: '2200',  // Washington State Sales Tax liability account
+                // Note: Sales tax is handled via line item (Tax_10.1) to prevent duplicate tax lines
+                // ShopWorks "Split Tax Line" mode automatically posts tax to GL Account 2200.101
+                // Tax amount displays correctly without requiring manual customer refresh
 
                 customer: {
                     firstName: formData.firstName,
