@@ -259,11 +259,11 @@ class SampleOrderService {
 
                 // Build notes array - user notes FIRST, then order summary
                 notes: [
-                    // User notes FIRST (conditionally added with red circle emoji prefix)
+                    // User notes FIRST (conditionally added with "Note From Customer:" prefix)
                     ...(formData.notes && formData.notes.trim().length > 0
                         ? [{
                             type: 'Notes On Order',
-                            text: `🔴 Note From Customer:\n${formData.notes.trim()}`
+                            text: `Note From Customer:\n${formData.notes.trim()}`
                         }]
                         : []
                     ),
