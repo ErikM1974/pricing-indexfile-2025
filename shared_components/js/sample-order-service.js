@@ -196,6 +196,26 @@ class SampleOrderService {
             // Expand each sample into multiple line items (one per size with proper suffixes)
             const lineItems = samples.flatMap(sample => this.expandSampleIntoLineItems(sample));
 
+            // Add sales tax as a line item (required for ShopWorks "Split Tax Line" integration)
+            // This ensures tax automatically displays in OnSite without manual customer re-selection
+            if (salesTax > 0) {
+                lineItems.push({
+                    partNumber: 'Tax',                           // Must match ShopWorks "Tax Line Item" config
+                    description: 'Washington State Sales Tax',   // Must match ShopWorks config
+                    color: '',
+                    size: null,                                  // No size for tax line item
+                    quantity: 1,
+                    price: parseFloat(salesTax.toFixed(2)),     // Tax amount as unit price
+                    notes: `Sales Tax (${(salesTaxRate * 100).toFixed(1)}%)`  // Helpful note showing tax rate
+                });
+
+                console.log('[SampleOrderService] ✅ Added tax line item:', {
+                    partNumber: 'Tax',
+                    price: salesTax.toFixed(2),
+                    rate: `${(salesTaxRate * 100).toFixed(1)}%`
+                });
+            }
+
             // CRITICAL VALIDATION: Ensure we have at least one line item before sending to API
             if (lineItems.length === 0) {
                 console.error('[SampleOrderService] No valid line items generated. Samples:', samples);
