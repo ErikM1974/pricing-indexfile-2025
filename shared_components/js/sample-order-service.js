@@ -118,8 +118,8 @@ class SampleOrderService {
      * @param {Array} samples - Array of sample items from cart
      * @returns {Promise<Object>} Result with success/failure and order number
      */
-    async submitSampleOrder(customerData, samples) {
-        return this.submitOrder(customerData, samples);
+    async submitSampleOrder(customerData, samples, logoFile = null) {
+        return this.submitOrder(customerData, samples, logoFile);
     }
 
     /**
@@ -146,9 +146,15 @@ class SampleOrderService {
      * @param {number} samples[].price - Sample price (0 for free, >0 for paid)
      * @param {string} samples[].type - 'free' or 'paid'
      *
+     * @param {Object} logoFile - Optional logo/artwork file (base64 encoded)
+     * @param {string} logoFile.fileName - Name of the file
+     * @param {string} logoFile.fileData - Base64-encoded file data (data:image/png;base64,...)
+     * @param {string} logoFile.category - File category (e.g., 'artwork')
+     * @param {string} logoFile.description - File description
+     *
      * @returns {Promise<Object>} Result with success/failure and order number
      */
-    async submitOrder(formData, samples) {
+    async submitOrder(formData, samples, logoFile = null) {
         try {
             const orderNumber = this.generateOrderNumber();
 
@@ -258,6 +264,12 @@ class SampleOrderService {
                         : `FREE SAMPLE - Top Sellers Showcase - ${formData.company || formData.lastName}`
                 }]
             };
+
+            // Add files array if logo was uploaded
+            if (logoFile) {
+                order.files = [logoFile];
+                console.log('[SampleOrderService] Logo file included:', logoFile.fileName);
+            }
 
             console.log('[SampleOrderService] Order payload:', order);
 
