@@ -257,12 +257,24 @@ class SampleOrderService {
                 // Use pre-validated lineItems array
                 lineItems: lineItems,
 
-                notes: [{
-                    type: 'Notes On Order',
-                    text: subtotal > 0
-                        ? `MIXED ORDER - ${paidItems.length} PAID ($${subtotal.toFixed(2)} + $${salesTax.toFixed(2)} tax = $${total.toFixed(2)}) + ${freeItems.length} FREE - ${formData.company || formData.lastName}`
-                        : `FREE SAMPLE - Top Sellers Showcase - ${formData.company || formData.lastName}`
-                }]
+                // Build notes array - user notes FIRST, then order summary
+                notes: [
+                    // User notes FIRST (conditionally added with red circle emoji prefix)
+                    ...(formData.notes && formData.notes.trim().length > 0
+                        ? [{
+                            type: 'Notes On Order',
+                            text: `🔴 Note From Customer:\n${formData.notes.trim()}`
+                        }]
+                        : []
+                    ),
+                    // Order summary SECOND (always added)
+                    {
+                        type: 'Notes On Order',
+                        text: subtotal > 0
+                            ? `MIXED ORDER - ${paidItems.length} PAID ($${subtotal.toFixed(2)} + $${salesTax.toFixed(2)} tax = $${total.toFixed(2)}) + ${freeItems.length} FREE - ${formData.company || formData.lastName}`
+                            : `FREE SAMPLE - Top Sellers Showcase - ${formData.company || formData.lastName}`
+                    }
+                ]
             };
 
             // Add files array if logo was uploaded

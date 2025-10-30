@@ -952,10 +952,10 @@
                         logoFile = {
                             fileName: file.name,
                             fileData: base64Data,
-                            category: 'artwork',
-                            description: 'Customer uploaded logo/artwork'
+                            category: 'reference',  // CHANGED: Sample orders ship BLANK (no decoration)
+                            description: 'Customer reference logo (samples ship BLANK)'
                         };
-                        console.log('[Sample Cart] ✅ Logo file converted to base64');
+                        console.log('[Sample Cart] ✅ Logo file converted to base64 (reference only)');
                     } catch (error) {
                         console.error('[Sample Cart] ❌ Failed to convert logo file:', error);
                         // Continue without logo - don't block order submission
