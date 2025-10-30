@@ -178,7 +178,12 @@ class SampleOrderService {
             // Calculate FREE vs PAID totals
             const freeItems = samples.filter(s => (s.type === 'free' || !s.type));
             const paidItems = samples.filter(s => s.type === 'paid');
-            const subtotal = paidItems.reduce((sum, item) => sum + (item.price || 0), 0);
+            const subtotal = paidItems.reduce((sum, item) => {
+                // Sum all size quantities for this sample
+                const totalQty = Object.values(item.sizes || {}).reduce((qtySum, qty) => qtySum + (parseInt(qty) || 0), 0);
+                // Multiply total quantity by price per piece
+                return sum + (totalQty * (item.price || 0));
+            }, 0);
 
             // Calculate Washington State Sales Tax (10.1%)
             const salesTaxRate = 0.101;
