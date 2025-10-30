@@ -393,7 +393,7 @@ class CartDrawer {
         }
 
         console.log('[CartDrawer] Proceeding to checkout');
-        window.location.href = '/pages/checkout-review.html';
+        window.location.href = '/pages/sample-cart.html';
     }
 
     showSuccessMessage(message) {

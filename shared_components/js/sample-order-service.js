@@ -112,7 +112,7 @@ class SampleOrderService {
     }
 
     /**
-     * Submit sample order (wrapper for submitOrder - for checkout-review.html compatibility)
+     * Submit sample order (wrapper for submitOrder - for sample-cart.html compatibility)
      *
      * @param {Object} customerData - Customer and shipping information
      * @param {Array} samples - Array of sample items from cart

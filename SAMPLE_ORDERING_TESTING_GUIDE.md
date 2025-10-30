@@ -221,7 +221,7 @@ This guide covers testing the complete sample ordering system from product selec
 
 #### 5.3 Empty Cart Checkout
 1. Clear cart completely
-2. Navigate directly to `/pages/checkout-review.html`
+2. Navigate directly to `/pages/sample-cart.html`
 3. **Verify:**
    - [ ] Shows "Your cart is empty" message
    - [ ] No checkout form visible
@@ -401,7 +401,7 @@ Before going live:
 - **Console Commands:** See "Console Testing Commands" section above
 - **Related Files:**
   - `/pages/top-sellers-showcase.html`
-  - `/pages/checkout-review.html`
+  - `/pages/sample-cart.html`
   - `/pages/order-confirmation.html`
   - `/shared_components/js/cart-drawer.js`
   - `/shared_components/js/sample-order-service.js`
