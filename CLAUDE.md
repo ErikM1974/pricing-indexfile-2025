@@ -25,6 +25,7 @@ grep -l "style=" --include="*.html" -r . | head -5       # Should return nothing
 - [Critical Rules (Tier 1)](#tier-1-critical-rules) - Prevent disasters
 - [Important Standards (Tier 2)](#tier-2-important-standards) - Maintain quality
 - [Project Overview](#project-overview) - System architecture
+- [Backend API Development](#backend-api-development) - **NEW** - Two-repo workflow
 - [Development Commands](#development-commands) - How to run the app
 - [Common Issues & Fixes](#common-issues--fixes) - Quick solutions
 - [Additional Resources](#additional-resources) - Helpful references
@@ -113,6 +114,97 @@ git branch -d feature/new-calculator
 ## Project Overview
 
 The NWCA Pricing System provides dynamic pricing calculators for apparel decoration (DTG, embroidery, screen printing, etc.) with quote generation and database persistence.
+
+## 🔗 Backend API Development
+
+### Two-Repository Architecture
+
+This project (Pricing Index File 2025) is the **frontend** - quote builders, calculators, pricing pages.
+
+The **backend** (API server) is in a separate repository:
+- **Location:** `../caspio-pricing-proxy` (sibling directory)
+- **Purpose:** Express server providing API endpoints
+- **Port:** 3002 (local development), Heroku (production)
+- **Base URL:** `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+
+### When to Work in Each Repository
+
+**Stay in Pricing Index File 2025 (this project) for:**
+- Quote builders and calculators
+- Pricing page UI
+- Using existing API endpoints
+- Frontend bug fixes
+- Adding new pages (requires route in backend)
+
+**Open caspio-pricing-proxy (separate VS Code window) for:**
+- Creating new API endpoints
+- Modifying backend server logic
+- Backend documentation
+- Route file organization
+- Server deployment
+
+### Cross-Repository Workflow
+
+**Example: Adding a new quote builder page**
+
+1. **Frontend (this project):**
+   - Create quote builder HTML/JS
+   - Use existing API endpoints for data
+
+2. **Backend (caspio-pricing-proxy):**
+   - Add route for new page in server.js:
+     ```javascript
+     app.get('/new-quote-builder.html', (req, res) => {
+       res.sendFile(path.join(__dirname, 'quote-builders', 'new-quote-builder.html'));
+     });
+     ```
+   - Restart server
+
+3. **If new API endpoints needed:**
+   - Work in backend repository
+   - Add endpoints to `/routes/` folder
+   - Deploy to Heroku
+   - Update API documentation in both repos
+
+### Backend Documentation Locations
+
+**In Backend Repository (caspio-pricing-proxy/memory/):**
+- `API_DOCUMENTATION.md` - Complete API reference (provider perspective)
+- `DEVELOPER_GUIDE.md` - Backend development guide
+- `MANAGEORDERS_INTEGRATION.md` - ManageOrders proxy implementation
+- `ONLINE_STORE_DEVELOPER_GUIDE.md` - Webstore integration
+
+**In This Repository (memory/):**
+- `CASPIO_API_CORE.md` - API reference (consumer perspective)
+- `manageorders/` - ManageOrders usage guides
+- Backend docs = "how to build it"
+- Frontend docs = "how to use it"
+
+### Environment Variables
+
+Backend uses environment variables for:
+- Caspio credentials
+- ManageOrders credentials
+- EmailJS keys
+- Port configuration
+
+See `caspio-pricing-proxy/.env.example` for complete list.
+
+**DO NOT** store credentials in frontend code.
+
+### Quick Reference
+
+```bash
+# Open backend in new VS Code window
+cd ../caspio-pricing-proxy
+code .
+
+# Test backend locally
+npm start  # Runs on port 3002
+
+# Check backend endpoints
+curl http://localhost:3002/api/health
+```
 
 ## Development Commands
 
