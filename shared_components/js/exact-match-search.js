@@ -24,6 +24,7 @@ class ExactMatchSearch {
         this.onSuggestions = config.onSuggestions || null; // Callback for suggestion list
         this.onError = config.onError || null; // Callback for errors
         this.filterFunction = config.filterFunction || null; // Optional product filter
+        this.onFilteredOut = config.onFilteredOut || null; // Callback for filtered items (e.g., wrong product type)
 
         // Cache recent searches (2 minutes)
         this.cache = new Map();
@@ -94,14 +95,23 @@ class ExactMatchSearch {
             // Fetch from API
             const results = await this.fetchFromAPI(query);
 
-            // Apply optional filter (e.g., caps only, no caps)
+            // Apply optional filter AND track what was filtered out
             let filteredResults = results;
+            let filteredOutItems = [];
+
             if (this.filterFunction) {
+                filteredOutItems = results.filter(item => !this.filterFunction(item));
                 filteredResults = results.filter(this.filterFunction);
             }
 
             // Cache the results
             this.setCached(query, filteredResults);
+
+            // Notify about filtered items BEFORE showing dropdown
+            if (this.onFilteredOut && filteredOutItems.length > 0 && filteredResults.length === 0) {
+                console.log('[ExactMatchSearch] Calling onFilteredOut with', filteredOutItems.length, 'filtered items');
+                this.onFilteredOut(filteredOutItems, query);
+            }
 
             // Process and callback
             this.processResults(filteredResults, query);

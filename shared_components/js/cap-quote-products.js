@@ -36,6 +36,17 @@ class CapProductLineManager {
             filterFunction: (item) => {
                 // Cap embroidery ONLY structured caps (exclude beanies/knits)
                 return this.isStructuredCap(item);
+            },
+            onFilteredOut: (filteredItems, query) => {
+                // Check if filtered items are beanies and show warning
+                const hasBeanies = filteredItems.some(item =>
+                    ProductCategoryFilter.isFlatHeadwear(item)
+                );
+
+                if (hasBeanies) {
+                    console.log('[CapProductLineManager] 🔔 Beanie detected via ExactMatchSearch:', query);
+                    this.showBeanieWarning(filteredItems[0]);
+                }
             }
         });
 
@@ -75,33 +86,20 @@ class CapProductLineManager {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
 
-        // PRIORITY 1: EXCLUDE flat embroidery headwear
-        // These don't have structured surfaces for cap embroidery machines
-        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
-        const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
-            title.includes(keyword) || description.includes(keyword)
-        );
-
-        if (isFlatHeadwear) {
+        // PRIORITY 1: Exclude flat embroidery headwear using shared utility
+        if (ProductCategoryFilter.isFlatHeadwear(product)) {
             console.log('[CapProductLineManager] Filtered out flat headwear product:', title);
             return false;  // EXCLUDE - use embroidery builder instead
         }
 
-        // PRIORITY 2: INCLUDE only structured caps
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted',
-                            'flexfit', 'visor', 'mesh back', 'dad hat',
-                            'baseball', '5-panel', '6-panel', 'bucket'];
-
-        const isStructuredCap = capKeywords.some(keyword =>
-            title.includes(keyword) ||
-            description.includes(keyword)
-        );
-
-        if (!isStructuredCap) {
-            console.log('[CapProductLineManager] Filtered out non-cap product:', title);
+        // PRIORITY 2: Include only structured caps using shared utility
+        if (ProductCategoryFilter.isStructuredCap(product)) {
+            return true;  // INCLUDE - this is a structured cap
         }
 
-        return isStructuredCap;
+        // Not a cap product
+        console.log('[CapProductLineManager] Filtered out non-cap product:', title);
+        return false;
     }
     
     /**
@@ -173,7 +171,17 @@ class CapProductLineManager {
                 // Filter to show only structured caps
                 const capSuggestions = suggestions.filter(item => this.isStructuredCap(item));
                 console.log('[CapProductLineManager] Filtered cap results:', capSuggestions.length);
-                
+
+                // Check if we filtered out any beanie/flat headwear products
+                const beanieProducts = suggestions.filter(item =>
+                    ProductCategoryFilter.isFlatHeadwear(item)
+                );
+
+                if (beanieProducts.length > 0 && capSuggestions.length === 0) {
+                    // User searched for a beanie - show warning banner
+                    this.showBeanieWarning(beanieProducts[0]);
+                }
+
                 if (capSuggestions.length > 0) {
                     // Show cap products with helpful note
                     const noteHtml = `
@@ -240,7 +248,10 @@ class CapProductLineManager {
      */
     async loadProductDetails(styleNumber) {
         console.log('[CapProductLineManager] Loading cap details:', styleNumber);
-        
+
+        // Hide beanie warning if it's showing (valid cap is being loaded)
+        this.hideBeanieWarning();
+
         try {
             this.showLoading(true);
             
@@ -1031,6 +1042,48 @@ class CapProductLineManager {
      */
     getTotalQuantity() {
         return this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
+    }
+
+    /**
+     * Show warning banner when beanie product is searched
+     * @param {Object} product - The beanie/flat headwear product that was searched
+     */
+    showBeanieWarning(product) {
+        const banner = document.getElementById('beanie-warning-banner');
+        if (!banner) {
+            console.warn('[CapProductLineManager] Warning banner element not found');
+            return;
+        }
+
+        // Update banner text with product name
+        const productName = product.label || product.PRODUCT_TITLE || 'this product';
+        const warningText = banner.querySelector('.warning-text strong');
+        if (warningText) {
+            warningText.textContent = `"${productName}" is a beanie/flat headwear product`;
+        }
+
+        // Show banner with animation
+        banner.style.display = 'block';
+
+        // Set up dismiss button
+        const dismissBtn = document.getElementById('dismiss-beanie-warning');
+        if (dismissBtn) {
+            dismissBtn.onclick = () => {
+                banner.style.display = 'none';
+            };
+        }
+
+        console.log('[CapProductLineManager] 🔔 Showing beanie warning for:', productName);
+    }
+
+    /**
+     * Hide beanie warning banner
+     */
+    hideBeanieWarning() {
+        const banner = document.getElementById('beanie-warning-banner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
     }
 }
 

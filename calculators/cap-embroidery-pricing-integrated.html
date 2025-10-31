@@ -1067,6 +1067,7 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
     <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
     <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <script>
@@ -1148,22 +1149,10 @@
                     const beanieResults = [];
 
                     results.forEach(item => {
-                        const label = item.label.toLowerCase();
-
-                        // PRIORITY 1: Check for flat embroidery headwear (NOT structured caps)
-                        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
-                        const isFlatHeadwear = flatHeadwearKeywords.some(keyword => label.includes(keyword));
-
-                        if (isFlatHeadwear) {
+                        // Use shared utility for filtering
+                        if (ProductCategoryFilter.isFlatHeadwear(item)) {
                             beanieResults.push(item);
-                            return;
-                        }
-
-                        // PRIORITY 2: Check for structured caps
-                        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 'flexfit', 'visor', 'mesh back', 'dad hat', 'baseball', '5-panel', '6-panel'];
-                        const isStructuredCap = capKeywords.some(keyword => label.includes(keyword));
-
-                        if (isStructuredCap) {
+                        } else if (ProductCategoryFilter.isStructuredCap(item)) {
                             capResults.push(item);
                         }
                     });
@@ -1285,13 +1274,8 @@
                 const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
                 const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
                 
-                // Check if it's a flat embroidery headwear item (beanie/knit/watch cap)
-                const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
-                const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
-                    productTitle.includes(keyword) || productDescription.includes(keyword)
-                );
-
-                if (isFlatHeadwear) {
+                // Use shared utility for filtering
+                if (ProductCategoryFilter.isFlatHeadwear(currentProduct)) {
                     showProductMismatchOverlay(
                         styleNumber,
                         `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
@@ -1299,11 +1283,8 @@
                     );
                     return; // Stop loading the rest of the page
                 }
-                
-                // Check if it's actually a cap
-                if (!productTitle.includes('cap') && !category.includes('cap') && 
-                    !productTitle.includes('trucker') && !productTitle.includes('snapback') &&
-                    !productTitle.includes('flexfit') && !productTitle.includes('fitted')) {
+
+                if (!ProductCategoryFilter.isStructuredCap(currentProduct)) {
                     // This is not a cap - likely a shirt or other item
                     showProductMismatchOverlay(
                         styleNumber,

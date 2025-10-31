@@ -26,6 +26,122 @@
         font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
         font-weight: 900 !important;
     }
+
+    /* Beanie Warning Banner Styles */
+    .beanie-warning-banner {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .warning-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .warning-content .fa-info-circle {
+        font-size: 24px;
+        color: #d97706;
+        flex-shrink: 0;
+    }
+
+    .warning-text {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .warning-text strong {
+        color: #92400e;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .warning-text p {
+        color: #78350f;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .btn-embroidery-redirect {
+        background: #3a7c52;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-embroidery-redirect:hover {
+        background: #2d6341;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .dismiss-warning {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #92400e;
+        cursor: pointer;
+        padding: 0 8px;
+        transition: color 0.2s;
+        line-height: 1;
+    }
+
+    .dismiss-warning:hover {
+        color: #78350f;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+        .warning-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .warning-content .fa-info-circle {
+            align-self: center;
+        }
+
+        .btn-embroidery-redirect {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .dismiss-warning {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .beanie-warning-banner {
+            position: relative;
+        }
+    }
     </style>
     
     <!-- Bootstrap CSS FIRST (foundation layer) -->
@@ -334,7 +450,22 @@
                     <div id="color-swatches-container" class="qb-swatch-grid"></div>
                 </div>
             </div>
-                
+
+                <!-- Beanie Warning Banner (hidden by default) -->
+                <div id="beanie-warning-banner" class="beanie-warning-banner" style="display: none;">
+                    <div class="warning-content">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="warning-text">
+                            <strong>This is a beanie/flat headwear product</strong>
+                            <p>Beanies and knit caps require flat embroidery, not cap embroidery.</p>
+                        </div>
+                        <a href="/embroidery-quote-builder.html" class="btn-embroidery-redirect">
+                            <i class="fas fa-arrow-right"></i> Use Embroidery Quote Builder
+                        </a>
+                        <button id="dismiss-beanie-warning" class="dismiss-warning" aria-label="Dismiss warning">&times;</button>
+                    </div>
+                </div>
+
                 <!-- Product Display -->
                 <div id="product-display" class="product-display" style="display: none;">
                     <div class="product-info">
@@ -540,6 +671,9 @@
 
     <!-- Exact Match Search Module (must load BEFORE cap-quote-products.js) -->
     <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
+
+    <!-- Product Category Filter (must load BEFORE cap-quote-products.js) -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
 
     <script src="/shared_components/js/cap-quote-service.js"></script>
     <script src="/shared_components/js/cap-quote-logos.js"></script>

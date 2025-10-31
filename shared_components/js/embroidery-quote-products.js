@@ -73,31 +73,16 @@ class ProductLineManager {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
 
-        // PRIORITY 1: Explicitly ALLOW flat embroidery headwear
-        // These work on flat surfaces and should use embroidery pricing
-        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
-        const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
-            title.includes(keyword) || description.includes(keyword)
-        );
-
-        if (isFlatHeadwear) {
+        // PRIORITY 1: Check for flat embroidery headwear using shared utility
+        if (ProductCategoryFilter.isFlatHeadwear(product)) {
             console.log('[ProductLineManager] Allowed flat headwear product:', title);
             return true;  // ALLOW - flat embroidery works on these
         }
 
-        // PRIORITY 2: EXCLUDE structured caps (these go on cap machines)
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted',
-                            'flexfit', 'visor', 'mesh back', 'dad hat',
-                            'baseball', '5-panel', '6-panel'];
-
-        const isStructuredCap = capKeywords.some(keyword =>
-            title.includes(keyword) ||
-            description.includes(keyword)
-        );
-
-        if (isStructuredCap) {
+        // PRIORITY 2: Check for structured caps using shared utility
+        if (ProductCategoryFilter.isStructuredCap(product)) {
             console.log('[ProductLineManager] Filtered out cap product:', title);
-            return false;
+            return false;  // EXCLUDE - these go on cap machines
         }
 
         // Allow everything else (shirts, polos, jackets, etc.)
