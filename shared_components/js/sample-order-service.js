@@ -246,7 +246,8 @@ class SampleOrderService {
 
                 // Note: Sales tax is handled via line item (Tax_10.1) to prevent duplicate tax lines
                 // ShopWorks "Split Tax Line" mode automatically posts tax to GL Account 2200.101
-                // Tax amount displays correctly without requiring manual customer refresh
+                // TaxTotal field must match line item amount to prevent ManageOrders API from defaulting to 0
+                taxTotal: parseFloat(salesTax.toFixed(2)),  // Must equal Tax_10.1 line item price
 
                 customer: {
                     firstName: formData.firstName,
