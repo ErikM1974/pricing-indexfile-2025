@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales & Office Procedures | Northwest Custom Apparel</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --wsu-crimson: #981e32;
+            --wsu-gray: #5e6a71;
+            --light-gray: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .policy-header {
+            background: linear-gradient(135deg, var(--wsu-crimson) 0%, #7a1827 100%);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .policy-meta {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .policy-meta-item {
+            display: inline-block;
+            margin-right: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .policy-meta-item i {
+            margin-right: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .policy-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .policy-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .policy-section h2 {
+            color: var(--wsu-crimson);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--wsu-crimson);
+        }
+
+        .policy-section h3 {
+            color: var(--wsu-gray);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .policy-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .policy-section li {
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .schedule-item {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--wsu-crimson);
+        }
+
+        .schedule-item strong {
+            color: var(--wsu-crimson);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .btn-back {
+            background: var(--wsu-gray);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: #4a545a;
+            color: white;
+        }
+
+        .lombardi-quote {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid var(--wsu-crimson);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 6px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .lombardi-quote strong {
+            color: var(--wsu-crimson);
+            font-size: 1.1rem;
+        }
+
+        .lombardi-image {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--wsu-crimson);
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(152, 30, 50, 0.3);
+        }
+
+        .lombardi-content {
+            flex: 1;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .lombardi-quote {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .lombardi-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        .responsibility-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .responsibility-card h4 {
+            color: var(--wsu-crimson);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .responsibility-card .time {
+            background: var(--wsu-crimson);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mockup Featured Callout Styles */
+        .mockup-featured-callout {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .mockup-featured-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .mockup-featured-header h4 {
+            color: var(--wsu-crimson);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .mockup-featured-header h4 i {
+            margin-right: 0.5rem;
+        }
+
+        .mockup-featured-header p {
+            color: var(--wsu-gray);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .mockup-thumbnail {
+            position: relative;
+            display: block;
+            cursor: pointer;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .mockup-thumbnail img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .mockup-thumbnail:hover img {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(152, 30, 50, 0.25);
+        }
+
+        .mockup-thumbnail-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(152, 30, 50, 0.95);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+        }
+
+        .mockup-thumbnail:hover .mockup-thumbnail-overlay {
+            opacity: 1;
+        }
+
+        .mockup-thumbnail-overlay i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .mockup-thumbnail-overlay p {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .mockup-featured-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .mockup-featured-footer p {
+            color: var(--wsu-gray);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .mockup-featured-footer strong {
+            color: var(--wsu-crimson);
+        }
+
+        /* Thank You Card Showcase Styles */
+        .thank-you-card-showcase {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            text-align: center;
+        }
+
+        .thank-you-card-showcase img {
+            max-width: 450px;
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 2px solid white;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+
+        .thank-you-card-showcase p {
+            color: var(--wsu-gray);
+            font-size: 0.9375rem;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .thank-you-card-showcase strong {
+            color: var(--wsu-crimson);
+        }
+
+        /* Modal Styles */
+        .mockup-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .mockup-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .mockup-modal-content {
+            position: relative;
+            max-width: 1200px;
+            max-height: 90vh;
+            width: 90%;
+            padding: 2rem;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .mockup-modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 1rem;
+        }
+
+        .mockup-modal-caption {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: #333;
+            text-align: center;
+        }
+
+        .mockup-modal-caption h4 {
+            color: var(--wsu-crimson);
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .mockup-modal-caption p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .mockup-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--wsu-crimson);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 10000;
+        }
+
+        .mockup-modal-close:hover {
+            background: var(--wsu-crimson);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .mockup-modal-content {
+                padding: 1rem;
+            }
+
+            .mockup-modal-close {
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Policy Header -->
+    <div class="policy-header">
+        <div class="container">
+            <div class="policy-content">
+                <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    <i class="fas fa-clipboard-list"></i> Sales & Office Procedures
+                </h1>
+                <p style="font-size: 1.125rem; opacity: 0.9; margin-bottom: 0;">
+                    Comprehensive office standards and operational responsibilities
+                </p>
+
+                <div class="policy-meta">
+                    <div class="policy-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <strong>Updated:</strong> October 31, 2025
+                    </div>
+                    <div class="policy-meta-item">
+                        <i class="fas fa-user"></i>
+                        <strong>Owner:</strong> Erik Mickelson
+                    </div>
+                    <div class="policy-meta-item">
+                        <i class="fas fa-building"></i>
+                        <strong>Company:</strong> Northwest Custom Apparel
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="container">
+        <div class="policy-content">
+            <div class="nav-buttons">
+                <a href="../pages/policies-hub.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Policies Hub
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Policy Content -->
+    <div class="container">
+        <div class="policy-content">
+
+            <!-- Section 1: Punctuality & Office Hours -->
+            <div class="policy-section">
+                <h2>1.0 Punctuality & Office Hours</h2>
+
+                <h3>1.1 Official Hours & Schedules</h3>
+                <p><strong>Customer-Facing Hours:</strong> Monday - Friday, 8:00 AM to 5:00 PM</p>
+
+                <p style="margin-bottom: 1rem;"><strong>Team Member Schedules:</strong></p>
+                <div class="schedule-grid">
+                    <div class="schedule-item">
+                        <strong>Nika Lao</strong>
+                        7:30 AM - 4:45 PM<br>
+                        <small>(with one-hour lunch)</small>
+                    </div>
+                    <div class="schedule-item">
+                        <strong>Taneisha Clark</strong>
+                        8:00 AM - 5:00 PM<br>
+                        <small>(with one-hour lunch)</small>
+                    </div>
+                    <div class="schedule-item">
+                        <strong>Bradley Wright</strong>
+                        8:00 AM - 5:00 PM<br>
+                        <small>(with one-hour lunch)</small>
+                    </div>
+                    <div class="schedule-item">
+                        <strong>Steve Deland</strong>
+                        8:00 AM - 5:00 PM<br>
+                        <small>(with one-hour lunch)</small>
+                    </div>
+                </div>
+
+                <h3>1.2 The "Ready to Work" Standard</h3>
+                <div class="highlight-box">
+                    <p style="margin-bottom: 0.5rem;"><strong>Policy:</strong> "Ready to work" means you are at your workstation, your computer is on, you are logged in, and you are ready to work at your scheduled start time.</p>
+                </div>
+
+                <div class="lombardi-quote">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9165986"
+                         alt="Vince Lombardi"
+                         class="lombardi-image">
+                    <div class="lombardi-content">
+                        <strong>"If you are not 15 minutes early, you are late."</strong>
+                        <p style="margin-top: 0.5rem; margin-bottom: 0;">We adopt the "Lombardi Time" mindset as a professional standard of preparedness.</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0;"><em>(Vince Lombardi was a Hall of Fame NFL coach known for his high standards and belief in discipline and punctuality.)</em></p>
+                    </div>
+                </div>
+
+                <h3>1.3 Emergency Lateness/Absence Policy</h3>
+                <ul>
+                    <li>If a true emergency prevents you from being on time, you must <strong>text or call Erik at least 30 minutes prior to your start time</strong>.</li>
+                    <li>This is critical for planning office and customer coverage.</li>
+                </ul>
+            </div>
+
+            <!-- Section 2: Customer Service & Presence -->
+            <div class="policy-section">
+                <h2>2.0 Customer Service & Presence</h2>
+
+                <h3>2.1 Phone Policy</h3>
+                <ul>
+                    <li><strong>The phone must be answered by the third ring.</strong> This is a shared team responsibility.</li>
+                    <li><strong>Coverage is mandatory.</strong> If you must step away from your desk (e.g., to the restroom or warehouse), you must inform another team member to ensure the phone is covered.</li>
+                </ul>
+
+                <h3>2.2 Showroom & Customer Greeting</h3>
+                <ul>
+                    <li>All office doors must be kept open throughout the day.</li>
+                    <li>Team members must be visible, approachable, and ready to greet any customer who walks into the showroom.</li>
+                    <li>You must be actively listening for the front door opening and the office bell being rung by a customer.</li>
+                </ul>
+
+                <h3>2.3 Digital Communications (Go-To App)</h3>
+                <ul>
+                    <li>The Go-To app must be kept on and visible at all times.</li>
+                    <li>Team members are responsible for continuously checking and responding to customer text messages.</li>
+                </ul>
+            </div>
+
+            <!-- Section 3: Sales & Account Management -->
+            <div class="policy-section">
+                <h2>3.0 Sales & Account Management</h2>
+
+                <h3>3.1 Best Practice: Reaching Customers</h3>
+                <p>Our data shows a clear pattern for effective communication:</p>
+                <ul>
+                    <li><strong>Office/Main Lines:</strong> ~50% Answer Rate</li>
+                    <li><strong>Cell Phones:</strong> ~80% Answer Rate</li>
+                </ul>
+                <div class="highlight-box">
+                    <p style="margin-bottom: 0;"><strong>Procedure:</strong> Prioritize calling a customer's cell phone first to get the quickest response, secure approvals, and keep orders moving.</p>
+                </div>
+
+                <h3>3.2 Mockups & Payment</h3>
+                <ul>
+                    <li>Nika and Taneisha are responsible for creating, sending, and managing their own virtual mockups and receiving customer payments.</li>
+                </ul>
+
+                <div class="mockup-featured-callout">
+                    <div class="mockup-featured-header">
+                        <h4><i class="fas fa-star"></i> Featured Example: Professional Mockup</h4>
+                        <p>Reference this standard when creating customer mockups</p>
+                    </div>
+
+                    <div class="mockup-thumbnail" onclick="openMockupModal()">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9165994"
+                             alt="Sample Product Mockup">
+                        <div class="mockup-thumbnail-overlay">
+                            <i class="fas fa-search-plus"></i>
+                            <p>Click to View Full Size</p>
+                        </div>
+                    </div>
+
+                    <div class="mockup-featured-footer">
+                        <p>
+                            Virtual mockups help customers visualize their final product before approving the order.
+                            Notice the clean presentation, realistic product placement, and clear visibility of design elements.
+                            <strong>Click image above to view full-size example.</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <h3>3.3 Customer Relations</h3>
+                <ul>
+                    <li>Nika and Taneisha are each responsible for sending <strong>2-3 thank-you letters per week</strong>.</li>
+                </ul>
+
+                <div class="thank-you-card-showcase">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Thank%20you%20Letter.png?ver=1"
+                         alt="Thank You Card Template">
+                    <p>
+                        <strong>Use this template</strong> for handwritten thank-you letters to build lasting customer relationships.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Section 4: Daily Operational Responsibilities -->
+            <div class="policy-section">
+                <h2>4.0 Daily Operational Responsibilities</h2>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-sun"></i> Daily Opening (Nika)</h4>
+                    <span class="time">7:30 AM</span>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Open blinds</li>
+                        <li>Turn on all computers</li>
+                        <li>Turn on lights</li>
+                        <li>Put on music (select workplace-appropriate playlist - seasonal is good)</li>
+                        <li><strong>Music Policy:</strong> No rap or heavy metal</li>
+                    </ul>
+                </div>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-moon"></i> Daily Closing (Taneisha)</h4>
+                    <span class="time">5:00 PM</span>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Close blinds</li>
+                        <li>Power down all computers</li>
+                        <li>Turn off music</li>
+                    </ul>
+                </div>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-box"></i> Customer Pickups (Mikalah)</h4>
+                    <span class="time">9:30 AM - 10:30 AM (Optimal calling time)</span>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Handle the Customer Order Pickup Notification Process</li>
+                        <li>Make pickup calls and update Shopworks logging</li>
+                    </ul>
+                </div>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-envelope"></i> Shared Email (Taneisha)</h4>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Responsible for checking, processing, and responding to the <strong>sales@nwcustomapparel.com</strong> email inbox</li>
+                    </ul>
+                </div>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-boxes"></i> Supply Management (Bradley)</h4>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Responsible for all office supply stocking (kitchen, bathrooms, and cleaning)</li>
+                        <li>Use the official Costco Run Checklist below</li>
+                    </ul>
+
+                    <div style="margin-top: 1rem; padding-left: 1rem; border-left: 3px solid #dee2e6;">
+                        <h5 style="color: var(--wsu-gray); font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">
+                            <i class="fas fa-restroom"></i> Must-Haves (Restrooms)
+                        </h5>
+                        <ul style="margin-bottom: 1rem;">
+                            <li>Toilet Paper</li>
+                            <li>Paper Towels</li>
+                            <li>Hand Soap Refills</li>
+                        </ul>
+
+                        <h5 style="color: var(--wsu-gray); font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">
+                            <i class="fas fa-spray-can"></i> Must-Haves (Cleaning)
+                        </h5>
+                        <ul style="margin-bottom: 0;">
+                            <li>Fabuloso (The purple one)</li>
+                            <li>Mop heads</li>
+                            <li>Buckets</li>
+                            <li>Clorox Wipes</li>
+                            <li>Windex</li>
+                            <li>Trash Bags</li>
+                            <li><strong>Batteries</strong> 🔋</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="responsibility-card">
+                    <h4><i class="fas fa-broom"></i> Weekly Cleaning (Theavy)</h4>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li>Weekly cleaning of the showroom, kitchen, and bathrooms</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <a href="../pages/policies-hub.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Policies Hub
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer spacing -->
+    <div style="height: 4rem;"></div>
+
+    <!-- Mockup Modal -->
+    <div id="mockupModal" class="mockup-modal" onclick="closeMockupModal()">
+        <button class="mockup-modal-close" onclick="closeMockupModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mockup-modal-content" onclick="event.stopPropagation()">
+            <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9165994"
+                 alt="Sample Product Mockup - Full Size">
+            <div class="mockup-modal-caption">
+                <h4><i class="fas fa-image"></i> Professional Mockup Example</h4>
+                <p>
+                    This is what a professional product mockup should look like. Notice the clean presentation, realistic product placement,
+                    and clear visibility of the design elements. Virtual mockups like this help customers visualize their final product
+                    before approving the order, reducing revision requests and increasing customer satisfaction.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Mockup Modal JavaScript -->
+    <script>
+        function openMockupModal() {
+            document.getElementById('mockupModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeMockupModal() {
+            document.getElementById('mockupModal').classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMockupModal();
+            }
+        });
+    </script>
+</body>
+</html>
