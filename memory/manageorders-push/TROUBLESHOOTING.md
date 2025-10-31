@@ -494,6 +494,57 @@ orderNumber: `SAMPLE-${Date.now()}`
 
 ---
 
+### "Duplicate sales tax line items"
+
+**Symptoms:**
+- Two identical tax line items appear in OnSite invoice
+- Both show same tax amount (e.g., two `Tax_10.1` entries for $34.54)
+- Total is correct but tax appears twice in line item list
+
+**Cause:** Tax being sent in BOTH locations:
+1. As a line item in `LinesOE` array (`PartNumber: "Tax_10.1"`)
+2. As Payment block fields (`TaxTotal`, `TaxPartNumber`, `TaxPartDescription`)
+
+ShopWorks OnSite creates a tax line item from EACH source, resulting in duplicates.
+
+**Solution:** Use Payment block approach only (recommended):
+
+```javascript
+// ❌ WRONG - Tax in both places causes duplicates
+const lineItems = [
+    { partNumber: 'PC54', quantity: 10, price: 38.00 },
+    { partNumber: 'Tax_10.1', quantity: 1, price: 34.54 }  // DON'T DO THIS
+];
+
+const order = {
+    lineItems: lineItems,
+    taxTotal: 34.54,              // This ALSO creates a tax line
+    taxPartNumber: 'Tax_10.1',
+    taxPartDescription: 'City of Milton Sales Tax 10.1%'
+};
+
+// ✅ CORRECT - Tax via Payment block only
+const lineItems = [
+    { partNumber: 'PC54', quantity: 10, price: 38.00 }
+    // No tax line item here
+];
+
+const order = {
+    lineItems: lineItems,
+    taxTotal: 34.54,              // ShopWorks auto-creates tax line from this
+    taxPartNumber: 'Tax_10.1',
+    taxPartDescription: 'City of Milton Sales Tax 10.1%'
+};
+```
+
+**Reference:** See [Payment Block - TaxTotal field](PAYMENT_SHIPPING_FIELDS.md#payment-subblock) for complete documentation.
+
+**Fixed in:**
+- `sample-order-service.js` (October 31, 2025) - Removed tax line item from LinesOE
+- `caspio-pricing-proxy/lib/manageorders-push-client.js` (October 31, 2025) - Added TaxPartNumber and TaxPartDescription field mapping
+
+---
+
 ## Getting Help
 
 **For API Issues:**

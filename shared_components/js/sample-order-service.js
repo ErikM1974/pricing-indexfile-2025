@@ -201,23 +201,15 @@ class SampleOrderService {
             // Expand each sample into multiple line items (one per size with proper suffixes)
             const lineItems = samples.flatMap(sample => this.expandSampleIntoLineItems(sample));
 
-            // Add sales tax as a line item (required for ShopWorks "Split Tax Line" integration)
-            // This ensures tax automatically displays in OnSite without manual customer re-selection
+            // Sales tax handled via Payment block TaxTotal field only
+            // ShopWorks will auto-create tax line from TaxTotal + TaxPartNumber + TaxPartDescription
+            // DO NOT add tax as line item in LinesOE - causes duplicate tax entries in OnSite
+            // See: memory/manageorders-push/PAYMENT_SHIPPING_FIELDS.md#payment-subblock
             if (salesTax > 0) {
-                lineItems.push({
-                    partNumber: 'Tax_10.1',                      // Must match ShopWorks "Tax Line Item" config
-                    description: 'City of Milton Sales Tax 10.1%', // Must match ShopWorks config
-                    color: '',
-                    size: null,                                  // No size for tax line item
-                    quantity: 1,
-                    price: parseFloat(salesTax.toFixed(2)),     // Tax amount as unit price
-                    notes: `Sales Tax (${(salesTaxRate * 100).toFixed(1)}%)`  // Helpful note showing tax rate
-                });
-
-                console.log('[SampleOrderService] ✅ Added tax line item:', {
-                    partNumber: 'Tax_10.1',
-                    description: 'City of Milton Sales Tax 10.1%',
-                    price: salesTax.toFixed(2),
+                console.log('[SampleOrderService] ✅ Tax will be added via Payment block:', {
+                    taxTotal: salesTax.toFixed(2),
+                    taxPartNumber: 'Tax_10.1',
+                    taxPartDescription: 'City of Milton Sales Tax 10.1%',
                     rate: `${(salesTaxRate * 100).toFixed(1)}%`
                 });
             }
@@ -244,10 +236,11 @@ class SampleOrderService {
                 salesRep: formData.salesRep || 'House',  // Dynamic from dropdown, defaults to House
                 terms: subtotal > 0 ? 'Prepaid' : 'FREE SAMPLE',  // Payment terms (not invoice amount)
 
-                // Note: Sales tax is handled via line item (Tax_10.1) to prevent duplicate tax lines
-                // ShopWorks "Split Tax Line" mode automatically posts tax to GL Account 2200.101
-                // TaxTotal field must match line item amount to prevent ManageOrders API from defaulting to 0
-                taxTotal: parseFloat(salesTax.toFixed(2)),  // Must equal Tax_10.1 line item price
+                // Tax handled via Payment block - ShopWorks auto-creates tax line item from these fields
+                // DO NOT add tax as line item in LinesOE - causes duplicate tax entries
+                taxTotal: parseFloat(salesTax.toFixed(2)),
+                taxPartNumber: 'Tax_10.1',                          // Must match ShopWorks "Tax Line Item" config
+                taxPartDescription: 'City of Milton Sales Tax 10.1%',  // Must match ShopWorks config
 
                 customer: {
                     firstName: formData.firstName,
