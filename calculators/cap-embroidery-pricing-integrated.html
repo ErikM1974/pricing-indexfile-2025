@@ -1146,16 +1146,24 @@
                     // Filter results into caps vs beanies/knit items
                     const capResults = [];
                     const beanieResults = [];
-                    
+
                     results.forEach(item => {
                         const label = item.label.toLowerCase();
-                        
-                        // Check if it's a beanie or knit item
-                        if (label.includes('beanie') || label.includes('knit')) {
+
+                        // PRIORITY 1: Check for flat embroidery headwear (NOT structured caps)
+                        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
+                        const isFlatHeadwear = flatHeadwearKeywords.some(keyword => label.includes(keyword));
+
+                        if (isFlatHeadwear) {
                             beanieResults.push(item);
+                            return;
                         }
-                        // Only include items that explicitly have 'cap' in the description
-                        else if (label.includes('cap')) {
+
+                        // PRIORITY 2: Check for structured caps
+                        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 'flexfit', 'visor', 'mesh back', 'dad hat', 'baseball', '5-panel', '6-panel'];
+                        const isStructuredCap = capKeywords.some(keyword => label.includes(keyword));
+
+                        if (isStructuredCap) {
                             capResults.push(item);
                         }
                     });
@@ -1277,13 +1285,17 @@
                 const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
                 const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
                 
-                // Check if it's a beanie/knit item
-                if (productTitle.includes('beanie') || productTitle.includes('knit') || 
-                    productDescription.includes('beanie') || productDescription.includes('knit')) {
+                // Check if it's a flat embroidery headwear item (beanie/knit/watch cap)
+                const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
+                const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
+                    productTitle.includes(keyword) || productDescription.includes(keyword)
+                );
+
+                if (isFlatHeadwear) {
                     showProductMismatchOverlay(
                         styleNumber,
                         `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
-                        'This is a beanie/knit item that requires flat embroidery.'
+                        'This is a flat headwear item that requires flat embroidery, not cap embroidery.'
                     );
                     return; // Stop loading the rest of the page
                 }

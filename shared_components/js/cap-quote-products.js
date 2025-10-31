@@ -69,33 +69,38 @@ class CapProductLineManager {
     }
     
     /**
-     * Check if product is a structured cap (NOT beanie or knit)
+     * Check if product is a structured cap (NOT beanie/watch cap/knit)
      */
     isStructuredCap(product) {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
-        
-        // EXCLUDE beanies and knits (these use flat embroidery)
-        if (title.includes('beanie') || description.includes('beanie') ||
-            title.includes('knit') || description.includes('knit')) {
-            console.log('[CapProductLineManager] Filtered out knit/beanie product:', title);
-            return false;
+
+        // PRIORITY 1: EXCLUDE flat embroidery headwear
+        // These don't have structured surfaces for cap embroidery machines
+        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
+        const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
+            title.includes(keyword) || description.includes(keyword)
+        );
+
+        if (isFlatHeadwear) {
+            console.log('[CapProductLineManager] Filtered out flat headwear product:', title);
+            return false;  // EXCLUDE - use embroidery builder instead
         }
-        
-        // INCLUDE structured caps only
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 
+
+        // PRIORITY 2: INCLUDE only structured caps
+        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted',
                             'flexfit', 'visor', 'mesh back', 'dad hat',
                             'baseball', '5-panel', '6-panel', 'bucket'];
-        
-        const isStructuredCap = capKeywords.some(keyword => 
-            title.includes(keyword) || 
+
+        const isStructuredCap = capKeywords.some(keyword =>
+            title.includes(keyword) ||
             description.includes(keyword)
         );
-        
+
         if (!isStructuredCap) {
             console.log('[CapProductLineManager] Filtered out non-cap product:', title);
         }
-        
+
         return isStructuredCap;
     }
     

@@ -67,33 +67,39 @@ class ProductLineManager {
     }
     
     /**
-     * Check if product is allowed (exclude caps, include beanies)
+     * Check if product is allowed (exclude caps, include beanies/watch caps)
      */
     isAllowedProduct(product) {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
-        
-        // Explicitly ALLOW beanies and knit caps (flat embroidery)
-        if (title.includes('beanie') || description.includes('beanie') ||
-            title.includes('knit') || description.includes('knit')) {
-            return true;
+
+        // PRIORITY 1: Explicitly ALLOW flat embroidery headwear
+        // These work on flat surfaces and should use embroidery pricing
+        const flatHeadwearKeywords = ['beanie', 'knit', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
+        const isFlatHeadwear = flatHeadwearKeywords.some(keyword =>
+            title.includes(keyword) || description.includes(keyword)
+        );
+
+        if (isFlatHeadwear) {
+            console.log('[ProductLineManager] Allowed flat headwear product:', title);
+            return true;  // ALLOW - flat embroidery works on these
         }
-        
-        // EXCLUDE structured caps (these go on cap machines)
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 
+
+        // PRIORITY 2: EXCLUDE structured caps (these go on cap machines)
+        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted',
                             'flexfit', 'visor', 'mesh back', 'dad hat',
                             'baseball', '5-panel', '6-panel'];
-        
-        const isStructuredCap = capKeywords.some(keyword => 
-            title.includes(keyword) || 
+
+        const isStructuredCap = capKeywords.some(keyword =>
+            title.includes(keyword) ||
             description.includes(keyword)
         );
-        
+
         if (isStructuredCap) {
             console.log('[ProductLineManager] Filtered out cap product:', title);
             return false;
         }
-        
+
         // Allow everything else (shirts, polos, jackets, etc.)
         return true;
     }
