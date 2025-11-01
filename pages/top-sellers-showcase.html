@@ -21,6 +21,9 @@
     <!-- EmailJS for sample request notifications -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Universal Cart Header Component -->
+    <script src="../shared_components/js/universal-cart-header.js"></script>
+
     <!-- Cart Drawer Component -->
     <link rel="stylesheet" href="../shared_components/css/cart-drawer.css">
     <script src="../shared_components/js/cart-drawer.js"></script>
@@ -58,52 +61,14 @@
             }
 
             initializeUI() {
-                if (!document.getElementById('sampleCartWidget')) {
-                    const widget = document.createElement('div');
-                    widget.id = 'sampleCartWidget';
-                    widget.className = 'sample-cart-widget';
-                    widget.setAttribute('role', 'button');
-                    widget.setAttribute('tabindex', '0');
-                    widget.innerHTML = `
-                        <div class="sample-cart-icon">
-                            <i class="fas fa-box-open"></i>
-                            <span class="sample-count-badge">${this.samples.length}</span>
-                        </div>
-                        <span class="sample-cart-label">Sample Cart</span>
-                    `;
-
-                    // Add to header's contact-header section (top-right position)
-                    const contactHeader = document.querySelector('.contact-header');
-                    if (contactHeader) {
-                        contactHeader.appendChild(widget);
-                    } else {
-                        // Fallback: add to body if header not found
-                        document.body.appendChild(widget);
-                    }
-                }
+                // Widget now handled by UniversalCartHeader component
+                // Just update the universal header's cart count
                 this.updateUI();
             }
 
             bindEvents() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget) {
-                    // Click handler
-                    widget.addEventListener('click', () => {
-                        if (window.cartDrawer) {
-                            window.cartDrawer.open();
-                        }
-                    });
-
-                    // Keyboard support (Enter/Space)
-                    widget.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            if (window.cartDrawer) {
-                                window.cartDrawer.open();
-                            }
-                        }
-                    });
-                }
+                // Cart widget events now handled by UniversalCartHeader component
+                // No need to bind events here
             }
 
             async checkEligibility(styleNumber) {
@@ -259,9 +224,7 @@
                 } else {
                     this.showNotification(`${product.name} added - FREE sample`, 'success');
                 }
-                
-                this.showWidget();
-                
+
                 return true;
             }
 
@@ -281,10 +244,6 @@
                     this.updateUI();
                     this.showNotification(`${removed.name} removed from samples`, 'info');
 
-                    if (this.samples.length === 0) {
-                        this.hideWidget();
-                    }
-
                     return true;
                 }
 
@@ -295,7 +254,6 @@
                 this.samples = [];
                 this.save();
                 this.updateUI();
-                this.hideWidget();
             }
 
             save() {
@@ -307,23 +265,13 @@
             }
 
             updateUI() {
-                const badge = document.querySelector('.sample-count-badge');
-                if (badge) {
-                    badge.textContent = this.samples.length;
-                    badge.style.display = this.samples.length > 0 ? 'flex' : 'none';
+                // Trigger universal header to update cart count
+                if (window.universalCartHeader) {
+                    window.universalCartHeader.updateCartCount();
                 }
 
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget) {
-                    // Update ARIA label for accessibility
-                    const itemText = this.samples.length === 1 ? 'item' : 'items';
-                    widget.setAttribute('aria-label', `Sample cart with ${this.samples.length} ${itemText}`);
-
-                    // Show widget
-                    if (this.samples.length > 0) {
-                        widget.style.display = 'flex'; // Changed from 'block' to 'flex'
-                    }
-                }
+                // Dispatch custom event for other components to listen to
+                window.dispatchEvent(new CustomEvent('cartUpdated'));
 
                 this.updateSampleButtons();
             }
@@ -339,25 +287,7 @@
                 });
             }
 
-            showWidget() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget && this.samples.length > 0) {
-                    widget.style.display = 'block';
-                    widget.classList.add('sample-cart-show');
-                }
-            }
-
-            hideWidget() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget) {
-                    widget.classList.remove('sample-cart-show');
-                    setTimeout(() => {
-                        if (this.samples.length === 0) {
-                            widget.style.display = 'none';
-                        }
-                    }, 300);
-                }
-            }
+            // Widget visibility now handled by UniversalCartHeader component
 
             openSampleModal() {
                 // Open drawer to view cart
@@ -2268,30 +2198,8 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="logo-section">
-                <a href="/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo" style="cursor: pointer;">
-                    <div>
-                        <div class="company-name" style="color: var(--text-primary);">Northwest Custom Apparel</div>
-                        <div class="tagline">Family Owned Since 1977</div>
-                    </div>
-                </a>
-            </div>
-            <div class="contact-header">
-                <a href="tel:253-922-5793" class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <span>253-922-5793</span>
-                </a>
-                <a href="mailto:sales@nwcustomapparel.com" class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>Quick Quote</span>
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -2678,6 +2586,12 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize universal header
+            window.universalCartHeader = new UniversalCartHeader({
+                isCartPage: false,
+                showContactInfo: true
+            });
+
             loadProducts('all');
             setupEventListeners();
             initializeSearch();
@@ -2751,6 +2665,23 @@
                         </div>
                     </div>
                 `;
+            }
+
+            // Check sample eligibility for search results (same pattern as displayProducts)
+            if (matchCount > 0) {
+                setTimeout(() => {
+                    if (window.sampleCart && typeof window.sampleCart.checkAllProductEligibility === 'function') {
+                        console.log('[Search] Checking sample eligibility for search results...');
+                        window.sampleCart.checkAllProductEligibility();
+                    } else {
+                        console.log('[Search] Sample cart not ready, retrying...');
+                        setTimeout(() => {
+                            if (window.sampleCart) {
+                                window.sampleCart.checkAllProductEligibility();
+                            }
+                        }, 500);
+                    }
+                }, 100);
             }
         }
 

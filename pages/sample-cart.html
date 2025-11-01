@@ -11,6 +11,9 @@
     <!-- EmailJS for sample request notifications -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Universal Cart Header Component -->
+    <script src="../shared_components/js/universal-cart-header.js"></script>
+
     <!-- Sample Order Service for ShopWorks Integration -->
     <script src="../shared_components/js/sample-order-service.js"></script>
 
@@ -58,6 +61,17 @@
 
         .company-logo {
             height: 50px;
+            transition: opacity 0.2s;
+        }
+
+        .company-logo:hover {
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
         }
 
         .contact-info {
@@ -80,10 +94,78 @@
             color: var(--primary-color);
         }
 
+        /* Cart Indicator Badge */
+        .cart-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .cart-indicator i {
+            font-size: 1.25rem;
+        }
+
+        .cart-count-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .cart-label {
+            font-size: 0.95rem;
+        }
+
         .container {
             max-width: 1000px;
             margin: 2rem auto;
             padding: 0 2rem;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb-separator {
+            color: var(--border-color);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
         }
 
         .page-title {
@@ -91,11 +173,68 @@
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+            font-size: 1.75rem;
         }
 
         .page-subtitle {
             color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        /* Cart Summary Bar */
+        .cart-summary-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            gap: 2rem;
+        }
+
+        .cart-summary-bar .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-summary-bar .summary-item i {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-summary-bar .summary-item > div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cart-summary-bar .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.2;
+            margin-bottom: 0.15rem;
+        }
+
+        .cart-summary-bar .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
         }
 
         .cart-section {
@@ -208,14 +347,64 @@
 
         .empty-cart {
             text-align: center;
-            padding: 3rem 0;
+            padding: 4rem 2rem;
             color: var(--text-secondary);
         }
 
         .empty-cart i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: var(--border-color);
+            animation: emptyCartPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes emptyCartPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+        }
+
+        .empty-cart h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-cart p {
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        .empty-cart .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .empty-cart .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .empty-cart .feature i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin: 0;
+            animation: none;
+        }
+
+        .empty-cart .feature-text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .empty-cart .feature-text p {
+            font-size: 0.875rem;
+            margin: 0;
+            color: var(--text-secondary);
         }
 
         .form-section {
@@ -380,9 +569,41 @@
                 gap: 1rem;
             }
 
-            .contact-info {
+            .header-actions {
+                width: 100%;
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
+            }
+
+            .contact-info {
+                width: 100%;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .cart-indicator {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .cart-summary-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cart-summary-bar .summary-item {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .breadcrumb {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
             }
 
             .cart-item {
@@ -469,31 +690,55 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <a href="/top-sellers-showcase.html">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="company-logo">
-            </a>
-            <div class="contact-info">
-                <a href="tel:253-922-5793">
-                    <i class="fas fa-phone"></i>
-                    253-922-5793
-                </a>
-                <a href="mailto:sales@nwcustomapparel.com">
-                    <i class="fas fa-envelope"></i>
-                    sales@nwcustomapparel.com
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
 
     <!-- Main Content -->
     <div class="container">
         <!-- Cart Section -->
         <div id="cartContainer">
-            <h1 class="page-title">Your Sample Cart</h1>
-            <p class="page-subtitle">Review your selected samples and complete the form below to submit your request.</p>
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="/pages/top-sellers-showcase.html">Products</a>
+                <span class="breadcrumb-separator">›</span>
+                <span>Sample Cart</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-shopping-cart"></i>
+                    Your Sample Cart
+                </h1>
+                <p class="page-subtitle">Review your selected samples and complete the form below to submit your request.</p>
+            </div>
+
+            <!-- Cart Summary Bar -->
+            <div class="cart-summary-bar" id="cartSummaryBar">
+                <div class="summary-item">
+                    <i class="fas fa-box-open"></i>
+                    <div>
+                        <div class="summary-label">Items in Cart</div>
+                        <div class="summary-value" id="summaryItemCount">0</div>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-tshirt"></i>
+                    <div>
+                        <div class="summary-label">Total Pieces</div>
+                        <div class="summary-value" id="summaryTotalPieces">0</div>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-calculator"></i>
+                    <div>
+                        <div class="summary-label">Estimated Total</div>
+                        <div class="summary-value" id="summaryTotalPrice">$0.00</div>
+                    </div>
+                </div>
+            </div>
 
             <div class="cart-section">
                 <div id="cartItems">
@@ -672,8 +917,8 @@
                             <i class="fas fa-paper-plane"></i>
                             Submit Sample Request
                         </button>
-                        <a href="/top-sellers-showcase.html" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i>
+                        <a href="/pages/top-sellers-showcase.html" class="btn btn-secondary">
+                            <i class="fas fa-shopping-bag"></i>
                             Continue Shopping
                         </a>
                     </div>
@@ -870,12 +1115,48 @@
             return cart;
         }
 
+        // Update cart summary bar and badge
+        function updateCartSummary(cart) {
+            const itemCount = cart.length;
+            let totalPieces = 0;
+            let totalPrice = 0;
+
+            cart.forEach(item => {
+                const upcharges = item.upcharges || {};
+                const basePrice = parseFloat(item.price) || 0;
+
+                Object.entries(item.sizes).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        totalPieces += qty;
+                        const upcharge = upcharges[size] || 0;
+                        const sizePrice = basePrice + upcharge;
+                        totalPrice += qty * sizePrice;
+                    }
+                });
+            });
+
+            // Update header cart badge
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge) {
+                badge.textContent = itemCount;
+                badge.style.display = itemCount > 0 ? 'flex' : 'none';
+            }
+
+            // Update summary bar
+            document.getElementById('summaryItemCount').textContent = itemCount;
+            document.getElementById('summaryTotalPieces').textContent = totalPieces;
+            document.getElementById('summaryTotalPrice').textContent = `$${totalPrice.toFixed(2)}`;
+        }
+
         // Load and display cart items
         async function loadCart() {
             let cart = getCartSamples();
 
             // Migrate old cart items to include upcharges (backward compatibility)
             cart = await migrateCartUpcharges(cart);
+
+            // Update summary bar and badge
+            updateCartSummary(cart);
 
             // DEBUG: Log cart load
             if (window.CART_DEBUG) {
@@ -889,15 +1170,50 @@
                     <div class="empty-cart">
                         <i class="fas fa-shopping-cart"></i>
                         <h3>Your sample cart is empty</h3>
-                        <p>Add some samples from our Top Sellers page!</p>
-                        <a href="/top-sellers-showcase.html" class="btn btn-primary" style="margin-top: 1rem;">
-                            Browse Products
+                        <p>Start exploring our top-selling products and add samples to your cart!</p>
+
+                        <div class="features">
+                            <div class="feature">
+                                <i class="fas fa-shipping-fast"></i>
+                                <div class="feature-text">
+                                    <h4>Free Samples</h4>
+                                    <p>Get physical samples to feel the quality</p>
+                                </div>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-palette"></i>
+                                <div class="feature-text">
+                                    <h4>All Colors</h4>
+                                    <p>See the actual colors before ordering</p>
+                                </div>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-ruler"></i>
+                                <div class="feature-text">
+                                    <h4>Check Sizes</h4>
+                                    <p>Try on different sizes for the perfect fit</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="/pages/top-sellers-showcase.html" class="btn btn-primary" style="margin-top: 1rem; padding: 1rem 2.5rem; font-size: 1.1rem;">
+                            <i class="fas fa-search"></i>
+                            Browse Top Sellers
                         </a>
+
+                        <p style="margin-top: 2rem; font-size: 0.9rem;">
+                            Need help? Call us at <a href="tel:253-922-5793" style="color: var(--primary-color); font-weight: 600;">253-922-5793</a>
+                        </p>
                     </div>
                 `;
-                // Hide contact form
+                // Hide contact form and summary bar
                 document.getElementById('contactForm').style.display = 'none';
+                document.getElementById('cartSummaryBar').style.display = 'none';
                 return;
+            } else {
+                // Show contact form and summary bar if cart has items
+                document.getElementById('contactForm').style.display = 'block';
+                document.getElementById('cartSummaryBar').style.display = 'flex';
             }
 
             // Display cart items
@@ -1165,6 +1481,12 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Sample Request';
             }
+        });
+
+        // Initialize universal header
+        window.universalCartHeader = new UniversalCartHeader({
+            isCartPage: true,  // This is the cart page, so don't make it clickable
+            showContactInfo: true
         });
 
         // Load cart on page load
