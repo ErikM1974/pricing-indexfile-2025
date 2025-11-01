@@ -155,13 +155,44 @@
         }
 
         .size-badge {
-            display: inline-block;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            margin: 0.25rem;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.875rem;
             font-weight: 600;
+            cursor: default;
+        }
+
+        .size-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .size-info {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2c7a4f 100%);
+            color: white;
+            padding: 0.5rem 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            letter-spacing: 0.025em;
+        }
+
+        .size-price {
+            background: linear-gradient(135deg, #1e5a3a 0%, #184a2f 100%);
+            color: white;
+            padding: 0.5rem 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            letter-spacing: 0.015em;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .item-remove {
@@ -266,6 +297,10 @@
         .btn-primary {
             background: var(--primary-color);
             color: white;
+        }
+
+        .btn-primary i {
+            color: white !important;
         }
 
         .btn-primary:hover {
@@ -882,7 +917,12 @@
                         const upcharge = upcharges[size] || 0;
                         const sizePrice = basePrice + upcharge;
                         itemTotal += qty * sizePrice;
-                        return `<span class="size-badge">${size} (${qty})</span>`;
+                        return `
+                            <div class="size-badge">
+                                <span class="size-info">${size} (${qty})</span>
+                                <span class="size-price">$${sizePrice.toFixed(2)}</span>
+                            </div>
+                        `;
                     })
                     .join('');
 
