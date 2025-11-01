@@ -839,6 +839,20 @@ Company Phone: 253-922-5793
 Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 ```
 
+### Sample Cart Pricing
+- **Formula**: `(baseCost ÷ 0.6) + sizeUpcharge`
+- **Rounding**: Half-dollar ceiling (`Math.ceil(price * 2) / 2`)
+- **Margin**: 40% (÷0.6 means ~67% markup)
+- **API Endpoint**: `/api/pricing-bundle?method=BLANK&styleNumber={styleNumber}`
+- **Upcharges**: From `sellingPriceDisplayAddOns` field
+- **Documentation**: @memory/SAMPLE_CART_PRICING.md
+
+**Quick Example:**
+```javascript
+// Base cost $6.00, size Large
+const price = Math.ceil(($6.00 / 0.6) * 2) / 2;  // $10.00
+```
+
 For detailed configuration management patterns and environment detection, see **@memory/CLAUDE_ARCHITECTURE.md**
 
 ## 📚 Documentation Navigation

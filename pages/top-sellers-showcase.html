@@ -193,9 +193,9 @@
                     console.log(`Style ${styleNumber}: Min price $${minPrice.toFixed(2)}, ${colors.length} colors, ${sizes.length} sizes`);
                     
                     if (minPrice < 10) {
-                        const result = { 
-                            eligible: true, 
-                            type: 'free', 
+                        const result = {
+                            eligible: true,
+                            type: 'free',
                             price: 0,
                             minCost: minPrice,
                             colors: colors,
@@ -205,18 +205,20 @@
                         console.log(`  → FREE sample`);
                         return result;
                     } else {
-                        // Calculate markup: cost / 0.60, round up
-                        const samplePrice = Math.ceil(minPrice / 0.60);
-                        const result = { 
-                            eligible: true, 
-                            type: 'paid', 
+                        // Calculate markup with half-dollar ceiling: (cost ÷ 0.60) rounded UP to nearest $0.50
+                        const priceWithMargin = minPrice / 0.60;
+                        const samplePrice = Math.ceil(priceWithMargin * 2) / 2;  // Half-dollar ceiling
+
+                        const result = {
+                            eligible: true,
+                            type: 'paid',
                             price: samplePrice,
                             minCost: minPrice,
                             colors: colors,
                             sizes: sizes
                         };
                         this.eligibilityCache[styleNumber] = result;
-                        console.log(`  → PAID sample at $${samplePrice}`);
+                        console.log(`  → PAID sample at $${samplePrice.toFixed(2)} (was ${minPrice.toFixed(2)})`);
                         return result;
                     }
                 } catch (error) {
@@ -778,6 +780,72 @@
                 `;
             }
         }
+
+        // ================================================================
+        // SAMPLE PRICING UTILITY - Fetch API upcharges and calculate pricing
+        // ================================================================
+
+        /**
+         * Calculate sample pricing with API-based size upcharges
+         * @param {string} styleNumber - Product style number
+         * @param {string} size - Size code (S, M, L, XL, 2XL, etc.)
+         * @returns {Promise<Object>} - Pricing data with base price and all upcharges
+         */
+        async function calculateSamplePricing(styleNumber, size) {
+            try {
+                console.log(`[Sample Pricing] Calculating for ${styleNumber} size ${size}`);
+
+                // Fetch pricing data from API
+                const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=BLANK&styleNumber=${styleNumber}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Get base cost for this specific size
+                const sizeData = data.sizes?.find(s => s.size === size);
+                const baseCost = sizeData ? parseFloat(sizeData.price) : parseFloat(data.sizes[0].price);
+
+                // Get upcharge from API (handles tall sizes automatically!)
+                const upcharge = parseFloat(data.sellingPriceDisplayAddOns?.[size] || 0);
+
+                // Calculate sample pricing: blank product with 40% margin (÷0.6)
+                const priceWithMargin = baseCost / 0.6;
+
+                // Round using half-dollar ceiling (consistent with DTG/Screen Print)
+                const roundedPrice = Math.ceil(priceWithMargin * 2) / 2;
+
+                // Final price with upcharge
+                const finalPrice = roundedPrice + upcharge;
+
+                console.log(`[Sample Pricing] ${styleNumber} ${size}: Base $${baseCost.toFixed(2)} → Margin $${roundedPrice.toFixed(2)} + Upcharge $${upcharge.toFixed(2)} = $${finalPrice.toFixed(2)}`);
+
+                return {
+                    basePrice: finalPrice,
+                    baseCost: baseCost,
+                    marginPrice: roundedPrice,
+                    upcharge: upcharge,
+                    upcharges: data.sellingPriceDisplayAddOns || {}  // All upcharges for cart storage
+                };
+            } catch (error) {
+                console.error(`[Sample Pricing] Error calculating pricing for ${styleNumber}:`, error);
+                // Return fallback pricing (base margin only, no upcharge)
+                return {
+                    basePrice: 0,
+                    baseCost: 0,
+                    marginPrice: 0,
+                    upcharge: 0,
+                    upcharges: {},
+                    error: error.message
+                };
+            }
+        }
+
+        // Make function globally available for product pages
+        window.calculateSamplePricing = calculateSamplePricing;
 
         // Initialize when DOM is ready to avoid document.body being null
         if (document.readyState === 'loading') {
@@ -3251,7 +3319,7 @@
         }
         
         // Show modal for color/size selection
-        function showSampleSelectionModal(styleNumber, productName, imageUrl, price, type, eligibilityData) {
+        async function showSampleSelectionModal(styleNumber, productName, imageUrl, price, type, eligibilityData) {
             // Validate we have colors and sizes
             if (!eligibilityData.colors || eligibilityData.colors.length === 0) {
                 console.error('No colors available for', styleNumber);
@@ -3265,6 +3333,21 @@
                 return;
             }
 
+            // Fetch upcharges from BLANK pricing endpoint
+            let upcharges = {};
+            try {
+                const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                const response = await fetch(`${apiBase}/api/pricing-bundle?method=BLANK&styleNumber=${styleNumber}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    upcharges = data.sellingPriceDisplayAddOns || {};
+                    console.log('[Sample] Fetched upcharges for', styleNumber, upcharges);
+                }
+            } catch (error) {
+                console.warn('[Sample] Failed to fetch upcharges:', error);
+                // Continue without upcharges
+            }
+
             // Open drawer with product selection
             if (window.cartDrawer) {
                 const productData = {
@@ -3274,6 +3357,7 @@
                     imageUrl: imageUrl,
                     price: price || 0,
                     type: type || 'free',
+                    upcharges: upcharges,
                     colors: eligibilityData.colors.map(c => ({
                         name: c.name,
                         code: c.name,

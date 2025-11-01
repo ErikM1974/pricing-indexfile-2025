@@ -302,6 +302,7 @@ class CartDrawer {
             size: this.selectedSize,
             price: this.currentProduct.price || 0,
             type: this.currentProduct.type || 'free',
+            upcharges: this.currentProduct.upcharges || {},
             addedAt: new Date().toISOString()
         };
 
