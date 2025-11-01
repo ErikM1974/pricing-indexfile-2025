@@ -671,6 +671,37 @@
         console.log('[Sample Cart] Service initialized');
 
         // ==============================================
+        // SIZE SORTING UTILITY
+        // ==============================================
+
+        /**
+         * Sort sizes in natural order: Youth → Standard → Tall → Oversized
+         * @param {Object} sizes - Object with size as key and quantity as value
+         * @returns {Array} - Sorted array of size keys
+         */
+        function sortSizesByOrder(sizes) {
+            const order = [
+                'YXS', 'YS', 'YM', 'YL', 'YXL',          // Youth
+                'XS', 'S', 'M', 'L', 'XL',                // Standard
+                'MT', 'LT', 'XLT',                        // Tall (medium/large/XL)
+                '2XL', '2XLT',                            // 2X and 2X Tall
+                '3XL', '3XLT',                            // 3X and 3X Tall
+                '4XL', '5XL', '6XL',                      // Extra oversized
+                'OSFA'                                    // One size
+            ];
+
+            return Object.keys(sizes)
+                .filter(size => sizes[size] > 0)
+                .sort((a, b) => {
+                    const indexA = order.indexOf(a);
+                    const indexB = order.indexOf(b);
+                    if (indexA === -1) return 1;         // Unknown sizes go to end
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
+        }
+
+        // ==============================================
         // DEBUG UTILITIES - Sample Cart & Checkout
         // ==============================================
         window.CART_DEBUG = {
@@ -745,9 +776,71 @@
             }
         }
 
+        // Migrate old cart items to include upcharges (backward compatibility)
+        async function migrateCartUpcharges(cart) {
+            if (!cart || cart.length === 0) return cart;
+
+            console.group('🔄 [Cart Migration] Checking for missing upcharges');
+
+            let updated = false;
+            const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+
+                // Check if upcharges field is missing
+                if (!item.upcharges || Object.keys(item.upcharges).length === 0) {
+                    console.log(`📦 [Migration] Fetching upcharges for ${item.style} (missing upcharges field)`);
+
+                    try {
+                        const response = await fetch(`${apiBase}/api/pricing-bundle?method=BLANK&styleNumber=${item.style}`);
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const upcharges = data.sellingPriceDisplayAddOns || {};
+
+                            // Add upcharges to item
+                            cart[i].upcharges = upcharges;
+                            updated = true;
+
+                            console.log(`✅ [Migration] Added upcharges for ${item.style}:`, upcharges);
+                        } else {
+                            console.warn(`⚠️ [Migration] API failed for ${item.style}:`, response.status);
+                            // Add empty upcharges object to prevent repeated attempts
+                            cart[i].upcharges = {};
+                        }
+                    } catch (error) {
+                        console.error(`❌ [Migration] Error fetching upcharges for ${item.style}:`, error);
+                        // Add empty upcharges object to prevent repeated attempts
+                        cart[i].upcharges = {};
+                    }
+                } else {
+                    console.log(`✓ [Migration] ${item.style} already has upcharges, skipping`);
+                }
+            }
+
+            console.log(`📊 [Migration] Summary: ${updated ? 'Cart updated' : 'No updates needed'}`);
+            console.groupEnd();
+
+            // If we updated any items, save the migrated cart back to sessionStorage
+            if (updated) {
+                const cartData = {
+                    samples: cart,
+                    timestamp: new Date().toISOString()
+                };
+                sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+                console.log('💾 [Migration] Saved migrated cart to sessionStorage');
+            }
+
+            return cart;
+        }
+
         // Load and display cart items
-        function loadCart() {
-            const cart = getCartSamples();
+        async function loadCart() {
+            let cart = getCartSamples();
+
+            // Migrate old cart items to include upcharges (backward compatibility)
+            cart = await migrateCartUpcharges(cart);
 
             // DEBUG: Log cart load
             if (window.CART_DEBUG) {
@@ -774,13 +867,26 @@
 
             // Display cart items
             container.innerHTML = cart.map((item, index) => {
-                const sizesDisplay = Object.entries(item.sizes)
-                    .filter(([size, qty]) => qty > 0)
-                    .map(([size, qty]) => `<span class="size-badge">${size} (${qty})</span>`)
+                // Get upcharges for this product (from API when added to cart)
+                const upcharges = item.upcharges || {};
+                const basePrice = parseFloat(item.price) || 0;
+
+                // Sort sizes in natural order
+                const sortedSizes = sortSizesByOrder(item.sizes);
+
+                // Calculate total with size-specific pricing
+                let itemTotal = 0;
+                const sizesDisplay = sortedSizes
+                    .map(size => {
+                        const qty = item.sizes[size];
+                        const upcharge = upcharges[size] || 0;
+                        const sizePrice = basePrice + upcharge;
+                        itemTotal += qty * sizePrice;
+                        return `<span class="size-badge">${size} (${qty})</span>`;
+                    })
                     .join('');
 
                 const totalQty = Object.values(item.sizes).reduce((sum, qty) => sum + qty, 0);
-                const itemPrice = parseFloat(item.price) || 0;
 
                 return `
                     <div class="cart-item" data-index="${index}">
@@ -791,7 +897,7 @@
                             <div class="item-color">Color: ${item.color}</div>
                             <div class="item-sizes">Sizes: ${sizesDisplay}</div>
                             <div class="item-price" style="margin-top: 0.5rem; font-weight: 600; color: var(--primary-color);">
-                                ${totalQty} ${totalQty === 1 ? 'item' : 'items'} × $${itemPrice.toFixed(2)} = $${(totalQty * itemPrice).toFixed(2)}
+                                ${totalQty} ${totalQty === 1 ? 'item' : 'items'} = $${itemTotal.toFixed(2)}
                             </div>
                         </div>
                         <div class="item-remove" onclick="removeItem(${index})">
@@ -919,7 +1025,8 @@
                 catalogColor: item.catalogColor,
                 sizes: item.sizes,  // Keep as object {S: 1, M: 2, L: 1} or {OSFA: 1}
                 price: item.price || 0,  // Use 0 not 0.01 for consistency
-                type: item.sampleType || 'free'
+                type: item.sampleType || 'free',
+                upcharges: item.upcharges || {}  // Size-specific upcharges from API
             }));
 
             console.log('[Sample Cart] Submitting order with:', {

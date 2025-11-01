@@ -67,13 +67,15 @@ class SampleOrderService {
      * @param {string} sample.name - Product name
      * @param {string} sample.catalogColor - ShopWorks catalog color
      * @param {Object} sample.sizes - Size breakdown (e.g., {S:1, M:2, L:1, '2XL':1})
-     * @param {number} sample.price - Price per sample
+     * @param {number} sample.price - Base price per sample
+     * @param {Object} sample.upcharges - Size-specific upcharges (e.g., {'2XL': 2.00, '3XL': 3.00})
      * @param {string} sample.type - 'paid' or 'free'
      * @returns {Array} Array of line items, one per size
      */
     expandSampleIntoLineItems(sample) {
         const lineItems = [];
         const basePartNumber = sample.style;
+        const upcharges = sample.upcharges || {};  // Size upcharges from API
 
         // Defensive check: Validate sizes object
         if (!sample.sizes || typeof sample.sizes !== 'object' || Array.isArray(sample.sizes)) {
@@ -86,10 +88,17 @@ class SampleOrderService {
         }
 
         console.log(`[SampleOrderService] Expanding ${basePartNumber} into line items:`, sample.sizes);
+        if (Object.keys(upcharges).length > 0) {
+            console.log(`[SampleOrderService] Applying size upcharges:`, upcharges);
+        }
 
         // Each size becomes a separate line item
         Object.entries(sample.sizes || {}).forEach(([size, qty]) => {
             if (!qty || qty === 0) return;
+
+            // Calculate size-specific price (base price + upcharge for this size)
+            const upcharge = parseFloat(upcharges[size] || 0);
+            const sizePrice = parseFloat(sample.price) + upcharge;
 
             const lineItem = {
                 partNumber: basePartNumber,       // Just "PC54" - ShopWorks handles size suffixes
@@ -97,13 +106,13 @@ class SampleOrderService {
                 color: sample.catalogColor,       // CRITICAL: Use CATALOG_COLOR for ShopWorks
                 size: size,                       // "S", "M", "L", "XL", "2XL", etc. in separate field
                 quantity: parseInt(qty),          // Actual quantity for this size
-                price: parseFloat(sample.price) || 0,  // Use actual price, no hardcoded fallback
-                notes: (sample.type === 'paid' && sample.price > 0)
-                    ? `PAID SAMPLE - Invoice customer $${sample.price.toFixed(2)}`
+                price: sizePrice,                 // Size-specific price (base + upcharge)
+                notes: (sample.type === 'paid' && sizePrice > 0)
+                    ? `PAID SAMPLE - Invoice customer $${sizePrice.toFixed(2)}`
                     : 'FREE SAMPLE'
             };
 
-            console.log(`  → ${basePartNumber} (${size}): ${qty} units`);
+            console.log(`  → ${basePartNumber} (${size}): ${qty} units @ $${sizePrice.toFixed(2)} (base: $${sample.price.toFixed(2)} + upcharge: $${upcharge.toFixed(2)})`);
             lineItems.push(lineItem);
         });
 
@@ -175,15 +184,18 @@ class SampleOrderService {
                 });
             });
 
-            // Calculate FREE vs PAID totals
+            // Expand each sample into multiple line items FIRST (one per size with proper suffixes)
+            // This must happen before calculating subtotal to get accurate size-specific pricing
+            const lineItems = samples.flatMap(sample => this.expandSampleIntoLineItems(sample));
+
+            // Calculate FREE vs PAID totals from actual line items (includes size-specific upcharges)
             const freeItems = samples.filter(s => (s.type === 'free' || !s.type));
             const paidItems = samples.filter(s => s.type === 'paid');
-            const subtotal = paidItems.reduce((sum, item) => {
-                // Sum all size quantities for this sample
-                const totalQty = Object.values(item.sizes || {}).reduce((qtySum, qty) => qtySum + (parseInt(qty) || 0), 0);
-                // Multiply total quantity by price per piece
-                return sum + (totalQty * (item.price || 0));
-            }, 0);
+
+            // Calculate subtotal by summing actual line item prices (which include size upcharges)
+            const subtotal = lineItems
+                .filter(item => item.notes && item.notes.includes('PAID SAMPLE'))
+                .reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
             // Calculate Washington State Sales Tax (10.1%)
             const salesTaxRate = 0.101;
@@ -197,9 +209,6 @@ class SampleOrderService {
                 salesTax: salesTax.toFixed(2),
                 total: total.toFixed(2)
             });
-
-            // Expand each sample into multiple line items (one per size with proper suffixes)
-            const lineItems = samples.flatMap(sample => this.expandSampleIntoLineItems(sample));
 
             // Sales tax handled via Payment block TaxTotal field only
             // ShopWorks will auto-create tax line from TaxTotal + TaxPartNumber + TaxPartDescription
