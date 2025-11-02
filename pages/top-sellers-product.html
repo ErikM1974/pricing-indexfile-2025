@@ -680,30 +680,8 @@
     </style>
 </head>
 <body>
-    <!-- Public Header -->
-    <header class="public-header">
-        <div class="header-container">
-            <div class="company-branding">
-                <a href="/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="company-logo" style="cursor: pointer;">
-                    <div class="company-info">
-                        <h1 style="color: var(--text-primary);">Northwest Custom Apparel</h1>
-                        <div class="company-tagline">Family Owned Since 1977</div>
-                    </div>
-                </a>
-            </div>
-            <div class="contact-info">
-                <a href="tel:253-922-5793">
-                    <i class="fas fa-phone"></i>
-                    253-922-5793
-                </a>
-                <a href="mailto:sales@nwcustomapparel.com">
-                    <i class="fas fa-envelope"></i>
-                    Contact Sales
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
 
     <!-- Breadcrumb Navigation -->
     <div class="breadcrumb-nav" style="background: white; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
@@ -862,6 +840,9 @@
         </div>
     </footer>
 
+    <!-- Universal Cart Header Component -->
+    <script src="../shared_components/js/universal-cart-header.js"></script>
+
     <!-- Product Recommendations Service -->
     <script src="../shared_components/js/product-recommendations.js"></script>
 
@@ -895,53 +876,13 @@
             }
 
             initializeUI() {
-                if (!document.getElementById('sampleCartWidget')) {
-                    const widget = document.createElement('div');
-                    widget.id = 'sampleCartWidget';
-                    widget.className = 'sample-cart-widget';
-                    widget.setAttribute('role', 'button');
-                    widget.setAttribute('tabindex', '0');
-                    widget.innerHTML = `
-                        <div class="sample-cart-icon">
-                            <i class="fas fa-box-open"></i>
-                            <span class="sample-count-badge">${this.samples.length}</span>
-                        </div>
-                        <span class="sample-cart-label">Sample Cart</span>
-                    `;
-
-                    // Add to header's contact-info section (top-right position)
-                    const contactInfo = document.querySelector('.contact-info');
-                    if (contactInfo) {
-                        contactInfo.appendChild(widget);
-                    } else {
-                        // Fallback: add to body if header not found
-                        document.body.appendChild(widget);
-                    }
-                }
+                // Widget now handled by UniversalCartHeader component
+                // Just update the universal header's cart count
                 this.updateUI();
             }
 
             bindEvents() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget) {
-                    // Click handler
-                    widget.addEventListener('click', () => {
-                        if (window.cartDrawer) {
-                            window.cartDrawer.open();
-                        }
-                    });
-
-                    // Keyboard support (Enter/Space)
-                    widget.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            if (window.cartDrawer) {
-                                window.cartDrawer.open();
-                            }
-                        }
-                    });
-                }
-
+                // Cart widget events now handled by UniversalCartHeader component
                 // Listen for storage events (cart updates from other tabs)
                 window.addEventListener('storage', (e) => {
                     if (e.key === 'sampleCart') {
@@ -966,26 +907,25 @@
             }
 
             updateUI() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (!widget) return;
-
-                const badge = widget.querySelector('.sample-count-badge');
-                if (badge) {
-                    badge.textContent = this.samples.length;
+                // Trigger universal header to update cart count
+                if (window.universalCartHeader) {
+                    window.universalCartHeader.updateCartCount();
                 }
 
-                // Show/hide widget based on cart contents
-                if (this.samples.length > 0) {
-                    widget.style.display = 'flex';
-                } else {
-                    widget.style.display = 'none';
-                }
+                // Dispatch custom event for other components to listen to
+                window.dispatchEvent(new CustomEvent('cartUpdated'));
             }
         }
 
         // Initialize sample cart when DOM is ready
         let sampleCart = null;
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize universal header
+            window.universalCartHeader = new UniversalCartHeader({
+                isCartPage: false,
+                showContactInfo: true
+            });
+
             sampleCart = new SampleCart();
             window.sampleCart = sampleCart; // Make globally accessible
         });
