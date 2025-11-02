@@ -17,6 +17,9 @@
     <!-- Sample Order Service for ShopWorks Integration -->
     <script src="../shared_components/js/sample-order-service.js"></script>
 
+    <!-- Sample Inventory Service for Real-Time Stock Checking -->
+    <script src="../shared_components/js/sample-inventory-service.js"></script>
+
     <style>
         :root {
             --primary-color: #4cb354;
@@ -343,6 +346,197 @@
 
         .item-remove:hover {
             opacity: 0.7;
+        }
+
+        /* ===== Inventory Status Badges ===== */
+        .inventory-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            transition: all 0.2s;
+        }
+
+        .inventory-status-badge i {
+            font-size: 0.875rem;
+        }
+
+        .inventory-status-badge.in-stock {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+
+        .inventory-status-badge.low-stock {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fbbf24;
+        }
+
+        .inventory-status-badge.out-of-stock {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+
+        .inventory-status-badge.checking {
+            background: #e5e7eb;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        .inventory-status-badge.checking i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Size Availability Indicators */
+        .size-unavailable {
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .size-unavailable::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ef4444;
+            transform: translateY(-50%) rotate(-15deg);
+        }
+
+        .size-unavailable .size-info,
+        .size-unavailable .size-price {
+            text-decoration: line-through;
+        }
+
+        /* Inventory Warning Messages */
+        .inventory-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.9375rem;
+        }
+
+        .inventory-warning i {
+            font-size: 1.25rem;
+            margin-top: 0.125rem;
+        }
+
+        .inventory-warning.warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+        }
+
+        .inventory-warning.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .inventory-warning strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Checkout Validation Alert */
+        .checkout-validation-alert {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .checkout-validation-alert i {
+            font-size: 1.5rem;
+            color: #dc2626;
+            margin-top: 0.125rem;
+        }
+
+        .checkout-validation-alert .alert-content h3 {
+            font-size: 1.125rem;
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkout-validation-alert .alert-content p {
+            color: #7f1d1d;
+            margin-bottom: 0.75rem;
+        }
+
+        .checkout-validation-alert .out-of-stock-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .checkout-validation-alert .out-of-stock-list li {
+            padding: 0.5rem 0;
+            color: #991b1b;
+            font-weight: 500;
+        }
+
+        .checkout-validation-alert .out-of-stock-list li i {
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Loading Overlay for Inventory Checks */
+        .inventory-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .inventory-loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .inventory-loading-content i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        .inventory-loading-content h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-loading-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
 
         .empty-cart {
@@ -1035,23 +1229,32 @@
 
         // Helper function to safely read cart from storage
         function getCartSamples() {
+            console.log('🔍 [GET CART] Function called');
             try {
                 const stored = sessionStorage.getItem('sampleCart');
-                if (!stored) return [];
+                console.log('🔍 [GET CART] Raw sessionStorage:', stored);
+
+                if (!stored) {
+                    console.log('🔍 [GET CART] No cart found, returning empty array');
+                    return [];
+                }
 
                 const parsed = JSON.parse(stored);
+                console.log('🔍 [GET CART] Parsed data:', parsed);
 
                 // Handle both old (array) and new (nested) formats
                 if (Array.isArray(parsed)) {
+                    console.log('🔍 [GET CART] Old format (array), returning:', parsed);
                     return parsed; // Old format
                 } else if (parsed && parsed.samples && Array.isArray(parsed.samples)) {
+                    console.log('🔍 [GET CART] New format (nested), returning samples:', parsed.samples);
                     return parsed.samples; // New format
                 } else {
-                    console.warn('[Cart] Unrecognized cart format');
+                    console.warn('⚠️ [GET CART] Unrecognized cart format:', parsed);
                     return [];
                 }
             } catch (e) {
-                console.error('[Cart] Error parsing cart:', e);
+                console.error('❌ [GET CART] Error parsing cart:', e);
                 return [];
             }
         }
@@ -1150,10 +1353,24 @@
 
         // Load and display cart items
         async function loadCart() {
+            // === ENSURE CONTAINER IS VISIBLE (Fix for browser back button edge cases) ===
+            const cartContainer = document.getElementById('cartContainer');
+            if (cartContainer) {
+                cartContainer.style.display = 'block';
+                console.log('🔧 [FIX] Ensured cartContainer is visible');
+            }
+
+            // === ENHANCED DEBUGGING ===
+            console.log('📦 [LOAD CART] Function called');
+            console.log('📦 [LOAD CART] sessionStorage value:', sessionStorage.getItem('sampleCart'));
+
             let cart = getCartSamples();
+            console.log('📦 [LOAD CART] Parsed cart:', cart);
+            console.log('📦 [LOAD CART] Cart length:', cart.length);
 
             // Migrate old cart items to include upcharges (backward compatibility)
             cart = await migrateCartUpcharges(cart);
+            console.log('📦 [LOAD CART] After migration:', cart);
 
             // Update summary bar and badge
             updateCartSummary(cart);
@@ -1163,9 +1380,69 @@
                 window.CART_DEBUG.logCartLoad(cart);
             }
 
+            // Get cart container (declare once for entire function)
             const container = document.getElementById('cartItems');
 
+            // ===== CHECK INVENTORY FOR ALL ITEMS =====
+            if (cart.length > 0 && window.sampleInventoryService) {
+                console.log('[Sample Cart] Checking inventory for cart items...');
+
+                // Show loading indicator
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                        <p style="margin-top: 1rem; color: var(--text-secondary);">Checking inventory...</p>
+                    </div>
+                `;
+
+                try {
+                    // Check inventory for all cart items
+                    cart = await window.sampleInventoryService.checkCartInventory(cart);
+
+                    console.log('[Sample Cart] ✓ Inventory check complete');
+
+                    // Save updated cart with inventory status
+                    const cartData = {
+                        samples: cart,
+                        timestamp: new Date().toISOString()
+                    };
+                    sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+
+                    // === DEBUG: Verify what was saved ===
+                    const verifyCart = JSON.parse(sessionStorage.getItem('sampleCart'));
+                    console.log('💾 [SAVE VERIFY] Saved to sessionStorage:', verifyCart.samples.length, 'items');
+                    console.log('💾 [SAVE VERIFY] First item:', verifyCart.samples[0]);
+
+                } catch (error) {
+                    console.error('[Sample Cart] Error checking inventory:', error);
+                    // Continue anyway - graceful degradation
+                }
+            }
+
+            // === CRITICAL DEBUG POINT: Check cart after inventory ===
+            console.log('🔍 [POST-INVENTORY] cart:', cart);
+            console.log('🔍 [POST-INVENTORY] cart.length:', cart.length);
+            console.log('🔍 [POST-INVENTORY] cart is array?', Array.isArray(cart));
+            console.log('🔍 [POST-INVENTORY] cart items summary:', cart.map(item => ({
+                style: item.style,
+                color: item.color,
+                inventoryStatus: item.inventoryStatus,
+                hasSizes: !!item.sizes
+            })));
+
+            // Validate cart is still an array
+            if (!Array.isArray(cart)) {
+                console.error('❌ CRITICAL: cart is not an array!', typeof cart, cart);
+                cart = []; // Recover with empty array
+            }
+
+            // Display cart contents (container already declared at top of function)
+
+            console.log('🔍 [PRE-DISPLAY CHECK] About to check if cart is empty');
+            console.log('🔍 [PRE-DISPLAY CHECK] cart.length:', cart.length);
+
             if (cart.length === 0) {
+                console.log('🔍 [PRE-DISPLAY CHECK] ⚠️ Cart IS EMPTY - will show empty message');
                 container.innerHTML = `
                     <div class="empty-cart">
                         <i class="fas fa-shopping-cart"></i>
@@ -1212,15 +1489,42 @@
                 return;
             } else {
                 // Show contact form and summary bar if cart has items
+                console.log('🔍 [DISPLAY] ✓ Cart has items - showing form and items');
                 document.getElementById('contactForm').style.display = 'block';
                 document.getElementById('cartSummaryBar').style.display = 'flex';
             }
 
-            // Display cart items
-            container.innerHTML = cart.map((item, index) => {
+            // === CRITICAL DEBUG POINT: Before rendering ===
+            console.log('🎨 [RENDER START] About to render cart items');
+            console.log('🎨 [RENDER START] Container element:', container);
+            console.log('🎨 [RENDER START] Cart length:', cart.length);
+            console.log('🎨 [RENDER START] Cart items:', cart);
+
+            // Display cart items (wrapped in try-catch for error handling)
+            try {
+                container.innerHTML = cart.map((item, index) => {
+                    // === DEBUG: Log each item being rendered ===
+                    console.log(`🎨 [RENDER ITEM ${index}] Rendering:`, {
+                        style: item.style,
+                        color: item.color,
+                        sizes: item.sizes,
+                        hasSizes: !!item.sizes,
+                        sizeType: typeof item.sizes,
+                        inventoryStatus: item.inventoryStatus
+                    });
+
+                    // Validate item.sizes before using it
+                    if (!item.sizes || typeof item.sizes !== 'object') {
+                        console.error(`🎨 [RENDER ITEM ${index}] ❌ Invalid sizes:`, item.sizes);
+                        item.sizes = {}; // Default to empty object
+                    }
                 // Get upcharges for this product (from API when added to cart)
                 const upcharges = item.upcharges || {};
                 const basePrice = parseFloat(item.price) || 0;
+
+                // Get inventory status
+                const inventoryStatus = item.inventoryStatus || 'unknown';
+                const sizeAvailability = item.sizeAvailability || {};
 
                 // Sort sizes in natural order
                 const sortedSizes = sortSizesByOrder(item.sizes);
@@ -1233,8 +1537,14 @@
                         const upcharge = upcharges[size] || 0;
                         const sizePrice = basePrice + upcharge;
                         itemTotal += qty * sizePrice;
+
+                        // Check if this size is available
+                        const sizeInfo = sizeAvailability[size] || {};
+                        const isAvailable = sizeInfo.available !== false;
+                        const unavailableClass = !isAvailable ? ' size-unavailable' : '';
+
                         return `
-                            <div class="size-badge">
+                            <div class="size-badge${unavailableClass}" title="${!isAvailable ? 'Out of Stock' : ''}">
                                 <span class="size-info">${size} (${qty})</span>
                                 <span class="size-price">$${sizePrice.toFixed(2)}</span>
                             </div>
@@ -1244,6 +1554,38 @@
 
                 const totalQty = Object.values(item.sizes).reduce((sum, qty) => sum + qty, 0);
 
+                // Generate inventory status badge
+                let inventoryBadge = '';
+                if (inventoryStatus === 'in_stock') {
+                    inventoryBadge = '<div class="inventory-status-badge in-stock"><i class="fas fa-check-circle"></i> In Stock</div>';
+                } else if (inventoryStatus === 'low_stock') {
+                    inventoryBadge = '<div class="inventory-status-badge low-stock"><i class="fas fa-exclamation-triangle"></i> Low Stock</div>';
+                } else if (inventoryStatus === 'out_of_stock') {
+                    inventoryBadge = '<div class="inventory-status-badge out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</div>';
+                } else if (inventoryStatus === 'unknown') {
+                    inventoryBadge = '<div class="inventory-status-badge checking"><i class="fas fa-question-circle"></i> Unable to Verify</div>';
+                }
+
+                // Generate size-specific warnings
+                let sizeWarnings = '';
+                if (item.hasWarnings) {
+                    const unavailableSizes = Object.entries(sizeAvailability)
+                        .filter(([size, info]) => info.available === false && item.sizes[size] > 0)
+                        .map(([size]) => size);
+
+                    if (unavailableSizes.length > 0) {
+                        sizeWarnings = `
+                            <div class="inventory-warning error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div>
+                                    <strong>Some sizes are unavailable:</strong>
+                                    ${unavailableSizes.join(', ')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
                 return `
                     <div class="cart-item" data-index="${index}">
                         <img src="${item.imageUrl || 'https://via.placeholder.com/100'}" alt="${item.name}" class="item-image">
@@ -1251,6 +1593,8 @@
                             <h3>${item.name}</h3>
                             <div class="item-style">Style: ${item.style}</div>
                             <div class="item-color">Color: ${item.color}</div>
+                            ${inventoryBadge}
+                            ${sizeWarnings}
                             <div class="item-sizes">Sizes: ${sizesDisplay}</div>
                             <div class="item-price" style="margin-top: 0.5rem; font-weight: 600; color: var(--primary-color);">
                                 ${totalQty} ${totalQty === 1 ? 'item' : 'items'} = $${itemTotal.toFixed(2)}
@@ -1261,7 +1605,25 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+                }).join('');
+
+                console.log('✅ [RENDER SUCCESS] Cart items rendered successfully');
+                console.log('✅ [RENDER SUCCESS] Container HTML length:', container.innerHTML.length);
+
+            } catch (error) {
+                console.error('❌ [RENDER ERROR] Failed to render cart items:', error);
+                console.error('❌ [RENDER ERROR] Error message:', error.message);
+                console.error('❌ [RENDER ERROR] Error stack:', error.stack);
+                container.innerHTML = `
+                    <div class="alert alert-danger" style="margin: 2rem; padding: 1.5rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 8px;">
+                        <h4 style="color: #991b1b; margin-bottom: 0.5rem;"><i class="fas fa-exclamation-triangle"></i> Display Error</h4>
+                        <p style="color: #7f1d1d; margin: 0;">Failed to render cart items. Error: ${error.message}</p>
+                        <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-sync"></i> Reload Page
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         // Remove item from cart
@@ -1334,6 +1696,58 @@
         document.getElementById('sampleRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            // ===== VALIDATE INVENTORY BEFORE CHECKOUT =====
+            const cart = getCartSamples();
+
+            if (window.sampleInventoryService) {
+                const validation = window.sampleInventoryService.validateCheckout(cart);
+
+                if (!validation.canProceed) {
+                    // Show validation alert
+                    const alertHtml = `
+                        <div class="checkout-validation-alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="alert-content">
+                                <h3>Cannot Complete Order</h3>
+                                <p>${validation.message}</p>
+                                <ul class="out-of-stock-list">
+                                    ${validation.outOfStockItems.map(item => `
+                                        <li>
+                                            <i class="fas fa-times-circle"></i>
+                                            ${item.name} (${item.color})
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                <p style="margin-top: 1rem;">Please remove out-of-stock items from your cart and try again.</p>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insert alert before form
+                    const existingAlert = document.querySelector('.checkout-validation-alert');
+                    if (existingAlert) {
+                        existingAlert.remove();
+                    }
+
+                    const form = document.getElementById('sampleRequestForm');
+                    form.insertAdjacentHTML('beforebegin', alertHtml);
+
+                    // Scroll to alert
+                    document.querySelector('.checkout-validation-alert').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    console.error('[Sample Cart] ❌ Checkout blocked: Out of stock items');
+                    return false; // Block submission
+                }
+
+                // Show warnings if any (but allow to proceed)
+                if (validation.warnings.length > 0) {
+                    console.warn('[Sample Cart] ⚠️ Warnings:', validation.warnings);
+                }
+            }
+
             // Ensure shipping fields are populated before submission
             const sameAsBilling = document.getElementById('same-as-billing').checked;
             if (sameAsBilling) {
@@ -1341,7 +1755,7 @@
             }
 
             const formData = new FormData(e.target);
-            const cart = getCartSamples();
+            // cart already declared at line 1610 - reuse it
             // Get customer data from form (no splitting needed - separate fields now)
             const firstName = formData.get('firstName').trim();
             const lastName = formData.get('lastName').trim();

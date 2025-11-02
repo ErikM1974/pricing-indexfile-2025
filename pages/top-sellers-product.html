@@ -680,30 +680,8 @@
     </style>
 </head>
 <body>
-    <!-- Public Header -->
-    <header class="public-header">
-        <div class="header-container">
-            <div class="company-branding">
-                <a href="/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="company-logo" style="cursor: pointer;">
-                    <div class="company-info">
-                        <h1 style="color: var(--text-primary);">Northwest Custom Apparel</h1>
-                        <div class="company-tagline">Family Owned Since 1977</div>
-                    </div>
-                </a>
-            </div>
-            <div class="contact-info">
-                <a href="tel:253-922-5793">
-                    <i class="fas fa-phone"></i>
-                    253-922-5793
-                </a>
-                <a href="mailto:sales@nwcustomapparel.com">
-                    <i class="fas fa-envelope"></i>
-                    Contact Sales
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
 
     <!-- Breadcrumb Navigation -->
     <div class="breadcrumb-nav" style="background: white; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
@@ -862,6 +840,9 @@
         </div>
     </footer>
 
+    <!-- Universal Cart Header Component -->
+    <script src="../shared_components/js/universal-cart-header.js"></script>
+
     <!-- Product Recommendations Service -->
     <script src="../shared_components/js/product-recommendations.js"></script>
 
@@ -895,53 +876,13 @@
             }
 
             initializeUI() {
-                if (!document.getElementById('sampleCartWidget')) {
-                    const widget = document.createElement('div');
-                    widget.id = 'sampleCartWidget';
-                    widget.className = 'sample-cart-widget';
-                    widget.setAttribute('role', 'button');
-                    widget.setAttribute('tabindex', '0');
-                    widget.innerHTML = `
-                        <div class="sample-cart-icon">
-                            <i class="fas fa-box-open"></i>
-                            <span class="sample-count-badge">${this.samples.length}</span>
-                        </div>
-                        <span class="sample-cart-label">Sample Cart</span>
-                    `;
-
-                    // Add to header's contact-info section (top-right position)
-                    const contactInfo = document.querySelector('.contact-info');
-                    if (contactInfo) {
-                        contactInfo.appendChild(widget);
-                    } else {
-                        // Fallback: add to body if header not found
-                        document.body.appendChild(widget);
-                    }
-                }
+                // Widget now handled by UniversalCartHeader component
+                // Just update the universal header's cart count
                 this.updateUI();
             }
 
             bindEvents() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (widget) {
-                    // Click handler
-                    widget.addEventListener('click', () => {
-                        if (window.cartDrawer) {
-                            window.cartDrawer.open();
-                        }
-                    });
-
-                    // Keyboard support (Enter/Space)
-                    widget.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            if (window.cartDrawer) {
-                                window.cartDrawer.open();
-                            }
-                        }
-                    });
-                }
-
+                // Cart widget events now handled by UniversalCartHeader component
                 // Listen for storage events (cart updates from other tabs)
                 window.addEventListener('storage', (e) => {
                     if (e.key === 'sampleCart') {
@@ -966,26 +907,25 @@
             }
 
             updateUI() {
-                const widget = document.getElementById('sampleCartWidget');
-                if (!widget) return;
-
-                const badge = widget.querySelector('.sample-count-badge');
-                if (badge) {
-                    badge.textContent = this.samples.length;
+                // Trigger universal header to update cart count
+                if (window.universalCartHeader) {
+                    window.universalCartHeader.updateCartCount();
                 }
 
-                // Show/hide widget based on cart contents
-                if (this.samples.length > 0) {
-                    widget.style.display = 'flex';
-                } else {
-                    widget.style.display = 'none';
-                }
+                // Dispatch custom event for other components to listen to
+                window.dispatchEvent(new CustomEvent('cartUpdated'));
             }
         }
 
         // Initialize sample cart when DOM is ready
         let sampleCart = null;
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize universal header
+            window.universalCartHeader = new UniversalCartHeader({
+                isCartPage: false,
+                showContactInfo: true
+            });
+
             sampleCart = new SampleCart();
             window.sampleCart = sampleCart; // Make globally accessible
         });
@@ -1591,24 +1531,22 @@
             // Get current color from loaded products
             const currentColor = currentProducts[selectedColorIndex]?.CATALOG_COLOR || '';
 
-            // Fetch available sizes from API
+            // Fetch available sizes from API (color-specific)
             try {
-                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${params.style}&catalogColor=${currentColor}`);
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=${params.style}&color=${encodeURIComponent(currentColor)}`);
 
                 if (response.ok) {
                     const data = await response.json();
+                    const sizes = data.sizes || [];  // Extract sizes array from response object
 
-                    // Handle array response (API returns array of color variants)
-                    let sizes = [];
-                    if (Array.isArray(data) && data.length > 0) {
-                        // Get sizes from first color variant (all colors have same sizes)
-                        sizes = Object.keys(data[0].basePrices || {});
-                        console.log(`[SizeGrid] Style ${params.style}: Received array of ${data.length} colors, extracting sizes from first:`, sizes);
-                    } else if (data.basePrices) {
-                        // Fallback: single object format (shouldn't happen but handle it)
-                        sizes = Object.keys(data.basePrices || {});
-                        console.log(`[SizeGrid] Style ${params.style}: Received single object, sizes:`, sizes);
+                    // API returns object with sizes property: {style, color, sizes: [...], warehouses: [...]}
+                    if (!Array.isArray(sizes) || sizes.length === 0) {
+                        console.warn(`[SizeGrid] Style ${params.style}, Color ${currentColor}: No sizes returned, using fallback`);
+                        displayStandardSizes(gridContainer);
+                        return;
                     }
+
+                    console.log(`[SizeGrid] Style ${params.style}, Color ${currentColor}: Received ${sizes.length} color-specific sizes:`, sizes);
 
                     // Sort sizes in logical order (XS → S → M → L → XL → 2XL → 3XL → 4XL → Tall sizes)
                     const sizeOrder = {
@@ -1680,6 +1618,9 @@
             const oldQty = selectedSamples[size] || 0;
             const newQty = Math.max(0, oldQty + delta); // Just prevent negative
 
+            // === ENHANCED DEBUGGING ===
+            console.log(`📊 [SIZE UPDATE] Size: ${size}, Old: ${oldQty}, New: ${newQty}, Delta: ${delta}`);
+
             // DEBUG: Log size update
             if (window.SAMPLE_DEBUG) {
                 window.SAMPLE_DEBUG.logSizeUpdate(size, oldQty, newQty, {...selectedSamples, [size]: newQty});
@@ -1691,6 +1632,8 @@
             } else {
                 selectedSamples[size] = newQty;
             }
+
+            console.log(`📊 [SIZE UPDATE] Updated selectedSamples:`, selectedSamples);
 
             // Update UI
             document.getElementById(`qty-${size}`).textContent = newQty;
@@ -1733,8 +1676,17 @@
 
         // Add samples to cart
         function addToSampleCart() {
+            // === ENHANCED DEBUGGING (Always enabled) ===
+            console.log('🛒 [ADD TO CART] Function called');
+            console.log('🛒 [ADD TO CART] selectedSamples:', selectedSamples);
+            console.log('🛒 [ADD TO CART] selectedColorIndex:', selectedColorIndex);
+            console.log('🛒 [ADD TO CART] currentProducts length:', currentProducts?.length);
+
             const params = getUrlParams();
             const product = currentProducts[selectedColorIndex];
+
+            console.log('🛒 [ADD TO CART] URL params:', params);
+            console.log('🛒 [ADD TO CART] Selected product:', product);
 
             // DEBUG: Start add-to-cart group
             if (window.SAMPLE_DEBUG?.enabled) {
@@ -1775,7 +1727,7 @@
                 style: params.style,
                 name: params.name,
                 color: product.COLOR_NAME,
-                catalogColor: product.CATALOG_COLOR,
+                catalogColor: product.CATALOG_COLOR,  // Use CATALOG_COLOR for inventory API (no spaces/abbreviations)
                 imageUrl: product.FRONT_MODEL || product.FRONT_FLAT || '',
                 sizes: { ...selectedSamples },
                 type: params.sampleType || params.type || 'free',  // Use sampleType from URL
@@ -1798,6 +1750,11 @@
                 timestamp: new Date().toISOString()
             };
             sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+
+            console.log('✅ [ADD TO CART] Saved to sessionStorage');
+            console.log('✅ [ADD TO CART] Cart item:', cartItem);
+            console.log('✅ [ADD TO CART] Cart now has', cartArray.length, 'items');
+            console.log('✅ [ADD TO CART] sessionStorage value:', sessionStorage.getItem('sampleCart'));
 
             console.log('[Sample Mode] Added to cart:', cartItem);
             console.log('[Sample Mode] Cart now has', cartArray.length, 'items');

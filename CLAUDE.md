@@ -853,6 +853,19 @@ Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
 const price = Math.ceil(($6.00 / 0.6) * 2) / 2;  // $10.00
 ```
 
+### Sample Cart Inventory Integration
+- **Real-Time Inventory**: Sanmar vendor inventory via `/api/sizes-by-style-color`
+- **Critical Fields**: Use `CATALOG_COLOR` (not `COLOR_NAME`) for API queries
+- **Service**: `SampleInventoryService` class in `/shared_components/js/sample-inventory-service.js`
+- **Caching**: 5-minute sessionStorage cache
+- **Complete Guide**: @memory/SAMPLE_INVENTORY_INTEGRATION_GUIDE.md
+
+**Key Concepts:**
+- COLOR_NAME ("Brilliant Orange") = Display to users
+- CATALOG_COLOR ("BrillOrng") = API queries and inventory checks
+- Size selector shows only color-specific available sizes
+- Inventory badges: "In Stock", "Low Stock", "Out of Stock", "Unable to Verify"
+
 For detailed configuration management patterns and environment detection, see **@memory/CLAUDE_ARCHITECTURE.md**
 
 ## 📚 Documentation Navigation
@@ -871,6 +884,7 @@ For detailed configuration management patterns and environment detection, see **
 - **@memory/QUOTE_BUILDER_GUIDE.md** - Creating new quote builders (3-phase architecture)
 - **@memory/PRICING_CALCULATOR_GUIDE.md** - Creating pricing calculators
 - **@memory/BUNDLE_CALCULATOR_GUIDE.md** - Creating promotional bundles
+- **@memory/SAMPLE_INVENTORY_INTEGRATION_GUIDE.md** - Adding real-time inventory to product pages
 - **@memory/STAFF_DIRECTORY.md** - Staff emails for dropdowns
 - **@memory/DATABASE_PATTERNS.md** - Database schema patterns
 
