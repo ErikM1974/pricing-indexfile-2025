@@ -28,6 +28,9 @@
     <link rel="stylesheet" href="../shared_components/css/cart-drawer.css">
     <script src="../shared_components/js/cart-drawer.js"></script>
 
+    <!-- Sample Inventory Service for Real-Time Stock Checking -->
+    <script src="../shared_components/js/sample-inventory-service.js"></script>
+
     <!-- Sample Order Service for ShopWorks Integration -->
     <script src="../shared_components/js/sample-order-service.js"></script>
 
@@ -194,11 +197,54 @@
                 }
             }
 
-            addSample(product) {
+            async addSample(product) {
                 // Check for duplicate
                 if (this.samples.find(s => s.style === product.style)) {
                     this.showNotification('This item is already in your sample cart', 'info');
                     return false;
+                }
+
+                // ===== CHECK INVENTORY BEFORE ADDING =====
+                if (window.sampleInventoryService && product.catalogColor && product.size) {
+                    console.log(`[Sample Cart] Checking inventory for ${product.style} ${product.catalogColor} size ${product.size}...`);
+
+                    try {
+                        const availability = await window.sampleInventoryService.checkSizeAvailability(
+                            product.style,
+                            product.catalogColor,
+                            product.size,
+                            1  // Requesting 1 sample
+                        );
+
+                        if (!availability.available) {
+                            // Out of stock - block adding
+                            console.warn(`[Sample Cart] ❌ Out of stock: ${product.style} ${product.catalogColor} size ${product.size}`);
+
+                            this.showNotification(
+                                `${product.name} (${product.color}) - Size ${product.size} is currently out of stock`,
+                                'warning'
+                            );
+
+                            return false; // Block adding to cart
+                        } else if (availability.isLowStock) {
+                            // Low stock - allow but warn
+                            console.warn(`[Sample Cart] ⚠️ Low stock: ${product.style} ${product.catalogColor} size ${product.size} (${availability.qtyInStock} left)`);
+
+                            this.showNotification(
+                                `Added to cart (only ${availability.qtyInStock} left in stock)`,
+                                'warning'
+                            );
+                        } else {
+                            // In stock
+                            console.log(`[Sample Cart] ✓ In stock: ${product.style} ${product.catalogColor} size ${product.size}`);
+                        }
+                    } catch (error) {
+                        console.error('[Sample Cart] Error checking inventory:', error);
+                        // Graceful degradation - allow adding but log the error
+                        console.warn('[Sample Cart] Proceeding without inventory check due to error');
+                    }
+                } else {
+                    console.warn('[Sample Cart] Inventory service not available or missing product data');
                 }
 
                 this.samples.push({
@@ -265,13 +311,22 @@
             }
 
             updateUI() {
+                // === ENHANCED DEBUGGING ===
+                console.log('🔄 [UPDATE UI] Called');
+                console.log('🔄 [UPDATE UI] samples.length:', this.samples.length);
+                console.log('🔄 [UPDATE UI] window.universalCartHeader exists:', !!window.universalCartHeader);
+
                 // Trigger universal header to update cart count
                 if (window.universalCartHeader) {
                     window.universalCartHeader.updateCartCount();
+                    console.log('🔄 [UPDATE UI] Called updateCartCount()');
+                } else {
+                    console.warn('⚠️ [UPDATE UI] Universal header not available');
                 }
 
                 // Dispatch custom event for other components to listen to
                 window.dispatchEvent(new CustomEvent('cartUpdated'));
+                console.log('🔄 [UPDATE UI] Dispatched cartUpdated event');
 
                 this.updateSampleButtons();
             }
