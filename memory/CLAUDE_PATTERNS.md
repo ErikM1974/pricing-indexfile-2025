@@ -443,6 +443,38 @@ scriptContent.replace(/<\/script>/g, '<\\/script>');
 <link rel="stylesheet" href="styles.css?v=20250928">
 ```
 
+### Issue: Sample Request Buttons Not Showing Size Selection
+**Symptoms**: User clicks "Request Sample", lands on product page, but can't select sizes or add to cart
+
+**Root Causes:**
+1. Missing `/pages/` path prefix in navigation URL (navigation fails)
+2. Missing `mode=sample` URL parameter (UI stays hidden)
+
+**Required URL Parameters for Sample Ordering:**
+```javascript
+// ✅ CORRECT - All required parameters
+window.location.href = `/pages/top-sellers-product.html?style=${style}&name=${encodeURIComponent(name)}&mode=sample&sampleType=free`;
+
+// ❌ WRONG - Missing mode=sample (UI won't show)
+window.location.href = `/pages/top-sellers-product.html?style=${style}&sampleType=free`;
+
+// ❌ WRONG - Missing /pages/ prefix (navigation fails)
+window.location.href = `top-sellers-product.html?style=${style}&mode=sample&sampleType=free`;
+```
+
+**What Each Parameter Does:**
+- `mode=sample` → **CRITICAL** - Hides "Call Us" CTA, shows size selection grid
+- `sampleType=free|paid` → Determines cart pricing (free vs $10)
+- `style=PC54` → Loads product from API
+- `name=Product%20Name` → Display name (URL encoded)
+
+**Files Affected:**
+- top-sellers-showcase.html (carousel samples)
+- dtg-compatible-products.html (product grid samples)
+- Any page with "Request Sample" functionality
+
+**Fixed**: 2025-11-03
+
 ## 🧪 Browser Testing Checklist
 
 ### Quick Console Commands for Testing
