@@ -12,7 +12,8 @@
       "Bash(curl:*)",
       "Bash(python3:*)",
       "Bash(__NEW_LINE__ echo \"\")",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Read(//mnt/c/Users/erik/Downloads/**)"
     ],
     "deny": [],
     "ask": [],
