@@ -375,7 +375,7 @@ curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new?l
 **Frontend Integration**:
 ```javascript
 // From top-sellers-showcase.html
-const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new?limit=100');
+const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers?limit=100');
 const result = await response.json();
 const products = result.products || [];
 
@@ -740,8 +740,363 @@ curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/
 
 **Total Endpoints**: 7 (2 consumer, 3 admin, 2 infrastructure)
 
+## 🏆 TOP SELLERS MANAGEMENT
+
+### Overview
+**Purpose**: Manage the "Top Sellers" showcase section on Top Sellers page
+**Architecture**: API-driven dynamic content (migrated from hardcoded arrays on 2025-11-03)
+**Status**: ✅ Production-ready (implemented in top-sellers-showcase.html)
+**Key Feature**: Products automatically appear/disappear when IsTopSeller flag is toggled in database
+
+### Business Rules
+- Products marked with `IsTopSeller=1` flag automatically appear in "Top Sellers" section
+- DISCONTINUED products automatically filtered out by frontend
+- Color variants grouped by style number (one card per style)
+- 5-minute API cache delay for database changes to appear
+- Image priority: COLOR_PRODUCT_IMAGE → PRODUCT_IMAGE → THUMBNAIL_IMAGE → brand placeholder
+- Sample pricing badges automatically displayed (free vs paid based on $10 threshold)
+
+### Migration History
+- **Before 2025-11-03**: Used hardcoded array of 9 Sanmar products
+- **After 2025-11-03**: Dynamic API-driven from IsTopSeller flag
+- **Initial Migration**: 9 Sanmar products marked as top sellers
+- **Current Set**: 4 Carhartt products (CT104670, CT103828, CTK121, CT104597)
+
+---
+
+### Consumer Endpoints
+
+#### 1. Get Top Sellers
+**Endpoint**: `GET /api/products/top-sellers`
+**Purpose**: Returns products marked with IsTopSeller flag for "Top Sellers" showcase
+**Status**: ✅ Active (used in top-sellers-showcase.html)
+**Cache**: 5 minutes server-side
+
+**Query Parameters**:
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| limit | number | No | Max results (default: 100) | 50 |
+
+**Success Response (200 OK)**:
+```json
+{
+  "products": [
+    {
+      "STYLE": "CT104670",
+      "PRODUCT_TITLE": "Carhartt Duck Detroit Jacket",
+      "MILL": "Carhartt",
+      "PRODUCT_DESCRIPTION": "12-ounce, firm-hand, 100% ring-spun cotton duck...",
+      "COLOR_PRODUCT_IMAGE": "https://cdn.caspio.com/...",
+      "PRODUCT_IMAGE": "https://cdn.caspio.com/...",
+      "THUMBNAIL_IMAGE": "https://cdn.caspio.com/...",
+      "IsTopSeller": 1,
+      "Status": "Active"
+    }
+  ],
+  "count": 4
+}
+```
+
+**Example Usage**:
+```bash
+# Get all top sellers
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"
+
+# Get limited results
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers?limit=10"
+```
+
+**Frontend Integration**:
+```javascript
+// From top-sellers-showcase.html
+const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers?limit=100');
+const result = await response.json();
+const products = result.products || [];
+
+// Group by style to eliminate color variant duplicates
+const uniqueProducts = new Map();
+products.forEach(p => {
+    const style = p.STYLE;
+    if (!uniqueProducts.has(style)) {
+        uniqueProducts.set(style, p);
+    }
+});
+
+// Filter out DISCONTINUED products
+const activeProducts = Array.from(uniqueProducts.values()).filter(p =>
+    !p.PRODUCT_TITLE?.includes('DISCONTINUED') &&
+    !p.PRODUCT_DESCRIPTION?.includes('DISCONTINUED')
+);
+
+// Check sample pricing eligibility
+const productsWithPricing = await Promise.all(
+    activeProducts.map(async product => {
+        const eligibility = await window.sampleCart.checkEligibility(product.STYLE);
+        return {
+            ...product,
+            isFree: eligibility.type === 'free',
+            price: eligibility.price || 0,
+            eligible: eligibility.eligible
+        };
+    })
+);
+```
+
+#### 2. Get Product Details
+**Endpoint**: `GET /api/product-details`
+**Purpose**: Get complete product information for any product (documented above in Products section)
+**Status**: ✅ Active
+**Use Case**: Fetch detailed info for products before marking as top seller
+
+---
+
+### Admin Endpoints
+
+#### 3. Update Product (Individual)
+**Endpoint**: `PUT /api/products/{styleNumber}`
+**Purpose**: Update individual product fields including IsTopSeller flag
+**Status**: ✅ Active
+**Authentication**: None required (internal tool)
+
+**URL Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| styleNumber | string | Yes | Product style number (e.g., CT104670) |
+
+**Request Body**:
+```json
+{
+  "IsTopSeller": 1,
+  "Status": "Active",
+  "PRODUCT_TITLE": "Updated Product Title"
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "success": true,
+  "message": "Product CT104670 updated successfully",
+  "updated": {
+    "IsTopSeller": 1,
+    "Status": "Active"
+  }
+}
+```
+
+**Example Usage**:
+```bash
+# Mark single product as top seller
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/CT104670" \
+  -H "Content-Type: application/json" \
+  -d '{"IsTopSeller": 1}'
+
+# Unmark single product
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/CT104670" \
+  -H "Content-Type: application/json" \
+  -d '{"IsTopSeller": 0}'
+```
+
+#### 4. Mark Products as Top Sellers (Bulk)
+**Endpoint**: `POST /api/admin/products/mark-as-top-seller`
+**Purpose**: Mark multiple products as top sellers in one operation
+**Status**: ✅ Active
+**Authentication**: None required (internal tool)
+
+**Request Body**:
+```json
+{
+  "styles": ["CT104670", "CT103828", "CTK121", "CT104597"]
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "success": true,
+  "message": "Marked 4 products as top sellers",
+  "updated": ["CT104670", "CT103828", "CTK121", "CT104597"],
+  "failed": []
+}
+```
+
+**Example Usage**:
+```bash
+# Mark Carhartt products as top sellers (current set)
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT104670", "CT103828", "CTK121", "CT104597"]}'
+
+# Mark single product as top seller
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["PC54"]}'
+```
+
+**Use Cases**:
+- Updating seasonal top sellers
+- Promotional product features
+- Managing featured product rotations
+- Migrating from hardcoded arrays
+
+#### 5. Clear IsTopSeller Flag (Bulk Reset)
+**Endpoint**: `POST /api/admin/products/clear-istopseller`
+**Purpose**: Remove IsTopSeller flag from ALL products (reset to clean slate)
+**Status**: ✅ Active
+**Authentication**: None required (internal tool)
+**⚠️ Warning**: This affects ALL products marked as top sellers
+
+**Request Body**:
+```json
+{
+  "confirm": true
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "success": true,
+  "message": "Cleared IsTopSeller flag from all products",
+  "count": 4
+}
+```
+
+**Example Usage**:
+```bash
+# Clear all IsTopSeller flags
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+```
+
+**Use Cases**:
+- Seasonal rotation (e.g., clearing last season's top sellers)
+- Starting fresh with new product selection
+- Testing individual product display
+- Fixing accidental bulk marking
+
+**Common Workflow**:
+```bash
+# 1. Clear all existing top sellers
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+# 2. Mark fresh set of top sellers
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT104670", "CT103828", "CTK121", "CT104597"]}'
+
+# 3. Verify (wait 5 minutes for cache or force refresh)
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"
+```
+
+---
+
+### Complete Workflow Examples
+
+#### Scenario 1: Replace All Top Sellers
+```bash
+# Step 1: Clear existing top sellers
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+# Step 2: Mark new set (4 Carhartt products)
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT104670", "CT103828", "CTK121", "CT104597"]}'
+
+# Step 3: Wait 5 minutes for cache to expire (or force browser refresh)
+
+# Step 4: Verify on website
+# Navigate to: http://localhost:3000/pages/top-sellers-showcase.html
+# Carousel should show 4 Carhartt products with "★ TOP SELLER" badge
+```
+
+#### Scenario 2: Add Single Top Seller
+```bash
+# Step 1: Mark product as top seller
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["PC54"]}'
+
+# Step 2: Wait 5 minutes for cache to expire
+
+# Step 3: Verify API response
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"
+```
+
+#### Scenario 3: Remove Single Top Seller
+```bash
+# Option A: Use individual update endpoint
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/CT104670" \
+  -H "Content-Type: application/json" \
+  -d '{"IsTopSeller": 0}'
+
+# Option B: Clear all and re-mark others
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT103828", "CTK121", "CT104597"]}'
+```
+
+---
+
+### Troubleshooting
+
+#### Problem: Products not appearing after marking as top seller
+**Solutions**:
+1. Wait 5 minutes for server cache to expire
+2. Check product is not DISCONTINUED (filtered out automatically)
+3. Verify API response: `curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"`
+4. Check browser console for JavaScript errors
+5. Verify carousel is limited to 4 products (horizontal scrolling removed)
+
+#### Problem: Sample pricing badges not showing
+**Solutions**:
+1. Verify `window.sampleCart.checkEligibility()` function is available
+2. Check API endpoint `/api/size-pricing?styleNumber={style}` is working
+3. Verify product has pricing data in database
+4. Check browser console for JavaScript errors in pricing check
+
+#### Problem: Wrong products showing
+**Solutions**:
+1. Verify which products have IsTopSeller=1 via API
+2. Use clear-istopseller endpoint to reset all
+3. Re-mark only desired products
+4. Check for duplicate style numbers (frontend groups by style)
+
+#### Problem: Images not loading
+**Solutions**:
+1. Check product has COLOR_PRODUCT_IMAGE, PRODUCT_IMAGE, or THUMBNAIL_IMAGE field
+2. Verify image URLs are accessible
+3. Check imageOverrides in top-sellers-showcase.html for manual overrides
+4. Fallback to brand placeholder if no image available
+
+---
+
+### API Endpoint Summary
+
+| Endpoint | Method | Purpose | Status | Auth Required |
+|----------|--------|---------|--------|---------------|
+| `/api/products/top-sellers` | GET | Get top seller products | ✅ Active | No |
+| `/api/product-details` | GET | Get product info | ✅ Active | No |
+| `/api/products/{style}` | PUT | Update product | ✅ Active | No |
+| `/api/admin/products/mark-as-top-seller` | POST | Mark as top sellers | ✅ Active | No |
+| `/api/admin/products/clear-istopseller` | POST | Clear all flags | ✅ Active | No |
+
+**Total Endpoints**: 5 (2 consumer, 3 admin)
+
+**Sample Pricing Integration**: All top seller products automatically check eligibility via `/api/size-pricing` endpoint and display pricing badges (free vs paid based on $10 threshold).
+
 ---
 
 **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
-**Documentation Version**: 2.3.0
+**Documentation Version**: 2.4.0
+**Last Updated**: 2025-11-03
 **Module**: Products & Inventory APIs

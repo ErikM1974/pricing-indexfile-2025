@@ -681,6 +681,165 @@ Before marking task complete:
 - A/B testing for product showcases
 - Analytics tracking for "New Products" clicks
 
+## 🏆 Managing "Top Sellers" Showcase (API-Driven Feature)
+
+### Overview
+The "Top Sellers" showcase is **API-driven** - products automatically appear/disappear when the `IsTopSeller` flag is toggled in the database. This system was migrated from hardcoded arrays on 2025-11-03.
+
+**Key Features:**
+- Products marked with `IsTopSeller=1` automatically appear in showcase
+- DISCONTINUED products automatically filtered out by frontend
+- Color variants grouped by style number (one card per style)
+- 5-minute API cache delay for database changes to appear
+- Sample pricing badges automatically displayed (free vs paid based on $10 threshold)
+
+### Quick Reference Commands
+
+```bash
+# Add single top seller
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["PC54"]}'
+
+# Add multiple top sellers (current set: 4 Carhartt products)
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT104670", "CT103828", "CTK121", "CT104597"]}'
+
+# Remove all top sellers (reset)
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+# Check current top sellers
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"
+
+# Remove single product (direct update)
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/PC54" \
+  -H "Content-Type: application/json" \
+  -d '{"IsTopSeller": 0}'
+```
+
+### Complete Workflow
+
+**Scenario 1: Replace All Top Sellers**
+
+1. **Clear existing** top sellers:
+   ```bash
+   curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+     -H "Content-Type: application/json" \
+     -d '{"confirm": true}'
+   ```
+2. **Mark new set** (4 Carhartt products):
+   ```bash
+   curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+     -H "Content-Type: application/json" \
+     -d '{"styles": ["CT104670", "CT103828", "CTK121", "CT104597"]}'
+   ```
+3. **Wait 5 minutes** for cache to expire (or force browser refresh)
+4. **Verify** on website: `http://localhost:3000/pages/top-sellers-showcase.html`
+
+**Scenario 2: Add Single Top Seller**
+
+```bash
+# Mark product as top seller
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["PC54"]}'
+
+# Wait 5 minutes for cache to expire
+
+# Verify API response
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"
+```
+
+**Scenario 3: Remove Single Top Seller**
+
+```bash
+# Option A: Use individual update endpoint
+curl -X PUT "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/CT104670" \
+  -H "Content-Type: application/json" \
+  -d '{"IsTopSeller": 0}'
+
+# Option B: Clear all and re-mark others
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/clear-istopseller" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/products/mark-as-top-seller" \
+  -H "Content-Type: application/json" \
+  -d '{"styles": ["CT103828", "CTK121", "CT104597"]}'
+```
+
+### Migration History
+
+**Before 2025-11-03**: Used hardcoded array of 9 Sanmar products
+**After 2025-11-03**: Dynamic API-driven from IsTopSeller flag
+**Initial Migration**: 9 Sanmar products marked as top sellers
+**Current Set**: 4 Carhartt products (CT104670, CT103828, CTK121, CT104597)
+
+### Available Endpoints
+
+| Endpoint | Method | Purpose | Auth |
+|----------|--------|---------|------|
+| `/api/products/top-sellers` | GET | Get top seller products | No |
+| `/api/product-details` | GET | Get product info | No |
+| `/api/products/{style}` | PUT | Update product | No |
+| `/api/admin/products/mark-as-top-seller` | POST | Mark as top sellers | No |
+| `/api/admin/products/clear-istopseller` | POST | Clear all flags | No |
+
+**Complete endpoint documentation:** See `memory/api/products-api.md` → "Top Sellers Management" section
+
+### Important Behaviors
+
+1. **Cache Delay**: Changes take up to 5 minutes to appear (server cache TTL)
+2. **Deduplication**: Frontend groups color variants by style number (one card per style)
+3. **Auto-Filtering**: DISCONTINUED products excluded automatically
+4. **Image Priority**: COLOR_PRODUCT_IMAGE → PRODUCT_IMAGE → THUMBNAIL_IMAGE → brand placeholder
+5. **Sample Pricing Integration**: All products automatically check eligibility via `/api/size-pricing` endpoint
+6. **Carousel Limit**: Reduced to 4 products (no horizontal scrolling)
+
+### Troubleshooting
+
+**Problem: Products not appearing after marking as top seller**
+- ✅ Wait 5 minutes for server cache to expire
+- ✅ Check product is not DISCONTINUED (filtered out automatically)
+- ✅ Verify API response: `curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-sellers"`
+- ✅ Check browser console for JavaScript errors
+- ✅ Verify carousel is limited to 4 products
+
+**Problem: Sample pricing badges not showing**
+- ✅ Verify `window.sampleCart.checkEligibility()` function is available
+- ✅ Check API endpoint `/api/size-pricing?styleNumber={style}` is working
+- ✅ Verify product has pricing data in database
+- ✅ Check browser console for JavaScript errors in pricing check
+
+**Problem: Wrong products showing**
+- ✅ Verify which products have IsTopSeller=1 via API
+- ✅ Use clear-istopseller endpoint to reset all
+- ✅ Re-mark only desired products
+- ✅ Check for duplicate style numbers (frontend groups by style)
+
+**Problem: Images not loading**
+- ✅ Check product has COLOR_PRODUCT_IMAGE, PRODUCT_IMAGE, or THUMBNAIL_IMAGE field
+- ✅ Verify image URLs are accessible
+- ✅ Check imageOverrides in top-sellers-showcase.html for manual overrides
+- ✅ Fallback to brand placeholder if no image available
+
+### Testing Checklist
+
+Before marking task complete:
+
+- [ ] Products marked via API: `curl -X POST .../mark-as-top-seller`
+- [ ] Waited 5 minutes for cache (or tested with force refresh)
+- [ ] Verified on website: `/pages/top-sellers-showcase.html`
+- [ ] Confirmed correct products display in carousel
+- [ ] Checked images loading properly
+- [ ] Verified DISCONTINUED products filtered out
+- [ ] Sample pricing badges showing correctly (free vs paid)
+- [ ] Carousel limited to 4 products (no horizontal scrolling)
+- [ ] No JavaScript errors in browser console
+
 ## 📊 Data Flow Documentation
 
 ### How Data Flows Through the System
