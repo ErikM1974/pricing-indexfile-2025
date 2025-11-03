@@ -1754,6 +1754,160 @@
             }
         }
 
+        /* Trust Signals */
+        .trust-signals {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            font-size: 0.875rem;
+            color: #666;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        /* Dual CTA Container */
+        .dual-cta-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        /* Single CTA Container - for pages with only one button */
+        .single-cta-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        /* Primary CTA Button */
+        .primary-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, #4cb354 0%, #45a049 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.125rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(76, 179, 84, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .primary-cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(76, 179, 84, 0.4);
+            background: linear-gradient(135deg, #45a049 0%, #3e8e41 100%);
+            color: white;
+        }
+
+        .primary-cta-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(76, 179, 84, 0.3);
+        }
+
+        .primary-cta-btn i {
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .primary-cta-btn:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Secondary CTA Link */
+        .secondary-cta-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #1a472a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .secondary-cta-link:hover {
+            color: #4cb354;
+            border-color: #4cb354;
+            transform: translateX(4px);
+            background: #f8fff9;
+        }
+
+        /* Sample Badge */
+        .sample-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #4cb354 0%, #45a049 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
+            text-transform: uppercase;
+        }
+
+        /* Responsive Trust Signals */
+        @media (max-width: 768px) {
+            .trust-signals {
+                gap: 1rem;
+            }
+
+            .trust-item {
+                font-size: 0.8rem;
+            }
+
+            .dual-cta-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .single-cta-container {
+                flex-direction: column;
+            }
+
+            .primary-cta-btn {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .secondary-cta-link {
+                width: 100%;
+                max-width: 320px;
+                justify-content: center;
+            }
+
+            .sample-badge {
+                font-size: 0.65rem;
+                padding: 5px 10px;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
         /* Bestsellers Grid - Modern Product Cards */
         .bestsellers-grid {
             display: grid;
@@ -1763,6 +1917,7 @@
         }
 
         .bestseller-card {
+            position: relative;
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 12px;
