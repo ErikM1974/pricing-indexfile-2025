@@ -2789,6 +2789,99 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* Sample Info Banner */
+        .sample-info-banner {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2.5rem 0;
+            margin-bottom: 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .sample-info-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .sample-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sample-info-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .sample-info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .sample-info-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .sample-info-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .sample-info-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Mobile Responsive for Sample Info Banner */
+        @media (max-width: 768px) {
+            .sample-info-banner {
+                padding: 1.5rem 0;
+            }
+
+            .sample-info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .sample-info-card {
+                padding: 1.25rem;
+            }
+
+            .sample-info-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .sample-info-card h3 {
+                font-size: 1rem;
+            }
+
+            .sample-info-card p {
+                font-size: 0.875rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2818,6 +2911,40 @@
         </div>
         <div class="search-results" id="searchResults" style="display: none;">
             Found <strong id="resultCount">0</strong> products
+        </div>
+    </section>
+
+    <!-- Sample Program Info Banner -->
+    <section class="sample-info-banner">
+        <div class="sample-info-container">
+            <div class="sample-info-grid">
+                <!-- Feature 1: Blank Products -->
+                <div class="sample-info-card">
+                    <div class="sample-info-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <h3>Blank Products</h3>
+                    <p>Samples arrive with NO LOGOS or decoration. Perfect for testing fabric quality and fit.</p>
+                </div>
+
+                <!-- Feature 2: Free & Paid Options -->
+                <div class="sample-info-card">
+                    <div class="sample-info-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3>Free & Paid Samples</h3>
+                    <p>Products under $10 are FREE samples. Premium items available at cost-based pricing.</p>
+                </div>
+
+                <!-- Feature 3: Test Drive -->
+                <div class="sample-info-card">
+                    <div class="sample-info-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Test Drive Before You Buy</h3>
+                    <p>Keep your samples! Perfect for checking quality before ordering bulk decorated products.</p>
+                </div>
+            </div>
         </div>
     </section>
 
