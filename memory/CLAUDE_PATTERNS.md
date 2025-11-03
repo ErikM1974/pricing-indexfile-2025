@@ -573,6 +573,30 @@ async function handleSubmit(e) {
 }
 ```
 
+### Badge Visibility Pattern
+```css
+/* ✅ CORRECT - White text on solid green for maximum contrast (WCAG AAA) */
+.dtg-badge {
+    background: linear-gradient(135deg, #10b981, #059669);  /* Solid green */
+    color: #ffffff;  /* White text */
+    border: 1px solid rgba(5, 150, 105, 0.3);
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.15);
+}
+
+/* ❌ WRONG - Transparent background makes text invisible */
+.dtg-badge-bad {
+    background: rgba(34, 197, 94, 0.08);  /* 8% opacity = nearly invisible */
+    color: #16A34A;  /* Dark text on near-transparent = unreadable */
+}
+```
+
+**Key Principles:**
+- Solid backgrounds (100% opacity) for critical badges
+- White text on dark/saturated colors (green, blue, purple)
+- Dark text on light/pastel colors (yellow, pink, light gray)
+- Test visibility on both light and dark backgrounds
+- WCAG AAA contrast ratio: 7:1 for normal text, 4.5:1 for large text
+
 ## 🔍 Search & Discovery Helpers
 
 **Run these BEFORE starting any task:**

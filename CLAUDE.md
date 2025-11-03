@@ -652,6 +652,25 @@ Before marking task complete:
 - [ ] Verified DISCONTINUED products filtered out
 - [ ] No JavaScript errors in browser console
 
+### Filter System Architecture & UI Patterns
+
+**Filter Toggle Behavior:**
+- Secondary filters (Brinton's Fresh Picks, DTG-Compatible) support toggle on/off by clicking again
+- When toggling off, system returns to previous active filter or "All Products" if none
+- DTG filter has separate handler to preserve education modal functionality
+
+**Critical Selector Matching:**
+⚠️ JavaScript querySelector must match actual HTML classes to prevent "Uncaught TypeError"
+- Example issue: JavaScript searches for `.dtg-filter-btn` but HTML uses `.badge-filter`
+- Always verify selector matches before adding event listeners
+- Use browser DevTools to confirm element exists with expected class
+
+**Badge Visibility Best Practice:**
+- Use solid color backgrounds with contrasting text (e.g., white text on solid green)
+- Avoid transparent backgrounds under 10% opacity (essentially invisible)
+- Test badge visibility against both light and dark product card backgrounds
+- See CLAUDE_PATTERNS.md for implementation details
+
 ### Future Enhancements
 
 **Current State:** Basic IsNew flag with manual API management
