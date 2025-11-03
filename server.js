@@ -351,6 +351,10 @@ app.get('/sample-cart.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'sample-cart.html'));
 });
 
+app.get('/dtg-compatible-products.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'dtg-compatible-products.html'));
+});
+
 app.get('/richardson-112-product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'richardson-112-product.html'));
 });

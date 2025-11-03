@@ -443,6 +443,38 @@ scriptContent.replace(/<\/script>/g, '<\\/script>');
 <link rel="stylesheet" href="styles.css?v=20250928">
 ```
 
+### Issue: Sample Request Buttons Not Showing Size Selection
+**Symptoms**: User clicks "Request Sample", lands on product page, but can't select sizes or add to cart
+
+**Root Causes:**
+1. Missing `/pages/` path prefix in navigation URL (navigation fails)
+2. Missing `mode=sample` URL parameter (UI stays hidden)
+
+**Required URL Parameters for Sample Ordering:**
+```javascript
+// ✅ CORRECT - All required parameters
+window.location.href = `/pages/top-sellers-product.html?style=${style}&name=${encodeURIComponent(name)}&mode=sample&sampleType=free`;
+
+// ❌ WRONG - Missing mode=sample (UI won't show)
+window.location.href = `/pages/top-sellers-product.html?style=${style}&sampleType=free`;
+
+// ❌ WRONG - Missing /pages/ prefix (navigation fails)
+window.location.href = `top-sellers-product.html?style=${style}&mode=sample&sampleType=free`;
+```
+
+**What Each Parameter Does:**
+- `mode=sample` → **CRITICAL** - Hides "Call Us" CTA, shows size selection grid
+- `sampleType=free|paid` → Determines cart pricing (free vs $10)
+- `style=PC54` → Loads product from API
+- `name=Product%20Name` → Display name (URL encoded)
+
+**Files Affected:**
+- top-sellers-showcase.html (carousel samples)
+- dtg-compatible-products.html (product grid samples)
+- Any page with "Request Sample" functionality
+
+**Fixed**: 2025-11-03
+
 ## 🧪 Browser Testing Checklist
 
 ### Quick Console Commands for Testing
@@ -572,6 +604,30 @@ async function handleSubmit(e) {
     }
 }
 ```
+
+### Badge Visibility Pattern
+```css
+/* ✅ CORRECT - White text on solid green for maximum contrast (WCAG AAA) */
+.dtg-badge {
+    background: linear-gradient(135deg, #10b981, #059669);  /* Solid green */
+    color: #ffffff;  /* White text */
+    border: 1px solid rgba(5, 150, 105, 0.3);
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.15);
+}
+
+/* ❌ WRONG - Transparent background makes text invisible */
+.dtg-badge-bad {
+    background: rgba(34, 197, 94, 0.08);  /* 8% opacity = nearly invisible */
+    color: #16A34A;  /* Dark text on near-transparent = unreadable */
+}
+```
+
+**Key Principles:**
+- Solid backgrounds (100% opacity) for critical badges
+- White text on dark/saturated colors (green, blue, purple)
+- Dark text on light/pastel colors (yellow, pink, light gray)
+- Test visibility on both light and dark backgrounds
+- WCAG AAA contrast ratio: 7:1 for normal text, 4.5:1 for large text
 
 ## 🔍 Search & Discovery Helpers
 
