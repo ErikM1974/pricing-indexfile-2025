@@ -1021,14 +1021,14 @@
                             <label>
                                 State <span class="required">*</span>
                             </label>
-                            <input type="text" name="billing_state" id="billing-state" required placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
+                            <input type="text" name="billing_state" id="billing-state" required placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" style="text-transform: uppercase;">
                         </div>
 
                         <div class="form-group">
                             <label>
                                 ZIP Code <span class="required">*</span>
                             </label>
-                            <input type="text" name="billing_zip" id="billing-zip" required placeholder="98101" pattern="\d{5}" maxlength="5">
+                            <input type="text" name="billing_zip" id="billing-zip" required placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric">
                         </div>
 
                         <!-- SAME AS BILLING CHECKBOX -->
@@ -1068,14 +1068,14 @@
                                 <label>
                                     State
                                 </label>
-                                <input type="text" name="shipping_state" id="shipping-state" placeholder="WA" maxlength="2" pattern="[A-Z]{2}" style="text-transform: uppercase;">
+                                <input type="text" name="shipping_state" id="shipping-state" placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" style="text-transform: uppercase;">
                             </div>
 
                             <div class="form-group">
                                 <label>
                                     ZIP Code
                                 </label>
-                                <input type="text" name="shipping_zip" id="shipping-zip" placeholder="98101" pattern="\d{5}" maxlength="5">
+                                <input type="text" name="shipping_zip" id="shipping-zip" placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric">
                             </div>
                         </div>
 
