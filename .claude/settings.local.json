@@ -13,7 +13,8 @@
       "Bash(python3:*)",
       "Bash(__NEW_LINE__ echo \"\")",
       "Bash(nul)",
-      "Read(//mnt/c/Users/erik/Downloads/**)"
+      "Read(//mnt/c/Users/erik/Downloads/**)",
+      "Bash(git log -1 --format=\"%H%n%an <%ae>%n%ad%n%s%n%n%b\" HEAD)"
     ],
     "deny": [],
     "ask": [],
