@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG-Compatible Products | Northwest Custom Apparel</title>
+    <meta name="description" content="Shop our curated selection of DTG-compatible garments. 100% cotton and high-cotton blend products tested over 10 years for perfect Direct-to-Garment printing.">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Universal Components -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <script src="/shared_components/js/universal-cart-header.js"></script>
+    <script src="/shared_components/js/sample-cart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2d5f3f;
+            --secondary-color: #0ea5e9;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --border-color: #e5e7eb;
+            --background: #f9fafb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            color: white;
+            padding: 4rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+
+        .hero-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .hero-feature {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-feature i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-feature h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-feature p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Info Section */
+        .info-section {
+            max-width: 1200px;
+            margin: -3rem auto 3rem;
+            padding: 0 1.5rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #0ea5e9;
+        }
+
+        .info-card h2 {
+            color: #0ea5e9;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .info-card strong {
+            color: var(--text-primary);
+        }
+
+        /* Products Section */
+        .products-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            position: relative;
+            padding-top: 100%;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .product-info {
+            padding: 1.25rem;
+        }
+
+        .product-style {
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .color-swatches {
+            display: flex;
+            gap: 0.375rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #e5e7eb;
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--secondary-color);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .more-colors {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .btn-sample {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-sample:hover {
+            background: #234a30;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f3f4f6;
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            opacity: 0.8;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .info-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>
+                <i class="fas fa-check-circle"></i>
+                DTG-Compatible Products
+            </h1>
+            <p class="hero-subtitle">
+                High-quality garments perfect for Direct-to-Garment printing<br>
+                100% cotton and high-cotton blends tested over 10+ years
+            </p>
+
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fas fa-certificate"></i>
+                    <h3>Tested & Verified</h3>
+                    <p>Every product tested for DTG compatibility</p>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-tshirt"></i>
+                    <h3>High Cotton Content</h3>
+                    <p>100% cotton or 50%+ cotton blends</p>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-palette"></i>
+                    <h3>Vibrant Prints</h3>
+                    <p>Perfect for full-color, detailed designs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+        <div class="info-card">
+            <h2><i class="fas fa-info-circle"></i> Why Fabric Content Matters for DTG</h2>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                Direct-to-Garment printing is a precise digital printing method that requires specific fabric types to achieve the best results.
+                Unlike screen printing or embroidery, DTG ink bonds best with natural cotton fibers.
+            </p>
+            <ul>
+                <li><strong>Best Results:</strong> 100% cotton garments provide the most vibrant colors and longest-lasting prints</li>
+                <li><strong>Good Results:</strong> 50% or higher cotton blends work well for most designs</li>
+                <li><strong>Poor Results:</strong> Polyester, performance fabrics, and low-cotton blends don't accept DTG ink properly</li>
+            </ul>
+            <p style="margin-top: 1rem; padding: 1rem; background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 0.5rem; color: #1e40af;">
+                <strong><i class="fas fa-lightbulb"></i> Pro Tip:</strong> All products on this page have been carefully selected and tested by our team
+                to ensure excellent DTG printing results every time.
+            </p>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2>DTG-Compatible Products</h2>
+            <p id="productCount">Loading products...</p>
+        </div>
+
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading DTG-compatible products...</p>
+        </div>
+
+        <div class="products-grid" id="productsGrid" style="display: none;">
+            <!-- Products will be dynamically loaded here -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Northwest Custom Apparel. All rights reserved.</p>
+            <p>2025 Freeman Road East, Milton, WA 98354 | 253-922-5793</p>
+        </div>
+    </footer>
+
+    <script>
+        // DTG-compatible products (high cotton content)
+        const dtgCompatibleStyles = [
+            'PC54', 'PC450', 'PC61', 'PC78H', 'PC55', 'PC61LS', 'PC600',
+            'PC90H', 'BC3001', 'PC54LS', 'CTK87'
+        ];
+
+        // Product cache
+        const productCache = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize universal header
+            window.universalCartHeader = new UniversalCartHeader({
+                isCartPage: false,
+                showContactInfo: true
+            });
+
+            loadDTGProducts();
+        });
+
+        // Load DTG-compatible products
+        async function loadDTGProducts() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const productsGrid = document.getElementById('productsGrid');
+            const productCount = document.getElementById('productCount');
+
+            loadingIndicator.style.display = 'block';
+            productsGrid.style.display = 'none';
+
+            const products = [];
+
+            // Fetch product details for each DTG-compatible style
+            for (const styleNumber of dtgCompatibleStyles) {
+                try {
+                    if (!productCache[styleNumber]) {
+                        const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
+                        if (response.ok) {
+                            const details = await response.json();
+                            if (details && details.length > 0) {
+                                productCache[styleNumber] = details;
+                            }
+                        }
+                    }
+
+                    if (productCache[styleNumber]) {
+                        const firstProduct = productCache[styleNumber][0];
+                        products.push({
+                            style: styleNumber,
+                            description: firstProduct.PRODUCT_TITLE?.split('.')[0]?.trim() || 'Unknown Product',
+                            brand: firstProduct.MILL || 'Unknown Brand',
+                            details: productCache[styleNumber]
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${styleNumber}:`, error);
+                }
+            }
+
+            // Update product count
+            productCount.textContent = `${products.length} products perfect for DTG printing`;
+
+            // Display products
+            displayProducts(products);
+
+            loadingIndicator.style.display = 'none';
+            productsGrid.style.display = 'grid';
+
+            // Check sample eligibility after products load
+            setTimeout(() => {
+                if (window.sampleCart && typeof window.sampleCart.checkAllProductEligibility === 'function') {
+                    window.sampleCart.checkAllProductEligibility();
+                }
+            }, 500);
+        }
+
+        // Display products
+        function displayProducts(products) {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+
+            products.forEach(product => {
+                const card = createProductCard(product);
+                if (card) {
+                    productsGrid.appendChild(card);
+                }
+            });
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+
+            if (!product.details || product.details.length === 0) {
+                return null;
+            }
+
+            const firstProduct = product.details[0];
+
+            // Get unique colors
+            const uniqueColors = [];
+            const seenColors = new Set();
+
+            for (const item of product.details) {
+                if (item.COLOR_NAME && !seenColors.has(item.COLOR_NAME)) {
+                    seenColors.add(item.COLOR_NAME);
+                    uniqueColors.push(item);
+                }
+            }
+
+            const colorsToShow = uniqueColors.slice(0, 5);
+
+            card.onclick = () => navigateToProduct(product);
+
+            const imageUrl = firstProduct.FRONT_MODEL ||
+                            firstProduct.FRONT_FLAT ||
+                            firstProduct.PRODUCT_IMAGE;
+
+            card.innerHTML = `
+                <div class="product-image">
+                    <div class="product-badge">
+                        <i class="fas fa-check-circle"></i> DTG-Compatible
+                    </div>
+                    <img src="${imageUrl}"
+                         alt="${product.description}"
+                         onerror="this.src='${firstProduct.PRODUCT_IMAGE || ''}'">
+                </div>
+                <div class="product-info">
+                    <div class="product-style">Style #${product.style}</div>
+                    <div class="product-name">${product.description}</div>
+                    <div class="color-swatches">
+                        ${colorsToShow.map(c => `
+                            <div class="color-swatch" title="${c.COLOR_NAME}">
+                                <img src="${c.COLOR_SQUARE_IMAGE}" alt="${c.COLOR_NAME}">
+                            </div>
+                        `).join('')}
+                        ${uniqueColors.length > 5 ? `
+                            <div class="more-colors">+${uniqueColors.length - 5}</div>
+                        ` : ''}
+                    </div>
+                    <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
+                            onclick="event.stopPropagation(); navigateToProduct({style: '${product.style}', description: '${product.description.replace(/'/g, "\\'")}', details: productCache['${product.style}']})">
+                        <i class="fas fa-box-open"></i> Request Sample
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Navigate to product page
+        function navigateToProduct(product) {
+            const params = new URLSearchParams({
+                style: product.style,
+                name: product.description,
+                sampleType: 'free',
+                price: '0'
+            });
+            window.location.href = `/pages/top-sellers-product.html?${params.toString()}`;
+        }
+
+        // Detect brand from product name
+        function detectBrand(name) {
+            if (!name) return '';
+            const nameLower = name.toLowerCase();
+            if (nameLower.includes('port & company')) return 'Port & Company';
+            if (nameLower.includes('bella')) return 'BellaCanvas';
+            if (nameLower.includes('carhartt')) return 'Carhartt';
+            return '';
+        }
+    </script>
+</body>
+</html>
