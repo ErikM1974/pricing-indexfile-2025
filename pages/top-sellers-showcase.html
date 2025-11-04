@@ -843,6 +843,58 @@
             window.sampleCart = new SampleCart();
             window.sampleRequestService = new SampleRequestService();
         }
+
+        // PHASE 0: Mobile filter toggle functionality
+        function toggleFilters() {
+            const toggle = document.getElementById('filterToggle');
+            const content = document.getElementById('filterContent');
+
+            if (!toggle || !content) return;
+
+            const isExpanded = content.classList.contains('expanded');
+
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+            }
+        }
+
+        // Show/hide toggle button based on screen size
+        function handleFilterToggleVisibility() {
+            const toggle = document.getElementById('filterToggle');
+            const content = document.getElementById('filterContent');
+
+            if (!toggle || !content) return;
+
+            if (window.innerWidth <= 768) {
+                // Mobile: show toggle button, collapse content by default
+                toggle.style.display = 'flex';
+                // Don't auto-collapse if user manually expanded
+                if (!toggle.classList.contains('user-interacted')) {
+                    content.classList.remove('expanded');
+                    toggle.classList.remove('expanded');
+                }
+            } else {
+                // Desktop: hide toggle, always show content
+                toggle.style.display = 'none';
+                content.classList.add('expanded');
+                content.style.maxHeight = 'none';
+            }
+        }
+
+        // Mark user interaction
+        if (document.getElementById('filterToggle')) {
+            document.getElementById('filterToggle').addEventListener('click', function() {
+                this.classList.add('user-interacted');
+            });
+        }
+
+        // Initialize on load and resize
+        window.addEventListener('load', handleFilterToggleVisibility);
+        window.addEventListener('resize', handleFilterToggleVisibility);
     </script>
     
     <style>
@@ -2788,6 +2840,88 @@
             .dtg-filter-subtitle {
                 font-size: 0.7rem;
             }
+
+            /* PHASE 0: Collapsible Filters on Mobile */
+            .filter-bar {
+                padding: 1rem 0;
+                position: relative;  /* Not sticky on mobile */
+                top: auto;
+            }
+
+            .filter-toggle-btn {
+                display: flex;
+                width: 100%;
+                padding: 1rem;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin: 0 1rem;
+            }
+
+            .filter-toggle-btn:hover {
+                background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            }
+
+            .filter-toggle-btn i {
+                transition: transform 0.3s ease;
+                color: var(--primary-color);
+            }
+
+            .filter-toggle-btn.expanded i {
+                transform: rotate(180deg);
+            }
+
+            .filter-content-wrapper {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+
+            .filter-content-wrapper.expanded {
+                max-height: 2000px;  /* Large enough for all filters */
+            }
+
+            .filter-container {
+                padding: 0 1rem;
+            }
+
+            /* Compact category cards */
+            .filter-btn {
+                padding: 0.75rem;
+                min-height: 90px;  /* Reduced from ~120px */
+            }
+
+            .filter-btn i {
+                font-size: 1.5rem;  /* Slightly smaller icons */
+            }
+
+            .filter-btn span:first-of-type {
+                font-size: 0.875rem;  /* Smaller text */
+            }
+
+            .filter-btn .count {
+                font-size: 0.75rem;  /* Smaller count badge */
+            }
+
+            /* Reduce horizontal padding */
+            .filter-container {
+                padding: 0 1rem;
+            }
+
+            .sample-info-container {
+                padding: 0 1rem;
+            }
+
+            .products-container {
+                padding: 0 1rem;
+            }
         }
 
         /* Sample Info Banner */
@@ -2880,6 +3014,71 @@
 
             .sample-info-card p {
                 font-size: 0.875rem;
+            }
+        }
+
+        /* PHASE 1: Small phone breakpoint (iPhone SE, small Android) */
+        @media (max-width: 480px) {
+            .filter-toggle-btn {
+                font-size: 0.9rem;
+                padding: 0.875rem;
+                margin: 0 0.5rem;
+            }
+
+            .filter-container,
+            .sample-info-container,
+            .products-container {
+                padding: 0 0.5rem;
+            }
+
+            .filter-btn {
+                min-height: 85px;
+                padding: 0.5rem;
+            }
+
+            .filter-btn i {
+                font-size: 1.25rem;
+            }
+
+            .filter-btn span:first-of-type {
+                font-size: 0.8rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;  /* Single column on very small screens */
+                gap: 1rem;
+            }
+
+            .product-card {
+                max-width: 100%;
+            }
+
+            /* Scale down headings for small screens */
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .sample-info-card h3 {
+                font-size: 0.9rem;
+            }
+
+            .sample-info-card p {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* PHASE 3: Tablet breakpoint (iPad) */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .filter-container {
+                padding: 0 1.5rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);  /* 3 columns for tablets */
+            }
+
+            .filter-btn {
+                min-height: 100px;
             }
         }
     </style>
@@ -2997,13 +3196,20 @@
 
     <!-- Filter Bar -->
     <div class="filter-bar">
-        <div class="filter-container">
-            <!-- Product Category Filters (PRIMARY) -->
-            <div class="filter-header">
-                <div class="filter-title">Shop by Product Type</div>
-                <div class="results-count" id="resultsCount">Showing 77 products</div>
-            </div>
-            <div class="category-filters">
+        <!-- Mobile Toggle Button (hidden on desktop) -->
+        <button class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()" style="display: none;">
+            <span>Shop by Product Type</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+
+        <div class="filter-content-wrapper" id="filterContent">
+            <div class="filter-container">
+                <!-- Product Category Filters (PRIMARY) -->
+                <div class="filter-header">
+                    <div class="filter-title">Shop by Product Type</div>
+                    <div class="results-count" id="resultsCount">Showing 77 products</div>
+                </div>
+                <div class="category-filters">
                 <button class="filter-btn active" data-category="all" data-filter-type="primary">
                     <i class="fas fa-th"></i>
                     <span>All Products</span>
@@ -3041,17 +3247,18 @@
                 </button>
             </div>
 
-            <!-- Refinement Filters (SECONDARY - includes DTG as subtle badge) -->
-            <div class="secondary-filters">
-                <span class="filter-label">Refine by:</span>
-                <button class="badge-filter" data-category="dtgCompatible" data-filter-type="dtg" title="Show DTG-compatible products (100% cotton or high-cotton blends)">
-                    <i class="fas fa-print"></i> DTG-Compatible <span class="badge-count">24</span>
-                </button>
-                <button class="badge-filter" data-category="freshPicks" data-filter-type="secondary">
-                    <i class="fas fa-sparkles"></i> Brinton's Fresh Picks 2025
-                </button>
+                <!-- Refinement Filters (SECONDARY - includes DTG as subtle badge) -->
+                <div class="secondary-filters">
+                    <span class="filter-label">Refine by:</span>
+                    <button class="badge-filter" data-category="dtgCompatible" data-filter-type="dtg" title="Show DTG-compatible products (100% cotton or high-cotton blends)">
+                        <i class="fas fa-print"></i> DTG-Compatible <span class="badge-count">24</span>
+                    </button>
+                    <button class="badge-filter" data-category="freshPicks" data-filter-type="secondary">
+                        <i class="fas fa-sparkles"></i> Brinton's Fresh Picks 2025
+                    </button>
+                </div>
             </div>
-        </div>
+        </div> <!-- Close filter-content-wrapper -->
     </div>
 
     <!-- Products Section -->
@@ -4118,6 +4325,7 @@
                             <div class="product-badge">${decorationType}</div>
                             <img src="${imageUrl}"
                                  alt="${product.description || 'Product Image'}"
+                                 loading="lazy"
                                  onerror="this.src='${firstProduct.PRODUCT_IMAGE || ''}'">
                         </div>
                         <div class="product-info">
@@ -4126,7 +4334,7 @@
                             <div class="color-swatches">
                                 ${colorsToShow.map(c => `
                                     <div class="color-swatch" title="${c.COLOR_NAME}">
-                                        <img src="${c.COLOR_SQUARE_IMAGE}" alt="${c.COLOR_NAME}">
+                                        <img src="${c.COLOR_SQUARE_IMAGE}" alt="${c.COLOR_NAME}" loading="lazy">
                                     </div>
                                 `).join('')}
                                 ${uniqueColors.length > 5 ? `
