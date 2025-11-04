@@ -1332,7 +1332,8 @@
                     if (qty > 0) {
                         totalPieces += qty;
                         const upcharge = upcharges[size] || 0;
-                        const sizePrice = basePrice + upcharge;
+                        // For free samples, price is always $0 regardless of size
+                        const sizePrice = (item.sampleType === 'free') ? 0 : (basePrice + upcharge);
                         totalPrice += qty * sizePrice;
                     }
                 });
@@ -1535,7 +1536,8 @@
                     .map(size => {
                         const qty = item.sizes[size];
                         const upcharge = upcharges[size] || 0;
-                        const sizePrice = basePrice + upcharge;
+                        // For free samples, price is always $0 regardless of size
+                        const sizePrice = (item.sampleType === 'free') ? 0 : (basePrice + upcharge);
                         itemTotal += qty * sizePrice;
 
                         // Check if this size is available
