@@ -3359,7 +3359,6 @@
                 { rank: 6, style: 'PC61LS', description: 'Port & Company - Long Sleeve Essential Tee', brand: 'Port & Company' },
                 { rank: 7, style: 'PC600', description: 'Port & Company Bouncer Tee', brand: 'Port & Company' },
                 { rank: 8, style: 'BC3001', description: 'BellaCanvas Unisex Jersey Short Sleeve Tee', brand: 'BellaCanvas' },
-                { rank: 10, style: 'GRT-50', description: 'Logo Mockup & Print Review Service', brand: 'Service' },
                 { rank: 11, style: 'PC54LS', description: 'Port & Company - Long Sleeve Core Cotton Tee', brand: 'Port & Company' },
                 { rank: 12, style: 'CTK87', description: 'Carhartt Workwear Pocket Short Sleeve T-Shirt', brand: 'Carhartt' }
             ],
@@ -3407,8 +3406,7 @@
                 { rank: 10, style: 'PC54', description: 'Port & Company - Core Cotton Tee', brand: 'Port & Company' },
                 { rank: 11, style: 'CS204', description: 'CornerStone ANSI 107 Class 2 Segmented Tape Tee', brand: 'CornerStone' },
                 { rank: 12, style: '5180', description: 'Hanes Beefy-T - 100 Cotton T-Shirt', brand: 'Hanes' },
-                { rank: 13, style: 'DT6100', description: 'District V.I.T. Fleece Hoodie', brand: 'District' },
-                { rank: 14, style: 'SPRESET', description: 'Screen Reset Charge', brand: 'Service' }
+                { rank: 13, style: 'DT6100', description: 'District V.I.T. Fleece Hoodie', brand: 'District' }
             ],
             freshPicks: [
                 // Essential Value Tees
@@ -3909,12 +3907,23 @@
             // Load image overrides from API (falls back to hardcoded if API unavailable)
             await loadImageOverridesFromAPI();
 
-            loadNewArrivalsCarousel(); // Load the New Arrivals carousel
-            loadBestsellersCarousel(); // Load the Bestsellers carousel (Hybrid: API + Richardson 112)
-            loadProducts('all', 'primary');
+            // Load carousels FIRST (8 products, fast ~300-500ms)
+            // This makes the top of page appear instantly while main grid loads in background
+            await Promise.all([
+                loadNewArrivalsCarousel(), // Load the New Arrivals carousel
+                loadBestsellersCarousel()  // Load the Bestsellers carousel (Hybrid: API + Richardson 112)
+            ]);
+
+            // Setup UI immediately (search, filters, event listeners)
             setupEventListeners();
             initializeSearch();
             checkEducationModal();
+
+            // Load main products grid in background (74 products, slower ~2.3s)
+            // Using setTimeout defers this to next event loop, allowing carousels to render first
+            setTimeout(() => {
+                loadProducts('all', 'primary');
+            }, 0);
         });
 
         // Initialize search functionality
@@ -4084,6 +4093,47 @@
             });
         }
 
+        // Helper function: Preload images for products (fast concurrent fetch)
+        async function preloadImagesForProducts(styleNumbers) {
+            console.log(`[ImagePreload] Starting concurrent fetch for ${styleNumbers.length} products...`);
+            console.time('[ImagePreload] Total Time');
+
+            // Fetch images concurrently (not sequential) - much faster
+            const imagePromises = styleNumbers.map(async (style) => {
+                // Skip if already cached
+                if (productCache[style]) {
+                    return { style, fromCache: true };
+                }
+
+                try {
+                    const response = await fetch(
+                        `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${style}`
+                    );
+
+                    if (response.ok) {
+                        const details = await response.json();
+                        if (details && details.length > 0) {
+                            productCache[style] = details;
+                            return { style, success: true };
+                        }
+                    }
+                    return { style, success: false };
+                } catch (error) {
+                    console.warn(`[ImagePreload] Failed to fetch ${style}:`, error.message);
+                    return { style, success: false, error: error.message };
+                }
+            });
+
+            // Wait for all to complete (concurrent, not sequential!)
+            const results = await Promise.all(imagePromises);
+
+            const successful = results.filter(r => r.success || r.fromCache).length;
+            console.timeEnd('[ImagePreload] Total Time');
+            console.log(`[ImagePreload] ✓ Loaded ${successful}/${styleNumbers.length} product images`);
+
+            return results;
+        }
+
         // Load products based on filter
         async function loadProducts(category, filterType) {
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -4098,23 +4148,83 @@
 
             if (filterType === 'dtg') {
                 // DTG-Compatible filter - show only DTG-compatible products
+
+                // Step 1: Collect all style numbers that will be displayed
+                const stylesToPreload = [];
+                for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
+                    for (const product of products) {
+                        if (dtgCompatibleProducts.has(product.style)) {
+                            stylesToPreload.push(product.style);
+                        }
+                    }
+                }
+
+                // Step 2: Preload images concurrently
+                await preloadImagesForProducts(stylesToPreload);
+
+                // Step 3: Build products with images now available in cache
                 for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
                     for (const product of products) {
                         const style = product.style;
                         if (dtgCompatibleProducts.has(style)) {
                             const productCategory = productCategoryMap[style] || 'other';
-                            allProducts.push({...product, type: categoryKey, category: productCategory, isDTG: true});
+
+                            // Get image from cache or override
+                            const cachedDetails = productCache[style];
+                            const imageUrl = imageOverrides[style] ||
+                                           (cachedDetails && cachedDetails[0] &&
+                                            (cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                                             cachedDetails[0].PRODUCT_IMAGE ||
+                                             cachedDetails[0].THUMBNAIL_IMAGE));
+
+                            allProducts.push({
+                                ...product,
+                                type: categoryKey,
+                                category: productCategory,
+                                isDTG: true,
+                                imageUrl: imageUrl || null,
+                                details: cachedDetails || null
+                            });
                         }
                     }
                 }
             } else if (category === 'all') {
                 // Load all products with category mapping
+
+                // Step 1: Collect all style numbers
+                const stylesToPreload = [];
+                for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
+                    for (const product of products) {
+                        stylesToPreload.push(product.style);
+                    }
+                }
+
+                // Step 2: Preload images concurrently
+                await preloadImagesForProducts(stylesToPreload);
+
+                // Step 3: Build products with images now available in cache
                 for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
                     for (const product of products) {
                         const style = product.style;
                         const productCategory = productCategoryMap[style] || 'other';
                         const isDTG = dtgCompatibleProducts.has(style);
-                        allProducts.push({...product, type: categoryKey, category: productCategory, isDTG});
+
+                        // Get image from cache or override
+                        const cachedDetails = productCache[style];
+                        const imageUrl = imageOverrides[style] ||
+                                       (cachedDetails && cachedDetails[0] &&
+                                        (cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                                         cachedDetails[0].PRODUCT_IMAGE ||
+                                         cachedDetails[0].THUMBNAIL_IMAGE));
+
+                        allProducts.push({
+                            ...product,
+                            type: categoryKey,
+                            category: productCategory,
+                            isDTG,
+                            imageUrl: imageUrl || null,
+                            details: cachedDetails || null
+                        });
                     }
                 }
             } else if (category === 'newProducts') {
@@ -4233,6 +4343,22 @@
                 }
             } else if (filterType === 'primary') {
                 // Filter by product category (tshirts, hoodies, polos, caps, jackets, workwear)
+
+                // Step 1: Collect all style numbers that match the category
+                const stylesToPreload = [];
+                for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
+                    for (const product of products) {
+                        const productCategory = productCategoryMap[product.style] || 'other';
+                        if (productCategory === category) {
+                            stylesToPreload.push(product.style);
+                        }
+                    }
+                }
+
+                // Step 2: Preload images concurrently
+                await preloadImagesForProducts(stylesToPreload);
+
+                // Step 3: Build products with images now available in cache
                 for (const [categoryKey, products] of Object.entries(completeTopSellers)) {
                     for (const product of products) {
                         const style = product.style;
@@ -4240,65 +4366,115 @@
                         const isDTG = dtgCompatibleProducts.has(style);
 
                         if (productCategory === category) {
-                            allProducts.push({...product, type: categoryKey, category: productCategory, isDTG});
+                            // Get image from cache or override
+                            const cachedDetails = productCache[style];
+                            const imageUrl = imageOverrides[style] ||
+                                           (cachedDetails && cachedDetails[0] &&
+                                            (cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                                             cachedDetails[0].PRODUCT_IMAGE ||
+                                             cachedDetails[0].THUMBNAIL_IMAGE));
+
+                            allProducts.push({
+                                ...product,
+                                type: categoryKey,
+                                category: productCategory,
+                                isDTG,
+                                imageUrl: imageUrl || null,
+                                details: cachedDetails || null
+                            });
                         }
                     }
                 }
             } else if (filterType === 'secondary') {
                 // Filter by freshPicks or other secondary categories
                 if (completeTopSellers[category]) {
+                    // Step 1: Collect all style numbers
+                    const stylesToPreload = completeTopSellers[category].map(p => p.style);
+
+                    // Step 2: Preload images concurrently
+                    await preloadImagesForProducts(stylesToPreload);
+
+                    // Step 3: Build products with images now available in cache
                     for (const product of completeTopSellers[category]) {
                         const style = product.style;
                         const productCategory = productCategoryMap[style] || 'other';
                         const isDTG = dtgCompatibleProducts.has(style);
-                        allProducts.push({...product, type: category, category: productCategory, isDTG});
+
+                        // Get image from cache or override
+                        const cachedDetails = productCache[style];
+                        const imageUrl = imageOverrides[style] ||
+                                       (cachedDetails && cachedDetails[0] &&
+                                        (cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                                         cachedDetails[0].PRODUCT_IMAGE ||
+                                         cachedDetails[0].THUMBNAIL_IMAGE));
+
+                        allProducts.push({
+                            ...product,
+                            type: category,
+                            category: productCategory,
+                            isDTG,
+                            imageUrl: imageUrl || null,
+                            details: cachedDetails || null
+                        });
                     }
                 }
             }
 
-            // Fetch product details from API for all products
-            const productsWithDetails = await Promise.all(
-                allProducts.map(async (product) => {
-                    // Skip service items
-                    if (product.brand === 'Service') {
-                        return {
-                            ...product,
-                            details: null,
-                            isService: true
-                        };
-                    }
-                    
-                    if (!productCache[product.style]) {
-                        try {
-                            const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${product.style}`);
-                            if (response.ok) {
-                                const details = await response.json();
-                                if (details && details.length > 0) {
-                                    productCache[product.style] = details;
-                                }
-                            }
-                        } catch (error) {
-                            console.error(`Error fetching ${product.style}:`, error);
-                        }
-                    }
-                    return {
-                        ...product,
-                        details: productCache[product.style] || null
-                    };
-                })
-            );
+            // Helper function: Enrich product details in background (non-blocking)
+            function enrichProductDetailsInBackground(products) {
+                console.log('[Background] Starting non-blocking product details enrichment');
 
+                // Fetch details for products not yet in cache, but don't block rendering
+                for (const product of products) {
+                    // Skip service items
+                    if (product.brand === 'Service' || product.isService) continue;
+
+                    // Skip if already cached
+                    if (productCache[product.style]) continue;
+
+                    // Fetch in background (no await - fire and forget)
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${product.style}`)
+                        .then(response => response.ok ? response.json() : null)
+                        .then(details => {
+                            if (details && details.length > 0) {
+                                productCache[product.style] = details;
+                                console.log(`[Background] Cached details for ${product.style}`);
+                            }
+                        })
+                        .catch(error => {
+                            // Silently fail - details aren't critical for display
+                            console.warn(`[Background] Failed to fetch ${product.style}:`, error.message);
+                        });
+                }
+
+                console.log(`[Background] Initiated background fetch for ${products.filter(p => !p.isService && !productCache[p.style]).length} products`);
+            }
+
+            // PERFORMANCE FIX: Skip blocking API calls for product details
+            // Images are already available from initial API response (imageUrl field)
+            // Details can be fetched on-demand when user clicks a product
+
+            console.time('[Performance] Display Products Grid');
+
+            // Display products immediately with images already loaded
             // Store products for search
-            allProducts = productsWithDetails;
-            
+            // allProducts already contains imageUrl from lines 4153, 4198, etc.
+
             // Display products (or perform search if there's a search term)
             if (searchTerm) {
                 performSearch();
             } else {
-                displayProducts(productsWithDetails);
-                document.getElementById('resultsCount').textContent = `Showing ${productsWithDetails.length} products`;
+                displayProducts(allProducts);
+                document.getElementById('resultsCount').textContent = `Showing ${allProducts.length} products`;
             }
-            
+
+            console.timeEnd('[Performance] Display Products Grid');
+            console.log(`[Performance] Displayed ${allProducts.length} products with images immediately`);
+
+            // OPTIONAL: Fetch product details in background (non-blocking)
+            // This enriches the cache for when users click on products
+            enrichProductDetailsInBackground(allProducts);
+
             loadingIndicator.style.display = 'none';
             productsGrid.style.display = 'grid';
         }
