@@ -1001,6 +1001,7 @@ async function handleSubmit(e) {
 | Quote ID not showing | Add display element in success message |
 | Script parsing error | Escape closing tags: `<\/script>` |
 | CSS not updating | Add cache-busting parameter to stylesheet |
+| **All images loading slowly or not at all** | **Check if Sanmar CDN is down** - See [@memory/TROUBLESHOOTING_IMAGE_LOADING.md](memory/TROUBLESHOOTING_IMAGE_LOADING.md). Test URL: `https://cdnm.sanmar.com/imglib/mresjpg/2022/f5/CT104616_navy_model_front.jpg` |
 
 ## 🚀 Quick Start Templates
 
