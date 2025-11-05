@@ -475,6 +475,27 @@ window.location.href = `top-sellers-product.html?style=${style}&mode=sample&samp
 
 **Fixed**: 2025-11-03
 
+### Issue: Product Images Loading Slowly or Not At All
+**Symptoms**: All images across site loading slowly (20-30 seconds) or not loading at all, blank images, timeouts
+
+**Root Cause:** Sanmar CDN (cdnm.sanmar.com) outage - external infrastructure issue
+
+**Quick Diagnosis:**
+Test this URL in browser: `https://cdnm.sanmar.com/imglib/mresjpg/2022/f5/CT104616_navy_model_front.jpg`
+- ✅ Image loads <1 second → Sanmar CDN working
+- ❌ No image or 20+ seconds → Sanmar CDN DOWN
+- ⚠️ Loads but slow (3-10 seconds) → Sanmar CDN degraded
+
+**Complete Troubleshooting Guide:** See [TROUBLESHOOTING_IMAGE_LOADING.md](TROUBLESHOOTING_IMAGE_LOADING.md)
+
+**Key Points:**
+- Our API responds in ~1 second (verified)
+- Images hosted on Sanmar's CDN (not our servers)
+- Cannot fix Sanmar's infrastructure
+- Workarounds and long-term solutions documented
+
+**Last Incident**: 2025-11-04 (2-3 hour Sanmar CDN outage)
+
 ## 🧪 Browser Testing Checklist
 
 ### Quick Console Commands for Testing

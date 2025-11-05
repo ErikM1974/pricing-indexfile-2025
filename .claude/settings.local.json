@@ -2,19 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git add:*)",
-      "Bash(cat:*)",
-      "Bash(git branch:*)",
       "Bash(git commit:*)",
-      "Bash(node -c:*)",
-      "Bash(git checkout:*)",
-      "Bash(git merge manageorders-API --no-ff -m \"$(cat <<''EOF''\nMerge branch ''manageorders-API'' into develop\n\nCompleted ManageOrders API integration and UI improvements:\n\n- Universal cart header component for consistent cart display\n- Cart summary bar alignment and spacing fixes\n- Search results button visibility fix\n- Full ManageOrders API integration\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push:*)",
-      "Bash(curl:*)",
-      "Bash(python3:*)",
-      "Bash(__NEW_LINE__ echo \"\")",
-      "Bash(nul)",
-      "Read(//mnt/c/Users/erik/Downloads/**)",
-      "Bash(git log -1 --format=\"%H%n%an <%ae>%n%ad%n%s%n%n%b\" HEAD)"
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": [],
