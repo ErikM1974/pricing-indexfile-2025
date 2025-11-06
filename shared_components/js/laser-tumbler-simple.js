@@ -8,16 +8,15 @@ class LaserTumblerPage {
     constructor() {
         this.apiService = new JDSApiService();
 
-        // All Polar Camel 16oz SKUs (18 color variants)
+        // Selected Polar Camel 16oz SKUs (3 color variants)
         this.POLAR_CAMEL_16OZ_SKUS = [
-            'LTM751', 'LTM752', 'LTM753', 'LTM754', 'LTM755',
-            'LTM756', 'LTM757', 'LTM758', 'LTM759', 'LTM760',
-            'LTM761', 'LTM762', 'LTM763', 'LTM764', 'LTM765',
-            'LTM766', 'LTM767', 'LTM768'
+            'LTM752',  // Black
+            'LTM763',  // Maroon
+            'LTM765'   // Green
         ];
 
         // Product state
-        this.allProducts = null;        // All 18 color variants
+        this.allProducts = null;        // All color variants
         this.currentProduct = null;     // Currently selected color
         this.currentSKU = null;         // Currently selected SKU
         this.pricingTiers = null;       // Pricing tiers for current product
@@ -283,6 +282,8 @@ class LaserTumblerPage {
             this.displayPricingTable();
             this.displayInventory();
             this.displayImages();
+            this.updateColorLegend();
+            this.updateSKUDisplay();
 
             // Announce to screen readers
             this.announceColorChange(colorName);
@@ -355,6 +356,27 @@ class LaserTumblerPage {
     }
 
     /**
+     * Update color selector legend with selected color
+     */
+    updateColorLegend() {
+        const legend = document.getElementById('color-selector-legend');
+        if (!legend) return;
+
+        const colorName = this.extractColorFromName(this.currentProduct.name);
+        legend.innerHTML = `Choose Your Color: <span class="selected-color-name">${colorName}</span>`;
+    }
+
+    /**
+     * Update SKU display with current product SKU
+     */
+    updateSKUDisplay() {
+        const skuEl = document.getElementById('product-sku');
+        if (!skuEl) return;
+
+        skuEl.textContent = this.currentProduct.sku;
+    }
+
+    /**
      * Display product information
      */
     displayProductInfo() {
@@ -362,12 +384,14 @@ class LaserTumblerPage {
         const descEl = document.getElementById('product-description');
 
         if (nameEl) {
-            nameEl.textContent = this.currentProduct.name;
+            nameEl.textContent = 'Polar Camel 16 oz Pint';
         }
 
         if (descEl) {
             descEl.textContent = this.currentProduct.description;
         }
+
+        this.updateSKUDisplay();
     }
 
     /**
@@ -454,6 +478,14 @@ class LaserTumblerPage {
      * Display product images from API
      */
     displayImages() {
+        // Update main hero image
+        const heroImage = document.querySelector('.hero-image img.product-image-main');
+        if (heroImage) {
+            heroImage.src = this.currentProduct.images.full;
+            heroImage.alt = this.currentProduct.name;
+        }
+
+        // Update gallery section
         const galleryEl = document.getElementById('product-gallery');
         if (!galleryEl) return;
 
