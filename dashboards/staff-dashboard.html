@@ -423,6 +423,67 @@
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         }
 
+        /* Employee Bundles Section */
+        .employee-bundles-section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .employee-bundles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .company-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            min-height: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Active company box (Drain-Pro) */
+        .company-box-active {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .company-box-active:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Placeholder boxes (Coming Soon) */
+        .company-box-placeholder {
+            background: #f3f4f6;
+            color: #9ca3af;
+            border: 2px dashed #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .company-box i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .coming-soon-text {
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .seasonal-btn {
@@ -3998,7 +4059,64 @@
                             </a>
                         </div>
                     </div>
-                    
+
+                    <!-- Employee Bundles -->
+                    <div class="employee-bundles-section">
+                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">
+                            <i class="fas fa-id-badge"></i> Employee Bundles
+                        </h3>
+                        <div class="employee-bundles-grid">
+                            <!-- Drain-Pro (Active) -->
+                            <a href="/DrainPro-Bundle.html" class="company-box company-box-active">
+                                <i class="fas fa-users"></i>
+                                <span>Drain-Pro</span>
+                            </a>
+
+                            <!-- Placeholder Boxes -->
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 2</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 3</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 4</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 5</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 6</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 7</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 8</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Hitter Tips Widget (Shows tips from last 14 days) -->
                     <div class="quick-tips-widget collapsed" id="quickTipsWidget">
                         <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">

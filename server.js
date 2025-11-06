@@ -149,6 +149,11 @@ app.get('/bundle-orders-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
 });
 
+// Employee Bundle Pages
+app.get('/DrainPro-Bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'DrainPro-Bundle.html'));
+});
+
 app.get('/art-invoices-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });

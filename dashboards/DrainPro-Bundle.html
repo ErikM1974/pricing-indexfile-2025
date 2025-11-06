@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drain-Pro Employee Bundle | Northwest Custom Apparel</title>
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        /* Header - Fire Engine Red matching Drain-Pro brand */
+        .drain-pro-header {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container img {
+            height: 80px;
+            display: block;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 5px;
+            padding: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ef4444;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #32373c;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #ef4444;
+        }
+
+        .section-header i {
+            color: #ef4444;
+        }
+
+        /* Caspio Table Container */
+        .table-container {
+            margin: 2rem 0;
+            background: #fafafa;
+            padding: 1.5rem;
+            border-radius: 5px;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #32373c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1f2937;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .info-banner i {
+            color: #f59e0b;
+            font-size: 1.5rem;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .info-banner-content strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-banner-content {
+            color: #78350f;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 1.25rem;
+            border-radius: 5px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .drain-pro-header {
+                padding: 2rem 1rem;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .header-subtitle {
+                font-size: 1rem;
+            }
+
+            .content-card {
+                padding: 1.5rem;
+            }
+
+            .logo-container {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo-container img {
+                height: 60px;
+            }
+
+            .section-header {
+                font-size: 1.25rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .tab-button.active {
+            color: #ef4444;
+            border-bottom-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .tab-button i {
+            font-size: 1.1rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Instructions Box */
+        .instructions-box {
+            background: #f9fafb;
+            border-left: 4px solid #ef4444;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .instructions-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #32373c;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .instructions-title i {
+            color: #ef4444;
+        }
+
+        .instructions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .instructions-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            color: #374151;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .instruction-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .instruction-text {
+            padding-top: 0.2rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            .drain-pro-header {
+                background: white !important;
+                color: #1f2937 !important;
+                padding: 1rem !important;
+                border-bottom: 3px solid #ef4444;
+            }
+
+            .logo-container {
+                background: none !important;
+                box-shadow: none !important;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .info-banner {
+                background: white !important;
+                border: 1px solid #f59e0b;
+            }
+
+            .tab-navigation {
+                display: none;
+            }
+
+            .tab-content {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fire Engine Red Header -->
+    <div class="drain-pro-header">
+        <div class="logo-container">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Drain%20Pro.png?ver=1"
+                 alt="Drain-Pro Inc. Logo">
+        </div>
+        <h1 class="header-title">Employee Bundle Program</h1>
+        <p class="header-subtitle">Manage team apparel sizes and orders</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="content-card">
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" onclick="switchTab('employees')">
+                    <i class="fas fa-users"></i>
+                    <span>Employee Bundles</span>
+                </button>
+                <button class="tab-button" onclick="switchTab('labels')">
+                    <i class="fas fa-tags"></i>
+                    <span>Avery 5960 (2.5" x 1") Box Labels</span>
+                </button>
+            </div>
+
+            <!-- Tab Content: Employee Bundles -->
+            <div id="employees-tab" class="tab-content active">
+                <h2 class="section-header">
+                    <i class="fas fa-users"></i>
+                    <span>Drain-Pro Team Members</span>
+                </h2>
+
+                <div class="table-container">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb"></script>
+                </div>
+            </div>
+
+            <!-- Tab Content: Box Labels -->
+            <div id="labels-tab" class="tab-content">
+                <h2 class="section-header">
+                    <i class="fas fa-tags"></i>
+                    <span>Drain-Pro Box Labels</span>
+                </h2>
+
+                <!-- Instructions Box -->
+                <div class="instructions-box">
+                    <div class="instructions-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>How to Print Labels</span>
+                    </div>
+                    <ol class="instructions-list">
+                        <li>
+                            <span class="instruction-number">1</span>
+                            <span class="instruction-text">Download all the names and sizes into Excel</span>
+                        </li>
+                        <li>
+                            <span class="instruction-number">2</span>
+                            <span class="instruction-text">Import them into Microsoft Word using the mail merge</span>
+                        </li>
+                        <li>
+                            <span class="instruction-number">3</span>
+                            <span class="instruction-text">Print them on the Avery 5960 labels</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="table-container">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb"></script>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <a href="/staff-dashboard.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.875rem;">
+        <p>Northwest Custom Apparel &bull; (253) 922-5793 &bull; sales@nwcustomapparel.com</p>
+        <p style="margin-top: 0.5rem;">Serving the Pacific Northwest since 1977</p>
+    </div>
+
+    <!-- Tab Switching JavaScript -->
+    <script>
+        function switchTab(tabName) {
+            // Get all tab buttons and tab contents
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Remove active class from all tabs and buttons
+            tabButtons.forEach(button => button.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and button
+            const selectedButton = event.target.closest('.tab-button');
+            const selectedContent = document.getElementById(`${tabName}-tab`);
+
+            if (selectedButton && selectedContent) {
+                selectedButton.classList.add('active');
+                selectedContent.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
