@@ -4,399 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Laser Engraved Polar Camel Tumblers - Northwest Custom Apparel</title>
+    <title>Polar Camel Black 16 oz Pint - Laser Engraved Tumblers | Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    
-    <!-- Shared Calculator Styles -->
-    <link href="../shared_components/css/calculator-base.css" rel="stylesheet">
-    <!-- Laser Tumbler-Specific Styles -->
-    <link href="laser-tumbler-styles.css" rel="stylesheet">
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Base Quote Service -->
-    <script src="../shared_components/js/base-quote-service.js"></script>
-    <!-- Calculator Utilities -->
-    <script src="../shared_components/js/calculator-utilities.js"></script>
-    <!-- Laser Tumbler Quote Service -->
-    <script src="laser-tumbler-quote-service.js"></script>
-    <!-- Laser Tumbler Calculator Class -->
-    <script src="laser-tumbler-calculator.js"></script>
+
+    <!-- Styles -->
+    <link href="../shared_components/css/laser-tumbler-simple.css" rel="stylesheet">
+
+    <!-- JDS API Service -->
+    <script src="../shared_components/js/jds-api-service.js"></script>
+
+    <!-- Page Logic -->
+    <script src="../shared_components/js/laser-tumbler-simple.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
-                    <a href="/staff-dashboard.html">Dashboard</a>
-                    <span>/</span>
-                    <span>Laser Tumblers</span>
-                </nav>
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
             </div>
-            <div class="user-welcome">
-                Polar Camel 16 oz. Pint Calculator
+        </div>
+
+        <!-- Main Navigation -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="breadcrumb">
+                    <a href="/">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Laser Tumblers</span>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-container">
-        <div class="page-header">
-            <h1 class="page-title">Laser Engraved Polar Camel Tumblers</h1>
-            <p class="page-subtitle">Premium Quality • Custom Designs • Fast Turnaround</p>
-        </div>
-
-        <div class="content-grid">
-            <!-- Left Column - Product Info -->
-            <div>
-                <!-- Product Card -->
-                <div class="card">
-                    <h2 class="card-title">
-                        Polar Camel 16 oz. Pint
-                    </h2>
-                    
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Tumbler%20from%20JDS%20Mountain%20Top%20Propane.JPG?ver=1" 
-                         alt="Polar Camel Tumbler" 
-                         class="product-image">
-                    
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">🔥</div>
-                            <div class="feature-text">Keeps Hot<br>8+ Hours</div>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">❄️</div>
-                            <div class="feature-text">Keeps Cold<br>24+ Hours</div>
-                        </div>
-                    </div>
-
-                    <!-- Pricing Table -->
-                    <h3 style="margin-bottom: 1rem;">Pricing</h3>
-                    
-                    <div style="background: var(--success-bg); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                        <p style="font-size: 0.875rem; font-weight: 500; color: var(--success-text); margin: 0;">
-                            ✨ All prices include 1-Sided Laser Engraving (approx. 2.5" x 3")
-                        </p>
-                    </div>
-
-                    <table class="pricing-table">
-                        <thead>
-                            <tr>
-                                <th>Quantity</th>
-                                <th style="text-align: center;">Price per Unit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <span class="quantity-label">24 Tumblers</span>
-                                    <span class="quantity-sublabel">1 Case</span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="new-price">$16.68</span>
-                                    <span class="price-unit">per unit</span>
-                                </td>
-                            </tr>
-                            <tr class="highlight">
-                                <td>
-                                    <span class="quantity-label">120 Tumblers</span>
-                                    <span class="quantity-sublabel">5 Cases</span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="new-price">$16.10</span>
-                                    <span class="price-unit">per unit</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="quantity-label">240 Tumblers</span>
-                                    <span class="quantity-sublabel">10 Cases</span>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="new-price">$15.53</span>
-                                    <span class="price-unit">per unit</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Additional Fees -->
-                    <div class="notice-box">
-                        <div class="notice-icon">🎨</div>
-                        <div class="notice-content">
-                            <div class="notice-title">One-Time Setup Fee: $75.00</div>
-                            <div class="notice-text">Includes professional mockup for approval</div>
-                        </div>
-                    </div>
-
-                    <div class="notice-box notice-box-blue">
-                        <div class="notice-icon">➕</div>
-                        <div class="notice-content">
-                            <div class="notice-title">Add a Second Logo</div>
-                            <div class="notice-text">
-                                Only <span style="font-size: 1.125rem; font-weight: 700;">$3.16</span> per tumbler
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column - Quote Builder -->
-            <div>
-                <div class="card">
-                    <h2 class="card-title">
-                        <i class="fas fa-calculator" style="color: var(--primary-green);"></i>
-                        Build Your Quote
-                    </h2>
-
-                    <form id="quoteForm">
-                        <div class="form-group">
-                            <label class="form-label" for="customerName">Customer Name</label>
-                            <input type="text" id="customerName" class="form-input" placeholder="e.g., John Smith" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="projectName">Project Name</label>
-                            <input type="text" id="projectName" class="form-input" placeholder="e.g., Company Event Tumblers">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Select Colors (24 tumblers per case)</label>
-                            <div id="casesContainer" style="margin-bottom: 1rem;">
-                                <!-- Color cases will be added here -->
-                            </div>
-                            <button type="button" id="addCaseBtn" class="btn btn-secondary btn-fullwidth">
-                                <i class="fas fa-plus"></i>
-                                Add Case (24 tumblers)
-                            </button>
-                            <div style="margin-top: 1rem; padding: 0.75rem; background: var(--hover-bg); border-radius: 8px; text-align: center;">
-                                <span style="font-weight: 600;">Total: </span>
-                                <span id="caseCount">0</span> cases • 
-                                <span id="totalQuantity">0</span> tumblers
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="secondLogo">
-                                <input type="checkbox" id="secondLogo" style="margin-right: 0.5rem;">
-                                Add Second Logo (+$3.16 per tumbler)
-                            </label>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-fullwidth">
-                            <i class="fas fa-calculator"></i>
-                            Calculate Quote
-                        </button>
-                    </form>
-
-                    <!-- Quote Display -->
-                    <div id="quoteDisplay" class="quote-display hidden">
-                        <h3 style="margin-bottom: 1rem;">Quote Summary</h3>
-                        <div class="quote-row">
-                            <span class="quote-label">Quantity:</span>
-                            <span class="quote-value" id="displayQuantity">-</span>
-                        </div>
-                        <div id="colorBreakdown" style="margin: 0.75rem 0; padding: 0.75rem; background: white; border-radius: 6px;">
-                            <!-- Color breakdown will be inserted here -->
-                        </div>
-                        <div class="quote-row">
-                            <span class="quote-label">Price per Tumbler:</span>
-                            <span class="quote-value" id="displayUnitPrice">-</span>
-                        </div>
-                        <div class="quote-row">
-                            <span class="quote-label">Subtotal:</span>
-                            <span class="quote-value" id="displaySubtotal">-</span>
-                        </div>
-                        <div class="quote-row">
-                            <span class="quote-label">Setup Fee:</span>
-                            <span class="quote-value">$75.00</span>
-                        </div>
-                        <div class="quote-row hidden" id="secondLogoRow">
-                            <span class="quote-label">Second Logo:</span>
-                            <span class="quote-value" id="displaySecondLogo">-</span>
-                        </div>
-                        <div class="quote-total">
-                            <span class="quote-total-label">Total:</span>
-                            <span class="quote-total-amount" id="displayTotal">-</span>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-                            <button type="button" class="btn btn-secondary" onclick="printQuote()">
-                                <i class="fas fa-file-invoice"></i>
-                                Print Invoice
-                            </button>
-                            <button type="button" class="btn btn-primary" id="emailQuoteBtn">
-                                <i class="fas fa-paper-plane"></i>
-                                Email Quote
-                            </button>
-                        </div>
-                        <button type="button" class="btn btn-secondary btn-fullwidth" onclick="printFlyer()" style="margin-top: 1rem; background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
-                            <i class="fas fa-file-pdf"></i>
-                            Print Promotional Flyer (8.5" x 11")
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Specifications Section -->
-        <div class="card">
-            <h2 class="card-title">Product Details & Specifications</h2>
-            
-            <div class="specs-grid">
-                <div class="spec-card">
-                    <h3 class="spec-title">
-                        <i class="fas fa-info-circle" style="color: var(--primary-green);"></i>
-                        Product Specs
-                    </h3>
-                    <ul class="spec-list">
-                        <li>Capacity: 16 oz.</li>
-                        <li>18/8 stainless steel (Type 304)</li>
-                        <li>Double-wall vacuum insulation</li>
-                        <li>Clear slider lid included</li>
-                        <li>2X heat and cold resistant</li>
-                        <li>Premium matte finish</li>
-                        <li>Gift box included</li>
-                    </ul>
-                </div>
-                
-                <div class="spec-card">
-                    <h3 class="spec-title">
-                        <i class="fas fa-ruler" style="color: var(--primary-green);"></i>
-                        Dimensions
-                    </h3>
-                    <ul class="spec-list">
-                        <li>Size: 3 3/8" (L) x 6" (H)</li>
-                        <li>Base: 2 5/8" diameter</li>
-                        <li>Circumference: 10.25"</li>
-                        <li>Silver laser engraving</li>
-                        <li>Rotary attachment compatible</li>
-                        <li>Engraving area: 2.5" x 3"</li>
-                    </ul>
-                </div>
-                
-                <div class="spec-card">
-                    <h3 class="spec-title">
-                        <i class="fas fa-hand-sparkles" style="color: var(--primary-green);"></i>
-                        Care & Info
-                    </h3>
-                    <ul class="spec-list">
-                        <li>Hand wash only</li>
-                        <li style="color: var(--amber-text);">⚠ Not dishwasher/microwave safe</li>
-                        <li>Indoor/outdoor use</li>
-                        <li>BPA-free lid</li>
-                        <li>Seamless construction</li>
-                        <li>Replacement lids: LTM20L, LTMR20</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Colors Section -->
-        <div class="card">
-            <h2 class="card-title">Available Colors</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                Choose from 18 vibrant colors to match your brand
-            </p>
-            
-            <div class="color-grid" id="colorGrid">
-                <!-- Colors will be generated by JavaScript -->
-            </div>
-        </div>
-    </main>
-
-    <!-- Email Quote Modal -->
-    <div id="emailModal" class="modal-backdrop">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Email Quote</h2>
-                <button type="button" class="modal-close" id="modalClose">&times;</button>
-            </div>
-
-            <!-- Sales Rep Selection -->
-            <div class="form-group">
-                <label class="form-label" for="salesRep">Sales Representative</label>
-                <select id="salesRep" class="form-select" required>
-                    <option value="">Select a sales rep...</option>
-                    <option value="erik@nwcustomapparel.com">Erik</option>
-                    <option value="nika@nwcustomapparel.com">Nika</option>
-                    <option value="taylar@nwcustomapparel.com">Taylar</option>
-                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                    <option value="bradley@nwcustomapparel.com">Bradley</option>
-                    <option value="jim@nwcustomapparel.com">Jim</option>
-                    <option value="art@nwcustomapparel.com">Steve (Artist)</option>
-                    <option value="sales@nwcustomapparel.com">General Sales</option>
-                </select>
-            </div>
-
-            <form id="emailForm">
-                <div class="form-group">
-                    <label class="form-label" for="emailCustomerName">Customer Name</label>
-                    <input type="text" id="emailCustomerName" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="customerEmail">Customer Email</label>
-                    <input type="email" id="customerEmail" class="form-input" required placeholder="customer@example.com">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="customerPhone">Phone Number (optional)</label>
-                    <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="companyName">Company Name (optional)</label>
-                    <input type="text" id="companyName" class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="emailNotes">Notes (optional)</label>
-                    <textarea id="emailNotes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" id="saveToDatabase" checked>
-                        <span>Save quote to database</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-fullwidth">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Quote
-                </button>
-            </form>
-
-            <div id="successMessage" class="success-message hidden">
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <span style="display: block;">Quote sent successfully!</span>
-                    <span id="quoteIdDisplay" style="display: block; font-weight: bold; font-size: 1.1em; margin-top: 0.5rem;"></span>
-                </div>
-            </div>
-
-            <div id="errorMessage" class="error-message hidden">
-                <i class="fas fa-exclamation-circle"></i>
-                <span id="errorText">An error occurred. Please try again.</span>
-            </div>
-        </div>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner">
+        <div class="spinner"></div>
     </div>
 
-    <!-- Hidden print content -->
-    <div id="printContent" style="display: none;"></div>
+    <!-- Error Message -->
+    <div id="error-message"></div>
 
+    <!-- Main Content -->
+    <div id="page-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-image">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9171981"
+                             alt="Polar Camel Black 16 oz Pint"
+                             class="product-image-main">
+                    </div>
+                    <div class="hero-info">
+                        <h1 id="product-name">Polar Camel Black 16 oz Pint</h1>
+                        <p class="product-subtitle">Laser Engraved Tumbler</p>
+                        <p id="product-description" class="product-description">
+                            16 oz. Stainless Steel vacuum insulated pint with clear slider lid.
+                            Perfect for hot or cold beverages, featuring professional laser engraving.
+                        </p>
+
+                        <!-- Inventory Status -->
+                        <div id="inventory-status" class="inventory-status">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section">
+            <div class="container">
+                <h2>Pricing</h2>
+                <p class="pricing-subtitle">All prices include laser engraving. Case quantity: 24 units per case.</p>
+
+                <table class="pricing-table">
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+                            <th style="text-align: center;">Price Per Unit</th>
+                            <th style="text-align: right;">Example Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricing-table-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+
+                <div class="pricing-notes">
+                    <h4><i class="fas fa-info-circle"></i> Pricing Includes:</h4>
+                    <ul>
+                        <li>Premium blank tumbler</li>
+                        <li>Professional laser engraving (one location)</li>
+                        <li>Labor and overhead costs</li>
+                        <li>Setup fee: $75.00 (one-time per order)</li>
+                        <li>Additional logo location: $3.16 per unit</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Gallery -->
+        <section class="gallery-section">
+            <div class="container">
+                <h2>Product Images</h2>
+                <div id="product-gallery" class="product-gallery">
+                    <!-- Populated by JavaScript from API -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Order?</h2>
+                <p>Contact us for custom quotes, bulk pricing, or questions about our laser engraving services.</p>
+                <a href="tel:253-922-5793" class="cta-button">
+                    <i class="fas fa-phone"></i>
+                    Call Us: 253-922-5793
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p>&copy; 2025 Northwest Custom Apparel. All rights reserved.</p>
+        <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
+    </footer>
+
+    <!-- Debug Console Commands -->
     <script>
-        // Initialize calculator when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            window.laserTumblerCalculator = new LaserTumblerCalculator();
-        });
+        // Debug utilities for testing
+        console.log('%c[Laser Tumbler Page] Debug Commands Available:', 'color: #2d5f3f; font-weight: bold;');
+        console.log('refreshProduct() - Refresh product data from API');
+        console.log('window.laserTumblerPage - Access page instance');
+        console.log('window.laserTumblerPage.apiService - Access API service');
     </script>
 </body>
 </html>
