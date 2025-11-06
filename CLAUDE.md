@@ -173,9 +173,11 @@ The **backend** (API server) is in a separate repository:
 - `DEVELOPER_GUIDE.md` - Backend development guide
 - `MANAGEORDERS_INTEGRATION.md` - ManageOrders proxy implementation
 - `ONLINE_STORE_DEVELOPER_GUIDE.md` - Webstore integration
+- `JDS_INTEGRATION.md` - JDS Industries API implementation (engravable products)
 
 **In This Repository (memory/):**
 - `CASPIO_API_CORE.md` - API reference (consumer perspective)
+- `api/jds-industries-api.md` - JDS Industries usage guide (mugs, tumblers, engravables)
 - `manageorders/` - ManageOrders usage guides
 - Backend docs = "how to build it"
 - Frontend docs = "how to use it"
