@@ -7,6 +7,7 @@
 class LaserTumblerPage {
     constructor() {
         this.apiService = new JDSApiService();
+        this.inventoryService = new ManageOrdersInventoryService();
 
         // Selected Polar Camel 16oz SKUs (3 color variants)
         this.POLAR_CAMEL_16OZ_SKUS = [
@@ -20,6 +21,7 @@ class LaserTumblerPage {
         this.currentProduct = null;     // Currently selected color
         this.currentSKU = null;         // Currently selected SKU
         this.pricingTiers = null;       // Pricing tiers for current product
+        this.localInventory = null;     // Local warehouse inventory
 
         console.log('[LaserTumblerPage] Initialized with multi-color support');
     }
@@ -42,6 +44,9 @@ class LaserTumblerPage {
             // Select the color (sets currentProduct and currentSKU)
             await this.selectColor(defaultSKU, true); // true = skip URL update on init
 
+            // Load local warehouse inventory
+            await this.loadLocalInventory();
+
             // Render color swatches
             this.renderColorSwatches();
 
@@ -59,6 +64,43 @@ class LaserTumblerPage {
         } catch (error) {
             console.error('[LaserTumblerPage] Error loading page:', error);
             this.showError('Unable to load product information. Please refresh the page or contact us at 253-922-5793.');
+        }
+    }
+
+    /**
+     * Load local warehouse inventory for current product
+     */
+    async loadLocalInventory() {
+        if (!this.currentSKU) {
+            console.warn('[LaserTumblerPage] No current SKU, skipping inventory check');
+            return;
+        }
+
+        try {
+            // Extract color name from current product (e.g., "Black" from "Polar Camel Black 16 oz Pint")
+            const colorName = this.currentProduct ? this.extractColorFromName(this.currentProduct.name) : null;
+
+            console.log('[LaserTumblerPage] Loading local inventory for', this.currentSKU, 'Color:', colorName);
+
+            // Query ManageOrders API for local warehouse stock (filtered by color)
+            const inventory = await this.inventoryService.checkInventory(this.currentSKU, colorName);
+
+            // Store inventory data
+            this.localInventory = inventory;
+
+            console.log('[LaserTumblerPage] Local inventory loaded:',
+                inventory.totalStock, 'units',
+                inventory.available ? 'in stock' : 'out of stock'
+            );
+
+        } catch (error) {
+            console.error('[LaserTumblerPage] Error loading local inventory:', error);
+            // Set empty inventory on error (don't fail the page)
+            this.localInventory = {
+                available: false,
+                totalStock: 0,
+                message: 'Unable to check local inventory'
+            };
         }
     }
 
@@ -277,6 +319,9 @@ class LaserTumblerPage {
                 input.checked = (input.value === sku);
             });
 
+            // Load local inventory for new color
+            await this.loadLocalInventory();
+
             // Update page content
             this.displayProductInfo();
             this.displayPricingTable();
@@ -403,10 +448,23 @@ class LaserTumblerPage {
 
         tableBody.innerHTML = '';
 
+        // Check local inventory status
+        const localStock = this.localInventory?.totalStock || 0;
+        const hasLocalInventory = localStock > 0;
+
         this.pricingTiers.forEach((tier, index) => {
             const row = document.createElement('tr');
 
-            // Add highlight class to first row (most common order size)
+            // Check if this is the small order tier (1-23 pieces)
+            const isSmallOrderTier = index === 0; // First tier is always 1-23
+            const isUnavailable = isSmallOrderTier && !hasLocalInventory;
+
+            // Add appropriate classes
+            if (isUnavailable) {
+                row.classList.add('pricing-tier-unavailable');
+            }
+
+            // Add highlight class to second row (most common order size: 24+)
             if (index === 1) {
                 row.classList.add('highlight-tier');
             }
@@ -427,48 +485,109 @@ class LaserTumblerPage {
             `;
 
             tableBody.appendChild(row);
+
+            // Add warning row after unavailable tier
+            if (isUnavailable) {
+                const warningRow = document.createElement('tr');
+                warningRow.classList.add('pricing-warning-row');
+                warningRow.innerHTML = `
+                    <td colspan="3" class="pricing-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Unavailable - No local inventory. Minimum 24 pieces when ordering from supplier.</span>
+                    </td>
+                `;
+                tableBody.appendChild(warningRow);
+            }
         });
     }
 
     /**
-     * Display inventory status
+     * Display inventory status (dual inventory: JDS supplier + local warehouse)
      */
     displayInventory() {
         const inventoryEl = document.getElementById('inventory-status');
         if (!inventoryEl) return;
 
-        const available = this.currentProduct.availableQuantity;
-        const local = this.currentProduct.localQuantity;
+        // JDS Supplier Inventory
+        const jdsAvailable = this.currentProduct.availableQuantity;
+        const jdsLocal = this.currentProduct.localQuantity;
 
-        let statusClass = 'in-stock';
-        let statusText = 'In Stock';
-        let statusIcon = 'fa-check-circle';
+        let jdsStatusClass = 'in-stock';
+        let jdsStatusText = 'In Stock';
+        let jdsStatusIcon = 'fa-check-circle';
 
-        if (available < 100) {
-            statusClass = 'low-stock';
-            statusText = 'Low Stock';
-            statusIcon = 'fa-exclamation-triangle';
+        if (jdsAvailable < 100) {
+            jdsStatusClass = 'low-stock';
+            jdsStatusText = 'Low Stock';
+            jdsStatusIcon = 'fa-exclamation-triangle';
         }
 
-        if (available === 0) {
-            statusClass = 'out-of-stock';
-            statusText = 'Out of Stock';
-            statusIcon = 'fa-times-circle';
+        if (jdsAvailable === 0) {
+            jdsStatusClass = 'out-of-stock';
+            jdsStatusText = 'Out of Stock';
+            jdsStatusIcon = 'fa-times-circle';
+        }
+
+        // Local Warehouse Inventory (ManageOrders API)
+        const localStock = this.localInventory?.totalStock || 0;
+        const localAvailable = this.localInventory?.available || false;
+
+        let localStatusClass = 'in-stock';
+        let localStatusText = 'In Stock';
+        let localStatusIcon = 'fa-check-circle';
+
+        if (localStock < 10 && localStock > 0) {
+            localStatusClass = 'low-stock';
+            localStatusText = 'Low Stock';
+            localStatusIcon = 'fa-exclamation-triangle';
+        }
+
+        if (localStock === 0 || !localAvailable) {
+            localStatusClass = 'out-of-stock';
+            localStatusText = 'Out of Stock';
+            localStatusIcon = 'fa-times-circle';
         }
 
         inventoryEl.innerHTML = `
-            <div class="inventory-badge ${statusClass}">
-                <i class="fas ${statusIcon}"></i>
-                <span>${statusText}</span>
-            </div>
-            <div class="inventory-details">
-                <div class="inventory-item">
-                    <span class="inventory-label">Available:</span>
-                    <span class="inventory-value">${available.toLocaleString()} units</span>
+            <div class="inventory-grid">
+                <!-- Local Warehouse (highlight first) -->
+                <div class="inventory-section local-inventory">
+                    <h4 class="inventory-section-title">
+                        <i class="fas fa-warehouse"></i>
+                        In Our Warehouse
+                    </h4>
+                    <div class="inventory-badge ${localStatusClass}">
+                        <i class="fas ${localStatusIcon}"></i>
+                        <span>${localStatusText}</span>
+                    </div>
+                    <div class="inventory-details">
+                        <div class="inventory-item">
+                            <span class="inventory-label">Available Now:</span>
+                            <span class="inventory-value">${localStock.toLocaleString()} units</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="inventory-item">
-                    <span class="inventory-label">Local Stock:</span>
-                    <span class="inventory-value">${local.toLocaleString()} units</span>
+
+                <!-- Supplier Inventory -->
+                <div class="inventory-section supplier-inventory">
+                    <h4 class="inventory-section-title">
+                        <i class="fas fa-truck"></i>
+                        Supplier Inventory
+                    </h4>
+                    <div class="inventory-badge ${jdsStatusClass}">
+                        <i class="fas ${jdsStatusIcon}"></i>
+                        <span>${jdsStatusText}</span>
+                    </div>
+                    <div class="inventory-details">
+                        <div class="inventory-item">
+                            <span class="inventory-label">Available:</span>
+                            <span class="inventory-value">${jdsAvailable.toLocaleString()} units</span>
+                        </div>
+                        <div class="inventory-item">
+                            <span class="inventory-label">Nearby Stock:</span>
+                            <span class="inventory-value">${jdsLocal.toLocaleString()} units</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
