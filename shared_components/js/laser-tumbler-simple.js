@@ -1,17 +1,28 @@
 /**
  * Laser Tumbler Simple Page
- * Simplified product page for Polar Camel Black 16 oz Pint (LTM752)
+ * Product page for Polar Camel 16 oz Pint with color variant selector
  * Uses JDS API for all product data and pricing
  */
 
 class LaserTumblerPage {
     constructor() {
         this.apiService = new JDSApiService();
-        this.productSKU = 'LTM752'; // Black 16 oz Polar Camel Pint
-        this.product = null;
-        this.pricingTiers = null;
 
-        console.log('[LaserTumblerPage] Initialized');
+        // All Polar Camel 16oz SKUs (18 color variants)
+        this.POLAR_CAMEL_16OZ_SKUS = [
+            'LTM751', 'LTM752', 'LTM753', 'LTM754', 'LTM755',
+            'LTM756', 'LTM757', 'LTM758', 'LTM759', 'LTM760',
+            'LTM761', 'LTM762', 'LTM763', 'LTM764', 'LTM765',
+            'LTM766', 'LTM767', 'LTM768'
+        ];
+
+        // Product state
+        this.allProducts = null;        // All 18 color variants
+        this.currentProduct = null;     // Currently selected color
+        this.currentSKU = null;         // Currently selected SKU
+        this.pricingTiers = null;       // Pricing tiers for current product
+
+        console.log('[LaserTumblerPage] Initialized with multi-color support');
     }
 
     /**
@@ -22,13 +33,20 @@ class LaserTumblerPage {
             // Show loading state
             this.showLoading();
 
-            // Fetch product data from API
-            this.product = await this.apiService.getProduct(this.productSKU);
+            // Load all color variants with batch API call
+            await this.loadAllColorVariants();
 
-            // Get pricing tiers
-            this.pricingTiers = this.apiService.getPricingTiers(this.product);
+            // Check URL parameter for color selection, or default to first available
+            const urlColor = this.getColorFromURL();
+            const defaultSKU = urlColor || this.allProducts[0]?.sku || 'LTM752';
 
-            // Populate page content
+            // Select the color (sets currentProduct and currentSKU)
+            await this.selectColor(defaultSKU, true); // true = skip URL update on init
+
+            // Render color swatches
+            this.renderColorSwatches();
+
+            // Populate page content for selected product
             this.displayProductInfo();
             this.displayPricingTable();
             this.displayInventory();
@@ -37,11 +55,302 @@ class LaserTumblerPage {
             // Hide loading state
             this.hideLoading();
 
-            console.log('[LaserTumblerPage] Page loaded successfully');
+            console.log('[LaserTumblerPage] Page loaded successfully with', this.allProducts.length, 'color variants');
 
         } catch (error) {
             console.error('[LaserTumblerPage] Error loading page:', error);
             this.showError('Unable to load product information. Please refresh the page or contact us at 253-922-5793.');
+        }
+    }
+
+    /**
+     * Load all color variants using batch API call
+     */
+    async loadAllColorVariants() {
+        console.log('[LaserTumblerPage] Loading all color variants...');
+
+        try {
+            // Check sessionStorage cache first
+            const cacheKey = 'polar_camel_16oz_variants';
+            const cached = sessionStorage.getItem(cacheKey);
+
+            if (cached) {
+                const cacheData = JSON.parse(cached);
+                const cacheAge = Date.now() - cacheData.timestamp;
+                const cacheMaxAge = 60 * 60 * 1000; // 1 hour
+
+                if (cacheAge < cacheMaxAge) {
+                    console.log('[LaserTumblerPage] Using cached color variants');
+                    this.allProducts = cacheData.products;
+                    return;
+                }
+            }
+
+            // Make batch API call
+            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/jds/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    skus: this.POLAR_CAMEL_16OZ_SKUS
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Batch API request failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Process products with pricing calculations
+            this.allProducts = data.result.map(product => {
+                const pricing = this.apiService.calculatePrice(product.oneCase);
+                const tiers = this.apiService.getPricingTiers(product);
+
+                return {
+                    ...product,
+                    customerPrice: pricing.customerPrice,
+                    tiers: tiers
+                };
+            });
+
+            // Cache the results
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+                products: this.allProducts,
+                timestamp: Date.now()
+            }));
+
+            console.log('[LaserTumblerPage] Loaded', this.allProducts.length, 'color variants');
+
+        } catch (error) {
+            console.error('[LaserTumblerPage] Error loading color variants:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Render color swatch selector
+     */
+    renderColorSwatches() {
+        const colorGrid = document.querySelector('.color-grid');
+        if (!colorGrid) {
+            console.warn('[LaserTumblerPage] Color grid element not found');
+            return;
+        }
+
+        colorGrid.innerHTML = '';
+
+        this.allProducts.forEach((product, index) => {
+            const colorName = this.extractColorFromName(product.name);
+            const colorSlug = this.createColorSlug(colorName);
+            const isSelected = product.sku === this.currentSKU;
+
+            const swatchContainer = document.createElement('div');
+            swatchContainer.className = 'color-swatch-container';
+
+            swatchContainer.innerHTML = `
+                <input
+                    type="radio"
+                    id="color-${product.sku}"
+                    name="tumbler-color"
+                    value="${product.sku}"
+                    class="color-swatch-input"
+                    ${isSelected ? 'checked' : ''}
+                    aria-label="${colorName} - ${product.sku}"
+                >
+                <label for="color-${product.sku}" class="color-swatch">
+                    <div
+                        class="color-preview"
+                        style="background-image: url('${product.images.thumbnail}')"
+                        role="img"
+                        aria-label="${colorName} tumbler preview"
+                    ></div>
+                    <span class="color-name">${colorName}</span>
+                </label>
+            `;
+
+            colorGrid.appendChild(swatchContainer);
+
+            // Add click handler
+            const input = swatchContainer.querySelector('input');
+            input.addEventListener('change', () => {
+                this.selectColor(product.sku);
+            });
+        });
+
+        console.log('[LaserTumblerPage] Rendered', this.allProducts.length, 'color swatches');
+
+        // Add keyboard navigation
+        this.addKeyboardNavigation();
+    }
+
+    /**
+     * Add keyboard navigation for color swatches
+     */
+    addKeyboardNavigation() {
+        const colorGrid = document.querySelector('.color-grid');
+        if (!colorGrid) return;
+
+        const swatchInputs = Array.from(document.querySelectorAll('.color-swatch-input'));
+
+        colorGrid.addEventListener('keydown', (e) => {
+            const focusedInput = document.activeElement;
+
+            // Only handle if a swatch input is focused
+            if (!focusedInput || !focusedInput.classList.contains('color-swatch-input')) {
+                return;
+            }
+
+            const currentIndex = swatchInputs.indexOf(focusedInput);
+            let newIndex = currentIndex;
+
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    e.preventDefault();
+                    newIndex = (currentIndex + 1) % swatchInputs.length;
+                    break;
+
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    e.preventDefault();
+                    newIndex = (currentIndex - 1 + swatchInputs.length) % swatchInputs.length;
+                    break;
+
+                case 'Home':
+                    e.preventDefault();
+                    newIndex = 0;
+                    break;
+
+                case 'End':
+                    e.preventDefault();
+                    newIndex = swatchInputs.length - 1;
+                    break;
+
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    focusedInput.checked = true;
+                    focusedInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+
+                default:
+                    return;
+            }
+
+            // Move focus to new swatch
+            if (newIndex !== currentIndex) {
+                swatchInputs[newIndex].focus();
+            }
+        });
+
+        console.log('[LaserTumblerPage] Keyboard navigation enabled');
+    }
+
+    /**
+     * Select a color variant
+     */
+    async selectColor(sku, skipURLUpdate = false) {
+        console.log('[LaserTumblerPage] Selecting color:', sku);
+
+        // Find product in allProducts array
+        const product = this.allProducts.find(p => p.sku === sku);
+
+        if (!product) {
+            console.error('[LaserTumblerPage] Product not found for SKU:', sku);
+            return;
+        }
+
+        // Update current selection
+        this.currentProduct = product;
+        this.currentSKU = sku;
+        this.pricingTiers = product.tiers;
+
+        // Update URL without reload (unless this is initial load)
+        if (!skipURLUpdate) {
+            const colorName = this.extractColorFromName(product.name);
+            const colorSlug = this.createColorSlug(colorName);
+            this.updateURL(colorSlug);
+
+            // Update checked state on color swatches
+            document.querySelectorAll('.color-swatch-input').forEach(input => {
+                input.checked = (input.value === sku);
+            });
+
+            // Update page content
+            this.displayProductInfo();
+            this.displayPricingTable();
+            this.displayInventory();
+            this.displayImages();
+
+            // Announce to screen readers
+            this.announceColorChange(colorName);
+        }
+
+        console.log('[LaserTumblerPage] Color selected:', product.name);
+    }
+
+    /**
+     * Get color from URL parameter
+     */
+    getColorFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const colorParam = params.get('color');
+
+        if (!colorParam) return null;
+
+        // Find product matching the color slug
+        const product = this.allProducts.find(p => {
+            const colorName = this.extractColorFromName(p.name);
+            const colorSlug = this.createColorSlug(colorName);
+            return colorSlug === colorParam;
+        });
+
+        return product ? product.sku : null;
+    }
+
+    /**
+     * Update URL with color parameter
+     */
+    updateURL(colorSlug) {
+        const url = new URL(window.location);
+        url.searchParams.set('color', colorSlug);
+        window.history.pushState({}, '', url);
+    }
+
+    /**
+     * Extract color name from product name
+     * Example: "Polar Camel Midnight Blue 16 oz. Pint" -> "Midnight Blue"
+     */
+    extractColorFromName(name) {
+        // Remove "Polar Camel" prefix and "16 oz..." suffix
+        const withoutPrefix = name.replace(/^Polar Camel\s+/i, '');
+        const colorMatch = withoutPrefix.match(/^([\w\s]+?)\s+16\s+oz/i);
+
+        return colorMatch ? colorMatch[1].trim() : withoutPrefix;
+    }
+
+    /**
+     * Create URL-friendly color slug
+     * Example: "Midnight Blue" -> "midnight-blue"
+     */
+    createColorSlug(colorName) {
+        return colorName.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    /**
+     * Announce color change to screen readers
+     */
+    announceColorChange(colorName) {
+        const announcer = document.getElementById('color-announcement');
+        if (announcer) {
+            announcer.textContent = `Selected color: ${colorName}`;
+
+            // Clear announcement after 3 seconds
+            setTimeout(() => {
+                announcer.textContent = '';
+            }, 3000);
         }
     }
 
@@ -53,11 +362,11 @@ class LaserTumblerPage {
         const descEl = document.getElementById('product-description');
 
         if (nameEl) {
-            nameEl.textContent = this.product.name;
+            nameEl.textContent = this.currentProduct.name;
         }
 
         if (descEl) {
-            descEl.textContent = this.product.description;
+            descEl.textContent = this.currentProduct.description;
         }
     }
 
@@ -104,8 +413,8 @@ class LaserTumblerPage {
         const inventoryEl = document.getElementById('inventory-status');
         if (!inventoryEl) return;
 
-        const available = this.product.availableQuantity;
-        const local = this.product.localQuantity;
+        const available = this.currentProduct.availableQuantity;
+        const local = this.currentProduct.localQuantity;
 
         let statusClass = 'in-stock';
         let statusText = 'In Stock';
@@ -148,14 +457,14 @@ class LaserTumblerPage {
         const galleryEl = document.getElementById('product-gallery');
         if (!galleryEl) return;
 
-        const images = this.product.images;
+        const images = this.currentProduct.images;
 
         galleryEl.innerHTML = `
             <div class="gallery-item">
-                <img src="${images.thumbnail}" alt="${this.product.name}" class="gallery-thumbnail">
+                <img src="${images.thumbnail}" alt="${this.currentProduct.name}" class="gallery-thumbnail">
             </div>
             <div class="gallery-item">
-                <img src="${images.full}" alt="${this.product.name} - Full" class="gallery-thumbnail">
+                <img src="${images.full}" alt="${this.currentProduct.name} - Full" class="gallery-thumbnail">
             </div>
         `;
 

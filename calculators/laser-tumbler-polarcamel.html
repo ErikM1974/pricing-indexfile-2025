@@ -94,6 +94,22 @@
                             Perfect for hot or cold beverages, featuring professional laser engraving.
                         </p>
 
+                        <!-- Color Selector -->
+                        <fieldset class="color-selector">
+                            <legend>Choose Your Color</legend>
+                            <div class="color-grid" role="radiogroup" aria-label="Tumbler colors">
+                                <!-- Color swatches populated by JavaScript -->
+                            </div>
+                            <!-- Loading state -->
+                            <div id="color-loading" class="color-loading" style="display: none;">
+                                <div class="color-loading-spinner"></div>
+                                <span>Loading colors...</span>
+                            </div>
+                        </fieldset>
+
+                        <!-- Screen reader announcements -->
+                        <div aria-live="polite" aria-atomic="true" class="sr-only" id="color-announcement"></div>
+
                         <!-- Inventory Status -->
                         <div id="inventory-status" class="inventory-status">
                             <!-- Populated by JavaScript -->
