@@ -417,34 +417,30 @@
         <div class="content-card">
             <!-- Tab Navigation -->
             <div class="tab-navigation">
-                <button class="tab-button active" onclick="switchTab('employees')">
-                    <i class="fas fa-users"></i>
-                    <span>Employee Bundles</span>
-                </button>
-                <button class="tab-button" onclick="switchTab('labels')">
+                <button class="tab-button active" onclick="switchTab('labels')">
                     <i class="fas fa-tags"></i>
                     <span>Avery 5960 (2.5" x 1") Box Labels</span>
                 </button>
-            </div>
-
-            <!-- Tab Content: Employee Bundles -->
-            <div id="employees-tab" class="tab-content active">
-                <h2 class="section-header">
+                <button class="tab-button" onclick="switchTab('employees')">
                     <i class="fas fa-users"></i>
-                    <span>Drain-Pro Team Members</span>
-                </h2>
-
-                <div class="table-container">
-                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb"></script>
-                </div>
+                    <span>Bundle Details</span>
+                </button>
             </div>
 
             <!-- Tab Content: Box Labels -->
-            <div id="labels-tab" class="tab-content">
+            <div id="labels-tab" class="tab-content active">
                 <h2 class="section-header">
                     <i class="fas fa-tags"></i>
                     <span>Drain-Pro Box Labels</span>
                 </h2>
+
+                <!-- Approval Note -->
+                <div class="info-banner">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="info-banner-content">
+                        <strong>Important:</strong> Account Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.
+                    </div>
+                </div>
 
                 <!-- Instructions Box -->
                 <div class="instructions-box">
@@ -470,6 +466,18 @@
 
                 <div class="table-container">
                     <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb"></script>
+                </div>
+            </div>
+
+            <!-- Tab Content: Bundle Details -->
+            <div id="employees-tab" class="tab-content">
+                <h2 class="section-header">
+                    <i class="fas fa-users"></i>
+                    <span>Bundle Details</span>
+                </h2>
+
+                <div class="table-container">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb"></script>
                 </div>
             </div>
 
