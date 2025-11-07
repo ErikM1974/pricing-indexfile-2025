@@ -154,6 +154,14 @@ app.get('/DrainPro-Bundle.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'DrainPro-Bundle.html'));
 });
 
+app.get('/streich-bros-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'employee-bundles', 'streich-bros-bundle.html'));
+});
+
+app.get('/wcttr-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'employee-bundles', 'wcttr-bundle.html'));
+});
+
 app.get('/art-invoices-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });

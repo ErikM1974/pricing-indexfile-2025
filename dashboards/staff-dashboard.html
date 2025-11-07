@@ -458,11 +458,27 @@
         /* Active company box (Drain-Pro) */
         .company-box-active {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white !important;
         }
 
         .company-box-active:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Override browser default link colors for active company boxes */
+        .company-box-active,
+        .company-box-active:link,
+        .company-box-active:visited,
+        .company-box-active:hover,
+        .company-box-active:active {
+            color: white !important;
+        }
+
+        /* Ensure child elements inherit white color */
+        .company-box-active *,
+        .company-box-active:visited * {
+            color: white !important;
         }
 
         /* Placeholder boxes (Coming Soon) */
@@ -4072,18 +4088,17 @@
                                 <span>Drain-Pro</span>
                             </a>
 
-                            <!-- Placeholder Boxes -->
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 2</span>
-                                <div class="coming-soon-text">Coming Soon</div>
-                            </div>
+                            <!-- Streich Bros (Active) -->
+                            <a href="/streich-bros-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #2C2997 0%, #1f1d6b 100%);">
+                                <i class="fas fa-hard-hat"></i>
+                                <span>Streich Bros</span>
+                            </a>
 
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 3</span>
-                                <div class="coming-soon-text">Coming Soon</div>
-                            </div>
+                            <!-- WCTTR (Active) -->
+                            <a href="/wcttr-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
+                                <i class="fas fa-truck"></i>
+                                <span>WCTTR</span>
+                            </a>
 
                             <div class="company-box company-box-placeholder">
                                 <i class="fas fa-building"></i>
