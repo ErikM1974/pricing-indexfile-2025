@@ -218,6 +218,13 @@ cap-embroidery-fix.css
 | `/dashboards/art-hub-dashboard.html` | Art hub | Multiple | ✅ Active |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 
+### Employee Bundle Pages
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/dashboards/DrainPro-Bundle.html` | Drain-Pro employee bundle labels | Caspio datapage | ✅ Active |
+| `/employee-bundles/streich-bros-bundle.html` | Streich Bros employee bundle labels | Caspio datapage | ✅ Active |
+| `/employee-bundles/wcttr-bundle.html` | WCTTR (West Coast Truck and Trailer Repair) employee bundle labels | Caspio datapage | ✅ Active |
+
 ## 🗑️ Recently Removed (For Reference)
 
 ### Removed During Cleanup (2025-01-27)
