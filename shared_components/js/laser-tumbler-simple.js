@@ -455,43 +455,53 @@ class LaserTumblerPage {
         this.pricingTiers.forEach((tier, index) => {
             const row = document.createElement('tr');
 
-            // Check if this is the small order tier (1-23 pieces)
-            const isSmallOrderTier = index === 0; // First tier is always 1-23
-            const isUnavailable = isSmallOrderTier && !hasLocalInventory;
+            // Check if this is a small order tier (1-11 or 12-23 pieces)
+            const isVerySmallTier = index === 0; // 1-11 pieces
+            const isSmallTier = index === 0 || index === 1; // 1-11 or 12-23 pieces
+            const isUnavailable = isSmallTier && !hasLocalInventory;
 
             // Add appropriate classes
             if (isUnavailable) {
                 row.classList.add('pricing-tier-unavailable');
             }
 
-            // Add highlight class to second row (most common order size: 24+)
-            if (index === 1) {
+            // Add highlight class to third row (24-119: most common order size)
+            if (index === 2) {
                 row.classList.add('highlight-tier');
             }
 
             row.innerHTML = `
                 <td class="tier-range">
                     <div class="tier-qty">${tier.range}</div>
-                    <div class="tier-desc">${tier.description}</div>
+                    <div class="tier-desc">${tier.description}${tier.handlingFee && hasLocalInventory ? ' + $50 LTM fee' : ''}</div>
                 </td>
                 <td class="tier-price">
                     <div class="price-large">$${tier.customerPrice.toFixed(2)}</div>
                     <div class="price-small">per unit</div>
                 </td>
-                <td class="tier-total">
-                    <div class="total-price">$${(tier.customerPrice * tier.quantity).toFixed(2)}</div>
-                    <div class="total-qty">(${tier.quantity} units)</div>
-                </td>
             `;
 
             tableBody.appendChild(row);
 
-            // Add warning row after unavailable tier
-            if (isUnavailable) {
+            // Add info row after 1-11 tier (when local inventory exists)
+            if (isVerySmallTier && tier.handlingFee && hasLocalInventory) {
+                const infoRow = document.createElement('tr');
+                infoRow.classList.add('pricing-info-row');
+                infoRow.innerHTML = `
+                    <td colspan="2" class="pricing-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders.</span>
+                    </td>
+                `;
+                tableBody.appendChild(infoRow);
+            }
+
+            // Add warning row after 12-23 tier when no local inventory
+            if (index === 1 && !hasLocalInventory) {
                 const warningRow = document.createElement('tr');
                 warningRow.classList.add('pricing-warning-row');
                 warningRow.innerHTML = `
-                    <td colspan="3" class="pricing-warning">
+                    <td colspan="2" class="pricing-warning">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Unavailable - No local inventory. Minimum 24 pieces when ordering from supplier.</span>
                     </td>

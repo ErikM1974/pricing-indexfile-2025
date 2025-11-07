@@ -610,6 +610,34 @@ body {
     line-height: 1.5;
 }
 
+/* ===== Pricing Info Row (Handling Fee Explanation) ===== */
+.pricing-info-row {
+    background: #e8f4f8;
+    border-left: 4px solid #0066cc;
+}
+
+.pricing-info-row:hover {
+    background: #e8f4f8 !important;
+}
+
+.pricing-info {
+    color: #004085;
+    font-weight: 500;
+    padding: 12px 15px !important;
+    border-bottom: none !important;
+}
+
+.pricing-info i {
+    margin-right: 8px;
+    color: #0066cc;
+    font-size: 16px;
+}
+
+.pricing-info span {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 /* ===== Pricing Notes ===== */
 .pricing-notes {
     margin-top: 25px;
@@ -634,6 +662,33 @@ body {
     margin: 8px 0;
     color: #555;
     font-size: 14px;
+}
+
+/* ===== Additional Charges Warning ===== */
+.pricing-additional-charges {
+    margin-top: 25px;
+    padding: 20px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+}
+
+.pricing-additional-charges h4 {
+    margin: 0 0 10px 0;
+    color: #856404;
+    font-size: 16px;
+}
+
+.pricing-additional-charges ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.pricing-additional-charges li {
+    margin: 8px 0;
+    color: #856404;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 /* ===== Product Gallery ===== */

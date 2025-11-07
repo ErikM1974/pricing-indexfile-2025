@@ -18,6 +18,7 @@ class JDSApiService {
         this.ENGRAVING_LABOR_COST = 2.85;   // Labor + overhead + engraving
         this.SETUP_FEE = 75.00;
         this.SECOND_LOGO_PRICE = 3.16;
+        this.SMALL_ORDER_HANDLING_FEE = 50.00;  // Handling fee for orders of 1-11 pieces
 
         console.log('[JDSApiService] Initialized');
     }
@@ -142,41 +143,43 @@ class JDSApiService {
     }
 
     /**
-     * Get all pricing tiers for display
-     * @param {Object} product - Product from API
+     * Get all pricing tiers for display with fixed pricing structure
+     * @param {Object} product - Product from API (not currently used for pricing)
      * @returns {Array} Array of tier objects with quantity ranges and prices
      */
     getPricingTiers(product) {
-        const caseQty = product.caseQuantity;
-
         return [
             {
-                range: `1-${caseQty - 1}`,
-                quantity: Math.floor((caseQty - 1) / 2), // Mid-point for display
-                wholesale: product.lessThanCasePrice,
-                customerPrice: this.calculatePrice(product.lessThanCasePrice),
-                description: 'Small Orders'
+                range: '1-11',
+                quantity: 11, // Example quantity for display
+                customerPrice: 19.00,
+                description: 'Small Order',
+                handlingFee: this.SMALL_ORDER_HANDLING_FEE, // $50 handling fee
+                totalWithFee: (19.00 * 11) + this.SMALL_ORDER_HANDLING_FEE // Example total with fee
             },
             {
-                range: `${caseQty}-${caseQty * 5 - 1}`,
-                quantity: caseQty, // Use minimum for display
-                wholesale: product.oneCase,
-                customerPrice: this.calculatePrice(product.oneCase),
-                description: '1-4 Cases'
+                range: '12-23',
+                quantity: 23, // Example quantity for display
+                customerPrice: 19.00,
+                description: 'Small Order'
             },
             {
-                range: `${caseQty * 5}-${caseQty * 10 - 1}`,
-                quantity: caseQty * 5, // Use minimum for display
-                wholesale: product.fiveCases,
-                customerPrice: this.calculatePrice(product.fiveCases),
-                description: '5-9 Cases'
+                range: '24-119',
+                quantity: 24, // Use minimum for display (most popular)
+                customerPrice: 17.00,
+                description: 'Standard Order'
             },
             {
-                range: `${caseQty * 10}+`,
-                quantity: caseQty * 10, // Use minimum for display
-                wholesale: product.tenCases,
-                customerPrice: this.calculatePrice(product.tenCases),
-                description: '10+ Cases'
+                range: '120-239',
+                quantity: 120, // Use minimum for display
+                customerPrice: 16.50,
+                description: 'Volume Order'
+            },
+            {
+                range: '240+',
+                quantity: 240, // Use minimum for display
+                customerPrice: 16.00,
+                description: 'Bulk Order'
             }
         ];
     }

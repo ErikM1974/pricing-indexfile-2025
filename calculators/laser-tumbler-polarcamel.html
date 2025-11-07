@@ -16,6 +16,9 @@
     <!-- JDS API Service -->
     <script src="../shared_components/js/jds-api-service.js"></script>
 
+    <!-- ManageOrders Inventory Service -->
+    <script src="../shared_components/js/manageorders-inventory-service.js"></script>
+
     <!-- Page Logic -->
     <script src="../shared_components/js/laser-tumbler-simple.js"></script>
 </head>
@@ -131,7 +134,6 @@
                         <tr>
                             <th>Quantity</th>
                             <th style="text-align: center;">Price Per Unit</th>
-                            <th style="text-align: right;">Example Total</th>
                         </tr>
                     </thead>
                     <tbody id="pricing-table-body">
@@ -140,13 +142,17 @@
                 </table>
 
                 <div class="pricing-notes">
-                    <h4><i class="fas fa-info-circle"></i> Pricing Includes:</h4>
+                    <h4><i class="fas fa-check-circle"></i> Pricing Includes:</h4>
                     <ul>
-                        <li>Premium blank tumbler</li>
                         <li>Professional laser engraving (one location)</li>
-                        <li>Labor and overhead costs</li>
-                        <li>Setup fee: $75.00 (one-time per order)</li>
-                        <li>Additional logo location: $3.16 per unit</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-additional-charges">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Additional Charges:</h4>
+                    <ul>
+                        <li><strong>Additional logo location:</strong> $5.00 per unit</li>
+                        <li><strong>Artwork mock-up:</strong> $50.00 (one-time charge)</li>
                     </ul>
                 </div>
             </div>
