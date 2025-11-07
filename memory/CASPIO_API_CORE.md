@@ -16,7 +16,7 @@
 **Version**: 2.0
 **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
 **Authentication**: None (Public API)
-**Total Active Endpoints**: 56
+**Total Active Endpoints**: 60 (includes 4 JDS Industries endpoints)
 
 ## 📋 Quick Reference Table
 | Module | Documentation | Primary Resources | Status |
@@ -24,6 +24,7 @@
 | Products | [products-api.md](api/products-api.md) | products, inventory, colors | ✅ Active |
 | Cart & Pricing | [cart-pricing-api.md](api/cart-pricing-api.md) | cart, pricing, tiers | ✅ Active |
 | Orders & Quotes | [orders-quotes-api.md](api/orders-quotes-api.md) | orders, quotes, sessions | ✅ Active |
+| JDS Industries | [jds-industries-api.md](api/jds-industries-api.md) | engravable products (mugs, tumblers) | ✅ Active |
 | Utilities | [utility-api.md](api/utility-api.md) | transfers, production, health | ✅ Active |
 
 ## 🔧 Common Patterns
