@@ -1342,35 +1342,80 @@
             }
         });
 
-        // Generate order number
+        // Generate order number (daily sequence with millisecond uniqueness)
         function generateOrderNumber() {
-            const date = new Date();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const sequence = Math.floor(Math.random() * 1000);
-            return `3DT${month}${day}-${sequence}`;
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            // Daily sequence from localStorage (shared across tabs, resets each day)
+            const dateKey = `${month}${day}`;
+            const storageKey = `3dt_order_seq_${dateKey}`;
+            let sequence = parseInt(localStorage.getItem(storageKey) || '0') + 1;
+            localStorage.setItem(storageKey, sequence.toString());
+
+            // Clean up old sequences (keep only today's)
+            for (let key in localStorage) {
+                if (key.startsWith('3dt_order_seq_') && key !== storageKey) {
+                    localStorage.removeItem(key);
+                }
+            }
+
+            // Add millisecond timestamp suffix for uniqueness
+            const ms = String(now.getMilliseconds()).padStart(3, '0');
+            const orderNumber = `3DT${month}${day}-${sequence}-${ms}`;
+            console.log('[3-Day Tees] Generated order number:', orderNumber);
+
+            return orderNumber;
         }
 
         // Send confirmation emails
         async function sendEmails(orderData, orderNumber) {
             try {
-                // Customer email
-                await emailjs.send('service_1c4k67j', 'template_3day_customer', {
+                // Build products table for email
+                const productsTable = orderData.lineItems.map((item, index) => `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 0.75rem;">${item.size}</td>
+                        <td style="padding: 0.75rem;">${item.quantity}</td>
+                        <td style="padding: 0.75rem;">$${item.price.toFixed(2)}</td>
+                        <td style="padding: 0.75rem;">$${(item.quantity * item.price).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                const emailData = {
                     to_email: orderData.customer.email,
                     to_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
                     order_number: orderNumber,
-                    total: `$${orderData.total.toFixed(2)}`,
-                    company_phone: '253-922-5793'
-                });
-
-                // Sales team email (BCC Erik)
-                await emailjs.send('service_1c4k67j', 'template_3day_sales', {
-                    order_number: orderNumber,
                     customer_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
                     customer_email: orderData.customer.email,
+                    customer_phone: orderData.customer.phone,
+                    company_name: orderData.customer.company || '',
+                    color: state.selectedColor,
+                    location: state.locations.find(l => l.code === state.selectedLocation).name,
+                    products_table: `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: #f3f4f6; border-bottom: 2px solid #d1d5db;">
+                                <th style="padding: 0.75rem; text-align: left;">Size</th>
+                                <th style="padding: 0.75rem; text-align: left;">Qty</th>
+                                <th style="padding: 0.75rem; text-align: left;">Price</th>
+                                <th style="padding: 0.75rem; text-align: left;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>${productsTable}</tbody>
+                    </table>`,
+                    subtotal: `$${(orderData.total - 30 - (orderData.total - 30) * 0.101 / 1.101).toFixed(2)}`,
                     total: `$${orderData.total.toFixed(2)}`,
-                    bcc_email: 'erik@nwcustomapparel.com'
-                });
+                    company_phone: '253-922-5793',
+                    reply_to: 'erik@nwcustomapparel.com',
+                    message: orderData.notes[0]?.text || 'No special instructions'
+                };
+
+                // Customer confirmation email
+                await emailjs.send('service_1c4k67j', 'template_sample_customer', emailData);
+
+                // Sales team notification (BCC Erik)
+                emailData.bcc_email = 'erik@nwcustomapparel.com';
+                await emailjs.send('service_1c4k67j', 'template_sample_sales', emailData);
 
                 console.log('[3-Day Tees] Emails sent successfully');
             } catch (error) {
