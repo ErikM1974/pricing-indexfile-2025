@@ -1230,23 +1230,19 @@
                                 input.disabled = true;
                                 input.value = 0;
                             }
-                        } else if (stock < 10) {
-                            badge.className = 'size-stock-badge critical';
-                            badge.textContent = `${stock} left`;
-                            if (input) {
-                                input.disabled = false;
-                                input.max = stock;
-                            }
-                        } else if (stock < 25) {
-                            badge.className = 'size-stock-badge low';
-                            badge.textContent = `${stock} available`;
-                            if (input) {
-                                input.disabled = false;
-                                input.max = stock;
-                            }
                         } else {
-                            badge.className = 'size-stock-badge adequate';
-                            badge.textContent = 'In Stock';
+                            // Always show exact inventory count for non-zero stock
+                            badge.textContent = `${stock} available`;
+
+                            // Determine badge color based on stock level
+                            if (stock < 10) {
+                                badge.className = 'size-stock-badge critical';
+                            } else if (stock < 25) {
+                                badge.className = 'size-stock-badge low';
+                            } else {
+                                badge.className = 'size-stock-badge adequate';
+                            }
+
                             if (input) {
                                 input.disabled = false;
                                 input.max = stock;
