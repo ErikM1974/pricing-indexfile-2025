@@ -321,6 +321,36 @@
             color: #991b1b;
         }
 
+        /* Size-Specific Stock Badges */
+        .size-stock-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .size-stock-badge.adequate {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .size-stock-badge.low {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .size-stock-badge.critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .size-stock-badge.out {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
         /* Location Selector */
         .location-selector {
             margin-bottom: 1.5rem;
@@ -1115,6 +1145,98 @@
             }
         }
 
+        // Load size-specific inventory for selected color
+        async function loadSizeInventory(catalogColor) {
+            try {
+                // Fetch inventory from all 3 SKUs
+                const [standard, twoXL, threeXL] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ sizes: [], sizeTotals: [] })),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54_2X&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ sizes: [], sizeTotals: [] })),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54_3X&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ sizes: [], sizeTotals: [] }))
+                ]);
+
+                // Map size names to standard format
+                const sizeMap = {
+                    'Size01': 'S',
+                    'Size02': 'M',
+                    'Size03': 'L',
+                    'Size04': 'XL'
+                };
+
+                // Build inventory by size
+                const sizeInventory = {};
+
+                // PC54 (S, M, L, XL)
+                if (standard.sizes && standard.sizeTotals) {
+                    standard.sizes.forEach((sizeName, index) => {
+                        const standardSize = sizeMap[sizeName];
+                        if (standardSize) {
+                            sizeInventory[standardSize] = (sizeInventory[standardSize] || 0) + (standard.sizeTotals[index] || 0);
+                        }
+                    });
+                }
+
+                // PC54_2X (2XL)
+                if (twoXL.grandTotal > 0) {
+                    sizeInventory['2XL'] = twoXL.grandTotal;
+                }
+
+                // PC54_3X (3XL)
+                if (threeXL.grandTotal > 0) {
+                    sizeInventory['3XL'] = threeXL.grandTotal;
+                }
+
+                // Update each size badge and input max attribute
+                state.sizes.forEach(size => {
+                    const stock = sizeInventory[size] || 0;
+                    const badge = document.getElementById(`stock-size-${size}`);
+                    const input = document.getElementById(`size-${size}`);
+
+                    if (badge) {
+                        if (stock === 0) {
+                            badge.className = 'size-stock-badge out';
+                            badge.textContent = 'Out of Stock';
+                            if (input) {
+                                input.disabled = true;
+                                input.value = 0;
+                            }
+                        } else if (stock < 10) {
+                            badge.className = 'size-stock-badge critical';
+                            badge.textContent = `${stock} left`;
+                            if (input) {
+                                input.disabled = false;
+                                input.max = stock;
+                            }
+                        } else if (stock < 25) {
+                            badge.className = 'size-stock-badge low';
+                            badge.textContent = `${stock} available`;
+                            if (input) {
+                                input.disabled = false;
+                                input.max = stock;
+                            }
+                        } else {
+                            badge.className = 'size-stock-badge adequate';
+                            badge.textContent = 'In Stock';
+                            if (input) {
+                                input.disabled = false;
+                                input.max = stock;
+                            }
+                        }
+                    }
+                });
+
+                console.log(`[3-Day Tees] Size inventory for ${catalogColor}:`, sizeInventory);
+            } catch (error) {
+                console.error('[3-Day Tees] Size inventory load error:', catalogColor, error);
+            }
+        }
+
         // Select color
         function selectColor(catalogColor) {
             state.selectedColor = catalogColor;
@@ -1154,6 +1276,9 @@
                     }
                 }
             }
+
+            // Load size-specific inventory
+            loadSizeInventory(catalogColor);
 
             console.log('[3-Day Tees] Color selected:', catalogColor);
             updatePricing();
@@ -1197,6 +1322,7 @@
                            value="0"
                            onchange="updateSizeBreakdown()">
                     <div class="size-price" id="price-size-${size}">$0.00/pc</div>
+                    <div class="size-stock-badge" id="stock-size-${size}"></div>
                 </div>
             `).join('');
 
