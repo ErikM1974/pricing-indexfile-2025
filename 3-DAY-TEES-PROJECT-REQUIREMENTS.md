@@ -119,13 +119,13 @@ Grand Total: $457.19
 
 | Color | Total Stock | Status |
 |-------|------------|--------|
-| **White** | 2,450 units | ✅ Excellent |
-| **Black** | 1,859 units | ✅ Excellent |
-| **Navy** | 1,470 units | ✅ Good |
-| **Athletic Heather** | 980 units | ⚠️ Moderate |
-| **Forest** | 605 units | ⚠️ Low |
+| **White** | 140 units | ✅ Good |
+| **Jet Black** | 104 units | ⚠️ Low |
+| **Ath Heather** | 32 units | ⚠️ Low |
+| **Dk Hthr Grey** | 32 units | ⚠️ Low |
+| **Navy** | 28 units | ⚠️ Low - Monitor |
 
-**Total:** 7,364 units across all colors
+**Total:** 336 units across all colors
 
 ### Multi-SKU Inventory Pattern
 

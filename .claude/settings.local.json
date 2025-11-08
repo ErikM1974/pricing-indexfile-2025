@@ -5,7 +5,11 @@
       "Bash(git commit:*)",
       "Bash(curl:*)",
       "Bash(npm start)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(python3:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(temp-sanmar-colors.json)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": [],

@@ -26,13 +26,13 @@
 **Why PC54:** Reliable inventory levels, consistent DTG print quality, industry-standard sizing
 
 **Available Colors:**
-1. **Black** - 1,859 units (Excellent Stock)
-2. **Forest** - 605 units (Low Stock - Monitor)
-3. **Navy** - 1,470 units (Good Stock)
-4. **White** - 2,450 units (Excellent Stock)
-5. **Athletic Heather** - 980 units (Moderate Stock)
+1. **Jet Black** - 104 units (Low Stock)
+2. **White** - 140 units (Good Stock)
+3. **Navy** - 28 units (Low Stock - Monitor)
+4. **Ath Heather** - 32 units (Low Stock)
+5. **Dk Hthr Grey** - 32 units (Low Stock)
 
-**Total Inventory:** 7,364 units across all colors
+**Total Inventory:** 336 units across all colors
 
 **Available Sizes:**
 - S, M, L, XL (standard pricing)
