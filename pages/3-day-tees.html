@@ -951,11 +951,11 @@
             sizeBreakdown: {},
             uploadedFiles: [],
             colors: [
-                { name: 'Black', catalogColor: 'Black', hex: '#000000' },
-                { name: 'Forest', catalogColor: 'Forest', hex: '#2d5f3f' },
-                { name: 'Navy', catalogColor: 'Navy', hex: '#001f3f' },
+                { name: 'Jet Black', catalogColor: 'Jet Black', hex: '#000000' },
                 { name: 'White', catalogColor: 'White', hex: '#FFFFFF' },
-                { name: 'Athletic Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' }
+                { name: 'Navy', catalogColor: 'Navy', hex: '#001f3f' },
+                { name: 'Ath Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' },
+                { name: 'Dk Hthr Grey', catalogColor: 'Dk Hthr Grey', hex: '#6b7280' }
             ],
             locations: [
                 { code: 'LC', name: 'Left Chest', icon: 'fa-tshirt' },
@@ -977,13 +977,13 @@
                 const products = await response.json();
 
                 // Deduplicate by CATALOG_COLOR and filter to desired colors
-                // Include all CATALOG_COLOR variants from API
+                // Match exact color names from ShopWorks inventory
                 const desiredColors = [
-                    'JetBlack', 'Jet Black',           // Black variants
-                    'DarkGreen', 'Dark Green',         // Forest variants
-                    'Navy', 'TrueNavy',                // Navy variants
-                    'White',                            // White
-                    'AthlHthr', 'Ath Heather'          // Athletic Heather variants
+                    'Jet Black',                        // Black (exact match from inventory)
+                    'White',                            // White (exact match from inventory)
+                    'Navy',                             // Navy (exact match from inventory)
+                    'Ath Heather',                      // Athletic Heather (exact match from inventory)
+                    'Dk Hthr Grey'                      // Dark Heather Grey (exact match from inventory)
                 ];
                 const uniqueColors = [...new Map(
                     products.map(p => [p.CATALOG_COLOR, p])
@@ -1012,22 +1012,12 @@
         // Fallback hex colors for color swatches
         function getHexForColor(catalogColor) {
             const hexMap = {
-                // Black variants
-                'JetBlack': '#000000',
+                // Exact color names from ShopWorks inventory
                 'Jet Black': '#000000',
-                'Black': '#000000',
-                // Forest/Dark Green variants
-                'DarkGreen': '#2d5f3f',
-                'Dark Green': '#2d5f3f',
-                'Forest': '#2d5f3f',
-                // Navy variants
-                'Navy': '#001f3f',
-                'TrueNavy': '#001f3f',
-                // White
                 'White': '#FFFFFF',
-                // Athletic Heather variants
-                'AthlHthr': '#9ca3af',
-                'Ath Heather': '#9ca3af'
+                'Navy': '#001f3f',
+                'Ath Heather': '#9ca3af',
+                'Dk Hthr Grey': '#6b7280'
             };
             return hexMap[catalogColor] || '#cccccc';
         }
