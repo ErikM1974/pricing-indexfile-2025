@@ -946,11 +946,25 @@
             });
         }
 
-        // Load inventory for a color
+        // Load inventory for a color (multi-SKU: PC54 + PC54_2X + PC54_3X)
         async function loadInventory(catalogColor) {
             try {
-                const inventory = await inventoryService.fetchInventoryLevels('PC54', catalogColor);
-                const total = inventory.grandTotal || 0;
+                // Query all 3 SKUs and combine results
+                const [standard, twoXL, threeXL] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ grandTotal: 0 })),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54_2X&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ grandTotal: 0 })),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=PC54_3X&color=${catalogColor}`)
+                        .then(r => r.json())
+                        .catch(() => ({ grandTotal: 0 }))
+                ]);
+
+                // Combine totals
+                const total = (standard.grandTotal || 0) + (twoXL.grandTotal || 0) + (threeXL.grandTotal || 0);
+
                 const badge = document.getElementById(`stock-${catalogColor}`);
 
                 if (total > 100) {
@@ -963,8 +977,13 @@
                     badge.className = 'stock-badge out-of-stock';
                     badge.textContent = 'Out of Stock';
                 }
+
+                console.log(`[3-Day Tees] Inventory for ${catalogColor}: ${total} units (PC54: ${standard.grandTotal}, PC54_2X: ${twoXL.grandTotal}, PC54_3X: ${threeXL.grandTotal})`);
             } catch (error) {
                 console.error('[3-Day Tees] Inventory load error:', catalogColor, error);
+                const badge = document.getElementById(`stock-${catalogColor}`);
+                badge.className = 'stock-badge';
+                badge.textContent = 'Check Stock';
             }
         }
 

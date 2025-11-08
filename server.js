@@ -376,6 +376,10 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'pricing-negotiation-policy.html'));
 });
 
+app.get('/3-day-tees.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', '3-day-tees.html'));
+});
+
 // Brands browse page
 app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));
