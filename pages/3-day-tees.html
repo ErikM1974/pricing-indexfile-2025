@@ -783,6 +783,17 @@
 
             <!-- Right Column: Order Summary & Checkout -->
             <div>
+                <!-- Product Images -->
+                <div class="card" style="margin-bottom: 1rem;">
+                    <h3>Product Preview</h3>
+                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p style="font-size: 0.875rem;">Select a color to see product images</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <h3>Order Summary</h3>
                     <div class="pricing-summary">
@@ -905,6 +916,50 @@
         const inventoryService = new SampleInventoryService();
         const orderService = new SampleOrderService();
 
+        // Load available colors from API
+        async function loadAvailableColors() {
+            try {
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=PC54');
+                const products = await response.json();
+
+                // Deduplicate by CATALOG_COLOR and filter to desired colors
+                const desiredColors = ['Black', 'Forest', 'Navy', 'White', 'Ath Heather'];
+                const uniqueColors = [...new Map(
+                    products.map(p => [p.CATALOG_COLOR, p])
+                ).values()];
+
+                const apiColors = uniqueColors
+                    .filter(p => desiredColors.includes(p.CATALOG_COLOR))
+                    .map(p => ({
+                        name: p.COLOR_NAME || p.CATALOG_COLOR,
+                        catalogColor: p.CATALOG_COLOR,
+                        hex: getHexForColor(p.CATALOG_COLOR), // Fallback hex
+                        swatchImage: p.COLOR_SQUARE_IMAGE,
+                        frontModel: p.FRONT_MODEL,
+                        backModel: p.BACK_MODEL,
+                        frontFlat: p.FRONT_FLAT || p.PRODUCT_IMAGE
+                    }));
+
+                console.log('[3-Day Tees] Loaded colors from API:', apiColors);
+                return apiColors.length > 0 ? apiColors : state.colors; // Fallback to hardcoded if API fails
+            } catch (error) {
+                console.error('[3-Day Tees] Error loading colors from API:', error);
+                return state.colors; // Fallback to hardcoded colors
+            }
+        }
+
+        // Fallback hex colors for color swatches
+        function getHexForColor(catalogColor) {
+            const hexMap = {
+                'Black': '#000000',
+                'Forest': '#2d5f3f',
+                'Navy': '#001f3f',
+                'White': '#FFFFFF',
+                'Ath Heather': '#9ca3af'
+            };
+            return hexMap[catalogColor] || '#cccccc';
+        }
+
         // Load pricing data on page load
         async function init() {
             try {
@@ -915,6 +970,9 @@
                 state.pricingData = await response.json();
 
                 console.log('[3-Day Tees] Pricing data loaded:', state.pricingData);
+
+                // Load colors from API
+                state.colors = await loadAvailableColors();
 
                 // Render UI
                 renderColors();
@@ -932,13 +990,21 @@
         // Render color selector
         function renderColors() {
             const grid = document.getElementById('colorGrid');
-            grid.innerHTML = state.colors.map(color => `
-                <div class="color-option" onclick="selectColor('${color.catalogColor}')">
-                    <div class="color-swatch" style="background: ${color.hex}; ${color.name === 'White' ? 'border: 2px solid #ccc;' : ''}"></div>
-                    <div class="color-name">${color.name}</div>
-                    <div class="stock-badge" id="stock-${color.catalogColor}">Loading...</div>
-                </div>
-            `).join('');
+            grid.innerHTML = state.colors.map(color => {
+                // Use swatch image if available, otherwise use hex color
+                const swatchStyle = color.swatchImage
+                    ? `background-image: url('${color.swatchImage}'); background-size: cover; background-position: center;`
+                    : `background: ${color.hex};`;
+                const whiteBorder = color.name === 'White' ? 'border: 2px solid #ccc;' : '';
+
+                return `
+                    <div class="color-option" onclick="selectColor('${color.catalogColor}')">
+                        <div class="color-swatch" style="${swatchStyle} ${whiteBorder}"></div>
+                        <div class="color-name">${color.name}</div>
+                        <div class="stock-badge" id="stock-${color.catalogColor}">Loading...</div>
+                    </div>
+                `;
+            }).join('');
 
             // Load inventory for all colors
             state.colors.forEach(color => {
@@ -996,6 +1062,36 @@
                 el.classList.remove('selected');
             });
             event.currentTarget.classList.add('selected');
+
+            // Update product images
+            const colorData = state.colors.find(c => c.catalogColor === catalogColor);
+            if (colorData) {
+                const imagesContainer = document.getElementById('productImages');
+                if (imagesContainer) {
+                    let imagesHTML = '';
+
+                    if (colorData.frontModel) {
+                        imagesHTML += `<img src="${colorData.frontModel}" alt="Front View" style="width: 100%; border-radius: 6px;">`;
+                    }
+                    if (colorData.backModel) {
+                        imagesHTML += `<img src="${colorData.backModel}" alt="Back View" style="width: 100%; border-radius: 6px;">`;
+                    }
+                    if (colorData.frontFlat && !colorData.frontModel) {
+                        imagesHTML += `<img src="${colorData.frontFlat}" alt="Flat View" style="width: 100%; border-radius: 6px;">`;
+                    }
+
+                    if (imagesHTML) {
+                        imagesContainer.innerHTML = imagesHTML;
+                    } else {
+                        imagesContainer.innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                                <p style="font-size: 0.875rem;">Images not available for this color</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
 
             console.log('[3-Day Tees] Color selected:', catalogColor);
             updatePricing();
@@ -1078,9 +1174,9 @@
             if (!state.pricingData || !location || quantity === 0) return 0;
 
             // Find tier
-            const tier = state.pricingData.tiers.find(t =>
+            const tier = state.pricingData.tiersR.find(t =>
                 quantity >= t.MinQuantity && quantity <= t.MaxQuantity
-            ) || state.pricingData.tiers[0];
+            ) || state.pricingData.tiersR[0];
 
             // Step 1: Base garment cost
             const baseCost = Math.min(...state.pricingData.sizes
@@ -1092,7 +1188,7 @@
             const markedUpGarment = baseCost / tier.MarginDenominator;
 
             // Step 3: Print cost
-            const printCost = state.pricingData.costs.find(c =>
+            const printCost = state.pricingData.allDtgCostsR.find(c =>
                 c.PrintLocationCode === location && c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
 
