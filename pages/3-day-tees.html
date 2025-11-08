@@ -109,24 +109,49 @@
 
         /* Hero Banner */
         .hero-banner {
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
             color: white;
-            padding: 2rem;
+            padding: 3rem 2rem;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 12px;
             margin: 2rem auto;
             max-width: 1200px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            pointer-events: none;
         }
 
         .hero-banner h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
         }
 
         .hero-banner .subtitle {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-banner .features {
@@ -157,22 +182,51 @@
         .product-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            gap: 2.5rem;
             margin-bottom: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 2rem;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
 
         .card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
+            font-size: 1.375rem;
+            margin-bottom: 1.25rem;
             color: var(--text-primary);
             font-weight: 700;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--bg-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.375rem;
+            background: var(--primary-color);
+            border-radius: 2px;
         }
 
         /* Product Display */
@@ -739,6 +793,17 @@
                     </div>
                 </div>
 
+                <!-- Product Images Preview -->
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>Product Preview</h3>
+                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p style="font-size: 0.875rem;">Select a color to see product images</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card" style="margin-top: 1rem;">
                     <h3>3. Print Location</h3>
                     <div class="location-selector">
@@ -783,17 +848,6 @@
 
             <!-- Right Column: Order Summary & Checkout -->
             <div>
-                <!-- Product Images -->
-                <div class="card" style="margin-bottom: 1rem;">
-                    <h3>Product Preview</h3>
-                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                            <p style="font-size: 0.875rem;">Select a color to see product images</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card">
                     <h3>Order Summary</h3>
                     <div class="pricing-summary">
@@ -923,7 +977,14 @@
                 const products = await response.json();
 
                 // Deduplicate by CATALOG_COLOR and filter to desired colors
-                const desiredColors = ['Black', 'Forest', 'Navy', 'White', 'Ath Heather'];
+                // Include all CATALOG_COLOR variants from API
+                const desiredColors = [
+                    'JetBlack', 'Jet Black',           // Black variants
+                    'DarkGreen', 'Dark Green',         // Forest variants
+                    'Navy', 'TrueNavy',                // Navy variants
+                    'White',                            // White
+                    'AthlHthr', 'Ath Heather'          // Athletic Heather variants
+                ];
                 const uniqueColors = [...new Map(
                     products.map(p => [p.CATALOG_COLOR, p])
                 ).values()];
@@ -951,10 +1012,21 @@
         // Fallback hex colors for color swatches
         function getHexForColor(catalogColor) {
             const hexMap = {
+                // Black variants
+                'JetBlack': '#000000',
+                'Jet Black': '#000000',
                 'Black': '#000000',
+                // Forest/Dark Green variants
+                'DarkGreen': '#2d5f3f',
+                'Dark Green': '#2d5f3f',
                 'Forest': '#2d5f3f',
+                // Navy variants
                 'Navy': '#001f3f',
+                'TrueNavy': '#001f3f',
+                // White
                 'White': '#FFFFFF',
+                // Athletic Heather variants
+                'AthlHthr': '#9ca3af',
                 'Ath Heather': '#9ca3af'
             };
             return hexMap[catalogColor] || '#cccccc';
