@@ -1,6 +1,6 @@
 # 📚 NWCA Documentation Index
 
-**Last Updated:** 2025-10-29
+**Last Updated:** 2025-11-08
 **Purpose:** Master navigation for all documentation files
 **Performance Note:** All files optimized to stay under 40k character limit for optimal Claude performance
 
@@ -45,6 +45,13 @@ This documentation has been reorganized into modular components for better perfo
 │   ├── IMPLEMENTATION_EXAMPLES.md   # Working code snippets
 │   ├── ENHANCEMENT_ROADMAP.md       # Phase planning & future features
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
+├── /3-day-tees/                      # 3-Day Tees Fast Turnaround Service (NEW)
+│   ├── OVERVIEW.md                  # Architecture, 25 components, multi-SKU patterns
+│   ├── PRICING-FORMULA.md           # 7-step pricing + 25% rush fee
+│   ├── INVENTORY-INTEGRATION.md     # Multi-SKU architecture (PC54/PC54_2X/PC54_3X)
+│   ├── API-PATTERNS.md              # 4 API endpoints, request/response patterns
+│   ├── IMPLEMENTATION-TIMELINE.md   # 4-day development plan with testing
+│   └── BUSINESS-LOGIC.md            # Business rules, terms, fees, decisions
 └── /templates/                       # Calculator templates
     ├── manual-calculator-template.md     # Manual pricing template
     ├── contract-calculator-template.md   # Contract pricing template
@@ -108,6 +115,33 @@ This documentation has been reorganized into modular components for better perfo
 #### Shared Components
 - **[calculator-components.md](./templates/calculator-components.md)** - BaseQuoteService, utilities, CSS
 
+### For 3-Day Tees Development
+1. **[3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md)** - Start here for architecture overview
+   - 25 reusable components
+   - Multi-SKU inventory patterns
+   - Component integration strategy
+2. **[3-day-tees/PRICING-FORMULA.md](./3-day-tees/PRICING-FORMULA.md)** - Complete pricing calculation
+   - 7-step DTG pricing formula
+   - 25% rush fee application
+   - Size upcharge handling
+3. **[3-day-tees/INVENTORY-INTEGRATION.md](./3-day-tees/INVENTORY-INTEGRATION.md)** - Multi-SKU architecture
+   - PC54/PC54_2X/PC54_3X pattern
+   - Real-time inventory checks
+   - Critical CATALOG_COLOR vs COLOR_NAME concepts
+4. **[3-day-tees/API-PATTERNS.md](./3-day-tees/API-PATTERNS.md)** - API integration patterns
+   - 4 API endpoints (pricing, inventory, order creation, file upload)
+   - Request/response examples
+   - Error handling strategies
+5. **[3-day-tees/IMPLEMENTATION-TIMELINE.md](./3-day-tees/IMPLEMENTATION-TIMELINE.md)** - Development roadmap
+   - 4-day development plan
+   - Testing procedures
+   - Phase 2 Stripe integration
+6. **[3-day-tees/BUSINESS-LOGIC.md](./3-day-tees/BUSINESS-LOGIC.md)** - Business rules
+   - Pricing & fees (LTM, shipping, tax)
+   - Payment terms (manual → Stripe)
+   - Terms & conditions
+   - Error handling & fallbacks
+
 ## 📋 Task-Based Navigation
 
 ### "I need to create a new pricing calculator"
@@ -146,6 +180,33 @@ This documentation has been reorganized into modular components for better perfo
 2. Understand the SizesPricing pattern (source of truth)
 3. Apply verification checklist to ensure pricing synchronization
 4. Reference implementation examples for your quote builder type
+
+### "I need to build the 3-Day Tees page"
+1. Start with **[3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md)** - Architecture and components
+   - Understand the 25 reusable components
+   - Review multi-SKU inventory pattern (PC54/PC54_2X/PC54_3X)
+   - Study component integration strategy
+2. Review **[3-day-tees/PRICING-FORMULA.md](./3-day-tees/PRICING-FORMULA.md)** - Pricing logic
+   - Implement 7-step DTG pricing formula
+   - Apply 25% rush fee modifier
+   - Handle size upcharges correctly
+3. Study **[3-day-tees/INVENTORY-INTEGRATION.md](./3-day-tees/INVENTORY-INTEGRATION.md)** - Inventory patterns
+   - Implement multi-SKU architecture
+   - Set up real-time inventory checks
+   - Use CATALOG_COLOR (not COLOR_NAME)
+4. Implement **[3-day-tees/API-PATTERNS.md](./3-day-tees/API-PATTERNS.md)** - API integration
+   - Integrate 4 API endpoints (pricing, inventory, order creation, file upload)
+   - Follow request/response patterns
+   - Implement error handling strategies
+5. Follow **[3-day-tees/IMPLEMENTATION-TIMELINE.md](./3-day-tees/IMPLEMENTATION-TIMELINE.md)** - Development plan
+   - Execute 4-day development plan
+   - Run testing procedures
+   - Plan Phase 2 Stripe integration
+6. Reference **[3-day-tees/BUSINESS-LOGIC.md](./3-day-tees/BUSINESS-LOGIC.md)** - Business rules
+   - Apply pricing & fees (LTM, shipping, tax)
+   - Implement payment terms (manual → Stripe)
+   - Include terms & conditions
+   - Set up error handling & fallbacks
 
 ### "I need to add customer autocomplete to a quote builder"
 1. Read **[MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md)** - Overview (11 endpoints available)
@@ -272,6 +333,19 @@ PATCH  - Embroidered Emblems
   - FIELD_REFERENCE_CORE.md (master navigation hub)
   - 3 field specification files
   - 4 implementation guide files
+
+**Latest Addition (2025-11-08):**
+- Created complete 3-Day Tees Fast Turnaround Service documentation (6 modular files)
+- Comprehensive project requirements modularized for optimal Claude performance
+- Complete implementation-ready specifications:
+  - OVERVIEW.md - Architecture with 25 reusable components, multi-SKU patterns
+  - PRICING-FORMULA.md - 7-step DTG pricing + 25% rush fee modifier
+  - INVENTORY-INTEGRATION.md - Multi-SKU architecture (PC54/PC54_2X/PC54_3X)
+  - API-PATTERNS.md - 4 API endpoints with request/response patterns
+  - IMPLEMENTATION-TIMELINE.md - 4-day development plan with testing procedures
+  - BUSINESS-LOGIC.md - Complete business rules, fees, terms & conditions
+- All files optimized under 40k characters
+- Integrated into INDEX.md with complete navigation structure
 
 ## 🔗 Related Documentation
 
