@@ -1115,19 +1115,35 @@
                 };
                 const displayColor = colorMapping[catalogColor] || catalogColor;
 
-                // Query ManageOrders local warehouse inventory
-                const response = await fetch(
-                    `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`
-                );
-                const data = await response.json();
+                // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(displayColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(displayColor)}`)
+                ]);
+
+                // Parse all responses
+                const standardData = await standardRes.json();
+                const twoXLData = await twoXLRes.json();
+                const threeXLData = await threeXLRes.json();
 
                 let total = 0;
-                if (data.result && data.result.length > 0) {
-                    const inventory = data.result[0];
-                    // Sum all sizes (Size01-Size06 = S, M, L, XL, 2XL, 3XL)
-                    total = (inventory.Size01 || 0) + (inventory.Size02 || 0) +
-                            (inventory.Size03 || 0) + (inventory.Size04 || 0) +
-                            (inventory.Size05 || 0) + (inventory.Size06 || 0);
+
+                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                if (standardData.result && standardData.result.length > 0) {
+                    const inventory = standardData.result[0];
+                    total += (inventory.Size01 || 0) + (inventory.Size02 || 0) +
+                            (inventory.Size03 || 0) + (inventory.Size04 || 0);
+                }
+
+                // PC54_2X: Size05=2XL
+                if (twoXLData.result && twoXLData.result.length > 0) {
+                    total += twoXLData.result[0].Size05 || 0;
+                }
+
+                // PC54_3X: Size06=3XL
+                if (threeXLData.result && threeXLData.result.length > 0) {
+                    total += threeXLData.result[0].Size06 || 0;
                 }
 
                 const badge = document.getElementById(`stock-${catalogColor}`);
@@ -1144,9 +1160,14 @@
                     badge.textContent = 'Out of Stock';
                 }
 
-                console.log(`[3-Day Tees] Local warehouse inventory for ${displayColor}: ${total} units`);
+                console.log(`[3-Day Tees] Multi-SKU inventory for ${displayColor}:`, {
+                    PC54: standardData.result?.[0] || 'No data',
+                    PC54_2X: twoXLData.result?.[0] || 'No data',
+                    PC54_3X: threeXLData.result?.[0] || 'No data',
+                    total: total
+                });
             } catch (error) {
-                console.error('[3-Day Tees] Inventory load error:', catalogColor, error);
+                console.error('[3-Day Tees] Multi-SKU inventory load error:', catalogColor, error);
                 const badge = document.getElementById(`stock-${catalogColor}`);
                 badge.className = 'stock-badge';
                 badge.textContent = 'Check Stock';
@@ -1164,31 +1185,48 @@
                 };
                 const displayColor = colorMapping[catalogColor] || catalogColor;
 
-                // Query ManageOrders local warehouse inventory
-                const response = await fetch(
-                    `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`
-                );
-                const data = await response.json();
+                // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(displayColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(displayColor)}`)
+                ]);
+
+                // Parse all responses
+                const standardData = await standardRes.json();
+                const twoXLData = await twoXLRes.json();
+                const threeXLData = await threeXLRes.json();
 
                 // Build inventory by size
                 const sizeInventory = {};
 
-                if (data.result && data.result.length > 0) {
-                    const inventory = data.result[0];
-
-                    // Map ManageOrders size fields to our size names
-                    // Size01 = S, Size02 = M, Size03 = L, Size04 = XL, Size05 = 2XL, Size06 = 3XL
+                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                if (standardData.result && standardData.result.length > 0) {
+                    const inventory = standardData.result[0];
                     sizeInventory['S'] = inventory.Size01 || 0;
                     sizeInventory['M'] = inventory.Size02 || 0;
                     sizeInventory['L'] = inventory.Size03 || 0;
                     sizeInventory['XL'] = inventory.Size04 || 0;
-                    sizeInventory['2XL'] = inventory.Size05 || 0;
-                    sizeInventory['3XL'] = inventory.Size06 || 0;
                 } else {
-                    // No inventory found - set all to 0
-                    state.sizes.forEach(size => {
-                        sizeInventory[size] = 0;
-                    });
+                    // No standard sizes found
+                    sizeInventory['S'] = 0;
+                    sizeInventory['M'] = 0;
+                    sizeInventory['L'] = 0;
+                    sizeInventory['XL'] = 0;
+                }
+
+                // PC54_2X: Size05=2XL
+                if (twoXLData.result && twoXLData.result.length > 0) {
+                    sizeInventory['2XL'] = twoXLData.result[0].Size05 || 0;
+                } else {
+                    sizeInventory['2XL'] = 0;
+                }
+
+                // PC54_3X: Size06=3XL
+                if (threeXLData.result && threeXLData.result.length > 0) {
+                    sizeInventory['3XL'] = threeXLData.result[0].Size06 || 0;
+                } else {
+                    sizeInventory['3XL'] = 0;
                 }
 
                 // Update each size badge and input max attribute
@@ -1226,7 +1264,12 @@
                     }
                 });
 
-                console.log(`[3-Day Tees] Size inventory for ${catalogColor}:`, sizeInventory);
+                console.log(`[3-Day Tees] Multi-SKU size inventory for ${displayColor}:`, {
+                    sizes: sizeInventory,
+                    PC54: standardData.result?.[0] || 'No data',
+                    PC54_2X: twoXLData.result?.[0] || 'No data',
+                    PC54_3X: threeXLData.result?.[0] || 'No data'
+                });
             } catch (error) {
                 console.error('[3-Day Tees] Size inventory load error:', catalogColor, error);
             }
