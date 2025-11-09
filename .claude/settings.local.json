@@ -9,7 +9,8 @@
       "Bash(python3:*)",
       "Bash(npx kill-port:*)",
       "Bash(temp-sanmar-colors.json)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": [],
