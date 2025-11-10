@@ -409,11 +409,106 @@ console.log('Order routed to correct SKU:', result.skuUsed); // Should be PC54_2
 **Cause:** Manual SKU routing instead of letting ShopWorks handle it
 **Solution:** Always use "PC54" as part number, let size field determine routing
 
-### Pitfall 3: CATALOG_COLOR vs COLOR_NAME
+### Pitfall 3: CATALOG_COLOR vs COLOR_NAME (CRITICAL)
 
-**Problem:** Inventory API returns 404 for "Forest Green"
-**Cause:** Using COLOR_NAME instead of CATALOG_COLOR
-**Solution:** Use "Forest" (CATALOG_COLOR) not "Forest Green" (COLOR_NAME)
+**Problem:** Inventory API returns empty results (`count:0`) for "Athletic Heather" or "Dark Heather Grey"
+**Cause:** Using COLOR_NAME instead of CATALOG_COLOR for API queries
+
+**Understanding the Two Color Field Systems:**
+
+Sanmar provides **TWO separate color fields** for every product:
+
+1. **COLOR_NAME** (Full Display Format)
+   - **Purpose:** Customer-facing display
+   - **Format:** Full, professional spelling with proper spacing
+   - **Examples:**
+     - "Athletic Heather" (NOT "Ath Heather")
+     - "Dark Heather Grey" (NOT "Dk Hthr Grey")
+     - "Brilliant Orange" (NOT "BrillOrng")
+     - "Cool Grey" (NOT "CoolGrey")
+   - **Where to use:** Website displays, customer quotes, marketing materials
+
+2. **CATALOG_COLOR** (Internal System Format)
+   - **Purpose:** Database queries and API communication
+   - **Format:** Abbreviated, condensed, no extra words
+   - **Examples:**
+     - "Ath Heather" (abbreviated from "Athletic Heather")
+     - "Dk Hthr Grey" (abbreviated from "Dark Heather Grey")
+     - "BrillOrng" (abbreviated from "Brilliant Orange")
+     - "CoolGrey" (abbreviated from "Cool Grey")
+   - **Where to use:** ShopWorks inventory entries, ManageOrders API queries, system integrations
+
+**Critical Implementation Pattern:**
+
+```javascript
+// Website color configuration (pages/3-day-tees.html)
+const colors = [
+    {
+        name: 'Jet Black',              // COLOR_NAME - shown to users
+        catalogColor: 'Jet Black',      // CATALOG_COLOR - used in API
+        hex: '#000000'
+    },
+    {
+        name: 'Athletic Heather',       // COLOR_NAME - professional display
+        catalogColor: 'Ath Heather',    // CATALOG_COLOR - API format
+        hex: '#9ca3af'
+    },
+    {
+        name: 'Dark Heather Grey',      // COLOR_NAME - professional display
+        catalogColor: 'Dk Hthr Grey',   // CATALOG_COLOR - API format
+        hex: '#6b7280'
+    }
+];
+
+// In API calls, ALWAYS use catalogColor:
+async function loadInventory(catalogColor) {
+    const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+        fetch(`/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+        fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+        fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+    ]);
+}
+```
+
+**Tested and Verified:**
+- ❌ `"Athletic Heather"` (COLOR_NAME) → API returns `count:0` (no data)
+- ✅ `"Ath Heather"` (CATALOG_COLOR) → API returns `count:1` (data found)
+
+**Why This Matters:**
+- ManageOrders API **ONLY accepts CATALOG_COLOR format**
+- ShopWorks inventory entries must use CATALOG_COLOR format
+- Website must display COLOR_NAME to users for professional appearance
+- System must internally convert: Display (COLOR_NAME) → API (CATALOG_COLOR)
+
+**Workflow for Adding New Colors:**
+
+1. **Query Sanmar API:**
+   ```bash
+   curl "https://caspio-pricing-proxy.../api/color-swatches?styleNumber=PC54"
+   ```
+
+2. **Extract both fields from response:**
+   ```json
+   {
+     "COLOR_NAME": "Dark Heather Grey",
+     "CATALOG_COLOR": "Dk Hthr Grey"
+   }
+   ```
+
+3. **Add to ShopWorks:** Use CATALOG_COLOR format
+   - ✅ Enter: "Dk Hthr Grey" (abbreviated)
+   - ❌ DON'T enter: "Dark Heather Grey" (full name)
+
+4. **Add to website colors array:**
+   ```javascript
+   {
+       name: 'Dark Heather Grey',     // Display to users (COLOR_NAME)
+       catalogColor: 'Dk Hthr Grey',  // API queries (CATALOG_COLOR)
+       hex: '#6b7280'
+   }
+   ```
+
+**Solution:** Always use `catalogColor` field (CATALOG_COLOR format) for API queries, never the `name` field (COLOR_NAME format)
 
 ### Pitfall 4: Cache Invalidation
 

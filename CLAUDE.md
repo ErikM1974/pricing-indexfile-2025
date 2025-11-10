@@ -842,6 +842,92 @@ Before marking task complete:
 - [ ] Carousel limited to 4 products (no horizontal scrolling)
 - [ ] No JavaScript errors in browser console
 
+## 🏷️ Sanmar to ShopWorks Product Transformation
+
+### Overview
+Transform Sanmar vendor products correctly for ShopWorks/ManageOrders inventory system. This is **CRITICAL** for inventory queries and order processing.
+
+**Complete Guide:** See [memory/SANMAR_TO_SHOPWORKS_GUIDE.md](memory/SANMAR_TO_SHOPWORKS_GUIDE.md) for full documentation
+
+### Quick Reference: Two SKU Patterns
+
+#### Pattern A: Multi-SKU (T-Shirts, Polos)
+**Example: PC54**
+```
+PC54      → Sizes: S, M, L, XL (Size01-04)
+PC54_2X   → Size: 2XL only (Size05 in field continuation)
+PC54_3X   → Size: 3XL only (Size06 in field continuation)
+```
+
+#### Pattern B: Single-SKU (Hoodies, Sweatshirts)
+**Example: PC90H**
+```
+PC90H     → All sizes: S-4XL (Size01-07)
+          No separate SKUs needed
+```
+
+### Critical: Color Transformation
+
+**MUST use CATALOG_COLOR (not COLOR_NAME) for API queries:**
+
+| COLOR_NAME (Display) | CATALOG_COLOR (API/ShopWorks) |
+|---------------------|-------------------------------|
+| Athletic Heather | Athletic Hthr |
+| Dark Heather Grey | Dark Hthr Grey |
+| Brilliant Orange | BrillOrng |
+| Cool Grey | CoolGrey |
+| Safety Green | Safety Green (no change) |
+
+### ShopWorks Entry Workflow
+
+**For Multi-SKU (PC54):**
+1. Create PC54 with S-XL quantities
+2. Create PC54_2X with 2XL quantity
+3. Create PC54_3X with 3XL quantity
+4. All use same CATALOG_COLOR
+
+**For Single-SKU (PC90H):**
+1. Create PC90H with all sizes (S-4XL)
+2. Enter quantities in Size01-07
+3. Single entry, all sizes included
+
+### Order Submission Rule
+
+⚠️ **ALWAYS use base part number for orders:**
+```javascript
+// ✅ CORRECT - Use base SKU
+partNumber: "PC54"  // Even for 2XL/3XL sizes
+
+// ❌ WRONG - Never use suffix
+partNumber: "PC54_2X"  // ShopWorks routing fails
+```
+
+### Common Issues & Solutions
+
+**Issue: "Unable to Verify" inventory badge**
+- Cause: Using COLOR_NAME instead of CATALOG_COLOR
+- Fix: Use exact CATALOG_COLOR format from Sanmar API
+
+**Issue: 2XL/3XL showing 0 inventory**
+- Cause: Not querying PC54_2X and PC54_3X SKUs
+- Fix: Query all three SKUs for multi-SKU products
+
+**Issue: Wrong size field mapping**
+- Cause: Assuming PC54_2X uses Size01 (it uses Size05)
+- Fix: Use field continuation pattern (Size05, Size06)
+
+### Testing Commands
+
+```bash
+# Test PC90H (Single-SKU)
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC90H&Color=Safety%20Green"
+
+# Test PC54 (Multi-SKU) - Need all three
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=Athletic%20Hthr"
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=Athletic%20Hthr"
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=Athletic%20Hthr"
+```
+
 ## 📊 Data Flow Documentation
 
 ### How Data Flows Through the System
@@ -1003,6 +1089,7 @@ async function handleSubmit(e) {
 | Quote ID not showing | Add display element in success message |
 | Script parsing error | Escape closing tags: `<\/script>` |
 | CSS not updating | Add cache-busting parameter to stylesheet |
+| **Sample inventory shows "Unable to Verify"** | **Use CATALOG_COLOR not COLOR_NAME for API queries** - Cart saves successfully but uses wrong color field. See @memory/SAMPLE_INVENTORY_INTEGRATION_GUIDE.md § "Critical Concepts" |
 | **All images loading slowly or not at all** | **Check if Sanmar CDN is down** - See [@memory/TROUBLESHOOTING_IMAGE_LOADING.md](memory/TROUBLESHOOTING_IMAGE_LOADING.md). Test URL: `https://cdnm.sanmar.com/imglib/mresjpg/2022/f5/CT104616_navy_model_front.jpg` |
 
 ## 🚀 Quick Start Templates
@@ -1036,10 +1123,52 @@ const price = Math.ceil(($6.00 / 0.6) * 2) / 2;  // $10.00
 
 ### Sample Cart Inventory Integration
 - **Real-Time Inventory**: Sanmar vendor inventory via `/api/sizes-by-style-color`
-- **Critical Fields**: Use `CATALOG_COLOR` (not `COLOR_NAME`) for API queries
 - **Service**: `SampleInventoryService` class in `/shared_components/js/sample-inventory-service.js`
 - **Caching**: 5-minute sessionStorage cache
 - **Complete Guide**: @memory/SAMPLE_INVENTORY_INTEGRATION_GUIDE.md
+
+**⚠️ CRITICAL: Two Color Field System (#1 Cause of "Unable to Verify" Errors)**
+
+Every Sanmar product has **TWO color fields** - using the wrong one causes inventory check failures:
+
+| Field | Purpose | Example | Used For |
+|-------|---------|---------|----------|
+| **COLOR_NAME** | Display to users | "Brilliant Orange" | UI, user-facing text, customer quotes |
+| **CATALOG_COLOR** | API queries | "BrillOrng" | Inventory API, database queries, ShopWorks |
+
+**Common Mistake (Silent Failure):**
+```javascript
+// ❌ WRONG - Cart saves but inventory shows "Unable to Verify"
+const cartItem = {
+    color: product.COLOR_NAME,  // "Brilliant Orange"
+    catalogColor: product.COLOR_NAME  // ❌ Should be "BrillOrng"
+};
+fetch(`/api/sizes-by-style-color?color=${product.COLOR_NAME}`);  // Returns 404
+
+// ✅ CORRECT - Inventory checks work properly
+const cartItem = {
+    color: product.COLOR_NAME,        // "Brilliant Orange" (display)
+    catalogColor: product.CATALOG_COLOR  // "BrillOrng" (API)
+};
+fetch(`/api/sizes-by-style-color?color=${product.CATALOG_COLOR}`);  // Returns data
+```
+
+**Why Two Fields Exist:**
+- Sanmar's inventory system uses abbreviated, no-space format (CATALOG_COLOR)
+- Users expect full, readable color names (COLOR_NAME)
+- Caspio stores both formats from vendor data
+
+**Impact of Using Wrong Field:**
+- ✅ Cart item saves successfully (no error message shown)
+- ❌ Inventory API returns 404 (displays "Unable to Verify" badge)
+- ❌ Size selector may show wrong sizes for color
+- ❌ Customer can't complete sample order
+
+**Systems Affected:**
+- Sample Cart (top-sellers-product.html, sample-cart.html)
+- Top Sellers Showcase (top-sellers-showcase.html)
+- DTG Compatible Products (dtg-compatible-products.html)
+- 3-Day Tees (pages/3-day-tees.html)
 
 **Key Concepts:**
 - COLOR_NAME ("Brilliant Orange") = Display to users

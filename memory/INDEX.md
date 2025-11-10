@@ -25,6 +25,8 @@ This documentation has been reorganized into modular components for better perfo
 ├── DATABASE_PATTERNS.md              # Database schema patterns
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints - read data)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md    # ManageOrders PUSH API (4 endpoints - create orders)
+├── SANMAR_TO_SHOPWORKS_GUIDE.md     # Transform Sanmar products for ShopWorks/ManageOrders
+├── PRODUCT_SKU_PATTERNS.md          # Quick reference for product SKU patterns
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
@@ -175,11 +177,35 @@ This documentation has been reorganized into modular components for better perfo
 2. Review error handling patterns
 3. Use debug utilities and console commands
 
+### "I need to fix 'Unable to Verify' inventory errors"
+1. **⚠️ CRITICAL: Use CATALOG_COLOR not COLOR_NAME** - See **CLAUDE.md** § "Sample Cart Inventory Integration" for comprehensive documentation
+2. Review complete pattern guide in **[SAMPLE_INVENTORY_INTEGRATION_GUIDE.md](./SAMPLE_INVENTORY_INTEGRATION_GUIDE.md)** § "Critical Concepts"
+3. Verify cart items use `catalogColor: product.CATALOG_COLOR` (not `product.COLOR_NAME`)
+4. Check API queries use `color=${product.CATALOG_COLOR}` parameter format
+5. **Systems affected:** Sample Cart, Top Sellers Showcase, DTG Compatible Products, 3-Day Tees
+6. **Root cause:** Using COLOR_NAME causes silent failure - cart saves but inventory API returns 404
+
 ### "I need to create ShopWorks EDP integration"
 1. Read **[SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md)** - Complete guide
 2. Understand the SizesPricing pattern (source of truth)
 3. Apply verification checklist to ensure pricing synchronization
 4. Reference implementation examples for your quote builder type
+
+### "I need to add a Sanmar product to ShopWorks/ManageOrders inventory"
+1. **Determine SKU pattern** - Check **[PRODUCT_SKU_PATTERNS.md](./PRODUCT_SKU_PATTERNS.md)**
+   - T-shirts/Polos → Multi-SKU (PC54, PC54_2X, PC54_3X)
+   - Hoodies/Sweatshirts → Single-SKU (PC90H only)
+2. **Get CATALOG_COLOR format** - Read **[SANMAR_TO_SHOPWORKS_GUIDE.md](./SANMAR_TO_SHOPWORKS_GUIDE.md)** § "Color Transformation"
+   - Must use CATALOG_COLOR (not COLOR_NAME) for ShopWorks
+   - Example: "Athletic Heather" → "Athletic Hthr"
+3. **Create ShopWorks entries:**
+   - Multi-SKU: Create base + _2X + _3X entries with same CATALOG_COLOR
+   - Single-SKU: Create one entry with all sizes (Size01-07)
+4. **Verify with API:**
+   ```bash
+   curl ".../api/manageorders/inventorylevels?PartNumber=PC90H&Color=Safety%20Green"
+   ```
+5. **Remember:** Always use base part number for orders (PC54, never PC54_2X)
 
 ### "I need to build the 3-Day Tees page"
 1. Start with **[3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md)** - Architecture and components

@@ -984,8 +984,8 @@
                 { name: 'Jet Black', catalogColor: 'Jet Black', hex: '#000000' },
                 { name: 'White', catalogColor: 'White', hex: '#FFFFFF' },
                 { name: 'Navy', catalogColor: 'Navy', hex: '#001f3f' },
-                { name: 'Ath Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' },
-                { name: 'Dk Hthr Grey', catalogColor: 'Dk Hthr Grey', hex: '#6b7280' }
+                { name: 'Athletic Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' },
+                { name: 'Dark Heather Grey', catalogColor: 'Dk Hthr Grey', hex: '#6b7280' }
             ],
             locations: [
                 { code: 'LC', name: 'Left Chest', icon: 'fa-tshirt' },
@@ -1107,19 +1107,12 @@
         // Load inventory for a color from local warehouse (ManageOrders)
         async function loadInventory(catalogColor) {
             try {
-                // Map catalog color to display color for ManageOrders API
-                const colorMapping = {
-                    'JetBlack': 'Jet Black',
-                    'AthHthr': 'Athletic Heather',
-                    'DkHthrGrey': 'Dark Heather Grey'
-                };
-                const displayColor = colorMapping[catalogColor] || catalogColor;
-
                 // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
                 const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(displayColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(displayColor)}`)
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
                 ]);
 
                 // Parse all responses
@@ -1177,19 +1170,12 @@
         // Load size-specific inventory for selected color from local warehouse
         async function loadSizeInventory(catalogColor) {
             try {
-                // Map catalog color to display color for ManageOrders API
-                const colorMapping = {
-                    'JetBlack': 'Jet Black',
-                    'AthHthr': 'Athletic Heather',
-                    'DkHthrGrey': 'Dark Heather Grey'
-                };
-                const displayColor = colorMapping[catalogColor] || catalogColor;
-
                 // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
                 const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(displayColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(displayColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(displayColor)}`)
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
                 ]);
 
                 // Parse all responses

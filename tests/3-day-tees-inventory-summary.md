@@ -27,6 +27,63 @@ const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
 ]);
 ```
 
+### Color Naming Architecture (Critical for API Integration)
+
+**Sanmar provides TWO separate color fields:**
+
+1. **COLOR_NAME** (Full Display Format)
+   - Purpose: Customer-facing display on website
+   - Format: Full, professional spelling with proper spacing
+   - Examples: "Athletic Heather", "Dark Heather Grey", "Brilliant Orange"
+   - Where to use: Website color badges, product displays, customer quotes
+
+2. **CATALOG_COLOR** (Internal System Format)
+   - Purpose: Database queries and API communication
+   - Format: Abbreviated, condensed format (no extra words)
+   - Examples: "Ath Heather", "Dk Hthr Grey", "BrillOrng"
+   - Where to use: ShopWorks inventory entries, ManageOrders API queries
+
+**Critical Implementation Pattern:**
+
+```javascript
+// In colors array:
+{
+    name: 'Athletic Heather',        // COLOR_NAME - shown to users
+    catalogColor: 'Ath Heather',     // CATALOG_COLOR - used in API calls
+    hex: '#9ca3af'
+}
+
+// In API calls:
+fetch(`/api/manageorders/inventorylevels?PartNumber=PC54&Color=${catalogColor}`)
+// Uses catalogColor field (abbreviated format)
+```
+
+**Why This Matters:**
+- ManageOrders API **ONLY accepts CATALOG_COLOR format**
+- Testing proved: "Athletic Heather" returns empty (`count:0`)
+- Testing proved: "Ath Heather" returns correct data (`count:1`)
+- Page must display COLOR_NAME to users while using CATALOG_COLOR for API queries
+
+**Workflow for Adding New Colors:**
+
+1. Query Sanmar API: `/api/color-swatches?styleNumber=PC54`
+2. Extract both fields from response:
+   ```json
+   {
+     "COLOR_NAME": "Dark Heather Grey",
+     "CATALOG_COLOR": "Dk Hthr Grey"
+   }
+   ```
+3. Add to ShopWorks inventory using **CATALOG_COLOR** format
+4. Add to website colors array:
+   ```javascript
+   {
+       name: 'Dark Heather Grey',     // Display to users
+       catalogColor: 'Dk Hthr Grey',  // API queries
+       hex: '#6b7280'
+   }
+   ```
+
 ## Verified Inventory Levels
 
 ### Jet Black
@@ -56,12 +113,21 @@ const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
 ## Files Modified
 
 1. **pages/3-day-tees.html**
-   - `loadInventory()` function - Queries all 3 SKUs, sums total inventory
+   - Updated `colors` array (lines 983-989) - Changed to use full display names (COLOR_NAME format)
+   - Removed `colorMapping` object from `loadInventory()` function (lines 1107-1116) - Now uses catalogColor directly
+   - Removed `colorMapping` object from `loadSizeInventory()` function (lines 1170-1179) - Now uses catalogColor directly
+   - `loadInventory()` function - Queries all 3 SKUs using CATALOG_COLOR format, sums total inventory
    - `loadSizeInventory()` function - Shows size-specific inventory with correct field mapping
 
 2. **tests/test-3day-multisku.js**
    - Comprehensive test script for multi-SKU implementation
    - Tests all colors and verifies field mappings
+   - Updated to reflect current color naming architecture
+
+3. **tests/3-day-tees-inventory-summary.md** (this file)
+   - Added "Color Naming Architecture" section
+   - Documented CATALOG_COLOR vs COLOR_NAME difference
+   - Added workflow for adding new colors/products
 
 ## Testing Instructions
 
