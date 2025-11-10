@@ -185,15 +185,21 @@
                 this.lineItems = [];
                 this.currentQuote = null;
                 this.quoteService = new RichardsonQuoteService();
-                
+
                 // Drag state
                 this.isDragging = false;
                 this.dragOffset = { x: 0, y: 0 };
                 this.originalPosition = null;
-                
+
                 // Initialize EmailJS
                 emailjs.init('4qSbDO-SQs19TbP80');
-                
+
+                // Initialize master bundle data for validation (capData is defined at top of file)
+                window.nwcaMasterBundleData = {
+                    caps: capData
+                };
+                console.log('[Richardson] Master bundle data initialized with', capData.length, 'styles');
+
                 this.initializeElements();
                 this.bindEvents();
                 this.addInitialLineItem();

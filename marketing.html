@@ -102,6 +102,26 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
         }
+
+        .marketing-container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .marketing-container {
+                padding: 1rem;
+            }
+
+            .campaign-card > div {
+                flex-direction: column;
+            }
+
+            .campaign-card h2 {
+                font-size: 1.5rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -116,11 +136,49 @@
     </header>
     
     <main class="content">
-        <div class="coming-soon">
-            <div class="icon">📢</div>
-            <h1>Marketing Resources</h1>
-            <p>Our marketing resources are coming soon! We're working on providing you with professional marketing materials, brand guidelines, and promotional content to help grow your business.</p>
-            <a href="/" class="btn-home">Return to Homepage</a>
+        <div class="marketing-container">
+            <h1 style="color: #1a472a; font-size: 2.5rem; margin-bottom: 2rem; text-align: center;">Marketing Campaigns</h1>
+
+            <!-- Breast Cancer Awareness Bundle -->
+            <div class="campaign-card" style="background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); border: 2px solid #e91e63; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2); cursor: pointer; transition: all 0.3s ease;" onclick="window.location.href='/breast-cancer-awareness-bundle.html'" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(233, 30, 99, 0.3)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(233, 30, 99, 0.2)'">
+                <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <span style="font-size: 2.5rem;">🎀</span>
+                            <h2 style="color: #d81b60; font-size: 1.875rem; margin: 0;">Breast Cancer Awareness Bundle</h2>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <p style="color: #666; font-size: 1.125rem; margin-bottom: 0.75rem;">Support the cause with our special bundle package!</p>
+                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                <li style="color: #333; margin-bottom: 0.5rem;">✓ C112 True Pink/White Embroidered Caps</li>
+                                <li style="color: #333; margin-bottom: 0.5rem;">✓ PC54 Candy Pink DTG T-Shirts</li>
+                                <li style="color: #333; margin-bottom: 0.5rem;">✓ Bundle Price: $45 per pack (8 shirts + 8 caps)</li>
+                                <li style="color: #333; font-weight: 600;">✓ Minimum Order: 8 bundles = $360</li>
+                            </ul>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="background: #d81b60; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem;">LIMITED TIME</span>
+                            <span style="color: #d81b60; font-weight: 600;">October Special</span>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="font-size: 3rem; color: #d81b60; font-weight: 700; margin-bottom: 0.5rem;">$45</div>
+                            <div style="color: #666; font-size: 0.875rem;">per bundle</div>
+                            <button style="background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%); color: white; border: none; padding: 0.875rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; margin-top: 1rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                Order Now →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coming Soon Section -->
+            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div class="icon" style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                <h3 style="color: #1a472a; font-size: 1.5rem; margin-bottom: 1rem;">More Campaigns Coming Soon</h3>
+                <p style="color: #666; font-size: 1rem;">We're preparing additional marketing campaigns and special promotions. Check back regularly for new offerings!</p>
+            </div>
         </div>
     </main>
 </body>

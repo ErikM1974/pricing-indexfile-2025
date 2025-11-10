@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View product details and request a custom quote from Northwest Custom Apparel">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Tags for Social Sharing -->
+    <meta property="og:title" content="Product Details - Northwest Custom Apparel">
+    <meta property="og:description" content="View our top-selling products and get custom quotes for your apparel needs">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="product">
+    
+    <title>Product Details - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Cart Drawer Component -->
+    <link rel="stylesheet" href="../shared_components/css/cart-drawer.css">
+    <script src="../shared_components/js/cart-drawer.js"></script>
+
+    <!-- Sample Order Service for ShopWorks Integration -->
+    <script src="../shared_components/js/sample-order-service.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #5bc85f;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Public Header */
+        .public-header {
+            background: white;
+            border-bottom: 2px solid var(--primary-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .company-branding {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .company-logo {
+            height: 50px;
+        }
+
+        .company-info h1 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .company-tagline {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .contact-info a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            transition: color 0.2s ease;
+        }
+
+        .contact-info a:hover {
+            color: var(--primary-color);
+        }
+
+        .contact-info i {
+            color: var(--primary-color);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Product Showcase - Enhanced Catalog Layout */
+        .product-showcase {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 3rem;
+        }
+
+        .product-images {
+            position: relative;
+        }
+
+        /* Main Image Container - Larger and Better */
+        .main-image {
+            width: 100%;
+            height: 650px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Image Navigation Dots */
+        .image-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .image-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.4;
+        }
+
+        .image-dot.active {
+            background: var(--primary-color);
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Thumbnail Strip */
+        .thumbnail-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            box-shadow: var(--shadow);
+            opacity: 0.6;
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+            opacity: 1;
+            box-shadow: var(--shadow-md);
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(135deg, #f5f7fa, #e5e7eb);
+            color: var(--text-secondary);
+        }
+
+        .image-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Color Selection - Enhanced and Larger */
+        .color-selection {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 12px;
+        }
+
+        .color-selection h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 1rem;
+        }
+
+        .color-swatch {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-swatch-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+            margin: 0 auto;
+        }
+
+        .color-swatch.active .color-swatch-image {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.2);
+        }
+
+        .color-swatch:hover .color-swatch-image {
+            transform: scale(1.05);
+        }
+
+        .color-swatch-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .color-name {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .color-swatch.active .color-name {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Product Information */
+        .product-info {
+            padding-top: 1rem;
+        }
+
+        .product-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: white;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .product-style {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-description {
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .product-features {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .product-features h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        .feature-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .product-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 2rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .cta-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-section p {
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Related Products */
+        .related-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .related-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .related-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .related-image {
+            height: 200px;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .related-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .related-content {
+            padding: 1.5rem;
+        }
+
+        .related-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-style {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .footer-content p {
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .product-showcase {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .product-details {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* PHASE 1: Touch Target Fixes for Mobile */
+            .quantity-btn {
+                width: 44px;   /* Increased from 28px for better touch target */
+                height: 44px;  /* Increased from 28px for better touch target */
+                font-size: 1rem;
+            }
+
+            .image-dot {
+                width: 20px;   /* Increased from 10px for better touch target */
+                height: 20px;  /* Increased from 10px for better touch target */
+            }
+        }
+
+        /* PHASE 1: Small phone breakpoint (iPhone SE, small Android) */
+        @media (max-width: 480px) {
+            .size-quantity-grid {
+                grid-template-columns: repeat(2, 1fr);  /* 2 columns for small screens */
+                gap: 0.5rem;
+            }
+
+            .size-quantity-item {
+                padding: 0.5rem;
+            }
+
+            .quantity-btn {
+                width: 44px;   /* Maintain touch target on small screens */
+                height: 44px;
+            }
+
+            .image-thumbnails {
+                grid-template-columns: repeat(2, 1fr);  /* 2 columns instead of 4 */
+                gap: 0.5rem;
+            }
+
+            .header-container h1 {
+                font-size: 1.5rem;  /* Scale down heading */
+            }
+
+            .cta-buttons {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* PHASE 3: Tablet breakpoint (iPad, larger tablets) */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .product-showcase {
+                gap: 2rem;
+            }
+
+            .size-quantity-grid {
+                grid-template-columns: repeat(4, 1fr);  /* 4 columns for tablets */
+            }
+
+            .image-thumbnails {
+                grid-template-columns: repeat(3, 1fr);  /* 3 columns for tablets */
+            }
+        }
+
+        /* Size & Quantity Selection Styles */
+        .size-quantity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .size-quantity-item {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.2s;
+            background: white;
+            cursor: pointer;
+        }
+
+        .size-quantity-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .size-quantity-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(76, 179, 84, 0.05);
+        }
+
+        .size-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quantity-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .size-quantity-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Header Placeholder -->
+    <div id="universal-header-placeholder"></div>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav" style="background: white; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                <a href="/top-sellers-showcase.html" 
+                   style="color: var(--primary-color); text-decoration: none; font-weight: 500; transition: opacity 0.2s;"
+                   onmouseover="this.style.opacity='0.7'"
+                   onmouseout="this.style.opacity='1'">
+                    <i class="fas fa-home" style="margin-right: 0.25rem;"></i>
+                    Best Sellers
+                </a>
+                <span style="color: var(--text-secondary);">/</span>
+                <span id="breadcrumbProductName" style="color: var(--text-primary);">Product Details</span>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingContainer" class="loading-container">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Back to Best Sellers Button Section -->
+    <div class="back-button-section" style="background: white; padding: 1.5rem 0; display: none;" id="backButtonSection">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <a href="/top-sellers-showcase.html" 
+               class="back-button"
+               style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--primary-color); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; box-shadow: var(--shadow-md);"
+               onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='translateX(-2px)'"
+               onmouseout="this.style.background='var(--primary-color)'; this.style.transform='translateX(0)'">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Best Sellers</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Product Showcase - Enhanced Catalog Style -->
+    <div id="productShowcase" class="product-showcase" style="display: none;">
+        <div class="product-images">
+            <!-- Main Image with Navigation -->
+            <div class="main-image" id="mainImageContainer">
+                <div class="image-placeholder">
+                    <i class="fas fa-tshirt"></i>
+                    <p>Loading product image...</p>
+                </div>
+                <!-- Image dots will be added dynamically -->
+            </div>
+            
+            <!-- Thumbnail Strip for Different Views -->
+            <div class="thumbnail-strip" id="thumbnailStrip">
+                <!-- Thumbnails will be added dynamically -->
+            </div>
+
+            <!-- Size & Quantity Selection (for sample mode) - MOVED HERE -->
+            <div class="size-quantity-section" id="sizeQuantitySection" style="display: none; margin-top: 1rem; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.125rem; margin-bottom: 0.5rem; color: var(--text-primary);">Select Sizes & Quantities</h3>
+
+                <!-- Current Color Indicator -->
+                <div id="currentColorIndicator" style="background: var(--bg-color); padding: 0.75rem; margin-bottom: 1rem; border-radius: 8px; border-left: 4px solid var(--primary-color); display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-palette" style="color: var(--primary-color); font-size: 1.125rem;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Current Color</div>
+                        <div id="currentColorName" style="font-weight: 600; color: var(--text-primary); font-size: 1rem;">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="size-quantity-grid" id="sizeQuantityGrid">
+                    <!-- Dynamically populated with available sizes -->
+                </div>
+
+                <div class="sample-summary" id="sampleSummary" style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 8px; border: 2px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> items</strong>
+                        <button id="addToCartBtn" class="btn btn-primary" onclick="addToSampleCart()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-info">
+            <div class="product-badge" id="productBadge">Top Seller</div>
+            <h1 class="product-title" id="productTitle">Loading...</h1>
+            <div class="product-style" id="productStyle">Style #</div>
+            <div class="product-description" id="productDescription">
+                This is one of our most popular products. Perfect for your custom apparel needs.
+            </div>
+
+            <!-- Color Selection Section -->
+            <div class="color-selection" id="colorSelection" style="display: none;">
+                <h3>Select Color</h3>
+                <div class="color-swatches" id="colorSwatches">
+                    <!-- Color swatches will be added dynamically -->
+                </div>
+            </div>
+
+            <div class="product-features">
+                <h3>Product Features</h3>
+                <ul class="feature-list" id="featureList">
+                    <li>Premium quality materials</li>
+                    <li>Multiple color options available</li>
+                    <li>Ideal for custom decoration</li>
+                    <li>Bulk pricing available</li>
+                </ul>
+            </div>
+
+            <div class="product-details" id="productDetails">
+                <div class="detail-item">
+                    <div class="detail-label">Category</div>
+                    <div class="detail-value" id="categoryValue">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Brand</div>
+                    <div class="detail-value" id="brandValue">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Available Sizes</div>
+                    <div class="detail-value" id="sizesValue">XS - 4XL</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Decoration Method</div>
+                    <div class="detail-value" id="decorationValue">-</div>
+                </div>
+            </div>
+
+            <!-- CTA Section: Simplified for sample ordering -->
+            <div class="cta-section" id="ctaSection">
+                <h3>Questions?</h3>
+                <p>Call us for product details, bulk pricing, or custom decoration options</p>
+                <div class="cta-buttons">
+                    <a href="tel:253-922-5793" class="btn btn-primary">
+                        <i class="fas fa-phone"></i>
+                        Call Us: 253-922-5793
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <section class="related-section" id="relatedSection" style="display: none;">
+        <h2>You Might Also Like</h2>
+        <div class="related-grid" id="relatedGrid">
+            <!-- Smart recommendations will be inserted here -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Northwest Custom Apparel. All rights reserved.</p>
+            <p>2025 Freeman Road East, Milton, WA 98354</p>
+            <p>Family Owned and Operated Since 1977</p>
+        </div>
+    </footer>
+
+    <!-- Universal Cart Header Component -->
+    <script src="../shared_components/js/universal-cart-header.js"></script>
+
+    <!-- Product Recommendations Service -->
+    <script src="../shared_components/js/product-recommendations.js"></script>
+
+    <!-- Sample Cart Functionality -->
+    <script>
+        // Embedded sample cart functionality
+        class SampleCart {
+            constructor() {
+                this.maxSamples = null; // No hard limit - 3 samples recommended for best experience
+
+                // Load cart with backward compatibility
+                const cartData = sessionStorage.getItem('sampleCart');
+                if (cartData) {
+                    try {
+                        const parsed = JSON.parse(cartData);
+                        // New format: {samples: [...]}
+                        // Old format: [...]
+                        this.samples = Array.isArray(parsed) ? parsed : (parsed.samples || []);
+                    } catch (e) {
+                        console.error('[SampleCart] Error parsing cart data:', e);
+                        this.samples = [];
+                    }
+                } else {
+                    this.samples = [];
+                }
+
+                this.eligibilityCache = {};
+                this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                this.initializeUI();
+                this.bindEvents();
+            }
+
+            initializeUI() {
+                // Widget now handled by UniversalCartHeader component
+                // Just update the universal header's cart count
+                this.updateUI();
+            }
+
+            bindEvents() {
+                // Cart widget events now handled by UniversalCartHeader component
+                // Listen for storage events (cart updates from other tabs)
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'sampleCart') {
+                        this.loadCart();
+                        this.updateUI();
+                    }
+                });
+            }
+
+            loadCart() {
+                const cartData = sessionStorage.getItem('sampleCart');
+                if (cartData) {
+                    try {
+                        const parsed = JSON.parse(cartData);
+                        this.samples = Array.isArray(parsed) ? parsed : (parsed.samples || []);
+                    } catch (e) {
+                        this.samples = [];
+                    }
+                } else {
+                    this.samples = [];
+                }
+            }
+
+            updateUI() {
+                // Trigger universal header to update cart count
+                if (window.universalCartHeader) {
+                    window.universalCartHeader.updateCartCount();
+                }
+
+                // Dispatch custom event for other components to listen to
+                window.dispatchEvent(new CustomEvent('cartUpdated'));
+            }
+        }
+
+        // Initialize sample cart when DOM is ready
+        let sampleCart = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize universal header
+            window.universalCartHeader = new UniversalCartHeader({
+                isCartPage: false,
+                showContactInfo: true
+            });
+
+            sampleCart = new SampleCart();
+            window.sampleCart = sampleCart; // Make globally accessible
+        });
+    </script>
+
+    <script>
+        // Global variables for product state
+        let currentProducts = [];
+        let selectedColorIndex = 0;
+        let currentImageType = 'model-front';
+        let availableImages = {};
+        
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                style: params.get('style'),
+                name: params.get('name'),
+                type: params.get('type'),
+                mode: params.get('mode'),
+                ref: params.get('ref'),
+                price: params.get('price'),
+                sampleType: params.get('sampleType')
+            };
+        }
+
+        // Initialize page
+        async function initializePage() {
+            const params = getUrlParams();
+            
+            if (!params.style) {
+                showError('Product not found');
+                return;
+            }
+
+            // Update page title
+            document.title = `${params.name || params.style} - Northwest Custom Apparel`;
+            
+            // Fetch product details from API
+            try {
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${params.style}`);
+                
+                if (response.ok) {
+                    const products = await response.json();
+                    if (products && products.length > 0) {
+                        currentProducts = products;
+                        displayProduct(products[0], params);
+                        displayColors(products);
+                        loadRelatedProducts(params.type);
+                    } else {
+                        // Fallback for non-Sanmar products
+                        displayFallbackProduct(params);
+                        loadRelatedProducts(params.type);
+                    }
+                } else {
+                    displayFallbackProduct(params);
+                    loadRelatedProducts(params.type);
+                }
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                displayFallbackProduct(params);
+                loadRelatedProducts(params.type);
+            }
+
+            // Hide loading, show content
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('backButtonSection').style.display = 'block';
+            document.getElementById('productShowcase').style.display = 'grid';
+            document.getElementById('relatedSection').style.display = 'block';
+        }
+
+        // Display product from API data
+        function displayProduct(product, params) {
+            // Update product info
+            const productName = params.name || product.PRODUCT_TITLE || 'Product Details';
+            document.getElementById('productTitle').textContent = productName;
+            document.getElementById('productStyle').textContent = `Style #${product.STYLE}`;
+            
+            // Update breadcrumb with product name
+            document.getElementById('breadcrumbProductName').textContent = productName;
+            
+            if (product.PRODUCT_DESCRIPTION) {
+                document.getElementById('productDescription').textContent = product.PRODUCT_DESCRIPTION;
+            }
+
+            // Update badge based on type
+            const badgeText = {
+                'dtg': 'DTG Top Seller',
+                'screenprint': 'Screen Print Top Seller',
+                'embroidery': 'Embroidery Top Seller',
+                'caps': 'Top Selling Cap'
+            };
+            document.getElementById('productBadge').textContent = badgeText[params.type] || 'Top Seller';
+
+            // Collect all available images for this product color
+            availableImages = {};
+            if (product.FRONT_MODEL) availableImages['model-front'] = product.FRONT_MODEL;
+            if (product.BACK_MODEL) availableImages['model-back'] = product.BACK_MODEL;
+            if (product.FRONT_FLAT) availableImages['flat-front'] = product.FRONT_FLAT;
+            if (product.BACK_FLAT) availableImages['flat-back'] = product.BACK_FLAT;
+            
+            // Display main image and thumbnails
+            updateMainImage();
+            createThumbnails();
+
+            // Update product details
+            document.getElementById('categoryValue').textContent = product.CATEGORY_NAME || 'Apparel';
+            document.getElementById('brandValue').textContent = product.BRAND_NAME || 'Premium Brand';
+            document.getElementById('decorationValue').textContent = getDecorationType(params.type);
+
+            // Parse and display features
+            if (product.PRODUCT_DESCRIPTION) {
+                const features = product.PRODUCT_DESCRIPTION.split('     ').filter(f => f.trim());
+                if (features.length > 1) {
+                    const featureList = document.getElementById('featureList');
+                    featureList.innerHTML = features.slice(1).map(f => `<li>${f.trim()}</li>`).join('');
+                }
+            }
+        }
+
+        // Display color swatches with click functionality
+        function displayColors(products) {
+            currentProducts = products; // Store for later use
+            const swatchContainer = document.getElementById('colorSwatches');
+            const colorSection = document.getElementById('colorSelection');
+            swatchContainer.innerHTML = ''; // Clear existing
+            
+            // Group products by color and create unique swatches
+            const colorMap = new Map();
+            products.forEach((product, index) => {
+                if (!colorMap.has(product.COLOR_NAME)) {
+                    colorMap.set(product.COLOR_NAME, index);
+                }
+            });
+            
+            // Create swatches for each unique color
+            colorMap.forEach((productIndex, colorName) => {
+                const product = products[productIndex];
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch' + (productIndex === selectedColorIndex ? ' active' : '');
+                swatch.dataset.colorIndex = productIndex;
+                
+                // Create swatch HTML - clicking the COLOR_SQUARE_IMAGE changes main image
+                swatch.innerHTML = `
+                    <div class="color-swatch-image">
+                        ${product.COLOR_SQUARE_IMAGE ?
+                            `<img src="${product.COLOR_SQUARE_IMAGE}" alt="${colorName}" loading="lazy">` :
+                            `<div style="width:100%; height:100%; background:${getColorHex(colorName)}; border-radius:8px;"></div>`
+                        }
+                    </div>
+                    <div class="color-name">${colorName}</div>
+                `;
+                
+                // Add click handler to change color and update main image
+                swatch.onclick = () => selectColor(productIndex);
+                swatchContainer.appendChild(swatch);
+            });
+            
+            // Show color section if there are colors
+            if (colorMap.size > 0) {
+                colorSection.style.display = 'block';
+            }
+        }
+
+        // Select a color and update images - triggered by clicking color swatch
+        function selectColor(colorIndex) {
+            selectedColorIndex = colorIndex;
+            const product = currentProducts[colorIndex];
+
+            // Update active swatch
+            document.querySelectorAll('.color-swatch').forEach((swatch, index) => {
+                if (parseInt(swatch.dataset.colorIndex) === colorIndex) {
+                    swatch.classList.add('active');
+                } else {
+                    swatch.classList.remove('active');
+                }
+            });
+
+            // Collect available images for this color
+            availableImages = {};
+            if (product.FRONT_MODEL) availableImages['model-front'] = product.FRONT_MODEL;
+            if (product.BACK_MODEL) availableImages['model-back'] = product.BACK_MODEL;
+            if (product.FRONT_FLAT) availableImages['flat-front'] = product.FRONT_FLAT;
+            if (product.BACK_FLAT) availableImages['flat-back'] = product.BACK_FLAT;
+
+            // Reset to front model view when changing colors
+            currentImageType = Object.keys(availableImages)[0] || 'model-front';
+
+            // Update displays with new color's images
+            updateMainImage();
+            createThumbnails();
+
+            // In sample mode, update color indicator and reset size selections
+            const params = getUrlParams();
+            if (params.mode === 'sample') {
+                updateColorIndicator();
+                // Reset size selections when switching colors
+                selectedSamples = {};
+                updateSampleSummary();
+                populateSizeQuantityGrid();
+            }
+        }
+        
+        // Update the main image display
+        function updateMainImage() {
+            const mainContainer = document.getElementById('mainImageContainer');
+            const imageUrl = availableImages[currentImageType];
+            
+            if (imageUrl) {
+                mainContainer.innerHTML = `
+                    <img src="${imageUrl}" alt="Product Image" 
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-tshirt\\'></i><p>Image not available</p></div>'">
+                `;
+            } else {
+                mainContainer.innerHTML = `
+                    <div class="image-placeholder">
+                        <i class="fas fa-tshirt"></i>
+                        <p>Image not available</p>
+                    </div>
+                `;
+            }
+            
+            // Add image dots if multiple views
+            if (Object.keys(availableImages).length > 1) {
+                addImageDots();
+            }
+        }
+        
+        // Create thumbnail strip for different views (model front/back, flat front/back)
+        function createThumbnails() {
+            const thumbnailStrip = document.getElementById('thumbnailStrip');
+            thumbnailStrip.innerHTML = '';
+            
+            // Define view labels
+            const viewLabels = {
+                'model-front': 'Model Front',
+                'model-back': 'Model Back',
+                'flat-front': 'Flat Front',
+                'flat-back': 'Flat Back'
+            };
+            
+            // Create thumbnails for each available view
+            ['model-front', 'model-back', 'flat-front', 'flat-back'].forEach(viewType => {
+                if (availableImages[viewType]) {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'thumbnail' + (viewType === currentImageType ? ' active' : '');
+                    thumb.dataset.viewType = viewType;
+                    thumb.innerHTML = `
+                        <img src="${availableImages[viewType]}" alt="${viewLabels[viewType]}"
+                             title="${viewLabels[viewType]}"
+                             loading="lazy">
+                    `;
+                    thumb.onclick = () => selectView(viewType);
+                    thumbnailStrip.appendChild(thumb);
+                }
+            });
+        }
+        
+        // Select a different view (model/flat, front/back)
+        function selectView(viewType) {
+            currentImageType = viewType;
+            
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                if (thumb.dataset.viewType === viewType) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+            
+            // Update main image
+            updateMainImage();
+        }
+        
+        // Add navigation dots to main image
+        function addImageDots() {
+            const existingDots = document.querySelector('.image-dots');
+            if (existingDots) existingDots.remove();
+            
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'image-dots';
+            
+            const imageTypes = Object.keys(availableImages);
+            imageTypes.forEach((type, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'image-dot' + (type === currentImageType ? ' active' : '');
+                dot.onclick = () => selectView(type);
+                dotsContainer.appendChild(dot);
+            });
+            
+            document.getElementById('mainImageContainer').appendChild(dotsContainer);
+        }
+        
+        // Get color hex code for fallback
+        function getColorHex(colorName) {
+            const colors = {
+                'Black': '#000000',
+                'White': '#FFFFFF',
+                'Navy': '#001F3F',
+                'Red': '#FF0000',
+                'Royal': '#4169E1',
+                'Sport Grey': '#8C8C8C',
+                'Charcoal': '#36454F',
+                'Forest Green': '#228B22',
+                'Maroon': '#800000',
+                'Light Blue': '#ADD8E6',
+                'Gold': '#FFD700',
+                'Orange': '#FFA500'
+            };
+            return colors[colorName] || '#CCCCCC';
+        }
+
+        // Display fallback for non-Sanmar products
+        function displayFallbackProduct(params) {
+            const productName = params.name || 'Premium Product';
+            document.getElementById('productTitle').textContent = productName;
+            document.getElementById('productStyle').textContent = `Style #${params.style}`;
+            
+            // Update breadcrumb with product name
+            document.getElementById('breadcrumbProductName').textContent = productName;
+            
+            // Set decoration-specific description
+            const descriptions = {
+                'embroidery': 'Premium quality garment perfect for embroidered logos and designs. This top seller is ideal for corporate apparel and team uniforms.',
+                'dtg': 'Excellent choice for direct-to-garment printing. The fabric composition ensures vibrant colors and long-lasting prints.',
+                'screenprint': 'One of our most popular items for screen printing. Perfect for bulk orders with crisp, durable designs.',
+                'caps': 'Top-quality headwear suitable for embroidered logos. Structured design maintains shape wash after wash.'
+            };
+            
+            document.getElementById('productDescription').textContent = descriptions[params.type] || 'This is one of our most popular products. Contact us for detailed specifications and custom pricing.';
+            
+            // Detect brand from name
+            const brand = detectBrand(params.name);
+            document.getElementById('brandValue').textContent = brand;
+            document.getElementById('decorationValue').textContent = getDecorationType(params.type);
+            
+            // Update features based on brand
+            if (brand !== 'Premium Brand') {
+                const brandFeatures = {
+                    'Nike': ['Dri-FIT moisture management technology', 'Premium athletic performance', 'Professional grade materials', 'Multiple color options'],
+                    'Carhartt': ['Rugged durability', 'Weather-resistant materials', 'Professional workwear quality', 'Built to last construction'],
+                    'Eddie Bauer': ['Outdoor-ready construction', 'Weather protection features', 'Premium comfort fit', 'Professional appearance'],
+                    'New Era': ['Structured crown design', 'Premium embroidery surface', 'Authentic sports styling', 'Adjustable fit options']
+                };
+                
+                if (brandFeatures[brand]) {
+                    document.getElementById('featureList').innerHTML = brandFeatures[brand].map(f => `<li>${f}</li>`).join('');
+                }
+            }
+        }
+
+        // Detect brand from product name
+        function detectBrand(name) {
+            if (!name) return 'Premium Brand';
+            const nameLower = name.toLowerCase();
+            if (nameLower.includes('nike')) return 'Nike';
+            if (nameLower.includes('carhartt')) return 'Carhartt';
+            if (nameLower.includes('eddie bauer')) return 'Eddie Bauer';
+            if (nameLower.includes('new era')) return 'New Era';
+            if (nameLower.includes('port & company')) return 'Port & Company';
+            if (nameLower.includes('port authority')) return 'Port Authority';
+            if (nameLower.includes('sport-tek')) return 'Sport-Tek';
+            if (nameLower.includes('gildan')) return 'Gildan';
+            if (nameLower.includes('jerzees')) return 'Jerzees';
+            if (nameLower.includes('hanes')) return 'Hanes';
+            if (nameLower.includes('bella')) return 'Bella+Canvas';
+            if (nameLower.includes('district')) return 'District';
+            if (nameLower.includes('cornerstone')) return 'CornerStone';
+            if (nameLower.includes('richardson')) return 'Richardson';
+            return 'Premium Brand';
+        }
+
+        // Get decoration type display name
+        function getDecorationType(type) {
+            const types = {
+                'dtg': 'Direct to Garment (DTG)',
+                'screenprint': 'Screen Printing',
+                'embroidery': 'Embroidery',
+                'caps': 'Embroidery'
+            };
+            return types[type] || 'Custom Decoration';
+        }
+
+        // Load smart API-driven product recommendations
+        async function loadRelatedProducts(type) {
+            try {
+                const grid = document.getElementById('relatedGrid');
+                const relatedSection = document.getElementById('relatedSection');
+
+                // Show loading state
+                grid.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i><p style="margin-top: 1rem;">Loading recommendations...</p></div>';
+
+                // Get current product data
+                const params = getUrlParams();
+                const currentProduct = currentProducts[selectedColorIndex] || currentProducts[0];
+
+                if (!currentProduct) {
+                    console.warn('[ProductPage] No current product data available');
+                    grid.innerHTML = '';
+                    relatedSection.style.display = 'none';
+                    return;
+                }
+
+                // Build product context for recommendations
+                const productContext = {
+                    style: currentProduct.STYLE || params.style,
+                    category: currentProduct.CATEGORY_NAME || 'Apparel',
+                    brand: currentProduct.BRAND_NAME || ''
+                };
+
+                console.log('[ProductPage] Getting recommendations for:', productContext);
+
+                // Safety check: Ensure recommendations service is loaded
+                if (!window.productRecommendations) {
+                    console.warn('[ProductPage] Product recommendations service not loaded');
+                    grid.innerHTML = '';
+                    relatedSection.style.display = 'none';
+                    return;
+                }
+
+                // Get recommendations from service
+                const recommendations = await window.productRecommendations.getRecommendations(productContext);
+
+                // Clear loading state
+                grid.innerHTML = '';
+
+                if (recommendations.length === 0) {
+                    console.warn('[ProductPage] No recommendations found');
+                    relatedSection.style.display = 'none';
+                    return;
+                }
+
+                // Display each recommendation
+                recommendations.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'related-card';
+                    card.onclick = () => navigateToProduct(product, type);
+
+                    // Build image HTML (use product image or fallback icon)
+                    const imageHTML = product.imageUrl
+                        ? `<img src="${product.imageUrl}" alt="${product.title}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">`
+                        : `<i class="fas fa-tshirt" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.3;"></i>`;
+
+                    // Build best seller badge
+                    const bestSellerBadge = (product.isBestSeller === true || product.isBestSeller === 'true')
+                        ? '<span class="badge-best-seller" style="position: absolute; top: 0.5rem; right: 0.5rem; background: gold; color: #000; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">⭐ Best Seller</span>'
+                        : '';
+
+                    card.innerHTML = `
+                        <div class="related-image" style="position: relative;">
+                            ${imageHTML}
+                            ${bestSellerBadge}
+                        </div>
+                        <div class="related-content">
+                            <div class="related-title">${product.title || product.name}</div>
+                            <div class="related-style">Style #${product.style}</div>
+                            ${product.category ? `<div class="related-category" style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">${product.category}</div>` : ''}
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                // Show section
+                relatedSection.style.display = 'block';
+
+                console.log(`[ProductPage] Displayed ${recommendations.length} recommendations`);
+
+            } catch (error) {
+                console.error('[ProductPage] Error loading recommendations:', error);
+                // Hide section on error
+                document.getElementById('relatedSection').style.display = 'none';
+            }
+        }
+
+        // Navigate to recommended product
+        function navigateToProduct(product, type) {
+            const params = new URLSearchParams({
+                style: product.style,
+                name: product.title || product.name,
+                type: type,
+                ref: 'recommendations'
+            });
+            window.location.href = `${window.location.pathname}?${params}`;
+        }
+
+        // ==============================================
+        // DEBUG UTILITIES - Sample Order Flow Tracking
+        // ==============================================
+        window.SAMPLE_DEBUG = {
+            enabled: true,  // Set to false to disable debug logging
+
+            // Log size update with formatted output
+            logSizeUpdate: function(size, oldQty, newQty, selectedSamples) {
+                if (!this.enabled) return;
+                console.group(`🔄 [Size Update] ${size}`);
+                console.log('Old Quantity:', oldQty);
+                console.log('New Quantity:', newQty);
+                console.log('All Selected Sizes:', selectedSamples);
+                console.log('Total Selected:', Object.values(selectedSamples).reduce((sum, q) => sum + q, 0));
+                console.groupEnd();
+            },
+
+            // Log cart payload before adding
+            logCartPayload: function(cartItem, existingCart) {
+                if (!this.enabled) return;
+                console.group('📦 [Add to Cart] Payload');
+                console.log('New Item:', JSON.stringify(cartItem, null, 2));
+                console.log('Existing Cart:', existingCart);
+                console.log('Cart Size After Add:', existingCart.length + 1);
+                console.groupEnd();
+            },
+
+            // Log sessionStorage state
+            logStorageState: function() {
+                if (!this.enabled) return;
+                const stored = sessionStorage.getItem('sampleCart');
+                console.group('💾 [SessionStorage] Current State');
+                console.log('Raw JSON:', stored);
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        console.table(parsed.map((item, i) => ({
+                            Index: i,
+                            Style: item.style,
+                            Color: item.color,
+                            Sizes: JSON.stringify(item.sizes),
+                            AddedAt: new Date(item.addedAt).toLocaleTimeString()
+                        })));
+                    } catch (e) {
+                        console.error('Parse error:', e);
+                    }
+                } else {
+                    console.log('Cart is empty');
+                }
+                console.groupEnd();
+            }
+        };
+
+        // Request quote function
+        function requestQuote() {
+            const params = getUrlParams();
+            const subject = `Quote Request: ${params.name || params.style}`;
+            const body = `Hello,\n\nI'm interested in getting a custom quote for:\n\nProduct: ${params.name || 'Product'}\nStyle: #${params.style}\n\nPlease provide pricing for custom decoration.\n\nThank you!`;
+            
+            window.location.href = `mailto:sales@nwcustomapparel.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('loadingContainer').innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-secondary);">${message}</p>
+                    <a href="/" class="btn btn-primary" style="margin-top: 1rem;">Go to Homepage</a>
+                </div>
+            `;
+        }
+
+        // Sample mode state
+        let sampleMode = false;
+        let selectedSamples = {};
+
+        // Check if page is in sample mode
+        function checkSampleMode() {
+            const params = getUrlParams();
+            sampleMode = params.mode === 'sample';
+
+            console.log('[Sample Mode Debug]', {
+                allParams: params,
+                mode: params.mode,
+                sampleMode: sampleMode,
+                ctaElement: document.getElementById('ctaSection'),
+                sizeQuantityElement: document.getElementById('sizeQuantitySection')
+            });
+
+            if (sampleMode) {
+                // Hide CTA section, show size/quantity section
+                document.getElementById('ctaSection').style.display = 'none';
+                document.getElementById('sizeQuantitySection').style.display = 'block';
+
+                // Update color indicator
+                updateColorIndicator();
+
+                // Populate available sizes
+                populateSizeQuantityGrid();
+            }
+        }
+
+        // Update color indicator with current selection
+        function updateColorIndicator() {
+            const colorNameEl = document.getElementById('currentColorName');
+            if (colorNameEl && currentProducts[selectedColorIndex]) {
+                colorNameEl.textContent = currentProducts[selectedColorIndex].COLOR_NAME;
+            }
+        }
+
+        // Populate size/quantity selection grid
+        async function populateSizeQuantityGrid() {
+            const params = getUrlParams();
+            const gridContainer = document.getElementById('sizeQuantityGrid');
+
+            // Get current color from loaded products
+            const currentColor = currentProducts[selectedColorIndex]?.CATALOG_COLOR || '';
+
+            // Fetch available sizes from API (color-specific)
+            try {
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=${params.style}&color=${encodeURIComponent(currentColor)}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const sizes = data.sizes || [];  // Extract sizes array from response object
+
+                    // API returns object with sizes property: {style, color, sizes: [...], warehouses: [...]}
+                    if (!Array.isArray(sizes) || sizes.length === 0) {
+                        console.warn(`[SizeGrid] Style ${params.style}, Color ${currentColor}: No sizes returned, using fallback`);
+                        displayStandardSizes(gridContainer);
+                        return;
+                    }
+
+                    console.log(`[SizeGrid] Style ${params.style}, Color ${currentColor}: Received ${sizes.length} color-specific sizes:`, sizes);
+
+                    // Sort sizes in logical order (XS → S → M → L → XL → 2XL → 3XL → 4XL → Tall sizes)
+                    const sizeOrder = {
+                        'OSFA': 0,  // One-size-fits-all comes first
+                        'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5,
+                        '2XL': 6, '3XL': 7, '4XL': 8, '5XL': 9, '6XL': 10,
+                        'LT': 11, 'XLT': 12, '2XLT': 13, '3XLT': 14, '4XLT': 15, '5XLT': 16
+                    };
+
+                    sizes.sort((a, b) => {
+                        const orderA = sizeOrder[a] !== undefined ? sizeOrder[a] : 999;
+                        const orderB = sizeOrder[b] !== undefined ? sizeOrder[b] : 999;
+                        return orderA - orderB;
+                    });
+
+                    console.log(`[SizeGrid] Style ${params.style}: Final size count: ${sizes.length} (sorted)`, sizes);
+
+                    if (sizes.length === 0) {
+                        console.warn('[SizeGrid] No sizes from API, using standard sizes as fallback');
+                        displayStandardSizes(gridContainer);
+                    } else if (sizes.length === 1) {
+                        // Single size product (caps, one-size items)
+                        console.log('[SizeGrid] Single-size product detected');
+                        displaySizes(gridContainer, sizes);
+                    } else {
+                        // Multiple sizes
+                        displaySizes(gridContainer, sizes);
+                    }
+                } else {
+                    console.error('[SizeGrid] API response not OK:', response.status);
+                    displayStandardSizes(gridContainer);
+                }
+            } catch (error) {
+                console.error('[SizeGrid] Error fetching sizes:', error);
+                displayStandardSizes(gridContainer);
+            }
+        }
+
+        // Display sizes in grid
+        function displaySizes(container, sizes) {
+            container.innerHTML = '';
+
+            sizes.forEach(size => {
+                const sizeItem = document.createElement('div');
+                sizeItem.className = 'size-quantity-item';
+                sizeItem.setAttribute('data-size', size);
+
+                sizeItem.innerHTML = `
+                    <div class="size-label">${size}</div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity('${size}', -1)">−</button>
+                        <span class="quantity-value" id="qty-${size}">0</span>
+                        <button class="quantity-btn" onclick="updateQuantity('${size}', 1)">+</button>
+                    </div>
+                `;
+
+                container.appendChild(sizeItem);
+            });
+        }
+
+        // Display standard sizes as fallback
+        function displayStandardSizes(container) {
+            const standardSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+            displaySizes(container, standardSizes);
+        }
+
+        // Update quantity for a size
+        function updateQuantity(size, delta) {
+            const oldQty = selectedSamples[size] || 0;
+            const newQty = Math.max(0, oldQty + delta); // Just prevent negative
+
+            // === ENHANCED DEBUGGING ===
+            console.log(`📊 [SIZE UPDATE] Size: ${size}, Old: ${oldQty}, New: ${newQty}, Delta: ${delta}`);
+
+            // DEBUG: Log size update
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logSizeUpdate(size, oldQty, newQty, {...selectedSamples, [size]: newQty});
+            }
+
+            // Update quantity
+            if (newQty === 0) {
+                delete selectedSamples[size];
+            } else {
+                selectedSamples[size] = newQty;
+            }
+
+            console.log(`📊 [SIZE UPDATE] Updated selectedSamples:`, selectedSamples);
+
+            // Update UI
+            document.getElementById(`qty-${size}`).textContent = newQty;
+
+            // Update parent container selection state
+            const sizeItem = document.querySelector(`[data-size="${size}"]`);
+            if (newQty > 0) {
+                sizeItem.classList.add('selected');
+            } else {
+                sizeItem.classList.remove('selected');
+            }
+
+            updateSampleSummary();
+        }
+
+        // Update sample summary and button state
+        function updateSampleSummary() {
+            const totalSelected = Object.values(selectedSamples).reduce((sum, qty) => sum + qty, 0);
+
+            // Add null check to prevent errors after success message
+            const selectedCountEl = document.getElementById('selectedCount');
+            if (selectedCountEl) {
+                selectedCountEl.textContent = totalSelected;
+            }
+
+            // Enable button if ANY samples selected
+            const addButton = document.getElementById('addToCartBtn');
+            if (addButton) {
+                if (totalSelected > 0) {
+                    addButton.disabled = false;
+                    addButton.style.opacity = '1';
+                    addButton.style.cursor = 'pointer';
+                } else {
+                    addButton.disabled = true;
+                    addButton.style.opacity = '0.5';
+                    addButton.style.cursor = 'not-allowed';
+                }
+            }
+        }
+
+        // Add samples to cart
+        function addToSampleCart() {
+            // === ENHANCED DEBUGGING (Always enabled) ===
+            console.log('🛒 [ADD TO CART] Function called');
+            console.log('🛒 [ADD TO CART] selectedSamples:', selectedSamples);
+            console.log('🛒 [ADD TO CART] selectedColorIndex:', selectedColorIndex);
+            console.log('🛒 [ADD TO CART] currentProducts length:', currentProducts?.length);
+
+            const params = getUrlParams();
+            const product = currentProducts[selectedColorIndex];
+
+            console.log('🛒 [ADD TO CART] URL params:', params);
+            console.log('🛒 [ADD TO CART] Selected product:', product);
+
+            // DEBUG: Start add-to-cart group
+            if (window.SAMPLE_DEBUG?.enabled) {
+                console.group('🛒 [Sample Mode] Adding to Cart');
+                console.log('URL Params:', params);
+                console.log('Selected Product:', product);
+                console.log('Selected Samples:', selectedSamples);
+            }
+
+            // FIXED: Explicitly read from sessionStorage, ignore any global sampleCart
+            let cartArray = [];
+            try {
+                const stored = sessionStorage.getItem('sampleCart');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+
+                    // Handle both old (array) and new (nested) formats
+                    if (Array.isArray(parsed)) {
+                        // Old format: plain array
+                        cartArray = parsed;
+                    } else if (parsed && parsed.samples && Array.isArray(parsed.samples)) {
+                        // New format: {samples: [...]}
+                        cartArray = parsed.samples;
+                    } else {
+                        console.warn('[Sample Mode] Unrecognized cart format, resetting to empty array');
+                        cartArray = [];
+                    }
+                } else {
+                    cartArray = [];
+                }
+            } catch (e) {
+                console.error('[Sample Mode] Error parsing cart:', e);
+                cartArray = [];
+            }
+
+            // Create cart item
+            const cartItem = {
+                style: params.style,
+                name: params.name,
+                color: product.COLOR_NAME,
+                catalogColor: product.CATALOG_COLOR,  // Use CATALOG_COLOR for inventory API (no spaces/abbreviations)
+                imageUrl: product.FRONT_MODEL || product.FRONT_FLAT || '',
+                sizes: { ...selectedSamples },
+                type: params.sampleType || params.type || 'free',  // Use sampleType from URL
+                price: parseFloat(params.price) || 0,  // Use actual price from URL
+                sampleType: params.sampleType || 'free',  // For ShopWorks categorization
+                addedAt: new Date().toISOString()
+            };
+
+            // DEBUG: Log payload
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logCartPayload(cartItem, cartArray);
+            }
+
+            // Add to cart
+            cartArray.push(cartItem);
+
+            // Save with nested structure for checkout compatibility
+            const cartData = {
+                samples: cartArray,
+                timestamp: new Date().toISOString()
+            };
+            sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+
+            console.log('✅ [ADD TO CART] Saved to sessionStorage');
+            console.log('✅ [ADD TO CART] Cart item:', cartItem);
+            console.log('✅ [ADD TO CART] Cart now has', cartArray.length, 'items');
+            console.log('✅ [ADD TO CART] sessionStorage value:', sessionStorage.getItem('sampleCart'));
+
+            console.log('[Sample Mode] Added to cart:', cartItem);
+            console.log('[Sample Mode] Cart now has', cartArray.length, 'items');
+
+            // DEBUG: Log storage state
+            if (window.SAMPLE_DEBUG) {
+                window.SAMPLE_DEBUG.logStorageState();
+                console.groupEnd();
+            }
+
+            // Show success message
+            showSuccessMessage();
+        }
+
+        // Show success message
+        function showSuccessMessage() {
+            const summary = document.getElementById('sampleSummary');
+            const originalContent = summary.innerHTML;
+
+            summary.innerHTML = `
+                <div style="text-align: center; color: var(--primary-color);">
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <div><strong>Added to Cart!</strong></div>
+                    <div style="margin-top: 0.5rem;">
+                        <a href="/sample-cart.html" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                            View Cart
+                        </a>
+                        <button onclick="resetForAnotherSample()" style="font-size: 0.9rem; padding: 0.5rem 1rem; margin-left: 0.5rem; background: white; color: var(--primary-color); border: 2px solid var(--primary-color); border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-plus"></i> Add Another Color
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reset for another sample
+        function resetForAnotherSample() {
+            selectedSamples = {};
+
+            // Reset all quantities in UI
+            document.querySelectorAll('.quantity-value').forEach(el => {
+                el.textContent = '0';
+            });
+
+            // Remove selection styling
+            document.querySelectorAll('.size-quantity-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            updateSampleSummary();
+
+            // Restore summary content
+            const summary = document.getElementById('sampleSummary');
+            summary.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: var(--text-primary);">Selected: <span id="selectedCount">0</span> samples</strong>
+                    <button id="addToCartBtn" class="btn btn-primary" onclick="addToSampleCart()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        <i class="fas fa-shopping-cart"></i> Add to Sample Cart
+                    </button>
+                </div>
+            `;
+        }
+
+        // ==============================================
+        // DEBUG HELPERS - Console Utilities
+        // ==============================================
+        window.DEBUG_HELPERS = {
+            // View current cart
+            viewCart: () => {
+                const cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+                console.table(cart.map((item, i) => ({
+                    Index: i,
+                    Style: item.style,
+                    Name: item.name,
+                    Color: item.color,
+                    Sizes: JSON.stringify(item.sizes)
+                })));
+                return cart;
+            },
+
+            // Clear cart
+            clearCart: () => {
+                sessionStorage.removeItem('sampleCart');
+                console.log('✅ Cart cleared');
+            },
+
+            // Toggle debug mode
+            toggleDebug: () => {
+                if (window.SAMPLE_DEBUG) window.SAMPLE_DEBUG.enabled = !window.SAMPLE_DEBUG.enabled;
+                if (window.CART_DEBUG) window.CART_DEBUG.enabled = !window.CART_DEBUG.enabled;
+                const enabled = window.SAMPLE_DEBUG?.enabled || window.CART_DEBUG?.enabled;
+                console.log('🔧 Debug mode:', enabled ? 'ENABLED' : 'DISABLED');
+                return enabled;
+            },
+
+            // Export cart as JSON
+            exportCart: () => {
+                const cart = sessionStorage.getItem('sampleCart');
+                console.log('📋 Cart JSON:', cart);
+                return cart;
+            },
+
+            // Simulate adding a sample
+            testAddSample: (style = 'PC54', color = 'Red', sizes = {M: 1, L: 1}) => {
+                const testItem = {
+                    style: style,
+                    name: 'Test Product',
+                    color: color,
+                    catalogColor: color,
+                    imageUrl: '',
+                    sizes: sizes,
+                    type: 'shirt',
+                    price: 0.01,
+                    sampleType: 'free',
+                    addedAt: new Date().toISOString()
+                };
+
+                let cart = JSON.parse(sessionStorage.getItem('sampleCart') || '[]');
+                cart.push(testItem);
+                sessionStorage.setItem('sampleCart', JSON.stringify(cart));
+                console.log('✅ Test sample added:', testItem);
+                console.log('📊 Cart now has', cart.length, 'items');
+                return testItem;
+            }
+        };
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', async function() {
+            await initializePage();
+            checkSampleMode();
+
+            // Log available debug helpers
+            console.log('%c🔧 Debug Helpers Available', 'font-weight: bold; font-size: 14px; color: #2196F3');
+            console.log('%c  DEBUG_HELPERS.viewCart()', 'color: #4CAF50', '- View cart contents');
+            console.log('%c  DEBUG_HELPERS.clearCart()', 'color: #4CAF50', '- Clear cart');
+            console.log('%c  DEBUG_HELPERS.toggleDebug()', 'color: #4CAF50', '- Enable/disable debug logs');
+            console.log('%c  DEBUG_HELPERS.exportCart()', 'color: #4CAF50', '- Export cart JSON');
+            console.log('%c  DEBUG_HELPERS.testAddSample()', 'color: #4CAF50', '- Add test sample');
+            console.log('%c  window.SAMPLE_DEBUG.enabled', 'color: #FF9800', '- Current state:', window.SAMPLE_DEBUG?.enabled);
+        });
+    </script>
+</body>
+</html>

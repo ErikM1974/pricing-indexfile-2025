@@ -1,0 +1,536 @@
+/**
+ * DTF Toggle Pricing Interface Styles
+ * Two-column layout: Print Locations (left) | Quantity Tiers (right)
+ * iOS-style toggle switches with green theme
+ */
+
+/* Pricing Matrix Header - Matches DTG style */
+.dtf-pricing-matrix-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dtf-matrix-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.dtf-matrix-subtitle {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Main Container - Two Column Grid */
+.dtf-toggle-pricing-container {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr; /* Left column 65%, right 35% - fixes whitespace */
+    gap: 40px;
+    margin: 0;
+    max-width: 1200px;
+    padding: 0;
+}
+
+/* Section Headers with Icons - Matches DTG style */
+.dtf-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dtf-section-icon {
+    font-size: 1.5rem;
+    color: #4cb354;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+/* Column Headers */
+.dtf-column-header {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+    margin-top: 0;
+}
+
+.dtf-column-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Print Locations Column */
+.dtf-locations-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Size Category Groups */
+.dtf-size-category {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dtf-size-category-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3a7c52;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8f5e9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dtf-size-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2d5f3f;
+}
+
+/* Toggle Items - 2 Column Layout */
+.dtf-location-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 12px;
+    column-gap: 16px; /* Slightly wider gap between columns */
+}
+
+.dtf-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.dtf-toggle-item:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    transform: translateX(2px);
+}
+
+.dtf-toggle-item.active {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
+    transform: translateX(4px);
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
+}
+
+.dtf-toggle-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    flex: 1;
+}
+
+.dtf-toggle-item.active .dtf-toggle-label {
+    color: #4cb354 !important;
+    font-weight: 600;
+}
+
+/* iOS Toggle Switch */
+.dtf-toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    background: #cbd5e0;
+    border-radius: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.dtf-toggle-item.active .dtf-toggle-switch {
+    background: #4ade80;
+}
+
+.dtf-toggle-switch-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dtf-toggle-item.active .dtf-toggle-switch-slider {
+    transform: translateX(24px);
+}
+
+/* Quantity Tiers Column */
+.dtf-tiers-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tier Buttons - Vertical Stack */
+/* Override any grid layouts (including .pricing-tiers-grid from dtf-calculator-fix.css) */
+#dtf-tier-buttons,
+.dtf-tier-buttons,
+.dtf-tiers-column .dtf-tier-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 12px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dtf-tier-button {
+    padding: 16px 20px;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.dtf-tier-button:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+.dtf-tier-button.selected {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
+    font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
+}
+
+/* Conditional Quantity Input for 10-23 Tier */
+.dtf-quantity-input-container {
+    display: none;
+    margin-top: 12px;
+    padding: 16px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+}
+
+.dtf-quantity-input-container.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dtf-quantity-input-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.dtf-quantity-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    background: white;
+    color: #1f2937;
+}
+
+.dtf-quantity-input:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+}
+
+.dtf-quantity-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #92400e;
+}
+
+/* Info Box Below Tiers */
+.dtf-info-box {
+    padding: 16px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    color: #1e3a8a;
+    line-height: 1.5;
+}
+
+.dtf-info-box i {
+    margin-right: 8px;
+    color: #3b82f6;
+}
+
+/* Live Price Display - Matches DTG style */
+.dtf-live-price-display {
+    margin-top: 32px;
+    padding: 32px;
+    background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    border: none;
+    border-radius: 12px;
+    text-align: center;
+    position: relative; /* CRITICAL: Allows absolutely positioned tooltips to be positioned relative to this container */
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+}
+
+/* Price label - matches DTG "Price per shirt" */
+.dtf-price-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: white;
+    opacity: 0.95;
+    margin-bottom: 12px;
+    text-transform: none;
+}
+
+.dtf-price-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative; /* Allows tooltip positioning relative to price */
+}
+
+.dtf-price-details {
+    font-size: 0.95rem;
+    color: white;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.dtf-ltm-warning {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .dtf-toggle-pricing-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 15px;
+    }
+
+    .dtf-matrix-title {
+        font-size: 1.75rem;
+    }
+
+    .dtf-matrix-subtitle {
+        font-size: 1rem;
+    }
+
+    .dtf-section-header {
+        padding: 12px;
+    }
+
+    .dtf-section-icon {
+        font-size: 1.25rem;
+    }
+
+    .dtf-column-header {
+        font-size: 1.125rem;
+    }
+
+    .dtf-price-amount {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .dtf-toggle-pricing-container {
+        padding: 10px;
+        margin: 20px 0;
+    }
+
+    .dtf-toggle-item {
+        padding: 12px 14px;
+    }
+
+    .dtf-tier-button {
+        padding: 14px 16px;
+    }
+
+    .dtf-price-amount {
+        font-size: 2rem;
+    }
+
+    .dtf-column-header {
+        font-size: 1.1rem;
+    }
+}
+
+/* ========================================
+   Size Upcharge Tooltip Styles
+   ======================================== */
+
+.dtf-upcharge-info-icon {
+    font-size: 20px;
+    color: white;
+    opacity: 0.85;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.dtf-upcharge-info-icon:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.dtf-upcharge-tooltip {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 2px solid #22c55e;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+    padding: 16px;
+    min-width: 280px;
+    max-width: 320px;
+    z-index: 1000;
+    animation: tooltipFadeIn 0.3s ease;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.dtf-upcharge-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-top-color: #22c55e;
+}
+
+.dtf-upcharge-tooltip-content {
+    font-size: 14px;
+    color: #166534;
+}
+
+.dtf-upcharge-tooltip-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dcfce7;
+}
+
+.dtf-upcharge-tooltip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dtf-upcharge-base {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dcfce7;
+}
+
+.dtf-upcharge-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: #f0fdf4;
+    border-radius: 6px;
+}
+
+.dtf-upcharge-item-size {
+    font-weight: 600;
+    color: #15803d;
+}
+
+.dtf-upcharge-item-price {
+    font-weight: 600;
+    color: #22c55e;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .dtf-upcharge-tooltip {
+        min-width: 240px;
+        max-width: 280px;
+        font-size: 13px;
+    }
+
+    .dtf-upcharge-tooltip::after {
+        display: none;  /* Hide arrow on mobile */
+    }
+
+    .dtf-upcharge-info-icon {
+        font-size: 18px;
+    }
+}

@@ -86,18 +86,18 @@ class CapLogoManager {
         if (frontStitches) {
             frontStitches.addEventListener('input', (e) => this.updateFrontLogo(e.target.value));
         }
-        
+
         const frontDigitizing = document.getElementById('front-digitizing');
         if (frontDigitizing) {
             frontDigitizing.addEventListener('change', (e) => this.updateFrontDigitizing(e.target.checked));
         }
-        
-        // Add additional logo button
+
+        // Add additional logo button - INLINE PATTERN (no modal)
         const addBtn = document.getElementById('add-additional-logo-btn');
         if (addBtn) {
-            addBtn.addEventListener('click', () => this.showAddLogoModal());
+            addBtn.addEventListener('click', () => this.addAdditionalLogo());
         }
-        
+
         // Continue button
         const continueBtn = document.getElementById('continue-to-products');
         if (continueBtn) {
@@ -142,105 +142,65 @@ class CapLogoManager {
     }
     
     /**
-     * Show modal to add additional logo position
+     * Add an additional logo position (INLINE PATTERN - no modal)
      */
-    showAddLogoModal() {
+    addAdditionalLogo() {
         // Check if we have positions available
         const usedPositions = this.logos.map(logo => logo.positionCode);
         const availablePositions = this.availablePositions.filter(pos => !usedPositions.includes(pos.code));
-        
+
         if (availablePositions.length === 0) {
-            alert('All available logo positions are already in use.');
+            alert('All available logo positions are already in use. Please remove a logo to add a new one.');
             return;
         }
-        
-        // Create modal HTML
-        const modalHTML = `
-            <div id="add-logo-modal" class="modal" style="display: flex;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Add Additional Logo Position</h3>
-                        <button class="modal-close" onclick="this.closest('.modal').style.display='none'">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="add-logo-position">Position</label>
-                            <select id="add-logo-position" class="form-select">
-                                ${availablePositions.map(pos => 
-                                    `<option value="${pos.code}">${pos.name}</option>`
-                                ).join('')}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="add-logo-stitches">Stitch Count</label>
-                            <input type="number" id="add-logo-stitches" class="form-control" 
-                                   value="5000" min="1000" step="1000">
-                            <small class="form-text">First 5,000 stitches included for additional positions</small>
-                        </div>
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="add-logo-digitizing">
-                                <span class="checkmark"></span>
-                                Needs Digitizing ($100)
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button onclick="this.closest('.modal').style.display='none'" class="btn-secondary">Cancel</button>
-                        <button onclick="window.capQuoteBuilder.logoManager.addAdditionalLogo()" class="btn-primary">Add Logo</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Remove existing modal
-        const existingModal = document.getElementById('add-logo-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-        
-        // Add new modal
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-    }
-    
-    /**
-     * Add additional logo from modal
-     */
-    addAdditionalLogo() {
-        const positionCode = document.getElementById('add-logo-position').value;
-        const stitchCount = parseInt(document.getElementById('add-logo-stitches').value) || 5000;
-        const needsDigitizing = document.getElementById('add-logo-digitizing').checked;
-        
-        // Find position details
-        const positionData = this.availablePositions.find(pos => pos.code === positionCode);
-        if (!positionData) {
-            alert('Invalid position selected');
-            return;
-        }
-        
-        // Round stitch count to nearest 1000
-        const roundedCount = Math.max(1000, Math.round(stitchCount / 1000) * 1000);
-        
-        // Create additional logo object
+
+        // Create new logo object with first available position
+        const positionData = availablePositions[0];
         const additionalLogo = {
             id: `additional-${this.nextLogoId++}`,
             position: positionData.name,
-            positionCode: positionCode,
-            stitchCount: roundedCount,
-            needsDigitizing: needsDigitizing,
+            positionCode: positionData.code,
+            stitchCount: 5000, // Default 5k for additional positions
+            needsDigitizing: false,
             isRequired: false,
             baseStitchCount: 5000 // Additional logos have 5k base
         };
-        
+
         this.logos.push(additionalLogo);
         console.log('[CapLogoManager] Additional logo added:', additionalLogo);
-        
-        // Update UI
+
+        // Re-render the additional logos list
         this.renderAdditionalLogos();
         this.updatePricingPreview();
-        
-        // Close modal
-        document.getElementById('add-logo-modal').style.display = 'none';
+    }
+
+    /**
+     * Edit an additional logo field (inline editing)
+     */
+    editAdditionalLogo(logoId, field, value) {
+        const logo = this.logos.find(l => l.id === logoId);
+        if (!logo || logo.isRequired) return;
+
+        if (field === 'stitchCount') {
+            // Round to nearest 1000, minimum 1000
+            value = Math.max(1000, Math.round(parseInt(value) / 1000) * 1000);
+        } else if (field === 'positionCode') {
+            // Update both code and name
+            const positionData = this.availablePositions.find(pos => pos.code === value);
+            if (positionData) {
+                logo.position = positionData.name;
+                logo.positionCode = positionData.code;
+                console.log('[CapLogoManager] Logo position updated:', logo);
+                this.renderAdditionalLogos();
+                this.updatePricingPreview();
+                return;
+            }
+        }
+
+        logo[field] = value;
+        console.log('[CapLogoManager] Logo updated:', field, '=', value);
+        this.renderAdditionalLogos();
+        this.updatePricingPreview();
     }
     
     /**
@@ -258,137 +218,135 @@ class CapLogoManager {
     }
     
     /**
-     * Render additional logos list
+     * Get available positions for a specific logo (excludes used positions)
+     */
+    getAvailablePositionsFor(logoId) {
+        // Get positions used by OTHER logos
+        const usedPositions = this.logos
+            .filter(l => l.id !== logoId && l.id !== 'front')
+            .map(l => l.positionCode);
+
+        // Return positions not used by other logos
+        return this.availablePositions.filter(pos => !usedPositions.includes(pos.code));
+    }
+
+    /**
+     * Render additional logos list (INLINE CARD PATTERN)
      */
     renderAdditionalLogos() {
         const container = document.getElementById('additional-logos-list');
         if (!container) return;
-        
+
         const additionalLogos = this.logos.filter(logo => !logo.isRequired);
-        
+
         if (additionalLogos.length === 0) {
-            container.innerHTML = '<p class="empty-message">No additional logos added</p>';
+            container.innerHTML = '<p class="empty-message">No additional logos added yet</p>';
             return;
         }
-        
-        container.innerHTML = additionalLogos.map(logo => `
-            <div class="additional-logo-item" data-logo-id="${logo.id}">
-                <div class="logo-info">
-                    <h4>${logo.position}</h4>
-                    <p>${logo.stitchCount.toLocaleString()} stitches ${logo.needsDigitizing ? '• Digitizing: $100' : ''}</p>
-                </div>
-                <div class="logo-actions">
-                    <button class="btn-sm btn-secondary" onclick="window.capLogoManager.editAdditionalLogo('${logo.id}')">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn-sm btn-danger" onclick="window.capLogoManager.removeAdditionalLogo('${logo.id}')">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </div>
-            </div>
-        `).join('');
+
+        // Render each logo as an inline editable card
+        container.innerHTML = additionalLogos.map(logo => this.renderAdditionalLogoCard(logo)).join('');
+
+        // Bind event listeners for each card
+        additionalLogos.forEach(logo => {
+            // Position select
+            const posSelect = container.querySelector(`#additional-position-${logo.id}`);
+            if (posSelect) {
+                posSelect.addEventListener('change', (e) => {
+                    this.editAdditionalLogo(logo.id, 'positionCode', e.target.value);
+                });
+            }
+
+            // Stitch count input
+            const stitchInput = container.querySelector(`#additional-stitches-${logo.id}`);
+            if (stitchInput) {
+                stitchInput.addEventListener('change', (e) => {
+                    this.editAdditionalLogo(logo.id, 'stitchCount', e.target.value);
+                });
+            }
+
+            // Digitizing toggle
+            const digitizingCheck = container.querySelector(`#additional-digitizing-${logo.id}`);
+            if (digitizingCheck) {
+                digitizingCheck.addEventListener('change', (e) => {
+                    this.editAdditionalLogo(logo.id, 'needsDigitizing', e.target.checked);
+                });
+            }
+
+            // Delete button
+            const deleteBtn = container.querySelector(`#delete-additional-${logo.id}`);
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    if (confirm('Remove this additional logo?')) {
+                        this.removeAdditionalLogo(logo.id);
+                    }
+                });
+            }
+        });
     }
-    
+
     /**
-     * Edit additional logo
+     * Render a single additional logo card (inline editable)
      */
-    editAdditionalLogo(logoId) {
-        const logo = this.logos.find(l => l.id === logoId);
-        if (!logo) return;
-        
-        // Show edit modal (similar to add modal but with current values)
-        const usedPositions = this.logos.filter(l => l.id !== logoId).map(l => l.positionCode);
-        const availablePositions = this.availablePositions.filter(pos => !usedPositions.includes(pos.code));
-        
-        // Add current position to available list
-        const currentPosition = this.availablePositions.find(pos => pos.code === logo.positionCode);
-        if (currentPosition) {
-            availablePositions.unshift(currentPosition);
-        }
-        
-        const modalHTML = `
-            <div id="edit-logo-modal" class="modal" style="display: flex;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Edit Logo Position</h3>
-                        <button class="modal-close" onclick="this.closest('.modal').style.display='none'">&times;</button>
-                    </div>
-                    <div class="modal-body">
+    renderAdditionalLogoCard(logo) {
+        const extraStitches = Math.max(0, logo.stitchCount - logo.baseStitchCount);
+        const extraCost = extraStitches > 0 ? ` (+$${(extraStitches / 1000 * 1.25).toFixed(2)}/pc)` : '';
+        const availablePositions = this.getAvailablePositionsFor(logo.id);
+
+        return `
+            <div class="additional-logo-card" data-logo-id="${logo.id}">
+                <div class="additional-logo-header">
+                    <h4>Additional Logo</h4>
+                    <button class="btn-delete" id="delete-additional-${logo.id}" title="Delete Logo">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+                <div class="logo-form">
+                    <div class="form-row">
                         <div class="form-group">
-                            <label for="edit-logo-position">Position</label>
-                            <select id="edit-logo-position" class="form-select">
-                                ${availablePositions.map(pos => 
-                                    `<option value="${pos.code}" ${pos.code === logo.positionCode ? 'selected' : ''}>${pos.name}</option>`
-                                ).join('')}
+                            <label for="additional-position-${logo.id}">Position</label>
+                            <select id="additional-position-${logo.id}" class="form-select">
+                                ${availablePositions.map(pos => `
+                                    <option value="${pos.code}" ${logo.positionCode === pos.code ? 'selected' : ''}>
+                                        ${pos.name}
+                                    </option>
+                                `).join('')}
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label for="edit-logo-stitches">Stitch Count</label>
-                            <input type="number" id="edit-logo-stitches" class="form-control" 
-                                   value="${logo.stitchCount}" min="1000" step="1000">
-                            <small class="form-text">First 5,000 stitches included for additional positions</small>
+                            <label for="additional-stitches-${logo.id}">Stitch Count</label>
+                            <input type="number"
+                                   id="additional-stitches-${logo.id}"
+                                   class="form-control"
+                                   value="${logo.stitchCount}"
+                                   min="1000"
+                                   step="1000"
+                                   placeholder="5000">
+                            <small class="form-text">First 5,000 stitches included${extraCost}</small>
                         </div>
+
                         <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="edit-logo-digitizing" ${logo.needsDigitizing ? 'checked' : ''}>
-                                <span class="checkmark"></span>
-                                Needs Digitizing ($100)
+                            <label class="toggle-label">
+                                <span class="toggle-text">Needs Digitizing ($100)</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="additional-digitizing-${logo.id}" class="toggle-input" ${logo.needsDigitizing ? 'checked' : ''}>
+                                    <span class="toggle-slider"></span>
+                                </div>
                             </label>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button onclick="this.closest('.modal').style.display='none'" class="btn-secondary">Cancel</button>
-                        <button onclick="window.capLogoManager.updateAdditionalLogo('${logoId}')" class="btn-primary">Update Logo</button>
-                    </div>
+                </div>
+
+                <div class="logo-summary">
+                    <span class="position-tag">${logo.position}</span>
+                    <span class="stitch-tag">${logo.stitchCount.toLocaleString()} stitches</span>
+                    ${logo.needsDigitizing ? '<span class="digitizing-tag">+Digitizing</span>' : ''}
+                    ${logo.stitchCount !== 5000 ? `<span class="part-number-tag">AL-${logo.stitchCount}</span>` : '<span class="part-number-tag">AL</span>'}
                 </div>
             </div>
         `;
-        
-        // Remove existing modal
-        const existingModal = document.getElementById('edit-logo-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-        
-        // Add new modal
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-    }
-    
-    /**
-     * Update additional logo from edit modal
-     */
-    updateAdditionalLogo(logoId) {
-        const logo = this.logos.find(l => l.id === logoId);
-        if (!logo) return;
-        
-        const positionCode = document.getElementById('edit-logo-position').value;
-        const stitchCount = parseInt(document.getElementById('edit-logo-stitches').value) || 5000;
-        const needsDigitizing = document.getElementById('edit-logo-digitizing').checked;
-        
-        // Find position details
-        const positionData = this.availablePositions.find(pos => pos.code === positionCode);
-        if (!positionData) {
-            alert('Invalid position selected');
-            return;
-        }
-        
-        // Round stitch count
-        const roundedCount = Math.max(1000, Math.round(stitchCount / 1000) * 1000);
-        
-        // Update logo
-        logo.position = positionData.name;
-        logo.positionCode = positionCode;
-        logo.stitchCount = roundedCount;
-        logo.needsDigitizing = needsDigitizing;
-        
-        console.log('[CapLogoManager] Additional logo updated:', logo);
-        
-        // Update UI
-        this.renderAdditionalLogos();
-        this.updatePricingPreview();
-        
-        // Close modal
-        document.getElementById('edit-logo-modal').style.display = 'none';
     }
     
     /**

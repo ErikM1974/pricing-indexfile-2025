@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer Awareness Bundle - Northwest Custom Apparel</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Quote Service -->
+    <script src="calculators/breast-cancer-bundle-service.js?v=2.1"></script>
+
+    <style>
+        /* Scope all styles to .bca-bundle-app to prevent conflicts */
+        .bca-bundle-app {
+            font-family: 'Inter', sans-serif;
+            /* CSS Variables for consistent theming */
+            --pink-primary: #ec4899;
+            --pink-secondary: #f472b6;
+            --pink-light: #fce7f3;
+            --pink-lighter: #fdf2f8;
+            --pink-dark: #be185d;
+            --pink-accent: #fbbcdc;
+            --gray-primary: #666666;
+            --gray-light: #f3f4f6;
+            --error-red: #ef4444;
+            --error-bg: #fee2e2;
+        }
+
+        /* Ensure Tailwind only affects our app */
+        .bca-bundle-app * {
+            box-sizing: border-box;
+        }
+
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--pink-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide inactive steps */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        /* Product image hover effect */
+        .product-image-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-image-container::after {
+            content: "🔍 Click to enlarge";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .product-image-container:hover::after,
+        .product-image-container:focus-within::after {
+            opacity: 1;
+        }
+
+        /* Form validation error states */
+        .input-error {
+            border-color: var(--error-red) !important;
+            background-color: var(--error-bg) !important;
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Scoped container for Tailwind -->
+    <div class="bca-bundle-app bg-gray-50 min-h-screen">
+
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel Logo" class="h-10">
+                </div>
+                <div class="hidden md:flex items-center space-x-4 text-sm text-gray-700">
+                    <span><i class="fas fa-phone"></i> 253-922-5793</span>
+                    <span class="text-gray-400">|</span>
+                    <span><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Product Zoom Modal -->
+        <div id="productModal" class="fixed inset-0 z-50 hidden">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeProductModal()"></div>
+
+            <!-- Modal Content -->
+            <div class="relative flex items-center justify-center h-full p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+                    <!-- Close button -->
+                    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-lg p-1">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Modal Body -->
+                    <div class="p-8">
+                        <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[70vh] object-contain mx-auto">
+                        <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mt-6 text-center"></h3>
+                        <p id="modalDescription" class="text-gray-600 mt-2 text-center"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="container mx-auto px-6 py-8 md:py-16 pb-24">
+
+            <!-- Main Title Section -->
+            <div class="text-center mb-12 fade-in">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-pink-600 leading-tight">
+                    Breast Cancer Awareness Bundle
+                </h1>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    Supporting the Fight & Making a Difference, Together.
+                </p>
+            </div>
+
+            <!-- Order Deadline Banner -->
+            <div id="deadlineBanner" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg p-4 md:p-6 mb-8 shadow-lg fade-in">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="text-center md:text-left">
+                        <div class="flex items-center gap-2 justify-center md:justify-start mb-2">
+                            <span class="text-2xl">⏰</span>
+                            <h3 class="text-xl md:text-2xl font-bold">ORDER BY SEPTEMBER 30TH for Early October Events!</h3>
+                        </div>
+                        <p class="text-sm md:text-base opacity-95">
+                            Only <span id="daysLeft" class="font-bold text-lg"></span> left to order for Breast Cancer Awareness Month
+                        </p>
+                        <p class="text-xs md:text-sm mt-1 opacity-90">
+                            🚀 <span class="font-semibold">RUSH PRODUCTION AVAILABLE</span> - Ships in 5-7 business days
+                        </p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.style.display='none'"
+                            class="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white rounded-lg transition p-2"
+                            title="Dismiss">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="flex items-center justify-center">
+                    <div class="flex items-center text-pink-600 relative" id="step-indicator-1">
+                        <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 flex items-center justify-center bg-pink-600 text-white font-bold">1</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-pink-600">Products</div>
+                    </div>
+                    <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300" id="step-line-1"></div>
+
+                    <div class="flex items-center text-gray-500 relative" id="step-indicator-2">
+                        <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 flex items-center justify-center border-2 border-gray-300">2</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500">Sizes</div>
+                    </div>
+                    <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300" id="step-line-2"></div>
+
+                    <div class="flex items-center text-gray-500 relative" id="step-indicator-3">
+                        <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 flex items-center justify-center border-2 border-gray-300">3</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500">Contact</div>
+                    </div>
+                    <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300" id="step-line-3"></div>
+
+                    <div class="flex items-center text-gray-500 relative" id="step-indicator-4">
+                        <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 flex items-center justify-center border-2 border-gray-300">4</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500">Review</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Products -->
+            <div class="step-content active" id="step-1">
+                <!-- Main Product Section -->
+                <div class="grid md:grid-cols-2 gap-12 items-center fade-in">
+                    <!-- Left Column: Info & Pricing -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                        <h2 class="text-3xl font-bold text-gray-800">Show Your Support with Style</h2>
+                        <p class="mt-4 text-gray-600">
+                            Join us in supporting breast cancer awareness with our specially designed bundle
+                            featuring premium embroidered caps and DTG printed t-shirts.
+                        </p>
+
+                        <!-- Bundle Quantity Selector -->
+                        <div class="mt-6">
+                            <label class="text-sm font-medium text-gray-700 mb-2 block">Number of Bundles</label>
+                            <div class="flex items-center space-x-4">
+                                <button onclick="adjustQuantity(-1)"
+                                        class="bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-full w-10 h-10 flex items-center justify-center transition">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" id="bundleQuantity" value="8" min="8"
+                                       class="w-20 text-center border-2 border-gray-300 rounded-lg py-2 font-bold text-lg focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200"
+                                       onchange="updateBundleDisplay()">
+                                <button onclick="adjustQuantity(1)"
+                                        class="bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded-full w-10 h-10 flex items-center justify-center transition">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="my-6 bg-pink-100 p-6 rounded-lg text-center">
+                            <span class="text-5xl font-extrabold text-pink-600">$<span id="totalPrice">360</span></span>
+                            <span class="text-gray-700 block mt-1">
+                                <span id="bundleCount">8</span> Bundles × $45 =
+                                <span id="itemCount">8</span> T-Shirts + <span id="itemCount2">8</span> Caps
+                            </span>
+                        </div>
+
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                            <p class="font-bold">Minimum Order: 8 Bundles = $360.00</p>
+                        </div>
+
+                        <div class="bg-orange-50 border border-orange-300 rounded-md p-4 mt-4">
+                            <div class="flex items-center">
+                                <span class="text-orange-800 text-lg mr-2">⏰</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-orange-800">
+                                        Order by September 30th for Early October Events
+                                    </p>
+                                    <p class="text-xs text-orange-700 mt-1">
+                                        <span class="font-semibold">RUSH PRODUCTION</span> • Ships in 5-7 business days
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Image -->
+                    <div>
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9109227"
+                             alt="Woman wearing breast cancer awareness t-shirt and cap"
+                             class="rounded-xl shadow-2xl w-full">
+                    </div>
+                </div>
+
+                <!-- Bundle Includes Section -->
+                <div class="mt-16 md:mt-24">
+                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-10">What's Included in Each Bundle</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Cap Card -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="product-image-container" onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594', 'Port Authority Snapback Trucker Cap', 'Style: C112 - True Pink/White - One Size Fits All - Front Embroidered Logo')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594"
+                                     alt="Port Authority Snapback Trucker Cap"
+                                     class="w-full h-64 object-contain">
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800">Port Authority Snapback Trucker Cap</h4>
+                                <p class="text-sm text-gray-500 mb-4">Style: C112</p>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">✓</span> True Pink/White
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">✓</span> One Size Fits All
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">✓</span> Front Embroidered Logo
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- T-Shirt Card (Your Choice) -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="h-64 bg-gradient-to-br from-pink-50 to-pink-100 p-6 relative flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="mb-4">
+                                        <i class="fas fa-tshirt text-pink-300 text-6xl"></i>
+                                    </div>
+                                    <div class="bg-white rounded-lg px-6 py-3 shadow-lg border-2 border-pink-200">
+                                        <div class="text-xl font-bold text-gray-800">Your Choice of Design</div>
+                                        <div class="text-sm text-pink-600 mt-1 font-medium">
+                                            <i class="fas fa-arrow-down mr-1"></i> Select in Step 3
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800">Core Cotton Tee</h4>
+                                <p class="text-sm text-gray-500 mb-4">Style: PC54</p>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">✓</span> Candy Pink
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">✓</span> Sizes S - 4XL
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="text-pink-500 mr-2">
+                                            <i class="fas fa-palette"></i>
+                                        </span>
+                                        <strong>Choice of 2 Designs</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T-Shirt Design Options Section -->
+                <div class="mt-16 md:mt-24">
+                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-3">Preview Your T-Shirt Design Options</h3>
+                    <p class="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+                        Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs.
+                        <strong class="text-pink-600">You'll make your selection in Step 3</strong> when you upload your logo.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Design Option 1: Classic Ribbon -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="product-image-container h-80"
+                                 onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676', 'Design Option 1: Classic Ribbon', 'Features the iconic pink ribbon with your company logo. A timeless design that shows your support.')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676"
+                                     alt="Classic Ribbon Design"
+                                     class="w-full h-full object-contain p-4 bg-gray-50">
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">Option 1: Classic Ribbon</h4>
+                                <p class="text-gray-600 text-sm">
+                                    Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness.
+                                </p>
+                                <div class="mt-4 inline-block px-3 py-1 bg-pink-100 text-pink-600 text-xs font-semibold rounded-full">
+                                    Default Option
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Design Option 2: Patriotic Flag -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition">
+                            <div class="product-image-container h-80"
+                                 onclick="openProductModal('https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677', 'Design Option 2: Patriotic Flag', 'Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic and breast cancer support.')">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677"
+                                     alt="Patriotic Flag Design"
+                                     class="w-full h-full object-contain p-4 bg-gray-50">
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">Option 2: Patriotic Flag</h4>
+                                <p class="text-gray-600 text-sm">
+                                    Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support.
+                                </p>
+                                <div class="mt-4 inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">
+                                    Patriotic Theme
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <div class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-50 to-pink-100 border-2 border-pink-300 rounded-full shadow-md">
+                            <span class="flex items-center justify-center w-8 h-8 bg-pink-500 text-white rounded-full font-bold text-sm">3</span>
+                            <span class="text-base text-pink-700 font-semibold">Make your selection in Step 3 below</span>
+                            <svg class="w-5 h-5 text-pink-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bonus Value Section -->
+                <div class="mt-16 md:mt-24 text-center">
+                    <h3 class="text-3xl font-bold text-gray-800">
+                        Plus, Your Order Includes Over <span class="text-pink-600">$150</span> in Free Extras!
+                    </h3>
+                    <p class="mt-3 text-gray-600 max-w-2xl mx-auto">
+                        To make your campaign a success, we're including these professional services at no extra cost.
+                    </p>
+
+                    <div class="grid md:grid-cols-3 gap-8 mt-12 text-left">
+                        <!-- Feature 1: Artwork -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-pink-100 p-2 rounded-full mr-4">
+                                    <i class="fas fa-paint-brush text-pink-600 text-xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-800">Custom Logo Artwork</h4>
+                            </div>
+                            <p class="text-gray-600">
+                                Our artists will provide 30 minutes of design time to help create or refine your
+                                perfect breast cancer awareness logo. <span class="font-semibold">(A $50 Value)</span>
+                            </p>
+                        </div>
+
+                        <!-- Feature 2: Sizing -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-pink-100 p-2 rounded-full mr-4">
+                                    <i class="fas fa-ruler text-pink-600 text-xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-800">No Larger Size Upcharges</h4>
+                            </div>
+                            <p class="text-gray-600">
+                                We believe in inclusivity for everyone showing support. The price is the same
+                                for all t-shirt sizes, from Small to 4XL.
+                            </p>
+                        </div>
+
+                        <!-- Feature 3: Digitizing -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-pink-100 p-2 rounded-full mr-4">
+                                    <i class="fas fa-code text-pink-600 text-xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-800">Free Cap Digitizing</h4>
+                            </div>
+                            <p class="text-gray-600">
+                                We'll convert your logo into a stitch-ready file for high-quality cap embroidery,
+                                completely free of charge. <span class="font-semibold">(A $100 Value)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Size Distribution -->
+            <div class="step-content" id="step-2">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Select Size Distribution</h2>
+                        <p class="text-gray-600 mb-8">
+                            Enter how many t-shirts you need in each size. Total must equal
+                            <span class="font-bold text-pink-600"><span id="requiredTotal">8</span> shirts</span>.
+                        </p>
+
+                        <!-- Size Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">Small</label>
+                                <input type="number" id="size-S" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">Medium</label>
+                                <input type="number" id="size-M" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">Large</label>
+                                <input type="number" id="size-L" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">X-Large</label>
+                                <input type="number" id="size-XL" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">2X-Large</label>
+                                <input type="number" id="size-2XL" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">3X-Large</label>
+                                <input type="number" id="size-3XL" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition">
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">4X-Large</label>
+                                <input type="number" id="size-4XL" min="0" value="0"
+                                       class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:border-pink-500 focus:outline-none"
+                                       onchange="updateSizeTotal()">
+                            </div>
+                        </div>
+
+                        <!-- Size Validation -->
+                        <div id="sizeValidation" class="p-4 rounded-lg border-2 text-center transition">
+                            <div class="text-lg">
+                                Total T-Shirts:
+                                <span id="currentTotal" class="font-bold">0</span> /
+                                <span id="requiredTotal2" class="font-bold">8</span>
+                            </div>
+                            <div id="validationMessage" class="mt-2 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Contact Information -->
+            <div class="step-content" id="step-3">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Contact Information</h2>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Full Name -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="customerName" required
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                            </div>
+
+                            <!-- Company -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                    Company/Organization
+                                </label>
+                                <input type="text" id="companyName"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" id="email" required
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <input type="tel" id="phone" required
+                                       placeholder="(555) 123-4567"
+                                       maxlength="14"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                            </div>
+                        </div>
+
+                        <!-- Delivery Method -->
+                        <div class="mt-8">
+                            <label class="text-sm font-medium text-gray-700 mb-4 block">
+                                Delivery Method <span class="text-red-500">*</span>
+                            </label>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <label class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition cursor-pointer">
+                                    <input type="radio" name="deliveryMethod" value="Ship" checked
+                                           onchange="toggleDeliveryFields()" class="mr-3">
+                                    <span class="text-gray-700 font-medium">
+                                        <i class="fas fa-truck mr-2 text-pink-600"></i> Ship to Address
+                                    </span>
+                                </label>
+                                <label class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition cursor-pointer">
+                                    <input type="radio" name="deliveryMethod" value="Pickup"
+                                           onchange="toggleDeliveryFields()" class="mr-3">
+                                    <span class="text-gray-700 font-medium">
+                                        <i class="fas fa-building mr-2 text-pink-600"></i> Factory Pickup
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Pickup Info -->
+                        <div id="pickupInfo" class="mt-6 bg-pink-50 p-6 rounded-lg border-2 border-pink-200" style="display: none;">
+                            <h4 class="font-bold text-gray-800 mb-3">
+                                <i class="fas fa-map-marker-alt text-pink-600 mr-2"></i> Pickup Location
+                            </h4>
+                            <p class="text-gray-700">
+                                <strong>Northwest Custom Apparel</strong><br>
+                                2025 Freeman Road East<br>
+                                Milton, WA 98354
+                            </p>
+                            <p class="mt-3 text-gray-700">
+                                <i class="fas fa-clock text-pink-600 mr-2"></i>
+                                <strong>Pickup Hours:</strong><br>
+                                Monday - Friday: 8:00 AM - 4:30 PM
+                            </p>
+                            <div class="mt-4 bg-white p-4 rounded-lg">
+                                <i class="fas fa-info-circle text-pink-600 mr-2"></i>
+                                Please allow 5-7 business days for order completion.
+                                We'll call you when your order is ready for pickup.
+                            </div>
+                        </div>
+
+                        <!-- Shipping Fields -->
+                        <div id="shippingFields" class="mt-6 space-y-6">
+                            <!-- Address -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                    Delivery Address <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="shippingAddress" required
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                            </div>
+
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <!-- City -->
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                        City <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="shippingCity" required
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                                </div>
+
+                                <!-- State -->
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                        State <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="shippingState" required maxlength="2"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                                </div>
+
+                                <!-- ZIP -->
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                        ZIP Code <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="shippingZip" required
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- T-Shirt Design Selection -->
+                        <div class="mt-8">
+                            <div class="bg-pink-50 border-2 border-pink-200 rounded-lg p-3 mb-4">
+                                <p class="text-sm text-pink-700 font-medium">
+                                    <i class="fas fa-arrow-up mr-2"></i>
+                                    Remember the designs from above? Now it's time to choose!
+                                </p>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-palette text-pink-600 mr-2"></i>
+                                Select Your T-Shirt Design <span class="text-red-500">*</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Choose which design you'd like for your t-shirts. Our artist will incorporate your logo into the selected design.
+                            </p>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <!-- Classic Ribbon Option -->
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="designChoice" value="No Flag" checked class="sr-only peer">
+                                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition peer-checked:border-pink-500 peer-checked:bg-pink-50">
+                                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676"
+                                             alt="Classic Ribbon Design"
+                                             class="w-full h-32 object-contain mb-3 rounded">
+                                        <div class="text-center">
+                                            <div class="font-semibold text-gray-800 mb-1">Classic Ribbon</div>
+                                            <div class="text-xs text-gray-600">Pink ribbon with your logo</div>
+                                            <div class="mt-2 hidden peer-checked:block">
+                                                <span class="inline-flex items-center gap-1 text-xs text-pink-600 font-semibold">
+                                                    <i class="fas fa-check-circle"></i> Selected
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Patriotic Flag Option -->
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="designChoice" value="Flag" class="sr-only peer">
+                                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 hover:border-pink-300 transition peer-checked:border-pink-500 peer-checked:bg-pink-50">
+                                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677"
+                                             alt="Patriotic Flag Design"
+                                             class="w-full h-32 object-contain mb-3 rounded">
+                                        <div class="text-center">
+                                            <div class="font-semibold text-gray-800 mb-1">Patriotic Flag</div>
+                                            <div class="text-xs text-gray-600">American flag, ribbon & logo</div>
+                                            <div class="mt-2 hidden peer-checked:block">
+                                                <span class="inline-flex items-center gap-1 text-xs text-pink-600 font-semibold">
+                                                    <i class="fas fa-check-circle"></i> Selected
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Logo Upload Section -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-upload text-pink-600 mr-2"></i>
+                                Upload Your Company Logo (Optional)
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Add your company or organization logo to personalize your bundles
+                            </p>
+
+                            <!-- Upload Area -->
+                            <div id="logoUploadArea"
+                                 onclick="document.getElementById('logoFile').click()"
+                                 class="border-2 border-dashed border-pink-300 rounded-lg p-8 text-center cursor-pointer hover:bg-pink-50 transition">
+                                <input type="file" id="logoFile" accept="image/*,.pdf" style="display: none;" onchange="handleLogoUpload(event)">
+
+                                <div class="text-pink-500 mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl"></i>
+                                </div>
+                                <div class="text-base font-medium text-gray-700">Click to upload your logo</div>
+                                <div class="text-sm text-gray-500 mt-2">JPG, PNG, or PDF (Max 20MB)</div>
+                            </div>
+
+                            <!-- Logo Preview -->
+                            <div id="logoPreview" class="hidden mt-4">
+                                <div class="bg-white p-4 rounded-lg border-2 border-pink-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <img id="previewImage" src="" alt="Logo Preview" class="h-16 w-auto object-contain mr-4">
+                                            <div>
+                                                <p class="font-medium text-gray-700">Logo uploaded!</p>
+                                                <p id="logoFileName" class="text-sm text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-lg p-1 transition">
+                                            <i class="fas fa-times-circle text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Date -->
+                        <div class="mt-6">
+                            <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                Event/Needed By Date
+                            </label>
+                            <input type="date" id="eventDate"
+                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mt-6">
+                            <label class="text-sm font-medium text-gray-700 mb-2 block">
+                                Special Instructions or Notes
+                            </label>
+                            <textarea id="notes" rows="3"
+                                      class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none transition"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Review -->
+            <div class="step-content" id="step-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Review Your Order</h2>
+
+                        <!-- Order Summary -->
+                        <div class="bg-pink-50 p-6 rounded-lg border-2 border-pink-200 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Order Details</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Bundles Ordered:</span>
+                                    <span class="font-bold"><span id="reviewBundleCount">8</span> bundles</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>T-Shirts (PC54 Candy Pink):</span>
+                                    <span class="font-bold"><span id="reviewShirtCount">8</span> shirts</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Caps (C112 True Pink/White):</span>
+                                    <span class="font-bold"><span id="reviewCapCount">8</span> caps</span>
+                                </div>
+                                <div class="border-t-2 border-pink-300 pt-2 mt-2">
+                                    <div class="flex justify-between text-lg">
+                                        <span class="font-bold">Total Amount:</span>
+                                        <span class="font-bold text-pink-600">$<span id="reviewTotalPrice">360.00</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer Info -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Contact Information</h3>
+                            <div id="reviewCustomerInfo" class="space-y-2 text-gray-700"></div>
+                        </div>
+
+                        <!-- Size Distribution -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Size Distribution</h3>
+                            <div id="reviewSizeDistribution" class="grid grid-cols-4 gap-2"></div>
+                        </div>
+
+                        <!-- Design Selection -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                            <h3 class="font-bold text-gray-800 mb-4">T-Shirt Design Selection</h3>
+                            <div id="reviewDesignChoice" class="flex items-center gap-4">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Next Steps -->
+                        <div class="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                                <div>
+                                    <strong class="text-gray-800">Next Steps:</strong>
+                                    <p class="text-gray-700 mt-1">
+                                        After submitting your order, our sales team will contact you within 24 hours
+                                        to finalize payment and delivery details.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="step-content" id="step-success">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white p-12 rounded-xl shadow-lg border border-gray-200 text-center">
+                        <div class="text-6xl text-green-500 mb-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Order Submitted Successfully!</h2>
+                        <div class="bg-pink-100 px-6 py-3 rounded-lg inline-block mb-6">
+                            <span class="text-gray-700">Quote ID:</span>
+                            <span class="font-bold text-pink-600 text-xl ml-2" id="displayQuoteId"></span>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            Thank you for supporting breast cancer awareness!
+                        </p>
+                        <p class="text-gray-600 mb-8">
+                            Your order has been received and our sales team will contact you within 24 hours
+                            to finalize payment and delivery arrangements.
+                        </p>
+                        <p class="text-gray-600">
+                            You will receive a confirmation email shortly with your order details.
+                        </p>
+                        <button onclick="location.reload()"
+                                class="mt-8 bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 transition">
+                            Start New Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-pink-200 p-4 z-40">
+                <div class="container mx-auto px-6">
+                    <div class="flex justify-between items-center max-w-4xl mx-auto">
+                        <button id="prevBtn" onclick="changeStep(-1)"
+                                class="bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 transition"
+                                style="display: none;">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+
+                        <button id="nextBtn" onclick="changeStep(1)"
+                                class="bg-pink-600 text-white font-bold py-3 px-8 rounded-full hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-300 transition ml-auto">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+
+                        <button id="submitBtn" onclick="submitOrder()"
+                                class="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 transition"
+                                style="display: none;">
+                            <i class="fas fa-check mr-2"></i> Submit Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+            <div class="bg-white p-8 rounded-xl shadow-2xl">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-700">Processing your order...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 mt-20 pb-20">
+            <div class="container mx-auto px-6 py-8 text-center text-gray-400">
+                <p>&copy; 2025 Northwest Custom Apparel. All Rights Reserved.</p>
+                <p class="text-sm mt-2">Let's make a difference together.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
+        // Form validation helpers
+        function showFieldError(inputId, message) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.classList.add('input-error');
+                // Check if error message element exists, if not create it
+                let errorElement = input.nextElementSibling;
+                if (!errorElement || !errorElement.classList.contains('error-message')) {
+                    errorElement = document.createElement('div');
+                    errorElement.className = 'error-message';
+                    input.parentNode.insertBefore(errorElement, input.nextSibling);
+                }
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+        }
+
+        function clearFieldError(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.classList.remove('input-error');
+                const errorElement = input.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('error-message')) {
+                    errorElement.classList.remove('show');
+                }
+            }
+        }
+
+        function clearAllErrors() {
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-message.show').forEach(el => el.classList.remove('show'));
+        }
+
+        // Calculate days until deadline
+        function updateDeadlineCountdown() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            // Determine the deadline year
+            // If we're past September 30 of current year, use next year
+            const deadlineMonth = 8; // September (0-indexed)
+            const deadlineDay = 30;
+            let deadlineYear = currentYear;
+
+            // Check if we've passed this year's deadline
+            const thisYearDeadline = new Date(currentYear, deadlineMonth, deadlineDay, 23, 59, 59);
+            if (now > thisYearDeadline) {
+                deadlineYear = currentYear + 1;
+            }
+
+            const deadline = new Date(deadlineYear, deadlineMonth, deadlineDay, 23, 59, 59);
+
+            // Set time to start of day for accurate day counting
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const deadlineStart = new Date(deadlineYear, deadlineMonth, deadlineDay);
+            const timeDiff = deadlineStart - todayStart;
+            const daysLeft = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+
+            const daysElement = document.getElementById('daysLeft');
+            const banner = document.getElementById('deadlineBanner');
+
+            if (daysElement && banner) {
+                // Show banner only from August 1st to September 30th
+                const showStartDate = new Date(deadlineYear, 7, 1); // August 1st
+
+                if (now < showStartDate) {
+                    // Too early in the year, hide banner
+                    banner.style.display = 'none';
+                } else if (daysLeft > 0) {
+                    daysElement.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
+                    banner.style.display = 'block';
+                } else if (daysLeft === 0) {
+                    daysElement.textContent = 'TODAY IS THE LAST DAY';
+                    daysElement.style.color = '#ff0000';
+                    banner.style.display = 'block';
+                } else {
+                    // Past deadline, hide banner
+                    banner.style.display = 'none';
+                }
+            }
+        }
+
+        // Update countdown on page load
+        updateDeadlineCountdown();
+
+        // Phone number formatting
+        function formatPhoneNumber(value) {
+            // Remove all non-digits
+            const phoneNumber = value.replace(/\D/g, '');
+
+            // Format as (XXX) XXX-XXXX
+            if (phoneNumber.length === 0) {
+                return '';
+            } else if (phoneNumber.length <= 3) {
+                return `(${phoneNumber}`;
+            } else if (phoneNumber.length <= 6) {
+                return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+            } else {
+                return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+            }
+        }
+
+        // Add phone formatting and validation clearing
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    const formatted = formatPhoneNumber(e.target.value);
+                    e.target.value = formatted;
+                    clearFieldError('phone'); // Clear error on input
+                });
+
+                // Handle paste events
+                phoneInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    e.target.value = formatPhoneNumber(pastedText);
+                    clearFieldError('phone');
+                });
+            }
+
+            // Clear errors on input for all required fields
+            const requiredFields = ['customerName', 'email', 'shippingAddress', 'shippingCity', 'shippingState', 'shippingZip'];
+            requiredFields.forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        clearFieldError(fieldId);
+                    });
+                }
+            });
+        });
+
+        // Logo Upload Functions
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Clear any previous file selection
+            if (window.selectedLogoFile) {
+                window.selectedLogoFile = null;
+                window.selectedLogoDataURL = null;
+            }
+
+            // Validate file type
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml', 'application/pdf'];
+            const maxSize = 20 * 1024 * 1024; // 20MB
+
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload an image (PNG, JPG, GIF, SVG) or PDF file');
+                event.target.value = '';
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert('File size must be less than 20MB');
+                event.target.value = '';
+                return;
+            }
+
+            // Store the file for upload
+            window.selectedLogoFile = file;
+
+            // Show preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    window.selectedLogoDataURL = e.target.result;
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('logoFileName').textContent = file.name;
+                    document.getElementById('logoPreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // For PDFs, just show filename
+                document.getElementById('logoPreview').innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border-2 border-pink-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 text-3xl mr-4"></i>
+                                <div>
+                                    <p class="font-medium text-gray-700">PDF uploaded!</p>
+                                    <p class="text-sm text-gray-500">${file.name}</p>
+                                </div>
+                            </div>
+                            <button onclick="removeLogo()" class="text-red-500 hover:text-red-700 transition">
+                                <i class="fas fa-times-circle text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('logoPreview').classList.remove('hidden');
+            }
+        }
+
+        function removeLogo() {
+            document.getElementById('logoFile').value = '';
+            document.getElementById('logoPreview').classList.add('hidden');
+            document.getElementById('previewImage').src = '';
+            window.selectedLogoFile = null;
+            window.selectedLogoDataURL = null;
+        }
+
+        // Upload file to API
+        async function uploadFileToAPI(file) {
+            try {
+                // Add timestamp to filename to avoid conflicts
+                const timestamp = Date.now();
+                const nameParts = file.name.split('.');
+                const extension = nameParts.pop();
+                const baseName = nameParts.join('.');
+                const uniqueFileName = `${baseName}_${timestamp}.${extension}`;
+
+                // Create a new File object with the unique name
+                const uniqueFile = new File([file], uniqueFileName, { type: file.type });
+
+                const formData = new FormData();
+                formData.append('file', uniqueFile);
+
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                return result.externalKey;
+
+            } catch (error) {
+                console.error('Failed to upload file:', error);
+                throw error;
+            }
+        }
+
+        // Product Modal Functions
+        function openProductModal(imageSrc, title, description) {
+            const modal = document.getElementById('productModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+
+            modalImage.src = imageSrc;
+            modalImage.alt = title;
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open'); // Add class for scroll locking
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('modal-open'); // Remove class to restore scrolling
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeProductModal();
+            }
+        });
+
+        let currentStep = 1;
+        const totalSteps = 4;
+        const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        const quoteService = new BreastCancerBundleService();
+
+        // Adjust quantity with buttons
+        function adjustQuantity(change) {
+            const input = document.getElementById('bundleQuantity');
+            let newValue = parseInt(input.value) + change;
+            if (newValue < 8) newValue = 8;
+            input.value = newValue;
+            updateBundleDisplay();
+        }
+
+        // Update bundle display when quantity changes
+        function updateBundleDisplay() {
+            let quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+
+            // Enforce minimum
+            if (quantity < 8) {
+                document.getElementById('bundleQuantity').value = 8;
+                quantity = 8;
+            }
+
+            // Update displays
+            document.getElementById('bundleCount').textContent = quantity;
+            document.getElementById('itemCount').textContent = quantity;
+            document.getElementById('itemCount2').textContent = quantity;
+            document.getElementById('requiredTotal').textContent = quantity;
+            document.getElementById('requiredTotal2').textContent = quantity;
+
+            // Update price
+            const totalPrice = quantity * 45;
+            document.getElementById('totalPrice').textContent = totalPrice.toFixed(0);
+
+            // Reset size inputs when quantity changes to prevent confusion
+            sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                if (input) {
+                    input.value = 0;
+                }
+            });
+
+            // Update size total display
+            updateSizeTotal();
+        }
+
+        // Update size total and validation
+        function updateSizeTotal() {
+            const requiredQuantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+            let total = 0;
+
+            sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                total += parseInt(input.value) || 0;
+            });
+
+            // Update display
+            document.getElementById('currentTotal').textContent = total;
+
+            // Validation
+            const validationDiv = document.getElementById('sizeValidation');
+            const messageDiv = document.getElementById('validationMessage');
+
+            if (total === requiredQuantity) {
+                validationDiv.className = 'p-4 rounded-lg border-2 text-center transition bg-green-50 border-green-500';
+                messageDiv.innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Perfect! Size distribution is complete.';
+                messageDiv.className = 'mt-2 text-sm text-green-700';
+            } else if (total > requiredQuantity) {
+                validationDiv.className = 'p-4 rounded-lg border-2 text-center transition bg-red-50 border-red-500';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle text-red-500"></i> Too many! Remove ${total - requiredQuantity} shirt(s).`;
+                messageDiv.className = 'mt-2 text-sm text-red-700';
+            } else if (total > 0) {
+                validationDiv.className = 'p-4 rounded-lg border-2 text-center transition bg-yellow-50 border-yellow-500';
+                messageDiv.innerHTML = `<i class="fas fa-info-circle text-yellow-600"></i> Add ${requiredQuantity - total} more shirt(s).`;
+                messageDiv.className = 'mt-2 text-sm text-yellow-700';
+            } else {
+                validationDiv.className = 'p-4 rounded-lg border-2 text-center transition bg-gray-50 border-gray-300';
+                messageDiv.innerHTML = 'Enter the size distribution for your t-shirts.';
+                messageDiv.className = 'mt-2 text-sm text-gray-600';
+            }
+        }
+
+        // Toggle between Ship and Pickup delivery methods
+        function toggleDeliveryFields() {
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const shippingFields = document.getElementById('shippingFields');
+            const pickupInfo = document.getElementById('pickupInfo');
+
+            if (deliveryMethod === 'Ship') {
+                shippingFields.style.display = 'block';
+                pickupInfo.style.display = 'none';
+
+                // Make shipping fields required
+                document.getElementById('shippingAddress').required = true;
+                document.getElementById('shippingCity').required = true;
+                document.getElementById('shippingState').required = true;
+                document.getElementById('shippingZip').required = true;
+            } else {
+                shippingFields.style.display = 'none';
+                pickupInfo.style.display = 'block';
+
+                // Remove required from shipping fields
+                document.getElementById('shippingAddress').required = false;
+                document.getElementById('shippingCity').required = false;
+                document.getElementById('shippingState').required = false;
+                document.getElementById('shippingZip').required = false;
+            }
+        }
+
+        // Validate current step
+        function validateStep(step) {
+            clearAllErrors(); // Clear any existing errors
+
+            if (step === 2) {
+                // Check that size distribution matches bundle quantity
+                const requiredQuantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+                let total = 0;
+
+                sizes.forEach(size => {
+                    const input = document.getElementById(`size-${size}`);
+                    total += parseInt(input.value) || 0;
+                });
+
+                if (total !== requiredQuantity) {
+                    const validationDiv = document.getElementById('sizeValidation');
+                    validationDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    if (total === 0) {
+                        alert('Please enter the size distribution for your t-shirts.');
+                    } else if (total < requiredQuantity) {
+                        alert(`Please add ${requiredQuantity - total} more shirt(s) to complete your order.`);
+                    } else {
+                        alert(`Please remove ${total - requiredQuantity} shirt(s). Total must equal ${requiredQuantity}.`);
+                    }
+                    return false;
+                }
+            } else if (step === 3) {
+                // Validate customer form
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+                let hasErrors = false;
+
+                // Validate name
+                const nameInput = document.getElementById('customerName');
+                if (!nameInput.value.trim()) {
+                    showFieldError('customerName', 'Full name is required');
+                    hasErrors = true;
+                }
+
+                // Validate email
+                const emailInput = document.getElementById('email');
+                if (!emailInput.value.trim()) {
+                    showFieldError('email', 'Email address is required');
+                    hasErrors = true;
+                } else if (!emailInput.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                    showFieldError('email', 'Please enter a valid email address');
+                    hasErrors = true;
+                }
+
+                // Validate phone
+                const phoneInput = document.getElementById('phone');
+                const phoneDigits = phoneInput.value.replace(/\D/g, '');
+                if (!phoneInput.value.trim()) {
+                    showFieldError('phone', 'Phone number is required');
+                    hasErrors = true;
+                } else if (phoneDigits.length !== 10) {
+                    showFieldError('phone', 'Please enter a 10-digit phone number');
+                    hasErrors = true;
+                }
+
+                // Only validate shipping fields if Ship is selected
+                if (deliveryMethod === 'Ship') {
+                    if (!document.getElementById('shippingAddress').value.trim()) {
+                        showFieldError('shippingAddress', 'Delivery address is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingCity').value.trim()) {
+                        showFieldError('shippingCity', 'City is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingState').value.trim()) {
+                        showFieldError('shippingState', 'State is required');
+                        hasErrors = true;
+                    }
+                    if (!document.getElementById('shippingZip').value.trim()) {
+                        showFieldError('shippingZip', 'ZIP code is required');
+                        hasErrors = true;
+                    }
+                }
+
+                if (hasErrors) {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.input-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Show review step
+        function showReview() {
+            const quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+            const totalPrice = quantity * 45;
+
+            // Update order summary
+            document.getElementById('reviewBundleCount').textContent = quantity;
+            document.getElementById('reviewShirtCount').textContent = quantity;
+            document.getElementById('reviewCapCount').textContent = quantity;
+            document.getElementById('reviewTotalPrice').textContent = totalPrice.toFixed(2);
+
+            // Customer info
+            const customerInfo = document.getElementById('reviewCustomerInfo');
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            let deliveryInfo = '';
+
+            if (deliveryMethod === 'Ship') {
+                deliveryInfo = `
+                    <div><strong>Delivery Method:</strong> Ship to Address</div>
+                    <div><strong>Shipping Address:</strong> ${document.getElementById('shippingAddress').value},
+                         ${document.getElementById('shippingCity').value},
+                         ${document.getElementById('shippingState').value}
+                         ${document.getElementById('shippingZip').value}</div>`;
+            } else {
+                deliveryInfo = `
+                    <div><strong>Delivery Method:</strong> Factory Pickup</div>
+                    <div><strong>Pickup Location:</strong> 2025 Freeman Road East, Milton, WA 98354</div>`;
+            }
+
+            // Check if logo was uploaded
+            let logoHTML = '';
+            if (window.selectedLogoFile) {
+                if (window.selectedLogoDataURL) {
+                    logoHTML = `
+                        <div class="mt-4 p-3 bg-pink-50 rounded-lg">
+                            <strong>Company Logo:</strong>
+                            <img src="${window.selectedLogoDataURL}" alt="Company Logo" class="mt-2 h-16 w-auto object-contain">
+                            <p class="text-sm text-gray-600 mt-1">${window.selectedLogoFile.name}</p>
+                        </div>
+                    `;
+                } else {
+                    logoHTML = `
+                        <div class="mt-4 p-3 bg-pink-50 rounded-lg">
+                            <strong>Company Logo:</strong>
+                            <div class="flex items-center mt-2">
+                                <i class="fas fa-file-pdf text-red-500 text-2xl mr-2"></i>
+                                <p class="text-sm text-gray-600">${window.selectedLogoFile.name}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            customerInfo.innerHTML = `
+                <div><strong>Name:</strong> ${document.getElementById('customerName').value}</div>
+                <div><strong>Company:</strong> ${document.getElementById('companyName').value || 'N/A'}</div>
+                <div><strong>Email:</strong> ${document.getElementById('email').value}</div>
+                <div><strong>Phone:</strong> ${document.getElementById('phone').value}</div>
+                ${deliveryInfo}
+                <div><strong>Event Date:</strong> ${document.getElementById('eventDate').value || 'Not specified'}</div>
+                ${logoHTML}
+            `;
+
+            // Size distribution
+            const sizeDistribution = document.getElementById('reviewSizeDistribution');
+            let sizeHTML = '';
+
+            sizes.forEach(size => {
+                const quantity = parseInt(document.getElementById(`size-${size}`).value) || 0;
+                if (quantity > 0) {
+                    sizeHTML += `
+                        <div class="bg-pink-100 p-2 rounded text-center">
+                            <div class="text-xs text-gray-600">${size}</div>
+                            <div class="font-bold text-pink-600">${quantity}</div>
+                        </div>
+                    `;
+                }
+            });
+            sizeDistribution.innerHTML = sizeHTML;
+
+            // Design choice
+            const designChoice = document.querySelector('input[name="designChoice"]:checked').value;
+            const designChoiceDiv = document.getElementById('reviewDesignChoice');
+            const designImage = designChoice === 'Flag'
+                ? 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677'
+                : 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676';
+            const designName = designChoice === 'Flag' ? 'Patriotic Flag' : 'Classic Ribbon';
+            const designDescription = designChoice === 'Flag'
+                ? 'American flag with pink ribbon and company logo'
+                : 'Pink ribbon with company logo';
+
+            designChoiceDiv.innerHTML = `
+                <img src="${designImage}" alt="${designName}" class="h-20 w-auto object-contain rounded border border-gray-300">
+                <div>
+                    <div class="font-semibold text-gray-800">${designName}</div>
+                    <div class="text-sm text-gray-600">${designDescription}</div>
+                    <div class="text-xs text-pink-600 font-semibold mt-1">
+                        <i class="fas fa-check-circle"></i> Selected Design
+                    </div>
+                </div>
+            `;
+        }
+
+        // Change step
+        function changeStep(direction) {
+            if (direction === 1 && !validateStep(currentStep)) {
+                return;
+            }
+
+            // Hide current step
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+
+            // Update step
+            currentStep += direction;
+
+            // Show new step
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // Update step indicators
+            updateStepIndicators();
+
+            // Show review if step 4
+            if (currentStep === 4) {
+                showReview();
+            }
+
+            // Update navigation buttons
+            updateNavigation();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update step indicators
+        function updateStepIndicators() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                const line = document.getElementById(`step-line-${i}`);
+
+                if (i < currentStep) {
+                    // Completed step
+                    indicator.innerHTML = `
+                        <div class="rounded-full h-12 w-12 flex items-center justify-center bg-green-500 text-white font-bold">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-green-600">
+                            ${getStepName(i)}
+                        </div>
+                    `;
+                    if (line) line.classList.add('border-green-500');
+                } else if (i === currentStep) {
+                    // Current step
+                    indicator.className = 'flex items-center text-pink-600 relative';
+                    indicator.innerHTML = `
+                        <div class="rounded-full h-12 w-12 flex items-center justify-center bg-pink-600 text-white font-bold">${i}</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-pink-600">
+                            ${getStepName(i)}
+                        </div>
+                    `;
+                } else {
+                    // Future step
+                    indicator.className = 'flex items-center text-gray-500 relative';
+                    indicator.innerHTML = `
+                        <div class="rounded-full h-12 w-12 flex items-center justify-center border-2 border-gray-300">${i}</div>
+                        <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500">
+                            ${getStepName(i)}
+                        </div>
+                    `;
+                    if (line) line.classList.remove('border-green-500');
+                }
+            }
+        }
+
+        function getStepName(step) {
+            const names = ['', 'Products', 'Sizes', 'Contact', 'Review'];
+            return names[step];
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'flex';
+
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'flex';
+            } else {
+                nextBtn.style.display = 'flex';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // Submit order
+        async function submitOrder() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'flex';
+
+            try {
+                // Upload logo first if present
+                let imageExternalKey = null;
+                if (window.selectedLogoFile) {
+                    try {
+                        imageExternalKey = await uploadFileToAPI(window.selectedLogoFile);
+                        console.log('Logo uploaded successfully:', imageExternalKey);
+                    } catch (uploadError) {
+                        console.error('Logo upload failed, continuing without logo:', uploadError);
+                        // Continue without logo if upload fails
+                    }
+                }
+
+                const quantity = parseInt(document.getElementById('bundleQuantity').value) || 8;
+                const totalPrice = quantity * 45;
+
+                // Collect size data
+                const sizeData = {};
+                sizes.forEach(size => {
+                    sizeData[size] = parseInt(document.getElementById(`size-${size}`).value) || 0;
+                });
+
+                // Get delivery method
+                const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+
+                // Get design choice
+                const designChoice = document.querySelector('input[name="designChoice"]:checked').value;
+                const designImageURL = designChoice === 'Flag'
+                    ? 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677'
+                    : 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676';
+
+                // Prepare order data
+                const orderData = {
+                    customerName: document.getElementById('customerName').value,
+                    companyName: document.getElementById('companyName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value.replace(/\D/g, ''),  // Strip formatting
+                    deliveryMethod: deliveryMethod,
+                    address: deliveryMethod === 'Ship' ? document.getElementById('shippingAddress').value : '',
+                    city: deliveryMethod === 'Ship' ? document.getElementById('shippingCity').value : '',
+                    state: deliveryMethod === 'Ship' ? document.getElementById('shippingState').value : '',
+                    zip: deliveryMethod === 'Ship' ? document.getElementById('shippingZip').value : '',
+                    eventDate: document.getElementById('eventDate').value,
+                    notes: document.getElementById('notes').value,
+                    imageUpload: imageExternalKey,  // Include logo reference
+                    designChoice: designChoice,  // Add design choice
+                    designImageURL: designImageURL,  // Add design image URL
+                    bundleCount: quantity,
+                    sizeDistribution: sizeData,
+                    totalShirts: quantity,
+                    totalCaps: quantity,
+                    totalAmount: totalPrice
+                };
+
+                // Process order
+                console.log('=== HTML: Sending orderData to service ===');
+                console.log('Order data being sent:', orderData);
+                const result = await quoteService.processOrder(orderData);
+
+                if (result.success) {
+                    // Show success message
+                    document.getElementById('displayQuoteId').textContent = result.quoteId;
+                    document.getElementById('step-4').classList.remove('active');
+                    document.getElementById('step-success').classList.add('active');
+
+                    // Hide navigation
+                    document.querySelector('.fixed.bottom-0').style.display = 'none';
+
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    throw new Error(result.message || 'Failed to process order');
+                }
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                alert('There was an error processing your order. Please try again or contact support.');
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            updateBundleDisplay();
+            updateStepIndicators();
+        });
+    </script>
+</body>
+</html>

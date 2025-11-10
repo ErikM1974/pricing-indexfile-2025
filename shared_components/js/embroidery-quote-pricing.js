@@ -655,27 +655,6 @@ class EmbroideryPricingCalculator {
                 }
             }
             
-            // Process monograms
-            if (product.logoAssignments?.monogram) {
-                const monogram = product.logoAssignments.monogram;
-                if (monogram.quantity > 0) {
-                    const total = monogram.quantity * 12.50;
-                    
-                    additionalServices.push({
-                        type: 'monogram',
-                        description: 'Monogram',
-                        partNumber: 'Monogram',
-                        quantity: monogram.quantity,
-                        unitPrice: 12.50,
-                        total: total,
-                        productStyle: product.style,
-                        mode: monogram.mode,
-                        names: monogram.names || []
-                    });
-                    
-                    additionalServicesTotal += total;
-                }
-            }
         }
         
         // Calculate setup fees

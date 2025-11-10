@@ -15,14 +15,20 @@
     <link href="../shared_components/css/calculator-modern-enhancements.css" rel="stylesheet">
     <!-- Richardson-Specific Styles -->
     <link href="richardson-2025-styles.css" rel="stylesheet">
-    
+    <!-- Richardson Color Selector Styles -->
+    <link href="richardson-color-selector.css" rel="stylesheet">
+
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
+
     <!-- Base Quote Service -->
     <script src="../shared_components/js/base-quote-service.js"></script>
     <!-- Calculator Utilities -->
     <script src="../shared_components/js/calculator-utilities.js"></script>
+    <!-- Richardson 112 Image Data -->
+    <script src="richardson-112-images.js"></script>
+    <!-- Richardson Color Selector Enhancement -->
+    <script src="richardson-color-selector-enhancement.js"></script>
     <!-- Richardson Quote Service -->
     <script src="richardson-quote-service.js"></script>
     <!-- Richardson Calculator Class -->
@@ -387,9 +393,40 @@
         // Initialize calculator when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.richardsonCalculator = new RichardsonCalculator();
-            
+
             // Images are now handled by the gallery in RichardsonCalculator class
-            
+
+            // Enhanced Color Selector Integration
+            // Override the original addLineItem method to include color selector
+            if (window.richardsonCalculator && window.RichardsonColorSelector) {
+                const originalAddLineItem = window.richardsonCalculator.addLineItem.bind(window.richardsonCalculator);
+
+                window.richardsonCalculator.addLineItem = function() {
+                    // Call original method
+                    originalAddLineItem();
+
+                    // Get the newly added line item (last one in container)
+                    const lineItems = document.querySelectorAll('.line-item');
+                    const newLineItem = lineItems[lineItems.length - 1];
+
+                    if (newLineItem) {
+                        // Enhance with color selector capability
+                        RichardsonColorSelector.enhanceLineItem(newLineItem);
+
+                        console.log('[Richardson] Line item enhanced with color selector');
+                    }
+                };
+
+                // Also enhance any existing line items (like the initial one)
+                const existingLineItems = document.querySelectorAll('.line-item');
+                existingLineItems.forEach(lineItem => {
+                    RichardsonColorSelector.enhanceLineItem(lineItem);
+                    console.log('[Richardson] Existing line item enhanced with color selector');
+                });
+
+                console.log('[Richardson] Color selector integration activated');
+            }
+
             // Setup Fees Accordion Toggle
             const setupToggle = document.getElementById('setupFeesToggle');
             const setupContent = document.getElementById('setupFeesContent');

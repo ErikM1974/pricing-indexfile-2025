@@ -1,0 +1,664 @@
+/**
+ * Richardson 112 Color Selector - Inspiration Match (2025)
+ * Clean 2-column layout matching the provided inspiration design
+ *
+ * Design Philosophy:
+ * - Title at top with subtitle
+ * - 2-column: Large image left | All controls right
+ * - Single horizontal row of color circles (scrollable)
+ * - Style + Quantity inputs BELOW color selector
+ * - Full-width remove button
+ */
+
+/* ===========================================
+   MAIN CONTAINER - INTEGRATED COMPONENT
+   =========================================== */
+
+.richardson-112-integrated {
+    max-width: 800px;        /* Constrain width for better centering */
+    width: 100%;             /* Allows shrinking on smaller screens */
+    margin: 1.5rem auto 0;   /* Horizontal centering with auto left/right margins */
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.richardson-112-integrated:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Hide standard line item classes for Richardson 112 */
+.is-richardson-112 .style-input-group,
+.is-richardson-112 .quantity-input-group,
+.is-richardson-112 .remove-btn {
+    display: none;
+}
+
+/* Fix grid layout - Disable grid for Richardson 112 line items */
+.line-item.is-richardson-112 {
+    display: block;  /* Override the grid layout - Richardson 112 doesn't need multi-column */
+}
+
+/* ===========================================
+   TITLE SECTION
+   =========================================== */
+
+.richardson-title-section {
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.richardson-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.3px;
+}
+
+.richardson-subtitle {
+    font-size: 1rem;
+    color: #6c757d;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ===========================================
+   MODAL-FIRST LAYOUT - SIMPLIFIED
+   Single column with preview + controls
+   =========================================== */
+
+.richardson-112-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Cap Preview Section */
+.cap-preview-section {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.cap-image-wrapper {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #e0e0e0;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.cap-image-wrapper:hover {
+    border-color: #4cb354;
+    box-shadow: 0 10px 32px rgba(76, 179, 84, 0.2);
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4cb354;
+    font-size: 2rem;
+}
+
+/* Color Selection Controls Section */
+.color-selection-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ===========================================
+   SELECTED COLOR DISPLAY
+   =========================================== */
+
+.selected-color-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 10px;
+    border: 2px solid #4cb354;
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.2);
+}
+
+.color-label-text {
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 1rem;
+}
+
+.color-current-name {
+    font-weight: 800;
+    color: #1b5e20;
+    font-size: 1.25rem;
+    flex: 1;
+}
+
+/* ===========================================
+   VIEW ALL COLORS BUTTON - PRIMARY ACTION
+   =========================================== */
+
+.view-all-colors-btn {
+    width: 100%;
+    padding: 1.25rem 2rem;
+    background: linear-gradient(135deg, #4cb354 0%, #45a048 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.view-all-colors-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.view-all-colors-btn:hover::before {
+    left: 100%;
+}
+
+.view-all-colors-btn:hover {
+    background: linear-gradient(135deg, #45a048 0%, #3d8f40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.4);
+}
+
+.view-all-colors-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
+}
+
+.view-all-colors-btn i:first-child {
+    font-size: 1.25rem;
+}
+
+.view-all-colors-btn i:last-child {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.view-all-colors-btn:hover i:last-child {
+    transform: translateX(4px);
+}
+
+/* ===========================================
+   INPUTS GRID - STYLE & QUANTITY
+   =========================================== */
+
+.inputs-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.25rem;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.style-input-readonly,
+.quantity-input {
+    padding: 0.875rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.style-input-readonly {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.quantity-input {
+    background: white;
+    color: #2c3e50;
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.2);
+}
+
+/* ===========================================
+   OBSOLETE CLASSES - KEPT FOR LEGACY COMPATIBILITY
+   The following classes are no longer used in the new modal-first design
+   but are kept in case they're referenced elsewhere
+   =========================================== */
+
+/* Legacy color circles - no longer used */
+.color-circles-single-row { display: none; }
+.color-circle { display: none; }
+
+/* Legacy selected banner and inputs-row-bottom - replaced by new design */
+.selected-banner { display: none; }
+.inputs-row-bottom { display: none; }
+
+/* ===========================================
+   REMOVE BUTTON - FULL WIDTH
+   =========================================== */
+
+.remove-btn-full {
+    width: 100%;
+    padding: 1rem;
+    background: #dc3545;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.remove-btn-full:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+/* ===========================================
+   RESPONSIVE BREAKPOINTS - MODAL-FIRST LAYOUT
+   =========================================== */
+
+@media (max-width: 768px) {
+    .richardson-112-integrated {
+        padding: 1.25rem;
+        gap: 1.25rem;
+    }
+
+    .richardson-title {
+        font-size: 1.5rem;
+    }
+
+    .richardson-112-layout {
+        gap: 1.5rem;
+    }
+
+    .cap-preview-section {
+        max-width: 100%;
+    }
+
+    .inputs-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .view-all-colors-btn {
+        padding: 1.125rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .richardson-112-integrated {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .richardson-title {
+        font-size: 1.375rem;
+    }
+
+    .richardson-subtitle {
+        font-size: 0.925rem;
+    }
+
+    .richardson-112-layout {
+        gap: 1.25rem;
+    }
+
+    .color-selection-section {
+        gap: 1.25rem;
+    }
+
+    .inputs-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .view-all-colors-btn {
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .view-all-colors-btn i:first-child {
+        font-size: 1.125rem;
+    }
+
+    .color-current-name {
+        font-size: 1.125rem;
+    }
+
+    .selected-color-display {
+        padding: 0.875rem 1rem;
+    }
+}
+
+/* ===========================================
+   ANIMATIONS
+   =========================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.richardson-112-integrated {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1.15);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.color-circle.selected {
+    animation: pulse 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selected-banner {
+    animation: slideUp 0.3s ease-out;
+}
+
+/* ===========================================
+   ACCESSIBILITY ENHANCEMENTS
+   =========================================== */
+
+.view-all-colors-btn:focus,
+.remove-btn-full:focus,
+.quantity-input:focus {
+    outline: 3px solid #4cb354;
+    outline-offset: 3px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .view-all-colors-btn,
+    .richardson-112-integrated,
+    .cap-image-wrapper,
+    .remove-btn-full {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* ===========================================
+   LOADING STATES
+   =========================================== */
+
+.richardson-112-integrated.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ===========================================
+   OLD CLASSES (LEGACY COMPATIBILITY)
+   Keep these for backwards compatibility with modals
+   =========================================== */
+
+.color-gallery-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: none;
+}
+
+.color-gallery-modal.active {
+    display: block;
+}
+
+.color-gallery-modal .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.color-gallery-modal .modal-content {
+    position: relative;
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.color-gallery-modal .modal-header {
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.color-gallery-modal .modal-header h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #2c3e50;
+}
+
+.color-gallery-modal .modal-close-btn {
+    padding: 0.625rem;
+    background: transparent;
+    border: none;
+    font-size: 1.75rem;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.color-gallery-modal .modal-close-btn:hover {
+    background: #fee;
+    color: #dc3545;
+}
+
+.color-gallery-modal .modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-category-tabs {
+    display: flex;
+    gap: 0.875rem;
+    margin-bottom: 2rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.modal-category-tab {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.875rem 1.125rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+}
+
+.modal-category-tab:hover {
+    background: #e9ecef;
+    border-color: #4cb354;
+}
+
+.modal-category-tab.active {
+    background: #4cb354;
+    border-color: #4cb354;
+    color: white;
+    font-weight: 700;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.gallery-item {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 3px solid transparent;
+}
+
+.gallery-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+    border-color: #4cb354;
+}
+
+.gallery-item.selected {
+    border-color: #4cb354;
+    box-shadow: 0 8px 24px rgba(76, 179, 84, 0.4);
+}
+
+.gallery-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+
+.gallery-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-image-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #6c757d;
+    font-size: 1.75rem;
+}
+
+.gallery-item-info {
+    padding: 1rem;
+    text-align: center;
+}
+
+.gallery-color-name {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.gallery-item.selected .gallery-item-info {
+    background: #e8f5e9;
+}
+
+.gallery-item.selected .gallery-color-name {
+    color: #4cb354;
+}

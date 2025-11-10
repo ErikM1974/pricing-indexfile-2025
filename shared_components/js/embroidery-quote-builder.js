@@ -10,18 +10,31 @@ class EmbroideryQuoteBuilder {
         this.productLineManager = new ProductLineManager();
         this.pricingCalculator = new EmbroideryPricingCalculator();
         this.quoteService = new EmbroideryQuoteService();
-        
+
         // Make product manager globally accessible for UI callbacks
         window.productLineManager = this.productLineManager;
-        
+
         // Current state
         this.currentPhase = 'logo';
         this.currentPricing = null;
-        
+
         this.initializeUI();
         this.bindEvents();
-        
+
         console.log('[EmbroideryQuoteBuilder] Initialized successfully');
+    }
+
+    /**
+     * Initialize async components (call after constructor)
+     */
+    async init() {
+        console.log('[EmbroideryQuoteBuilder] Starting async initialization...');
+
+        // Initialize logo manager (fetches API configuration)
+        await this.logoManager.init();
+
+        console.log('[EmbroideryQuoteBuilder] Async initialization complete');
+        return this;
     }
     
     /**
@@ -29,7 +42,8 @@ class EmbroideryQuoteBuilder {
      */
     initializeUI() {
         this.showPhase('logo');
-        this.logoManager.addLogo(); // Start with one logo
+        // Primary logo is initialized by LogoManager constructor
+        // Additional logos are added by user via "Add Additional Position" button
     }
     
     /**
@@ -40,41 +54,145 @@ class EmbroideryQuoteBuilder {
         document.getElementById('continue-to-products')?.addEventListener('click', () => {
             this.showPhase('product');
         });
-        
+
         document.getElementById('continue-to-summary')?.addEventListener('click', () => {
             this.showPhase('summary');
             this.generateSummary();
         });
-        
+
         document.getElementById('back-to-logos')?.addEventListener('click', () => {
             this.showPhase('logo');
         });
-        
+
         document.getElementById('back-to-products')?.addEventListener('click', () => {
             this.showPhase('product');
         });
-        
-        // Quote actions
-        document.getElementById('save-quote-btn')?.addEventListener('click', () => {
-            this.handleSaveQuote();
-        });
-        
-        document.getElementById('email-quote-btn')?.addEventListener('click', () => {
-            this.handleEmailQuote();
-        });
-        
+
+        // Quick Actions (no customer info required)
         document.getElementById('copy-quote-btn')?.addEventListener('click', () => {
             this.handleCopyQuote();
         });
-        
+
         document.getElementById('print-quote-btn')?.addEventListener('click', () => {
             this.handlePrintQuote();
         });
-        
+
+        document.getElementById('download-quote-btn')?.addEventListener('click', () => {
+            this.handleDownloadQuote();
+        });
+
+        document.getElementById('shopworks-guide-btn')?.addEventListener('click', () => {
+            this.handleShopWorksGuide();
+        });
+
+        // Save & Send Actions (require customer info)
+        document.getElementById('save-quote-btn')?.addEventListener('click', () => {
+            this.handleSaveQuote();
+        });
+
+        document.getElementById('email-quote-btn')?.addEventListener('click', () => {
+            this.handleEmailQuote();
+        });
+
         document.getElementById('new-quote-btn')?.addEventListener('click', () => {
             this.handleNewQuote();
         });
-        
+
+        // Collapsible Save & Send section (Industry standard pattern)
+        const saveSendHeader = document.getElementById('save-send-header');
+        if (saveSendHeader) {
+            saveSendHeader.addEventListener('click', () => {
+                this.toggleSaveSendSection();
+            });
+        }
+
+        // NEW: Initialize exact match search for sales reps (optimized for known style numbers)
+        this.productLineManager.initializeExactMatchSearch(
+            // Callback for exact matches - auto-load product
+            (product) => {
+                console.log('[EmbroideryQuoteBuilder] Exact match found, auto-loading:', product.value);
+                const styleSearch = document.getElementById('style-search');
+                if (styleSearch) {
+                    styleSearch.value = product.value;
+                }
+                this.productLineManager.loadProductDetails(product.value);
+            },
+            // Callback for suggestions list
+            (products) => {
+                const styleSuggestions = document.getElementById('style-suggestions');
+                if (!styleSuggestions) return;
+
+                if (products.length === 0) {
+                    styleSuggestions.innerHTML = '';
+                    styleSuggestions.style.display = 'none';
+                    return;
+                }
+
+                // Add note about beanies if any are present
+                const hasBeanies = products.some(item =>
+                    (item.label || '').toLowerCase().includes('beanie')
+                );
+
+                const noteHtml = hasBeanies
+                    ? '<div class="autocomplete-note" style="padding: 8px; background: #f0f9ff; color: #0369a1; font-size: 12px; border-bottom: 1px solid #e0e7ff;">Note: Beanies use flat embroidery pricing</div>'
+                    : '';
+
+                styleSuggestions.innerHTML = noteHtml + products.map(product => `
+                    <div class="suggestion-item" data-style="${product.value}">
+                        <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                    </div>
+                `).join('');
+
+                // Add click handlers
+                styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const styleSearch = document.getElementById('style-search');
+                        if (styleSearch) {
+                            styleSearch.value = item.dataset.style;
+                        }
+                        styleSuggestions.style.display = 'none';
+                        this.productLineManager.loadProductDetails(item.dataset.style);
+                    });
+                });
+
+                styleSuggestions.style.display = 'block';
+            }
+        );
+
+        // NEW: Override ProductLineManager's input event listener to use exact match search
+        const styleSearch = document.getElementById('style-search');
+        if (styleSearch) {
+            // Remove old event listener by cloning (replaces all listeners)
+            const newStyleSearch = styleSearch.cloneNode(true);
+            styleSearch.parentNode.replaceChild(newStyleSearch, styleSearch);
+
+            // Add exact match search listener
+            newStyleSearch.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    const suggestions = document.getElementById('style-suggestions');
+                    if (suggestions) {
+                        suggestions.innerHTML = '';
+                        suggestions.style.display = 'none';
+                    }
+                    return;
+                }
+                // Use exact match search
+                this.productLineManager.searchWithExactMatch(query);
+            });
+
+            // NEW: Add Enter key support for immediate search
+            newStyleSearch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = e.target.value.trim();
+                    if (query.length >= 2) {
+                        this.productLineManager.searchImmediate(query);
+                    }
+                }
+            });
+        }
+
         // Hide suggestions when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#style-search') && !e.target.closest('#style-suggestions')) {
@@ -93,23 +211,28 @@ class EmbroideryQuoteBuilder {
             section.style.display = 'none';
             section.classList.remove('active');
         });
-        
+
         // Show selected phase
         const phaseElement = document.getElementById(`${phase}-phase`);
         if (phaseElement) {
             phaseElement.style.display = 'block';
             phaseElement.classList.add('active');
         }
-        
+
         // Update navigation indicators
         this.updatePhaseNavigation(phase);
-        
+
         this.currentPhase = phase;
-        
+
         // Update pricing if showing summary
         if (phase === 'summary') {
             this.updatePricing();
         }
+
+        // Trigger phase change event for quote indicator
+        document.dispatchEvent(new CustomEvent('phaseChanged', {
+            detail: phase === 'product' ? 'product-phase' : phase
+        }));
     }
     
     /**
@@ -213,188 +336,200 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Render summary display - matching Cap Embroidery style
+     * Render summary display - Modern Phase 3 redesign (matches Cap Embroidery)
      */
     renderSummary() {
         const container = document.getElementById('quote-summary');
         if (!container || !this.currentPricing) return;
-        
-        let html = '<div class="quote-summary-content">';
-        
-        // Header
+
+        // NEW UNIFIED DESIGN - Single professional container
+        let html = '<div class="phase3-unified-container">';
+
+        // Modern header with gradient and key info (spans full width)
         html += `
-            <div class="summary-header">
-                <h3>Embroidery Quote Summary</h3>
-                <div class="quote-meta">
-                    <span>Total Pieces: <strong>${this.currentPricing.totalQuantity}</strong></span>
-                    <span>Tier: <strong>${this.currentPricing.tier}</strong></span>
+            <div class="phase3-header">
+                <div class="phase3-title">
+                    <h3>Embroidery Quote Summary</h3>
+                    <div class="phase3-meta">
+                        <span class="meta-item"><i class="fas fa-box"></i> ${this.currentPricing.totalQuantity} pieces</span>
+                        <span class="meta-item"><i class="fas fa-layer-group"></i> ${this.currentPricing.tier}</span>
+                    </div>
                 </div>
             </div>
         `;
-        
-        // EMBROIDERY PACKAGE BREAKDOWN - Like Cap Embroidery
+
+        // LEFT COLUMN: Scrollable content wrapper
+        html += '<div class="phase3-content-wrapper">';
+
+        // Embroidery specifications - compact list
         html += `
-            <div style="background: #f0f8f0; border: 1px solid #4cb354; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h4 style="margin: 0 0 12px 0; color: #4cb354; text-transform: uppercase; font-size: 14px;">
-                    <i class="fas fa-thread"></i> EMBROIDERY PACKAGE FOR THIS ORDER:
-                </h4>
+            <div class="phase3-section embroidery-specs">
+                <h4 class="section-title"><i class="fas fa-thread"></i> Embroidery Details</h4>
+                <div class="logo-list">
         `;
-        
+
         // Show primary logo first
         const primaryLogos = this.currentPricing.logos.filter((l, idx) => idx === 0);
         const additionalLogos = this.currentPricing.logos.filter((l, idx) => idx > 0);
-        
+
         primaryLogos.forEach(logo => {
             html += `
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <span style="color: #4cb354;">✓</span> 
-                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                    <strong style="color: #4cb354;">INCLUDED IN BASE PRICE</strong>
-                    ${logo.needsDigitizing ? '<span style="color: #ff6b6b;"> [+$100 Digitizing]</span>' : ''}
-                </p>
+                <div class="logo-item">
+                    <span class="logo-icon">✓</span>
+                    <div class="logo-info">
+                        <strong>${logo.position}</strong>
+                        <div class="logo-detail">${logo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <span class="badge-primary">Primary Logo</span>
+                    ${logo.needsDigitizing ? '<span class="badge-setup" style="margin-left: 8px;">+$100 Setup</span>' : ''}
+                </div>
             `;
         });
-        
+
         // Show additional logos with pricing from API
         additionalLogos.forEach(logo => {
             // Find matching additional service for this logo position
             let matchedService = null;
             let alPrice = 0;
-            
+
             if (this.currentPricing.additionalServices) {
                 // Try to match by position name in service description
                 matchedService = this.currentPricing.additionalServices.find(service => {
                     const serviceDesc = service.description.toLowerCase();
                     const logoPos = logo.position.toLowerCase();
                     // Match if service description contains the logo position
-                    return serviceDesc.includes(logoPos.replace(' ', '')) || 
+                    return serviceDesc.includes(logoPos.replace(' ', '')) ||
                            serviceDesc.includes(logoPos) ||
                            (logoPos.includes('chest') && serviceDesc.includes('chest')) ||
                            (logoPos.includes('back') && serviceDesc.includes('back')) ||
                            (logoPos.includes('sleeve') && serviceDesc.includes('sleeve'));
                 });
-                
+
                 if (matchedService) {
                     alPrice = matchedService.unitPrice;
                 }
             }
-            
+
             html += `
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <span style="color: #4cb354;">✓</span> 
-                    <strong>${logo.position}</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                    <strong style="color: #ff9800;">ADDITIONAL ${alPrice > 0 ? `(+$${alPrice.toFixed(2)} per piece)` : '(see additional services)'}</strong>
-                    ${logo.needsDigitizing ? '<span style="color: #ff6b6b;"> [+$100 Digitizing]</span>' : ''}
-                </p>
+                <div class="logo-item">
+                    <span class="logo-icon">✓</span>
+                    <div class="logo-info">
+                        <strong>${logo.position}</strong>
+                        <div class="logo-detail">${logo.stitchCount.toLocaleString()} stitches${alPrice > 0 ? ` • +$${alPrice.toFixed(2)}/piece` : ''}</div>
+                    </div>
+                    <span class="badge-additional">Additional</span>
+                    ${logo.needsDigitizing ? '<span class="badge-setup" style="margin-left: 8px;">+$100 Setup</span>' : ''}
+                </div>
             `;
         });
-        
+
         // Show small batch fee if applicable
         if (this.currentPricing.ltmFee > 0) {
             const ltmPerPiece = (this.currentPricing.ltmFee / this.currentPricing.totalQuantity).toFixed(2);
             html += `
-                <p style="margin: 5px 0; font-size: 14px; color: #ff6b6b;">
-                    <span>⚠</span> 
-                    <strong>Small Batch Fee</strong> - 
-                    <strong>ADDITIONAL (+$${ltmPerPiece} per piece for orders under 24)</strong>
-                </p>
+                <div class="ltm-alert">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Small Batch Fee:</strong> +$${ltmPerPiece} per piece (orders under 24)
+                </div>
             `;
         }
-        
-        html += '</div>';
-        
-        // Products section - Enhanced like Cap Embroidery
-        html += '<div class="summary-section">';
-        html += '<h4><i class="fas fa-tshirt"></i> Products</h4>';
-        
+
+        html += '</div></div>'; // Close logo-list and embroidery-specs
+
+        // Products section - Modern card design
+        html += `
+            <div class="phase3-section products-section">
+                <h4 class="section-title"><i class="fas fa-tshirt"></i> Products</h4>
+        `;
+
         // Track corrected overall subtotal for grand total calculation
         let correctedOverallSubtotal = 0;
-        
+
         this.currentPricing.products.forEach(pp => {
-            // Calculate total additional logo cost from API data
-            let totalAdditionalLogoCost = 0;
+            // Calculate additional logo cost PER PIECE from API data (filtered by product)
+            // Note: additionalServices[].unitPrice is already a per-piece cost, not a total
+            let additionalLogoCostPerPiece = 0;
             if (this.currentPricing.additionalServices) {
-                totalAdditionalLogoCost = this.currentPricing.additionalServices
+                console.log('[DEBUG Phase 3] All additionalServices:', this.currentPricing.additionalServices);
+                console.log('[DEBUG Phase 3] Current product style:', pp.product.style);
+
+                // Filter additional services for THIS product only
+                const filteredServices = this.currentPricing.additionalServices
+                    .filter(service => service.productStyle === pp.product.style);
+
+                console.log('[DEBUG Phase 3] Filtered services for this product:', filteredServices);
+
+                additionalLogoCostPerPiece = filteredServices
                     .reduce((sum, service) => sum + service.unitPrice, 0);
+
+                console.log('[DEBUG Phase 3] additionalLogoCostPerPiece:', additionalLogoCostPerPiece);
+            } else {
+                console.log('[DEBUG Phase 3] NO additionalServices in currentPricing!');
             }
-            
+
             html += `
-                <div class="product-summary" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div class="product-header" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
-                        <img src="${pp.product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(pp.product.style)}"
-                             alt="${pp.product.style} - ${pp.product.color}"
-                             style="width: 85px; height: 85px; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 4px; padding: 5px; background: #fff;"
-                             onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${pp.product.style}')">
-                        <div class="product-info" style="flex: 1;">
-                            <strong style="font-size: 18px; color: #333;">${pp.product.style} - ${pp.product.color}</strong>
-                            <p style="margin: 6px 0; color: #666; font-size: 14px;">${pp.product.title}</p>
-                            <p style="margin: 6px 0; color: #4cb354; font-weight: 600; font-size: 15px;">
-                                <i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces total
-                            </p>
+                <div class="product-card">
+                    <div class="product-card-header-wrapper">
+                        <div class="product-card-image-section">
+                            <img src="${pp.product.imageUrl || 'https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent(pp.product.style)}"
+                                 alt="${pp.product.style} - ${pp.product.color}"
+                                 class="product-card-img"
+                                 onerror="this.src='https://via.placeholder.com/200x200/4cb354/white?text=' + encodeURIComponent('${pp.product.style}')">
+                        </div>
+                        <div class="product-card-info-section">
+                            <h5 class="product-name">${pp.product.style} - ${pp.product.color}</h5>
+                            <p class="product-desc">${pp.product.title}</p>
+                            <div class="product-meta">
+                                <span class="meta-badge"><i class="fas fa-box"></i> ${pp.product.totalQuantity} pieces</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="product-lines">
+                    <div class="product-divider"></div>
+                    <div class="product-card-body">
             `;
             
             // Calculate corrected product subtotal based on corrected line items
             let correctedProductSubtotal = 0;
-            
+
+            // Modern horizontal pricing breakdown (e-commerce style)
             pp.lineItems.forEach((item, index) => {
-                // Calculate pricing components
-                const ltmPerPiece = this.currentPricing.ltmFee > 0 ? this.currentPricing.ltmFee / this.currentPricing.totalQuantity : 0;
-                const extraStitchCharge = this.currentPricing.additionalStitchCost || 0; // Extra stitch charge for primary logo over 8000
-                
-                // Use the stored basePrice from the line item (this is the rounded base without extra stitches)
-                const basePrice = item.basePrice || item.unitPrice; // Use stored basePrice if available
-                const displayPrice = item.unitPriceWithLTM || item.unitPrice;
-                const consolidatedPrice = displayPrice + totalAdditionalLogoCost;
-                const correctedTotal = consolidatedPrice * item.quantity;
-                correctedProductSubtotal += correctedTotal;
-                
-                // Build the pricing breakdown like cap quote
-                let baseLine = '';
-                if (extraStitchCharge > 0) {
-                    // Show base price with extra stitch charge separately
-                    baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)} + Extra stitches: $${extraStitchCharge.toFixed(2)}`;
-                    if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
-                    }
-                } else {
-                    // No extra stitches, show normal breakdown
-                    baseLine = `Base (includes primary logo): $${basePrice.toFixed(2)}`;
-                    if (ltmPerPiece > 0) {
-                        baseLine += ` + Small batch: $${ltmPerPiece.toFixed(2)}`;
-                    }
+                // Extract pricing components
+                const basePrice = item.basePrice || item.unitPrice;
+                const ltmFee = item.ltmPerUnit || 0;
+                const extraStitch = item.extraStitchCost || 0;
+                const alCost = additionalLogoCostPerPiece || 0;
+
+                const consolidatedPrice = basePrice + ltmFee + extraStitch + alCost;
+                const lineTotal = consolidatedPrice * item.quantity;
+                correctedProductSubtotal += lineTotal;
+
+                // Build two-line compact pricing breakdown (2025-12-19)
+                // First line: Unit price and line total
+                // Second line: Component breakdown with bullets
+                let components = [];
+                components.push(`<span class="price-component"><span class="component-label">Base</span> <span class="component-value">$${basePrice.toFixed(2)}</span></span>`);
+
+                if (ltmFee > 0) {
+                    components.push(`<span class="price-component"><span class="component-label">Small Batch</span> <span class="component-value">$${ltmFee.toFixed(2)}</span></span>`);
                 }
-                
-                // Build additional logos lines if present
-                let additionalLogosLines = '';
-                if (this.currentPricing.additionalServices && this.currentPricing.additionalServices.length > 0) {
-                    this.currentPricing.additionalServices.forEach(service => {
-                        additionalLogosLines += `<br>+ ${service.description}: $${service.unitPrice.toFixed(2)}`;
-                    });
+
+                if (extraStitch > 0) {
+                    components.push(`<span class="price-component"><span class="component-label">Extra Stitches</span> <span class="component-value">$${extraStitch.toFixed(2)}</span></span>`);
                 }
-                
+
+                if (alCost > 0) {
+                    components.push(`<span class="price-component"><span class="component-label">Add'l Logo</span> <span class="component-value">$${alCost.toFixed(2)}</span></span>`);
+                }
+
                 html += `
-                    <div class="line-item" style="padding: 16px 0; ${index > 0 ? 'border-top: 1px solid #e0e0e0;' : ''}">
-                        <div style="margin-bottom: 12px;">
-                            <strong style="font-size: 15px;">${item.description} (${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'})</strong>
+                    <div class="size-line">
+                        <div class="size-line-header">
+                            <span class="size-qty">${item.description} • ${item.quantity} ${item.quantity === 1 ? 'piece' : 'pieces'}</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="margin-bottom: 8px;">
-                                    <span style="font-size: 14px; color: #666; margin-right: 8px;">Price per piece:</span>
-                                    <span style="font-size: 20px; font-weight: bold; color: #4cb354;">$${consolidatedPrice.toFixed(2)}</span>
-                                </div>
-                                <div style="font-size: 11px; color: #999; line-height: 1.4; padding-left: 20px; border-left: 2px solid #e8e8e8; margin-top: -4px;">
-                                    ${baseLine}
-                                    ${additionalLogosLines}
-                                </div>
-                            </div>
-                            <div style="text-align: right; min-width: 120px; align-self: center;">
-                                <div style="font-size: 13px; color: #666; margin-bottom: 2px;">Line total:</div>
-                                <div style="font-size: 18px; font-weight: bold; color: #333;">$${correctedTotal.toFixed(2)}</div>
-                            </div>
+                        <span class="unit-price-display">$${consolidatedPrice.toFixed(2)} /ea</span>
+                        <span class="line-total">$${lineTotal.toFixed(2)}</span>
+                        <div class="price-components">
+                            ${components.join('')}
                         </div>
                     </div>
                 `;
@@ -402,70 +537,78 @@ class EmbroideryQuoteBuilder {
             
             // Add to overall corrected subtotal
             correctedOverallSubtotal += correctedProductSubtotal;
-            
+
             html += `
                     </div>
-                    <div class="product-subtotal" style="text-align: right; margin-top: 15px; padding-top: 12px; border-top: 2px solid #f0f0f0;">
-                        <span style="font-size: 14px; color: #666; margin-right: 8px;">Product Subtotal:</span>
-                        <strong style="font-size: 20px; color: #4cb354;">$${correctedProductSubtotal.toFixed(2)}</strong>
+                    <div class="product-card-footer">
+                        <span class="footer-label">Product Total:</span>
+                        <span class="footer-amount">$${correctedProductSubtotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
         });
-        
-        html += '</div>';
-        
+
+        html += '</div>'; // Close products-section
+
+        html += '</div>'; // Close phase3-content-wrapper (LEFT COLUMN)
+
+        // RIGHT COLUMN: Sticky sidebar with totals
+        html += '<div class="phase3-sidebar">';
+
         // Additional Services section removed from display since costs are already included in line item prices
         // The additional services data is still maintained in this.currentPricing.additionalServices for database/email purposes
-        
-        // Totals section - No tax in summary (tax only in PDF like cap quote)
+
+        // Invoice-style totals section
         // Note: LTM fee is already included in correctedOverallSubtotal via unitPriceWithLTM
         // Since additional services are already included in our corrected line items, we don't double-add them
         const grandTotal = correctedOverallSubtotal + this.currentPricing.setupFees;
-        
+
         // Calculate tax separately for PDF use (not shown in summary)
         const salesTax = grandTotal * 0.101; // 10.1% Milton, WA sales tax
         const grandTotalWithTax = grandTotal + salesTax;
-        
+
         html += `
-            <div class="summary-section totals-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                <h4 style="color: #4cb354; margin-bottom: 15px;"><i class="fas fa-calculator"></i> Quote Totals</h4>
-                <div class="totals-breakdown">
-                    <div class="total-line" style="display: flex; justify-content: space-between; padding: 8px 0;">
-                        <span>Products & Primary Embroidery${this.currentPricing.ltmFee > 0 ? ' (includes small batch fee)' : ''}:</span>
-                        <span style="font-weight: bold;">$${correctedOverallSubtotal.toFixed(2)}</span>
+            <div class="phase3-section totals-section">
+                <h4 class="section-title"><i class="fas fa-calculator"></i> Quote Total</h4>
+                <div class="totals-table">
+                    <div class="total-row">
+                        <span class="total-label">Products & Embroidery${this.currentPricing.ltmFee > 0 ? ' (includes small batch fee)' : ''}:</span>
+                        <span class="total-value">$${correctedOverallSubtotal.toFixed(2)}</span>
                     </div>
         `;
-        
+
         // Additional services are already included in corrected line item calculations
         // So we don't show them as a separate line in the totals
-        
+
         if (this.currentPricing.setupFees > 0) {
             html += `
-                <div class="total-line" style="display: flex; justify-content: space-between; padding: 8px 0;">
-                    <span>Setup Fees (${this.currentPricing.logos.filter(l => l.needsDigitizing).length} logo${this.currentPricing.logos.filter(l => l.needsDigitizing).length > 1 ? 's' : ''}):</span>
-                    <span style="font-weight: bold;">$${this.currentPricing.setupFees.toFixed(2)}</span>
+                <div class="total-row">
+                    <span class="total-label">Setup Fees (${this.currentPricing.logos.filter(l => l.needsDigitizing).length} logo${this.currentPricing.logos.filter(l => l.needsDigitizing).length > 1 ? 's' : ''}):</span>
+                    <span class="total-value">$${this.currentPricing.setupFees.toFixed(2)}</span>
                 </div>
             `;
         }
-        
+
         // Small batch fee is already included in product pricing, so we don't add it as a separate line
         // No subtotal or sales tax lines in summary (like cap quote) - tax only appears in PDF
-        
+
         html += `
-                    <div class="total-line grand-total" style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #4cb354; margin-top: 10px; font-size: 18px;">
-                        <span style="font-weight: bold; color: #333;">GRAND TOTAL:</span>
-                        <span style="font-weight: bold; color: #333;">$${grandTotal.toFixed(2)}</span>
+                    <div class="total-row grand-total-row">
+                        <span class="total-label">GRAND TOTAL:</span>
+                        <span class="total-value">$${grandTotal.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
         `;
-        
+
+        html += '</div>'; // Close phase3-sidebar (RIGHT COLUMN)
+
+        html += '</div>'; // Close phase3-unified-container (GRID WRAPPER)
+
         // Store both totals for later use (summary shows pre-tax, PDF shows with tax)
         this.currentPricing.grandTotal = grandTotal;
         this.currentPricing.grandTotalWithTax = grandTotalWithTax;
-        
-        html += '</div>';
+
         container.innerHTML = html;
     }
     
@@ -614,17 +757,85 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Handle copy quote to clipboard
+     * Toggle Save & Send section (collapsible)
+     */
+    toggleSaveSendSection() {
+        const content = document.getElementById('save-send-content');
+        const icon = document.getElementById('save-send-icon');
+        const status = document.getElementById('save-send-status');
+
+        if (!content) return;
+
+        const isExpanded = content.style.display === 'block';
+
+        if (isExpanded) {
+            // Collapse
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            status.textContent = 'Click to expand';
+        } else {
+            // Expand
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+            status.textContent = 'Click to collapse';
+        }
+    }
+
+    /**
+     * Handle download quote (Quick Action - no customer info required)
+     */
+    handleDownloadQuote() {
+        if (!this.currentPricing) {
+            this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
+            return;
+        }
+
+        console.log('[EmbroideryQuoteBuilder] Handling download quote...');
+
+        // Generate a temporary quote ID for the filename
+        const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
+
+        // Use generic customer data for quick download
+        const customerData = {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
+        // Generate HTML content
+        const htmlContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
+
+        // Create blob and download
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Quote_${quoteId}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.showSuccessNotification('Quote Downloaded', `Quote saved as Quote_${quoteId}.html`);
+    }
+
+    /**
+     * Handle copy quote to clipboard (Quick Action - no customer info required)
      */
     handleCopyQuote() {
         if (!this.currentPricing) {
             this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
             return;
         }
-        
+
         console.log('[EmbroideryQuoteBuilder] Handling copy quote...');
-        
-        const quoteText = this.generateQuoteText();
+
+        // Pass false to use generic customer data for quick copy
+        const quoteText = this.generateQuoteText(false);
         
         navigator.clipboard.writeText(quoteText).then(() => {
             console.log('[EmbroideryQuoteBuilder] Quote copied to clipboard');
@@ -651,18 +862,29 @@ class EmbroideryQuoteBuilder {
     }
     
     /**
-     * Handle print quote
+     * Handle print quote (Quick Action - no customer info required)
      */
     handlePrintQuote() {
         if (!this.currentPricing) {
             this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
             return;
         }
-        
+
         console.log('[EmbroideryQuoteBuilder] Handling print quote...');
-        
+
         const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
-        const customerData = this.getCustomerData();
+
+        // Use generic customer data for quick print
+        const customerData = {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
         const printContent = this.generatePrintHTML(quoteId, customerData, this.currentPricing);
         
         const printWindow = window.open('', '_blank');
@@ -674,15 +896,105 @@ class EmbroideryQuoteBuilder {
             setTimeout(() => printWindow.close(), 500);
         };
     }
-    
+
+    /**
+     * Handle ShopWorks Data Entry Guide generation
+     */
+    handleShopWorksGuide() {
+        if (!this.currentPricing) {
+            this.showErrorNotification('No Quote Data', 'Please complete your quote first.');
+            return;
+        }
+
+        console.log('[EmbroideryQuoteBuilder] Generating ShopWorks Entry Guide...');
+        console.log('[EmbroideryQuoteBuilder] currentPricing:', this.currentPricing);
+
+        // Calculate sales tax for ShopWorks guide (10.1% Milton, WA)
+        const subtotalBeforeTax = (this.currentPricing.subtotal || 0) + (this.currentPricing.setupFees || 0);
+        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
+        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
+        // Prepare quote data in format expected by ShopWorks guide generator
+        // The currentPricing structure has products with lineItems
+        const quoteData = {
+            QuoteID: this.currentPricing.quoteId || this.quoteService.generateQuoteID(),
+            CustomerName: this.currentCustomerInfo?.name || 'Customer',
+            products: [],
+            TotalQuantity: this.currentPricing.totalQuantity || 0,
+            SubtotalAmount: subtotalBeforeTax,  // Full subtotal including all fees
+            SalesTaxAmount: salesTax,           // 10.1% calculated tax
+            TotalAmount: grandTotalWithTax,     // Total with tax included
+            Notes: this.currentCustomerInfo?.notes || ''
+        };
+
+        // Convert each product's lineItems into the format ShopWorks generator expects
+        this.currentPricing.products.forEach(productPricing => {
+            const product = productPricing.product;
+
+            // Log the product to see what fields are available
+            console.log('[EmbroideryQuoteBuilder] Product object:', product);
+
+            productPricing.lineItems.forEach(lineItem => {
+                // Parse size breakdown from description like "S(3) M(1) L(3) XL(2)" or "2XL(2)"
+                const sizeBreakdown = {};
+                const sizeMatches = lineItem.description.matchAll(/([A-Z0-9]+)\((\d+)\)/g);
+                for (const match of sizeMatches) {
+                    const size = match[1];
+                    const qty = parseInt(match[2]);
+                    sizeBreakdown[size] = qty;
+                }
+
+                // Get style and description from product object
+                // product.title already contains the clean product name (e.g., "Port & Co Essential Tee")
+                // No parsing needed - it's already in the correct format!
+                const styleNumber = product.style || product.styleNumber || product.StyleNumber || '';
+                const description = product.title || product.name || product.productName || '';
+
+                console.log('[EmbroideryQuoteBuilder] Product description:', {
+                    style: styleNumber,
+                    description: description
+                });
+
+                quoteData.products.push({
+                    StyleNumber: styleNumber,
+                    ProductName: description,
+                    Color: product.color || product.Color || '',
+                    ColorCode: product.colorCode || product.ColorCode || '',
+                    SizeBreakdown: JSON.stringify(sizeBreakdown),
+                    Quantity: lineItem.quantity,
+                    FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
+                    LineTotal: lineItem.total,
+                    PrintLocation: this.currentPricing.primaryLogos?.[0]?.location || 'Left Chest'
+                });
+            });
+        });
+
+        console.log('[EmbroideryQuoteBuilder] Prepared quote data for ShopWorks:', quoteData);
+
+        // Generate and open the guide
+        const generator = new ShopWorksGuideGenerator();
+        generator.generateGuide(quoteData);
+    }
+
     /**
      * Generate quote text for copying - Professional format
      */
-    generateQuoteText() {
+    generateQuoteText(useCustomerData = false) {
         if (!this.currentPricing) return '';
-        
+
         const quoteId = this.currentPricing.quoteId || this.quoteService.generateQuoteID();
-        const customerData = this.getCustomerData();
+
+        // Use generic data for Quick Actions, form data for Save/Email actions
+        const customerData = useCustomerData ? this.getCustomerData() : {
+            name: 'Customer',
+            email: 'Not Provided',
+            phone: '',
+            company: '',
+            project: '',
+            notes: '',
+            salesRepEmail: 'sales@nwcustomapparel.com'
+        };
+
         const currentDate = new Date().toLocaleDateString('en-US');
         
         let text = '';

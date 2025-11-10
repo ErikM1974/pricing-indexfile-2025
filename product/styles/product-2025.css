@@ -1,0 +1,1008 @@
+/**
+ * Product Page 2025 Modern Redesign
+ * Northwest Custom Apparel
+ * Version: 2.0
+ * Created: January 10, 2025
+ *
+ * Features:
+ * - Simplified header with Northwest green
+ * - Prominent decoration selector
+ * - Larger product images
+ * - Modern spacing and typography
+ * - Mobile-first responsive design
+ */
+
+/* ==========================================
+   CSS VARIABLES - Northwest Green Theme
+   ========================================== */
+:root {
+    /* Northwest Green (Primary) */
+    --nw-green: #4cb354;
+    --nw-green-dark: #409a47;
+    --nw-green-light: #e8f5e9;
+    --nw-green-pale: rgba(76, 179, 84, 0.1);
+
+    /* Neutral Colors */
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-light: #999999;
+    --border-color: #e5e7eb;
+    --bg-white: #ffffff;
+    --bg-light: #f9fafb;
+    --bg-lighter: #f3f4f6;
+
+    /* Accent Colors */
+    --success-green: #10b981;
+    --warning-yellow: #f59e0b;
+    --error-red: #ef4444;
+    --info-blue: #3b82f6;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+    /* Green Shadows */
+    --shadow-green-sm: 0 2px 8px rgba(76, 179, 84, 0.2);
+    --shadow-green-md: 0 4px 12px rgba(76, 179, 84, 0.3);
+    --shadow-green-lg: 0 8px 20px rgba(76, 179, 84, 0.4);
+
+    /* Spacing */
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xl: 40px;
+}
+
+/* ==========================================
+   BODY & GENERAL STYLES
+   ========================================== */
+body.product-page-2025 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-top: 130px;  /* Space for fixed header */
+    background: var(--bg-light);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   HEADER - SIMPLIFIED DESIGN
+   ========================================== */
+.product-page-header {
+    background: white;
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* Tier 1: Contact Bar (Northwest Green) */
+.header-contact-bar {
+    background: var(--nw-green);
+    color: white;
+    padding: 12px 0;
+    font-size: 14px;
+}
+
+.contact-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-info {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-item i {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.contact-link {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.contact-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.business-hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    opacity: 0.95;
+}
+
+/* Tier 2: Logo & Search (No Navigation Links) */
+.header-main {
+    background: white;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 45px;
+    width: auto;
+    display: block;
+}
+
+.header-search {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    gap: 10px;
+    position: relative;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--nw-green);
+    box-shadow: 0 0 0 3px var(--nw-green-pale);
+}
+
+.search-button {
+    background: var(--nw-green);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button:hover {
+    background: var(--nw-green-dark);
+}
+
+.search-button i {
+    font-size: 16px;
+}
+
+/* Search Results Dropdown */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 50px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+}
+
+/* ==========================================
+   DECORATION SELECTOR - HORIZONTAL BAR (2025)
+   ========================================== */
+.decoration-selector-hero {
+    background: white;
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 130px;
+    z-index: 900;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Hide titles - compact design */
+.decoration-hero-title,
+.decoration-hero-subtitle {
+    display: none;
+}
+
+/* Horizontal Bar Layout */
+.decoration-methods-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--nw-green) transparent;
+}
+
+.decoration-methods-grid::-webkit-scrollbar {
+    height: 4px;
+}
+
+.decoration-methods-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.decoration-methods-grid::-webkit-scrollbar-thumb {
+    background: var(--nw-green);
+    border-radius: 2px;
+}
+
+/* Compact Horizontal Button Design */
+.decoration-method-card {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.decoration-method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.25);
+    border-color: var(--nw-green);
+    background: var(--nw-green-pale);
+}
+
+.decoration-method-card.active {
+    background: var(--nw-green);
+    border-color: var(--nw-green);
+    color: white;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.4);
+}
+
+/* Icon - Compact Size */
+.method-icon {
+    font-size: 20px;
+    color: var(--nw-green);
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.decoration-method-card:hover .method-icon {
+    transform: scale(1.1);
+}
+
+.decoration-method-card.active .method-icon {
+    color: white;
+}
+
+/* Name - No Description in Horizontal Bar */
+.method-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.decoration-method-card.active .method-name {
+    color: white;
+}
+
+/* Hide description in compact horizontal layout */
+.method-desc {
+    display: none;
+}
+
+/* More Options - Special Styling */
+.decoration-method-card.more-options {
+    border-style: dashed;
+    background: var(--bg-light);
+}
+
+.decoration-method-card.more-options:hover {
+    background: white;
+}
+
+.decoration-method-card.more-options.active {
+    background: var(--nw-green);
+    border-style: solid;
+}
+
+/* ==========================================
+   PRODUCT DISPLAY GRID - LARGER IMAGES
+   ========================================== */
+.product-display-grid {
+    display: grid;
+    grid-template-columns: 100px 1fr 400px;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Column 1: Thumbnails */
+.product-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.thumbnail {
+    width: 100px;
+    height: 100px;
+    border: 3px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    background: white;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border-color: var(--nw-green);
+    box-shadow: var(--shadow-green-sm);
+}
+
+/* Column 2: Main Image (LARGE - 60% of layout) */
+.product-gallery {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-lighter);
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    padding: 20px;
+}
+
+.main-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.gallery-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Column 3: Product Info */
+.product-info-column {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
+}
+
+.product-info h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 10px 0;
+}
+
+.product-style {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+   CHECK INVENTORY BUTTON - NORTHWEST GREEN
+   ========================================== */
+.inventory-action {
+    margin: 30px 0;
+}
+
+.check-inventory-btn {
+    background: var(--nw-green) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    box-shadow: var(--shadow-green-sm);
+}
+
+.check-inventory-btn:hover {
+    background: var(--nw-green-dark) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green-md);
+}
+
+.check-inventory-btn:active {
+    transform: translateY(0);
+}
+
+.check-inventory-btn i {
+    font-size: 18px;
+}
+
+/* Loading state */
+.check-inventory-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.check-inventory-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   COLOR SWATCHES - ENHANCED
+   ========================================== */
+.color-swatches-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-color);
+}
+
+.color-swatches-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.swatches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 16px;
+}
+
+.color-swatch {
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.05);
+}
+
+.swatch-circle {
+    width: 70px;
+    height: 70px;
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 8px;
+    transition: border-color 0.2s ease;
+    background: white;
+}
+
+.color-swatch.selected .swatch-circle,
+.color-swatch:hover .swatch-circle {
+    border-color: var(--nw-green);
+    box-shadow: 0 0 0 3px var(--nw-green-pale);
+}
+
+.swatch-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.swatch-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.color-swatch.selected .swatch-label {
+    color: var(--nw-green);
+    font-weight: 600;
+}
+
+/* ==========================================
+   LOADING & ERROR STATES
+   ========================================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--nw-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.error-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-xl);
+    text-align: center;
+    max-width: 400px;
+    z-index: 9999;
+}
+
+.error-message p {
+    color: var(--error-red);
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.error-message button {
+    padding: 12px 24px;
+    background: var(--nw-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ========================================== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+    body.product-page-2025 {
+        padding-top: 200px;  /* More space for stacked header */
+    }
+
+    .contact-bar-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .contact-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .header-search {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* Decoration Selector - Keep Horizontal, Smaller Buttons */
+    .decoration-methods-grid {
+        gap: 6px;
+        padding: 10px 0;
+        justify-content: flex-start;
+    }
+
+    .decoration-method-card {
+        padding: 10px 16px;
+        gap: 8px;
+    }
+
+    .method-icon {
+        font-size: 18px;
+    }
+
+    .method-name {
+        font-size: 14px;
+    }
+
+    /* Product Grid - Stack Vertically */
+    .product-display-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .product-thumbnails {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+    }
+
+    .product-gallery {
+        min-height: 400px;
+    }
+
+    .product-info-column {
+        padding: 20px;
+    }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+    body.product-page-2025 {
+        padding-top: 220px;
+    }
+
+    .logo-image {
+        height: 36px;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+
+    .contact-item {
+        font-size: 12px;
+    }
+
+    /* Decoration Selector - Very Compact on Mobile */
+    .decoration-methods-grid {
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .decoration-method-card {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .method-icon {
+        font-size: 16px;
+    }
+
+    .method-name {
+        font-size: 13px;
+    }
+
+    .product-gallery {
+        min-height: 300px;
+    }
+
+    .check-inventory-btn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+.text-center {
+    text-align: center;
+}
+
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+
+.p-1 { padding: var(--spacing-xs); }
+.p-2 { padding: var(--spacing-sm); }
+.p-3 { padding: var(--spacing-md); }
+.p-4 { padding: var(--spacing-lg); }
+
+/* ==========================================
+   MODERN POLISH & ANIMATIONS (2025)
+   ========================================== */
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Page Load Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-display-grid {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.product-info-column {
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Enhanced Focus States (Accessibility) */
+*:focus {
+    outline: 2px solid var(--nw-green);
+    outline-offset: 2px;
+}
+
+button:focus,
+a:focus,
+input:focus {
+    outline: 2px solid var(--nw-green);
+    outline-offset: 2px;
+}
+
+/* Breadcrumb Enhancement */
+.breadcrumb {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.breadcrumb a {
+    color: var(--nw-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--nw-green-dark);
+    text-decoration: underline;
+}
+
+/* Card Lift Effect */
+.product-info-column {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-info-column:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Main Image Hover */
+.main-image {
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+}
+
+.main-image:hover {
+    transform: scale(1.02);
+}
+
+/* Gradient Text Effect for Headings */
+.product-info h1 {
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--nw-green-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Pulse Animation for Active Decoration Button */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(76, 179, 84, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(76, 179, 84, 0.6);
+    }
+}
+
+.decoration-method-card.active {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Skeleton Loading Animation */
+@keyframes skeleton {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.gallery-loading {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-lighter) 25%,
+        var(--bg-light) 50%,
+        var(--bg-lighter) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton 1.5s ease-in-out infinite;
+    border-radius: 12px;
+}
+
+/* Backdrop Blur Effect */
+.decoration-selector-hero {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Micro-interaction: Button Press */
+.decoration-method-card:active,
+.check-inventory-btn:active,
+.search-button:active {
+    transform: scale(0.98);
+}
+
+/* Enhanced Scrollbar for Decoration Bar */
+.decoration-methods-grid {
+    scrollbar-width: thin;
+}
+
+.decoration-methods-grid::-webkit-scrollbar {
+    height: 6px;
+}
+
+.decoration-methods-grid::-webkit-scrollbar-thumb {
+    background: var(--nw-green);
+    border-radius: 3px;
+}
+
+.decoration-methods-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--nw-green-dark);
+}
+
+/* Shimmer Effect for Check Inventory Button */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.check-inventory-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 3s infinite;
+}
+
+.check-inventory-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tooltip Animations */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Color Swatch Selection Animation */
+.color-swatch.selected .swatch-circle {
+    animation: scaleUp 0.3s ease-out;
+}
+
+@keyframes scaleUp {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Reduced Motion Support (Accessibility) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}

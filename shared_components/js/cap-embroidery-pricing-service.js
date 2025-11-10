@@ -13,11 +13,132 @@ class CapEmbroideryPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[CapEmbroideryPricingService] Manual cost from URL:', cost);
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[CapEmbroideryPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[CapEmbroideryPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Fetch cap embroidery costs from API using reference product
+     * @returns {Array} Embroidery costs from API
+     * @throws {Error} If API request fails
+     */
+    async fetchEmbroideryCosts() {
+        const url = `${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`;
+        console.log('[CapEmbroideryPricingService] Fetching cap embroidery costs from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch cap embroidery costs from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.allEmbroideryCostsR) {
+            throw new Error('Invalid API response: missing cap embroidery costs');
+        }
+
+        console.log('[CapEmbroideryPricingService] Successfully fetched cap embroidery costs from API');
+        return data.allEmbroideryCostsR;
+    }
+
+    /**
+     * Generate synthetic pricing data using manual cost
+     * @param {number} manualCost - Base cap cost
+     * @returns {Object} Synthetic API-compatible data
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[CapEmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Default tiers
+        const defaultTiers = [
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+        ];
+
+        // Fetch current cap embroidery costs from API (throws error if fails - no silent fallback)
+        const defaultEmbroideryCosts = await this.fetchEmbroideryCosts();
+
+        // Caps typically have OSFA (One Size Fits All)
+        const defaultSizes = [
+            { size: 'OSFA', price: manualCost, sortOrder: 1 }
+        ];
+
+        // No upcharges for OSFA
+        const defaultUpcharges = {
+            'OSFA': 0
+        };
+
+        // Default rules
+        const defaultRules = {
+            RoundingMethod: 'HalfDollarUp'
+        };
+
+        // Create synthetic API data
+        const syntheticAPIData = {
+            styleNumber: 'MANUAL',
+            tiersR: defaultTiers,
+            allEmbroideryCostsR: defaultEmbroideryCosts,
+            sizes: defaultSizes,
+            sellingPriceDisplayAddOns: defaultUpcharges,
+            rulesR: defaultRules,
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // Use existing calculatePricing method
+        const calculatedData = this.calculatePricing(syntheticAPIData);
+
+        // Transform using existing method
+        const transformedData = this.transformToExistingFormat(calculatedData, syntheticAPIData);
+
+        // Mark as manual mode
+        transformedData.manualMode = true;
+        transformedData.manualCost = manualCost;
+        transformedData.source = 'manual';
+
+        return transformedData;
+    }
+
+    /**
      * Main entry point - fetches and calculates pricing data
      */
     async fetchPricingData(styleNumber, options = {}) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[CapEmbroideryPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            return await this.generateManualPricingData(manualCost);
+        }
+
         console.log(`[CapEmbroideryPricingService] Fetching pricing data for ${styleNumber}`);
-        
+
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
@@ -29,16 +150,16 @@ class CapEmbroideryPricingService {
         try {
             // Fetch from API
             const apiData = await this.fetchFromAPI(styleNumber);
-            
+
             // Calculate pricing using exact logic
             const calculatedData = this.calculatePricing(apiData);
-            
+
             // Transform to match existing format expected by cap-embroidery-pricing-v3.js
             const transformedData = this.transformToExistingFormat(calculatedData, apiData);
-            
+
             // Cache the result
             this.saveToCache(cacheKey, transformedData);
-            
+
             return transformedData;
         } catch (error) {
             console.error('[CapEmbroideryPricingService] Error:', error);

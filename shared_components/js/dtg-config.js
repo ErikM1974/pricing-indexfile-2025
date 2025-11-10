@@ -95,16 +95,13 @@ const DTGConfig = {
             '6XL': 6.00
         },
         
-        // Default quantity tiers for quick quote
+        // Default quantity tiers for quick quote (matches API structure)
         defaultTiers: [
             { min: 1, max: 11, label: '1-11' },
             { min: 12, max: 23, label: '12-23' },
             { min: 24, max: 47, label: '24-47' },
             { min: 48, max: 71, label: '48-71' },
-            { min: 72, max: 143, label: '72-143' },
-            { min: 144, max: 287, label: '144-287' },
-            { min: 288, max: 499, label: '288-499' },
-            { min: 500, max: 999, label: '500+' }
+            { min: 72, max: 9999, label: '72+' }
         ]
     },
     

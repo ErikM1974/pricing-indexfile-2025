@@ -318,26 +318,29 @@ class ScreenPrintPricingCalculator {
             for (let i = 1; i < locations.length; i++) {
                 const location = locations[i];
                 let locationColorCount = colorsByLocation[location] || 1;
-                
+
                 // Add white underbase for dark garments
                 if (darkGarments && locationColorCount > 0) {
                     locationColorCount += 1;
                 }
-                
-                if (finalPrices.AdditionalLocation &&
-                    finalPrices.AdditionalLocation[tier] &&
-                    finalPrices.AdditionalLocation[tier][locationColorCount]) {
-                    
-                    let additionalPrice = 0;
-                    if (finalPrices.AdditionalLocation[tier][locationColorCount][size]) {
-                        additionalPrice = finalPrices.AdditionalLocation[tier][locationColorCount][size];
-                    } else if (finalPrices.AdditionalLocation[tier][locationColorCount][size.toUpperCase()]) {
-                        additionalPrice = finalPrices.AdditionalLocation[tier][locationColorCount][size.toUpperCase()];
-                    }
-                    
-                    if (additionalPrice > 0) {
-                        unitPrice += additionalPrice;
-                        console.log(`[calculateUnitPrice] Added location ${location} price: $${additionalPrice}`);
+
+                // Use additionalLocationPricing structure (matches calculator)
+                // Additional locations use pricePerPiece (no size variation)
+                if (this.cachedPricingData.additionalLocationPricing &&
+                    this.cachedPricingData.additionalLocationPricing[locationColorCount.toString()]) {
+
+                    const addlPricingData = this.cachedPricingData.additionalLocationPricing[locationColorCount.toString()];
+                    if (addlPricingData.tiers) {
+                        const tierObj = addlPricingData.tiers.find(t =>
+                            quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty)
+                        );
+                        if (tierObj && tierObj.pricePerPiece !== undefined) {
+                            const additionalPrice = parseFloat(tierObj.pricePerPiece) || 0;
+                            if (additionalPrice > 0) {
+                                unitPrice += additionalPrice;
+                                console.log(`[calculateUnitPrice] Added location ${location} price: $${additionalPrice}`);
+                            }
+                        }
                     }
                 }
             }
@@ -454,9 +457,9 @@ class ScreenPrintPricingCalculator {
         
         // Fallback to standard tiers if no API data (should not happen)
         console.warn('[getPricingTier] No tier data available, using fallback');
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity < 13) return '1-12';
+        if (quantity < 37) return '13-36';
+        if (quantity < 72) return '37-71';
         return '72+';
     }
 

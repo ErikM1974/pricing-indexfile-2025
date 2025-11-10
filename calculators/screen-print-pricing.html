@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Pricing Calculator | Northwest Custom Apparel</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Get instant screen print pricing on custom apparel. Professional calculator with automatic pricing, quantity discounts, setup fees, and multi-color printing options.">
+    <meta name="keywords" content="screen print pricing, custom apparel calculator, t-shirt printing prices, bulk screen printing, screen print quotes">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.nwcustomapparel.com/calculators/screen-print-pricing.html">
+    <meta property="og:title" content="Screen Print Pricing Calculator | Northwest Custom Apparel">
+    <meta property="og:description" content="Calculate screen printing costs instantly. Get accurate quotes with quantity discounts, color options, and setup fees.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Screen Print Pricing Calculator | Northwest Custom Apparel">
+    <meta name="twitter:description" content="Get instant screen printing quotes with our professional pricing calculator.">
+    <meta name="twitter:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- UNIVERSAL PRICING HEADER (New Unified Design) -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20250110">
+
+    <!-- Universal Toggle Pricing CSS for consistency across all calculators -->
+    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
+    
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <!-- NOTE: Not using universal-product-display.css - we have custom DTG-style CSS in this file -->
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css">
+    <link rel="stylesheet" href="/shared_components/css/image-modal.css">
+    
+    <!-- FORCE GREEN THEME - Load LAST to override everything -->
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css">
+    
+    <!-- Screen Print Pricing Tables - Modern styling -->
+    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-tables.css?v=20251003c">
+    
+    <!-- Screen Print Safety Stripes - Safety Orange Theme -->
+    <link rel="stylesheet" href="/shared_components/css/screenprint-safety-stripes.css">
+
+    <!-- Screen Print Toggle Styles - NEW for Phase 1 -->
+    <link rel="stylesheet" href="/shared_components/css/screenprint-toggle-styles.css?v=20251210-fix">
+    <!-- Universal LTM Quantity Input CSS (shared across all calculators) -->
+    <link rel="stylesheet" href="/shared_components/css/universal-ltm-quantity-input.css?v=20251009">
+
+    <!-- Screen Print Clean Style - New clean layout matching DTG -->
+    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-clean.css?v=20250108">
+
+    <!-- Font Awesome for header icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Screen Print V2 Styles -->
+    <style>
+        /* CRITICAL: Force green theme colors - Updated to match DTG/DTF */
+        :root {
+            --primary-color: #4cb354 !important;  /* Updated to match DTG/DTF green */
+            --primary: #4cb354 !important;
+            --primary-dark: #409a47 !important;  /* Updated to match DTG/DTF dark green */
+            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
+        }
+
+        /* Screen reader only utility class for accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Enhanced Header Styles for Screen Print */
+        /* DTG-Style Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            color: #666666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: #4cb354;  /* Updated to match DTG/DTF green */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #409a47;
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-loading {
+            padding: 12px;
+            text-align: center;
+            color: #666666;
+        }
+
+        .search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: #666666;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-style {
+            font-weight: 600;
+            color: #333333;
+        }
+
+        .search-result-desc {
+            color: #666666;
+            font-size: 0.875rem;
+            margin-top: 2px;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4cb354;  /* Updated to match DTG/DTF green */
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);  /* Updated shadow color */
+        }
+
+        .search-btn {
+            background: #4cb354;  /* Updated to match DTG/DTF green */
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: #409a47;
+        }
+
+        /* Hide universal header */
+        #universal-header-container {
+            display: none !important;
+        }
+
+        /* ========================================
+           DTG-STYLE LAYOUT: HERO SECTION AT TOP
+           ======================================== */
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Product Hero Section - Full Width at Top */
+        .product-hero-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero-section:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* DTG-Style Two-Column Grid */
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Image Section (Left Column) */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #409a47;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.2);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .image-thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnail:hover {
+            border-color: #409a47;
+            transform: scale(1.05);
+        }
+
+        .image-thumbnail.active {
+            border-color: #409a47;
+            box-shadow: 0 0 0 2px rgba(45, 95, 63, 0.3);
+        }
+
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Product Info Section (Right Column) */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .product-detail-item i {
+            color: #409a47;
+            font-size: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Color Swatches Section */
+        .color-swatches-section {
+            margin-top: 24px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #409a47;
+        }
+
+        .color-swatch.active {
+            border-color: #409a47;
+            box-shadow: 0 0 0 2px rgba(45, 95, 63, 0.3);
+        }
+
+        /* Pricing Calculator Section - Full Width Below Product */
+        .pricing-calculator-section {
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 30px;
+        }
+
+        /* Remove old two-column layout */
+        .product-page-columns-container {
+            display: none;
+        }
+
+        .product-context-column,
+        .product-interactive-column {
+            display: none;
+        }
+
+        /* Screen Print Calculator V2 Styles */
+        .sp-calculator {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sp-title {
+            color: #4cb354 !important;
+            font-size: 1.5em;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+
+        .sp-layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Controls */
+        .sp-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sp-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sp-control-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .sp-input, .sp-select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .sp-input:focus, .sp-select:focus {
+            outline: none;
+            border-color: #4cb354 !important;
+        }
+
+        .sp-help-text {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .sp-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .sp-checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .sp-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .sp-btn-add {
+            background: #4cb354 !important;
+            color: white;
+        }
+
+        .sp-btn-add:hover {
+            background: #409a47 !important;
+        }
+
+        .sp-btn-remove {
+            background: #dc3545;
+            color: white;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            font-size: 1.5em;
+            line-height: 1;
+        }
+
+        .sp-btn-remove:hover {
+            background: #c82333;
+        }
+
+        /* Location rows */
+        .sp-location-row {
+            display: grid;
+            grid-template-columns: 1fr 120px 40px;
+            gap: 8px;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pricing display */
+        .sp-pricing {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sp-price-box {
+            background: white;
+            border: 2px solid #4cb354 !important;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .sp-price-main {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .sp-currency {
+            font-size: 28px;
+            font-weight: 600;
+            color: #4cb354 !important;
+        }
+
+        .sp-price-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #4cb354 !important;
+            line-height: 1;
+        }
+
+        .sp-price-label {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-left: 5px;
+        }
+
+        .sp-price-subtitle {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .sp-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 15px 0;
+        }
+
+        .sp-breakdown {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .sp-breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .sp-breakdown-row span:first-child {
+            color: #666;
+        }
+
+        .sp-breakdown-row span:last-child {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .sp-total {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+
+        .sp-total span:last-child {
+            color: #4cb354 !important;
+        }
+
+        .sp-order-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #666;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .sp-order-total span:last-child {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Setup details */
+        .sp-setup-details {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            font-size: 0.9em;
+        }
+
+        .sp-setup-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .sp-setup-breakdown {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.6;
+            padding-left: 10px;
+        }
+
+        /* LTM warning */
+        .sp-ltm-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        /* Order summary */
+        .sp-order-summary {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .sp-order-summary h4 {
+            color: #4cb354 !important;
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+        }
+
+        .sp-summary-table {
+            width: 100%;
+            font-size: 0.95em;
+        }
+
+        .sp-summary-table td {
+            padding: 5px 0;
+        }
+
+        .sp-summary-total {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .sp-summary-divider {
+            border-top: 1px solid #eee;
+            padding: 5px 0;
+        }
+
+        .sp-summary-section {
+            font-weight: 600;
+            color: #555;
+            padding-top: 10px;
+        }
+
+        .sp-summary-indent {
+            padding-left: 20px;
+        }
+
+        .sp-summary-subtotal td {
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .sp-summary-grand-total td {
+            padding-top: 10px;
+            border-top: 2px solid #4cb354 !important;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .sp-summary-grand-total .sp-summary-total {
+            color: #4cb354 !important;
+        }
+
+        .sp-summary-per-item {
+            background: #f8f9fa;
+            font-size: 0.9em;
+        }
+
+        .sp-summary-per-item td {
+            padding: 10px 5px;
+        }
+
+        /* Accordions */
+        .sp-accordions {
+            margin-top: 30px;
+        }
+
+        .sp-accordion-trigger {
+            width: 100%;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #4cb354 !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+            text-align: left;
+        }
+
+        .sp-accordion-trigger:hover {
+            background: #e9ecef;
+        }
+
+        .sp-accordion-icon {
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+
+        .sp-accordion-content {
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 20px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        /* Pricing tiers table */
+        .sp-tiers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sp-tiers-table th,
+        .sp-tiers-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .sp-tiers-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .sp-current-tier {
+            background: #e7f5e7;
+            font-weight: 600;
+        }
+
+        .sp-tier-range {
+            text-align: left !important;
+            font-weight: 600;
+        }
+
+        .sp-savings {
+            color: #4cb354 !important;
+            font-weight: 600;
+        }
+
+        .sp-tiers-note {
+            font-size: 0.85em;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        /* Color row with safety checkbox */
+        .sp-color-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .sp-safety-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .sp-safety-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #ff6b35;
+        }
+        
+        .sp-safety-price {
+            color: #4cb354;
+            font-weight: normal;
+        }
+        
+        /* Tooltip for safety stripes pricing */
+        .sp-safety-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 1000;
+            font-weight: normal;
+        }
+        
+        .sp-safety-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+        
+        .sp-safety-checkbox:hover .sp-safety-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Safety label styling */
+        .sp-safety-label {
+            color: #ff6b35;
+            font-size: 0.9em;
+        }
+        
+        /* Compact safety checkbox for additional locations */
+        .sp-location-row .sp-safety-checkbox {
+            margin-left: 10px;
+        }
+        
+        /* Keep full text for front safety checkbox */
+        .sp-front-safety .sp-safety-label {
+            color: inherit;
+            font-size: inherit;
+        }
+        
+        /* Safety row in order summary */
+        .sp-safety-row {
+            background-color: #fff5f0;
+        }
+        
+        .sp-safety-row td {
+            color: #d64520;
+            font-weight: 500;
+        }
+        
+        /* Location row styling */
+        .sp-location-row {
+            display: grid;
+            grid-template-columns: 180px minmax(250px, 1fr) 50px;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Size Upcharge Info Box */
+        .sp-size-upcharge-info {
+            background: linear-gradient(135deg, #f0f7f0 0%, #e8f5e8 100%);
+            border: 1px solid #d4e8d4;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .sp-size-upcharge-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d4e8d4;
+        }
+
+        .sp-size-icon {
+            font-size: 24px;
+        }
+
+        .sp-size-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #4cb354 !important;
+        }
+
+        .sp-size-upcharge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .sp-size-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .sp-size-item:hover {
+            border-color: #4cb354 !important;
+            box-shadow: 0 2px 6px rgba(46, 88, 39, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .sp-size-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .sp-size-price {
+            display: block;
+            color: #4cb354 !important;
+            font-weight: 500;
+            font-size: 1.05em;
+        }
+
+        .sp-size-item:first-child .sp-size-price {
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        /* DTG-Style Layout Responsiveness */
+        @media (max-width: 1024px) {
+            .pricing-calculator-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Stack two-column grid on mobile */
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 30px 20px;
+            }
+
+            .main-image-container {
+                height: 350px;
+            }
+
+            .product-hero-section {
+                margin-bottom: 30px;
+            }
+
+            .pricing-calculator-section {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .sp-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .sp-price-value {
+                font-size: 36px;
+            }
+
+            .sp-currency {
+                font-size: 24px;
+            }
+
+            .sp-location-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .sp-location-row select {
+                width: 100%;
+            }
+
+            .sp-btn-remove {
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .sp-color-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .sp-safety-checkbox {
+                width: 100%;
+            }
+
+            .sp-size-upcharge-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-hero-section,
+            .pricing-calculator-section {
+                border-radius: 12px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 20px 15px;
+            }
+
+            .main-image-container {
+                height: 300px;
+            }
+
+            .product-title {
+                font-size: 24px;
+            }
+
+            .pricing-calculator-section {
+                padding: 0;
+            }
+
+            .sp-size-upcharge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="pricing-calculator-page">
+
+    <!-- ========================================
+         UNIVERSAL PRICING CALCULATOR HEADER
+         ======================================== -->
+    <header class="enhanced-pricing-header">
+
+        <!-- TIER 1: Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-922-5793" class="contact-link">253-922-5793</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:sales@nwcustomapparel.com" class="contact-link">sales@nwcustomapparel.com</a>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2: Logo/Navigation Bar -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 3: Pricing Context Bar with Breadcrumb + Calculator Badge + Search -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb Navigation -->
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="/">Home</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <a href="/product.html" id="products-breadcrumb">Products</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">Screen Print Pricing</span>
+                    </nav>
+
+                    <!-- Calculator Type Badge -->
+                    <div class="calculator-type-badge">
+                        <i class="fas fa-print"></i>
+                        <span class="badge-text">Screen Print Pricing Calculator</span>
+                    </div>
+                </div>
+
+                <!-- Product Search -->
+                <div class="search-wrapper">
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="styleSearch"
+                        placeholder="Search by style number or name..."
+                        autocomplete="off"
+                        aria-label="Search for product by style number or name"
+                        aria-describedby="search-results-live"
+                        role="combobox"
+                        aria-expanded="false"
+                        aria-controls="searchResults"
+                    >
+                    <button class="search-btn" id="searchBtn" aria-label="Search for products">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- Search Results Dropdown -->
+                    <div class="search-results"
+                         id="searchResults"
+                         role="listbox"
+                         aria-label="Product search results">
+                        <!-- Results populated by JavaScript -->
+                    </div>
+
+                    <!-- Live region for screen readers -->
+                    <div id="search-results-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Product Hero Section (DTG-Style Two-Column Layout) -->
+        <div class="product-hero-section">
+            <div class="product-content">
+                <!-- Product Image Section (Left Column) -->
+                <div class="product-image-section">
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section (Right Column) -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Calculator Section (Full Width Below) -->
+        <div class="pricing-calculator-section">
+            <!-- Hidden Caspio Container -->
+            <div id="caspio-iframe-container" style="display: none;">
+                <!-- Caspio iframe loads here -->
+            </div>
+
+            <!-- Screen Print Calculator V2 -->
+            <div id="screenprint-calculator-v2">
+                <!-- Calculator UI will be inserted here by JS -->
+            </div>
+
+            <!-- Size Upcharges Section -->
+            <div id="sp-size-upcharges-container" style="display: none;">
+                <!-- Upcharge display will be inserted here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts (must load first) -->
+    <script src="/shared_components/js/utils.js"></script>
+    
+    <!-- Initialize product display when ready -->
+    <script>
+        // Fetch full product details including title and description
+        async function fetchFullProductDetails(styleNumber) {
+            try {
+                const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`;
+                console.log('[ScreenPrintV2] Fetching full product details from:', apiUrl);
+
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[ScreenPrintV2] Received full product data:', data);
+                return data;
+            } catch (error) {
+                console.error('[ScreenPrintV2] Error fetching product details:', error);
+                return null;
+            }
+        }
+
+        // Helper function to transform API data to display format
+        function transformApiData(eventData, fullProductData) {
+            // Get style number from URL
+            const styleNumber = new URLSearchParams(window.location.search).get('StyleNumber') || 'PC61';
+
+            // Use full product data if available, otherwise try event data
+            const productTitle = fullProductData?.productTitle || eventData.productTitle || styleNumber;
+            const productDescription = fullProductData?.PRODUCT_DESCRIPTION || eventData.PRODUCT_DESCRIPTION || 'Loading product information...';
+
+            return {
+                name: productTitle,
+                description: productDescription,
+                styleNumber: styleNumber,
+                brand: extractBrand(productTitle),
+                color: eventData.selectedColor?.COLOR_NAME || window.selectedColorName || 'Natural',
+                imageUrl: eventData.selectedColor?.MAIN_IMAGE_URL || eventData.selectedColor?.FRONT_MODEL,
+                images: getProductImages(eventData.selectedColor),
+                colors: eventData.colors || fullProductData?.colors || []
+            };
+        }
+
+        // Load manual screen print pricing (when ?manualCost parameter is provided)
+        async function loadManualScreenPrintPricing(manualCost) {
+            console.log(`🔧 Loading manual screen print pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            // Set flag to prevent duplicate calculator initialization
+            window.screenPrintManualMode = true;
+            console.log('🔧 Manual mode flag set - will prevent duplicate calculator initialization');
+
+            try {
+                // Show product hero section with manual info
+                const productHero = document.querySelector('.product-hero-section');
+                if (productHero) {
+                    productHero.style.display = 'block';
+                }
+
+                // Update product display for manual mode
+                const manualProductData = {
+                    title: 'Manual Pricing Mode',
+                    description: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`,
+                    styleNumber: 'MANUAL',
+                    brand: 'Manual Entry',
+                    color: 'N/A',
+                    imageUrl: '',
+                    images: {},
+                    colors: []
+                };
+
+                populateProductDisplay(manualProductData);
+
+                // Hide the product image
+                const productImage = document.querySelector('.product-image-main');
+                if (productImage) productImage.style.display = 'none';
+
+                // Initialize screen print calculator
+                if (typeof ScreenPrintPricing !== 'undefined') {
+                    window.screenPrintCalculator = new ScreenPrintPricing();
+
+                    // Generate manual pricing data and load it into calculator
+                    if (window.screenPrintCalculator.pricingService) {
+                        const manualPricingData = await window.screenPrintCalculator.pricingService.generateManualPricingData(manualCost);
+                        window.screenPrintCalculator.handleMasterBundle(manualPricingData);
+                        console.log('[ScreenPrintV2] Calculator initialized in manual mode');
+                    } else {
+                        console.error('[ScreenPrintV2] Pricing service not found!');
+                    }
+                } else {
+                    console.error('[ScreenPrintV2] ScreenPrintPricing class not found!');
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading manual screen print pricing:', error);
+                alert('Failed to load manual pricing mode');
+            }
+        }
+
+        // Initialize Product Display (Custom HTML, NOT UniversalProductDisplay)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[ScreenPrintV2] DOM Ready - Initializing Product Display');
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const urlParams = new URLSearchParams(window.location.search);
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualScreenPrintPricing(parseFloat(manualCost));
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Check if data already exists (race condition fix)
+            // The productColorsReady event may have already fired before this listener registered
+            if (window.productColorsData || window.productColors) {
+                console.log('[ScreenPrintV2] Using pre-loaded product data (event already fired)');
+                const preloadedData = window.productColorsData || window.productColors;
+
+                // Get style number and fetch full product details
+                const styleNumber = new URLSearchParams(window.location.search).get('StyleNumber') || 'PC61';
+                fetchFullProductDetails(styleNumber).then(fullProductData => {
+                    const productData = transformApiData(preloadedData, fullProductData);
+                    console.log('[ScreenPrintV2] Transformed pre-loaded data:', productData);
+                    populateProductDisplay(productData);
+                    document.querySelector('.product-hero-section').style.display = 'block';
+                });
+            } else {
+                console.log('[ScreenPrintV2] No pre-loaded data found, waiting for productColorsReady event');
+            }
+
+            // Listen for product colors ready event (dispatched by pricing-pages.js on WINDOW not document)
+            window.addEventListener('productColorsReady', async function(e) {
+                console.log('[ScreenPrintV2] Product colors ready event received:', e.detail);
+
+                // Get style number from URL
+                const styleNumber = new URLSearchParams(window.location.search).get('StyleNumber') || 'PC61';
+
+                // Fetch full product details (includes title, description, brand)
+                const fullProductData = await fetchFullProductDetails(styleNumber);
+
+                // Transform the API data structure to match our function's expectations
+                const eventData = e.detail;
+                const productData = transformApiData(eventData, fullProductData);
+
+                console.log('[ScreenPrintV2] Transformed product data:', productData);
+                populateProductDisplay(productData);
+
+                // Show the product hero section
+                document.querySelector('.product-hero-section').style.display = 'block';
+            });
+
+            // Initialize Screen Print Calculator (skip if manual mode already initialized)
+            if (window.screenPrintManualMode) {
+                console.log('[ScreenPrintV2] Skipping normal calculator initialization - manual mode active');
+            } else if (typeof ScreenPrintPricing !== 'undefined') {
+                window.screenPrintCalculator = new ScreenPrintPricing();
+                console.log('[ScreenPrintV2] Calculator initialized');
+            } else {
+                console.error('[ScreenPrintV2] ScreenPrintPricing class not found!');
+            }
+        });
+
+        // Extract brand name from product title
+        function extractBrand(title) {
+            if (!title) return 'Port & Company';
+
+            // Common brand patterns
+            if (title.includes('Port & Co')) return 'Port & Company';
+            if (title.includes('Gildan')) return 'Gildan';
+            if (title.includes('Bella')) return 'Bella+Canvas';
+            if (title.includes('Next Level')) return 'Next Level';
+            if (title.includes('Hanes')) return 'Hanes';
+
+            // Default fallback
+            return 'Port & Company';
+        }
+
+        // Get product images array for gallery
+        function getProductImages(colorObj) {
+            if (!colorObj) return [];
+
+            const images = [];
+            if (colorObj.FRONT_MODEL) images.push(colorObj.FRONT_MODEL);
+            if (colorObj.FRONT_FLAT && colorObj.FRONT_FLAT !== colorObj.FRONT_MODEL) {
+                images.push(colorObj.FRONT_FLAT);
+            }
+            if (colorObj.BACK_FLAT) images.push(colorObj.BACK_FLAT);
+
+            return images;
+        }
+
+        // Populate custom product display HTML
+        function populateProductDisplay(productData) {
+            if (!productData) {
+                console.error('[ScreenPrintV2] No product data provided');
+                return;
+            }
+
+            // Set product title and description
+            document.getElementById('productTitle').textContent = productData.name || 'Loading...';
+            document.getElementById('productDescription').textContent = productData.description || 'Loading product information...';
+
+            // Set product details
+            document.getElementById('currentColor').textContent = productData.color || 'Natural';
+            document.getElementById('currentStyle').textContent = productData.styleNumber ? `#${productData.styleNumber}` : '#PC54';
+            document.getElementById('currentBrand').textContent = productData.brand || 'Port & Company';
+
+            // Set product image
+            const productImage = document.getElementById('productImage');
+            const imagePlaceholder = document.getElementById('imagePlaceholder');
+
+            if (productData.imageUrl) {
+                productImage.src = productData.imageUrl;
+                productImage.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            }
+
+            // Handle image thumbnails if multiple images
+            if (productData.images && productData.images.length > 1) {
+                const thumbnailsContainer = document.getElementById('imageThumbnails');
+                thumbnailsContainer.innerHTML = '';
+
+                productData.images.forEach((imageUrl, index) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'image-thumbnail' + (index === 0 ? ' active' : '');
+                    thumb.innerHTML = `<img src="${imageUrl}" alt="View ${index + 1}">`;
+                    thumb.onclick = () => switchProductImage(imageUrl, thumb);
+                    thumbnailsContainer.appendChild(thumb);
+                });
+
+                thumbnailsContainer.style.display = 'flex';
+            }
+
+            // Populate color swatches
+            if (productData.colors && productData.colors.length > 0) {
+                const swatchesContainer = document.getElementById('colorSwatches');
+                swatchesContainer.innerHTML = '';
+
+                productData.colors.forEach((colorObj, index) => {
+                    const swatch = document.createElement('div');
+                    const isActive = colorObj.COLOR_NAME === productData.color;
+                    swatch.className = 'color-swatch' + (isActive ? ' active' : '');
+
+                    // Use the color square image as background
+                    if (colorObj.COLOR_SQUARE_IMAGE) {
+                        swatch.style.backgroundImage = `url(${colorObj.COLOR_SQUARE_IMAGE})`;
+                        swatch.style.backgroundSize = 'cover';
+                        swatch.style.backgroundPosition = 'center';
+                    }
+
+                    swatch.title = colorObj.COLOR_NAME || colorObj.CATALOG_COLOR || 'Color';
+                    swatch.onclick = () => selectColor(colorObj, swatch);
+                    swatchesContainer.appendChild(swatch);
+                });
+
+                document.getElementById('colorSwatchesSection').style.display = 'block';
+            }
+        }
+
+        // Switch main product image
+        function switchProductImage(imageUrl, thumbnailElement) {
+            document.getElementById('productImage').src = imageUrl;
+
+            // Update active thumbnail
+            document.querySelectorAll('.image-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            thumbnailElement.classList.add('active');
+        }
+
+        // Handle color swatch selection
+        function selectColor(colorObj, swatchElement) {
+            // Update active swatch
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.remove('active');
+            });
+            swatchElement.classList.add('active');
+
+            // Update color display
+            document.getElementById('currentColor').textContent = colorObj.COLOR_NAME || colorObj.CATALOG_COLOR;
+
+            // Update product image if color has specific image
+            const mainImageUrl = colorObj.MAIN_IMAGE_URL || colorObj.FRONT_MODEL;
+            if (mainImageUrl) {
+                const productImage = document.getElementById('productImage');
+                const imagePlaceholder = document.getElementById('imagePlaceholder');
+                productImage.src = mainImageUrl;
+                productImage.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+
+                // Update thumbnails if multiple images
+                const images = getProductImages(colorObj);
+                if (images.length > 1) {
+                    const thumbnailsContainer = document.getElementById('imageThumbnails');
+                    thumbnailsContainer.innerHTML = '';
+
+                    images.forEach((imageUrl, index) => {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'image-thumbnail' + (index === 0 ? ' active' : '');
+                        thumb.innerHTML = `<img src="${imageUrl}" alt="View ${index + 1}">`;
+                        thumb.onclick = () => switchProductImage(imageUrl, thumb);
+                        thumbnailsContainer.appendChild(thumb);
+                    });
+
+                    thumbnailsContainer.style.display = 'flex';
+                } else {
+                    document.getElementById('imageThumbnails').style.display = 'none';
+                }
+            }
+
+            // Update global color selection (for compatibility with existing system)
+            window.selectedColorName = colorObj.COLOR_NAME;
+            window.selectedCatalogColor = colorObj.CATALOG_COLOR;
+
+            // Notify calculator of color change (if handler exists)
+            if (window.screenPrintCalculator && window.screenPrintCalculator.handleColorChange) {
+                window.screenPrintCalculator.handleColorChange(colorObj);
+            }
+        }
+
+        // Update size upcharges display from pricing data
+        function updateSizeUpchargesDisplay() {
+            // The section is now hardcoded in the calculator template
+            const upchargeSection = document.getElementById('sp-size-upcharges-section');
+
+            if (!upchargeSection) {
+                console.error('[SizeUpcharges] Section not found! Calculator may not be initialized yet.');
+                return;
+            }
+
+            console.log('[SizeUpcharges] Found upcharge section, updating display');
+
+            // Get pricing data from global
+            const pricingData = window.screenPrintPricingData;
+            if (!pricingData) {
+                console.error('[SizeUpcharges] No pricing data available');
+                upchargeSection.style.display = 'none';
+                return;
+            }
+
+            // DEBUG: Log the entire data structure
+            console.log('[SizeUpcharges] Full pricing data:', pricingData);
+            console.log('[SizeUpcharges] pricingData.sizes:', pricingData.sizes);
+            console.log('[SizeUpcharges] pricingData.sellingPriceDisplayAddOns:', pricingData.sellingPriceDisplayAddOns);
+
+            // Get available sizes and upcharges
+            const availableSizes = pricingData.sizes?.map(s => s.size) || [];
+            const allUpcharges = pricingData.sellingPriceDisplayAddOns || {};
+
+            console.log('[SizeUpcharges] Available sizes array:', availableSizes);
+            console.log('[SizeUpcharges] All upcharges object:', allUpcharges);
+            console.log('[SizeUpcharges] Object.entries(allUpcharges):', Object.entries(allUpcharges));
+
+            // Filter to only show upcharges for sizes that exist for this product
+            const upcharges = {};
+            Object.entries(allUpcharges).forEach(([size, amount]) => {
+                console.log(`[SizeUpcharges] Checking size "${size}": amount=${amount}, in availableSizes=${availableSizes.includes(size)}, amount > 0=${amount > 0}`);
+                if (availableSizes.includes(size) && amount > 0) {
+                    upcharges[size] = amount;
+                }
+            });
+
+            console.log('[SizeUpcharges] Filtered upcharges:', upcharges);
+            console.log('[SizeUpcharges] Number of upcharges:', Object.keys(upcharges).length);
+
+            // Build HTML
+            let html = '<div class="sp-size-upcharge-info">';
+            html += '<div class="sp-size-upcharge-header">';
+            html += '<i class="fas fa-ruler-combined" style="color: #409a47;"></i>';
+            html += '<span class="sp-size-title">Size Upcharges</span>';
+            html += '</div>';
+
+            // Base sizes (no upcharge)
+            const baseSizes = availableSizes.filter(size => !upcharges[size]);
+            console.log('[SizeUpcharges] baseSizes array:', baseSizes);
+
+            // If there are any upcharges to show
+            console.log('[SizeUpcharges] About to check upcharges.length:', Object.keys(upcharges).length);
+            if (Object.keys(upcharges).length > 0) {
+                console.log('[SizeUpcharges] BUILDING GRID HTML with', Object.keys(upcharges).length, 'upcharges');
+                html += '<div class="sp-size-upcharge-grid">';
+
+                // Show base sizes first
+                baseSizes.forEach(size => {
+                    html += '<div class="sp-size-item">';
+                    html += `<div class="sp-size-label">${size}</div>`;
+                    html += '<div class="sp-size-price">Base Price</div>';
+                    html += '</div>';
+                });
+
+                // Sort upcharge sizes (2XL, 3XL, 4XL, etc.)
+                const upchargeSizes = Object.keys(upcharges).sort((a, b) => {
+                    const sizeOrder = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+                    const aIndex = sizeOrder.indexOf(a);
+                    const bIndex = sizeOrder.indexOf(b);
+                    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                    if (aIndex !== -1) return -1;
+                    if (bIndex !== -1) return 1;
+                    return a.localeCompare(b);
+                });
+
+                // Show upcharged sizes
+                upchargeSizes.forEach(size => {
+                    const upcharge = upcharges[size];
+                    html += '<div class="sp-size-item">';
+                    html += `<div class="sp-size-label">${size}</div>`;
+                    html += `<div class="sp-size-price">+$${upcharge.toFixed(2)}</div>`;
+                    html += '</div>';
+                });
+
+                html += '</div>';
+                console.log('[SizeUpcharges] Grid HTML built successfully');
+            } else {
+                // No upcharges for this style
+                console.log('[SizeUpcharges] NO UPCHARGES - Showing empty message');
+                html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+                html += 'No size upcharges for this style';
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            console.log('[SizeUpcharges] Setting container HTML. Length:', html.length);
+            console.log('[SizeUpcharges] Final HTML:', html);
+            upchargeSection.innerHTML = html;
+
+            // Force visibility with multiple properties to override any hiding
+            upchargeSection.style.display = 'block';
+            upchargeSection.style.visibility = 'visible';
+            upchargeSection.style.opacity = '1';
+            upchargeSection.style.position = 'relative';
+            upchargeSection.style.zIndex = '10';
+            upchargeSection.style.minHeight = 'auto';
+            upchargeSection.style.maxHeight = 'none';
+            upchargeSection.style.overflow = 'visible';
+
+            console.log('[SizeUpcharges] Container display set to block. Visible:', upchargeSection.style.display);
+            console.log('[SizeUpcharges] Container computed style:', window.getComputedStyle(upchargeSection).display);
+            console.log('[SizeUpcharges] Container offsetHeight:', upchargeSection.offsetHeight);
+            console.log('[SizeUpcharges] Container offsetWidth:', upchargeSection.offsetWidth);
+            console.log('[SizeUpcharges] ✅ Size upcharges displayed inside calculator modal');
+        }
+
+        // Listen for pricing data loaded event
+        window.addEventListener('screenPrintPricingLoaded', function() {
+            console.log('[ScreenPrintV2] Pricing data loaded, updating size upcharges display');
+            updateSizeUpchargesDisplay();
+        });
+    </script>
+    
+    <!-- Shared Pricing Scripts (handles product data fetching) -->
+    <script src="/shared_components/js/pricing-pages.js?v=20250130"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/product-pricing-ui.js"></script>
+    <script src="/shared_components/js/pricing-calculator.js"></script>
+    <script src="/shared_components/js/dtg-page-setup.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+
+    <!-- Universal Components -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    <!-- NOTE: Not using universal-product-display.js - we have custom HTML/JS for DTG-style layout -->
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
+
+    <!-- Screen Print V2 Scripts -->
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
+    <!-- Using original v2 with ALL functionality -->
+    <script src="/shared_components/js/screenprint-pricing-v2.js?v=20251003c"></script>
+    
+    <!-- API Testing Utilities -->
+    <script>
+        // Screen Print API Testing Utilities
+        window.SCREENPRINT_API_TEST = {
+            // Test API endpoint
+            testAPI: async function(styleNumber = 'PC61') {
+                console.log('🧪 Testing Screen Print API for:', styleNumber);
+                try {
+                    const service = new ScreenPrintPricingService();
+                    const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                    console.log('✅ API Response:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ API Error:', error);
+                    return null;
+                }
+            },
+            
+            // Compare API vs Caspio prices
+            compareCalculations: async function(qty = 48, colors = 2) {
+                const calculator = window.screenPrintCalculator;
+                if (!calculator) {
+                    console.error('Calculator not initialized');
+                    return;
+                }
+                
+                const styleNumber = calculator.state.styleNumber || 'PC61';
+                console.log(`📊 Comparing prices for ${styleNumber}, Qty: ${qty}, Colors: ${colors}`);
+                
+                // Get API pricing
+                const apiData = await this.testAPI(styleNumber);
+                if (apiData && apiData.primaryLocationPricing) {
+                    const apiPricing = apiData.primaryLocationPricing[colors.toString()];
+                    if (apiPricing && apiPricing.tiers) {
+                        const tier = apiPricing.tiers.find(t => qty >= t.minQty && (!t.maxQty || qty <= t.maxQty));
+                        if (tier) {
+                            const apiPrice = tier.prices['M'] || tier.prices[Object.keys(tier.prices)[0]];
+                            console.log(`API Price: $${apiPrice}`);
+                        }
+                    }
+                }
+                
+                // Get current calculator price
+                calculator.state.quantity = qty;
+                calculator.state.frontColors = colors;
+                const pricing = calculator.calculatePricing();
+                console.log(`Calculator Price: $${pricing.perShirtTotal.toFixed(2)}`);
+                
+                return { api: apiData, calculated: pricing };
+            },
+            
+            // Check service status
+            checkStatus: function() {
+                const calculator = window.screenPrintCalculator;
+                const service = calculator?.pricingService;
+                
+                if (service) {
+                    const status = service.getStatus();
+                    console.log('📊 Service Status:', status);
+                    console.log('API Mode: ✅ Enabled (Direct API Only)');
+                    console.log('Pricing Data Loaded:', calculator.state.pricingData ? '✅ Yes' : '❌ No');
+                } else {
+                    console.log('❌ Service not initialized');
+                }
+            },
+            
+            // Clear cache
+            clearCache: function() {
+                const calculator = window.screenPrintCalculator;
+                if (calculator?.pricingService) {
+                    calculator.pricingService.clearCache();
+                    console.log('🗑️ Cache cleared');
+                } else {
+                    console.log('❌ Service not available');
+                }
+            },
+            
+            // Reload pricing data
+            reload: async function() {
+                const calculator = window.screenPrintCalculator;
+                if (calculator && calculator.state.styleNumber) {
+                    await calculator.checkUrlParams();
+                    console.log('🔄 Pricing data reloaded');
+                } else {
+                    console.log('❌ No style number to reload');
+                }
+            }
+        };
+
+        // Pricing Report Generator for Testing/Verification
+        window.SCREENPRINT_DEBUG = {
+            getPricingReport: function() {
+                const calculator = window.screenPrintCalculator;
+                if (!calculator) {
+                    console.error('❌ Calculator not initialized');
+                    return 'ERROR: Calculator not initialized';
+                }
+
+                const state = calculator.state;
+                const pricing = calculator.calculatePricing();
+                const pricingData = state.pricingData || state.masterBundle;
+
+                // Build comprehensive report
+                let report = '\n';
+                report += '═══════════════════════════════════════════════════════════\n';
+                report += '          SCREEN PRINT PRICING CALCULATION REPORT          \n';
+                report += '═══════════════════════════════════════════════════════════\n\n';
+
+                // Product Information
+                report += '📦 PRODUCT DETAILS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Style Number: ${state.styleNumber || 'Not set'}\n`;
+                report += `Product Title: ${state.productTitle || 'Not set'}\n`;
+                report += `Color: ${state.productColor || 'Not set'}\n`;
+                report += `Garment Type: ${state.garmentType || 'Not set'}\n\n`;
+
+                // Selection Details
+                report += '🎨 SELECTIONS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Quantity: ${state.quantity}\n`;
+                report += `Front Colors: ${state.frontColors}\n`;
+                report += `Back Colors: ${state.backColors}\n`;
+                report += `Primary Location: ${state.primaryLocation || 'Front'}\n`;
+                if (state.hasAdditionalLocations) {
+                    report += `Additional Locations: ${JSON.stringify(state.additionalLocations || [])}\n`;
+                }
+                report += `Safety Stripes: ${state.hasSafetyStripes ? 'Yes' : 'No'}\n\n`;
+
+                // Base Pricing Data
+                report += '💰 BASE PRICING DATA (from API):\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                if (pricingData && pricingData.sizes) {
+                    const sizes = pricingData.sizes;
+                    const baseCost = Math.min(...sizes.map(s => s.price).filter(p => p > 0));
+                    report += `Garment Sizes Available: ${sizes.map(s => s.size).join(', ')}\n`;
+                    report += `Base Garment Cost (lowest): $${baseCost.toFixed(2)}\n`;
+                }
+                if (pricingData && pricingData.tiersR) {
+                    const currentTier = pricingData.tiersR.find(t =>
+                        state.quantity >= t.MinQuantity && state.quantity <= t.MaxQuantity
+                    );
+                    if (currentTier) {
+                        report += `Current Tier: ${currentTier.TierLabel}\n`;
+                        report += `Margin Denominator: ${currentTier.MarginDenominator}\n`;
+                        report += `LTM Fee: $${currentTier.LTM_Fee || 0}\n`;
+                    }
+                }
+                report += '\n';
+
+                // Print Costs
+                report += '🖨️ PRINT COSTS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                if (pricing.frontPrintCost) {
+                    report += `Front Print (${state.frontColors} color${state.frontColors !== 1 ? 's' : ''}): $${pricing.frontPrintCost.toFixed(2)}\n`;
+                }
+                if (pricing.backPrintCost) {
+                    report += `Back Print (${state.backColors} color${state.backColors !== 1 ? 's' : ''}): $${pricing.backPrintCost.toFixed(2)}\n`;
+                }
+                if (pricing.additionalLocationsCost && pricing.additionalLocationsCost > 0) {
+                    report += `Additional Locations: $${pricing.additionalLocationsCost.toFixed(2)}\n`;
+                }
+                if (pricing.safetyStripesCost && pricing.safetyStripesCost > 0) {
+                    report += `Safety Stripes: $${pricing.safetyStripesCost.toFixed(2)}\n`;
+                }
+                report += '\n';
+
+                // Calculation Breakdown - Enhanced with raw API values
+                report += '🧮 CALCULATION BREAKDOWN:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+
+                // Get debug data if available
+                const debugData = pricingData?.debug || {};
+                const currentTier = this.findTierForQuantity(state.quantity, pricingData?.tierData);
+
+                if (currentTier) {
+                    const marginDenom = currentTier.MarginDenominator;
+                    const markupPercent = ((1 / marginDenom - 1) * 100).toFixed(0);
+                    report += `Quantity Tier: ${currentTier.TierLabel}\n`;
+                    report += `Margin Denominator: ${marginDenom}\n`;
+                    report += `Markup: ${markupPercent}%\n\n`;
+                }
+
+                // Garment calculation breakdown
+                if (pricing.garmentCost !== undefined) {
+                    const baseGarmentCost = debugData.baseGarmentCost || 0;
+                    const marginDenom = currentTier?.MarginDenominator || 0.5;
+                    const beforeRounding = baseGarmentCost / marginDenom;
+
+                    report += 'GARMENT CALCULATION:\n';
+                    report += `  1. Base Cost (from API): $${baseGarmentCost.toFixed(2)}\n`;
+                    report += `  2. Apply Margin (÷ ${marginDenom}): $${beforeRounding.toFixed(2)}\n`;
+                    report += `  3. Round Up to $0.50: $${pricing.garmentCost.toFixed(2)}\n\n`;
+                }
+
+                // Print calculation breakdown
+                if (pricing.frontPrintCost !== undefined && state.frontColors > 0) {
+                    // Find base print cost from debug data
+                    const basePrintEntry = debugData.basePrintCosts?.find(c =>
+                        c.TierLabel === currentTier?.TierLabel &&
+                        c.ColorCount === state.frontColors &&
+                        c.CostType === 'PrimaryLocation'
+                    );
+
+                    const basePrintCost = basePrintEntry?.BasePrintCost || 0;
+                    // Flash charge is now PER COLOR (simplified - applied to all garments)
+                    const flashChargePerColor = debugData.flashCharge || 0;
+                    const flashChargeTotal = flashChargePerColor * state.frontColors;
+                    const totalCost = basePrintCost + flashChargeTotal;
+                    const marginDenom = currentTier?.MarginDenominator || 0.5;
+                    const beforeRounding = totalCost / marginDenom;
+
+                    report += `PRINT CALCULATION (Front ${state.frontColors} color${state.frontColors !== 1 ? 's' : ''}):\n`;
+                    report += `  1. Base Print Cost (from API): $${basePrintCost.toFixed(2)}\n`;
+                    report += `  2. Flash Charge ($${flashChargePerColor.toFixed(2)} × ${state.frontColors} colors): $${flashChargeTotal.toFixed(2)}\n`;
+                    report += `  3. Total Cost: $${totalCost.toFixed(2)}\n`;
+                    report += `  4. Apply Margin (÷ ${marginDenom}): $${beforeRounding.toFixed(2)}\n`;
+                    report += `  5. Round Up to $0.50: $${pricing.frontPrintCost.toFixed(2)}\n\n`;
+                }
+
+                report += `Rounding Method: ${debugData.roundingMethod || 'HalfDollarCeil_Final'} (always round UP)\n`;
+                report += '\n';
+
+                // Final Totals
+                report += '💵 FINAL TOTALS:\n';
+                report += '─────────────────────────────────────────────────────────\n';
+                report += `Unit Price: $${pricing.perShirtTotal ? pricing.perShirtTotal.toFixed(2) : '0.00'}\n`;
+                report += `Subtotal (${state.quantity} × $${pricing.perShirtTotal ? pricing.perShirtTotal.toFixed(2) : '0.00'}): $${pricing.subtotal ? pricing.subtotal.toFixed(2) : '0.00'}\n`;
+                if (pricing.ltmFee && pricing.ltmFee > 0) {
+                    report += `LTM Fee: $${pricing.ltmFee.toFixed(2)}\n`;
+                }
+                report += `GRAND TOTAL: $${pricing.total ? pricing.total.toFixed(2) : '0.00'}\n`;
+                report += '\n';
+
+                // Pricing Tier Table (if available)
+                if (pricingData && pricingData.tiersR) {
+                    report += '📊 PRICING TIERS (for reference):\n';
+                    report += '─────────────────────────────────────────────────────────\n';
+                    pricingData.tiersR.forEach(tier => {
+                        const isCurrent = state.quantity >= tier.MinQuantity && state.quantity <= tier.MaxQuantity;
+                        const marker = isCurrent ? '→ ' : '  ';
+                        report += `${marker}${tier.TierLabel}: ${tier.MinQuantity}-${tier.MaxQuantity} qty, Margin: ${tier.MarginDenominator}\n`;
+                    });
+                    report += '\n';
+                }
+
+                report += '═══════════════════════════════════════════════════════════\n';
+                report += '✅ Copy the above report to share with Claude for verification\n';
+                report += '═══════════════════════════════════════════════════════════\n';
+
+                console.log(report);
+                return report;
+            },
+
+            // Helper method to find tier for quantity
+            findTierForQuantity: function(quantity, tierData) {
+                if (!tierData) return null;
+
+                for (const tierLabel in tierData) {
+                    const tier = tierData[tierLabel];
+                    if (quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity) {
+                        return tier;
+                    }
+                }
+                return null;
+            }
+        };
+
+        // Setup search functionality with API integration
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
+
+            if (!searchInput || !searchBtn || !searchWrapper) {
+                console.warn('Search elements not found');
+                return;
+            }
+
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+
+            let searchTimeout = null;
+
+            // Perform API search
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.classList.add('active');
+
+                try {
+                    // Search using the API endpoint
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+
+                    const results = await response.json();
+
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                    } else {
+                        // Build results HTML
+                        let html = '';
+                        results.slice(0, 10).forEach(result => {
+                            html += `
+                                <div class="search-result-item" data-style="${result.style || result.value}">
+                                    <div class="search-result-style">${result.style || result.value}</div>
+                                    <div class="search-result-desc">${result.label}</div>
+                                </div>
+                            `;
+                        });
+                        resultsContainer.innerHTML = html;
+
+                        // Add click handlers to results
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+                }
+            }
+
+            // Handle search input
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(query);
+                }, 300);
+            });
+
+            // Handle enter key for direct navigation
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        // Try direct style number navigation
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
+                }
+            });
+
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+
+            console.log('✅ Search functionality initialized');
+        }
+
+        // Store calculator reference when initialized
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize search functionality
+            setupSearch();
+
+            setTimeout(() => {
+                // Skip if manual mode already initialized calculator
+                if (window.screenPrintManualMode) {
+                    console.log('[ScreenPrint Debug] Skipping third calculator initialization - manual mode active');
+                } else if (typeof ScreenPrintPricing !== 'undefined') {
+                    window.screenPrintCalculator = new ScreenPrintPricing();
+                    console.log('═══════════════════════════════════════════════════════════');
+                    console.log('🚀 Screen Print Pricing System: Direct API Mode');
+                    console.log('═══════════════════════════════════════════════════════════');
+                    console.log('📦 API endpoint: /api/pricing-bundle?method=ScreenPrint');
+                    console.log('');
+                    console.log('🧪 Testing Commands:');
+                    console.log('  • SCREENPRINT_API_TEST.testAPI() - Test API endpoint');
+                    console.log('  • SCREENPRINT_API_TEST.checkStatus() - Check service status');
+                    console.log('  • SCREENPRINT_API_TEST.clearCache() - Clear price cache');
+                    console.log('');
+                    console.log('📋 Pricing Report:');
+                    console.log('  • SCREENPRINT_DEBUG.getPricingReport() - Get detailed pricing report');
+                    console.log('    (Select your options first, then run this to copy/paste results)');
+                    console.log('═══════════════════════════════════════════════════════════');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

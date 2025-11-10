@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard Amount Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 10px;
+        }
+        .problem-section {
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #fecaca;
+        }
+        .solution-section {
+            background: #d1fae5;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #6ee7b7;
+        }
+        .test-section {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: bold;
+        }
+        .old-value {
+            color: #dc2626;
+            text-decoration: line-through;
+        }
+        .new-value {
+            color: #16a34a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Dashboard Amount Display Fix</h1>
+
+        <div class="problem-section">
+            <h2>❌ Previous Issue:</h2>
+            <p>The dashboard was showing <span class="old-value">$200.00</span> for all Christmas bundles</p>
+            <p><strong>Cause:</strong> calculateTotalPrice() was using a placeholder: 4 items × $50 = $200</p>
+        </div>
+
+        <div class="solution-section">
+            <h2>✅ Fix Applied:</h2>
+            <p>Now calculates the actual retail value dynamically based on:</p>
+            <ul>
+                <li>Selected products with their base prices</li>
+                <li>Size upcharges (2XL +$2, 3XL +$3, 4XL +$4, 5XL +$6)</li>
+                <li>Gift box ($9)</li>
+                <li>Shipping ($25)</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Example Calculations:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bundle Components</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Jacket CT103828 5XL (base $137 + $6 upcharge)</td>
+                        <td>$143</td>
+                    </tr>
+                    <tr>
+                        <td>Hoodie F281 4XL (base $58 + $4 upcharge)</td>
+                        <td>$62</td>
+                    </tr>
+                    <tr>
+                        <td>Beanie CT104597 OSFA</td>
+                        <td>$35</td>
+                    </tr>
+                    <tr>
+                        <td>Gloves CTGD0794 XL</td>
+                        <td>$19</td>
+                    </tr>
+                    <tr>
+                        <td>Gift Box</td>
+                        <td>$9</td>
+                    </tr>
+                    <tr>
+                        <td>Shipping</td>
+                        <td>$25</td>
+                    </tr>
+                    <tr style="background: #fef3c7;">
+                        <td><strong>Total Retail Value</strong></td>
+                        <td class="new-value">$293.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Testing Instructions:</h2>
+            <ol>
+                <li>Submit a new Christmas bundle order</li>
+                <li>Note the total value shown in the confirmation (e.g., $293)</li>
+                <li>Open the Staff Dashboard</li>
+                <li>Find your order in the list</li>
+                <li><strong>Verify:</strong> The "TOTAL" column should now show the correct retail value (not $200.00)</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>Dashboard Display:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Before Fix</th>
+                        <th>After Fix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>REQUEST ID</td>
+                        <td>XMAS0921-44</td>
+                        <td>XMAS0921-44</td>
+                    </tr>
+                    <tr>
+                        <td>SAMPLES</td>
+                        <td>4</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>TOTAL</td>
+                        <td class="old-value">$200.00</td>
+                        <td class="new-value">$293.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>Quick Access:</h2>
+            <button onclick="window.open('/christmas-bundles.html', '_blank')">
+                Open Christmas Bundle Page
+            </button>
+            <button onclick="window.open('/staff-dashboard.html', '_blank')">
+                Open Staff Dashboard
+            </button>
+        </div>
+
+        <div class="solution-section">
+            <h2>💡 Note:</h2>
+            <p>The amount will vary for each order based on the sizes selected:</p>
+            <ul>
+                <li>Regular sizes (S-XL): Base price</li>
+                <li>2XL: +$2 upcharge</li>
+                <li>3XL: +$3 upcharge</li>
+                <li>4XL: +$4 upcharge</li>
+                <li>5XL: +$6 upcharge</li>
+            </ul>
+            <p>So each bundle will show its actual retail value in the dashboard!</p>
+        </div>
+    </div>
+</body>
+</html>

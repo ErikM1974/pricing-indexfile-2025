@@ -11,38 +11,80 @@ class ProductLineManager {
         this.currentProduct = null;
         this.availableSizes = [];
         this.logos = []; // Will be populated from LogoManager
-        
+
+        // Initialize exact match search (optimized for sales reps)
+        this.exactMatchSearch = null; // Will be initialized when search is called
+
         this.initializeEvents();
+    }
+
+    /**
+     * Initialize the exact match search module with callbacks
+     */
+    initializeExactMatchSearch(onExactMatch, onSuggestions) {
+        if (!window.ExactMatchSearch) {
+            console.error('[ProductLineManager] ExactMatchSearch module not loaded!');
+            return false;
+        }
+
+        this.exactMatchSearch = new window.ExactMatchSearch({
+            apiBase: this.baseURL,
+            onExactMatch: onExactMatch,
+            onSuggestions: onSuggestions,
+            filterFunction: (item) => {
+                // Embroidery works on apparel but not structured caps
+                return this.isAllowedProduct(item);
+            }
+        });
+
+        console.log('[ProductLineManager] Exact match search initialized');
+        return true;
+    }
+
+    /**
+     * Search for products using exact match optimization
+     * This is the new method - auto-loads exact matches
+     */
+    searchWithExactMatch(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[ProductLineManager] Exact match search not initialized. Call initializeExactMatchSearch() first.');
+            return;
+        }
+
+        this.exactMatchSearch.search(query);
+    }
+
+    /**
+     * Immediate search (for Enter key press)
+     */
+    searchImmediate(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[ProductLineManager] Exact match search not initialized.');
+            return;
+        }
+
+        this.exactMatchSearch.searchImmediate(query);
     }
     
     /**
-     * Check if product is allowed (exclude caps, include beanies)
+     * Check if product is allowed (exclude caps, include beanies/watch caps)
      */
     isAllowedProduct(product) {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
-        
-        // Explicitly ALLOW beanies and knit caps (flat embroidery)
-        if (title.includes('beanie') || description.includes('beanie') ||
-            title.includes('knit') || description.includes('knit')) {
-            return true;
+
+        // PRIORITY 1: Check for flat embroidery headwear using shared utility
+        if (ProductCategoryFilter.isFlatHeadwear(product)) {
+            console.log('[ProductLineManager] Allowed flat headwear product:', title);
+            return true;  // ALLOW - flat embroidery works on these
         }
-        
-        // EXCLUDE structured caps (these go on cap machines)
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 
-                            'flexfit', 'visor', 'mesh back', 'dad hat',
-                            'baseball', '5-panel', '6-panel'];
-        
-        const isStructuredCap = capKeywords.some(keyword => 
-            title.includes(keyword) || 
-            description.includes(keyword)
-        );
-        
-        if (isStructuredCap) {
+
+        // PRIORITY 2: Check for structured caps using shared utility
+        if (ProductCategoryFilter.isStructuredCap(product)) {
             console.log('[ProductLineManager] Filtered out cap product:', title);
-            return false;
+            return false;  // EXCLUDE - these go on cap machines
         }
-        
+
         // Allow everything else (shirts, polos, jackets, etc.)
         return true;
     }
@@ -60,13 +102,10 @@ class ProductLineManager {
         if (colorSelect) {
             colorSelect.addEventListener('change', (e) => this.handleColorChange(e.target.value));
         }
-        
-        // Load product button
-        const loadBtn = document.getElementById('load-product-btn');
-        if (loadBtn) {
-            loadBtn.addEventListener('click', () => this.loadProduct());
-        }
-        
+
+        // Load Product button removed (2025-10-17) - Auto-load on color selection now
+        // Button was removed from HTML, functionality moved to handleColorChange()
+
         // Add to quote button
         const addBtn = document.getElementById('add-to-quote-btn');
         if (addBtn) {
@@ -82,7 +121,8 @@ class ProductLineManager {
     }
     
     /**
-     * Handle style number search
+     * LEGACY: Handle style number search
+     * NOTE: This is kept for backwards compatibility but new code should use searchWithExactMatch()
      */
     async handleStyleSearch(query) {
         const suggestionsDiv = document.getElementById('style-suggestions');
@@ -220,26 +260,28 @@ class ProductLineManager {
                 const colorSelect = document.getElementById('color-select');
                 if (colors.colors && colors.colors.length > 0) {
                     console.log('[ProductLineManager] Populating color dropdown with', colors.colors.length, 'colors');
-                    
+
                     // Store full color data for future use
                     this.currentProduct.colorData = colors.colors;
-                    
+
                     console.log('[ProductLineManager] Sample color object:', colors.colors[0]);
-                    
+
                     colorSelect.innerHTML = '<option value="">Select a color</option>' +
-                        colors.colors.map(color => 
+                        colors.colors.map(color =>
                             `<option value="${color.COLOR_NAME}" data-catalog="${color.CATALOG_COLOR || ''}">${color.COLOR_NAME}</option>`
                         ).join('');
                     colorSelect.disabled = false;
+
+                    // Fetch and display color swatches if available
+                    this.fetchAndDisplayColorSwatches(styleNumber);
                 } else {
                     console.log('[ProductLineManager] No colors available');
                     colorSelect.innerHTML = '<option value="">No colors available</option>';
                     colorSelect.disabled = true;
                 }
-                
-                const loadBtn = document.getElementById('load-product-btn');
-                loadBtn.disabled = false;
-                console.log('[ProductLineManager] Load Product button enabled');
+
+                // Load Product button removed (2025-10-17) - Auto-load on color selection now
+                console.log('[ProductLineManager] Product details loaded, ready for color selection');
             } else {
                 console.error('[ProductLineManager] No product data returned');
             }
@@ -252,12 +294,208 @@ class ProductLineManager {
     }
     
     /**
-     * Handle color change
+     * Fetch and display color swatches from API
+     */
+    async fetchAndDisplayColorSwatches(styleNumber) {
+        const swatchContainer = document.getElementById('color-swatches-container');
+        const colorSelect = document.getElementById('color-select');
+
+        if (!swatchContainer || !colorSelect) {
+            console.warn('[ProductLineManager] Swatch container or select not found');
+            return;
+        }
+
+        try {
+            console.log('[ProductLineManager] Fetching color swatches for:', styleNumber);
+
+            // Show loading state
+            swatchContainer.innerHTML = '<div class="color-swatch-loading"><i class="fas fa-spinner fa-spin"></i> Loading colors...</div>';
+            swatchContainer.style.display = 'grid';
+
+            // Fetch swatches from API
+            const response = await fetch(`${this.baseURL}/api/color-swatches?styleNumber=${styleNumber}`);
+
+            if (!response.ok) {
+                throw new Error(`Color swatches API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[ProductLineManager] Color swatches received:', data);
+
+            // API returns array directly, not wrapped in { swatches: [] }
+            const swatches = Array.isArray(data) ? data : (data.swatches || []);
+
+            if (swatches.length === 0) {
+                // No swatches available, keep using dropdown
+                console.log('[ProductLineManager] No swatches available, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+                return;
+            }
+
+            // 🎯 UX IMPROVEMENT (2025-10-17): Smart "Show More" pattern - Simplified approach
+            // Generate all swatches with "initially-hidden" class for colors beyond first 12
+            const generateSwatchHTML = (swatch, index) => {
+                const colorName = swatch.COLOR_NAME || swatch.name || 'Unknown';
+                const imageUrl = swatch.COLOR_SQUARE_IMAGE || swatch.SWATCH_IMAGE_URL || swatch.swatchUrl || '';
+                const catalogColor = swatch.CATALOG_COLOR || colorName;
+                const isHidden = index >= 12; // Hide swatches beyond the first 12
+
+                if (!imageUrl) {
+                    console.warn('[ProductLineManager] No image URL for color:', colorName);
+                    return '';
+                }
+
+                return `
+                    <div class="color-swatch ${isHidden ? 'initially-hidden' : ''}"
+                         data-color="${colorName}"
+                         data-catalog="${catalogColor}"
+                         title="${colorName}">
+                        <img src="${imageUrl}"
+                             alt="${colorName}"
+                             class="color-swatch-image"
+                             onerror="this.parentElement.style.display='none'">
+                        <span class="color-swatch-name">${colorName}</span>
+                    </div>
+                `;
+            };
+
+            // Generate HTML for all swatches (no wrapper divs)
+            const swatchesHTML = swatches
+                .map((swatch, index) => generateSwatchHTML(swatch, index))
+                .filter(html => html !== '')
+                .join('');
+
+            const hiddenCount = swatches.length - 12; // Count of hidden swatches
+
+            if (swatchesHTML) {
+                // Display swatches and hide dropdown
+                swatchContainer.innerHTML = swatchesHTML;
+                // Always use grid layout (no wrapper divs to complicate things)
+                swatchContainer.style.display = 'grid';
+                colorSelect.classList.add('swatch-mode');
+
+                // Add "Show More" button if there are hidden swatches
+                if (hiddenCount > 0) {
+                    this.addShowMoreButton(swatchContainer, hiddenCount);
+                }
+
+                // Add click handlers to ALL swatches (visible and hidden)
+                this.attachSwatchClickHandlers(swatchContainer, colorSelect);
+
+                console.log('[ProductLineManager] ✅ Color swatches displayed:', swatches.length, '(showing', Math.min(12, swatches.length), 'initially)');
+
+                // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
+                // Show the modern swatches section (progressive disclosure pattern)
+                const swatchesSection = document.getElementById('qb-swatches-section');
+                if (swatchesSection) {
+                    swatchesSection.style.display = 'block';
+                    console.log('[ProductLineManager] ✅ Modern swatches section shown');
+                }
+            } else {
+                // No valid swatches with images, fall back to dropdown
+                console.log('[ProductLineManager] No valid swatch images, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+            }
+
+        } catch (error) {
+            console.warn('[ProductLineManager] Color swatches failed, falling back to dropdown:', error);
+
+            // Hide swatches container and show dropdown
+            swatchContainer.style.display = 'none';
+            colorSelect.classList.remove('swatch-mode');
+
+            // Don't show error to user - dropdown is perfectly fine fallback
+        }
+    }
+
+    /**
+     * Add "Show More Colors" button
+     * 🎯 UX IMPROVEMENT (2025-10-17): Progressive disclosure pattern - Simplified with classes
+     */
+    addShowMoreButton(container, hiddenCount) {
+        const button = document.createElement('button');
+        button.id = 'show-more-colors-btn';
+        button.className = 'qb-show-more-btn';
+        button.innerHTML = `
+            <span class="show-more-text">
+                Show <span id="hidden-color-count">${hiddenCount}</span> More Colors
+            </span>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        `;
+
+        button.addEventListener('click', () => {
+            // Toggle .show-more-active class on #product-phase
+            const productPhase = document.getElementById('product-phase');
+            const isExpanded = productPhase.classList.contains('show-more-active');
+
+            if (isExpanded) {
+                // Collapse - hide swatches with .initially-hidden class
+                productPhase.classList.remove('show-more-active');
+                button.classList.remove('expanded');
+                button.querySelector('.show-more-text').innerHTML =
+                    `Show <span id="hidden-color-count">${hiddenCount}</span> More Colors`;
+            } else {
+                // Expand - reveal swatches with .initially-hidden class
+                productPhase.classList.add('show-more-active');
+                button.classList.add('expanded');
+                button.querySelector('.show-more-text').textContent = 'Show Less';
+            }
+        });
+
+        container.appendChild(button);
+        console.log('[ProductLineManager] ✅ "Show More" button added for', hiddenCount, 'hidden colors');
+    }
+
+    /**
+     * Attach click handlers to all swatches (visible and hidden)
+     * 🎯 UX IMPROVEMENT (2025-10-17): Universal swatch interaction
+     */
+    attachSwatchClickHandlers(container, colorSelect) {
+        container.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', (e) => {
+                const selectedColor = swatch.dataset.color;
+                const catalogColor = swatch.dataset.catalog;
+
+                // Remove selected class from all swatches
+                container.querySelectorAll('.color-swatch').forEach(s => {
+                    s.classList.remove('selected');
+                });
+
+                // Add selected class to clicked swatch
+                swatch.classList.add('selected');
+
+                // Update dropdown value
+                colorSelect.value = selectedColor;
+
+                // Update catalog color data attribute
+                const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
+                if (selectedOption) {
+                    selectedOption.setAttribute('data-catalog', catalogColor);
+                }
+
+                // Trigger change event to auto-load product
+                colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                console.log('[ProductLineManager] ✅ Color swatch selected:', selectedColor, catalogColor);
+            });
+        });
+
+        console.log('[ProductLineManager] ✅ Click handlers attached to', container.querySelectorAll('.color-swatch').length, 'swatches');
+    }
+
+    /**
+     * Handle color change - AUTO-LOAD product like Cap Embroidery builder (2025-10-17)
      */
     handleColorChange(color) {
-        if (color) {
-            document.getElementById('load-product-btn').disabled = false;
-        }
+        if (!color || !this.currentProduct) return;
+
+        console.log('[ProductLineManager] Color selected:', color);
+
+        // 🎯 AUTO-LOAD IMPROVEMENT (2025-10-17): Match Cap builder behavior
+        // Automatically load product when color is selected (no button click needed)
+        this.loadProduct();
     }
     
     /**
@@ -507,76 +745,113 @@ class ProductLineManager {
         this.renderProductsList();
         this.resetProductForm();
         this.updateContinueButton();
-        
+
         // Trigger pricing update
         if (window.embroideryQuoteBuilder) {
             window.embroideryQuoteBuilder.updatePricing();
         }
+
+        // 🎯 UX IMPROVEMENT (2025-10-15): Show success toast
+        if (window.ToastNotifications) {
+            ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
+        }
+
+        // Trigger quote indicator update
+        document.dispatchEvent(new CustomEvent('productAdded', {
+            detail: { product, source: 'ProductLineManager' }
+        }));
     }
     
     /**
      * Render products list
+     * 🎨 PHASE 2 (2025-10-15): Modern compact card design
      */
     renderProductsList() {
         const container = document.getElementById('products-container');
-        
+
         if (this.products.length === 0) {
             container.innerHTML = '<p class="empty-message">No products added yet</p>';
             document.getElementById('aggregate-total').textContent = '0';
             return;
         }
-        
+
         let aggregateTotal = 0;
-        
+
         container.innerHTML = this.products.map(product => {
             aggregateTotal += product.totalQuantity;
-            
-            const sizesList = Object.entries(product.sizeBreakdown)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(', ');
-            
-            // Get logos from LogoManager if available
-            const logos = window.embroideryQuoteBuilder?.logoManager?.logos || [];
-            const primaryLogo = logos.find(l => l.isPrimary);
-            const additionalLogos = logos.filter(l => !l.isPrimary);
-            
-            // Initialize logo assignments if not present
+
+            // FIX (2025-12-19): LogoManager has primaryLogo (object) and additionalLogos (array), NOT a combined logos array
+            const logoManager = window.embroideryQuoteBuilder?.logoManager;
+            const primaryLogo = logoManager?.primaryLogo?.position ? {
+                id: 'primary',
+                isPrimary: true,
+                position: logoManager.primaryLogo.position,
+                stitchCount: logoManager.primaryLogo.stitchCount,
+                needsDigitizing: logoManager.primaryLogo.needsDigitizing
+            } : null;
+            const additionalLogos = logoManager?.additionalLogos || [];
             if (!product.logoAssignments) {
+                // AUTO-SELECT additional logos by default (2025-12-19 UX IMPROVEMENT)
+                // 95% of orders include additional logos on ALL pieces
+                const autoSelectedAdditional = additionalLogos.map(logo => ({
+                    logoId: logo.id,
+                    quantity: product.totalQuantity
+                }));
+
                 product.logoAssignments = {
                     primary: primaryLogo ? { logoId: primaryLogo.id, quantity: product.totalQuantity } : null,
-                    additional: [],
-                    monogram: null
+                    additional: autoSelectedAdditional,  // Auto-select instead of empty array
+                    monogram: null  // To be removed in next commit
                 };
             }
-            
+
+            // Build size breakdown - SMART FILTERING (2025-10-17 POLISH)
+            // Only show sizes with qty >= 1 to reduce visual clutter (hide empty sizes only)
+            // If no meaningful quantities, show top 3 sizes
+            const sizeEntries = Object.entries(product.sizeBreakdown);
+            const significantSizes = sizeEntries.filter(([size, qty]) => qty >= 1);
+            const displaySizes = significantSizes.length > 0 ? significantSizes : sizeEntries.slice(0, 3);
+            const sizeBadges = displaySizes.map(([size, qty]) =>
+                `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
+            ).join('');
+            const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
+
             return `
-                <div class="product-item" data-product-id="${product.id}">
-                    <div class="product-item-header">
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
-                             alt="${product.style} - ${product.color}" 
-                             onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
-                             class="product-item-image">
-                        <div class="product-item-info">
-                            <strong>${product.style} - ${product.title}</strong>
-                            <span>${product.color} | ${product.totalQuantity} pieces</span>
-                            <small>${sizesList}</small>
+                <div class="product-card-modern" data-product-id="${product.id}">
+                    <!-- Product Thumbnail (80px) -->
+                    <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent(product.style)}"
+                         alt="${product.style}"
+                         onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/666?text=' + encodeURIComponent('${product.style}')"
+                         class="product-card-image">
+
+                    <!-- Product Info (flexible width) -->
+                    <div class="product-card-info">
+                        <h4 class="product-card-title">${product.style}</h4>
+                        <p class="product-card-subtitle">${product.title}</p>
+                        <div class="product-card-meta">
+                            <span class="color-badge">${product.color}</span>
+                            <span class="qty-badge">${product.totalQuantity} pcs</span>
                         </div>
-                        <div class="product-item-actions">
-                            <button class="btn-edit" onclick="window.productLineManager.editProduct(${product.id})" title="Edit quantities">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove product">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <!-- Size Breakdown (all sizes visible) -->
+                        <div class="product-card-sizes" title="${sizesTooltip}">
+                            ${sizeBadges}
                         </div>
+                        <!-- Logo Selection (Collapsible) -->
+                        ${this.renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos)}
                     </div>
-                    ${this.renderLogoSelection(product, primaryLogo, additionalLogos)}
+
+                    <!-- Actions (120px) -->
+                    <div class="product-card-actions">
+                        <button class="btn-icon btn-danger" onclick="window.productLineManager.removeProduct(${product.id})" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             `;
         }).join('');
-        
+
         document.getElementById('aggregate-total').textContent = aggregateTotal;
-        
+
         // Update tier indicator
         this.updateTierIndicator(aggregateTotal);
     }
@@ -598,144 +873,6 @@ class ProductLineManager {
     }
     
     /**
-     * Edit product quantities
-     */
-    editProduct(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-        
-        // Create edit modal HTML
-        const modalHtml = `
-            <div id="edit-product-modal" class="modal active">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Edit Product Quantities</h3>
-                        <button class="modal-close" onclick="window.productLineManager.closeEditModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="product-edit-info">
-                            <img src="${product.imageUrl || 'https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent(product.style)}" 
-                                 alt="${product.style} - ${product.color}" 
-                                 onerror="this.src='https://via.placeholder.com/150x150/f0f0f0/666?text=' + encodeURIComponent('${product.style}')" 
-                                 class="product-edit-image">
-                            <div>
-                                <strong>${product.style} - ${product.title}</strong>
-                                <p>${product.color}</p>
-                            </div>
-                        </div>
-                        <div class="size-inputs edit-size-inputs">
-                            ${Object.entries(product.sizeBreakdown).map(([size, qty]) => `
-                                <div class="size-input-group">
-                                    <label>${size}</label>
-                                    <input type="number" 
-                                           class="edit-size-qty" 
-                                           data-size="${size}" 
-                                           min="0" 
-                                           value="${qty}">
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="edit-total">
-                            Total: <span id="edit-total-qty">0</span> pieces
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="window.productLineManager.closeEditModal()">
-                            Cancel
-                        </button>
-                        <button class="btn btn-primary" onclick="window.productLineManager.saveProductEdit(${productId})">
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Add modal to DOM
-        const existingModal = document.getElementById('edit-product-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
-        // Add event listeners for quantity changes
-        document.querySelectorAll('.edit-size-qty').forEach(input => {
-            input.addEventListener('input', () => this.updateEditTotal());
-        });
-        
-        // Calculate initial total
-        this.updateEditTotal();
-    }
-    
-    /**
-     * Update edit modal total
-     */
-    updateEditTotal() {
-        const inputs = document.querySelectorAll('.edit-size-qty');
-        let total = 0;
-        inputs.forEach(input => {
-            total += parseInt(input.value) || 0;
-        });
-        const totalElement = document.getElementById('edit-total-qty');
-        if (totalElement) {
-            totalElement.textContent = total;
-        }
-    }
-    
-    /**
-     * Save product edit
-     */
-    saveProductEdit(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-        
-        const newSizeBreakdown = {};
-        let totalQty = 0;
-        
-        document.querySelectorAll('.edit-size-qty').forEach(input => {
-            const qty = parseInt(input.value) || 0;
-            if (qty > 0) {
-                newSizeBreakdown[input.dataset.size] = qty;
-                totalQty += qty;
-            }
-        });
-        
-        if (totalQty === 0) {
-            if (confirm('All quantities are 0. Remove this product?')) {
-                this.removeProduct(productId);
-                this.closeEditModal();
-            }
-            return;
-        }
-        
-        // Update product
-        product.sizeBreakdown = newSizeBreakdown;
-        product.totalQuantity = totalQty;
-        
-        // Re-render and update pricing
-        this.renderProductsList();
-        this.updateContinueButton();
-        
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-        
-        this.closeEditModal();
-    }
-    
-    /**
-     * Close edit modal
-     */
-    closeEditModal() {
-        const modal = document.getElementById('edit-product-modal');
-        if (modal) {
-            modal.remove();
-        }
-    }
-    
-    /**
      * Remove product
      */
     removeProduct(productId) {
@@ -743,24 +880,52 @@ class ProductLineManager {
             this.products = this.products.filter(p => p.id !== productId);
             this.renderProductsList();
             this.updateContinueButton();
-            
+
             // Trigger pricing update
             if (window.embroideryQuoteBuilder) {
                 window.embroideryQuoteBuilder.updatePricing();
             }
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productRemoved', {
+                detail: { productId, source: 'ProductLineManager' }
+            }));
         }
     }
     
     /**
      * Reset product form
+     * CRITICAL: Hides ALL elements to return to clean search state (2025 UX)
      */
     resetProductForm() {
+        // Clear search input
         document.getElementById('style-search').value = '';
+        document.getElementById('style-suggestions').style.display = 'none';
+
+        // Reset color dropdown
         document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
         document.getElementById('color-select').disabled = true;
-        document.getElementById('load-product-btn').disabled = true;
+
+        // 🎯 CRITICAL FIX (2025-10-15): Hide swatches section after adding product
+        // This returns the interface to a clean search state (progressive disclosure pattern)
+        const swatchesSection = document.getElementById('qb-swatches-section');
+        if (swatchesSection) {
+            swatchesSection.style.display = 'none';
+            console.log('[ProductLineManager] ✅ Swatches section hidden (clean state)');
+        }
+
+        // Clear swatches container
+        const swatchContainer = document.getElementById('color-swatches-container');
+        if (swatchContainer) {
+            swatchContainer.innerHTML = '';
+        }
+
+        // Hide product display
         document.getElementById('product-display').style.display = 'none';
-        document.getElementById('style-suggestions').style.display = 'none';
+
+        // Load Product button removed (2025-10-17) - No longer needed with auto-load
+
+        console.log('[ProductLineManager] ✅ Form reset to clean search state');
     }
     
     /**
@@ -774,116 +939,171 @@ class ProductLineManager {
     }
     
     /**
-     * Render logo selection checkboxes for a product
+     * Render logo selection with collapsible <details> element
+     * 🎨 PHASE 2 (2025-10-15): Modern collapsible design
+     */
+    renderLogoSelectionCollapsible(product, primaryLogo, additionalLogos) {
+        if (!primaryLogo && additionalLogos.length === 0) {
+            return ''; // No logos defined yet
+        }
+
+        // Build preview cards for collapsed state
+        let previewCards = '';
+
+        // Primary logo preview
+        if (primaryLogo) {
+            previewCards += `
+                <div class="logo-preview-card primary">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="logo-preview-info">
+                        <div class="logo-preview-name">${primaryLogo.position}</div>
+                        <div class="logo-preview-meta">${primaryLogo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <span class="badge badge-primary">PRIMARY</span>
+                    <div class="logo-preview-qty">${product.totalQuantity} pcs</div>
+                </div>
+            `;
+        }
+
+        // Additional logo previews
+        if (product.logoAssignments?.additional) {
+            product.logoAssignments.additional.forEach(assignment => {
+                const logo = additionalLogos.find(l => l.id === assignment.logoId);
+                if (logo) {
+                    previewCards += `
+                        <div class="logo-preview-card additional">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="logo-preview-info">
+                                <div class="logo-preview-name">${logo.position}</div>
+                                <div class="logo-preview-meta">${logo.stitchCount.toLocaleString()} stitches</div>
+                            </div>
+                            <span class="badge badge-additional">ADDITIONAL</span>
+                            <div class="logo-preview-qty">${assignment.quantity} pcs</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Count selected logos for header
+        let logoCount = primaryLogo ? 1 : 0;
+        logoCount += product.logoAssignments?.additional?.length || 0;
+
+        return `
+            <details class="logo-details">
+                <summary class="logo-summary">
+                    <div class="logo-summary-header">
+                        <i class="fas fa-image"></i>
+                        <span>Logo Options</span>
+                        <span class="logo-count">${logoCount} selected</span>
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </summary>
+                <div class="logo-preview-section">
+                    ${previewCards}
+                </div>
+                <div class="logo-content">
+                    ${this.renderLogoSelection(product, primaryLogo, additionalLogos)}
+                </div>
+            </details>
+        `;
+    }
+
+    /**
+     * Render logo selection checkboxes for a product (internal helper)
+     * 🎨 PHASE 3 (2025-12-19): Modern card-based design with custom controls
      */
     renderLogoSelection(product, primaryLogo, additionalLogos) {
         if (!primaryLogo && additionalLogos.length === 0) {
             return ''; // No logos defined yet
         }
-        
+
         let html = '<div class="logo-selection-section">';
-        html += '<div class="logo-selection-header">Logo Selection:</div>';
+        html += '<div class="logo-selection-header">Configure Logo Assignments</div>';
         html += '<div class="logo-selection-grid">';
-        
-        // Primary logo (always checked, disabled)
+
+        // Primary logo (always checked, disabled) - MODERN CARD
         if (primaryLogo) {
             html += `
-                <div class="logo-selection-item primary">
-                    <label class="logo-checkbox-label">
-                        <input type="checkbox" 
-                               checked 
-                               disabled 
-                               class="logo-checkbox primary-logo-check">
-                        <span class="logo-label">
-                            <i class="fas fa-check-circle"></i>
-                            ${primaryLogo.position} - ${primaryLogo.stitchCount.toLocaleString()} stitches
+                <div class="logo-card primary">
+                    <div class="logo-card-checkbox-wrapper">
+                        <div class="custom-checkbox checked disabled">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="logo-card-content">
+                        <div class="logo-card-header">
+                            <span class="logo-card-title">${primaryLogo.position}</span>
                             <span class="badge badge-primary">PRIMARY</span>
-                        </span>
-                    </label>
-                    <span class="logo-qty">[${product.totalQuantity}] pieces</span>
+                        </div>
+                        <div class="logo-card-meta">${primaryLogo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <div class="logo-card-qty">
+                        <div class="qty-display primary">
+                            <span class="qty-number">${product.totalQuantity}</span>
+                            <span class="qty-label">pieces</span>
+                        </div>
+                    </div>
                 </div>
             `;
         }
-        
-        // Additional logos (optional with quantity input)
+
+        // Additional logos (optional with quantity controls) - MODERN CARDS
         additionalLogos.forEach(logo => {
             const assignment = product.logoAssignments?.additional?.find(a => a.logoId === logo.id);
-            const isChecked = assignment ? 'checked' : '';
-            const quantity = assignment?.quantity || '';
-            
+            const isChecked = assignment ? true : false;
+            const quantity = assignment?.quantity || product.totalQuantity;
+
             html += `
-                <div class="logo-selection-item additional">
-                    <label class="logo-checkbox-label">
-                        <input type="checkbox" 
-                               ${isChecked}
-                               class="logo-checkbox additional-logo-check"
-                               data-logo-id="${logo.id}"
-                               data-product-id="${product.id}"
-                               onchange="window.productLineManager.toggleAdditionalLogo(${product.id}, ${logo.id}, this.checked)">
-                        <span class="logo-label">
-                            ${logo.position} - ${logo.stitchCount.toLocaleString()} stitches
+                <div class="logo-card additional ${isChecked ? 'checked' : ''}">
+                    <div class="logo-card-checkbox-wrapper">
+                        <div class="custom-checkbox ${isChecked ? 'checked' : ''}"
+                             data-logo-id="${logo.id}"
+                             data-product-id="${product.id}"
+                             onclick="window.productLineManager.toggleAdditionalLogoModern(${product.id}, ${logo.id})">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="logo-card-content">
+                        <div class="logo-card-header">
+                            <span class="logo-card-title">${logo.position}</span>
                             <span class="badge badge-additional">ADDITIONAL</span>
-                        </span>
-                    </label>
-                    <input type="number" 
-                           class="logo-qty-input"
-                           placeholder="Qty"
-                           min="1"
-                           max="${product.totalQuantity}"
-                           value="${quantity}"
-                           ${!isChecked ? 'disabled' : ''}
-                           data-logo-id="${logo.id}"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.updateAdditionalLogoQty(${product.id}, ${logo.id}, this.value)">
-                    <span class="logo-qty-suffix">of ${product.totalQuantity}</span>
+                        </div>
+                        <div class="logo-card-meta">${logo.stitchCount.toLocaleString()} stitches</div>
+                    </div>
+                    <div class="logo-card-qty">
+                        <div class="qty-controls ${!isChecked ? 'disabled' : ''}">
+                            <button type="button"
+                                    class="qty-btn qty-minus"
+                                    onclick="window.productLineManager.decrementLogoQty(${product.id}, ${logo.id})"
+                                    ${!isChecked ? 'disabled' : ''}>
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number"
+                                   class="qty-input"
+                                   min="1"
+                                   max="${product.totalQuantity}"
+                                   value="${quantity}"
+                                   ${!isChecked ? 'disabled' : ''}
+                                   data-logo-id="${logo.id}"
+                                   data-product-id="${product.id}"
+                                   onchange="window.productLineManager.updateAdditionalLogoQty(${product.id}, ${logo.id}, this.value)">
+                            <button type="button"
+                                    class="qty-btn qty-plus"
+                                    onclick="window.productLineManager.incrementLogoQty(${product.id}, ${logo.id})"
+                                    ${!isChecked ? 'disabled' : ''}>
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="qty-of-total">of ${product.totalQuantity}</div>
+                    </div>
                 </div>
             `;
         });
-        
-        // Monogram option
-        const monogram = product.logoAssignments?.monogram;
-        const hasMonogram = monogram && monogram.quantity > 0;
-        
-        html += `
-            <div class="logo-selection-item monogram">
-                <label class="logo-checkbox-label">
-                    <input type="checkbox" 
-                           ${hasMonogram ? 'checked' : ''}
-                           class="logo-checkbox monogram-check"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.toggleMonogram(${product.id}, this.checked)">
-                    <span class="logo-label">
-                        <i class="fas fa-signature"></i> Monogram
-                        <span class="badge badge-monogram">$12.50 each</span>
-                    </span>
-                </label>
-                <div class="monogram-options" ${!hasMonogram ? 'style="display:none;"' : ''}>
-                    <select class="monogram-mode" 
-                            data-product-id="${product.id}"
-                            onchange="window.productLineManager.updateMonogramMode(${product.id}, this.value)">
-                        <option value="quick" ${monogram?.mode === 'quick' ? 'selected' : ''}>Quick (Qty only)</option>
-                        <option value="detailed" ${monogram?.mode === 'detailed' ? 'selected' : ''}>Detailed (Names)</option>
-                    </select>
-                    <input type="number" 
-                           class="monogram-qty-input"
-                           placeholder="Qty"
-                           min="1"
-                           max="${product.totalQuantity}"
-                           value="${monogram?.quantity || ''}"
-                           data-product-id="${product.id}"
-                           onchange="window.productLineManager.updateMonogramQty(${product.id}, this.value)">
-                    ${monogram?.mode === 'detailed' ? 
-                        `<button class="btn-small" onclick="window.productLineManager.openMonogramNames(${product.id})">
-                            <i class="fas fa-edit"></i> Names
-                        </button>` : ''
-                    }
-                </div>
-            </div>
-        `;
-        
+
         html += '</div>';
         html += '</div>';
-        
+
         return html;
     }
     
@@ -945,145 +1165,104 @@ class ProductLineManager {
     updateAdditionalLogoQty(productId, logoId, quantity) {
         const product = this.products.find(p => p.id === productId);
         if (!product || !product.logoAssignments) return;
-        
+
         const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
         if (assignment) {
             assignment.quantity = Math.min(parseInt(quantity) || 0, product.totalQuantity);
         }
-        
+
         // Trigger pricing update
         if (window.embroideryQuoteBuilder) {
             window.embroideryQuoteBuilder.updatePricing();
         }
     }
-    
+
     /**
-     * Toggle monogram for a product
+     * Modern checkbox toggle (for custom checkboxes)
+     * 🎨 PHASE 3 (2025-12-19): New helper for modern UI
      */
-    toggleMonogram(productId, isChecked) {
+    toggleAdditionalLogoModern(productId, logoId) {
         const product = this.products.find(p => p.id === productId);
         if (!product) return;
-        
+
         if (!product.logoAssignments) {
             product.logoAssignments = { primary: null, additional: [], monogram: null };
         }
-        
-        const monogramOptions = document.querySelector(`.logo-selection-item.monogram .monogram-options[data-product-id="${productId}"]`);
-        const parentDiv = document.querySelector(`[data-product-id="${productId}"] .monogram-options`);
-        
-        if (isChecked) {
-            product.logoAssignments.monogram = {
-                quantity: product.totalQuantity,
-                mode: 'quick',
-                names: []
-            };
-            if (parentDiv) parentDiv.style.display = 'flex';
+
+        // Check if logo is currently assigned
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        const isCurrentlyChecked = !!assignment;
+
+        if (isCurrentlyChecked) {
+            // Remove assignment
+            product.logoAssignments.additional = product.logoAssignments.additional.filter(a => a.logoId !== logoId);
         } else {
-            product.logoAssignments.monogram = null;
-            if (parentDiv) parentDiv.style.display = 'none';
+            // Add assignment
+            if (!product.logoAssignments.additional) {
+                product.logoAssignments.additional = [];
+            }
+            product.logoAssignments.additional.push({
+                logoId: logoId,
+                quantity: product.totalQuantity
+            });
         }
-        
-        // Re-render to update the UI
-        this.renderProductsList();
-        
+
+        // Update UI
+        this.renderAllProducts();
+
         // Trigger pricing update
         if (window.embroideryQuoteBuilder) {
             window.embroideryQuoteBuilder.updatePricing();
         }
     }
-    
+
     /**
-     * Update monogram mode
+     * Increment logo quantity
+     * 🎨 PHASE 3 (2025-12-19): New helper for +/- buttons
      */
-    updateMonogramMode(productId, mode) {
+    incrementLogoQty(productId, logoId) {
         const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        product.logoAssignments.monogram.mode = mode;
-        
-        // Re-render to show/hide names button
-        this.renderProductsList();
-    }
-    
-    /**
-     * Update monogram quantity
-     */
-    updateMonogramQty(productId, quantity) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        product.logoAssignments.monogram.quantity = Math.min(parseInt(quantity) || 0, product.totalQuantity);
-        
-        // Trigger pricing update
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
-        }
-    }
-    
-    /**
-     * Open monogram names entry modal
-     */
-    openMonogramNames(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        // Create modal for entering names
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-content monogram-modal">
-                <div class="modal-header">
-                    <h3>Enter Monogram Names</h3>
-                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>${product.style} - ${product.color}</strong></p>
-                    <p>Enter ${product.logoAssignments.monogram.quantity} names (one per line):</p>
-                    <p class="help-text">Format: Name - Size - Thread Color (optional)</p>
-                    <p class="help-text">Example: John Smith - M - Gold</p>
-                    <textarea id="monogram-names-input" rows="10" cols="50">${product.logoAssignments.monogram.names?.join('\n') || ''}</textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-                    <button class="btn-primary" onclick="window.productLineManager.saveMonogramNames(${productId})">Save Names</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Focus the textarea
-        document.getElementById('monogram-names-input').focus();
-    }
-    
-    /**
-     * Save monogram names
-     */
-    saveMonogramNames(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.logoAssignments?.monogram) return;
-        
-        const textarea = document.getElementById('monogram-names-input');
-        if (textarea) {
-            const names = textarea.value.split('\n').filter(n => n.trim());
-            product.logoAssignments.monogram.names = names;
-            product.logoAssignments.monogram.quantity = names.length;
-            
-            // Update the quantity input
-            const qtyInput = document.querySelector(`input.monogram-qty-input[data-product-id="${productId}"]`);
-            if (qtyInput) {
-                qtyInput.value = names.length;
+        if (!product || !product.logoAssignments) return;
+
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        if (assignment && assignment.quantity < product.totalQuantity) {
+            assignment.quantity++;
+
+            // Update input value
+            const input = document.querySelector(`input.qty-input[data-product-id="${productId}"][data-logo-id="${logoId}"]`);
+            if (input) input.value = assignment.quantity;
+
+            // Trigger pricing update
+            if (window.embroideryQuoteBuilder) {
+                window.embroideryQuoteBuilder.updatePricing();
             }
         }
-        
-        // Close modal
-        document.querySelector('.modal-overlay').remove();
-        
-        // Trigger pricing update
-        if (window.embroideryQuoteBuilder) {
-            window.embroideryQuoteBuilder.updatePricing();
+    }
+
+    /**
+     * Decrement logo quantity
+     * 🎨 PHASE 3 (2025-12-19): New helper for +/- buttons
+     */
+    decrementLogoQty(productId, logoId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product || !product.logoAssignments) return;
+
+        const assignment = product.logoAssignments.additional?.find(a => a.logoId === logoId);
+        if (assignment && assignment.quantity > 1) {
+            assignment.quantity--;
+
+            // Update input value
+            const input = document.querySelector(`input.qty-input[data-product-id="${productId}"][data-logo-id="${logoId}"]`);
+            if (input) input.value = assignment.quantity;
+
+            // Trigger pricing update
+            if (window.embroideryQuoteBuilder) {
+                window.embroideryQuoteBuilder.updatePricing();
+            }
         }
     }
-    
+
+
     /**
      * Export products data
      */

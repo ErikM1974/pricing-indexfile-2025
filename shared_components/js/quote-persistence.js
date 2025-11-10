@@ -154,12 +154,14 @@ class QuotePersistence {
      */
     getDraftAge() {
         const data = this.load();
-        if (!data || !data._metadata) return null;
-        
+        if (!data || !data._metadata || !data._metadata.timestamp) {
+            return 'recently';  // Graceful fallback instead of null
+        }
+
         const age = Date.now() - new Date(data._metadata.timestamp).getTime();
         const minutes = Math.floor(age / 60000);
         const hours = Math.floor(minutes / 60);
-        
+
         if (hours > 0) {
             return `${hours} hour${hours > 1 ? 's' : ''} ago`;
         } else if (minutes > 0) {

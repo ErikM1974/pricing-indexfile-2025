@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Cap Summary Display</title>
+    <script>
+        // Test the cap summary display
+        function testCapSummary() {
+            // Open the cap embroidery quote builder with test data
+            window.open('http://localhost:3000/cap-embroidery-quote-builder#test-summary', '_blank');
+        }
+    </script>
+</head>
+<body>
+    <h1>Cap Embroidery Quote Summary Test</h1>
+    <p>Click the button below to test the new cap summary display format:</p>
+    <button onclick="testCapSummary()" style="
+        background: #003f7f;
+        color: white;
+        padding: 15px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    ">
+        Test Cap Summary Display
+    </button>
+
+    <h2>Expected Display:</h2>
+    <ul>
+        <li>✅ Detailed pricing breakdown formulas</li>
+        <li>✅ "Cap with Logo: $18.00 + Small Batch $3.33 = $21.33" format</li>
+        <li>✅ Separate "Cap Back $6.75" additional logo pricing</li>
+        <li>✅ OSFA designation with quantity badge</li>
+        <li>✅ Larger, more readable text (16-18px)</li>
+        <li>✅ Product subtotal at bottom</li>
+    </ul>
+
+    <h2>Test Data Includes:</h2>
+    <ul>
+        <li>C112 - Grey Steel/Black (15 pieces) - Base pricing with small batch</li>
+        <li>C112 - Black/Gold (15 pieces) - With extra stitches fee</li>
+        <li>Both caps include back logo pricing at $6.75</li>
+    </ul>
+</body>
+</html>

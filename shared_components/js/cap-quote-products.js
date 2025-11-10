@@ -12,40 +12,94 @@ class CapProductLineManager {
         this.currentProduct = null;
         this.availableSizes = [];
         this.logos = []; // Will be populated from LogoManager
-        
+
+        // Initialize exact match search (optimized for sales reps)
+        this.exactMatchSearch = null; // Will be initialized when search is called
+
         this.initializeEvents();
         console.log('[CapProductLineManager] Initialized');
     }
+
+    /**
+     * Initialize the exact match search module with callbacks
+     */
+    initializeExactMatchSearch(onExactMatch, onSuggestions) {
+        if (!window.ExactMatchSearch) {
+            console.error('[CapProductLineManager] ExactMatchSearch module not loaded!');
+            return false;
+        }
+
+        this.exactMatchSearch = new window.ExactMatchSearch({
+            apiBase: this.baseURL,
+            onExactMatch: onExactMatch,
+            onSuggestions: onSuggestions,
+            filterFunction: (item) => {
+                // Cap embroidery ONLY structured caps (exclude beanies/knits)
+                return this.isStructuredCap(item);
+            },
+            onFilteredOut: (filteredItems, query) => {
+                // Check if filtered items are beanies and show warning
+                const hasBeanies = filteredItems.some(item =>
+                    ProductCategoryFilter.isFlatHeadwear(item)
+                );
+
+                if (hasBeanies) {
+                    console.log('[CapProductLineManager] 🔔 Beanie detected via ExactMatchSearch:', query);
+                    this.showBeanieWarning(filteredItems[0]);
+                }
+            }
+        });
+
+        console.log('[CapProductLineManager] Exact match search initialized');
+        return true;
+    }
+
+    /**
+     * Search for products using exact match optimization
+     * This is the new method - auto-loads exact matches
+     */
+    searchWithExactMatch(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[CapProductLineManager] Exact match search not initialized. Call initializeExactMatchSearch() first.');
+            return;
+        }
+
+        this.exactMatchSearch.search(query);
+    }
+
+    /**
+     * Immediate search (for Enter key press)
+     */
+    searchImmediate(query) {
+        if (!this.exactMatchSearch) {
+            console.error('[CapProductLineManager] Exact match search not initialized.');
+            return;
+        }
+
+        this.exactMatchSearch.searchImmediate(query);
+    }
     
     /**
-     * Check if product is a structured cap (NOT beanie or knit)
+     * Check if product is a structured cap (NOT beanie/watch cap/knit)
      */
     isStructuredCap(product) {
         const title = (product.label || product.PRODUCT_TITLE || product.value || '').toLowerCase();
         const description = (product.PRODUCT_DESCRIPTION || '').toLowerCase();
-        
-        // EXCLUDE beanies and knits (these use flat embroidery)
-        if (title.includes('beanie') || description.includes('beanie') ||
-            title.includes('knit') || description.includes('knit')) {
-            console.log('[CapProductLineManager] Filtered out knit/beanie product:', title);
-            return false;
+
+        // PRIORITY 1: Exclude flat embroidery headwear using shared utility
+        if (ProductCategoryFilter.isFlatHeadwear(product)) {
+            console.log('[CapProductLineManager] Filtered out flat headwear product:', title);
+            return false;  // EXCLUDE - use embroidery builder instead
         }
-        
-        // INCLUDE structured caps only
-        const capKeywords = ['cap', 'trucker', 'snapback', 'fitted', 
-                            'flexfit', 'visor', 'mesh back', 'dad hat',
-                            'baseball', '5-panel', '6-panel', 'bucket'];
-        
-        const isStructuredCap = capKeywords.some(keyword => 
-            title.includes(keyword) || 
-            description.includes(keyword)
-        );
-        
-        if (!isStructuredCap) {
-            console.log('[CapProductLineManager] Filtered out non-cap product:', title);
+
+        // PRIORITY 2: Include only structured caps using shared utility
+        if (ProductCategoryFilter.isStructuredCap(product)) {
+            return true;  // INCLUDE - this is a structured cap
         }
-        
-        return isStructuredCap;
+
+        // Not a cap product
+        console.log('[CapProductLineManager] Filtered out non-cap product:', title);
+        return false;
     }
     
     /**
@@ -65,11 +119,8 @@ class CapProductLineManager {
             colorSelect.addEventListener('change', (e) => this.handleColorChange(e.target.value));
         }
         
-        // Load product button
-        const loadBtn = document.getElementById('load-product-btn');
-        if (loadBtn) {
-            loadBtn.addEventListener('click', () => this.loadProduct());
-        }
+        // Load Product button removed (2025-10-17) - Auto-load on color selection now
+        // Button was removed from HTML, functionality moved to handleColorChange()
         
         // Add to quote button
         const addBtn = document.getElementById('add-to-quote-btn');
@@ -91,7 +142,8 @@ class CapProductLineManager {
     }
     
     /**
-     * Handle style number search with cap filtering
+     * LEGACY: Handle style number search with cap filtering
+     * NOTE: This is kept for backwards compatibility but new code should use searchWithExactMatch()
      */
     async handleStyleSearch(query) {
         const suggestionsDiv = document.getElementById('style-suggestions');
@@ -119,7 +171,17 @@ class CapProductLineManager {
                 // Filter to show only structured caps
                 const capSuggestions = suggestions.filter(item => this.isStructuredCap(item));
                 console.log('[CapProductLineManager] Filtered cap results:', capSuggestions.length);
-                
+
+                // Check if we filtered out any beanie/flat headwear products
+                const beanieProducts = suggestions.filter(item =>
+                    ProductCategoryFilter.isFlatHeadwear(item)
+                );
+
+                if (beanieProducts.length > 0 && capSuggestions.length === 0) {
+                    // User searched for a beanie - show warning banner
+                    this.showBeanieWarning(beanieProducts[0]);
+                }
+
                 if (capSuggestions.length > 0) {
                     // Show cap products with helpful note
                     const noteHtml = `
@@ -186,7 +248,10 @@ class CapProductLineManager {
      */
     async loadProductDetails(styleNumber) {
         console.log('[CapProductLineManager] Loading cap details:', styleNumber);
-        
+
+        // Hide beanie warning if it's showing (valid cap is being loaded)
+        this.hideBeanieWarning();
+
         try {
             this.showLoading(true);
             
@@ -250,47 +315,242 @@ class CapProductLineManager {
     }
     
     /**
-     * Populate color dropdown
+     * Populate color dropdown and fetch color swatches
      */
-    populateColorDropdown(colors) {
+    async populateColorDropdown(colors) {
         const colorSelect = document.getElementById('color-select');
         if (!colorSelect) return;
-        
+
         if (colors.length === 0) {
             colorSelect.innerHTML = '<option value="">No colors available</option>';
             colorSelect.disabled = true;
             return;
         }
-        
+
         // Sort colors alphabetically
-        const sortedColors = colors.sort((a, b) => 
+        const sortedColors = colors.sort((a, b) =>
             (a.COLOR_NAME || a.name || '').localeCompare(b.COLOR_NAME || b.name || '')
         );
-        
-        colorSelect.innerHTML = '<option value="">Select color...</option>' + 
+
+        colorSelect.innerHTML = '<option value="">Select color...</option>' +
             sortedColors.map(color => {
                 const colorName = color.COLOR_NAME || color.name || 'Unknown';
                 const catalogColor = color.CATALOG_COLOR || colorName;
                 return `<option value="${colorName}" data-catalog="${catalogColor}">${colorName}</option>`;
             }).join('');
-        
+
         colorSelect.disabled = false;
         console.log('[CapProductLineManager] Colors populated:', sortedColors.length);
+
+        // Fetch and display color swatches if available
+        if (this.currentProduct && this.currentProduct.style) {
+            await this.fetchAndDisplayColorSwatches(this.currentProduct.style);
+        }
+    }
+
+    /**
+     * Fetch and display color swatches from API
+     */
+    async fetchAndDisplayColorSwatches(styleNumber) {
+        const swatchContainer = document.getElementById('color-swatches-container');
+        const colorSelect = document.getElementById('color-select');
+
+        if (!swatchContainer || !colorSelect) {
+            console.warn('[CapProductLineManager] Swatch container or select not found');
+            return;
+        }
+
+        try {
+            console.log('[CapProductLineManager] Fetching color swatches for:', styleNumber);
+
+            // Show loading state
+            swatchContainer.innerHTML = '<div class="color-swatch-loading"><i class="fas fa-spinner fa-spin"></i> Loading colors...</div>';
+            swatchContainer.style.display = 'block';
+
+            // Fetch swatches from API
+            const response = await fetch(`${this.baseURL}/api/color-swatches?styleNumber=${styleNumber}`);
+
+            if (!response.ok) {
+                throw new Error(`Color swatches API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[CapProductLineManager] Color swatches received:', data);
+
+            // API returns array directly, not wrapped in { swatches: [] }
+            const swatches = Array.isArray(data) ? data : (data.swatches || []);
+
+            if (swatches.length === 0) {
+                // No swatches available, keep using dropdown
+                console.log('[CapProductLineManager] No swatches available, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+                return;
+            }
+
+            // 🎯 UX IMPROVEMENT (2025-10-17): Smart "Show More" pattern - Simplified approach
+            // Generate all swatches with "initially-hidden" class for colors beyond first 12
+            const generateSwatchHTML = (swatch, index) => {
+                const colorName = swatch.COLOR_NAME || swatch.name || 'Unknown';
+                const imageUrl = swatch.COLOR_SQUARE_IMAGE || swatch.SWATCH_IMAGE_URL || swatch.swatchUrl || '';
+                const catalogColor = swatch.CATALOG_COLOR || colorName;
+                const isHidden = index >= 12; // Hide swatches beyond the first 12
+
+                if (!imageUrl) {
+                    console.warn('[CapProductLineManager] No image URL for color:', colorName);
+                    return '';
+                }
+
+                return `
+                    <div class="color-swatch ${isHidden ? 'initially-hidden' : ''}"
+                         data-color="${colorName}"
+                         data-catalog="${catalogColor}"
+                         title="${colorName}">
+                        <img src="${imageUrl}"
+                             alt="${colorName}"
+                             class="color-swatch-image"
+                             onerror="this.parentElement.style.display='none'">
+                        <span class="color-swatch-name">${colorName}</span>
+                    </div>
+                `;
+            };
+
+            // Generate HTML for all swatches (no wrapper divs)
+            const swatchesHTML = swatches
+                .map((swatch, index) => generateSwatchHTML(swatch, index))
+                .filter(html => html !== '')
+                .join('');
+
+            const hiddenCount = swatches.length - 12; // Count of hidden swatches
+
+            if (swatchesHTML) {
+                // Display swatches and hide dropdown
+                swatchContainer.innerHTML = swatchesHTML;
+                // Always use grid layout (no wrapper divs to complicate things)
+                swatchContainer.style.display = 'grid';
+                colorSelect.classList.add('swatch-mode');
+
+                // Add "Show More" button if there are hidden swatches
+                if (hiddenCount > 0) {
+                    this.addShowMoreButton(swatchContainer, hiddenCount);
+                }
+
+                // Add click handlers to ALL swatches (visible and hidden)
+                this.attachSwatchClickHandlers(swatchContainer, colorSelect);
+
+                console.log('[CapProductLineManager] ✅ Color swatches displayed:', swatches.length, '(showing', Math.min(12, swatches.length), 'initially)');
+
+                // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
+                // Show the modern swatches section (progressive disclosure pattern)
+                const swatchesSection = document.getElementById('qb-swatches-section');
+                if (swatchesSection) {
+                    swatchesSection.style.display = 'block';
+                    console.log('[CapProductLineManager] ✅ Modern swatches section shown');
+                }
+            } else {
+                // No valid swatches with images, fall back to dropdown
+                console.log('[CapProductLineManager] No valid swatch images, using dropdown');
+                swatchContainer.style.display = 'none';
+                colorSelect.classList.remove('swatch-mode');
+            }
+
+        } catch (error) {
+            console.warn('[CapProductLineManager] Color swatches failed, falling back to dropdown:', error);
+
+            // Hide swatches container and show dropdown
+            swatchContainer.style.display = 'none';
+            colorSelect.classList.remove('swatch-mode');
+
+            // Don't show error to user - dropdown is perfectly fine fallback
+        }
     }
     
     /**
-     * Handle color selection
+     * Add "Show More Colors" button
+     * 🎯 UX IMPROVEMENT (2025-10-17): Progressive disclosure pattern
+     */
+    addShowMoreButton(container, hiddenCount) {
+        const button = document.createElement('button');
+        button.id = 'show-more-colors-btn';
+        button.className = 'qb-show-more-btn';
+        button.innerHTML = `
+            <span class="show-more-text">
+                Show <span id="hidden-color-count">${hiddenCount}</span> More Colors
+            </span>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        `;
+
+        button.addEventListener('click', () => {
+            // 🎯 SIMPLIFIED APPROACH (2025-10-17): Toggle .show-more-active class on #product-phase
+            const productPhase = document.getElementById('product-phase');
+            const isExpanded = productPhase.classList.contains('show-more-active');
+
+            if (isExpanded) {
+                // Collapse - hide swatches with .initially-hidden class
+                productPhase.classList.remove('show-more-active');
+                button.classList.remove('expanded');
+                button.querySelector('.show-more-text').innerHTML =
+                    `Show <span id="hidden-color-count">${hiddenCount}</span> More Colors`;
+            } else {
+                // Expand - reveal swatches with .initially-hidden class
+                productPhase.classList.add('show-more-active');
+                button.classList.add('expanded');
+                button.querySelector('.show-more-text').textContent = 'Show Less';
+            }
+        });
+
+        container.appendChild(button);
+        console.log('[CapProductLineManager] ✅ "Show More" button added for', hiddenCount, 'hidden colors');
+    }
+
+    /**
+     * Attach click handlers to all swatches (visible and hidden)
+     * 🎯 UX IMPROVEMENT (2025-10-17): Universal swatch interaction
+     */
+    attachSwatchClickHandlers(container, colorSelect) {
+        container.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', (e) => {
+                const selectedColor = swatch.dataset.color;
+                const catalogColor = swatch.dataset.catalog;
+
+                // Remove selected class from all swatches
+                container.querySelectorAll('.color-swatch').forEach(s => {
+                    s.classList.remove('selected');
+                });
+
+                // Add selected class to clicked swatch
+                swatch.classList.add('selected');
+
+                // Update dropdown value
+                colorSelect.value = selectedColor;
+
+                // Update catalog color data attribute
+                const selectedOption = Array.from(colorSelect.options).find(opt => opt.value === selectedColor);
+                if (selectedOption) {
+                    selectedOption.setAttribute('data-catalog', catalogColor);
+                }
+
+                // Trigger change event to auto-load product
+                colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                console.log('[CapProductLineManager] ✅ Color swatch selected:', selectedColor, catalogColor);
+            });
+        });
+
+        console.log('[CapProductLineManager] ✅ Click handlers attached to', container.querySelectorAll('.color-swatch').length, 'swatches');
+    }
+
+    /**
+     * Handle color selection - AUTO-LOAD product (2025-10-17)
      */
     handleColorChange(color) {
         if (!color || !this.currentProduct) return;
-        
+
         console.log('[CapProductLineManager] Color selected:', color);
-        
-        // Enable load button
-        const loadBtn = document.getElementById('load-product-btn');
-        if (loadBtn) {
-            loadBtn.disabled = false;
-        }
+
+        // 🎯 AUTO-LOAD IMPROVEMENT (2025-10-17): Match Embroidery builder behavior
+        // Automatically load product when color is selected (no button click needed)
+        this.loadProduct();
     }
     
     /**
@@ -531,14 +791,24 @@ class CapProductLineManager {
             
             this.products.push(product);
             console.log('[CapProductLineManager] ✅ Cap added to quote');
-            
+
             // Update UI
             this.renderProductsList();
             this.updateAggregateTotal();
             this.resetProductForm();
-            
+
             // Check if we can continue to summary
             this.updateContinueButton();
+
+            // 🎯 UX IMPROVEMENT (2025-10-15): Show success toast
+            if (window.ToastNotifications) {
+                ToastNotifications.success(`${product.style} ${product.color} added to quote (${totalQty} pieces)`);
+            }
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productAdded', {
+                detail: { product, source: 'CapProductLineManager' }
+            }))
             
         } catch (error) {
             console.error('[CapProductLineManager] ❌ Failed to add cap:', error);
@@ -574,70 +844,77 @@ class CapProductLineManager {
     
     /**
      * Render products list
+     * 🎨 PHASE 2 (2025-10-15): Modern compact card design
      */
     renderProductsList() {
         const container = document.getElementById('products-container');
         if (!container) return;
-        
+
         if (this.products.length === 0) {
             container.innerHTML = '<p class="empty-message">No caps added yet</p>';
+            document.getElementById('aggregate-total').textContent = '0';
             return;
         }
-        
+
+        let aggregateTotal = 0;
+
         container.innerHTML = this.products.map(product => {
-            const sizesList = Object.entries(product.sizeBreakdown)
-                .filter(([size, qty]) => qty > 0)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(' ');
-            
+            aggregateTotal += product.totalQuantity;
+
+            // Build size breakdown - SMART FILTERING (2025-10-17 POLISH)
+            // Only show sizes with qty >= 1 to reduce visual clutter (hide empty sizes only)
+            // If no meaningful quantities, show top 3 sizes
+            const sizeEntries = Object.entries(product.sizeBreakdown);
+            const significantSizes = sizeEntries.filter(([size, qty]) => qty >= 1);
+            const displaySizes = significantSizes.length > 0 ? significantSizes : sizeEntries.slice(0, 3);
+            const sizeBadges = displaySizes.map(([size, qty]) =>
+                `<span class="size-badge">${size} <strong>×${qty}</strong></span>`
+            ).join('');
+            const sizesTooltip = sizeEntries.map(([size, qty]) => `${size}: ${qty}`).join(', ');
+
             return `
-                <div class="product-item" data-product-id="${product.id}">
-                    <div class="product-item-image">
-                        <img src="${product.imageUrl || `https://via.placeholder.com/60x60/4cb354/white?text=${product.style}`}" alt="${product.style}">
+                <div class="product-card-modern" data-product-id="${product.id}">
+                    <!-- Product Thumbnail (80px) -->
+                    <img src="${product.imageUrl || 'https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent(product.style)}"
+                         alt="${product.style}"
+                         onerror="this.src='https://via.placeholder.com/80x80/4cb354/white?text=' + encodeURIComponent('${product.style}')"
+                         class="product-card-image">
+
+                    <!-- Product Info (flexible width) -->
+                    <div class="product-card-info">
+                        <h4 class="product-card-title">${product.style}</h4>
+                        <p class="product-card-subtitle">${product.title}</p>
+                        <div class="product-card-meta">
+                            <span class="color-badge">${product.color}</span>
+                            <span class="qty-badge">${product.totalQuantity} pcs</span>
+                        </div>
+                        <!-- Size Breakdown (all sizes visible) -->
+                        <div class="product-card-sizes" title="${sizesTooltip}">
+                            ${sizeBadges}
+                        </div>
                     </div>
-                    <div class="product-item-info">
-                        <h4>${product.style} - ${product.title}</h4>
-                        <p>${product.brand} | ${product.color}</p>
-                        <p class="sizes">${sizesList}</p>
-                        <p class="quantity"><strong>Total: ${product.totalQuantity} caps</strong></p>
-                    </div>
-                    <div class="product-item-actions">
-                        <button class="btn-sm btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})">
-                            <i class="fas fa-trash"></i> Remove
+
+                    <!-- Actions (120px) -->
+                    <div class="product-card-actions">
+                        <button class="btn-icon btn-danger" onclick="window.capProductLineManager.removeProduct(${product.id})" title="Remove">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
-    }
-    
-    /**
-     * Remove product from quote
-     */
-    removeProduct(productId) {
-        const index = this.products.findIndex(p => p.id === productId);
-        if (index > -1) {
-            this.products.splice(index, 1);
-            console.log('[CapProductLineManager] Product removed:', productId);
-            
-            this.renderProductsList();
-            this.updateAggregateTotal();
-            this.updateContinueButton();
-        }
-    }
-    
-    /**
-     * Update aggregate total and tier indicator
-     */
-    updateAggregateTotal() {
-        const totalQty = this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
-        
-        const totalSpan = document.getElementById('aggregate-total');
-        if (totalSpan) {
-            totalSpan.textContent = totalQty;
-        }
-        
+
+        document.getElementById('aggregate-total').textContent = aggregateTotal;
+
         // Update tier indicator
+        this.updateTierIndicator(aggregateTotal);
+    }
+
+    /**
+     * Update tier indicator based on aggregate quantity
+     * 🎨 PHASE 2 (2025-10-15): Helper for tier display
+     */
+    updateTierIndicator(totalQty) {
         const tierIndicator = document.getElementById('tier-indicator');
         if (tierIndicator) {
             let tierText = '';
@@ -649,7 +926,43 @@ class CapProductLineManager {
             }
             tierIndicator.textContent = tierText;
         }
-        
+    }
+    
+    /**
+     * Remove product from quote
+     */
+    removeProduct(productId) {
+        const index = this.products.findIndex(p => p.id === productId);
+        if (index > -1) {
+            const removedProduct = this.products[index];
+            this.products.splice(index, 1);
+            console.log('[CapProductLineManager] Product removed:', productId);
+
+            this.renderProductsList();
+            this.updateAggregateTotal();
+            this.updateContinueButton();
+
+            // Trigger quote indicator update
+            document.dispatchEvent(new CustomEvent('productRemoved', {
+                detail: { productId, product: removedProduct, source: 'CapProductLineManager' }
+            }));
+        }
+    }
+    
+    /**
+     * Update aggregate total and tier indicator
+     */
+    updateAggregateTotal() {
+        const totalQty = this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
+
+        const totalSpan = document.getElementById('aggregate-total');
+        if (totalSpan) {
+            totalSpan.textContent = totalQty;
+        }
+
+        // Update tier indicator using dedicated function
+        this.updateTierIndicator(totalQty);
+
         // Dispatch event for pricing updates
         window.dispatchEvent(new CustomEvent('capProductsChanged', {
             detail: { products: this.products, totalQuantity: totalQty }
@@ -668,20 +981,43 @@ class CapProductLineManager {
     
     /**
      * Reset product form
+     * CRITICAL: Hides ALL elements to return to clean search state (2025 UX)
      */
     resetProductForm() {
+        // Clear search input
+        document.getElementById('style-search').value = '';
+
+        // Reset color dropdown
+        document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
+        document.getElementById('color-select').disabled = true;
+
+        // 🎯 CRITICAL FIX (2025-10-15): Hide swatches section after adding product
+        // This returns the interface to a clean search state (progressive disclosure pattern)
+        const swatchesSection = document.getElementById('qb-swatches-section');
+        if (swatchesSection) {
+            swatchesSection.style.display = 'none';
+            console.log('[CapProductLineManager] ✅ Swatches section hidden (clean state)');
+        }
+
+        // Clear swatches container
+        const swatchContainer = document.getElementById('color-swatches-container');
+        if (swatchContainer) {
+            swatchContainer.innerHTML = '';
+        }
+
+        // Hide product display
         const display = document.getElementById('product-display');
         if (display) {
             display.style.display = 'none';
         }
-        
-        document.getElementById('style-search').value = '';
-        document.getElementById('color-select').innerHTML = '<option value="">Select style first</option>';
-        document.getElementById('color-select').disabled = true;
-        document.getElementById('load-product-btn').disabled = true;
-        
+
+        // Load Product button removed (2025-10-17) - No longer needed with auto-load
+
+        // Reset state
         this.currentProduct = null;
         this.availableSizes = [];
+
+        console.log('[CapProductLineManager] ✅ Form reset to clean search state');
     }
     
     /**
@@ -706,6 +1042,48 @@ class CapProductLineManager {
      */
     getTotalQuantity() {
         return this.products.reduce((sum, p) => sum + p.totalQuantity, 0);
+    }
+
+    /**
+     * Show warning banner when beanie product is searched
+     * @param {Object} product - The beanie/flat headwear product that was searched
+     */
+    showBeanieWarning(product) {
+        const banner = document.getElementById('beanie-warning-banner');
+        if (!banner) {
+            console.warn('[CapProductLineManager] Warning banner element not found');
+            return;
+        }
+
+        // Update banner text with product name
+        const productName = product.label || product.PRODUCT_TITLE || 'this product';
+        const warningText = banner.querySelector('.warning-text strong');
+        if (warningText) {
+            warningText.textContent = `"${productName}" is a beanie/flat headwear product`;
+        }
+
+        // Show banner with animation
+        banner.style.display = 'block';
+
+        // Set up dismiss button
+        const dismissBtn = document.getElementById('dismiss-beanie-warning');
+        if (dismissBtn) {
+            dismissBtn.onclick = () => {
+                banner.style.display = 'none';
+            };
+        }
+
+        console.log('[CapProductLineManager] 🔔 Showing beanie warning for:', productName);
+    }
+
+    /**
+     * Hide beanie warning banner
+     */
+    hideBeanieWarning() {
+        const banner = document.getElementById('beanie-warning-banner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
     }
 }
 

@@ -1,27 +1,68 @@
-/*
- * Universal Pricing Header CSS
- * Consistent brand header for all pricing calculator pages
- * Green theme matching the mockup (#3a7c52)
+/**
+ * UNIVERSAL PRICING HEADER
+ * Consistent header design for all pricing calculators
+ * Version: 1.0
+ * Created: 2025-01-10
+ *
+ * Used by: DTG, DTF, Screen Print, Embroidery, Cap Embroidery calculators
+ *
+ * Three-tier header structure:
+ * 1. Contact Bar (dark green) - Phone, email, business hours
+ * 2. Logo Bar (white) - Company branding
+ * 3. Context Bar (light gray) - Breadcrumbs, calculator badge, search
  */
 
-/* Header Container */
-.universal-pricing-header {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
-    color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 100;
+/* ==========================================
+   CSS VARIABLES
+   ========================================== */
+:root {
+    --primary-color: #4cb354;  /* NWCA Green */
+    --primary-dark: #409a47;   /* Dark Green */
+    --primary-light: #e8f5e9;  /* Light Green */
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #e5e7eb;
+    --bg-white: #ffffff;
+    --bg-light: #f9f9f9;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* Top Contact Bar */
-.universal-header-contact-bar {
-    background: rgba(0, 0, 0, 0.1);
-    padding: 8px 0;
+/* ==========================================
+   BODY ADJUSTMENT
+   ========================================== */
+body.pricing-calculator-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-top: 180px;  /* Space for fixed header */
+}
+
+/* ==========================================
+   HEADER CONTAINER
+   ========================================== */
+.enhanced-pricing-header {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* ==========================================
+   TIER 1: CONTACT BAR
+   ========================================== */
+.header-contact-bar {
+    background: var(--primary-dark);  /* Dark green background */
+    color: white;
+    padding: 10px 0;
     font-size: 14px;
 }
 
-.universal-header-contact-content {
-    max-width: 1200px;
+.contact-bar-content {
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
@@ -29,207 +70,379 @@
     align-items: center;
 }
 
-.universal-header-contact-left {
+.contact-info {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     align-items: center;
 }
 
-.universal-header-contact-item {
+.contact-item {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.contact-item i {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.contact-link {
     color: white;
     text-decoration: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.2s ease;
 }
 
-.universal-header-contact-item:hover {
+.contact-link:hover {
     opacity: 0.8;
-    color: white;
+    text-decoration: underline;
 }
 
-.universal-header-contact-icon {
-    font-size: 16px;
+.business-hours {
+    font-size: 13px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* Main Header */
-.universal-header-main {
-    padding: 20px 0;
+/* ==========================================
+   TIER 2: LOGO/NAVIGATION BAR
+   ========================================== */
+.header-nav {
+    padding: 15px 0;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.universal-header-main-content {
-    max-width: 1200px;
+.nav-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    display: inline-block;
+    line-height: 0;  /* Remove extra space around image */
+}
+
+.logo-image {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+
+/* ==========================================
+   TIER 3: PRICING CONTEXT BAR
+   ========================================== */
+.pricing-context-bar {
+    background: var(--bg-light);
+    border-bottom: 2px solid var(--primary-color);
+    padding: 15px 0;
+}
+
+.context-bar-content {
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
-/* Logo Area */
-.universal-header-logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    text-decoration: none;
-    color: white;
-}
-
-.universal-header-logo-text {
+.context-left {
     display: flex;
     flex-direction: column;
+    gap: 8px;
 }
 
-.universal-header-company-name {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.universal-header-tagline {
+/* ==========================================
+   BREADCRUMB NAVIGATION
+   ========================================== */
+.breadcrumb {
+    color: var(--text-secondary);
     font-size: 14px;
-    opacity: 0.9;
-    margin: 0;
-}
-
-/* Navigation */
-.universal-header-nav {
-    display: flex;
-    gap: 30px;
-    align-items: center;
-}
-
-.universal-header-nav-link {
-    color: white;
-    text-decoration: none;
     font-weight: 500;
-    font-size: 16px;
-    padding: 8px 0;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s;
-}
-
-.universal-header-nav-link:hover {
-    color: white;
-    border-bottom-color: white;
-    opacity: 0.9;
-}
-
-.universal-header-nav-link.active {
-    border-bottom-color: white;
-}
-
-/* CTA Buttons */
-.universal-header-cta-group {
     display: flex;
-    gap: 15px;
     align-items: center;
+    gap: 8px;
 }
 
-.universal-header-btn {
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: 600;
+.breadcrumb a {
+    color: var(--primary-color);
     text-decoration: none;
-    transition: all 0.3s;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+.breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ==========================================
+   CALCULATOR TYPE BADGE (NEW)
+   ========================================== */
+.calculator-type-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    background: var(--primary-color);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.calculator-type-badge i {
+    font-size: 16px;
+}
+
+.badge-text {
+    white-space: nowrap;
+}
+
+/* ==========================================
+   SEARCH WRAPPER
+   ========================================== */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    min-width: 350px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+}
+
+.search-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background: var(--primary-dark);
+}
+
+.search-btn i {
+    font-size: 16px;
+}
+
+/* ==========================================
+   SEARCH RESULTS DROPDOWN
+   ========================================== */
+.search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 50px;  /* Account for search button */
+    background: var(--primary-color) !important;  /* Green background */
+    border: 1px solid var(--primary-dark);
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    z-index: 2000;
+    box-shadow: var(--shadow-md);
+}
+
+.search-results.active {
+    display: block;
+}
+
+.search-loading,
+.search-no-results {
+    padding: 16px;
+    text-align: center;
+    color: white !important;  /* White text on green */
     font-size: 14px;
 }
 
-.universal-header-btn-secondary {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.search-result-item {
+    background: transparent !important;  /* Transparent by default */
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);  /* Subtle white border */
+    transition: background-color 0.2s ease;
 }
 
-.universal-header-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
-    transform: translateY(-1px);
+.search-result-item:hover {
+    background-color: var(--primary-dark) !important;  /* Darker green on hover */
 }
 
-.universal-header-btn-primary {
-    background: white;
-    color: #3a7c52;
-    border: 1px solid white;
+.search-result-item:last-child {
+    border-bottom: none;
 }
 
-.universal-header-btn-primary:hover {
-    background: #f8f9fa;
-    color: #2d5f3f;
-    transform: translateY(-1px);
+.search-result-style {
+    font-weight: 600;
+    color: white !important;  /* White text */
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
 }
 
-/* Page Title Section */
-.universal-pricing-page-title {
-    background: #f8f9fa;
-    padding: 30px 0;
-    border-bottom: 1px solid #e9ecef;
+.search-result-desc {
+    color: rgba(255, 255, 255, 0.9) !important;  /* Slightly transparent white */
+    font-size: 13px;
+    display: block;
 }
 
-.universal-page-title-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+.search-result-name {
+    color: rgba(255, 255, 255, 0.9) !important;  /* Slightly transparent white */
+    font-size: 13px;
+    display: block;
 }
 
-.universal-page-title {
-    font-size: 32px;
-    font-weight: 700;
-    color: #333;
-    margin: 0 0 10px 0;
+/* Search results sections (for grouped results) */
+.search-results-section {
+    /* Allow sections if needed */
 }
 
-.universal-page-subtitle {
-    font-size: 18px;
-    color: #666;
-    margin: 0;
+.search-results-title {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white !important;  /* White text */
+    text-transform: uppercase;
+    background: var(--primary-dark);  /* Dark green background */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Mobile Responsiveness */
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+    .search-wrapper {
+        min-width: 300px;
+    }
+}
+
 @media (max-width: 768px) {
-    .universal-header-contact-content {
+    body.pricing-calculator-page {
+        padding-top: 240px;  /* More space for stacked header */
+    }
+
+    .contact-bar-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .contact-info {
         flex-direction: column;
         gap: 10px;
-        text-align: center;
     }
-    
-    .universal-header-contact-left {
+
+    .context-bar-content {
         flex-direction: column;
-        gap: 10px;
+        align-items: stretch;
     }
-    
-    .universal-header-main-content {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+
+    .context-left {
+        width: 100%;
     }
-    
-    .universal-header-nav {
+
+    .calculator-type-badge {
+        justify-content: center;
+    }
+
+    .search-wrapper {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .search-results {
+        right: 0;  /* Full width on mobile */
+    }
+
+    .breadcrumb {
+        font-size: 12px;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
     }
-    
-    .universal-header-cta-group {
-        flex-direction: column;
-        width: 100%;
+}
+
+@media (max-width: 480px) {
+    body.pricing-calculator-page {
+        padding-top: 260px;  /* Even more space for smaller screens */
     }
-    
-    .universal-header-btn {
-        width: 100%;
-        justify-content: center;
+
+    .logo-image {
+        height: 32px;
     }
-    
-    .universal-page-title {
-        font-size: 24px;
+
+    .calculator-type-badge {
+        font-size: 12px;
+        padding: 5px 12px;
     }
-    
-    .universal-page-subtitle {
-        font-size: 16px;
+
+    .search-input {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .contact-item {
+        font-size: 12px;
+    }
+
+    .business-hours {
+        font-size: 12px;
     }
 }

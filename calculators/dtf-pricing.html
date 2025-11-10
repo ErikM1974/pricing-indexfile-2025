@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTF Transfer Pricing | NWCA</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Universal Pricing CSS - Load FIRST for proper theming -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
+    
+    <!-- Existing styles -->
+    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css">
+    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-system.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-product-display.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css">
+    
+    <!-- DTF Calculator CSS -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-calculator.css">
+
+    <!-- DTF Calculator Fix CSS - Fixes styling issues and ensures proper theming -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-calculator-fix.css">
+
+    <!-- DTF Toggle Pricing Interface -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-toggle-pricing.css?v=20251008-fix">
+    <!-- Universal LTM Quantity Input CSS (shared across all calculators) -->
+    <link rel="stylesheet" href="/shared_components/css/universal-ltm-quantity-input.css?v=20251009">
+
+    <!-- Universal Toggle Pricing CSS for consistency across all calculators -->
+    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008-fix2">
+
+    <!-- FORCE GREEN THEME - Load LAST to override everything -->
+    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css?v=20251008">
+
+    <!-- DTF Outline Override - Load AFTER force-green-theme to ensure outline style -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-outline-override.css?v=20251008-fix2">
+
+    <!-- jsPDF Libraries for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        /* CRITICAL: Override blue theme with green - MUST be inline to override JS */
+        :root {
+            --primary-color: #4cb354 !important;  /* Updated to match DTG green */
+            --primary: #4cb354 !important;
+            --primary-dark: #409a47 !important;  /* Updated to match DTG dark green */
+            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
+            --nwca-primary: #4cb354 !important;
+        }
+        
+        /* Enhanced Header Styles for DTF */
+        body.dtf-pricing-page {
+            padding-top: 180px; /* Space for fixed header */
+        }
+        
+        .enhanced-pricing-header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        /* Top contact bar */
+        .header-contact-bar {
+            background: #409a47;  /* Updated to match DTG dark green */
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contact-item i {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .business-hours {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* Main navigation header */
+        .header-nav {
+            padding: 15px 0;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-link {
+            display: inline-block;
+        }
+        
+        .logo-image {
+            height: 40px;
+            width: auto;
+        }
+        
+        /* Pricing Context Bar */
+        .pricing-context-bar {
+            background: #f8f9fa;
+            border-bottom: 2px solid #4cb354;  /* Updated to match DTG green */
+            padding: 15px 0;
+        }
+        
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breadcrumb {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4cb354;  /* Updated to match DTG green */
+        }
+        
+        /* Live Pricing Display */
+        .header-live-pricing {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .header-price-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .header-price-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .header-price-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .header-price-value.highlight {
+            color: #4cb354;  /* Updated to match DTG green */
+            font-size: 24px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body.dtf-pricing-page {
+                padding-top: 220px;
+            }
+            
+            .contact-bar-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .context-bar-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-live-pricing {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        /* Hide universal header since we're using enhanced header */
+        #universal-header-container {
+            display: none !important;
+        }
+        
+        /* Force green header styling */
+        #universal-header-container .header-main,
+        .universal-header,
+        .pricing-header,
+        .header-container {
+            background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;  /* Updated to match DTG gradient */
+        }
+        
+        /* Override any blue colors in buttons and links */
+        .btn-primary,
+        .action-btn,
+        .dtf-btn,
+        button[type="submit"] {
+            background-color: #4cb354 !important;  /* Updated to match DTG green */
+            border-color: #4cb354 !important;
+        }
+
+        .btn-primary:hover,
+        .action-btn:hover,
+        .dtf-btn:hover,
+        button[type="submit"]:hover {
+            background-color: #409a47 !important;  /* Updated to match DTG dark green */
+            border-color: #409a47 !important;
+        }
+        
+        a {
+            color: #4cb354 !important;  /* Updated to match DTG green */
+        }
+        
+        /* DTF Calculator specific overrides */
+        .dtf-calculator-header {
+            background: #4cb354 !important;  /* Updated to match DTG green */
+        }
+
+        .dtf-price-display {
+            color: #4cb354 !important;  /* Updated to match DTG green */
+            border-color: #4cb354 !important;
+        }
+        
+        /* Critical internal-only hiding styles - must be inline for immediate effect */
+        .internal-only {
+            display: none !important;
+        }
+        
+        .accordion-item.internal-only {
+            display: none !important;
+        }
+        
+        body.show-internal .internal-only,
+        body.show-internal .accordion-item.internal-only {
+            display: block !important;
+        }
+        
+        /* Page layout styles */
+        .product-page-columns-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .product-context-column {
+            flex: 0 0 350px;
+            min-width: 0;
+        }
+        
+        .product-interactive-column {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        /* Hide old calculator sections */
+        #add-to-cart-section {
+            display: none;
+        }
+        
+        /* Page header styles */
+        .page-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 992px) {
+            .product-page-columns-container {
+                flex-direction: column;
+            }
+            
+            .product-context-column {
+                flex: 1;
+                max-width: 100%;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+        /* Breadcrumb Links */
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Search Wrapper */
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-loading {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .search-no-results {
+            padding: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-style {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .search-result-desc {
+            color: #666;
+            font-size: 0.875rem;
+            margin-top: 2px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Product Hero Section */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .product-hero:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.3);
+        }
+
+        /* Responsive adjustments for product hero */
+        @media (max-width: 768px) {
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="pricing-calculator-page">
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- TIER 1: Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-922-5793" class="contact-link">253-922-5793</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:sales@nwcustomapparel.com" class="contact-link">sales@nwcustomapparel.com</a>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2: Logo/Navigation Bar -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 3: Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb Navigation -->
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="/">Home</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <a href="/product.html" id="products-breadcrumb">Products</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">DTF Pricing</span>
+                    </nav>
+
+                    <!-- Calculator Type Badge -->
+                    <div class="calculator-type-badge">
+                        <i class="fas fa-file-image"></i>
+                        <span class="badge-text">DTF Transfer Pricing Calculator</span>
+                    </div>
+                </div>
+
+                <!-- Search Wrapper -->
+                <div class="search-wrapper">
+                    <input type="text"
+                           class="search-input"
+                           id="styleSearch"
+                           placeholder="Search by style number or name..."
+                           autocomplete="off"
+                           role="combobox"
+                           aria-label="Search products"
+                           aria-autocomplete="list"
+                           aria-controls="searchResults"
+                           aria-expanded="false">
+                    <button class="search-btn" id="searchBtn" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <!-- Search Results Dropdown -->
+                    <div id="searchResults" class="search-results" role="listbox" aria-live="polite">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content Container -->
+    <div class="container-fluid" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading product information...</p>
+        </div>
+
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Product Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading product information...</p>
+
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Natural</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#PC54</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port & Company</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-page-columns-container">
+            <!-- Right Column: DTF Calculator -->
+            <div class="product-interactive-column">
+                <!-- DTF Calculator Container -->
+                <div id="dtf-calculator-container">
+                    <div class="dtf-calculator-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading calculator...</span>
+                    </div>
+                </div>
+                
+                <!-- Quote System Integration (hidden but available for future use) -->
+                <div id="add-to-cart-section" style="display: none;">
+                    <!-- Quote system placeholder -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Existing JavaScript Files -->
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/utils.js"></script>
+    <script src="/shared_components/js/pricing-pages.js"></script>
+    <script src="/shared_components/js/pricing-matrix-capture.js"></script>
+    <script src="/shared_components/js/pricing-matrix-api.js"></script>
+    <script src="/shared_components/js/dp5-helper.js"></script>
+    <script src="/product-url-handler.js"></script>
+    
+    <!-- DTF Calculator V2 Scripts -->
+    <script src="/shared_components/js/dtf-config.js"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js"></script>
+    <script src="/shared_components/js/dtf-pricing-calculator.js"></script>
+    <script src="/shared_components/js/dtf-adapter.js"></script>
+    <script src="/shared_components/js/dtf-integration.js"></script>
+    
+    <!-- Universal Components -->
+    <script src="/shared_components/js/universal-header-component.js"></script>
+    <script src="/shared_components/js/universal-product-display.js"></script>
+    <script src="/shared_components/js/universal-image-gallery.js"></script>
+
+    <!-- Manual Pricing Mode Indicator -->
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
+    
+    <!-- DTF Page Initialization -->
+    <script>
+        // Initialize DTF page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[DTF] Page initialized with V2 calculator');
+
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualDTFPricing(parseFloat(manualCost));
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW
+            console.log('===================================');
+            console.log('🚀 DTF Pricing System: API-Powered Calculator');
+            console.log('📡 API endpoint: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF');
+            console.log('📊 Using live pricing data from Caspio tables');
+            console.log('✅ Labor cost, freight, and transfer prices from API');
+            console.log('===================================');
+
+            // Listen for product data from existing pricing-pages.js system
+            const styleNumber = urlParams.get('StyleNumber');
+            console.log('🚀 [DTF] Initial URL check - StyleNumber:', styleNumber);
+
+            // Listen for the productColorsReady event that's already working
+            window.addEventListener('productColorsReady', function(e) {
+                console.log('✅ [DTF] Received productColorsReady event:', e.detail);
+
+                // Extract data from event - now includes top-level fields
+                const productData = {
+                    productTitle: e.detail.productTitle,
+                    PRODUCT_DESCRIPTION: e.detail.productDescription,
+                    BRAND_NAME: e.detail.brandName,
+                    colors: e.detail.colors,
+                    selectedColor: e.detail.selectedColor,
+                    // Pass through full product data for calculator
+                    product: e.detail
+                };
+
+                // Use the working data to update our UI
+                updateProductInfo(productData, e.detail.styleNumber || styleNumber);
+
+                // Update DTF calculator with full product data for upcharge tooltip
+                // Check both possible calculator locations
+                const calculator = window.dtfCalculator || window.dtfIntegration?.calculator;
+                if (calculator && e.detail) {
+                    console.log('🎯 [DTF] Updating calculator with product upcharges and sizes');
+                    console.log('📍 [DTF] Calculator found at:', window.dtfCalculator ? 'window.dtfCalculator' : 'window.dtfIntegration.calculator');
+
+                    // Set upcharges data
+                    if (e.detail.sellingPriceDisplayAddOns || e.detail.upcharges) {
+                        calculator.productUpcharges = e.detail.sellingPriceDisplayAddOns || e.detail.upcharges || {};
+                        console.log('✅ [DTF] Upcharges set:', calculator.productUpcharges);
+                    }
+
+                    // Set sizes data
+                    if (e.detail.sizes) {
+                        calculator.productSizes = Array.isArray(e.detail.sizes)
+                            ? e.detail.sizes.map(s => s.size || s)
+                            : [];
+                        console.log('✅ [DTF] Sizes set:', calculator.productSizes);
+                    }
+
+                    // Force tooltip update if it's visible
+                    if (calculator.updateUpchargeTooltipContent && typeof calculator.updateUpchargeTooltipContent === 'function') {
+                        console.log('🔄 [DTF] Forcing tooltip content update');
+                        calculator.updateUpchargeTooltipContent();
+                    }
+                } else {
+                    console.warn('⚠️ [DTF] Calculator not found yet, data may be picked up by event listener');
+                }
+
+                // Hide loading, show product
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('productHero').style.display = 'block';
+                console.log('✨ [DTF] Product display complete from event');
+            });
+
+            // Fallback: Show product hero after 3 seconds even if event doesn't fire
+            setTimeout(function() {
+                const loadingState = document.getElementById('loadingState');
+                const productHero = document.getElementById('productHero');
+
+                if (loadingState && loadingState.style.display !== 'none') {
+                    console.log('⏱️ [DTF] Fallback timer: Showing product hero after 3s');
+                    loadingState.style.display = 'none';
+                    productHero.style.display = 'block';
+
+                    // Set basic fallback info if we don't have product data yet
+                    if (styleNumber) {
+                        document.getElementById('productTitle').textContent = styleNumber;
+                        document.getElementById('productDescription').textContent = 'Direct-to-Film transfer printing';
+                        document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+                        document.getElementById('currentBrand').textContent = getBrandFromStyle(styleNumber);
+                    }
+                }
+            }, 3000);
+
+            // Setup search functionality
+            setupSearch();
+            
+            // Handle calculator ready state
+            setTimeout(function() {
+                const loadingDiv = document.querySelector('.dtf-calculator-loading');
+                if (loadingDiv) {
+                    loadingDiv.style.display = 'none';
+                }
+            }, 100);
+            
+            // Listen for product data updates
+            window.addEventListener('productDataUpdated', function(event) {
+                console.log('[DTF] Product data updated:', event.detail);
+
+                // Extract pricing data
+                const productData = event.detail;
+                const pricingData = {
+                    garmentCost: productData.price || productData.basePrice || productData.garmentPrice || 0,
+                    quantity: productData.quantity || 24,
+                    productInfo: {
+                        name: productData.name || productData.productName || productData.title,
+                        sku: productData.sku || productData.styleNumber,
+                        image: productData.imageUrl || productData.image
+                    }
+                };
+
+                // Update DTF calculator via adapter - force immediate update for product changes
+                if (window.DTFAdapter) {
+                    window.DTFAdapter.updateData(pricingData);
+
+                    // Also trigger refresh on the calculator directly if it exists
+                    if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                        setTimeout(() => {
+                            console.log('[DTF] Triggering calculator refresh after product update');
+                            window.dtfIntegration.calculator.refreshTransferPricing();
+                        }, 100);
+                    }
+                }
+            });
+            
+            // Listen for pricing data loaded event (from DTG/pricing system)
+            window.addEventListener('pricingDataLoaded', async function(event) {
+                console.log('[DTF] Pricing data loaded:', event.detail);
+
+                // Check if this is fallback pricing data
+                if (event.detail && event.detail.isFallback) {
+                    console.log('[DTF] Detected fallback pricing - fetching real garment costs from API');
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const styleNumber = event.detail.styleNumber || urlParams.get('StyleNumber');
+                    if (styleNumber && window.DTFAdapter) {
+                        const realCost = await window.DTFAdapter.fetchAndSetGarmentCost(styleNumber);
+                        if (realCost !== null) {
+                            console.log('[DTF] Successfully fetched real garment cost:', realCost);
+                            // Force a refresh after API cost is loaded
+                            if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                                setTimeout(() => {
+                                    window.dtfIntegration.calculator.refreshTransferPricing();
+                                }, 50);
+                            }
+                            return; // Exit early, we've set the real cost
+                        }
+                    }
+                }
+
+                if (event.detail && event.detail.prices) {
+                    // Extract base garment price from first tier, first size group
+                    // For DTF, we need the garment-only price (0 colors/locations)
+                    let garmentPrice = 0;
+
+                    // Try to get price from first size group and first tier
+                    const sizeGroups = Object.keys(event.detail.prices);
+                    if (sizeGroups.length > 0) {
+                        const firstSizeGroup = sizeGroups[0];
+                        const tierPrices = event.detail.prices[firstSizeGroup];
+                        const firstTier = Object.keys(tierPrices)[0];
+                        if (firstTier && tierPrices[firstTier]) {
+                            garmentPrice = tierPrices[firstTier];
+                        }
+                    }
+
+                    const pricingData = {
+                        garmentCost: garmentPrice,
+                        quantity: 24, // Default quantity
+                        productInfo: {
+                            name: event.detail.productTitle,
+                            sku: event.detail.styleNumber,
+                            color: event.detail.color
+                        }
+                    };
+
+                    if (window.DTFAdapter) {
+                        window.DTFAdapter.updateData(pricingData);
+
+                        // Force refresh after pricing data is loaded
+                        if (window.dtfIntegration && window.dtfIntegration.calculator) {
+                            setTimeout(() => {
+                                window.dtfIntegration.calculator.refreshTransferPricing();
+                            }, 100);
+                        }
+                    }
+                }
+            });
+            
+            // Listen for pricing matrix API events
+            window.addEventListener('pricingMatrixDataAvailable', function(event) {
+                console.log('[DTF] Pricing matrix data available:', event.detail);
+                
+                // Try to get garment price from the pricing matrix
+                if (event.detail && event.detail.data) {
+                    // Look for the base garment price (usually first row or "0" colors)
+                    let garmentPrice = 0;
+                    
+                    // Check if data has a structure like DTG or screen print
+                    if (event.detail.data.primaryLocationPricing && event.detail.data.primaryLocationPricing["0"]) {
+                        // Screen print style data structure
+                        const zeroColorPricing = event.detail.data.primaryLocationPricing["0"];
+                        if (zeroColorPricing.tiers && zeroColorPricing.tiers.length > 0) {
+                            const firstTier = zeroColorPricing.tiers[0];
+                            const sizes = Object.keys(firstTier.prices || {});
+                            if (sizes.length > 0) {
+                                garmentPrice = firstTier.prices[sizes[0]];
+                            }
+                        }
+                    } else if (event.detail.data.rows) {
+                        // Table-based structure
+                        const rows = event.detail.data.rows;
+                        if (rows.length > 0 && rows[0].cells && rows[0].cells.length > 1) {
+                            // Try to parse the first price cell
+                            const priceText = rows[0].cells[1];
+                            const price = parseFloat(priceText.replace(/[$,]/g, ''));
+                            if (!isNaN(price)) {
+                                garmentPrice = price;
+                            }
+                        }
+                    }
+                    
+                    if (garmentPrice > 0) {
+                        const pricingData = {
+                            garmentCost: garmentPrice,
+                            quantity: 24,
+                            productInfo: {
+                                name: event.detail.productTitle || window.selectedColorName,
+                                sku: event.detail.styleNumber || urlParams.get('StyleNumber')
+                            }
+                        };
+                        
+                        console.log('[DTF] Sending garment price from matrix:', pricingData);
+                        if (window.DTFAdapter) {
+                            window.DTFAdapter.updateData(pricingData);
+                        }
+                    }
+                }
+            });
+            
+            // Also listen for pricing matrix data (legacy support)
+            window.addEventListener('pricingMatrixDataReceived', function(event) {
+                console.log('[DTF] Pricing matrix data received:', event.detail);
+                
+                if (event.detail && event.detail.price) {
+                    const pricingData = {
+                        garmentCost: event.detail.price,
+                        quantity: event.detail.quantity || 24
+                    };
+                    
+                    if (window.DTFAdapter) {
+                        window.DTFAdapter.updateData(pricingData);
+                    }
+                }
+            });
+            
+            // Check for initial URL parameters
+            // urlParams already declared above, reusing it
+            const initialData = {};
+            let hasData = false;
+            
+            // Map common parameter names
+            const garmentCost = urlParams.get('price') || urlParams.get('garmentCost') || urlParams.get('cost');
+            const quantity = urlParams.get('quantity') || urlParams.get('qty');
+            const productName = urlParams.get('productName') || urlParams.get('name');
+            const sku = urlParams.get('sku');
+            
+            if (garmentCost) {
+                initialData.garmentCost = parseFloat(garmentCost);
+                hasData = true;
+            }
+            
+            if (quantity) {
+                initialData.quantity = parseInt(quantity);
+                hasData = true;
+            }
+            
+            if (productName || sku) {
+                initialData.productInfo = {
+                    name: productName,
+                    sku: sku
+                };
+                hasData = true;
+            }
+            
+            // Send initial data if available
+            if (hasData && window.DTFAdapter) {
+                console.log('[DTF] Sending initial URL data:', initialData);
+                window.DTFAdapter.updateData(initialData);
+            }
+            
+            // Listen for API errors
+            window.addEventListener('dtfApiError', function(event) {
+                console.error('[DTF] API Error detected:', event.detail);
+                
+                // Show user-friendly error message
+                const container = document.getElementById('dtf-calculator-container');
+                if (container) {
+                    const errorHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">
+                                <i class="fas fa-exclamation-circle"></i> Connection Error
+                            </h4>
+                            <p>We're unable to retrieve pricing information at this time.</p>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Please call for a quote: 253-922-5793</strong><br>
+                                <small>Error: ${event.detail.error || 'Network connection failed'}</small>
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Insert error at the top of the calculator
+                    const existingError = container.querySelector('.alert-danger');
+                    if (!existingError) {
+                        container.insertAdjacentHTML('afterbegin', errorHTML);
+                    }
+                }
+            });
+            
+            // Dispatch event to signal DTF page is ready
+            window.dispatchEvent(new CustomEvent('dtfPageReady', {
+                detail: {
+                    embellishmentType: 'dtf',
+                    calculatorVersion: 'v2',
+                    useQuoteSystem: false
+                }
+            }));
+            
+            // Try to fetch pricing data if not received after a delay
+            setTimeout(function() {
+                if (!window.DTFAdapter || !window.DTFAdapter.getData || window.DTFAdapter.getData().garmentCost === 0) {
+                    console.log('[DTF] No pricing data received, attempting to fetch...');
+                    
+                    // Try to trigger pricing data load
+                    if (window.PricingMatrixAPI && window.PricingMatrixAPI.fetchPricingData) {
+                        const styleNumber = urlParams.get('StyleNumber');
+                        const color = urlParams.get('COLOR') || urlParams.get('color');
+                        
+                        if (styleNumber) {
+                            console.log('[DTF] Requesting pricing data for:', styleNumber, color);
+                            window.PricingMatrixAPI.fetchPricingData(styleNumber, 'dtf', color);
+                        }
+                    }
+                    
+                    // Also try to get data from the pricing matrix if it exists
+                    if (window.PricingMatrix && window.PricingMatrix.data) {
+                        console.log('[DTF] Found existing pricing matrix data:', window.PricingMatrix.data);
+                        // Dispatch event with the data
+                        window.dispatchEvent(new CustomEvent('pricingMatrixDataAvailable', {
+                            detail: {
+                                data: window.PricingMatrix.data,
+                                styleNumber: urlParams.get('StyleNumber')
+                            }
+                        }));
+                    }
+                }
+            }, 2000); // Wait 2 seconds for normal data flow
+
+            // ========================================
+            // PRODUCT DATA FUNCTIONS
+            // ========================================
+
+            // Helper function to get brand from style number prefix
+            function getBrandFromStyle(styleNumber) {
+                const stylePrefix = styleNumber.toUpperCase().replace(/[0-9]/g, '');
+                const brandMap = {
+                    'PC': 'Port & Company',
+                    'DT': 'District',
+                    'SP': 'Sport-Tek',
+                    'DM': 'District Made',
+                    'AA': 'Alternative Apparel',
+                    'NL': 'Next Level',
+                    'G': 'Gildan',
+                    'ST': 'Sport-Tek',
+                    'TSC': 'The Supply Chain',
+                    'LST': 'Sport-Tek Ladies',
+                    'YST': 'Sport-Tek Youth'
+                };
+                return brandMap[stylePrefix] || 'Premium Brand';
+            }
+
+            // REMOVED: fetchAndDisplayProduct() - This function tried to fetch from /api/product-details which doesn't exist
+            // Instead, we now listen for the 'productColorsReady' event dispatched by pricing-pages.js
+            // which successfully fetches from /api/product-colors and provides all the data we need.
+            // The working event listener is in the initialization code below.
+
+            /**
+             * Load manual DTF pricing mode with synthetic data
+             */
+            async function loadManualDTFPricing(manualCost) {
+                console.log(`🔧 Loading manual DTF pricing with base cost: ${manualCost.toFixed(2)}`);
+
+                try {
+                    // Show product hero section
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('productHero').style.display = 'block';
+
+                    // Instantiate the DTF service
+                    console.log('📡 Creating DTF service instance...');
+                    const dtfService = new DTFPricingService();
+
+                    // Generate manual pricing data from API
+                    console.log('📡 Fetching DTF pricing data from API...');
+                    const pricingData = await dtfService.generateManualPricingData(manualCost);
+                    console.log('✅ Manual DTF pricing data generated:', {
+                        totalTiers: pricingData.tiersR?.length || pricingData.tiers?.length,
+                        totalCosts: pricingData.allDtfCostsR?.length,
+                        manualCost: pricingData.manualCost,
+                        sampleCosts: pricingData.allDtfCostsR?.slice(0, 4).map(c =>
+                            `${c.size} ${c.quantity_range}: $${c.unit_price}`)
+                    });
+
+                    // Store in the service for calculator access
+                    dtfService.apiData = pricingData;
+                    window.dtfService = dtfService;
+
+                    // Dispatch event so DTF calculator can pick up the data
+                    window.dispatchEvent(new CustomEvent('dtfManualPricingLoaded', {
+                        detail: pricingData
+                    }));
+
+                    // CRITICAL: Directly set garment cost in calculator (manual mode)
+                    // The calculator needs garment cost to perform pricing calculations
+                    if (window.dtfCalculator) {
+                        console.log('🔧 Setting manual garment cost in calculator:', manualCost);
+                        window.dtfCalculator.updateGarmentCost(manualCost);
+                    } else {
+                        // Calculator not ready yet, wait for it
+                        console.log('⏳ Calculator not ready, waiting for dtfCalculatorReady event...');
+                        window.addEventListener('dtfCalculatorReady', () => {
+                            console.log('🔧 Calculator ready, setting manual cost:', manualCost);
+                            window.dtfCalculator.updateGarmentCost(manualCost);
+                        }, { once: true });
+                    }
+
+                    // Update product info for manual mode
+                    const manualProduct = {
+                        productTitle: 'Manual DTF Pricing Mode',
+                        BRAND_NAME: 'Manual Entry',
+                        PRODUCT_DESCRIPTION: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`,
+                        colors: [],
+                        selectedColor: null
+                    };
+
+                    updateProductInfo(manualProduct, 'MANUAL');
+
+                    // Hide product image
+                    const productImage = document.querySelector('.product-image-main');
+                    if (productImage) {
+                        productImage.style.display = 'none';
+                    }
+
+                    // Initialize DTF calculator with manual mode
+                    // The DTF integration will handle pricing calculations
+                    console.log('✅ Manual DTF pricing mode loaded successfully');
+
+                } catch (error) {
+                    console.error('❌ Error loading manual DTF pricing:', error);
+                    alert('Failed to load manual pricing mode. Please refresh and try again.');
+                }
+            }
+
+            // Update product information with images and colors
+            function updateProductInfo(product, styleNumber) {
+                console.log('📝 [DTF] updateProductInfo called');
+                console.log('📦 [DTF] Product data:', product);
+                console.log('🏷️ [DTF] Style number:', styleNumber);
+
+                // DIAGNOSTIC: Log exact structure to identify field names
+                console.log('🔍 [DTF] DIAGNOSTIC - Full product object:', JSON.stringify(product, null, 2));
+                console.log('🔍 [DTF] DIAGNOSTIC - Product keys:', Object.keys(product));
+                console.log('🔍 [DTF] DIAGNOSTIC - Checking image fields:');
+                console.log('  - FRONT_MODEL:', product.FRONT_MODEL);
+                console.log('  - FRONT_FLAT:', product.FRONT_FLAT);
+                console.log('  - PRODUCT_IMAGE:', product.PRODUCT_IMAGE);
+                console.log('  - front_model:', product.front_model);
+                console.log('  - frontModel:', product.frontModel);
+                console.log('  - image:', product.image);
+                console.log('  - imageUrl:', product.imageUrl);
+                console.log('🔍 [DTF] DIAGNOSTIC - Colors data:', product.colors);
+                if (product.colors) {
+                    console.log('🔍 [DTF] DIAGNOSTIC - Colors array length:', product.colors.length);
+                    if (product.colors.length > 0) {
+                        console.log('🔍 [DTF] DIAGNOSTIC - First color object:', product.colors[0]);
+                        console.log('🔍 [DTF] DIAGNOSTIC - First color keys:', Object.keys(product.colors[0]));
+                    }
+                }
+
+                // Update breadcrumb Products link - link back to specific product page
+                const productsBreadcrumb = document.getElementById('products-breadcrumb');
+                if (productsBreadcrumb && styleNumber) {
+                    productsBreadcrumb.href = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}`;
+                    console.log('✅ Updated breadcrumb to product page:', styleNumber);
+                } else if (productsBreadcrumb) {
+                    // Fallback to main catalog if no style number
+                    productsBreadcrumb.href = '/';
+                    console.log('⚠️ No style number, breadcrumb links to main catalog');
+                }
+
+                // Use PRODUCT_TITLE from API or fallback
+                const title = product.PRODUCT_TITLE || product.title || styleNumber;
+
+                // Use PRODUCT_DESCRIPTION from API or fallback
+                const description = product.PRODUCT_DESCRIPTION || product.description || 'Direct-to-Film transfer printing';
+
+                // Use BRAND_NAME from API, with intelligent fallback
+                const brand = product.BRAND_NAME || product.brand || getBrandFromStyle(styleNumber);
+
+                document.getElementById('productTitle').textContent = title;
+                document.getElementById('productDescription').textContent = description;
+                document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+                document.getElementById('currentBrand').textContent = brand;
+                console.log('✏️ [DTF] Text fields updated:', { title, description, brand });
+
+                // Update product image
+                console.log('🖼️ [DTF] Calling updateProductImage...');
+                updateProductImage(product);
+
+                // Update color swatches
+                console.log('🎨 [DTF] Calling updateColorSwatches...');
+                updateColorSwatches(product);
+
+                console.log('✅ [DTF] Product info update complete');
+            }
+
+            // Update product image
+            function updateProductImage(product) {
+                console.log('🖼️ [DTF] updateProductImage called');
+                const imageEl = document.getElementById('productImage');
+                const placeholderEl = document.getElementById('imagePlaceholder');
+
+                // Try selectedColor first (most reliable source)
+                const selectedColor = product.selectedColor || (product.colors && product.colors[0]);
+
+                if (selectedColor) {
+                    const imageUrl = selectedColor.MAIN_IMAGE_URL || selectedColor.FRONT_MODEL || selectedColor.FRONT_FLAT;
+                    if (imageUrl) {
+                        imageEl.src = imageUrl;
+                        imageEl.style.display = 'block';
+                        placeholderEl.style.display = 'none';
+                        console.log('✅ [DTF] Image displayed:', imageUrl);
+
+                        // Update current color
+                        const colorName = selectedColor.COLOR_NAME || 'Color';
+                        document.getElementById('currentColor').textContent = colorName;
+                        return;
+                    }
+                }
+
+                // Fallback: show placeholder
+                console.warn('⚠️ [DTF] No image found');
+                imageEl.style.display = 'none';
+                placeholderEl.style.display = 'flex';
+                placeholderEl.innerHTML = '<i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i><div>Image Not Available</div>';
+            }
+
+            // Update color swatches
+            function updateColorSwatches(product) {
+                console.log('🎨 [DTF] updateColorSwatches called');
+                const swatchesSection = document.getElementById('colorSwatchesSection');
+                const swatchesContainer = document.getElementById('colorSwatches');
+
+                const colors = product.colors;
+                if (!colors || colors.length === 0) {
+                    console.warn('⚠️ [DTF] No colors array found');
+                    swatchesSection.style.display = 'none';
+                    return;
+                }
+
+                console.log(`🎨 [DTF] Creating ${colors.length} color swatches`);
+                swatchesContainer.innerHTML = '';
+
+                colors.forEach((color) => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                        border: 2px solid #e5e7eb;
+                        cursor: pointer;
+                        display: inline-block;
+                        margin-right: 8px;
+                        margin-bottom: 8px;
+                        position: relative;
+                        overflow: hidden;
+                        transition: all 0.2s;
+                    `;
+
+                    // Use color square image or hex code
+                    if (color.COLOR_SQUARE_IMAGE) {
+                        swatch.style.backgroundImage = `url('${color.COLOR_SQUARE_IMAGE}')`;
+                        swatch.style.backgroundSize = 'cover';
+                    } else if (color.HEX_CODE) {
+                        swatch.style.backgroundColor = color.HEX_CODE;
+                    } else {
+                        swatch.style.background = 'linear-gradient(135deg, #f0f0f0, #e0e0e0)';
+                    }
+
+                    swatch.title = color.COLOR_NAME || 'Color';
+
+                    // Hover effect
+                    swatch.addEventListener('mouseenter', () => {
+                        swatch.style.transform = 'scale(1.1)';
+                        swatch.style.borderColor = '#4cb354';  // Updated to match DTG green
+                    });
+                    swatch.addEventListener('mouseleave', () => {
+                        swatch.style.transform = 'scale(1)';
+                        swatch.style.borderColor = '#e5e7eb';
+                    });
+
+                    // Click to change image
+                    swatch.addEventListener('click', () => {
+                        const imageUrl = color.MAIN_IMAGE_URL || color.FRONT_MODEL || color.FRONT_FLAT;
+                        if (imageUrl) {
+                            document.getElementById('productImage').src = imageUrl;
+                            document.getElementById('productImage').style.display = 'block';
+                            document.getElementById('imagePlaceholder').style.display = 'none';
+                            document.getElementById('currentColor').textContent = color.COLOR_NAME || 'Color';
+                            console.log(`✅ [DTF] Changed to ${color.COLOR_NAME}`);
+
+                            // Highlight selected swatch
+                            document.querySelectorAll('.color-swatch').forEach(s => {
+                                s.style.border = '2px solid #e5e7eb';
+                            });
+                            swatch.style.border = '3px solid #4cb354';  // Updated to match DTG green
+                        }
+                    });
+
+                    swatchesContainer.appendChild(swatch);
+                });
+
+                swatchesSection.style.display = 'block';
+                console.log('✅ [DTF] Color swatches displayed');
+            }
+
+            // Setup search functionality with API integration
+            function setupSearch() {
+                const searchInput = document.getElementById('styleSearch');
+                const searchBtn = document.getElementById('searchBtn');
+                const searchWrapper = document.querySelector('.search-wrapper');
+
+                // Create search results dropdown
+                const resultsContainer = document.createElement('div');
+                resultsContainer.className = 'search-results';
+                searchWrapper.appendChild(resultsContainer);
+
+                let searchTimeout = null;
+
+                // Perform API search
+                async function performAPISearch(query) {
+                    if (query.length < 2) {
+                        resultsContainer.classList.remove('active');
+                        return;
+                    }
+
+                    // Show loading state
+                    resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    resultsContainer.classList.add('active');
+
+                    try {
+                        // Search using the API endpoint
+                        const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+
+                        if (!response.ok) {
+                            throw new Error('Search failed');
+                        }
+
+                        const results = await response.json();
+
+                        if (results.length === 0) {
+                            resultsContainer.innerHTML = '<div class="search-no-results">No products found</div>';
+                        } else {
+                            // Build results HTML
+                            let html = '';
+                            results.slice(0, 10).forEach(result => {
+                                html += `
+                                    <div class="search-result-item" data-style="${result.style || result.value}">
+                                        <div class="search-result-style">${result.style || result.value}</div>
+                                        <div class="search-result-desc">${result.label}</div>
+                                    </div>
+                                `;
+                            });
+                            resultsContainer.innerHTML = html;
+
+                            // Add click handlers to results
+                            resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                                item.addEventListener('click', () => {
+                                    const style = item.dataset.style;
+                                    window.location.href = `?StyleNumber=${style}`;
+                                });
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+                    }
+                }
+
+                // Handle search input
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+
+                    // Clear previous timeout
+                    clearTimeout(searchTimeout);
+
+                    if (query.length < 2) {
+                        resultsContainer.classList.remove('active');
+                        return;
+                    }
+
+                    // Debounce search
+                    searchTimeout = setTimeout(() => {
+                        performAPISearch(query);
+                    }, 300);
+                });
+
+                // Handle enter key for direct navigation
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const value = searchInput.value.trim();
+                        if (value) {
+                            // Try direct style number navigation
+                            window.location.href = `?StyleNumber=${value}`;
+                        }
+                    }
+                });
+
+                // Handle search button click
+                searchBtn.addEventListener('click', () => {
+                    const value = searchInput.value.trim();
+                    if (value) {
+                        window.location.href = `?StyleNumber=${value}`;
+                    }
+                });
+
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!searchWrapper.contains(e.target)) {
+                        resultsContainer.classList.remove('active');
+                    }
+                });
+            }
+
+            // ========================================
+            // END PRODUCT DATA FUNCTIONS
+            // ========================================
+        });
+        
+        // Handle messages from parent window (iframe scenarios)
+        window.addEventListener('message', function(event) {
+            // Ignore React DevTools messages
+            if (event.data && event.data.source === 'react-devtools-content-script') {
+                return;
+            }
+            
+            console.log('[DTF] Received postMessage:', event.data);
+            
+            // Handle DTF-specific pricing data
+            if (event.data && event.data.type === 'dtfPricingData') {
+                console.log('[DTF] Received DTF pricing data:', event.data);
+                if (window.DTFAdapter) {
+                    window.DTFAdapter.updateData(event.data.data);
+                }
+            }
+            
+            // Handle Caspio pricing data
+            if (event.data && (event.data.type === 'caspioPricingData' || event.data.type === 'caspioDataReady')) {
+                console.log('[DTF] Received Caspio pricing data:', event.data);
+                const pricingData = {
+                    garmentCost: event.data.price || event.data.garmentPrice || event.data.basePrice || 0,
+                    quantity: event.data.quantity || 24,
+                    productInfo: {
+                        name: event.data.productName || event.data.name,
+                        sku: event.data.sku || event.data.styleNumber
+                    }
+                };
+                
+                if (window.DTFAdapter && pricingData.garmentCost > 0) {
+                    window.DTFAdapter.updateData(pricingData);
+                }
+            }
+        });
+    </script>
+
+    <!-- CRITICAL: Inline styles to force outline style for DTF page -->
+    <!-- This must be at the END to override all other CSS -->
+    <style>
+        /* DTF toggle items styling to match DTG */
+        body.dtf-pricing-page .dtf-toggle-item.active,
+        .dtf-toggle-item.active {
+            background: #e8f5e9 !important;  /* Light green background like DTG */
+            background-color: #e8f5e9 !important;
+            background-image: none !important;
+            border: 3px solid #4cb354 !important;
+            color: #4cb354 !important;
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+        }
+
+        /* Ensure toggle label text is green, not white */
+        body.dtf-pricing-page .dtf-toggle-item.active .dtf-toggle-label,
+        .dtf-toggle-item.active .dtf-toggle-label {
+            color: #4cb354 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Force DTF tier buttons to use outline style */
+        body.dtf-pricing-page .dtf-tier-button.selected,
+        .dtf-tier-button.selected {
+            background: white !important;
+            background-color: white !important;
+            background-image: none !important;
+            border: 3px solid #4cb354 !important;
+            border-width: 3px !important;
+            color: #4cb354 !important;
+            font-weight: 600 !important;
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+        }
+
+        /* Prevent any pseudo-elements from adding backgrounds */
+        .dtf-toggle-item.active::before,
+        .dtf-toggle-item.active::after,
+        .dtf-tier-button.selected::before,
+        .dtf-tier-button.selected::after {
+            background: none !important;
+            background-image: none !important;
+        }
+
+        /* Keep the toggle switch slider green when active */
+        .dtf-toggle-item.active .dtf-toggle-switch {
+            background: #4cb354 !important;
+        }
+
+        .dtf-toggle-item.active .dtf-toggle-switch .dtf-toggle-slider {
+            transform: translateX(20px);
+        }
+
+        /* Override hover states to maintain proper backgrounds */
+        .dtf-toggle-item.active:hover {
+            background: #e8f5e9 !important;  /* Keep light green on hover */
+            background-color: #e8f5e9 !important;
+            border-color: #4cb354 !important;
+        }
+
+        .dtf-tier-button.selected:hover {
+            background: white !important;  /* Keep tier buttons white as per DTG */
+            background-color: white !important;
+            border-color: #4cb354 !important;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Selection Validation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 10px;
+        }
+        .problem-section {
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #fecaca;
+        }
+        .solution-section {
+            background: #d1fae5;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #6ee7b7;
+        }
+        .test-section {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+        }
+        .old-behavior {
+            color: #dc2626;
+            text-decoration: line-through;
+        }
+        .new-behavior {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Selection Validation Improvements</h1>
+
+        <div class="problem-section">
+            <h2>❌ Previous Issues:</h2>
+            <ul>
+                <li><span class="old-behavior">Could select items without choosing a color</span></li>
+                <li><span class="old-behavior">Could advance to next step with incomplete selections</span></li>
+                <li><span class="old-behavior">Gift box showed "Color not selected" or "Size not selected"</span></li>
+                <li><span class="old-behavior">Incomplete items were added to the bundle</span></li>
+            </ul>
+        </div>
+
+        <div class="solution-section">
+            <h2>✅ Fixes Applied:</h2>
+            <ul class="checklist">
+                <li>
+                    <strong>Color Validation Added</strong><br>
+                    Now requires color selection before allowing item selection
+                </li>
+                <li>
+                    <strong>Size Validation Enhanced</strong><br>
+                    Prevents selection if size is not chosen for sized items
+                </li>
+                <li>
+                    <strong>Visual Feedback</strong><br>
+                    Red border highlights missing selections for 3 seconds
+                </li>
+                <li>
+                    <strong>Selection Not Saved</strong><br>
+                    Items are NOT added to bundle if validation fails
+                </li>
+                <li>
+                    <strong>Continue Button Disabled</strong><br>
+                    Cannot advance to next step without complete selection
+                </li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test Scenarios:</h2>
+            <ol>
+                <li>
+                    <strong>Try to select jacket without color:</strong>
+                    <ul>
+                        <li>Choose a jacket</li>
+                        <li>Select a size but NOT a color</li>
+                        <li>Click "Select This Jacket"</li>
+                        <li><span class="new-behavior">Expected: Alert "Please select a color" + red border on colors</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Try to select hoodie without size:</strong>
+                    <ul>
+                        <li>Choose a hoodie</li>
+                        <li>Select a color but NOT a size</li>
+                        <li>Click "Select This Hoodie"</li>
+                        <li><span class="new-behavior">Expected: Alert "Please select a size" + red border on sizes</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Verify Continue button:</strong>
+                    <ul>
+                        <li>Make incomplete selection</li>
+                        <li><span class="new-behavior">Expected: Continue button remains disabled</span></li>
+                        <li>Complete the selection (both color and size)</li>
+                        <li><span class="new-behavior">Expected: Continue button becomes enabled</span></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Validation Rules:</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f3f4f6;">
+                        <th style="padding: 10px; border: 1px solid #e5e7eb;">Product Type</th>
+                        <th style="padding: 10px; border: 1px solid #e5e7eb;">Color Required</th>
+                        <th style="padding: 10px; border: 1px solid #e5e7eb;">Size Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">Jackets</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">Hoodies</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">Beanies</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">⚪ OSFA (auto-selected)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">Gloves</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">⚪ Black Barley (auto-selected)</td>
+                        <td style="padding: 10px; border: 1px solid #e5e7eb;">✅ Yes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>Quick Access:</h2>
+            <button onclick="window.open('/christmas-bundles.html', '_blank')">
+                Test Christmas Bundle Page
+            </button>
+        </div>
+
+        <div class="solution-section">
+            <h2>💡 User Experience Improvements:</h2>
+            <ul>
+                <li>Clear error messages tell users exactly what's missing</li>
+                <li>Visual highlighting (red border) shows where to make selection</li>
+                <li>Cannot accidentally skip required selections</li>
+                <li>Gift box only shows complete, valid items</li>
+                <li>Prevents incomplete orders from being submitted</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

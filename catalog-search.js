@@ -30,17 +30,67 @@ class CatalogSearch {
 
     init() {
         console.log('[CatalogSearch] Initializing...');
-        
+
         // Set up event listeners
         this.setupSearchInput();
         this.setupCategoryMenu();
         this.setupSortOptions();
-        
-        // Load initial content
-        this.loadTopSellers();
-        
+
+        // Check URL parameters and apply filters if present
+        this.checkUrlParameters();
+
+        // Load initial content (only if no URL parameters)
+        if (!window.location.search) {
+            this.loadTopSellers();
+        }
+
         // Set up infinite scroll
         this.setupInfiniteScroll();
+    }
+
+    /**
+     * Check URL parameters and apply filters on page load
+     */
+    checkUrlParameters() {
+        const params = new URLSearchParams(window.location.search);
+
+        let hasFilters = false;
+
+        // Check for search query parameter
+        if (params.has('q')) {
+            this.currentFilters.q = params.get('q');
+            const searchInput = document.getElementById('navSearchInput');
+            if (searchInput) {
+                searchInput.value = this.currentFilters.q;
+            }
+            hasFilters = true;
+        }
+
+        // Check for brand parameter
+        if (params.has('brand')) {
+            const brandName = params.get('brand');
+            this.currentFilters.brand = [brandName];
+            console.log('[CatalogSearch] Brand filter from URL:', brandName);
+            hasFilters = true;
+        }
+
+        // Check for category parameter
+        if (params.has('category')) {
+            this.currentFilters.category = params.get('category');
+            hasFilters = true;
+        }
+
+        // Check for subcategory parameter
+        if (params.has('subcategory')) {
+            this.currentFilters.subcategory = params.get('subcategory');
+            hasFilters = true;
+        }
+
+        // If any filters were found in URL, trigger search
+        if (hasFilters) {
+            console.log('[CatalogSearch] Filters found in URL, performing search:', this.currentFilters);
+            this.performSearch();
+        }
     }
 
     /**
@@ -53,13 +103,13 @@ class CatalogSearch {
         if (!searchInput) return;
         
         // Replace autocomplete with new implementation
+        // NOTE: Only update filter value, don't trigger automatic search
+        // Search only executes when user presses Enter or clicks search button
+        // This prevents premature searches while typing (e.g., "pc" instead of "pc90h")
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
-            
-            // Clear existing timeout
-            clearTimeout(this.searchTimeout);
-            
-            // Reset filters when searching
+
+            // Update the current filter value
             if (query !== this.currentFilters.q) {
                 this.currentFilters = {
                     ...this.currentFilters,
@@ -69,16 +119,15 @@ class CatalogSearch {
                     page: 1
                 };
             }
-            
-            // Debounce search
-            if (query.length >= 2) {
-                this.searchTimeout = setTimeout(() => {
-                    this.performSearch();
-                }, 300);
-            } else if (query.length === 0) {
-                // Clear search
+
+            // Only clear search if input is empty
+            if (query.length === 0) {
                 this.clearSearch();
             }
+
+            // NOTE: No automatic performSearch() here!
+            // Autocomplete dropdown still works (handled by autocomplete-new.js)
+            // User must press Enter or click search button to see full results
         });
         
         // Search button
@@ -108,39 +157,60 @@ class CatalogSearch {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const category = link.dataset.category;
-                
-                // Clear search and set category
+
+                // Reset ALL filters for fresh category search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
                     subcategory: null,
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters for clean navigation
+                window.history.pushState({}, '', window.location.pathname);
+
                 // Update UI
                 this.setActiveCategory(link);
-                
+
                 // Perform search
                 this.performSearch();
             });
         });
         
-        // Subcategory links in flyout
+        // Subcategory links in flyout (including "View All" links)
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('flyout-item')) {
+            if (e.target.classList.contains('flyout-item') || e.target.closest('.flyout-item')) {
                 e.preventDefault();
-                const category = e.target.dataset.category;
-                const subcategory = e.target.dataset.subcategory;
-                
+
+                // Get the actual link element (in case <strong> was clicked)
+                const link = e.target.classList.contains('flyout-item') ? e.target : e.target.closest('.flyout-item');
+
+                const category = link.dataset.category;
+                const subcategory = link.dataset.subcategory; // Will be undefined for "View All"
+
+                // Reset ALL filters for fresh category/subcategory search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
-                    subcategory: subcategory,
+                    subcategory: subcategory || null, // null if "View All" (no subcategory)
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters
+                window.history.pushState({}, '', window.location.pathname);
+
                 this.performSearch();
             }
         });
@@ -151,15 +221,35 @@ class CatalogSearch {
                 e.preventDefault();
                 const category = e.target.dataset.category;
                 const subcategory = e.target.dataset.subcategory;
-                
+
+                // Reset ALL filters for fresh subcategory search
                 this.currentFilters = {
-                    ...this.currentFilters,
                     q: '',
                     category: category,
                     subcategory: subcategory,
+                    brand: [],
+                    color: [],
+                    size: [],
+                    minPrice: null,
+                    maxPrice: null,
+                    sort: null,
                     page: 1
                 };
-                
+
+                // Clear URL parameters
+                window.history.pushState({}, '', window.location.pathname);
+
+                // Close dropdown smoothly
+                const dropdown = e.target.closest('.nav-dropdown');
+                const navLink = document.querySelector('.nav-products');
+                if (dropdown && navLink) {
+                    navLink.setAttribute('aria-expanded', 'false');
+                    dropdown.style.opacity = '0';
+                    dropdown.style.visibility = 'hidden';
+                    dropdown.style.transform = 'translateY(-10px)';
+                    dropdown.style.pointerEvents = 'none';
+                }
+
                 this.performSearch();
             }
         });
@@ -302,6 +392,31 @@ class CatalogSearch {
             countElement.textContent = `${totalCount} product${totalCount !== 1 ? 's' : ''}`;
         }
         
+        // Display smart filter badges if detected
+        let smartFilterBadges = '';
+        if (results.smartFilters && results.smartFilters.length > 0) {
+            const badges = results.smartFilters.map(filter => {
+                const icon = filter.type === 'brand' ? '🏷️' : '📂';
+                return `
+                    <div class="smart-filter-badge" data-filter-type="${filter.type}" data-filter-value="${filter.value}">
+                        <span class="badge-icon">${icon}</span>
+                        <span class="badge-label">${filter.type}: ${filter.value}</span>
+                        <button class="badge-remove" onclick="catalogSearch.removeSmartFilter('${filter.type}', '${filter.value}')" title="Remove filter">×</button>
+                    </div>
+                `;
+            }).join('');
+
+            smartFilterBadges = `
+                <div class="smart-filters-notice">
+                    <span class="notice-icon">✨</span>
+                    <span class="notice-text">Smart filters detected:</span>
+                    <div class="smart-filter-badges">
+                        ${badges}
+                    </div>
+                </div>
+            `;
+        }
+
         // Check if we used a fallback search (metadata would tell us)
         if (results.metadata && results.metadata.searchStrategy) {
             const strategy = results.metadata.searchStrategy;
@@ -312,12 +427,16 @@ class CatalogSearch {
                     <span class="notice-icon">ℹ️</span>
                     <span>Showing broader results for better selection</span>
                 `;
-                
+
                 // Insert notice before products
                 if (this.currentFilters.page === 1) {
-                    grid.innerHTML = notice.outerHTML;
+                    grid.innerHTML = smartFilterBadges + notice.outerHTML;
                 }
+            } else if (smartFilterBadges && this.currentFilters.page === 1) {
+                grid.innerHTML = smartFilterBadges;
             }
+        } else if (smartFilterBadges && this.currentFilters.page === 1) {
+            grid.innerHTML = smartFilterBadges;
         }
         
         // Build product cards
@@ -339,10 +458,34 @@ class CatalogSearch {
             // Append for pagination
             grid.insertAdjacentHTML('beforeend', productsHTML);
         }
-        
+
         // Add sort dropdown if not exists
         this.addSortDropdown();
-        
+
+        // Create client-side pagination tracking if API didn't provide it
+        // This handles brand filtering where API doesn't return pagination metadata
+        if (!results.pagination) {
+            // If we got a full page (48 products), assume there might be more
+            // If we got fewer than 48, we've reached the end
+            const hasMore = results.products.length >= 48;
+
+            this.currentResults.pagination = {
+                page: this.currentFilters.page || 1,
+                hasMore: hasMore,
+                limit: 48,
+                clientSide: true // Flag to indicate this is client-side tracking
+            };
+
+            console.log('[CatalogSearch] Client-side pagination:', {
+                page: this.currentResults.pagination.page,
+                productsReturned: results.products.length,
+                hasMore: hasMore
+            });
+        } else if (results.pagination) {
+            // Mark server-side pagination
+            this.currentResults.pagination.clientSide = false;
+        }
+
         // Add Load More button if there are more products
         this.updateLoadMoreButton(results);
         
@@ -427,9 +570,6 @@ class CatalogSearch {
      * Display filter options
      */
     displayFilters(filters) {
-        // For now, we'll add filters to the sidebar
-        // In a full implementation, we'd create a dedicated filter panel
-        
         // Add filter counts to categories
         const categoryFilter = filters.find(f => f.type === 'category');
         if (categoryFilter) {
@@ -448,6 +588,354 @@ class CatalogSearch {
                 }
             });
         }
+
+        // Display brand filters
+        const brandFilter = filters.find(f => f.type === 'brand');
+        if (brandFilter && brandFilter.options.length > 0) {
+            this.displayBrandFilters(brandFilter.options);
+        }
+    }
+
+    /**
+     * Display brand filter checkboxes
+     */
+    displayBrandFilters(brands) {
+        // Get references to BOTH old sidebar and new horizontal bar elements
+        const filtersSection = document.getElementById('filtersSection');
+        const brandOptions = document.getElementById('brandFilterOptions');
+        const clearBtn = document.getElementById('clearFiltersBtn');
+
+        // New horizontal filter bar elements
+        const filtersBarContainer = document.getElementById('filtersBarContainer');
+        const brandFilterOptionsNew = document.getElementById('brandFilterOptionsNew');
+
+        // DEPRECATED: Keep sidebar filters hidden - using horizontal filter bar instead
+        if (filtersSection) {
+            filtersSection.style.display = 'none';
+        }
+
+        // Show horizontal filter bar and populate it
+        if (filtersBarContainer && brandFilterOptionsNew) {
+            // Show the filter bar container
+            filtersBarContainer.style.display = 'block';
+
+            // Clear existing options
+            brandFilterOptionsNew.innerHTML = '';
+
+            // Sort brands alphabetically
+            const sortedBrands = [...brands].sort((a, b) => a.label.localeCompare(b.label));
+
+            // Create checkbox for each brand (no limit - show all brands)
+            sortedBrands.forEach((brand) => {
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                option.dataset.brand = brand.label.toLowerCase();
+                option.innerHTML = `
+                    <input
+                        type="checkbox"
+                        id="brand-new-${brand.value.replace(/\s+/g, '-')}"
+                        value="${brand.value}"
+                        class="brand-checkbox-new"
+                        ${this.currentFilters.brand && this.currentFilters.brand.includes(brand.value) ? 'checked' : ''}
+                    >
+                    <label for="brand-new-${brand.value.replace(/\s+/g, '-')}">${brand.label}</label>
+                `;
+                brandFilterOptionsNew.appendChild(option);
+            });
+
+            // Initialize dropdown interactions (will be set up in separate method)
+            this.setupFilterDropdowns();
+
+            // Update active filters display and count
+            this.updateActiveFiltersDisplay();
+            this.updateFilterCount('brand', this.currentFilters.brand ? this.currentFilters.brand.length : 0);
+        }
+
+        // Keep old sidebar functionality for backwards compatibility (but hidden)
+        if (brandOptions) {
+            brandOptions.innerHTML = '';
+            const topBrands = brands.slice(0, 15);
+            topBrands.forEach((brand) => {
+                const option = document.createElement('label');
+                option.className = 'filter-option';
+                option.innerHTML = `
+                    <input
+                        type="checkbox"
+                        value="${brand.value}"
+                        class="brand-checkbox"
+                        ${this.currentFilters.brand && this.currentFilters.brand.includes(brand.value) ? 'checked' : ''}
+                    >
+                    <span class="filter-label">${brand.label}</span>
+                    <span class="filter-count">${brand.count}</span>
+                `;
+                brandOptions.appendChild(option);
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.style.display = this.hasActiveFilters() ? 'flex' : 'none';
+            clearBtn.onclick = () => this.clearAllFilters();
+        }
+    }
+
+    /**
+     * Handle brand filter checkbox change
+     */
+    handleBrandFilterChange(brandValue, isChecked) {
+        console.log('[CatalogSearch] Brand filter changed:', brandValue, isChecked);
+
+        // Initialize brand filter array if needed
+        if (!this.currentFilters.brand) {
+            this.currentFilters.brand = [];
+        }
+
+        if (isChecked) {
+            // Add brand to filters
+            if (!this.currentFilters.brand.includes(brandValue)) {
+                this.currentFilters.brand.push(brandValue);
+            }
+        } else {
+            // Remove brand from filters
+            this.currentFilters.brand = this.currentFilters.brand.filter(b => b !== brandValue);
+        }
+
+        // Update clear button visibility
+        const clearBtn = document.getElementById('clearFiltersBtn');
+        if (clearBtn) {
+            clearBtn.style.display = this.hasActiveFilters() ? 'flex' : 'none';
+        }
+
+        // Perform search with updated filters
+        this.currentFilters.page = 1; // Reset to first page
+        this.performSearch();
+    }
+
+    /**
+     * Check if any filters are active
+     */
+    hasActiveFilters() {
+        return (this.currentFilters.brand && this.currentFilters.brand.length > 0) ||
+               (this.currentFilters.color && this.currentFilters.color.length > 0) ||
+               (this.currentFilters.size && this.currentFilters.size.length > 0);
+    }
+
+    /**
+     * Setup horizontal filter dropdown interactions
+     */
+    setupFilterDropdowns() {
+        const brandBtn = document.getElementById('brandFilterBtn');
+        const brandPanel = document.getElementById('brandFilterPanel');
+        const closeBtn = brandPanel?.querySelector('.filter-panel-close');
+        const applyBtn = document.getElementById('applyBrandFilter');
+        const searchInput = document.getElementById('brandSearchInput');
+
+        if (!brandBtn || !brandPanel) return;
+
+        // Remove old listeners by cloning elements
+        const newBrandBtn = brandBtn.cloneNode(true);
+        brandBtn.parentNode.replaceChild(newBrandBtn, brandBtn);
+
+        // Toggle dropdown
+        newBrandBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = brandPanel.classList.contains('show');
+
+            // Close all other panels
+            document.querySelectorAll('.filter-dropdown-panel').forEach(panel => {
+                panel.classList.remove('show');
+            });
+            document.querySelectorAll('.filter-dropdown-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Toggle current panel
+            if (!isOpen) {
+                brandPanel.classList.add('show');
+                newBrandBtn.classList.add('active');
+            }
+        });
+
+        // Close button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            });
+        }
+
+        // Apply button
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                this.applyBrandFilter();
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            });
+        }
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.filter-controls')) {
+                brandPanel.classList.remove('show');
+                newBrandBtn.classList.remove('active');
+            }
+        });
+
+        // Brand search
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterBrandOptions(e.target.value);
+            });
+        }
+    }
+
+    /**
+     * Filter brand options by search term
+     */
+    filterBrandOptions(searchTerm) {
+        const options = document.querySelectorAll('#brandFilterOptionsNew .filter-option');
+        const term = searchTerm.toLowerCase().trim();
+
+        options.forEach(option => {
+            const brandName = option.dataset.brand;
+            option.style.display = brandName.includes(term) ? 'flex' : 'none';
+        });
+    }
+
+    /**
+     * Apply brand filter from horizontal bar
+     */
+    applyBrandFilter() {
+        const checkboxes = document.querySelectorAll('#brandFilterOptionsNew input[type="checkbox"]:checked');
+        const selectedBrands = Array.from(checkboxes).map(cb => cb.value);
+
+        // Update filters
+        this.currentFilters.brand = selectedBrands;
+        this.currentFilters.page = 1;
+
+        // Update UI
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount('brand', selectedBrands.length);
+
+        // Perform search
+        this.performSearch();
+    }
+
+    /**
+     * Update active filters chip display
+     */
+    updateActiveFiltersDisplay() {
+        const container = document.getElementById('activeFilters');
+        if (!container) return;
+
+        let html = '';
+
+        // Brand chips
+        if (this.currentFilters.brand && this.currentFilters.brand.length > 0) {
+            this.currentFilters.brand.forEach(brand => {
+                // Escape brand name for use in onclick attribute
+                const escapedBrand = brand.replace(/'/g, "\\'");
+                html += `
+                    <div class="filter-chip" data-filter-type="brand" data-filter-value="${brand}">
+                        <span>${brand}</span>
+                        <button class="filter-chip-remove" onclick="window.catalogSearch.removeFilter('brand', '${escapedBrand}')">×</button>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
+
+        // Show/hide clear all button
+        const clearAllBtn = document.getElementById('clearAllFiltersBtn');
+        const hasFilters = this.currentFilters.brand && this.currentFilters.brand.length > 0;
+        if (clearAllBtn) {
+            clearAllBtn.style.display = hasFilters ? 'flex' : 'none';
+
+            // Remove old listener and add new one
+            const newClearAllBtn = clearAllBtn.cloneNode(true);
+            clearAllBtn.parentNode.replaceChild(newClearAllBtn, clearAllBtn);
+            newClearAllBtn.addEventListener('click', () => this.clearAllFiltersNew());
+        }
+    }
+
+    /**
+     * Update filter count badge
+     */
+    updateFilterCount(filterType, count) {
+        const countEl = document.getElementById(`${filterType}Count`);
+        if (!countEl) return;
+
+        if (count > 0) {
+            countEl.textContent = count;
+            countEl.style.display = 'inline-flex';
+        } else {
+            countEl.style.display = 'none';
+        }
+    }
+
+    /**
+     * Remove individual filter from horizontal bar
+     */
+    removeFilter(filterType, value) {
+        if (filterType === 'brand') {
+            this.currentFilters.brand = this.currentFilters.brand.filter(b => b !== value);
+        }
+
+        // Update checkbox
+        const checkbox = document.querySelector(`#brandFilterOptionsNew input[value="${value}"]`);
+        if (checkbox) checkbox.checked = false;
+
+        // Update UI and search
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount(filterType, this.currentFilters.brand ? this.currentFilters.brand.length : 0);
+        this.currentFilters.page = 1;
+        this.performSearch();
+    }
+
+    /**
+     * Clear all filters from horizontal bar
+     */
+    clearAllFiltersNew() {
+        // Clear all filters
+        this.currentFilters.brand = [];
+
+        // Uncheck all checkboxes
+        document.querySelectorAll('#brandFilterOptionsNew input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Update UI and search
+        this.updateActiveFiltersDisplay();
+        this.updateFilterCount('brand', 0);
+        this.currentFilters.page = 1;
+        this.performSearch();
+    }
+
+    /**
+     * Clear all active filters
+     */
+    clearAllFilters() {
+        console.log('[CatalogSearch] Clearing all filters');
+
+        // Reset filter arrays
+        this.currentFilters.brand = [];
+        this.currentFilters.color = [];
+        this.currentFilters.size = [];
+
+        // Uncheck all checkboxes
+        document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Hide clear button
+        const clearBtn = document.getElementById('clearFiltersBtn');
+        if (clearBtn) {
+            clearBtn.style.display = 'none';
+        }
+
+        // Perform search without filters
+        this.currentFilters.page = 1;
+        this.performSearch();
     }
 
     /**
@@ -603,32 +1091,66 @@ class CatalogSearch {
 
     /**
      * Update or create Load More button
+     *
+     * NOTE: Client-side pagination tracking was added on 2025-01-27 as a defensive fallback
+     * when API pagination bugs were causing incomplete results. Server-side pagination bugs
+     * were fixed on 2025-10-23, but this fallback remains as a safety mechanism in case
+     * API pagination metadata is ever unavailable.
      */
     updateLoadMoreButton(results) {
         // Remove existing button/sentinel if any
         const existingButton = document.getElementById('loadMoreButton');
         const existingSentinel = document.getElementById('scroll-sentinel');
-        
+
         if (existingButton) existingButton.remove();
         if (existingSentinel) existingSentinel.remove();
-        
+
         // Check if there are more products to load
+        // Handle both server-side pagination (with totalPages) and client-side (without)
         if (results && results.pagination) {
-            const { page, totalPages, total, limit } = results.pagination;
-            const showingCount = Math.min(page * limit, total);
-            
-            if (page < totalPages) {
+            const { page, totalPages, total, limit, clientSide, hasMore } = results.pagination;
+
+            // Determine if we should show the Load More button
+            let shouldShowButton = false;
+            let buttonHTML = '';
+
+            if (clientSide) {
+                // Client-side pagination (brand filtering without API pagination)
+                // Show button if we got a full page (48 products), suggesting more exist
+                shouldShowButton = hasMore && results.products.length >= 48;
+
+                if (shouldShowButton) {
+                    const showingCount = page * limit;
+                    buttonHTML = `
+                        <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
+                            Load More Products
+                            <span class="load-more-count">(Showing ${showingCount})</span>
+                        </button>
+                        <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
+                    `;
+                }
+            } else {
+                // Server-side pagination (normal search with API pagination metadata)
+                shouldShowButton = totalPages && page < totalPages;
+
+                if (shouldShowButton) {
+                    const showingCount = Math.min(page * limit, total);
+                    buttonHTML = `
+                        <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
+                            Load More Products
+                            <span class="load-more-count">(Showing ${showingCount} of ${total})</span>
+                        </button>
+                        <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
+                    `;
+                }
+            }
+
+            if (shouldShowButton) {
                 // Create Load More button container
                 const buttonContainer = document.createElement('div');
                 buttonContainer.className = 'load-more-container';
                 buttonContainer.id = 'loadMoreContainer';
-                buttonContainer.innerHTML = `
-                    <button id="loadMoreButton" class="load-more-btn" onclick="catalogSearch.loadMoreProducts()">
-                        Load More Products
-                        <span class="load-more-count">(Showing ${showingCount} of ${total})</span>
-                    </button>
-                    <div id="scroll-sentinel" style="height: 1px; margin-top: 100px;"></div>
-                `;
+                buttonContainer.innerHTML = buttonHTML;
                 
                 // Add after results grid
                 const resultsGrid = document.getElementById('resultsGrid');
@@ -677,17 +1199,21 @@ class CatalogSearch {
      */
     async loadMoreProducts() {
         if (!this.currentResults || !this.currentResults.pagination) return;
-        
-        const { page, totalPages } = this.currentResults.pagination;
-        
-        if (page >= totalPages) return;
-        
+
+        const { page, totalPages, clientSide } = this.currentResults.pagination;
+
+        // For server-side pagination, check if we've reached the end
+        if (!clientSide && totalPages && page >= totalPages) return;
+
+        // For client-side pagination, just continue loading until we get < 48 products
+        // (The check for hasMore happens in displayResults when next page loads)
+
         // Remove existing Load More button container before loading
         const container = document.getElementById('loadMoreContainer');
         if (container) {
             container.remove();
         }
-        
+
         this.currentFilters.page = page + 1;
         await this.performSearch();
     }
@@ -748,6 +1274,31 @@ class CatalogSearch {
         } else {
             breadcrumb.textContent = '';
         }
+    }
+
+    /**
+     * Remove a smart filter and re-run search
+     */
+    removeSmartFilter(filterType, filterValue) {
+        if (filterType === 'brand') {
+            // Remove brand from filters
+            if (Array.isArray(this.currentFilters.brand)) {
+                this.currentFilters.brand = this.currentFilters.brand.filter(b => b !== filterValue);
+            }
+            // Uncheck the brand checkbox if visible
+            const checkbox = document.querySelector(`input.brand-checkbox[value="${filterValue}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        } else if (filterType === 'category') {
+            // Remove category from filters
+            this.currentFilters.category = null;
+            this.currentFilters.subcategory = null;
+        }
+
+        // Re-run search
+        this.currentFilters.page = 1;
+        this.performSearch();
     }
 
     /**

@@ -246,6 +246,15 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version with BaseAd
             window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: singleLocationDataPayload }));
             this.debugLog('Dispatched pricingDataLoaded event ON WINDOW for selected location:', locationCode);
 
+            // Also dispatch dtg-specific event with full bundle for universal pricing grid
+            window.dispatchEvent(new CustomEvent('dtgPricingDataLoaded', {
+                detail: {
+                    bundle: masterBundle,
+                    embellishmentType: 'dtg'
+                }
+            }));
+            this.debugLog('Dispatched dtgPricingDataLoaded event with full bundle for universal pricing grid');
+
             // The universal pricing grid handles its own display, so we don't need to manipulate the old grid
             // Just make sure the data is dispatched and let the universal components handle display
             this.debugLog('Pricing data dispatched, universal components will handle display');

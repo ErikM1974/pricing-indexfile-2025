@@ -11,6 +11,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Safety monitoring system (optional - for development only)
+let monitor = null;
+let autoRecovery = null;
+
+if (process.env.ENABLE_MONITORING === 'true') {
+  console.log('🔍 Monitoring system enabled');
+  try {
+    const FileAccessMonitor = require('./scripts/safety-tools/file-access-monitor');
+    const autoRecoveryModule = require('./scripts/safety-tools/auto-recovery');
+
+    monitor = new FileAccessMonitor();
+    autoRecovery = autoRecoveryModule.autoRecovery;
+  } catch (error) {
+    console.warn('⚠️ Monitoring system files not found. Run with ENABLE_MONITORING=false or install monitoring tools.');
+    console.warn('   See MONITORING_SETUP.md for details.');
+  }
+}
+
 // CORS middleware - MUST be before other middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -29,16 +47,34 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   // Skip for localhost development
   if (process.env.NODE_ENV === 'production') {
+    // Allow Let's Encrypt ACME challenge to pass through (needed for SSL cert validation)
+    if (req.path.startsWith('/.well-known/acme-challenge/')) {
+      return next();
+    }
+
     // The 'x-forwarded-proto' header is set by Heroku
     if (req.headers['x-forwarded-proto'] !== 'https') {
       // Redirect to HTTPS
       return res.redirect('https://' + req.hostname + req.url);
+    }
+
+    // Redirect non-www to www
+    if (req.hostname === 'teamnwca.com') {
+      return res.redirect(301, 'https://www.teamnwca.com' + req.url);
     }
   }
   return next();
 });
 
 // Middleware
+// Add monitoring BEFORE static file serving (if enabled)
+if (monitor) {
+  app.use(monitor.middleware());
+}
+if (autoRecovery) {
+  app.use(autoRecovery.middleware());
+}
+
 // Compress all responses
 app.use(compression());
 
@@ -69,20 +105,19 @@ app.get('/product.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'product.html'));
 });
 
-// Serve top sellers public product page
-app.get('/top-sellers-product.html', (req, res) => {
-  console.log('Serving top-sellers-product.html page');
-  res.sendFile(path.join(__dirname, 'top-sellers-product.html'));
-});
-
-// Serve top sellers public showcase page
-app.get('/top-sellers-showcase.html', (req, res) => {
-  console.log('Serving top-sellers-showcase.html page');
-  res.sendFile(path.join(__dirname, 'top-sellers-showcase.html'));
-});
+// Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
+app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
+app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
+app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
+app.use('/art-tools', express.static(path.join(__dirname, 'art-tools'), staticOptions));
+app.use('/tools', express.static(path.join(__dirname, 'tools'), staticOptions));
+app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
+app.use('/email-templates', express.static(path.join(__dirname, 'email-templates'), staticOptions));
+app.use('/mockups', express.static(path.join(__dirname, 'mockups'), staticOptions));
+app.use('/tests', express.static(path.join(__dirname, 'tests'), staticOptions));
 app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
 app.use('/scripts', express.static(path.join(__dirname, 'scripts'), staticOptions));
 app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions));
@@ -92,6 +127,7 @@ app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
 app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
 app.use('/training', express.static(path.join(__dirname, 'training'), staticOptions));
 app.use('/shared_components', express.static(path.join(__dirname, 'shared_components'), staticOptions));
+app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
 // Serve CSS and JS files from root directory
 app.get('/*.css', (req, res) => {
@@ -104,61 +140,76 @@ app.get('/*.js', (req, res) => {
   res.sendFile(path.join(__dirname, fileName));
 });
 
-// Serve specific HTML files from root
+// Serve specific HTML files from their new directories
 app.get('/staff-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'staff-dashboard.html'));
+});
+
+app.get('/bundle-orders-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
+});
+
+// Employee Bundle Pages
+app.get('/DrainPro-Bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'DrainPro-Bundle.html'));
+});
+
+app.get('/streich-bros-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'employee-bundles', 'streich-bros-bundle.html'));
+});
+
+app.get('/wcttr-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'employee-bundles', 'wcttr-bundle.html'));
 });
 
 app.get('/art-invoices-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-invoices-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });
 
 app.get('/art-invoice-view.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-invoice-view.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoice-view.html'));
 });
 
 app.get('/art-invoice-unified-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-invoice-unified-dashboard.html'));
 });
 
-app.get('/webstore-info.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'webstore-info.html'));
-});
+// Removed duplicate route - webstore-info.html is now served from /pages/ directory (see line 328)
 
 app.get('/universal-records-admin.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'universal-records-admin.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'universal-records-admin.html'));
 });
 
 app.get('/art-hub-detail.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-detail.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'art-hub-detail.html'));
 });
 
 app.get('/art-hub-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-dashboard.html'));
 });
 
 app.get('/art-hub-steve.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-steve.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-steve.html'));
 });
 
 app.get('/art-hub-ruth.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-ruth.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-ruth.html'));
 });
 
 app.get('/edit-ruth-mockup.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'edit-ruth-mockup.html'));
+  res.sendFile(path.join(__dirname, 'mockups', 'edit-ruth-mockup.html'));
 });
 
 app.get('/announcements-create.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'announcements-create.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'announcements-create.html'));
 });
 
 app.get('/announcements-manage.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'announcements-manage.html'));
+  res.sendFile(path.join(__dirname, 'admin', 'announcements-manage.html'));
 });
 
 app.get('/design-name-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'design-name-generator.html'));
+  res.sendFile(path.join(__dirname, 'tools', 'design-name-generator.html'));
 });
 
 // Serve the standardized embroidery pricing page
@@ -173,67 +224,74 @@ app.get('/embroidery-pricing-professional.html', (req, res) => {
 
 // Serve the embroidery quote builder
 app.get('/embroidery-quote-builder.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'embroidery-quote-builder.html'));
 });
 
 // Serve the cap embroidery quote builder
 app.get('/cap-embroidery-quote-builder.html', (req, res) => {
   console.log('Serving cap-embroidery-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'cap-embroidery-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'cap-embroidery-quote-builder.html'));
 });
 
 // Serve the DTG quote builder
 app.get('/dtg-quote-builder.html', (req, res) => {
   console.log('Serving dtg-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'dtg-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'dtg-quote-builder.html'));
 });
 
 // Serve the screen print quote builder
 app.get('/screenprint-quote-builder.html', (req, res) => {
   console.log('Serving screenprint-quote-builder.html page');
-  res.sendFile(path.join(__dirname, 'screenprint-quote-builder.html'));
+  res.sendFile(path.join(__dirname, 'quote-builders', 'screenprint-quote-builder.html'));
 });
 
 app.get('/ae-art-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-art-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-dashboard.html'));
 });
 
 app.get('/ae-submit-art.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-submit-art.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-submit-art.html'));
 });
 
 app.get('/ae-art-report.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-art-report.html'));
+  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-report.html'));
 });
 
 app.get('/ae-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ae-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'ae-dashboard.html'));
 });
 
 app.get('/art-hub-coordinator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-hub-coordinator.html'));
+  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-coordinator.html'));
 });
 
 app.get('/digitizingform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'digitizingform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'digitizingform.html'));
 });
 
 app.get('/purchasingform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'purchasingform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'purchasingform.html'));
 });
 
 app.get('/monogramform.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'monogramform.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'monogramform.html'));
 });
 
-// Policies pages
-app.get('/policies-hub.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'policies-hub.html'));
-});
+// Removed duplicate route - policies-hub.html is now served from /pages/ directory (see line 314)
 
 // Christmas Bundles Calculator page
 app.get('/christmas-bundles.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'christmas-bundles.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'christmas-bundles.html'));
+});
+
+// Breast Cancer Awareness Bundle page (Archived - October 2025 promotion)
+app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'archive', 'seasonal-2025', 'breast-cancer-awareness-bundle.html'));
+});
+
+// Marketing page
+app.get('/marketing.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'marketing.html'));
 });
 
 // Top Sellers Catalog page
@@ -246,15 +304,15 @@ app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOpti
 
 // Sanmar Vendor Management Pages
 app.get('/sanmar-invoices.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-invoices.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-invoices.html'));
 });
 
 app.get('/sanmar-credits.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-credits.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-credits.html'));
 });
 
 app.get('/sanmar-vendor-portal.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sanmar-vendor-portal.html'));
+  res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-vendor-portal.html'));
 });
 
 // Test files for new search implementation
@@ -265,28 +323,82 @@ app.get('/index-new.html', (req, res) => {
 
 app.get('/test-api.html', (req, res) => {
   console.log('Serving test-api.html for API testing');
-  res.sendFile(path.join(__dirname, 'test-api.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-api.html'));
 });
 
 app.get('/test-catalog-layout.html', (req, res) => {
   console.log('Serving test-catalog-layout.html for layout testing');
-  res.sendFile(path.join(__dirname, 'test-catalog-layout.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-catalog-layout.html'));
+});
+
+// Routes for pages moved to /pages/ directory
+app.get('/inventory-details.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'inventory-details.html'));
+});
+
+app.get('/policies-hub.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'policies-hub.html'));
+});
+
+app.get('/resources.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'resources.html'));
+});
+
+app.get('/sale.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'sale.html'));
+});
+
+app.get('/webstore-info.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'webstore-info.html'));
+});
+
+app.get('/top-sellers-showcase.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-showcase.html'));
+});
+
+app.get('/top-sellers-product.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-product.html'));
+});
+
+app.get('/sample-cart.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'sample-cart.html'));
+});
+
+app.get('/dtg-compatible-products.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'dtg-compatible-products.html'));
+});
+
+app.get('/richardson-112-product.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'richardson-112-product.html'));
+});
+
+app.get('/pricing-negotiation-policy.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'pricing-negotiation-policy.html'));
+});
+
+app.get('/3-day-tees.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', '3-day-tees.html'));
+});
+
+// Brands browse page
+app.get('/brands.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'brands.html'));
 });
 
 // Phase 1 Infrastructure Test Pages
 app.get('/test-phase1-infrastructure.html', (req, res) => {
   console.log('Serving test-phase1-infrastructure.html page');
-  res.sendFile(path.join(__dirname, 'test-phase1-infrastructure.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-infrastructure.html'));
 });
 
 app.get('/test-phase1-verification.html', (req, res) => {
   console.log('Serving test-phase1-verification.html page');
-  res.sendFile(path.join(__dirname, 'test-phase1-verification.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-verification.html'));
 });
 
 app.get('/test-screenprint-sizes.html', (req, res) => {
   console.log('Serving test-screenprint-sizes.html page');
-  res.sendFile(path.join(__dirname, 'test-screenprint-sizes.html'));
+  res.sendFile(path.join(__dirname, 'tests', 'test-screenprint-sizes.html'));
 });
 
 // Also serve the new JS files explicitly if needed
@@ -347,6 +459,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Also serve index.html when accessed with .html extension
+app.get('/index.html', (req, res) => {
+  console.log('Serving index.html for /index.html route');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // 2. API routes
 app.get('/api/status', (req, res) => {
   res.json({
@@ -358,49 +476,87 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Monitoring API endpoints (if enabled)
+if (monitor) {
+  app.get('/api/monitor/stats', (req, res) => {
+    res.json(monitor.getStats());
+  });
+
+  app.get('/api/monitor/report', (req, res) => {
+    const report = monitor.generateReport();
+    res.json(report);
+  });
+}
+
+// Error reporting endpoint (if monitoring enabled)
+if (monitor) {
+  app.post('/api/error-report', (req, res) => {
+    const errorReport = {
+      timestamp: new Date().toISOString(),
+      page: req.body.page || 'unknown',
+      errors: req.body.errors || [],
+      userAgent: req.headers['user-agent'],
+      sessionId: req.body.sessionId
+    };
+
+    // Save error report to file
+    const errorReports = [];
+    try {
+      if (fs.existsSync('error-reports.json')) {
+        const existing = fs.readFileSync('error-reports.json', 'utf-8');
+        errorReports.push(...JSON.parse(existing));
+      }
+    } catch (e) {
+      console.error('Failed to load existing error reports:', e);
+    }
+
+    errorReports.push(errorReport);
+
+    // Keep only last 1000 reports
+    if (errorReports.length > 1000) {
+      errorReports.splice(0, errorReports.length - 1000);
+    }
+
+    try {
+      fs.writeFileSync('error-reports.json', JSON.stringify(errorReports, null, 2));
+    } catch (e) {
+      console.error('Failed to save error report:', e);
+    }
+
+    res.json({ received: true });
+  });
+}
+
 // Serve cart.html for the /cart route (shopping cart page)
 app.get('/cart', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart.html'));
 });
 
-// Serve inventory-details.html as a specific page
-app.get('/inventory-details.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'inventory-details.html'));
-});
-
-// Serve AI Designer iframe page
-app.get('/ai-designer.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-designer.html'));
-});
-
-// Serve AI Mockup Generator iframe page
-app.get('/ai-mockup-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
-});
-
-app.get('/ai-mockup-generator', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ai-mockup-generator.html'));
-});
+// Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
 
 // Serve pricing pages
 app.get('/pricing/embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing.html'));
 });
 
 app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cap-embroidery-pricing-integrated.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'));
 });
 
 app.get('/pricing/dtg', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtg-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'dtg-pricing.html'));
 });
 
 app.get('/pricing/screen-print', (req, res) => {
-  res.sendFile(path.join(__dirname, 'screen-print-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'screen-print-pricing.html'));
 });
 
 app.get('/pricing/dtf', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dtf-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'dtf-pricing.html'));
+});
+
+app.get('/pricing/stickers', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'sticker-manual-pricing.html'));
 });
 
 // Cart Sessions API

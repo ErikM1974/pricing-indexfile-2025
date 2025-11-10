@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Negotiation Strategy & Policy | Northwest Custom Apparel</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --nwca-green: #2d5f3f;
+            --nwca-dark-green: #1a3a26;
+            --nwca-light-green: #4a7c59;
+            --warning-red: #dc3545;
+            --success-green: #28a745;
+            --info-blue: #17a2b8;
+            --warning-yellow: #ffc107;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, var(--nwca-green) 0%, var(--nwca-dark-green) 100%);
+            color: white;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>') center/cover;
+        }
+
+        .new-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 1rem;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .breadcrumb-container {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            border-left: 5px solid var(--nwca-green);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .principle-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .principle-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .principle-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: var(--nwca-green);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .danger-box {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            border: 2px solid var(--warning-red);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
+            border: 2px solid var(--success-green);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+            border: 2px solid var(--info-blue);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .scenario-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .scenario-card h4 {
+            color: var(--nwca-green);
+            margin-bottom: 1rem;
+        }
+
+        .script-response {
+            background: white;
+            border-left: 4px solid var(--nwca-green);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+
+        .economic-table {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .economic-table thead {
+            background: var(--nwca-green);
+            color: white;
+        }
+
+        .economic-table th {
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .economic-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .economic-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--nwca-green);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            width: 45%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            text-align: right;
+            margin-left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            text-align: left;
+            margin-left: 55%;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--nwca-green);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -12%;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -12%;
+        }
+
+        .value-add-card {
+            background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
+            border: 2px solid var(--success-green);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-add-card h5 {
+            color: var(--success-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: none;
+            width: 50px;
+            height: 50px;
+            background: var(--nwca-green);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top:hover {
+            background: var(--nwca-dark-green);
+            transform: translateY(-3px);
+        }
+
+        .quick-reference {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .quick-reference h5 {
+            color: var(--nwca-green);
+            margin-bottom: 1rem;
+        }
+
+        .quick-reference ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .quick-reference li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .quick-reference a {
+            color: #495057;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .quick-reference a:hover {
+            color: var(--nwca-green);
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                margin-left: 40px !important;
+                text-align: left !important;
+            }
+
+            .timeline-dot {
+                left: -30px !important;
+            }
+
+            .quick-reference {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Banner -->
+    <div class="header-banner">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        Northwest Custom Apparel Pricing Strategy
+                        <span class="new-badge">NEW</span>
+                    </h1>
+                    <p class="lead mb-0">Defending Our 48-Year Legacy of Fair, Consistent Pricing</p>
+                    <p class="mt-2">Presented by Erik Mickelson | Tuesday Company Meeting | October 7, 2025</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="bg-white bg-opacity-10 p-3 rounded">
+                        <h5 class="mb-2">Critical Policy</h5>
+                        <p class="mb-0 small">Essential reference for all Account Executives</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/policies-hub.html">Policies</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Pricing Negotiation Strategy</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Main Content Column -->
+            <div class="col-lg-9">
+                <!-- Executive Summary -->
+                <div class="executive-summary">
+                    <h2 class="mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Executive Summary: Defending Our $30 Customer-Supplied Pricing
+                    </h2>
+                    <p class="lead">
+                        After 48 years in business, Northwest Custom Apparel maintains pricing that ensures both sustainability and fair value. Our $30 customer-supplied embroidery pricing is not negotiable—it represents the true cost of quality service, skilled labor, and business continuity.
+                    </p>
+                    <div class="danger-box mt-3">
+                        <h5 class="text-danger mb-2">
+                            <i class="fas fa-times-circle me-2"></i>
+                            The Economic Reality
+                        </h5>
+                        <p class="mb-2 fw-bold">A 5% discount destroys 50% of our profit margin.</p>
+                        <p class="mb-0">When operating at 10% profit margins, every discount directly threatens our ability to maintain quality, pay fair wages, and invest in equipment.</p>
+                    </div>
+                </div>
+
+                <!-- Seven Core Principles -->
+                <div class="content-section" id="core-principles">
+                    <h2 class="mb-4">
+                        <i class="fas fa-shield-alt text-primary me-2"></i>
+                        The Seven Core Principles of Northwest Custom Apparel
+                    </h2>
+                    <p class="text-muted mb-4">These principles guide every pricing decision and customer interaction</p>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">1</span>Quality Without Compromise</h4>
+                        <p class="ms-5">Every job receives the same attention to detail, whether it's 12 pieces or 12,000. Our reputation is built on consistency.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">2</span>Fair Wages for Skilled Labor</h4>
+                        <p class="ms-5">Our team members deserve living wages. Discounts come directly from their paychecks and our ability to retain talent.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">3</span>Investment in Modern Equipment</h4>
+                        <p class="ms-5">Quality requires investment. Our pricing maintains equipment that produces superior results.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">4</span>Sustainability Over Sales Volume</h4>
+                        <p class="ms-5">We choose profitable relationships over volume. 100 profitable customers beat 1,000 unprofitable ones.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">5</span>Transparency in All Dealings</h4>
+                        <p class="ms-5">Our pricing is clear, consistent, and fair. No hidden fees, no surprise charges, no games.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">6</span>Value Beyond Price</h4>
+                        <p class="ms-5">We compete on service, quality, and reliability—not on being the cheapest option.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <h4><span class="principle-number">7</span>Long-term Relationships</h4>
+                        <p class="ms-5">We build partnerships, not transactions. Our pricing ensures we're here for decades to come.</p>
+                    </div>
+                </div>
+
+                <!-- Economic Reality of Discounting -->
+                <div class="content-section" id="economic-reality">
+                    <h2 class="mb-4">
+                        <i class="fas fa-chart-line text-danger me-2"></i>
+                        The Economic Reality of Discounting
+                    </h2>
+                    <p class="lead mb-4">Understanding why "just a small discount" can destroy a business</p>
+
+                    <table class="table economic-table">
+                        <thead>
+                            <tr>
+                                <th>Discount Given</th>
+                                <th>Profit Lost</th>
+                                <th>Additional Sales Needed to Break Even</th>
+                                <th>Real Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>5%</td>
+                                <td class="text-danger fw-bold">50%</td>
+                                <td>+100% more volume</td>
+                                <td>Must double sales to maintain profit</td>
+                            </tr>
+                            <tr>
+                                <td>10%</td>
+                                <td class="text-danger fw-bold">100%</td>
+                                <td>+∞ (impossible)</td>
+                                <td>Working for free</td>
+                            </tr>
+                            <tr>
+                                <td>15%</td>
+                                <td class="text-danger fw-bold">-50%</td>
+                                <td>N/A</td>
+                                <td>Losing money on every order</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="danger-box">
+                        <h5 class="text-danger">
+                            <i class="fas fa-calculator me-2"></i>
+                            The Math Doesn't Lie
+                        </h5>
+                        <p>On a $30 job with 10% profit margin ($3 profit):</p>
+                        <ul>
+                            <li>5% discount ($1.50) reduces profit to $1.50 = <strong>50% profit loss</strong></li>
+                            <li>10% discount ($3.00) reduces profit to $0 = <strong>100% profit loss</strong></li>
+                            <li>15% discount ($4.50) = <strong>$1.50 LOSS per piece</strong></li>
+                        </ul>
+                        <p class="mb-0 fw-bold">Would you work for half pay? Neither should we.</p>
+                    </div>
+                </div>
+
+                <!-- Customer-Supplied Garment Pricing -->
+                <div class="content-section" id="customer-supplied">
+                    <h2 class="mb-4">
+                        <i class="fas fa-tshirt text-info me-2"></i>
+                        Why Customer-Supplied Garments Cost What They Do
+                    </h2>
+                    <p class="lead mb-4">The hidden costs and risks of customer-supplied items</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <h5 class="text-info">Additional Labor Required</h5>
+                                <ul>
+                                    <li>Sorting mixed items</li>
+                                    <li>Quality checking each piece</li>
+                                    <li>Handling various fabrics/blends</li>
+                                    <li>Managing multiple brands</li>
+                                    <li>Extra documentation</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="danger-box">
+                                <h5 class="text-danger">Risks We Absorb</h5>
+                                <ul>
+                                    <li>Damage liability</li>
+                                    <li>Missing items claims</li>
+                                    <li>Quality variations</li>
+                                    <li>Incorrect counts</li>
+                                    <li>Storage requirements</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-light rounded">
+                        <h5>The Time Factor</h5>
+                        <p>Customer-supplied jobs take <strong>40% longer</strong> to process than standard orders:</p>
+                        <ul>
+                            <li>20 minutes: Receiving and counting</li>
+                            <li>15 minutes: Sorting by size/color</li>
+                            <li>10 minutes: Quality inspection</li>
+                            <li>15 minutes: Extra handling during production</li>
+                            <li>10 minutes: Final count and packaging</li>
+                        </ul>
+                        <p class="mb-0 fw-bold">Total: 70 minutes extra per job = Higher cost</p>
+                    </div>
+                </div>
+
+                <!-- Scripts for Common Scenarios -->
+                <div class="content-section" id="scripts">
+                    <h2 class="mb-4">
+                        <i class="fas fa-comments text-success me-2"></i>
+                        Scripts & Responses for Common Scenarios
+                    </h2>
+                    <p class="lead mb-4">Professional responses that protect margins while maintaining relationships</p>
+
+                    <div class="scenario-card">
+                        <h4>Scenario 1: "Your competitor charges $25"</h4>
+                        <div class="script-response">
+                            "I understand price is important. Our $30 pricing reflects our 48 years of reliability and quality. We've seen many $25 competitors come and go—usually when customers needed rush orders or had quality issues. Would you prefer to save $5 per piece or have confidence your order will be perfect and on time?"
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <h4>Scenario 2: "Can you do $25 for a large order?"</h4>
+                        <div class="script-response">
+                            "I appreciate your business, and I wish I could. At $25, we'd actually lose money on every piece. What I can offer is priority scheduling, free digitizing on your next order, or help finding ways to reduce the complexity to save costs. Would any of these alternatives work better for you?"
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <h4>Scenario 3: "We're a non-profit"</h4>
+                        <div class="script-response">
+                            "We deeply respect your mission and support many non-profits. While we can't discount below our costs, we can offer extended payment terms, help you design for efficiency, or suggest alternatives like patches that might fit your budget better. How can we help make this work within your budget?"
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <h4>Scenario 4: "Just this once for a special event"</h4>
+                        <div class="script-response">
+                            "I understand this is important to you. The challenge is that 'just once' becomes precedent, and we must be consistent with all customers. Instead, let me show you how we can modify the design to reduce stitch count, or explore other decoration methods that might be more budget-friendly. Would you like to see those options?"
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <h4>Scenario 5: "I'll take my business elsewhere"</h4>
+                        <div class="script-response">
+                            "I respect your decision and truly wish we could meet your price point. If you do find someone who can do quality work at that price, we'd love to know how they manage it. Many customers who leave for lower prices return when they experience the difference. We'll be here if you need us, and I'm happy to provide a reference for your files."
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Value-Add Strategies -->
+                <div class="content-section" id="value-strategies">
+                    <h2 class="mb-4">
+                        <i class="fas fa-gift text-success me-2"></i>
+                        Value-Add Strategies: Erik's Beanie Approach
+                    </h2>
+                    <p class="lead mb-4">How to increase value without destroying margins</p>
+
+                    <div class="value-add-card">
+                        <h5>The Beanie Strategy</h5>
+                        <p>"I can't reduce the price, but I can throw in free embroidered beanies with your order. These retail for $25 but cost us $8. You get $25 in value, we protect our margins."</p>
+                    </div>
+
+                    <div class="value-add-card">
+                        <h5>Free Digitizing on Next Order</h5>
+                        <p>"Place this order at full price, and I'll waive the $75 digitizing fee on your next order. That's like getting $3 off per piece on a 25-piece order."</p>
+                    </div>
+
+                    <div class="value-add-card">
+                        <h5>Priority Rush Service</h5>
+                        <p>"At our standard pricing, I can guarantee 3-day turnaround on your next rush order—that's a $200 value when you need it most."</p>
+                    </div>
+
+                    <div class="value-add-card">
+                        <h5>Extended Payment Terms</h5>
+                        <p>"While we can't reduce the price, I can offer NET 45 payment terms, helping your cash flow without affecting our costs."</p>
+                    </div>
+
+                    <div class="value-add-card">
+                        <h5>Free Samples</h5>
+                        <p>"Order at standard pricing, and I'll include 3 free samples for your sales team—that's $90 in value at no charge."</p>
+                    </div>
+                </div>
+
+                <!-- Handling Difficult Customers -->
+                <div class="content-section" id="difficult-customers">
+                    <h2 class="mb-4">
+                        <i class="fas fa-user-slash text-warning me-2"></i>
+                        The Cost of Bad Customers: When to Say No
+                    </h2>
+                    <p class="lead mb-4">Protecting team morale and company profitability</p>
+
+                    <div class="danger-box">
+                        <h5 class="text-danger">Red Flags to Recognize</h5>
+                        <ul>
+                            <li>Demands pricing before discussing project details</li>
+                            <li>Compares only price, ignores quality/service</li>
+                            <li>Has a history of complaints with other vendors</li>
+                            <li>Refuses to pay deposits</li>
+                            <li>Threatens negative reviews for leverage</li>
+                            <li>Consistently pays late or disputes invoices</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h4>The True Cost of a Bad Customer</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <h6>Time Drain</h6>
+                                    <ul class="mb-0">
+                                        <li>5x more communication required</li>
+                                        <li>Multiple revisions and complaints</li>
+                                        <li>Disrupts workflow and schedules</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <h6>Morale Impact</h6>
+                                    <ul class="mb-0">
+                                        <li>Team stress and frustration</li>
+                                        <li>Decreased productivity</li>
+                                        <li>Risk of losing good employees</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-box mt-4">
+                        <h5 class="text-success">The Professional Exit</h5>
+                        <p class="mb-2">"I don't think we're the right fit for your needs. Our pricing and processes are designed for customers who value quality and reliability over the lowest price. I'd be happy to recommend [competitor] who might better match what you're looking for."</p>
+                        <p class="mb-0 fw-bold">Remember: Firing bad customers makes room for good ones.</p>
+                    </div>
+                </div>
+
+                <!-- Seven Dangers of Discounting -->
+                <div class="content-section" id="seven-dangers">
+                    <h2 class="mb-4">
+                        <i class="fas fa-skull-crossbones text-danger me-2"></i>
+                        The Seven Dangers That Destroy Companies
+                    </h2>
+                    <p class="lead mb-4">Why discounting is a death spiral for service businesses</p>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>1. The Precedent Trap</h5>
+                                <p>One discount becomes expected forever. "You did it last time" becomes your new price.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>2. The Referral Poison</h5>
+                                <p>Discounted customers refer other price-shoppers. You attract the wrong clientele.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>3. The Quality Slide</h5>
+                                <p>Less profit means cutting corners. Quality drops, reputation suffers, good customers leave.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>4. The Morale Killer</h5>
+                                <p>Team knows discounts come from their raises. Good employees leave for better-paying companies.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>5. The Cash Flow Crisis</h5>
+                                <p>Lower margins mean no cash reserves. One bad month becomes bankruptcy.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="danger-box h-100">
+                                <h5>6. The Investment Freeze</h5>
+                                <p>No profit means no new equipment. You fall behind competitors who invested wisely.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="danger-box">
+                        <h5 class="text-danger">7. The Death Spiral</h5>
+                        <p class="mb-0">Discounts → Less Profit → Worse Service → Lost Customers → More Discounts → Bankruptcy</p>
+                        <p class="mt-2 mb-0 fw-bold">This cycle has killed thousands of print shops. We will not be one of them.</p>
+                    </div>
+                </div>
+
+                <!-- Implementation Timeline -->
+                <div class="content-section" id="timeline">
+                    <h2 class="mb-4">
+                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        Implementation Timeline
+                    </h2>
+                    <p class="lead mb-4">Rolling out the new pricing defense strategy</p>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Week 1: Team Training</h5>
+                                    <p class="card-text">All AEs receive pricing defense training and scripts</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Week 2: Customer Communication</h5>
+                                    <p class="card-text">Send pricing policy updates to all active customers</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Week 3: Implementation</h5>
+                                    <p class="card-text">Begin using new scripts and value-add strategies</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Week 4: Review & Adjust</h5>
+                                    <p class="card-text">Team meeting to share experiences and refine approach</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Message -->
+                <div class="content-section">
+                    <h2 class="mb-4">
+                        <i class="fas fa-flag text-success me-2"></i>
+                        Final Message: Standing Firm for 48 More Years
+                    </h2>
+
+                    <div class="success-box">
+                        <h4 class="text-success">Our Commitment</h4>
+                        <p class="lead">We are not the cheapest. We will never be the cheapest. We are the best value.</p>
+                        <p>After 48 years, Northwest Custom Apparel stands for:</p>
+                        <ul>
+                            <li>Quality that exceeds expectations</li>
+                            <li>Service that solves problems</li>
+                            <li>Reliability that builds trust</li>
+                            <li>Fairness that sustains relationships</li>
+                        </ul>
+                        <p class="mb-0 fw-bold">Our prices ensure we'll be here for your grandchildren's orders. That's our promise.</p>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-light rounded">
+                        <h5>Remember</h5>
+                        <p class="mb-2">Every time you defend our pricing, you're defending:</p>
+                        <ul>
+                            <li>Your coworkers' livelihoods</li>
+                            <li>Our ability to serve customers well</li>
+                            <li>The company's future</li>
+                            <li>Your own job security</li>
+                        </ul>
+                        <p class="mb-0 fw-bold text-primary">Stand firm. Stand proud. Stand together.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="quick-reference">
+                    <h5>Quick Reference</h5>
+                    <ul>
+                        <li><a href="#core-principles">7 Core Principles</a></li>
+                        <li><a href="#economic-reality">Economic Reality</a></li>
+                        <li><a href="#customer-supplied">Customer-Supplied Pricing</a></li>
+                        <li><a href="#scripts">Response Scripts</a></li>
+                        <li><a href="#value-strategies">Value-Add Strategies</a></li>
+                        <li><a href="#difficult-customers">Difficult Customers</a></li>
+                        <li><a href="#seven-dangers">7 Dangers</a></li>
+                        <li><a href="#timeline">Implementation</a></li>
+                    </ul>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-danger">Key Numbers</h6>
+                        <ul class="small mb-0">
+                            <li>$30 - Min customer supplied</li>
+                            <li>10% - Our profit margin</li>
+                            <li>5% discount = 50% profit loss</li>
+                            <li>48 years in business</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-success bg-opacity-10 rounded">
+                        <h6 class="text-success">Value-Adds Available</h6>
+                        <ul class="small mb-0">
+                            <li>Free beanies ($8 cost)</li>
+                            <li>Free digitizing ($75 value)</li>
+                            <li>Priority rush service</li>
+                            <li>Extended payment terms</li>
+                            <li>Free samples</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 py-4 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">© 2025 Northwest Custom Apparel. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Questions? Contact Erik Mickelson</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Back to Top Button
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                document.getElementById('backToTop').style.display = "block";
+            } else {
+                document.getElementById('backToTop').style.display = "none";
+            }
+        };
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Print function
+        function printPolicy() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

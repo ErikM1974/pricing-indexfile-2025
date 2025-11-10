@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Pricing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .style-test {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .style-test h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .price-table th, .price-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .price-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        .match {
+            color: green;
+            font-weight: bold;
+        }
+        .mismatch {
+            color: red;
+            font-weight: bold;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Embroidery Pricing Comparison Test</h1>
+    <p>Testing pricing consistency between embroidery-pricing-service.js (used by static page) and embroidery-quote-pricing.js (used by quote builder)</p>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h2>Embroidery Pricing Service (Static Page)</h2>
+            <div id="service-results"></div>
+        </div>
+        <div class="test-section">
+            <h2>Embroidery Quote Pricing (Quote Builder)</h2>
+            <div id="quote-results"></div>
+        </div>
+    </div>
+
+    <!-- Load both services -->
+    <script src="shared_components/js/embroidery-pricing-service.js"></script>
+    <script src="shared_components/js/embroidery-quote-pricing.js"></script>
+
+    <script>
+        // Test styles
+        const testStyles = ['PC61', 'PC90H', 'J790', 'J317', 'TLJ798'];
+
+        // Test function for embroidery-pricing-service.js
+        async function testPricingService(styleNumber) {
+            const service = new EmbroideryPricingService();
+            try {
+                const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                return data;
+            } catch (error) {
+                console.error(`Service error for ${styleNumber}:`, error);
+                return { error: error.message };
+            }
+        }
+
+        // Test function for embroidery-quote-pricing.js
+        async function testQuotePricing(styleNumber) {
+            const service = new EmbroideryQuotePricingService();
+            try {
+                const data = await service.fetchPricingData(styleNumber, { forceRefresh: true });
+                return data;
+            } catch (error) {
+                console.error(`Quote error for ${styleNumber}:`, error);
+                return { error: error.message };
+            }
+        }
+
+        // Format pricing data for display
+        function formatPricing(data, containerId, serviceName) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (data.error) {
+                container.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                return;
+            }
+
+            const styleDiv = document.createElement('div');
+            styleDiv.className = 'style-test';
+            styleDiv.innerHTML = `
+                <h3>${data.styleNumber || 'Unknown'}</h3>
+                <p>Sizes: ${data.uniqueSizes ? data.uniqueSizes.join(', ') : 'N/A'}</p>
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>24-47 pcs</th>
+                            <th>48-71 pcs</th>
+                            <th>72+ pcs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="${containerId}-${data.styleNumber}-tbody">
+                    </tbody>
+                </table>
+            `;
+            container.appendChild(styleDiv);
+
+            const tbody = document.getElementById(`${containerId}-${data.styleNumber}-tbody`);
+
+            // Display pricing for each size
+            if (data.pricing && data.uniqueSizes) {
+                data.uniqueSizes.forEach(size => {
+                    const row = document.createElement('tr');
+                    const tier1Price = data.pricing['24-47']?.[size] || 'N/A';
+                    const tier2Price = data.pricing['48-71']?.[size] || 'N/A';
+                    const tier3Price = data.pricing['72+']?.[size] || 'N/A';
+
+                    row.innerHTML = `
+                        <td>${size}</td>
+                        <td>$${tier1Price !== 'N/A' ? tier1Price.toFixed(2) : 'N/A'}</td>
+                        <td>$${tier2Price !== 'N/A' ? tier2Price.toFixed(2) : 'N/A'}</td>
+                        <td>$${tier3Price !== 'N/A' ? tier3Price.toFixed(2) : 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        // Compare pricing between services
+        function comparePricing(serviceData, quoteData) {
+            if (serviceData.error || quoteData.error) {
+                return { match: false, message: 'One or both services returned an error' };
+            }
+
+            let allMatch = true;
+            const mismatches = [];
+
+            if (serviceData.uniqueSizes && quoteData.uniqueSizes) {
+                // Check if sizes match
+                if (serviceData.uniqueSizes.join(',') !== quoteData.uniqueSizes.join(',')) {
+                    allMatch = false;
+                    mismatches.push('Size lists do not match');
+                }
+
+                // Check pricing for each tier and size
+                ['24-47', '48-71', '72+'].forEach(tier => {
+                    serviceData.uniqueSizes.forEach(size => {
+                        const servicePrice = serviceData.pricing?.[tier]?.[size];
+                        const quotePrice = quoteData.pricing?.[tier]?.[size];
+
+                        if (servicePrice !== quotePrice) {
+                            allMatch = false;
+                            mismatches.push(`${tier}/${size}: Service=$${servicePrice}, Quote=$${quotePrice}`);
+                        }
+                    });
+                });
+            }
+
+            return { match: allMatch, mismatches };
+        }
+
+        // Run all tests
+        async function runTests() {
+            for (const style of testStyles) {
+                // Clear previous results
+                document.getElementById('service-results').innerHTML += `<div class="loading">Testing ${style}...</div>`;
+                document.getElementById('quote-results').innerHTML += `<div class="loading">Testing ${style}...</div>`;
+
+                // Run tests in parallel
+                const [serviceData, quoteData] = await Promise.all([
+                    testPricingService(style),
+                    testQuotePricing(style)
+                ]);
+
+                // Display results
+                formatPricing(serviceData, 'service-results', 'Service');
+                formatPricing(quoteData, 'quote-results', 'Quote');
+
+                // Compare results
+                const comparison = comparePricing(serviceData, quoteData);
+
+                // Add comparison result
+                const serviceContainer = document.getElementById('service-results');
+                const lastServiceDiv = serviceContainer.lastElementChild;
+                const comparisonDiv = document.createElement('div');
+                comparisonDiv.innerHTML = comparison.match
+                    ? '<span class="match">✓ Prices Match!</span>'
+                    : `<span class="mismatch">✗ Mismatch: ${comparison.mismatches.join(', ')}</span>`;
+                lastServiceDiv.appendChild(comparisonDiv);
+            }
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

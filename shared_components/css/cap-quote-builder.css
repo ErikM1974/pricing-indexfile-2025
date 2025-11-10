@@ -189,11 +189,17 @@ body {
 
 /* Phase Sections */
 .phase-section {
+    display: none; /* Hide all phases by default - active class shows the current phase */
     background: white;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     margin: 2rem 0;
     overflow: hidden;
+}
+
+/* Show the active phase section */
+.phase-section.active {
+    display: block !important;
 }
 
 .phase-header {
@@ -233,6 +239,19 @@ body {
 /* Phase Content */
 .phase-section > div:not(.phase-header) {
     padding: 2rem;
+}
+
+/* Phase 3 Content Wrapper - Fix for "two pages" appearance (2025-10-15) */
+#summary-phase {
+    padding: 0; /* Remove padding on Phase 3 */
+}
+
+#summary-phase .phase-header {
+    margin: 0 2.5rem 2rem 2.5rem; /* Restore margin for header only */
+}
+
+#summary-phase > div:not(.phase-header):not(.phase-actions) {
+    padding: 0; /* Remove padding on Phase 3 content - individual sections have their own padding */
 }
 
 /* Logo Sections */
@@ -381,6 +400,8 @@ body {
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 2rem;
+    overflow: visible; /* Allow dropdown to show outside container */
+    position: relative; /* For absolute positioned dropdown */
 }
 
 .search-row {
@@ -391,8 +412,8 @@ body {
 }
 
 .suggestions-dropdown {
-    position: relative;
-    z-index: 10;
+    position: absolute;
+    z-index: 9999; /* Higher z-index to ensure it's above everything */
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -834,11 +855,14 @@ body {
     background: var(--secondary-color);
     border-top: 1px solid var(--border-color);
     gap: 1rem;
+    position: static;
+    width: auto;
 }
 
 .phase-actions .btn {
     min-width: 120px;
     justify-content: center;
+    position: static;
 }
 
 /* Modals */
@@ -1003,61 +1027,61 @@ body {
     padding: 2rem;
 }
 
-/* Totals Section Styling */
-.totals-section {
-    background: var(--primary-color) !important;
-    color: white !important;
-    border-color: var(--primary-dark) !important;
+/* Totals Section Styling - Higher specificity instead of !important */
+#summary-phase .totals-section {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-dark);
 }
 
-.totals-section h4 {
-    color: white !important;
+#summary-phase .totals-section h4 {
+    color: white;
 }
 
-.totals-section h4 i {
-    color: white !important;
+#summary-phase .totals-section h4 i {
+    color: white;
 }
 
-.totals-section p {
-    color: white !important;
+#summary-phase .totals-section p {
+    color: white;
 }
 
 .totals-breakdown {
     space-y: 0.5rem;
 }
 
-.total-line {
+#summary-phase .total-line {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    color: white !important;
+    color: white;
 }
 
-.total-line:last-child {
+#summary-phase .total-line:last-child {
     border-bottom: none;
 }
 
-.ltm-line {
-    color: rgba(255, 255, 255, 0.9) !important;
+#summary-phase .ltm-line {
+    color: rgba(255, 255, 255, 0.9);
     font-style: italic;
 }
 
-.grand-total {
+#summary-phase .grand-total {
     font-size: 1.25rem;
     font-weight: bold;
     border-top: 2px solid rgba(255, 255, 255, 0.3);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    color: white !important;
+    color: white;
 }
 
-.grand-total span {
-    color: white !important;
+#summary-phase .grand-total span {
+    color: white;
 }
 
-.grand-total strong {
-    color: white !important;
+#summary-phase .grand-total strong {
+    color: white;
 }
 
 /* Additional Services Styling */
@@ -1106,7 +1130,7 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: 10px;
         margin-top: 60px;
     }
     

@@ -14,13 +14,115 @@ class DTFPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[DTFPricingService] Manual cost from URL:', cost);
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[DTFPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[DTFPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Fetch DTF pricing bundle from API using reference product
+     * @returns {Object} Complete pricing bundle from API
+     * @throws {Error} If API request fails
+     */
+    async fetchPricingBundle() {
+        const url = `${this.baseURL}/api/pricing-bundle?method=DTF&styleNumber=PC61`;
+        console.log('[DTFPricingService] Fetching complete pricing bundle from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch DTF pricing bundle from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate required fields
+        if (!data.tiersR || !data.allDtfCostsR || !data.freightR) {
+            throw new Error('Invalid API response: missing required DTF pricing data');
+        }
+
+        console.log('[DTFPricingService] Successfully fetched complete pricing bundle from API');
+        return data;
+    }
+
+    /**
+     * Generate pricing data using manual cost + API pricing rules
+     * Fetches everything from API except garment base cost
+     * DTF uses garment cost + transfer cost + labor + freight
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Pricing data with API rules + manual garment cost
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[DTFPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        const apiBundle = await this.fetchPricingBundle();
+
+        // Use API data with manual cost
+        const syntheticAPIData = {
+            styleNumber: 'MANUAL',
+            tiersR: apiBundle.tiersR,          // From API
+            allDtfCostsR: apiBundle.allDtfCostsR,  // From API
+            freightR: apiBundle.freightR,      // From API
+            rulesR: apiBundle.rulesR,          // From API
+            locations: apiBundle.locations || [{ code: 'FRONT', name: 'Front' }, { code: 'BACK', name: 'Back' }],
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // Transform using existing method
+        const transformedData = this.transformApiData(syntheticAPIData);
+
+        // Mark as manual mode
+        transformedData.manualMode = true;
+        transformedData.manualCost = manualCost;
+        transformedData.source = 'manual';
+
+        return transformedData;
+    }
+
+    /**
      * Main entry point - fetches DTF pricing data from API
      */
-    async fetchPricingData(options = {}) {
-        console.log('[DTFPricingService] Fetching DTF pricing data');
-        
-        // Check cache first
-        const cacheKey = `${this.cachePrefix}-bundle`;
+    async fetchPricingData(styleNumber = null, options = {}) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[DTFPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            const manualData = await this.generateManualPricingData(manualCost);
+            this.apiData = manualData;
+            return manualData;
+        }
+
+        console.log('[DTFPricingService] Fetching DTF pricing data', styleNumber ? `for style: ${styleNumber}` : '(generic)');
+
+        // Build cache key based on style number
+        const cacheKey = styleNumber ? `${this.cachePrefix}-${styleNumber}` : `${this.cachePrefix}-bundle`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
             console.log('[DTFPricingService] Returning cached data');
@@ -29,28 +131,34 @@ class DTFPricingService {
         }
 
         try {
+            // Build API URL with optional style number
+            let apiUrl = `${this.baseURL}/api/pricing-bundle?method=DTF`;
+            if (styleNumber) {
+                apiUrl += `&styleNumber=${encodeURIComponent(styleNumber)}`;
+            }
+
             // Fetch from API
-            const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=DTF`);
-            
+            const response = await fetch(apiUrl);
+
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log('[DTFPricingService] API data received:', data);
-            
+
             // Validate required fields
             if (!data.tiersR || !data.allDtfCostsR || !data.freightR) {
                 throw new Error('Invalid API response - missing required fields');
             }
-            
+
             // Transform to usable format
             const transformedData = this.transformApiData(data);
-            
+
             // Cache the result
             this.saveToCache(cacheKey, transformedData);
             this.apiData = transformedData;
-            
+
             return transformedData;
         } catch (error) {
             console.error('[DTFPricingService] Error:', error);

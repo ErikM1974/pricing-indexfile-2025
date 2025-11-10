@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Company Policies Hub - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="shared_components/css/dashboard-styles.css" rel="stylesheet">
+    
+    <style>
+        /* Policy Hub Specific Styles */
+        .policies-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .hub-header {
+            background: linear-gradient(135deg, var(--wsu-crimson) 0%, var(--wsu-grey) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hub-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hub-header p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+        }
+        
+        .policy-search {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--wsu-crimson);
+            box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .policy-categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .category-filter {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .category-filter:hover {
+            background: var(--light-bg);
+            border-color: var(--wsu-crimson);
+        }
+        
+        .category-filter.active {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+        }
+        
+        .policies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .policy-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid var(--wsu-crimson);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .policy-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .policy-card.new-policy::before {
+            content: 'NEW';
+            position: absolute;
+            top: -8px;
+            right: 1rem;
+            background: #22c55e;
+            color: white;
+            font-size: 0.625rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+        }
+        
+        .policy-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--light-bg);
+            color: var(--wsu-grey);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .policy-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .policy-description {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .policy-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .policy-updated {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .policy-owner {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .quick-actions-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-link:hover {
+            background: var(--wsu-crimson);
+            color: white;
+            border-color: var(--wsu-crimson);
+            transform: translateY(-1px);
+        }
+        
+        .back-to-dashboard {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--wsu-crimson);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(152, 30, 50, 0.3);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+        
+        .back-to-dashboard:hover {
+            background: var(--wsu-crimson-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(152, 30, 50, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .policies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hub-header h1 {
+                font-size: 1.875rem;
+            }
+            
+            .back-to-dashboard {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="policies-container">
+        <!-- Header -->
+        <div class="hub-header">
+            <h1><i class="fas fa-book-open"></i> Company Policies Hub</h1>
+            <p>Quick reference for all NWCA operational policies and guidelines</p>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="policy-search">
+            <div style="position: relative;">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="policySearch" placeholder="Search policies by title or keyword...">
+            </div>
+        </div>
+        
+        <!-- Category Filters -->
+        <div class="policy-categories">
+            <button class="category-filter active" data-category="all">All Policies</button>
+            <button class="category-filter" data-category="financial">Financial</button>
+            <button class="category-filter" data-category="operations">Operations</button>
+            <button class="category-filter" data-category="customer-service">Customer Service</button>
+            <button class="category-filter" data-category="hr">HR & Team</button>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3 class="quick-actions-title">Quick Actions</h3>
+            <div class="quick-links">
+                <a href="#" class="quick-link" onclick="window.print(); return false;">
+                    <i class="fas fa-print"></i> Print All Policies
+                </a>
+                <a href="mailto:sales@nwcustomapparel.com?subject=Policy%20Question" class="quick-link">
+                    <i class="fas fa-envelope"></i> Ask a Question
+                </a>
+                <a href="#" class="quick-link" onclick="alert('Policy request form coming soon!'); return false;">
+                    <i class="fas fa-plus-circle"></i> Request New Policy
+                </a>
+            </div>
+        </div>
+        
+        <!-- Policies Grid -->
+        <div class="policies-grid" id="policiesGrid">
+            <!-- Sales & Office Procedures -->
+            <a href="policies/sales-office-procedures.html" class="policy-card new-policy" data-category="operations">
+                <span class="policy-category">Operations</span>
+                <h3 class="policy-title">Sales & Office Procedures</h3>
+                <p class="policy-description">
+                    Comprehensive office standards including punctuality (Lombardi Time philosophy), customer service protocols, phone policies (3-ring rule), digital communications, and daily operational responsibilities. Essential guide for all team members covering opening/closing procedures, customer interaction standards, and individual role assignments.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Oct 31, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Retail vs Wholesale Pricing Policy -->
+            <a href="policies/retail-vs-wholesale-pricing-policy.html" class="policy-card" data-category="financial">
+                <span class="policy-category">Financial</span>
+                <h3 class="policy-title">Retail vs. Wholesale Pricing Policy</h3>
+                <p class="policy-description">
+                    Essential understanding of our two business models and why we maintain different pricing for retail customers vs. wholesale partners. Explains the Condo Care decision and how to protect our 40% jacket margins. Critical for all staff to understand customer pricing strategies.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Oct 21, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Pricing Negotiation Policy -->
+            <a href="pricing-negotiation-policy.html" class="policy-card" data-category="financial">
+                <span class="policy-category">Financial</span>
+                <h3 class="policy-title">Pricing Negotiation Strategy & Policy</h3>
+                <p class="policy-description">
+                    Critical strategies for defending our $30 customer-supplied pricing and maintaining profitability. Includes scripts for common scenarios, value-add alternatives to discounting, and the seven dangers that destroy margins. Essential reference for all AEs.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Jan 28, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Bundle Kitting Process -->
+            <a href="policies/bundle-kitting-xmas-2025.html" class="policy-card" data-category="operations">
+                <span class="policy-category">Operations</span>
+                <h3 class="policy-title">Christmas Bundle Kitting Process 2025</h3>
+                <p class="policy-description">
+                    Step-by-step workflow for producing and assembling customer gift bundles with multiple decoration methods. Covers order intake, department coordination, quality control, and final kitting with photography.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Oct 03, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Ruth N.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Payment Terms Policy -->
+            <a href="policies/payment-terms.html" class="policy-card" data-category="financial">
+                <span class="policy-category">Financial</span>
+                <h3 class="policy-title">Payment Terms Guide</h3>
+                <p class="policy-description">
+                    Comprehensive guide to all payment terms including Pay on Pickup, Prepaid, Net terms, and special cases. Essential reference for all customer transactions.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Aug 22, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Less Than Minimum Fee Policy -->
+            <a href="policies/ltm-fee-policy.html" class="policy-card" data-category="financial">
+                <span class="policy-category">Financial</span>
+                <h3 class="policy-title">Less Than Minimum (LTM) Fee Policy</h3>
+                <p class="policy-description">
+                    Essential guide for applying the $50 LTM fee on orders under minimums. Covers fee calculations, waiver eligibility, and customer communication for embroidery, DTG, DTF, and screen print services.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Aug 22, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- LTM Order Decision Algorithm -->
+            <a href="policies/ltm-order-decision-algorithm.html" class="policy-card" data-category="operations">
+                <span class="policy-category">Operations</span>
+                <h3 class="policy-title">LTM Order Decision Algorithm</h3>
+                <p class="policy-description">
+                    Comprehensive framework for AEs to handle Less-Than-Minimum order inquiries. Includes decision tree for existing vs. new customers, upselling scripts, strategic filtering, and referral procedures.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Jan 09, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Erik M.
+                    </span>
+                </div>
+            </a>
+
+            <!-- Customer Notification SOP -->
+            <a href="policies/customer-notification-sop.html" class="policy-card" data-category="operations">
+                <span class="policy-category">Operations</span>
+                <h3 class="policy-title">Customer Notification for Order Pickup</h3>
+                <p class="policy-description">
+                    Standard operating procedure for notifying customers when orders are ready for pickup. Includes call scripts, Shopworks logging instructions with visual guide, and follow-up protocols.
+                </p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> Sep 16, 2025
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> Office Admin
+                    </span>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Back to Dashboard Button -->
+    <a href="staff-dashboard.html" class="back-to-dashboard">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <script>
+        // Search functionality
+        document.getElementById('policySearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.policy-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.policy-title').textContent.toLowerCase();
+                const description = card.querySelector('.policy-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Category filtering
+        document.querySelectorAll('.category-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.category-filter').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Filter cards
+                const category = this.dataset.category;
+                const cards = document.querySelectorAll('.policy-card');
+                
+                cards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

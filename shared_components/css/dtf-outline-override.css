@@ -1,0 +1,89 @@
+/**
+ * DTF Outline Override CSS
+ * This file ensures DTF uses outline style (white background with green border)
+ * instead of filled green backgrounds for selected items
+ * Load this AFTER force-green-theme.css
+ * Updated with maximum specificity to ensure override
+ */
+
+/* Force outline style for DTF toggle items with maximum specificity */
+body.dtf-pricing-page .dtf-toggle-item.active,
+body .dtf-toggle-item.active,
+.dtf-toggle-item.active,
+.dtf-toggle-item.selected,
+.dtf-toggle-item.on {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+}
+
+/* Ensure text stays green, not white with maximum specificity */
+body.dtf-pricing-page .dtf-toggle-item.active .dtf-toggle-label,
+body .dtf-toggle-item.active .dtf-toggle-label,
+.dtf-toggle-item.active .dtf-toggle-label,
+.dtf-toggle-item.selected .dtf-toggle-label,
+.dtf-toggle-item.on .dtf-toggle-label {
+    color: #4cb354 !important;
+    font-weight: 600 !important;
+}
+
+/* Force outline style for tier buttons with maximum specificity */
+body.dtf-pricing-page .dtf-tier-button.selected,
+body .dtf-tier-button.selected,
+.dtf-tier-button.selected,
+.dtf-tier-button.active,
+.dtf-tier-button.on {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    border-width: 3px !important;
+    color: #4cb354 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+}
+
+/* Additional specificity for any nested elements */
+.dtf-toggle-item.active *,
+.dtf-tier-button.selected * {
+    color: #4cb354 !important;
+}
+
+/* Prevent any gradient backgrounds */
+.dtf-toggle-item.active::before,
+.dtf-toggle-item.active::after,
+.dtf-tier-button.selected::before,
+.dtf-tier-button.selected::after {
+    background: none !important;
+    background-image: none !important;
+}
+
+/* Ensure the toggle switch itself stays green when ON */
+.dtf-toggle-item.active .dtf-toggle-switch {
+    background: #4cb354 !important;
+}
+
+/* Universal toggle and tier overrides for DTF page */
+.universal-toggle-item.active {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+}
+
+.universal-toggle-item.active .universal-toggle-label {
+    color: #4cb354 !important;
+}
+
+.universal-tier-button.selected {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    border: 3px solid #4cb354 !important;
+    color: #4cb354 !important;
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+}

@@ -1,0 +1,4138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Print Quote Builder | Northwest Custom Apparel</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Create professional screen print quotes with our advanced quote builder. Multi-product quotes, automatic pricing, database storage, and email delivery. Northwest Custom Apparel.">
+    <meta name="keywords" content="screen print quotes, quote builder, multi-product quotes, screen printing estimates, custom apparel quotes">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.nwcustomapparel.com/quote-builders/screenprint-quote-builder.html">
+    <meta property="og:title" content="Screen Print Quote Builder | Northwest Custom Apparel">
+    <meta property="og:description" content="Build comprehensive screen print quotes with multiple products, automatic calculations, and professional delivery.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Screen Print Quote Builder | Northwest Custom Apparel">
+    <meta name="twitter:description" content="Professional quote builder for screen printing projects with multi-product support.">
+    <meta name="twitter:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- Font Awesome - Simplified without integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Force Font Awesome font-family -->
+    <style>
+    .fas, .far, .fab, .fa {
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
+        font-weight: 900 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-rendering: auto !important;
+        -webkit-font-smoothing: antialiased !important;
+    }
+    .fas::before, .far::before, .fab::before, .fa::before {
+        font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
+        font-weight: 900 !important;
+    }
+
+    /* E-Commerce Style Product Layout */
+
+    /* Search Section */
+    .search-section {
+        margin-bottom: 2rem;
+    }
+
+    .search-section .search-input {
+        width: 100%;
+        max-width: 600px;
+        padding: 1rem;
+        font-size: 1.1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        transition: border-color 0.2s;
+    }
+
+    .search-section .search-input:focus {
+        outline: none;
+        border-color: #3a7c52;
+    }
+
+    /* Screen reader only utility class for accessibility */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* Two Column Product Layout - Image hidden during color selection */
+    .product-layout {
+        display: grid;
+        grid-template-columns: 1fr; /* Full width - no image column */
+        gap: 2rem;
+        margin-bottom: 2rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Hide product image during color selection to maximize space */
+    .product-image-col {
+        display: none; /* Hidden to save horizontal space */
+    }
+
+    .product-image-col img {
+        width: 100%;
+        max-width: 450px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .product-info-col {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .product-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .product-desc {
+        color: #6b7280;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .color-selection h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+
+    /* Color Grid - Optimized for many colors */
+    .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+        gap: 0.5rem;
+        max-width: 100%;
+        position: relative;
+    }
+
+    .color-grid.collapsed {
+        max-height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .color-grid.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(to bottom, transparent, white);
+        pointer-events: none;
+    }
+
+    .color-counter {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .show-more-colors-btn {
+        margin-top: 0.75rem;
+        padding: 0.625rem 1.25rem;
+        background: #3a7c52;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .show-more-colors-btn:hover {
+        background: #2d5f3f;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+    }
+
+    .show-more-colors-btn i {
+        transition: transform 0.2s;
+    }
+
+    .show-more-colors-btn.expanded i {
+        transform: rotate(180deg);
+    }
+
+    .color-swatch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem 0.375rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+        position: relative;
+    }
+
+    .color-swatch:hover {
+        border-color: #3a7c52;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+        z-index: 10;
+    }
+
+    .color-swatch.selected {
+        border-color: #3a7c52;
+        background: #e8f5e9;
+        box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.2);
+    }
+
+    .color-swatch.selected::after {
+        content: '\2713'; /* Checkmark */
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: #3a7c52;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .color-swatch-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 6px;
+        margin-bottom: 0.375rem;
+        object-fit: cover;
+    }
+
+    .color-swatch-name {
+        font-size: 0.7rem;
+        text-align: center;
+        line-height: 1.1;
+        color: #374151;
+        font-weight: 500;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    /* Tooltip on hover for long color names */
+    .color-swatch:hover .color-swatch-name {
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.375rem 0.625rem;
+        border-radius: 6px;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        max-width: none;
+        overflow: visible;
+        text-overflow: clip;
+        display: block;
+        -webkit-line-clamp: unset;
+    }
+
+    /* Size Section */
+    .size-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .size-section h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+    }
+
+    /* Size Grid */
+    .size-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+
+    .size-input-group {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .size-label {
+        display: block;
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 1rem;
+        padding: 0.375rem 0.5rem;
+        background: #e5e7eb;
+        border-radius: 6px 6px 0 0;
+        margin: 0;
+    }
+
+    .size-quantity {
+        width: 100%;
+        padding: 0.875rem 0.5rem;
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border: 2px solid #d1d5db;
+        border-radius: 0 0 6px 6px;
+        border-top: none;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .size-quantity:hover {
+        border-color: #9ca3af;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .size-quantity:focus {
+        outline: none;
+        border-color: #3a7c52;
+        box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+        background: #f0fdf4;
+    }
+
+    .size-quantity:not([value="0"]):not([value=""]) {
+        background: #dcfce7;
+        border-color: #3a7c52;
+        color: #15803d;
+    }
+
+    .size-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .total-display {
+        font-size: 1.1rem;
+        color: #374151;
+    }
+
+    .total-display strong {
+        color: #3a7c52;
+        font-size: 1.3rem;
+    }
+
+    /* Product List Enhancements */
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        background: white;
+        transition: box-shadow 0.2s;
+    }
+
+    .product-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .product-item-info {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .product-color-swatch {
+        flex-shrink: 0;
+    }
+
+    .color-swatch-indicator {
+        width: 50px;
+        height: 50px;
+        border-radius: 6px;
+        border: 2px solid #e5e7eb;
+        object-fit: cover;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .product-item-details {
+        flex: 1;
+    }
+
+    .product-item-details h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .product-item-details p {
+        margin: 0 0 0.5rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .size-breakdown {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        margin-top: 0.5rem;
+    }
+
+    .size-chip {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .product-item-actions {
+        flex-shrink: 0;
+    }
+
+    .product-item-actions .btn-danger {
+        padding: 0.5rem 0.75rem;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .product-item-actions .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+        .product-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .product-image-col {
+            position: static;
+        }
+    }
+
+    /* Product Summary Items - Individual Size Pricing Display */
+    .product-summary-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f9fafb;
+    }
+
+    .product-header {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1f2937;
+    }
+
+    .size-breakdown-pricing {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .size-pricing-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.25rem 0;
+        font-size: 0.9rem;
+        color: #374151;
+    }
+
+    .size-pricing-row:hover {
+        background: #f3f4f6;
+        border-radius: 4px;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .additional-locations-cost {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        background: #fef3c7;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #92400e;
+    }
+
+    /* Product Total Row - DOMINANT */
+    .product-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0.75rem;
+        margin-top: 1.25rem;
+        border-top: 3px solid #047857;
+        font-size: 1.25rem;
+        color: #065f46;
+        background: linear-gradient(to right, #d1fae5, transparent);
+        border-radius: 8px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    /* Transparent Pricing Breakdown Styles - A+ PREMIUM QUALITY */
+
+    /* Product Quantity Badge - Premium Gradient */
+    .product-qty-badge {
+        background: linear-gradient(135deg, #047857, #059669);
+        color: white;
+        padding: 0.375rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-left: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        box-shadow: 0 2px 4px rgba(4, 120, 87, 0.3);
+    }
+
+    /* Breakdown Section - Premium Container */
+    .pricing-breakdown-section {
+        background: #f0fdf4;
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.25rem 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Breakdown Header - Professional */
+    .breakdown-header {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #065f46;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #10b981;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .size-breakdown-transparent {
+        margin-bottom: 1rem;
+    }
+
+    /* Size Pricing Detail - Professional Spacing */
+    .size-pricing-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        padding: 0.875rem;
+        margin-bottom: 0.875rem;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #d1fae5;
+        transition: all 0.15s ease;
+    }
+
+    .size-pricing-detail:hover {
+        background: #ecfdf5;
+        border-color: #6ee7b7;
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Size Label - BOLD & DARK */
+    .size-label {
+        font-weight: 700;
+        color: #065f46;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.375rem;
+    }
+
+    /* Price Calculation - Better Alignment */
+    .price-calculation {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.625rem;
+        font-size: 0.9rem;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    /* Base Price - LIGHTER (less important) */
+    .base-price {
+        font-weight: 500;
+        color: #4b5563;
+        font-size: 0.9rem;
+    }
+
+    /* Plus/Equals Signs - DARKER */
+    .price-plus, .price-equals {
+        color: #6b7280;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Safety Stripes - STRONGER RED */
+    .safety-stripes {
+        color: #b91c1c;
+        font-weight: 600;
+        background: #fecaca;
+        padding: 0.25rem 0.625rem;
+        border-radius: 6px;
+        border: 1px solid #fca5a5;
+    }
+
+    /* Additional Locations - STRONGER ORANGE */
+    .additional-loc {
+        color: #c2410c;
+        font-weight: 600;
+        background: #fed7aa;
+        padding: 0.25rem 0.625rem;
+        border-radius: 6px;
+        border: 1px solid #fdba74;
+    }
+
+    /* Unit Total (Green Pill) - WHITE TEXT, DARK GREEN */
+    .unit-total {
+        font-weight: 700;
+        color: white;
+        background: #059669;
+        padding: 0.375rem 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3);
+    }
+
+    /* Subtotal Arrow - DOMINANT */
+    .size-subtotal {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #047857;
+        letter-spacing: -0.025em;
+        margin-left: auto;
+    }
+
+    /* Mobile Responsive Adjustments for Premium Pricing */
+    @media (max-width: 768px) {
+        .price-calculation {
+            font-size: 0.825rem;
+            gap: 0.5rem;
+        }
+
+        .size-label {
+            font-size: 0.9rem;
+        }
+
+        .size-subtotal {
+            font-size: 1rem;
+        }
+
+        .unit-total {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .breakdown-header {
+            font-size: 1rem;
+        }
+
+        .product-total-row {
+            font-size: 1.125rem;
+            padding: 0.875rem 0.625rem;
+        }
+
+        .size-pricing-detail:hover {
+            transform: none; /* Disable slide on mobile */
+        }
+    }
+
+    /* ========================================
+       STEP 1: TWO-COLUMN LAYOUT WITH LIVE QUOTE SUMMARY
+       ======================================== */
+
+    .setup-two-column-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 3rem; /* Increased from 2rem for better separation */
+        align-items: start;
+    }
+
+    /* Left column: Setup controls */
+    .setup-controls-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* Right column: Live Quote Summary */
+    .live-quote-summary {
+        position: sticky;
+        top: 2rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12); /* Enhanced shadow for better hierarchy */
+    }
+
+    .live-quote-summary h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .live-quote-summary h3 i {
+        color: #2d5f3f;
+        font-size: 1.25rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.9375rem;
+    }
+
+    .summary-row:last-of-type {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .summary-value {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .summary-value.highlight {
+        color: #2d5f3f;
+        font-size: 1.125rem;
+    }
+
+    .summary-subrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0 0.5rem 1.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .summary-sublabel {
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .summary-subvalue {
+        color: #2d5f3f;
+        font-weight: 600;
+    }
+
+    .setup-formula {
+        display: block;
+        padding-left: 2.5rem;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-style: italic;
+        margin-top: 0.125rem;
+        padding-bottom: 0.375rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .additional-locations-summary {
+        margin: 0.5rem 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .additional-locations-summary li {
+        padding: 0.5rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .additional-locations-summary li span:last-child {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .summary-total-row {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .summary-total-label {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .summary-total-value {
+        color: #2d5f3f;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .summary-continue-btn {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 0.875rem 1.5rem;
+        background: #2d5f3f;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .summary-continue-btn:hover {
+        background: #1f4530;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+    }
+
+    @media (max-width: 1024px) {
+        .setup-two-column-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .live-quote-summary {
+            position: static;
+            margin-top: 2rem;
+        }
+    }
+
+    /* ========================================
+       ADDITIONAL LOCATIONS - GEMINI-INSPIRED CLEAN LAYOUT
+       ======================================== */
+
+    /* Global dark garment note */
+    .dark-garment-global-note {
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #92400e;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .dark-garment-global-note i {
+        color: #f59e0b;
+        font-size: 1.125rem;
+    }
+
+    /* Master Info Panel - Tightened */
+    .master-info-panel {
+        margin: 0.75rem 0 1rem 0;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #1e3a8a;
+        line-height: 1.5;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+    .master-info-panel i {
+        margin-right: 0.625rem;
+        color: #3b82f6;
+        font-size: 1.125rem;
+        vertical-align: middle;
+    }
+
+    .master-info-panel strong {
+        color: #1e40af;
+    }
+
+    /* Primary Color Button Disabled State with Tooltip - CRITICAL OVERRIDES */
+    .color-btn:disabled {
+        opacity: 0.4 !important;
+        cursor: not-allowed !important;
+        background: #f3f4f6 !important;
+        border: 2px dashed #d1d5db !important;
+        color: #9ca3af !important;
+        position: relative !important;
+    }
+
+    .color-btn:disabled::before {
+        content: '🔒' !important;
+        position: absolute !important;
+        top: -8px !important;
+        right: -8px !important;
+        font-size: 0.875rem !important;
+        background: #fff !important;
+        border-radius: 50% !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Tooltip for disabled buttons */
+    .color-btn[data-tooltip] {
+        position: relative;
+    }
+
+    .color-btn[data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .color-btn[data-tooltip]:hover::before {
+        content: '';
+        position: absolute;
+        bottom: calc(100% + 2px);
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: #1f2937;
+        z-index: 1000;
+    }
+
+    /* Compact Color Buttons */
+    .color-btn {
+        height: 38px !important;
+        padding: 0 1rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    .color-buttons {
+        gap: 0.375rem !important;
+    }
+
+    /* Primary Location Info - Ultra Compressed */
+    .primary-location-info {
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .location-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .location-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #1f2937;
+    }
+
+    .location-description {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.2;
+    }
+
+    /* Additional Location Cards - Compressed */
+    .additional-location-card {
+        margin-bottom: 1rem;
+        padding: 0.875rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .location-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .location-header h4 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .btn-icon-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f3f4f6;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #6b7280;
+        transition: all 0.2s;
+    }
+
+    .btn-icon-close:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Single Column Vertical Layout (Gemini Style) */
+    .location-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .location-section,
+    .colors-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .location-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    /* Location Dropdown */
+    .location-select {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.9375rem;
+        color: #1f2937;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .location-select:focus {
+        outline: none;
+        border-color: #2d5f3f;
+    }
+
+    /* Color Number Buttons */
+    .color-number-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+    }
+
+    .color-num-btn {
+        width: 56px;
+        height: 56px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .color-num-btn.active {
+        background: #2d5f3f;
+        color: white;
+        border-color: #2d5f3f;
+    }
+
+    .color-num-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: #f3f4f6 !important;
+        border: 2px dashed #d1d5db !important;
+        color: #9ca3af !important;
+        position: relative;
+    }
+
+    .color-num-btn:disabled::before {
+        content: '🔒';
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        font-size: 0.875rem;
+        background: #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Tooltip for disabled additional location buttons */
+    .color-num-btn[data-tooltip] {
+        position: relative;
+    }
+
+    .color-num-btn[data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .color-num-btn[data-tooltip]:hover::before {
+        content: '';
+        position: absolute;
+        bottom: calc(100% + 2px);
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: #1f2937;
+        z-index: 1000;
+    }
+
+    .color-num-btn:hover:not(.active):not(:disabled) {
+        border-color: #9ca3af;
+        background: #f9fafb;
+    }
+
+    /* Dashed Add Button */
+    .btn-add-location-dashed {
+        width: 100%;
+        padding: 1rem;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        background: white;
+        color: #2d5f3f;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9375rem;
+    }
+
+    .btn-add-location-dashed:hover {
+        border-color: #2d5f3f;
+        background: #f0fdf4;
+    }
+
+    .btn-add-location-dashed i {
+        font-size: 1rem;
+    }
+
+    /* Modal Close Button */
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #666;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
+    }
+
+    .modal-header.success {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 640px) {
+        .location-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .color-number-buttons {
+            justify-content: space-between;
+        }
+
+        .color-num-btn {
+            flex: 1;
+            min-width: 48px;
+            max-width: 60px;
+        }
+    }
+
+    /* ===================================================================
+       PHASE 3 SUMMARY FIX - Only show summary in Phase 3
+       2025-10-15: Prevents "everything on one page" issue
+       =================================================================== */
+
+    /* HIDE the entire quote-summary container when not in Phase 3 */
+    #product-phase #quote-summary {
+        display: none !important;
+    }
+
+    /* ONLY show quote-summary when in summary-phase */
+    #summary-phase #quote-summary {
+        display: block !important;
+    }
+
+    /* ===================================================================
+       MANAGEORDERS AUTOCOMPLETE STYLES
+       2025-10-26: Customer autocomplete for company name field
+       =================================================================== */
+
+    /* Autocomplete Container */
+    .autocomplete-container {
+        position: relative;
+    }
+
+    .autocomplete-wrapper {
+        position: relative;
+    }
+
+    /* Autocomplete Dropdown */
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 350px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: -1px;
+    }
+
+    .autocomplete-dropdown.show {
+        display: block;
+    }
+
+    /* Autocomplete Items */
+    .autocomplete-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.15s ease;
+    }
+
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+        background: #f9fafb;
+    }
+
+    .autocomplete-item-company {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .autocomplete-item-details {
+        font-size: 13px;
+        color: #6b7280;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .autocomplete-item-detail {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .autocomplete-item-detail i {
+        width: 14px;
+        text-align: center;
+        opacity: 0.7;
+    }
+
+    /* No Results / Loading */
+    .autocomplete-no-results,
+    .autocomplete-loading-item {
+        padding: 16px;
+        text-align: center;
+        color: #6b7280;
+        font-style: italic;
+    }
+
+    .autocomplete-loading-item {
+        color: #3a7c52;
+        font-style: normal;
+    }
+
+    /* Scrollbar Styling */
+    .autocomplete-dropdown::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-track {
+        background: #f9fafb;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+    }
+
+    .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+    </style>
+
+    <!-- Bootstrap CSS FIRST (foundation layer) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Universal Styles (override Bootstrap) -->
+    <link rel="stylesheet" href="/shared_components/css/universal-header.css">
+    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
+
+    <!-- Base Quote Builder Styles (screenprint inherits from embroidery) -->
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder.css">
+
+    <!-- Unified Step 1 Styles -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1.css">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css">
+
+    <!-- ScreenPrint Specific Overrides (highest priority - must load AFTER unified CSS) -->
+    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder.css?v=20250911">
+
+    <!-- Phase 1 Infrastructure - v20250911 -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
+    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
+    <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
+
+    <!-- Phase 2 Persistence - v20250911 -->
+    <script src="/shared_components/js/quote-persistence.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-session.js?v=20250911"></script>
+
+    <!-- Phase 3 Advanced Features - v20250911 -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-phase3.css?v=20250911">
+    <script src="/shared_components/js/quote-validation.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-ui-feedback.js?v=20250911"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="embroidery-header">
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(253) 922-5793</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>sales@nwcustomapparel.com</span>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/staff-dashboard.html" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="btn-secondary header-btn" onclick="window.location.href='/staff-dashboard.html'" aria-label="Go back to staff dashboard">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Screen Print Quote Builder</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">Screen Print Quote Builder</h1>
+        <p class="page-description">
+            Create professional screen print quotes with automatic tier pricing
+        </p>
+
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" id="phase-1-nav" data-phase="1">
+                <div class="phase-step-number">1</div>
+                <div class="phase-step-label">Setup</div>
+            </div>
+            <div class="phase-connector" id="connector-1"></div>
+            <div class="phase-step" id="phase-2-nav" data-phase="2">
+                <div class="phase-step-number">2</div>
+                <div class="phase-step-label">Add Products</div>
+            </div>
+            <div class="phase-connector" id="connector-2"></div>
+            <div class="phase-step" id="phase-3-nav" data-phase="3">
+                <div class="phase-step-number">3</div>
+                <div class="phase-step-label">Review & Save</div>
+            </div>
+        </div>
+
+        <!-- Phase 1: Print Setup -->
+        <section id="setup-phase" class="phase-section active">
+            <div class="phase-header">
+                <h2><span class="phase-number">1</span> Print Setup</h2>
+                <p>Select locations, colors, and garment type.</p>
+            </div>
+
+            <!-- Two Column Layout: Setup Controls + Live Quote Summary -->
+            <div class="setup-two-column-layout">
+                <!-- LEFT COLUMN: Setup Controls -->
+                <div class="setup-controls-column">
+                    <div class="setup-card">
+                        <h3 class="setup-title"><i class="fas fa-shirt"></i> Primary Location</h3>
+                        <div class="primary-location-info">
+                            <div class="location-details">
+                                <div class="location-name">Front Print Location</div>
+                                <div class="location-description">Primary design area for all products</div>
+                            </div>
+                        </div>
+
+                        <!-- Master Info Panel -->
+                        <div class="master-info-panel">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Quick Tip:</strong> Toggle "Printing on Dark Garments" to add a white underbase layer. This limits design colors to 5 (6th color is used for underbase).
+                        </div>
+
+                        <!-- Garment Color Type -->
+                        <h3 class="setup-title" style="margin-top: 2rem;">Garment Color Type</h3>
+                        <div class="dark-garment-section">
+                            <div class="dark-garment-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="dark-garment-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <strong>Printing on Dark Garments?</strong>
+                                    <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                        Adds a white underbase layer (+1 color).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="setup-title" style="margin-top: 2rem;">Number of Colors</h3>
+                        <div class="color-buttons" role="group" aria-label="Select number of print colors">
+                            <button class="color-btn active" data-colors="1" aria-pressed="true" aria-label="1 color printing">1 Color</button>
+                            <button class="color-btn" data-colors="2" aria-pressed="false" aria-label="2 colors printing">2 Colors</button>
+                            <button class="color-btn" data-colors="3" aria-pressed="false" aria-label="3 colors printing">3 Colors</button>
+                            <button class="color-btn" data-colors="4" aria-pressed="false" aria-label="4 colors printing">4 Colors</button>
+                            <button class="color-btn" data-colors="5" aria-pressed="false" aria-label="5 colors printing">5 Colors</button>
+                            <button class="color-btn" data-colors="6" aria-pressed="false" aria-label="6 colors printing">6 Colors</button>
+                        </div>
+
+                        <h3 class="setup-title" style="margin-top: 2rem;">Special Design Options</h3>
+                        <div class="dark-garment-section">
+                            <div class="dark-garment-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox"
+                                           id="safety-stripes-toggle"
+                                           aria-label="Enable safety stripes design, adds $2.00 per piece">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <div>
+                                    <strong>Safety Stripes Design</strong>
+                                    <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                        4-color high-visibility design: +$2.00 per piece
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setup-card" id="additional-locations-card">
+                        <h3 class="setup-title"><i class="fas fa-layer-group"></i> Additional Locations</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+                            Add up to 3 more print locations. Each location counts as a separate setup fee.
+                        </p>
+                        <div id="additional-locations-list"></div>
+                        <button id="add-location-btn" class="btn-add-location-dashed" aria-label="Add another print location, up to 3 additional locations">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Another Location
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Live Quote Summary -->
+                <div class="live-quote-summary">
+                    <h3><i class="fas fa-table-list"></i> Live Quote Summary</h3>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Garment Type:</span>
+                        <span class="summary-value" id="summary-garment-type">Light</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Primary Location Colors:</span>
+                        <span class="summary-value" id="summary-primary-colors">2</span>
+                    </div>
+                    <div id="summary-primary-setup-container"></div>
+
+                    <div id="summary-additional-locations-container"></div>
+
+                    <div class="summary-total-row">
+                        <span class="summary-total-label">Total Setup Fees:</span>
+                        <span class="summary-total-value" id="summary-total-setups">1</span>
+                    </div>
+
+                    <!-- Safety Stripes Surcharge (if applicable) -->
+                    <div id="summary-safety-stripes-container"></div>
+
+                    <!-- LTM Fee (if applicable) -->
+                    <div id="summary-ltm-fee-container"></div>
+
+                    <button class="summary-continue-btn" onclick="screenPrintQuoteBuilder.navigateToPhase(2)" aria-label="Continue to adding products">
+                        Continue to Products <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2: Add Products -->
+        <section id="product-phase" class="phase-section">
+            <div class="phase-header">
+                <h2><span class="phase-number">2</span> Add Products</h2>
+                <p>Search and add products</p>
+            </div>
+
+            <!-- Search Section (Full Width) -->
+            <div class="search-section">
+                <div class="form-group" style="position: relative;">
+                    <label for="style-search">Search Product Style</label>
+                    <input type="text"
+                           id="style-search"
+                           class="search-input"
+                           placeholder="Enter style number (e.g., PC54, PC61, 18500)"
+                           autocomplete="off"
+                           aria-label="Search for product by style number"
+                           aria-describedby="style-search-help"
+                           aria-controls="style-suggestions"
+                           aria-autocomplete="list"
+                           role="combobox"
+                           aria-expanded="false">
+                    <div id="style-suggestions"
+                         class="suggestions-dropdown"
+                         style="display: none;"
+                         role="listbox"
+                         aria-label="Product suggestions"></div>
+                    <div id="style-search-help" class="sr-only">Type a style number to search for products</div>
+                </div>
+            </div>
+
+            <!-- Product Display (Two Column Layout) -->
+            <div id="product-display" class="product-layout" style="display: none;">
+                <!-- Left Column: Product Image -->
+                <div class="product-image-col">
+                    <img id="product-image" src="" alt="" aria-describedby="product-name">
+                </div>
+
+                <!-- Right Column: Product Info & Colors -->
+                <div class="product-info-col">
+                    <h3 id="product-name" class="product-title"></h3>
+                    <p id="product-description" class="product-desc"></p>
+
+                    <div class="color-selection">
+                        <h4>Select Color</h4>
+                        <div id="color-swatches" class="color-grid"></div>
+                        <input type="hidden" id="selected-color">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Size Selection (Full Width - Shows After Color Selected) -->
+            <div id="size-section" class="size-section" style="display: none;">
+                <h4>Select Sizes & Quantities</h4>
+                <div id="size-inputs" class="size-grid"></div>
+
+                <div class="size-actions">
+                    <div class="total-display">
+                        Total Quantity: <strong id="product-total-qty">0</strong>
+                    </div>
+                    <button id="add-to-quote-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-plus"></i> Add to Quote
+                    </button>
+                </div>
+            </div>
+
+            <div class="products-list">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Products in Quote (<span id="products-count">0</span> items, <span id="total-pieces">0</span> pieces)</h3>
+                    <button id="add-another-product-btn" class="btn btn-secondary" style="display: none;" onclick="screenPrintQuoteBuilder.addAnotherProduct()">
+                        <i class="fas fa-plus"></i> Add Another Product
+                    </button>
+                </div>
+                <div id="products-container">
+                    <p style="color: var(--text-secondary);">No products added yet.</p>
+                </div>
+
+                <div id="minimum-warning" class="alert alert-warning" style="display: none; margin-top: 1rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Minimum 24 pieces required. Current total: <span id="current-total">0</span> pieces.
+                </div>
+            </div>
+
+            <div class="phase-actions">
+                <button id="back-to-setup" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Setup
+                </button>
+                <button id="continue-to-summary" class="btn btn-primary" disabled>
+                    Continue to Summary <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 3: Review & Save -->
+        <section id="summary-phase" class="phase-section">
+            <div class="phase-header">
+                <h2><span class="phase-number">3</span> Review & Export</h2>
+                <p>Review pricing and export or save quote</p>
+            </div>
+
+            <div id="quote-summary" class="quote-summary"></div>
+
+            <div class="customer-info-section">
+                <div class="section-header" style="margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 5px;">Customer Information</h3>
+                    <p class="text-muted" style="margin: 0; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Optional - only needed if saving quote to database or emailing customer
+                    </p>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name</label>
+                        <input type="text" id="customer-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email</label>
+                        <input type="email" id="customer-email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone</label>
+                        <input type="tel" id="customer-phone" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group autocomplete-container">
+                        <label for="company-name">
+                            Company Name
+                            <span class="autocomplete-status" style="font-size: 12px; color: #6b7280; margin-left: 8px;">
+                                <i class="fas fa-sync fa-spin" style="display:none;" id="autocomplete-loading"></i>
+                                <span id="autocomplete-count" style="display:none;"></span>
+                            </span>
+                        </label>
+                        <div class="autocomplete-wrapper" style="position: relative;">
+                            <input type="text" id="company-name" class="form-control"
+                                   placeholder="Start typing company name..."
+                                   autocomplete="off">
+                            <div id="company-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sales-rep">Sales Representative</label>
+                        <select id="sales-rep" class="form-control">
+                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Actions -->
+            <div class="quote-actions" style="margin-top: 20px; padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div class="action-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div class="save-option" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="save-to-database" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="save-to-database" style="margin: 0; cursor: pointer; font-weight: 500;">
+                            Save to Database
+                        </label>
+                        <span class="help-text" style="color: #6b7280; font-size: 13px;">
+                            (Uncheck for quick pricing only)
+                        </span>
+                    </div>
+                    <div class="action-buttons" style="display: flex; gap: 10px;">
+                        <button id="save-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Quote
+                        </button>
+                        <button id="email-quote-btn" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Email to Customer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="phase-actions" style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 24px;">
+                <button id="back-to-products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Products
+                </button>
+                <button id="shopworks-guide-btn" class="btn btn-success" style="background: #2d5f3f; border-color: #2d5f3f;" title="Quick pricing export (no save required)">
+                    <i class="fas fa-file-pdf"></i> ShopWorks Entry Guide
+                </button>
+                <button id="shopworks-edp-btn" class="btn btn-primary" title="Generate EDP text for ShopWorks import">
+                    <i class="fas fa-file-code"></i> Generate EDP
+                </button>
+                <button id="new-quote-btn" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> New Quote
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <h2 style="margin: 0;">Quote Saved Successfully!</h2>
+                </div>
+                <button class="modal-close" onclick="document.getElementById('success-modal').style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Your quote has been created.</p>
+                <div class="quote-id-display" id="modal-quote-id"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="newQuote()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Quote
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDP Modal -->
+    <div id="edp-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; width: 90%;">
+            <div class="modal-header" style="background: #2d5f3f; color: white;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-file-code"></i>
+                    <h2 style="margin: 0;">Inksoft EDP Import</h2>
+                </div>
+                <button class="modal-close" onclick="document.getElementById('edp-modal').style.display='none'" style="color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Quote ID:</strong> <span id="edp-quote-id"></span></p>
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                    Copy this text and paste into ShopWorks: <strong>File → Import → EDP Text Import</strong>
+                </p>
+                <textarea id="edp-text"
+                          readonly
+                          style="width: 100%; height: 450px; font-family: 'Courier New', Consolas, monospace; font-size: 12px; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; resize: vertical; background: #f9fafb;">
+                </textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="window.edpGenerator.copyToClipboard()" class="btn btn-success">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button onclick="document.getElementById('edp-modal').style.display='none'" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services -->
+
+    <!-- Exact Match Search Module (must load BEFORE inline quote builder) -->
+    <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
+
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-v2.js"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js"></script>
+    <script src="/shared_components/js/manageorders-customer-service.js"></script>
+    <script src="/shared_components/js/shopworks-guide-generator.js"></script>
+    <script src="/shared_components/js/screenprint-shopworks-guide-generator.js"></script>
+    <script src="/shared_components/js/shopworks-edp-generator.js"></script>
+
+    <script>
+    class ScreenPrintQuoteBuilder {
+        constructor() {
+            this.currentPhase = 1;
+
+            // Print setup state
+            this.printSetup = {
+                frontColors: 1, // Default to 1 color for cleaner starting point
+                isDarkGarment: true,  // Default to dark garment (most common use case)
+                frontHasSafetyStripes: false,
+                safetyStripeSurcharge: 2.00, // $2.00 per location per piece
+                additionalLocations: []
+            };
+
+            // Products array
+            this.products = [];
+            this.currentProduct = null;
+
+            // Search state
+            this.lastSearchTerm = '';  // Track last searched term to prevent re-searching
+
+            // Initialize exact match search (optimized for sales reps)
+            this.exactMatchSearch = null; // Will be initialized in initializeEventListeners()
+
+            // Services
+            this.quoteService = new ScreenPrintQuoteService();
+            this.pricingService = new ScreenPrintPricingService();
+
+            // Search debouncing
+            this.searchDebounceTimer = null;
+            this.isSettingValue = false; // Flag to prevent input event during programmatic updates
+
+            // Initialize
+            emailjs.init('4qSbDO-SQs19TbP80');
+            this.initializeEventListeners();
+            this.updateLiveQuoteSummary(); // Initial summary update
+
+            console.log('[ScreenPrintQuoteBuilder] Initialized - using screenprint-pricing-v2.js for ALL calculations');
+        }
+
+        // Update Live Quote Summary in real-time
+        updateLiveQuoteSummary() {
+            // Update garment type
+            const garmentType = this.printSetup.isDarkGarment ? 'Dark' : 'Light';
+            document.getElementById('summary-garment-type').textContent = garmentType;
+
+            // Update primary location colors
+            document.getElementById('summary-primary-colors').textContent = this.printSetup.frontColors;
+
+            // Update primary setup fee breakdown
+            const primarySetupContainer = document.getElementById('summary-primary-setup-container');
+            if (this.printSetup.frontColors > 0) {
+                let frontEffectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffectiveColors += 1;
+                }
+                const frontSetupFee = frontEffectiveColors * 30;
+                const formula = this.printSetup.isDarkGarment
+                    ? `(${this.printSetup.frontColors} colors + 1 underbase × $30)`
+                    : `(${this.printSetup.frontColors} ${this.printSetup.frontColors === 1 ? 'color' : 'colors'} × $30)`;
+
+                primarySetupContainer.innerHTML = `
+                    <div class="summary-subrow">
+                        <span class="summary-sublabel">└─ Setup Fee:</span>
+                        <span class="summary-subvalue">$${frontSetupFee.toFixed(2)}</span>
+                    </div>
+                    <div class="setup-formula">${formula}</div>
+                `;
+            } else {
+                primarySetupContainer.innerHTML = '';
+            }
+
+            // Update additional locations with setup fee breakdown
+            const additionalContainer = document.getElementById('summary-additional-locations-container');
+            if (this.printSetup.additionalLocations.length > 0) {
+                const locationsHTML = this.printSetup.additionalLocations.map(loc => {
+                    const locationName = this.getLocationName(loc.location) || 'Not selected';
+                    const colorCount = loc.colors || 0;
+
+                    // Calculate setup fee for this location
+                    let effectiveColors = colorCount;
+                    if (this.printSetup.isDarkGarment && colorCount > 0) {
+                        effectiveColors += 1;
+                    }
+                    const setupFee = effectiveColors * 30;
+                    const formula = this.printSetup.isDarkGarment && colorCount > 0
+                        ? `(${colorCount} ${colorCount === 1 ? 'color' : 'colors'} + 1 underbase × $30)`
+                        : colorCount > 0 ? `(${colorCount} ${colorCount === 1 ? 'color' : 'colors'} × $30)` : '';
+
+                    return `
+                        <div class="summary-row">
+                            <span class="summary-label">${locationName}:</span>
+                            <span class="summary-value">${colorCount} ${colorCount === 1 ? 'color' : 'colors'}</span>
+                        </div>
+                        ${colorCount > 0 ? `
+                            <div class="summary-subrow">
+                                <span class="summary-sublabel">└─ Setup Fee:</span>
+                                <span class="summary-subvalue">$${setupFee.toFixed(2)}</span>
+                            </div>
+                            <div class="setup-formula">${formula}</div>
+                        ` : ''}
+                    `;
+                }).join('');
+                additionalContainer.innerHTML = locationsHTML;
+            } else {
+                additionalContainer.innerHTML = '';
+            }
+
+            // Calculate setup fees based on COLORS (matches screenprint-pricing-v2.js logic)
+            let totalSetupFee = 0;
+
+            // Front location setup
+            if (this.printSetup.frontColors > 0) {
+                let frontEffectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffectiveColors += 1;  // Add white underbase
+                }
+                totalSetupFee += frontEffectiveColors * 30;  // $30 per color
+            }
+
+            // Additional locations setup
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.location && loc.colors > 0) {
+                    let effectiveColors = loc.colors;
+                    if (this.printSetup.isDarkGarment) {
+                        effectiveColors += 1;  // Add underbase
+                    }
+                    totalSetupFee += effectiveColors * 30;  // $30 per color
+                }
+            });
+
+            // Display as dollar amount
+            document.getElementById('summary-total-setups').textContent = `$${totalSetupFee.toFixed(2)}`;
+
+            // Calculate safety stripes surcharge (per piece)
+            let safetyStripeSurchargePerPiece = 0;
+
+            // Add surcharge for front if has safety stripes and printing
+            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
+                safetyStripeSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+            }
+
+            // Add surcharge for each additional location with safety stripes and printing
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.hasSafetyStripes && loc.colors > 0) {
+                    safetyStripeSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+                }
+            });
+
+            // Display safety stripes surcharge if applicable
+            const safetyStripesContainer = document.getElementById('summary-safety-stripes-container');
+            if (safetyStripeSurchargePerPiece > 0) {
+                safetyStripesContainer.innerHTML = `
+                    <div class="summary-row" style="margin-top: 0.75rem; color: var(--primary-color);">
+                        <span class="summary-label">Safety Stripes Surcharge:</span>
+                        <span class="summary-value">+$${safetyStripeSurchargePerPiece.toFixed(2)}/piece</span>
+                    </div>
+                `;
+            } else {
+                safetyStripesContainer.innerHTML = '';
+            }
+
+            // Get LTM fee from current pricing (calculated correctly by calculateLTMFee method)
+            const ltmFee = this.currentPricing?.ltmFee || 0;
+            const totalQty = this.currentPricing?.totalQuantity || 0;
+
+            // Display LTM fee if applicable
+            const ltmContainer = document.getElementById('summary-ltm-fee-container');
+            if (ltmFee > 0) {
+                ltmContainer.innerHTML = `
+                    <div class="summary-row" style="margin-top: 0.5rem; color: #ff9800;">
+                        <span class="summary-label">Less Than Minimum Fee:</span>
+                        <span class="summary-value">$${ltmFee.toFixed(2)}</span>
+                    </div>
+                `;
+            } else {
+                ltmContainer.innerHTML = '';
+            }
+
+            console.log('[Live Summary] Updated:', {
+                garmentType,
+                primaryColors: this.printSetup.frontColors,
+                additionalLocations: this.printSetup.additionalLocations.length,
+                totalSetupFee: `$${totalSetupFee.toFixed(2)}`,
+                safetyStripeSurcharge: safetyStripeSurchargePerPiece > 0 ? `+$${safetyStripeSurchargePerPiece.toFixed(2)}/piece` : 'None',
+                ltmFee: ltmFee > 0 ? `$${ltmFee.toFixed(2)}` : 'None',
+                totalQuantity: totalQty
+            });
+        }
+
+        updateColorButtonStates() {
+            // Calculate max allowed colors based on dark garment toggle
+            const maxColors = this.printSetup.isDarkGarment ? 5 : 6;
+
+            // Update primary location color buttons
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                const colorCount = parseInt(btn.dataset.colors);
+
+                if (colorCount > maxColors) {
+                    btn.disabled = true;
+                    btn.setAttribute('data-tooltip', 'Available only on light garments');
+                } else {
+                    btn.disabled = false;
+                    btn.removeAttribute('data-tooltip');
+                }
+            });
+
+            // Auto-reset frontColors if current selection exceeds limit
+            if (this.printSetup.frontColors > maxColors) {
+                this.printSetup.frontColors = maxColors;
+
+                // Update button active state
+                document.querySelectorAll('.color-btn').forEach(btn => {
+                    if (parseInt(btn.dataset.colors) === maxColors) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                this.updateLiveQuoteSummary();
+            }
+
+            // Update additional location color buttons
+            this.updateAdditionalLocationsUI();
+        }
+
+        initializeEventListeners() {
+            // Color selection
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.printSetup.frontColors = parseInt(e.target.dataset.colors);
+                    this.updateLiveQuoteSummary(); // Update summary
+                });
+            });
+
+            // Dark garment toggle
+            document.getElementById('dark-garment-toggle').addEventListener('change', (e) => {
+                this.printSetup.isDarkGarment = e.target.checked;
+                this.updateColorButtonStates(); // Update button states and limits
+                this.updateLiveQuoteSummary(); // Update summary
+            });
+
+            // Safety stripes toggle
+            document.getElementById('safety-stripes-toggle').addEventListener('change', (e) => {
+                this.printSetup.frontHasSafetyStripes = e.target.checked;
+                this.updateLiveQuoteSummary(); // Update summary
+            });
+
+            // Navigation (continue button is now in summary panel with onclick)
+            document.getElementById('back-to-setup').addEventListener('click', () => this.navigateToPhase(1));
+            document.getElementById('continue-to-summary').addEventListener('click', () => {
+                if (this.products.length > 0) {
+                    this.generateQuoteSummary();
+                    this.navigateToPhase(3);
+                }
+            });
+            document.getElementById('back-to-products').addEventListener('click', () => this.navigateToPhase(2));
+
+            // NEW: Initialize exact match search for sales reps (optimized for known style numbers)
+            if (window.ExactMatchSearch) {
+                this.exactMatchSearch = new window.ExactMatchSearch({
+                    apiBase: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+                    onExactMatch: (product) => {
+                        console.log('[ScreenPrintQuoteBuilder] Exact match found, auto-loading:', product.value);
+                        const styleSearch = document.getElementById('style-search');
+                        if (styleSearch) {
+                            styleSearch.value = product.value;
+                        }
+                        this.selectProductStyle(product.value);
+                    },
+                    onSuggestions: (products) => {
+                        const styleSuggestions = document.getElementById('style-suggestions');
+                        if (!styleSuggestions) return;
+
+                        if (products.length === 0) {
+                            styleSuggestions.innerHTML = '';
+                            styleSuggestions.style.display = 'none';
+                            return;
+                        }
+
+                        // Show screenprint products (no filtering - all products allowed)
+                        styleSuggestions.innerHTML = products.map(product => `
+                            <div class="suggestion-item" data-style="${product.value}">
+                                <strong>${product.value}</strong> - ${product.label.split(' - ')[1] || product.label}
+                            </div>
+                        `).join('');
+
+                        // Add click handlers
+                        styleSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const styleSearch = document.getElementById('style-search');
+                                if (styleSearch) {
+                                    styleSearch.value = item.dataset.style;
+                                }
+                                styleSuggestions.style.display = 'none';
+                                this.selectProductStyle(item.dataset.style);
+                            });
+                        });
+
+                        styleSuggestions.style.display = 'block';
+                    },
+                    filterFunction: null // Screenprint works on all products
+                });
+
+                console.log('[ScreenPrintQuoteBuilder] Exact match search initialized');
+
+                // Add exact match search listener to style search input
+                const styleSearch = document.getElementById('style-search');
+                if (styleSearch) {
+                    // Add exact match search listener directly (overrides default behavior)
+                    styleSearch.addEventListener('input', (e) => {
+                        const query = e.target.value.trim();
+                        if (query.length < 2) {
+                            const suggestions = document.getElementById('style-suggestions');
+                            if (suggestions) {
+                                suggestions.innerHTML = '';
+                                suggestions.style.display = 'none';
+                            }
+                            return;
+                        }
+                        // Use exact match search
+                        this.exactMatchSearch.search(query);
+                    });
+
+                    // Add Enter key support for immediate search
+                    styleSearch.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const query = e.target.value.trim();
+                            if (query.length >= 2) {
+                                this.exactMatchSearch.searchImmediate(query);
+                            }
+                        }
+                    });
+                }
+            } else {
+                console.error('[ScreenPrintQuoteBuilder] ExactMatchSearch module not loaded!');
+            }
+
+            // Close suggestions dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const suggestionsEl = document.getElementById('style-suggestions');
+                if (!e.target.closest('#style-search') && !e.target.closest('#style-suggestions')) {
+                    suggestionsEl.style.display = 'none';
+                }
+            });
+
+            // Prevent dropdown from closing when scrolling/clicking inside it
+            const suggestionsEl = document.getElementById('style-suggestions');
+            suggestionsEl.addEventListener('mousedown', (e) => {
+                // Prevent input blur and event bubbling when interacting with dropdown
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            // Prevent scroll events from affecting the input
+            suggestionsEl.addEventListener('scroll', (e) => {
+                e.stopPropagation();
+            });
+
+            // Add to quote
+            const addToQuoteBtn = document.getElementById('add-to-quote-btn');
+            if (addToQuoteBtn) {
+                addToQuoteBtn.addEventListener('click', () => this.addProductToQuote());
+            }
+
+            // Additional locations
+            const addLocationBtn = document.getElementById('add-location-btn');
+            if (addLocationBtn) {
+                addLocationBtn.addEventListener('click', () => this.addLocation());
+                console.log('[Init] Add location button event listener attached');
+            } else {
+                console.error('[Init] Add location button not found!');
+            }
+
+            // Save quote
+            const saveQuoteBtn = document.getElementById('save-quote-btn');
+            if (saveQuoteBtn) {
+                saveQuoteBtn.addEventListener('click', () => this.saveQuote());
+            }
+
+            // Email quote
+            const emailQuoteBtn = document.getElementById('email-quote-btn');
+            if (emailQuoteBtn) {
+                emailQuoteBtn.addEventListener('click', () => this.emailQuote());
+            }
+
+            // ShopWorks Entry Guide
+            const shopworksBtn = document.getElementById('shopworks-guide-btn');
+            if (shopworksBtn) {
+                shopworksBtn.addEventListener('click', () => this.generateShopWorksGuide());
+            }
+
+            // ShopWorks EDP Generator
+            const edpBtn = document.getElementById('shopworks-edp-btn');
+            if (edpBtn) {
+                edpBtn.addEventListener('click', () => this.generateEDPText());
+            }
+
+            // New Quote button
+            const newQuoteBtn = document.getElementById('new-quote-btn');
+            if (newQuoteBtn) {
+                newQuoteBtn.addEventListener('click', () => location.reload());
+            }
+        }
+
+        // Additional Locations Management
+        addLocation() {
+            if (this.printSetup.additionalLocations.length >= 3) {
+                alert('Maximum 3 additional locations allowed');
+                return;
+            }
+
+            this.printSetup.additionalLocations.push({
+                location: '',
+                colors: 0,
+                hasSafetyStripes: false
+            });
+
+            this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        removeLocation(index) {
+            this.printSetup.additionalLocations.splice(index, 1);
+            this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        updateAdditionalLocationsUI() {
+            const container = document.getElementById('additional-locations-list');
+            const addBtn = document.getElementById('add-location-btn');
+
+            if (this.printSetup.additionalLocations.length === 0) {
+                container.innerHTML = '';
+                addBtn.style.display = 'block';
+                return;
+            }
+
+            container.innerHTML = this.printSetup.additionalLocations.map((loc, index) => {
+                const availableOptions = this.getAvailableLocationOptions(index);
+
+                return `
+                    <div class="additional-location-card">
+                        <div class="location-header">
+                            <h4>Location ${index + 1}</h4>
+                            <button class="btn-icon-close" onclick="screenPrintQuoteBuilder.removeLocation(${index})">
+                                ×
+                            </button>
+                        </div>
+
+                        <div class="location-content">
+                            <!-- Location Section -->
+                            <div class="location-section">
+                                <label class="location-label">Location</label>
+                                <select class="location-select" onchange="screenPrintQuoteBuilder.updateLocationSelection(${index}, this.value)">
+                                    <option value="">Select location...</option>
+                                    ${availableOptions.map(opt => `
+                                        <option value="${opt.value}" ${loc.location === opt.value ? 'selected' : ''}>${opt.label}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+
+                            <!-- Colors Section -->
+                            <div class="colors-section">
+                                <label class="location-label">Colors</label>
+                                <div class="color-number-buttons">
+                                    ${[1,2,3,4,5,6].map(n => {
+                                        const maxColors = this.printSetup.isDarkGarment ? 5 : 6;
+                                        const isDisabled = !loc.location || n > maxColors;
+                                        const tooltipAttr = (n > maxColors && this.printSetup.isDarkGarment) ?
+                                            'data-tooltip="Available only on light garments"' : '';
+                                        return `
+                                        <button
+                                            class="color-num-btn ${loc.colors === n ? 'active' : ''}"
+                                            ${isDisabled ? 'disabled' : ''}
+                                            ${tooltipAttr}
+                                            onclick="screenPrintQuoteBuilder.updateLocationColors(${index}, ${n})"
+                                        >
+                                            ${n}
+                                        </button>
+                                    `;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Safety Stripes Toggle -->
+                            <div class="dark-garment-section" style="margin-top: 1rem;">
+                                <div class="dark-garment-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="safety-stripes-loc-${index}"
+                                               ${loc.hasSafetyStripes ? 'checked' : ''}
+                                               onchange="screenPrintQuoteBuilder.updateLocationSafetyStripes(${index}, this.checked)">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <div>
+                                        <strong>Safety Stripes</strong>
+                                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                                            +$2.00 per piece
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            addBtn.style.display = this.printSetup.additionalLocations.length >= 3 ? 'none' : 'block';
+        }
+
+        getAvailableLocationOptions(currentIndex) {
+            // All available locations
+            const allLocations = [
+                { value: 'back', label: 'Full Back' },
+                { value: 'left-sleeve', label: 'Left Sleeve' },
+                { value: 'right-sleeve', label: 'Right Sleeve' },
+                { value: 'custom', label: 'Custom Location' }
+            ];
+
+            // Locations to exclude (already selected in OTHER slots)
+            const excluded = [];
+
+            this.printSetup.additionalLocations.forEach((loc, index) => {
+                if (index !== currentIndex && loc.location) {
+                    excluded.push(loc.location);
+                }
+            });
+
+            return allLocations.filter(opt => !excluded.includes(opt.value));
+        }
+
+        updateLocationSelection(index, value) {
+            this.printSetup.additionalLocations[index].location = value;
+
+            // If location is cleared, also clear colors
+            if (!value) {
+                this.printSetup.additionalLocations[index].colors = 0;
+            }
+
+            this.updateAdditionalLocationsUI();
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        updateLocationColors(index, colors) {
+            this.printSetup.additionalLocations[index].colors = colors;
+            this.updateAdditionalLocationsUI();  // Re-render to show active state
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        updateLocationSafetyStripes(index, enabled) {
+            this.printSetup.additionalLocations[index].hasSafetyStripes = enabled;
+            this.updateLiveQuoteSummary(); // Update summary
+        }
+
+        getLocationName(code) {
+            const locationNames = {
+                'back': 'Full Back',
+                'left-sleeve': 'Left Sleeve',
+                'right-sleeve': 'Right Sleeve',
+                'custom': 'Custom Location'
+            };
+            return locationNames[code] || code;
+        }
+
+        async searchProducts(term) {
+            const suggestionsEl = document.getElementById('style-suggestions');
+
+            if (term.length < 2) {
+                suggestionsEl.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Use the WORKING /api/stylesearch endpoint (same as product page search)
+                const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(term)}`);
+
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
+                }
+
+                const suggestions = await response.json();
+
+                // suggestions format: [{value: "PC54", label: "Port & Company Core Cotton Tee"}, ...]
+                if (suggestions.length > 0) {
+                    // Show dropdown with clickable suggestions
+                    suggestionsEl.innerHTML = suggestions.map(s => `
+                        <div class="suggestion-item" data-style="${s.value}">
+                            <strong>${s.value}</strong> - ${s.label}
+                        </div>
+                    `).join('');
+                    suggestionsEl.style.display = 'block';
+
+                    // Add mousedown handlers to suggestions (prevents race condition with input event)
+                    suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('mousedown', async (e) => {
+                            // Prevent default to stop input blur and event bubbling
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            const style = item.dataset.style;
+
+                            // Set flag to prevent input event from firing
+                            this.isSettingValue = true;
+                            document.getElementById('style-search').value = style;
+
+                            // Keep flag true for a bit to ensure input event is blocked
+                            setTimeout(() => {
+                                this.isSettingValue = false;
+                            }, 100); // 100ms is enough to block the input event
+
+                            suggestionsEl.style.display = 'none';
+                            await this.selectProductStyle(style);
+                        });
+                    });
+                } else {
+                    suggestionsEl.innerHTML = '<div class="suggestion-item no-results">No products found</div>';
+                    suggestionsEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                suggestionsEl.innerHTML = '<div class="suggestion-item no-results">Error loading products</div>';
+                suggestionsEl.style.display = 'block';
+            }
+        }
+
+        async selectProductStyle(styleNumber) {
+            try {
+                // Fetch product details and color swatches in parallel
+                const [detailsResponse, swatchesResponse] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`)
+                ]);
+
+                const detailsData = await detailsResponse.json();
+                const swatchesData = await swatchesResponse.json();
+
+                // API returns an array of rows (one per color/size combination)
+                const productRows = Array.isArray(detailsData) ? detailsData : (detailsData.data || []);
+
+                if (productRows.length === 0) {
+                    throw new Error('No product data found');
+                }
+
+                // Store ALL product rows and first row for easy access
+                this.currentProduct = {
+                    styleNumber: styleNumber,
+                    allRows: productRows,
+                    details: productRows[0],
+                    colorSwatches: swatchesData || []
+                };
+
+                // Display generic product image
+                const productImage = document.getElementById('product-image');
+
+                if (productRows[0].FRONT_FLAT || productRows[0].PRODUCT_IMAGE) {
+                    productImage.src = productRows[0].FRONT_FLAT || productRows[0].PRODUCT_IMAGE;
+                    productImage.alt = productRows[0].PRODUCT_TITLE || styleNumber;
+                }
+
+                // Display product info and color swatches
+                document.getElementById('product-name').textContent = `${productRows[0].PRODUCT_TITLE || styleNumber}`;
+                document.getElementById('product-description').textContent = productRows[0].PRODUCT_DESCRIPTION || 'Select a color to continue';
+
+                this.displayColorSwatches(swatchesData);
+
+                // Show the product display section
+                document.getElementById('product-display').style.display = 'grid';
+
+            } catch (error) {
+                console.error('Error loading style:', error);
+                alert('Error loading product details. Please try again.');
+            }
+        }
+
+        displayColorSwatches(swatches) {
+            const container = document.getElementById('color-swatches');
+            container.innerHTML = '';
+
+            if (!swatches || swatches.length === 0) {
+                container.innerHTML = '<p>No color options available</p>';
+                return;
+            }
+
+            const totalColors = swatches.length;
+            const initialShowCount = 12;
+            const shouldCollapse = totalColors > initialShowCount;
+
+            // Add color counter
+            if (totalColors > 0) {
+                const colorCounter = document.createElement('div');
+                colorCounter.className = 'color-counter';
+                colorCounter.id = 'color-counter';
+                colorCounter.textContent = shouldCollapse
+                    ? `Showing ${initialShowCount} of ${totalColors} colors`
+                    : `${totalColors} color${totalColors !== 1 ? 's' : ''} available`;
+                container.parentElement.insertBefore(colorCounter, container);
+            }
+
+            // Apply collapsed class directly to container if needed
+            if (shouldCollapse) {
+                container.classList.add('collapsed');
+            } else {
+                container.classList.remove('collapsed');
+            }
+
+            // Add swatches directly to container (no wrapper needed!)
+            swatches.forEach(swatch => {
+                const swatchEl = document.createElement('div');
+                swatchEl.className = 'color-swatch';
+                swatchEl.onclick = () => this.selectColor(swatch.COLOR_NAME, swatch.CATALOG_COLOR, swatchEl);
+
+                swatchEl.innerHTML = `
+                    <img class="color-swatch-image" src="${swatch.COLOR_SQUARE_IMAGE}" alt="${swatch.COLOR_NAME}">
+                    <div class="color-swatch-name">${swatch.COLOR_NAME}</div>
+                `;
+
+                container.appendChild(swatchEl);
+            });
+
+            // Add "Show More" button if needed (as sibling, not child)
+            if (shouldCollapse) {
+                const showMoreBtn = document.createElement('button');
+                showMoreBtn.className = 'show-more-colors-btn';
+                showMoreBtn.id = 'show-more-colors-btn';
+                showMoreBtn.innerHTML = `
+                    Show ${totalColors - initialShowCount} More Colors
+                    <i class="fas fa-chevron-down"></i>
+                `;
+
+                showMoreBtn.onclick = () => {
+                    const isCollapsed = container.classList.toggle('collapsed');
+                    const counter = document.getElementById('color-counter');
+
+                    if (isCollapsed) {
+                        // Now collapsed (showing less)
+                        showMoreBtn.innerHTML = `
+                            Show ${totalColors - initialShowCount} More Colors
+                            <i class="fas fa-chevron-down"></i>
+                        `;
+                        showMoreBtn.classList.remove('expanded');
+                        counter.textContent = `Showing ${initialShowCount} of ${totalColors} colors`;
+                    } else {
+                        // Now expanded (showing all)
+                        showMoreBtn.innerHTML = `
+                            Show Less Colors
+                            <i class="fas fa-chevron-up"></i>
+                        `;
+                        showMoreBtn.classList.add('expanded');
+                        counter.textContent = `Showing all ${totalColors} colors`;
+                    }
+                };
+
+                // Insert button after the container
+                container.parentElement.insertBefore(showMoreBtn, container.nextSibling);
+            }
+
+            container.style.display = 'grid';
+        }
+
+        async selectColor(colorName, catalogColor, swatchElement) {
+            // Update visual selection
+            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+            swatchElement.classList.add('selected');
+
+            // Store selected color and swatch image
+            document.getElementById('selected-color').value = colorName;
+            this.currentProduct.color = colorName;  // For display (COLOR_NAME)
+            this.currentProduct.catalogColor = catalogColor;  // For ShopWorks (CATALOG_COLOR)
+
+            // Store swatch image from the clicked element
+            const swatchImage = swatchElement.querySelector('.color-swatch-image');
+            this.currentProduct.colorSwatchImage = swatchImage ? swatchImage.src : '';
+
+            // Update product image to show selected color
+            const colorRow = this.currentProduct.allRows.find(row =>
+                row.COLOR_NAME === colorName || row.CATALOG_COLOR === colorName
+            );
+
+            if (colorRow && (colorRow.FRONT_FLAT || colorRow.FRONT_MODEL)) {
+                const productImage = document.getElementById('product-image');
+                productImage.src = colorRow.FRONT_FLAT || colorRow.FRONT_MODEL;
+            }
+
+            // Load sizes for this color
+            await this.loadProductDetails(colorName);
+        }
+
+        /**
+         * Helper: Lookup CATALOG_COLOR from colorSwatches data
+         * @param {string} colorName - The COLOR_NAME to look up
+         * @returns {string} The CATALOG_COLOR, or empty string if not found
+         */
+        getCatalogColorFromSwatches(colorName) {
+            if (!this.currentProduct || !this.currentProduct.colorSwatches) {
+                console.warn('[CatalogColor] No color swatches data available');
+                return '';
+            }
+
+            // Find the swatch that matches the COLOR_NAME
+            const swatch = this.currentProduct.colorSwatches.find(s =>
+                s.COLOR_NAME === colorName
+            );
+
+            if (swatch && swatch.CATALOG_COLOR) {
+                console.log(`[CatalogColor] Found match: "${colorName}" → "${swatch.CATALOG_COLOR}"`);
+                return swatch.CATALOG_COLOR;
+            } else {
+                console.warn(`[CatalogColor] No CATALOG_COLOR found for "${colorName}"`);
+                return '';
+            }
+        }
+
+        async loadProductDetails(colorName) {
+            // Color is passed from selectColor(), or get from hidden input
+            const color = colorName || document.getElementById('selected-color').value;
+
+            if (!color) {
+                alert('Please select a color');
+                return;
+            }
+
+            if (!this.currentProduct) {
+                alert('Please select a product style first');
+                return;
+            }
+
+            try {
+                // Fetch accurate sizes from sizes-by-style-color API
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=${this.currentProduct.styleNumber}&color=${encodeURIComponent(color)}`);
+                const sizeData = await response.json();
+
+                // Extract sizes array from response
+                const displaySizes = sizeData.sizes || ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+
+                // Update product description with selected color
+                document.getElementById('product-description').textContent = `Color: ${color}`;
+
+                // Create size inputs
+                const sizeInputsContainer = document.getElementById('size-inputs');
+                sizeInputsContainer.innerHTML = '';
+
+                displaySizes.forEach(size => {
+                    const sizeGroup = document.createElement('div');
+                    sizeGroup.className = 'size-input-group';
+                    sizeGroup.innerHTML = `
+                        <label class="size-label">${size}</label>
+                        <input type="number"
+                               class="size-quantity"
+                               data-size="${size}"
+                               min="0"
+                               value="0"
+                               onchange="screenPrintQuoteBuilder.updateProductTotal()">
+                    `;
+                    sizeInputsContainer.appendChild(sizeGroup);
+                });
+
+                // Store color information (both formats)
+                this.currentProduct.color = color;  // COLOR_NAME for display
+
+                // CRITICAL FIX: Look up and store catalogColor even when auto-loading
+                // This ensures catalogColor is populated whether color is clicked or auto-loaded
+                const catalogColor = this.getCatalogColorFromSwatches(color);
+                this.currentProduct.catalogColor = catalogColor;
+
+                console.log(`[loadProductDetails] Stored colors - Display: "${color}", Catalog: "${catalogColor}"`);
+
+                this.currentProduct.sizes = displaySizes;
+
+                // Show the size section
+                document.getElementById('size-section').style.display = 'block';
+
+                document.getElementById('add-to-quote-btn').disabled = false;
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Error loading product details. Please try again.');
+            }
+        }
+
+        updateProductTotal() {
+            let total = 0;
+            document.querySelectorAll('.size-quantity').forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+
+            document.getElementById('product-total-qty').textContent = total;
+            document.getElementById('add-to-quote-btn').disabled = total === 0;
+        }
+
+        addProductToQuote() {
+            const sizeBreakdown = {};
+            let totalQuantity = 0;
+
+            document.querySelectorAll('.size-quantity').forEach(input => {
+                const size = input.dataset.size;
+                const qty = parseInt(input.value) || 0;
+                if (qty > 0) {
+                    sizeBreakdown[size] = qty;
+                    totalQuantity += qty;
+                }
+            });
+
+            if (totalQuantity === 0) {
+                alert('Please enter at least one quantity');
+                return;
+            }
+
+            // Store product WITHOUT pricing calculations (pricing done in summary phase)
+            const product = {
+                styleNumber: this.currentProduct.styleNumber,
+                productName: this.currentProduct.details.PRODUCT_TITLE || '',
+                color: this.currentProduct.color,
+                catalogColor: this.currentProduct.catalogColor,  // CRITICAL: ShopWorks catalog color format
+                colorSwatchImage: this.currentProduct.colorSwatchImage || '',
+                sizeBreakdown: sizeBreakdown,
+                quantity: totalQuantity
+            };
+
+            this.products.push(product);
+            this.displayProductsList();
+
+            // Reset form
+            document.getElementById('style-search').value = '';
+            this.lastSearchTerm = '';  // Reset search tracking
+
+            // Clear color counter if it exists
+            const colorCounter = document.getElementById('color-counter');
+            if (colorCounter) {
+                colorCounter.remove();
+            }
+
+            // Clear "Show More" button if it exists
+            const showMoreBtn = document.getElementById('show-more-colors-btn');
+            if (showMoreBtn) {
+                showMoreBtn.remove();
+            }
+
+            // Clear color swatches and product image
+            const colorSwatches = document.getElementById('color-swatches');
+            colorSwatches.innerHTML = '';
+            colorSwatches.classList.remove('collapsed');
+            colorSwatches.style.display = 'none';
+            document.getElementById('selected-color').value = '';
+
+            // Clear size inputs
+            document.getElementById('size-inputs').innerHTML = '';
+            document.getElementById('product-total-qty').textContent = '0';
+
+            // Hide both sections
+            document.getElementById('product-display').style.display = 'none';
+            document.getElementById('size-section').style.display = 'none';
+
+            // Show warning if under minimum, but don't block
+            this.checkMinimum();
+        }
+
+        getTierForQuantity(qty) {
+            if (qty >= 13 && qty <= 36) return '13-36';
+            if (qty >= 37 && qty <= 71) return '37-71';
+            if (qty >= 72 && qty <= 144) return '72-144';
+            if (qty >= 145) return '145-576';
+            return '13-36';
+        }
+
+        displayProductsList() {
+            const container = document.getElementById('products-container');
+            const totalPieces = this.products.reduce((sum, p) => sum + p.quantity, 0);
+            const addAnotherBtn = document.getElementById('add-another-product-btn');
+
+            document.getElementById('products-count').textContent = this.products.length;
+            document.getElementById('total-pieces').textContent = totalPieces;
+
+            // Show "Add Another Product" button when there's at least 1 product
+            if (addAnotherBtn) {
+                addAnotherBtn.style.display = this.products.length > 0 ? 'inline-flex' : 'none';
+            }
+
+            if (this.products.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">No products added yet.</p>';
+                return;
+            }
+
+            container.innerHTML = this.products.map((product, index) => `
+                <div class="product-item">
+                    <div class="product-item-info">
+                        ${product.colorSwatchImage ? `
+                            <div class="product-color-swatch">
+                                <img src="${product.colorSwatchImage}" alt="${product.color}" class="color-swatch-indicator">
+                            </div>
+                        ` : ''}
+                        <div class="product-item-details">
+                            <h4>${product.styleNumber} - ${product.productName}</h4>
+                            <p><strong>${product.color}</strong> | <strong>${product.quantity} pieces</strong></p>
+                            <div class="size-breakdown">
+                                ${Object.entries(product.sizeBreakdown)
+                                    .sort(([a], [b]) => {
+                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+                                        return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+                                    })
+                                    .map(([size, qty]) => `<span class="size-chip">${size}: ${qty}</span>`)
+                                    .join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-item-actions">
+                        <button class="btn-danger" onclick="screenPrintQuoteBuilder.removeProduct(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Check minimum requirement after updating product list
+            this.checkMinimum();
+        }
+
+        removeProduct(index) {
+            if (confirm('Remove this product?')) {
+                this.products.splice(index, 1);
+                this.displayProductsList();
+                this.checkMinimum();
+            }
+        }
+
+        addAnotherProduct() {
+            // Scroll to search box smoothly
+            const searchBox = document.getElementById('style-search');
+            searchBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Focus the search input after scroll completes
+            setTimeout(() => {
+                searchBox.focus();
+                // Clear any existing value and suggestions
+                searchBox.value = '';
+                document.getElementById('style-suggestions').style.display = 'none';
+                // Hide product display instead of clearing innerHTML to preserve DOM elements
+                document.getElementById('product-display').style.display = 'none';
+                document.getElementById('size-section').style.display = 'none';
+            }, 500);
+        }
+
+        checkMinimum() {
+            const total = this.products.reduce((sum, p) => sum + p.quantity, 0);
+            const productCount = this.products.length;
+            const warning = document.getElementById('minimum-warning');
+
+            // Update display totals in products list header
+            document.getElementById('products-count').textContent = productCount;
+            document.getElementById('total-pieces').textContent = total;
+
+            // Update warning total
+            document.getElementById('current-total').textContent = total;
+
+            if (total > 0 && total < 24) {
+                // Show warning with current count when under minimum
+                warning.style.setProperty('display', 'block', 'important');
+                document.getElementById('continue-to-summary').disabled = false;
+            } else if (total >= 24) {
+                // Hide warning when minimum met (use !important to override Bootstrap)
+                warning.style.setProperty('display', 'none', 'important');
+                document.getElementById('continue-to-summary').disabled = false;
+            } else {
+                // Hide warning and disable continue when no products
+                warning.style.setProperty('display', 'none', 'important');
+                document.getElementById('continue-to-summary').disabled = true;
+            }
+        }
+
+        async generateQuoteSummary() {
+            const totalQuantity = this.products.reduce((sum, p) => sum + p.quantity, 0);
+
+            // Get unique styles and fetch pricing for each
+            const uniqueStyles = [...new Set(this.products.map(p => p.styleNumber))];
+            const pricingDataByStyle = {};
+
+            for (const styleNumber of uniqueStyles) {
+                const data = await this.pricingService.fetchPricingData(styleNumber);
+                pricingDataByStyle[styleNumber] = data;
+            }
+
+            // Calculate pricing for each product
+            const productPricing = this.products.map(product => {
+                return this.calculateProductPricing(product, pricingDataByStyle[product.styleNumber], totalQuantity);
+            });
+
+            // Calculate totals
+            const subtotal = productPricing.reduce((sum, p) => sum + p.lineTotal, 0);
+            const setupFee = this.calculateTotalSetupFee();
+
+            // FIX: Get pricing data from first product (all products share same tier structure)
+            const firstStyle = Object.keys(pricingDataByStyle)[0];
+            const pricingData = pricingDataByStyle[firstStyle];
+            const ltmFee = this.calculateLTMFee(totalQuantity, pricingData);
+
+            console.log('[ScreenPrintQuote] LTM Fee Calculation:', {
+                totalQuantity,
+                tierData: pricingData?.tierData ? 'Found' : 'Missing',
+                ltmFee: ltmFee
+            });
+
+            // Calculate LTM impact per shirt for detailed breakdown
+            const ltmImpactPerShirt = ltmFee > 0 && totalQuantity > 0 ? ltmFee / totalQuantity : 0;
+
+            // Calculate products with LTM impact distributed
+            const productsWithLTM = productPricing.map(p => ({
+                ...p,
+                basePriceWithoutLTM: p.perShirtTotal,
+                ltmImpact: ltmImpactPerShirt,
+                finalUnitPrice: p.perShirtTotal + ltmImpactPerShirt,
+                finalLineTotal: (p.perShirtTotal + ltmImpactPerShirt) * p.quantity
+            }));
+
+            const subtotalWithLTM = productsWithLTM.reduce((sum, p) => sum + p.finalLineTotal, 0);
+            const grandTotal = subtotalWithLTM + setupFee;
+
+            // Display breakdown
+            const summaryContainer = document.getElementById('quote-summary');
+            summaryContainer.innerHTML = `
+                <div class="summary-section">
+                    <h3>Print Setup</h3>
+                    <div class="summary-row">
+                        <span>Front Colors:</span>
+                        <span>${this.printSetup.frontColors} ${this.printSetup.frontColors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}${this.printSetup.frontHasSafetyStripes ? ' + Safety Stripes' : ''}</span>
+                    </div>
+                    ${this.printSetup.additionalLocations.length > 0 ? `
+                        <div class="summary-row">
+                            <span>Additional Locations:</span>
+                            <span>${this.printSetup.additionalLocations.length}</span>
+                        </div>
+                        ${this.printSetup.additionalLocations.map((loc, index) => `
+                            <div class="summary-row" style="padding-left: 1rem; font-size: 0.875rem;">
+                                <span>${this.getLocationName(loc.location)}: ${loc.colors} ${loc.colors === 1 ? 'color' : 'colors'}${this.printSetup.isDarkGarment ? ' + 1 underbase' : ''}${loc.hasSafetyStripes ? ' + Safety Stripes' : ''}</span>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                    <div class="summary-row" style="border-top: 1px solid #ddd; padding-top: 0.5rem; margin-top: 0.5rem;">
+                        <span>Setup Fee:</span>
+                        <span>$${setupFee.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>Products</h3>
+                    ${productsWithLTM.map(p => `
+                        <div class="product-summary-item">
+                            <div class="product-header">
+                                <strong>${p.styleNumber} - ${p.color}</strong>
+                                <span class="product-qty-badge">${p.quantity} pieces</span>
+                            </div>
+
+                            ${ltmFee > 0 ? `
+                            <div class="ltm-notice" style="background: #fff9e6; border: 1px solid #ffc107; padding: 0.875rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; color: #856404; font-size: 0.95rem;">
+                                    <i class="fas fa-info-circle" style="font-size: 1.1rem;"></i>
+                                    <span style="font-weight: 600;">Small Batch Fee Applied:</span>
+                                    <span>$${ltmFee.toFixed(2)} ÷ ${totalQuantity} total pieces = $${ltmImpactPerShirt.toFixed(2)} per shirt</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #856404; margin-top: 0.5rem; margin-left: 1.6rem;">
+                                    See size-specific final pricing in the breakdown below.
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <div class="pricing-breakdown-section">
+                                <div class="breakdown-header">${ltmFee > 0 ? '📋 Size & Options Breakdown' : '💰 Pricing Breakdown'}</div>
+                                ${ltmFee > 0 ? `
+                                <div class="breakdown-subtitle" style="font-size: 0.85rem; color: #666; margin: -8px 0 12px 0; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+                                    <i class="fas fa-info-circle"></i> Base components shown below. Final prices include $${ltmImpactPerShirt.toFixed(2)}/pc Small Batch Fee. See summary table for quick reference.
+                                </div>
+                                ` : ''}
+
+                                <!-- Size Distribution with Transparent Pricing -->
+                                <div class="size-breakdown-transparent">
+                                    <strong style="color: #2d5f3f; display: block; margin-bottom: 8px;">Size Distribution:</strong>
+                                    ${(() => {
+                                        // Group sizes by their total unit price (base + safety + additional)
+                                        const priceGroups = {};
+                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+
+                                        Object.entries(p.sizesPricing).forEach(([size, pricing]) => {
+                                            const totalUnitPrice = pricing.basePrice + pricing.safetyStripesPerPiece + p.additionalCost;
+                                            const priceKey = totalUnitPrice.toFixed(2);
+
+                                            if (!priceGroups[priceKey]) {
+                                                priceGroups[priceKey] = {
+                                                    sizes: {},  // Changed to object to store individual quantities
+                                                    quantity: 0,
+                                                    basePrice: pricing.basePrice,
+                                                    safetyStripes: pricing.safetyStripesPerPiece,
+                                                    additionalCost: p.additionalCost,
+                                                    totalUnitPrice: totalUnitPrice,
+                                                    subtotal: 0
+                                                };
+                                            }
+                                            priceGroups[priceKey].sizes[size] = pricing.quantity;  // Store individual size quantity
+                                            priceGroups[priceKey].quantity += pricing.quantity;
+                                            priceGroups[priceKey].subtotal += pricing.quantity * totalUnitPrice;
+                                        });
+
+                                        // Display grouped sizes with individual quantities on one line
+                                        return Object.values(priceGroups)
+                                            .sort((a, b) => a.totalUnitPrice - b.totalUnitPrice)
+                                            .map(group => {
+                                                // Sort sizes within group
+                                                const sortedSizes = Object.entries(group.sizes)
+                                                    .sort(([sizeA], [sizeB]) => sizeOrder.indexOf(sizeA) - sizeOrder.indexOf(sizeB));
+
+                                                // Create individual size breakdown (e.g., "S: 10, M: 10, L: 10, XL: 8")
+                                                const sizeBreakdownList = sortedSizes
+                                                    .map(([size, qty]) => `${size}: ${qty}`)
+                                                    .join(', ');
+
+                                                const hasSafetyStripes = group.safetyStripes > 0;
+                                                const hasAdditional = group.additionalCost > 0;
+
+                                                // Calculate final price with LTM for this size group
+                                                const finalUnitPriceWithLTM = group.totalUnitPrice + ltmImpactPerShirt;
+                                                const finalSubtotalWithLTM = Math.round((finalUnitPriceWithLTM * group.quantity) * 100) / 100;
+
+                                                return `
+                                                    <div class="size-pricing-detail">
+                                                        <div class="size-label" style="font-weight: 600; margin-bottom: 4px;">
+                                                            ${sizeBreakdownList} <span style="color: #666; font-weight: 400;">(${group.quantity} total)</span>
+                                                        </div>
+                                                        <div class="price-calculation">
+                                                            <span class="base-price">$${group.basePrice.toFixed(2)}</span>
+                                                            ${hasSafetyStripes ? `
+                                                                <span class="price-plus">+</span>
+                                                                <span class="safety-stripes">$${group.safetyStripes.toFixed(2)} safety stripes</span>
+                                                            ` : ''}
+                                                            ${hasAdditional ? `
+                                                                <span class="price-plus">+</span>
+                                                                <span class="additional-loc">$${group.additionalCost.toFixed(2)} add'l locations</span>
+                                                            ` : ''}
+                                                            ${ltmFee > 0 ? `
+                                                                <span class="price-plus">+</span>
+                                                                <span class="small-batch-fee" style="color: #f97316; font-weight: 500;">$${ltmImpactPerShirt.toFixed(2)} Small Batch Fee</span>
+                                                            ` : ''}
+                                                            <span class="price-equals">=</span>
+                                                            <span class="unit-total">$${finalUnitPriceWithLTM.toFixed(2)}/pc</span>
+                                                            <span class="size-subtotal">→ $${finalSubtotalWithLTM.toFixed(2)} total</span>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }).join('');
+                                    })()}
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="summary-section summary-totals">
+                    <h3 style="margin-bottom: 1rem;">Quote Total</h3>
+                    <div class="summary-row">
+                        <span>Products Subtotal${ltmFee > 0 ? ' (includes Small Batch Fee)' : ''}:</span>
+                        <span>$${subtotalWithLTM.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Setup Fees (One-Time):</span>
+                        <span>$${setupFee.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row grand-total-row" style="border-top: 3px double #2d5f3f; padding-top: 1rem; margin-top: 1rem; font-weight: 900; font-size: 1.5rem;">
+                        <span>GRAND TOTAL:</span>
+                        <span style="color: #2d5f3f;">$${grandTotal.toFixed(2)}</span>
+                    </div>
+                    ${ltmFee > 0 ? `
+                    <div class="ltm-info-note" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 0.875rem; margin-top: 1rem; font-size: 0.875rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                            <i class="fas fa-info-circle" style="color: #ff9800; margin-top: 2px; flex-shrink: 0;"></i>
+                            <div>
+                                <strong style="color: #856404;">Small Batch Fee Breakdown:</strong><br>
+                                <span style="color: #856404;">
+                                    $${ltmFee.toFixed(2)} total fee ÷ ${totalQuantity} ${totalQuantity === 1 ? 'shirt' : 'shirts'} = $${ltmImpactPerShirt.toFixed(2)} per shirt
+                                </span><br>
+                                <small style="color: #856404; font-style: italic;">
+                                    This fee is included in the per-shirt prices shown above. Order 73+ pieces to eliminate this fee!
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+            // Store pricing for quote save
+            this.currentPricing = {
+                totalQuantity,
+                productPricing: productsWithLTM,
+                subtotal: subtotalWithLTM,
+                setupFee,
+                ltmFee,
+                ltmImpactPerShirt,
+                grandTotal
+            };
+        }
+
+        calculateProductPricing(product, pricingData, totalQuantity) {
+            // Calculate effective colors (design + underbase if dark)
+            let frontEffectiveColors = this.printSetup.frontColors;
+            if (this.printSetup.isDarkGarment && this.printSetup.frontColors > 0) {
+                frontEffectiveColors += 1;
+            }
+
+            // Get base price from primaryLocationPricing
+            const frontPricingData = pricingData.primaryLocationPricing?.[frontEffectiveColors.toString()];
+            if (!frontPricingData) {
+                console.error('[ScreenPrintQuote] No pricing data for', frontEffectiveColors, 'colors');
+                return {
+                    styleNumber: product.styleNumber,
+                    color: product.color,
+                    quantity: product.quantity,
+                    sizeBreakdown: product.sizeBreakdown,
+                    sizesPricing: {},
+                    baseCostSubtotal: 0,
+                    additionalCost: 0,
+                    perShirtTotal: 0,
+                    lineTotal: 0
+                };
+            }
+
+            const tier = frontPricingData.tiers.find(t =>
+                totalQuantity >= t.minQty && (!t.maxQty || totalQuantity <= t.maxQty)
+            );
+
+            if (!tier || !tier.prices) {
+                console.error('[ScreenPrintQuote] No tier found for quantity', totalQuantity);
+                return {
+                    styleNumber: product.styleNumber,
+                    color: product.color,
+                    quantity: product.quantity,
+                    sizeBreakdown: product.sizeBreakdown,
+                    sizesPricing: {},
+                    baseCostSubtotal: 0,
+                    additionalCost: 0,
+                    perShirtTotal: 0,
+                    lineTotal: 0
+                };
+            }
+
+            // Calculate safety stripes surcharge per piece FIRST (so we can include it in unit prices)
+            let safetyStripesSurchargePerPiece = 0;
+
+            // Add surcharge for front if has safety stripes and printing
+            if (this.printSetup.frontHasSafetyStripes && this.printSetup.frontColors > 0) {
+                safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+            }
+
+            // Add surcharge for each additional location with safety stripes and printing
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.hasSafetyStripes && loc.colors > 0) {
+                    safetyStripesSurchargePerPiece += this.printSetup.safetyStripeSurcharge;
+                }
+            });
+
+            // Calculate pricing per size - store base price and safety stripes separately for transparent display
+            const sizesPricing = {};
+            Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                const baseSizePrice = parseFloat(tier.prices[size]) || parseFloat(tier.prices['S']) || 0;
+                const unitPriceWithSafetyStripes = baseSizePrice + safetyStripesSurchargePerPiece;
+                sizesPricing[size] = {
+                    quantity: qty,
+                    basePrice: baseSizePrice,  // Store base garment price
+                    safetyStripesPerPiece: safetyStripesSurchargePerPiece,  // Store safety stripes amount
+                    unitPrice: unitPriceWithSafetyStripes,  // Total per piece (base + safety)
+                    subtotal: unitPriceWithSafetyStripes * qty
+                };
+            });
+
+            // Calculate base cost subtotal from individual sizes (already includes safety stripes)
+            const baseCostSubtotal = Object.values(sizesPricing).reduce((sum, s) => sum + s.subtotal, 0);
+
+            // Add additional locations cost (per-piece, applies to all pieces)
+            let additionalCostPerPiece = 0;
+            this.printSetup.additionalLocations.forEach(loc => {
+                let effectiveColors = loc.colors;
+                if (this.printSetup.isDarkGarment && loc.colors > 0) {
+                    effectiveColors += 1;
+                }
+
+                const locPricingData = pricingData.additionalLocationPricing?.[effectiveColors.toString()];
+                if (locPricingData) {
+                    const locTier = locPricingData.tiers.find(t =>
+                        totalQuantity >= t.minQty && (!t.maxQty || totalQuantity <= t.maxQty)
+                    );
+                    if (locTier) {
+                        // Additional locations are per-piece, no size variation
+                        additionalCostPerPiece += parseFloat(locTier.pricePerPiece) || 0;
+                    }
+                }
+            });
+
+            const totalAdditionalCost = additionalCostPerPiece * product.quantity;
+            const totalSafetyStripesCost = safetyStripesSurchargePerPiece * product.quantity;
+            // baseCostSubtotal now includes safety stripes, so don't add totalSafetyStripesCost again
+            const lineTotal = baseCostSubtotal + totalAdditionalCost;
+            const perShirtTotal = lineTotal / product.quantity;
+
+            return {
+                styleNumber: product.styleNumber,
+                color: product.color,
+                quantity: product.quantity,
+                sizeBreakdown: product.sizeBreakdown,
+                sizesPricing: sizesPricing,  // NEW: individual size pricing
+                baseCostSubtotal: baseCostSubtotal,  // NEW: subtotal before additional locations
+                additionalCost: additionalCostPerPiece,  // Per-piece additional location cost
+                totalAdditionalCost: totalAdditionalCost,  // Total additional cost for all pieces
+                safetyStripesCostPerPiece: safetyStripesSurchargePerPiece,  // Safety stripes per piece
+                totalSafetyStripesCost: totalSafetyStripesCost,  // Total safety stripes cost
+                perShirtTotal: perShirtTotal,  // Average per shirt (for backward compatibility)
+                lineTotal: lineTotal
+            };
+        }
+
+        calculateTotalSetupFee() {
+            // Front setup (MATCHES screenprint-pricing-v2.js LINE 1338)
+            let frontColors = this.printSetup.frontColors;
+            if (this.printSetup.isDarkGarment && frontColors > 0) {
+                frontColors += 1; // Add underbase
+            }
+            const frontSetup = frontColors * 30;
+
+            // Additional locations setup
+            let additionalSetup = 0;
+            this.printSetup.additionalLocations.forEach(loc => {
+                let colors = loc.colors;
+                if (this.printSetup.isDarkGarment && colors > 0) {
+                    colors += 1;
+                }
+                additionalSetup += colors * 30;
+            });
+
+            return frontSetup + additionalSetup;
+        }
+
+        /**
+         * ⚠️ CALCULATOR SYNC WARNING
+         *
+         * This LTM fee calculation is DUPLICATED in:
+         * - shared_components/js/screenprint-pricing-v2.js (lines 1587-1595)
+         *
+         * If you change this logic, you MUST also update the pricing calculator
+         * to ensure both calculators show identical prices for the same inputs.
+         *
+         * See shared_components/js/screenprint-pricing-service.js header for
+         * complete synchronization requirements.
+         */
+        calculateLTMFee(totalQuantity, pricingDataByStyle) {
+            // API-DRIVEN LTM Fee: Pull from tier data (matches screenprint-manual-pricing.js)
+            // No hardcoded values - uses API tier data for flexibility
+
+            if (!pricingDataByStyle?.tierData) {
+                console.warn('[LTM Fee] No tier data available, defaulting to $0');
+                return 0;
+            }
+
+            // Find the current tier for this quantity
+            const tierData = pricingDataByStyle.tierData;
+
+            for (const tierLabel in tierData) {
+                const tier = tierData[tierLabel];
+                const minQty = parseInt(tier.MinQuantity || 0);
+                const maxQty = tier.MaxQuantity ? parseInt(tier.MaxQuantity) : Infinity;
+
+                if (totalQuantity >= minQty && totalQuantity <= maxQty) {
+                    const ltmFee = parseFloat(tier.LTM_Fee || 0);
+                    console.log(`[LTM Fee] Quantity: ${totalQuantity} - Tier: ${tierLabel} - Fee: $${ltmFee.toFixed(2)} (from API)`);
+                    return ltmFee;
+                }
+            }
+
+            // No matching tier found - default to first tier's LTM fee
+            const firstTier = Object.values(tierData)[0];
+            const defaultFee = firstTier ? parseFloat(firstTier.LTM_Fee || 0) : 0;
+            console.warn(`[LTM Fee] No tier match for quantity ${totalQuantity}, using default: $${defaultFee.toFixed(2)}`);
+            return defaultFee;
+        }
+
+        async saveQuote() {
+            // Check if user wants to save to database
+            const saveToDatabase = document.getElementById('save-to-database').checked;
+
+            if (!saveToDatabase) {
+                alert('Quote not saved to database (Save to Database is unchecked).\n\nFor quick pricing:\n• Use "ShopWorks Entry Guide" to export\n• Or check "Save to Database" and fill in customer info');
+                return;
+            }
+
+            // Validate customer info ONLY if saving to database
+            const customerName = document.getElementById('customer-name').value.trim();
+            const customerEmail = document.getElementById('customer-email').value.trim();
+            const salesRep = document.getElementById('sales-rep').value;
+
+            if (!customerName || !customerEmail || !salesRep) {
+                alert('Please fill in customer information to save quote to database:\n\n• Customer Name (required)\n• Email (required)\n• Sales Representative (required)');
+                return;
+            }
+
+            const quoteData = {
+                customerName,
+                customerEmail,
+                customerPhone: document.getElementById('customer-phone').value.trim(),
+                companyName: document.getElementById('company-name').value.trim(),
+                salesRepEmail: salesRep,
+
+                printSetup: this.printSetup,
+                items: this.products,
+                totalQuantity: this.currentPricing.totalQuantity,
+                subtotal: this.currentPricing.subtotal,
+                setupFees: this.currentPricing.setupFees,
+                ltmFee: this.currentPricing.ltmFee,
+                grandTotal: this.currentPricing.grandTotal
+            };
+
+            const result = await this.quoteService.saveQuote(quoteData);
+
+            if (result.success) {
+                document.getElementById('modal-quote-id').textContent = result.quoteID;
+                document.getElementById('success-modal').style.display = 'block';
+            } else {
+                alert('Error saving quote: ' + result.error);
+            }
+        }
+
+        async emailQuote() {
+            // Validate customer email (required for emailing)
+            const customerEmail = document.getElementById('customer-email').value.trim();
+
+            if (!customerEmail) {
+                alert('Please enter customer email address to send quote.');
+                return;
+            }
+
+            // Get other optional customer info
+            const customerName = document.getElementById('customer-name').value.trim() || 'Customer';
+            const salesRep = document.getElementById('sales-rep').value;
+
+            // Check if user wants to save to database before emailing
+            const saveToDatabase = document.getElementById('save-to-database').checked;
+
+            if (saveToDatabase) {
+                // Save to database first if checkbox is checked
+                if (!customerName || customerName === 'Customer' || !salesRep) {
+                    alert('To save quote before emailing, please fill in:\n\n• Customer Name (required)\n• Sales Representative (required)');
+                    return;
+                }
+
+                // Save quote first
+                await this.saveQuote();
+            }
+
+            // TODO: Implement email sending via quoteService
+            // For now, show a placeholder message
+            alert(`Email Quote Feature\n\nThis will send quote to: ${customerEmail}\n\nNote: Email functionality needs to be implemented in screenprint-quote-service.js`);
+
+            // Future implementation:
+            // const result = await this.quoteService.emailQuote({
+            //     customerName,
+            //     customerEmail,
+            //     customerPhone: document.getElementById('customer-phone').value.trim(),
+            //     companyName: document.getElementById('company-name').value.trim(),
+            //     salesRepEmail: salesRep,
+            //     printSetup: this.printSetup,
+            //     items: this.products,
+            //     pricing: this.currentPricing
+            // });
+        }
+
+        /**
+         * Generate ShopWorks Data Entry Guide for screen print quote
+         */
+        generateShopWorksGuide() {
+            if (!this.currentPricing || this.products.length === 0) {
+                alert('Please complete your quote first by adding products.');
+                return;
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Generating ShopWorks Entry Guide...');
+            console.log('[ScreenPrintQuoteBuilder] currentPricing:', this.currentPricing);
+            console.log('[ScreenPrintQuoteBuilder] products:', this.products);
+
+            // Calculate sales tax for ShopWorks guide (10.1% Milton, WA)
+            const subtotalBeforeTax = this.currentPricing.subtotal + this.currentPricing.setupFees + (this.currentPricing.ltmFee || 0);
+            const salesTax = subtotalBeforeTax * 0.101;
+            const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
+            // ENHANCED DEBUGGING: Setup fee breakdown
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🛠️ SETUP FEE BREAKDOWN FOR SHOPWORKS');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[Setup] isDarkGarment:', this.printSetup.isDarkGarment);
+
+            if (this.printSetup.frontColors > 0) {
+                const frontInk = this.printSetup.frontColors;
+                const frontUnderbase = this.printSetup.isDarkGarment ? 1 : 0;
+                const frontTotal = frontInk + frontUnderbase;
+                console.log(`[Setup] Front: ${frontInk} ink colors${frontUnderbase ? ' + 1 underbase' : ''} = ${frontTotal} screens × $30 = $${frontTotal * 30}`);
+            }
+
+            this.printSetup.additionalLocations.forEach(loc => {
+                if (loc.colors > 0) {
+                    const locInk = loc.colors;
+                    const locUnderbase = this.printSetup.isDarkGarment ? 1 : 0;
+                    const locTotal = locInk + locUnderbase;
+                    console.log(`[Setup] ${loc.location}: ${locInk} ink colors${locUnderbase ? ' + 1 underbase' : ''} = ${locTotal} screens × $30 = $${locTotal * 30}`);
+                }
+            });
+
+            const totalColors = this.calculateTotalColors();
+            const setupBreakdown = this.getSetupBreakdown();
+            console.log(`[Setup] Total Effective Colors: ${totalColors}`);
+            console.log(`[Setup] Setup Breakdown:`, setupBreakdown);
+            console.log(`[Setup] Total Setup Fee: $${this.currentPricing.setupFees}`);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+            // Prepare quote data in format expected by ShopWorks guide generator
+            const quoteData = {
+                QuoteID: this.quoteService.generateQuoteID(),
+                CustomerName: document.getElementById('customer-name')?.value.trim() || 'Customer',
+                products: [],
+                TotalQuantity: this.currentPricing.totalQuantity || 0,
+                SubtotalAmount: subtotalBeforeTax,      // Full subtotal including all fees
+                SalesTaxAmount: salesTax,               // 10.1% calculated tax
+                TotalAmount: grandTotalWithTax,         // Total with tax included
+                SetupFees: this.currentPricing.setupFees || 0,
+                SmallBatchFee: this.currentPricing.ltmFee || 0,
+                TotalColors: this.calculateTotalColors(),
+                SetupBreakdown: this.getSetupBreakdown(),
+                isDarkGarment: this.printSetup.isDarkGarment,  // For EDP art/production notes
+                Notes: document.getElementById('customer-notes')?.value.trim() || ''
+            };
+
+            // BUG FIX: Create lookup map of pricing data by product (styleNumber + color)
+            const pricingLookup = {};
+
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🔍 PRICING LOOKUP CREATION');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[ScreenPrintQuoteBuilder] currentPricing exists?', !!this.currentPricing);
+            console.log('[ScreenPrintQuoteBuilder] productPricing exists?', !!this.currentPricing?.productPricing);
+            console.log('[ScreenPrintQuoteBuilder] productPricing array:', this.currentPricing?.productPricing);
+
+            if (this.currentPricing && this.currentPricing.productPricing) {
+                this.currentPricing.productPricing.forEach((pricingData, index) => {
+                    const key = `${pricingData.styleNumber}-${pricingData.color}`;
+                    pricingLookup[key] = pricingData;
+                    console.log(`[ScreenPrintQuoteBuilder] Pricing Lookup [${index}]:`, {
+                        key,
+                        styleNumber: pricingData.styleNumber,
+                        color: pricingData.color,
+                        perShirtTotal: pricingData.perShirtTotal,
+                        finalUnitPrice: pricingData.finalUnitPrice,
+                        finalLineTotal: pricingData.finalLineTotal,
+                        quantity: pricingData.quantity
+                    });
+                });
+            } else {
+                console.error('❌ [ScreenPrintQuoteBuilder] CRITICAL: currentPricing or productPricing is missing!');
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Created pricing lookup map:', pricingLookup);
+            console.log('[ScreenPrintQuoteBuilder] Lookup map keys:', Object.keys(pricingLookup));
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+            // Convert each product into the format ShopWorks generator expects
+            this.products.forEach((product, productIndex) => {
+                console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                console.log(`📦 PROCESSING PRODUCT [${productIndex}]`);
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                console.log('[ScreenPrintQuoteBuilder] Product object:', product);
+                console.log('[ScreenPrintQuoteBuilder] product.styleNumber:', product.styleNumber);
+                console.log('[ScreenPrintQuoteBuilder] product.color:', product.color);
+                console.log('[ScreenPrintQuoteBuilder] product.sizeBreakdown:', product.sizeBreakdown);
+
+                // Build size breakdown object
+                const sizeBreakdown = {};
+                let totalQuantity = 0;
+
+                if (product.sizeBreakdown) {
+                    Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                        if (qty > 0) {
+                            sizeBreakdown[size] = qty;
+                            totalQuantity += parseInt(qty);
+                        }
+                    });
+                }
+
+                console.log('[ScreenPrintQuoteBuilder] Built sizeBreakdown:', sizeBreakdown);
+                console.log('[ScreenPrintQuoteBuilder] totalQuantity:', totalQuantity);
+
+                // BUG FIX: Find matching pricing data for this product
+                const pricingKey = `${product.styleNumber}-${product.color}`;
+                const pricingMatch = pricingLookup[pricingKey];
+
+                console.log('[ScreenPrintQuoteBuilder] Looking for pricing with key:', pricingKey);
+                console.log('[ScreenPrintQuoteBuilder] Available keys in lookup:', Object.keys(pricingLookup));
+                console.log('[ScreenPrintQuoteBuilder] Found pricing match:', pricingMatch);
+
+                if (!pricingMatch) {
+                    console.error(`❌ [ScreenPrintQuoteBuilder] CRITICAL: No pricing match found for key "${pricingKey}"`);
+                    console.error('[ScreenPrintQuoteBuilder] This will result in $0.00 pricing!');
+                } else {
+                    console.log('✅ [ScreenPrintQuoteBuilder] Pricing match found successfully');
+                }
+
+                // Build print locations array for description
+                const printLocations = [];
+                if (this.printSetup.front && this.printSetup.frontColors > 0) {
+                    printLocations.push({
+                        name: 'Full Front',
+                        colors: this.printSetup.frontColors
+                    });
+                }
+                if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                    this.printSetup.additionalLocations.forEach(loc => {
+                        printLocations.push({
+                            name: loc.location,
+                            colors: loc.colors
+                        });
+                    });
+                }
+
+                console.log('[ScreenPrintQuoteBuilder] printSetup.front:', this.printSetup.front);
+                console.log('[ScreenPrintQuoteBuilder] printSetup.frontColors:', this.printSetup.frontColors);
+                console.log('[ScreenPrintQuoteBuilder] printSetup.additionalLocations:', this.printSetup.additionalLocations);
+                console.log('[ScreenPrintQuoteBuilder] Built print locations:', printLocations);
+
+                // BUG FIX: Use pricing data from currentPricing instead of product object
+                const baseUnitPrice = pricingMatch ? pricingMatch.perShirtTotal : 0;
+                const finalUnitPrice = pricingMatch ? pricingMatch.finalUnitPrice : 0;
+                const lineTotal = pricingMatch ? pricingMatch.finalLineTotal : 0;
+
+                console.log('[ScreenPrintQuoteBuilder] Extracting pricing values:');
+                console.log('  - pricingMatch.perShirtTotal:', pricingMatch?.perShirtTotal);
+                console.log('  - pricingMatch.finalUnitPrice:', pricingMatch?.finalUnitPrice);
+                console.log('  - pricingMatch.finalLineTotal:', pricingMatch?.finalLineTotal);
+                console.log('[ScreenPrintQuoteBuilder] Final pricing values:', {
+                    baseUnitPrice,
+                    finalUnitPrice,
+                    lineTotal
+                });
+
+                if (baseUnitPrice === 0 || finalUnitPrice === 0 || lineTotal === 0) {
+                    console.error('❌ [ScreenPrintQuoteBuilder] WARNING: One or more pricing values is $0.00!');
+                }
+
+                // CHANGE #1: Extract size-specific unit prices from pricingMatch
+                // IMPORTANT: Include additional locations cost + LTM impact for complete pricing
+                const sizesPricing = {};
+                const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
+                const additionalCostPerPiece = pricingMatch?.additionalCost || 0;  // Get additional locations cost
+                if (pricingMatch && pricingMatch.sizesPricing) {
+                    console.log('[ScreenPrintQuoteBuilder] Extracting size-specific pricing from pricingMatch.sizesPricing...');
+                    console.log('[ScreenPrintQuoteBuilder] Additional locations cost per piece: $' + additionalCostPerPiece.toFixed(2));
+                    console.log('[ScreenPrintQuoteBuilder] LTM impact per piece: $' + ltmImpact.toFixed(2));
+                    Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
+                        // Complete price = base + safety stripes + additional locations + LTM
+                        const completePrice = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
+                        sizesPricing[size] = completePrice;
+                        console.log(`  - Size ${size}: $${priceData.unitPrice.toFixed(2)} (base+safety) + $${additionalCostPerPiece.toFixed(2)} (add'l loc) + $${ltmImpact.toFixed(2)} (LTM) = $${completePrice.toFixed(2)}`);
+                    });
+                    console.log('[ScreenPrintQuoteBuilder] Size-specific pricing extracted (complete):', sizesPricing);
+                } else {
+                    console.warn('⚠️ [ScreenPrintQuoteBuilder] No sizesPricing data found in pricingMatch');
+                }
+
+                const productForShopWorks = {
+                    StyleNumber: product.styleNumber || '',
+                    ProductName: product.productName || product.name || '',
+                    Color: product.color || '',
+                    CatalogColor: product.catalogColor || '',  // ShopWorks catalog color format
+                    ColorCode: '',
+                    SizeBreakdown: sizeBreakdown,
+                    Quantity: totalQuantity,
+                    BaseUnitPrice: baseUnitPrice,
+                    FinalUnitPrice: finalUnitPrice,
+                    LineTotal: lineTotal,
+                    PrintLocations: printLocations,
+                    SizesPricing: sizesPricing  // CHANGE #2: Pass size-specific pricing to ShopWorks generator
+                };
+
+                console.log('[ScreenPrintQuoteBuilder] Product object being added to quoteData:', productForShopWorks);
+                quoteData.products.push(productForShopWorks);
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+            });
+
+            console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📋 FINAL QUOTE DATA FOR SHOPWORKS');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('[ScreenPrintQuoteBuilder] Prepared quote data for ShopWorks:', quoteData);
+            console.log('[ScreenPrintQuoteBuilder] QuoteID:', quoteData.QuoteID);
+            console.log('[ScreenPrintQuoteBuilder] TotalQuantity:', quoteData.TotalQuantity);
+            console.log('[ScreenPrintQuoteBuilder] TotalColors:', quoteData.TotalColors);
+            console.log('[ScreenPrintQuoteBuilder] SetupBreakdown:', quoteData.SetupBreakdown);
+            console.log('[ScreenPrintQuoteBuilder] Products array length:', quoteData.products.length);
+            console.log('[ScreenPrintQuoteBuilder] First product detail:', JSON.stringify(quoteData.products[0], null, 2));
+            console.log('[ScreenPrintQuoteBuilder] First product SizeBreakdown:', quoteData.products[0]?.SizeBreakdown);
+            console.log('[ScreenPrintQuoteBuilder] First product BaseUnitPrice:', quoteData.products[0]?.BaseUnitPrice);
+            console.log('[ScreenPrintQuoteBuilder] First product FinalUnitPrice:', quoteData.products[0]?.FinalUnitPrice);
+            console.log('[ScreenPrintQuoteBuilder] First product LineTotal:', quoteData.products[0]?.LineTotal);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+            // Generate and open the guide using screen print specific generator
+            const generator = new ScreenPrintShopWorksGuideGenerator();
+            generator.generateGuide(quoteData);
+        }
+
+        /**
+         * Generate ShopWorks EDP text for importing quote into ShopWorks
+         */
+        generateEDPText() {
+            if (!this.currentPricing || this.products.length === 0) {
+                alert('Please complete your quote first by adding products.');
+                return;
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] Generating EDP text...');
+
+            // Reuse same quote data preparation as ShopWorks guide
+            const subtotalBeforeTax = this.currentPricing.subtotal + this.currentPricing.setupFees + (this.currentPricing.ltmFee || 0);
+            const salesTax = subtotalBeforeTax * 0.101;
+            const grandTotalWithTax = subtotalBeforeTax + salesTax;
+
+            const quoteData = {
+                QuoteID: this.quoteService.generateQuoteID(),
+                CustomerName: document.getElementById('customer-name')?.value.trim() || 'Customer',
+                products: [],
+                TotalQuantity: this.currentPricing.totalQuantity || 0,
+                SubtotalAmount: subtotalBeforeTax,
+                SalesTaxAmount: salesTax,
+                TotalAmount: grandTotalWithTax,
+                SetupFees: this.currentPricing.setupFees || 0,
+                SmallBatchFee: this.currentPricing.ltmFee || 0,
+                TotalColors: this.calculateTotalColors(),
+                SetupBreakdown: this.getSetupBreakdown(),
+                isDarkGarment: this.printSetup.isDarkGarment,  // For EDP art/production notes
+                Notes: document.getElementById('customer-notes')?.value.trim() || ''
+            };
+
+            // Create pricing lookup (same as ShopWorks guide)
+            const pricingLookup = {};
+            if (this.currentPricing && this.currentPricing.productPricing) {
+                this.currentPricing.productPricing.forEach((pricingData) => {
+                    const key = `${pricingData.styleNumber}-${pricingData.color}`;
+                    pricingLookup[key] = pricingData;
+                });
+            }
+
+            // Convert products (same logic as ShopWorks guide)
+            this.products.forEach((product) => {
+                const sizeBreakdown = {};
+                let totalQuantity = 0;
+
+                if (product.sizeBreakdown) {
+                    Object.entries(product.sizeBreakdown).forEach(([size, qty]) => {
+                        if (qty > 0) {
+                            sizeBreakdown[size] = qty;
+                            totalQuantity += parseInt(qty);
+                        }
+                    });
+                }
+
+                const pricingKey = `${product.styleNumber}-${product.color}`;
+                const pricingMatch = pricingLookup[pricingKey];
+
+                const baseUnitPrice = pricingMatch ? pricingMatch.perShirtTotal : 0;
+                const finalUnitPrice = pricingMatch ? pricingMatch.finalUnitPrice : 0;
+                const lineTotal = pricingMatch ? pricingMatch.finalLineTotal : 0;
+
+
+                const sizesPricing = {};
+                const ltmImpact = this.currentPricing?.ltmImpactPerShirt || 0;
+                const additionalCostPerPiece = pricingMatch?.additionalCost || 0;  // Get additional locations cost
+                if (pricingMatch && pricingMatch.sizesPricing) {
+                    Object.entries(pricingMatch.sizesPricing).forEach(([size, priceData]) => {
+                        // Complete price = base + safety stripes + additional locations + LTM
+                        sizesPricing[size] = priceData.unitPrice + additionalCostPerPiece + ltmImpact;
+                    });
+                }
+                const printLocations = [];
+                if (this.printSetup.front && this.printSetup.frontColors > 0) {
+                    printLocations.push({
+                        name: 'Full Front',
+                        colors: this.printSetup.frontColors
+                    });
+                }
+                if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                    this.printSetup.additionalLocations.forEach(loc => {
+                        printLocations.push({
+                            name: loc.location,
+                            colors: loc.colors
+                        });
+                    });
+                }
+
+                quoteData.products.push({
+                    StyleNumber: product.styleNumber || '',
+                    ProductName: product.productName || product.name || '',
+                    Color: product.color || '',
+                    CatalogColor: product.catalogColor || '',  // ShopWorks catalog color format
+                    ColorCode: '',
+                    SizeBreakdown: sizeBreakdown,
+                    Quantity: totalQuantity,
+                    BaseUnitPrice: baseUnitPrice,
+                    FinalUnitPrice: finalUnitPrice,
+                    LineTotal: lineTotal,
+                    PrintLocations: printLocations,
+                    SizesPricing: sizesPricing
+                });
+            });
+
+            console.log('[ScreenPrintQuoteBuilder] Prepared quote data for EDP:', quoteData);
+
+            // Generate EDP using EDP generator
+            if (!window.edpGenerator) {
+                window.edpGenerator = new ShopWorksEDPGenerator();
+            }
+            window.edpGenerator.generateEDP(quoteData);
+        }
+
+        /**
+         * Calculate total number of unique colors across all locations
+         */
+        calculateTotalColors() {
+            let total = 0;
+            let frontEffective = 0;
+            const additionalEffective = [];
+
+            // Front: ink colors + underbase (if dark garment)
+            if (this.printSetup.frontColors && this.printSetup.frontColors > 0) {
+                frontEffective = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    frontEffective += 1;  // Add white underbase for dark garments
+                }
+                total += frontEffective;
+            }
+
+            // Additional locations: ink colors + underbase per location (if dark garment)
+            if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                this.printSetup.additionalLocations.forEach(loc => {
+                    if (loc.colors > 0) {
+                        let locEffective = loc.colors;
+                        if (this.printSetup.isDarkGarment) {
+                            locEffective += 1;  // Add underbase for each location
+                        }
+                        total += locEffective;
+                        additionalEffective.push({location: loc.location, effective: locEffective});
+                    }
+                });
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] calculateTotalColors:', {
+                frontInkColors: this.printSetup.frontColors,
+                frontUnderbase: this.printSetup.isDarkGarment && this.printSetup.frontColors > 0 ? 1 : 0,
+                frontEffectiveColors: frontEffective,
+                additionalLocations: additionalEffective,
+                isDarkGarment: this.printSetup.isDarkGarment,
+                totalEffectiveColors: total
+            });
+
+            return total;
+        }
+
+        /**
+         * Get setup fee breakdown by location
+         * Enhanced to include safety stripes information
+         * Returns EFFECTIVE colors (ink colors + underbase for dark garments)
+         */
+        getSetupBreakdown() {
+            const breakdown = {};
+
+            // Front: effective colors (ink + underbase if dark)
+            if (this.printSetup.frontColors && this.printSetup.frontColors > 0) {
+                let effectiveColors = this.printSetup.frontColors;
+                if (this.printSetup.isDarkGarment) {
+                    effectiveColors += 1;  // Add underbase
+                }
+
+                breakdown['Front'] = {
+                    colors: effectiveColors,  // Effective colors (with underbase)
+                    hasSafetyStripes: this.printSetup.frontHasSafetyStripes || false
+                };
+            }
+
+            // Additional locations: effective colors per location
+            if (this.printSetup.additionalLocations && this.printSetup.additionalLocations.length > 0) {
+                this.printSetup.additionalLocations.forEach(loc => {
+                    if (loc.colors > 0) {
+                        let effectiveColors = loc.colors;
+                        if (this.printSetup.isDarkGarment) {
+                            effectiveColors += 1;  // Add underbase
+                        }
+
+                        breakdown[loc.location] = {
+                            colors: effectiveColors,  // Effective colors (with underbase)
+                            hasSafetyStripes: loc.hasSafetyStripes || false
+                        };
+                    }
+                });
+            }
+
+            console.log('[ScreenPrintQuoteBuilder] getSetupBreakdown (with underbase & safety stripes):', breakdown);
+
+            return breakdown;
+        }
+
+
+        navigateToPhase(phase) {
+            document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.phase-step').forEach(s => s.classList.remove('active', 'completed'));
+
+            const phases = ['setup-phase', 'product-phase', 'summary-phase'];
+            document.getElementById(phases[phase - 1]).classList.add('active');
+
+            document.querySelectorAll('.phase-step').forEach(step => {
+                const stepPhase = parseInt(step.dataset.phase);
+                if (stepPhase < phase) step.classList.add('completed');
+                else if (stepPhase === phase) step.classList.add('active');
+            });
+
+            this.currentPhase = phase;
+        }
+    }
+
+    let screenPrintQuoteBuilder;
+
+    // Wait for DOM to be ready before initializing
+    document.addEventListener('DOMContentLoaded', function() {
+        screenPrintQuoteBuilder = new ScreenPrintQuoteBuilder();
+
+        // Initialize color button states after DOM is ready
+        screenPrintQuoteBuilder.updateColorButtonStates();
+
+        console.log('✅ Screen Print Quote Builder initialized - using screenprint-pricing-v2.js for pricing');
+    });
+
+    // ===================================================================
+    // MANAGEORDERS CUSTOMER AUTOCOMPLETE INITIALIZATION
+    // 2025-10-26: Initialize customer service and setup autocomplete
+    // ===================================================================
+
+    let customerService;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('[ManageOrders] Initializing customer autocomplete...');
+
+        const loadingIcon = document.getElementById('autocomplete-loading');
+        const countSpan = document.getElementById('autocomplete-count');
+
+        try {
+            // Show loading indicator
+            if (loadingIcon) loadingIcon.style.display = 'inline-block';
+
+            // Initialize customer service
+            customerService = new ManageOrdersCustomerService();
+            await customerService.initialize();
+
+            // Show customer count
+            if (countSpan) {
+                countSpan.textContent = `(${customerService.customers.length} companies available)`;
+                countSpan.style.display = 'inline';
+            }
+
+            console.log('[ManageOrders] ✓ Initialized with', customerService.customers.length, 'customers');
+
+            // Setup autocomplete
+            setupCompanyAutocomplete();
+
+        } catch (error) {
+            console.error('[ManageOrders] ✗ Failed to initialize:', error);
+            // Fallback to manual entry - no breaking changes
+            if (countSpan) {
+                countSpan.textContent = '(manual entry)';
+                countSpan.style.display = 'inline';
+                countSpan.style.color = '#9ca3af';
+            }
+        } finally {
+            if (loadingIcon) loadingIcon.style.display = 'none';
+        }
+    });
+
+    function setupCompanyAutocomplete() {
+        const input = document.getElementById('company-name');
+        const dropdown = document.getElementById('company-autocomplete-dropdown');
+
+        if (!input || !dropdown || !customerService) {
+            console.warn('[ManageOrders] Autocomplete elements not found or service unavailable');
+            return;
+        }
+
+        // Search on input with debounce
+        input.addEventListener('input', debounce((e) => {
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            const results = customerService.searchCustomers(query);
+            displayAutocompleteResults(results, dropdown);
+        }, 200));
+
+        // Close dropdown on ESC
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        console.log('[ManageOrders] ✓ Autocomplete event listeners attached');
+    }
+
+    function displayAutocompleteResults(customers, dropdown) {
+        if (!customers || customers.length === 0) {
+            dropdown.innerHTML = '<div class="autocomplete-no-results">No matching customers found. You can still type manually.</div>';
+            dropdown.classList.add('show');
+            return;
+        }
+
+        // Generate HTML for results (limit to 10)
+        const html = customers.slice(0, 10).map(customer => {
+            const fullName = `${customer.ContactFirstName} ${customer.ContactLastName}`.trim();
+            const email = customer.ContactEmail ? customer.ContactEmail.replace(/\r/g, '').trim() : '';
+            const phone = customer.ContactPhone || '';
+
+            return `
+                <div class="autocomplete-item" data-customer-id="${customer.id_Customer}">
+                    <div class="autocomplete-item-company">${escapeHtml(customer.CustomerName)}</div>
+                    <div class="autocomplete-item-details">
+                        ${fullName ? `<span class="autocomplete-item-detail"><i class="fas fa-user"></i> ${escapeHtml(fullName)}</span>` : ''}
+                        ${email ? `<span class="autocomplete-item-detail"><i class="fas fa-envelope"></i> ${escapeHtml(email)}</span>` : ''}
+                        ${phone ? `<span class="autocomplete-item-detail"><i class="fas fa-phone"></i> ${escapeHtml(phone)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        dropdown.innerHTML = html;
+
+        // Add click handlers for each result
+        dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const customerId = parseInt(item.dataset.customerId);
+                const customer = customerService.getCustomerById(customerId);
+                if (customer) {
+                    populateCustomerFields(customer);
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        dropdown.classList.add('show');
+    }
+
+    function populateCustomerFields(customer) {
+        // Company name
+        const companyInput = document.getElementById('company-name');
+        if (companyInput) companyInput.value = customer.CustomerName;
+
+        // Customer name (first + last)
+        const fullName = `${customer.ContactFirstName} ${customer.ContactLastName}`.trim();
+        const nameInput = document.getElementById('customer-name');
+        if (nameInput) nameInput.value = fullName;
+
+        // Email (clean up \r characters)
+        if (customer.ContactEmail) {
+            const cleanEmail = customer.ContactEmail.replace(/\r/g, '').trim();
+            const emailInput = document.getElementById('customer-email');
+            if (emailInput) emailInput.value = cleanEmail;
+        }
+
+        // Phone
+        if (customer.ContactPhone) {
+            const phoneInput = document.getElementById('customer-phone');
+            if (phoneInput) phoneInput.value = customer.ContactPhone;
+        }
+
+        // Sales rep (map name to email)
+        if (customer.CustomerServiceRep) {
+            const repEmail = mapSalesRepToEmail(customer.CustomerServiceRep);
+            if (repEmail) {
+                const salesRepSelect = document.getElementById('sales-rep');
+                if (salesRepSelect) salesRepSelect.value = repEmail;
+            }
+        }
+
+        console.log('[ManageOrders] ✓ Auto-populated customer:', customer.CustomerName);
+    }
+
+    function mapSalesRepToEmail(repName) {
+        const mapping = {
+            'Nika Lao': 'nika@nwcustomapparel.com',
+            'Taneisha Clark': 'taneisha@nwcustomapparel.com',
+            'Ruth Nhong': 'ruth@nwcustomapparel.com',
+            'Erik Mickelson': 'erik@nwcustomapparel.com',
+            'Adriyella': 'adriyella@nwcustomapparel.com',
+            'Bradley Wright': 'bradley@nwcustomapparel.com',
+            'Jim Mickelson': 'jim@nwcustomapparel.com',
+            'Steve Deland': 'art@nwcustomapparel.com'
+        };
+        return mapping[repName] || null;
+    }
+
+    // Debounce helper function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // HTML escape helper to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function newQuote() {
+        if (confirm('Start a new quote?')) {
+            location.reload();
+        }
+    }
+    </script>
+</body>
+</html>

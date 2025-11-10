@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Screen Print Quote | Northwest Custom Apparel</title>
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+
+        .progress-step.active:not(:last-child)::after {
+            background: #3a7c52;
+        }
+
+        .progress-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .progress-circle {
+            background: #3a7c52;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed .progress-circle {
+            background: #28a745;
+            color: white;
+        }
+
+        .progress-label {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .progress-step.active .progress-label {
+            color: #3a7c52;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 40px 30px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3a7c52;
+            box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        /* Option Cards */
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .option-card:hover {
+            border-color: #3a7c52;
+            background: #f0f9f4;
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: #3a7c52;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+        }
+
+        .option-card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #3a7c52;
+        }
+
+        .option-card-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .option-card-hint {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 124, 82, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Success Screen */
+        .success-icon {
+            text-align: center;
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            text-align: center;
+        }
+
+        .success-message h2 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .quote-id-display {
+            background: #f7fafc;
+            border: 2px solid #3a7c52;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .quote-id-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .quote-id-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3a7c52;
+        }
+
+        /* Estimate Display */
+        .estimate-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+            border: 2px solid #3a7c52;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .estimate-label {
+            font-size: 14px;
+            color: #2d5f3f;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .estimate-range {
+            font-size: 36px;
+            font-weight: 700;
+            color: #3a7c52;
+            margin-bottom: 10px;
+        }
+
+        .estimate-note {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .option-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚡ Fast Screen Print Quote</h1>
+            <p>Get an estimate in 60 seconds</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <span class="progress-circle">1</span>
+                <span class="progress-label">Project</span>
+            </div>
+            <div class="progress-step" data-step="2">
+                <span class="progress-circle">2</span>
+                <span class="progress-label">Contact</span>
+            </div>
+            <div class="progress-step" data-step="3">
+                <span class="progress-circle">3</span>
+                <span class="progress-label">Done</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Step 1: Project Details -->
+            <div class="step active" id="step-1">
+                <h2 class="step-title">Tell us about your project</h2>
+                <p class="step-subtitle">Just the basics - we'll work out the details together</p>
+
+                <div class="form-group">
+                    <label class="form-label">Quantity Needed</label>
+                    <select class="form-select" id="quantity" required>
+                        <option value="">Select quantity...</option>
+                        <option value="24-47">24-47 pieces</option>
+                        <option value="48-71">48-71 pieces</option>
+                        <option value="72-143">72-143 pieces</option>
+                        <option value="144+">144+ pieces</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Number of Print Locations</label>
+                    <div class="option-cards">
+                        <div class="option-card" data-value="1">
+                            <div class="option-card-icon">📍</div>
+                            <div class="option-card-label">1 Location</div>
+                            <div class="option-card-hint">Most common</div>
+                        </div>
+                        <div class="option-card" data-value="2">
+                            <div class="option-card-icon">📍📍</div>
+                            <div class="option-card-label">2 Locations</div>
+                            <div class="option-card-hint">Popular</div>
+                        </div>
+                        <div class="option-card" data-value="3">
+                            <div class="option-card-icon">📍📍📍</div>
+                            <div class="option-card-label">3+ Locations</div>
+                            <div class="option-card-hint">Full service</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="locations" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Colors Per Design</label>
+                    <div class="option-cards">
+                        <div class="option-card" data-value="1-2">
+                            <div class="option-card-icon">🎨</div>
+                            <div class="option-card-label">1-2 Colors</div>
+                            <div class="option-card-hint">Simple logos</div>
+                        </div>
+                        <div class="option-card" data-value="3-4">
+                            <div class="option-card-icon">🎨🎨</div>
+                            <div class="option-card-label">3-4 Colors</div>
+                            <div class="option-card-hint">Detailed art</div>
+                        </div>
+                        <div class="option-card" data-value="5-6">
+                            <div class="option-card-icon">🎨🎨🎨</div>
+                            <div class="option-card-label">5-6 Colors</div>
+                            <div class="option-card-hint">Full color</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="colors" required>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="nextStep()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Contact Information -->
+            <div class="step" id="step-2">
+                <h2 class="step-title">How can we reach you?</h2>
+                <p class="step-subtitle">We'll send your quote in the next 2 hours</p>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" id="customerName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" class="form-input" id="customerEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number *</label>
+                    <input type="tel" class="form-input" id="customerPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Company Name (Optional)</label>
+                    <input type="text" class="form-input" id="companyName">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Target Deadline (Optional)</label>
+                    <input type="date" class="form-input" id="deadline">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Additional Notes (Optional)</label>
+                    <textarea class="form-textarea" id="notes" placeholder="Any special requirements or questions..."></textarea>
+                </div>
+
+                <!-- Estimated Price Display -->
+                <div class="estimate-box">
+                    <div class="estimate-label">Estimated Price Range</div>
+                    <div class="estimate-range" id="estimateRange">$8 - $12 per piece</div>
+                    <div class="estimate-note">
+                        Final pricing depends on garment selection, artwork complexity, and turnaround time.
+                        A sales representative will provide exact pricing within 2 hours.
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="submitQuote()">
+                        Get My Quote <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div class="step" id="step-3">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-message">
+                    <h2>Quote Request Submitted!</h2>
+                    <p>
+                        Thank you! We've received your screen print quote request.
+                        A sales representative will contact you within 2 hours with detailed pricing.
+                    </p>
+                </div>
+
+                <div class="quote-id-display">
+                    <div class="quote-id-label">Your Quote ID</div>
+                    <div class="quote-id-value" id="displayQuoteId">SPC0130-1</div>
+                </div>
+
+                <div class="success-message">
+                    <p>
+                        <strong>What happens next?</strong><br>
+                        We'll email you at <span id="confirmEmail">your email</span> with:
+                    </p>
+                    <ul style="text-align: left; margin: 20px 0; padding-left: 40px; color: #4a5568;">
+                        <li>Exact pricing for your project</li>
+                        <li>Garment options and color choices</li>
+                        <li>Production timeline</li>
+                        <li>Next steps to move forward</li>
+                    </ul>
+                    <p style="margin-top: 30px;">
+                        Questions? Call us at <strong>(253) 922-5793</strong>
+                    </p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="window.location.href='/'">
+                        Return to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fast Quote Service -->
+    <script src="/shared_components/js/screenprint-fast-quote-service.js"></script>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
+        let currentStep = 1;
+        const formData = {
+            quantity: '',
+            locations: '',
+            colors: '',
+            customerName: '',
+            customerEmail: '',
+            customerPhone: '',
+            companyName: '',
+            deadline: '',
+            notes: ''
+        };
+
+        // Option card selection
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const group = this.parentElement;
+                group.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+
+                // Update hidden input
+                const input = group.nextElementSibling;
+                if (input && input.tagName === 'INPUT') {
+                    input.value = this.dataset.value;
+                }
+            });
+        });
+
+        function updateProgress(step) {
+            document.querySelectorAll('.progress-step').forEach((elem, index) => {
+                if (index + 1 < step) {
+                    elem.classList.add('completed');
+                    elem.classList.remove('active');
+                } else if (index + 1 === step) {
+                    elem.classList.add('active');
+                    elem.classList.remove('completed');
+                } else {
+                    elem.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            updateProgress(step);
+            window.scrollTo(0, 0);
+        }
+
+        function validateStep1() {
+            const quantity = document.getElementById('quantity').value;
+            const locations = document.getElementById('locations').value;
+            const colors = document.getElementById('colors').value;
+
+            if (!quantity || !locations || !colors) {
+                alert('Please complete all fields before continuing');
+                return false;
+            }
+
+            formData.quantity = quantity;
+            formData.locations = locations;
+            formData.colors = colors;
+
+            // Update estimate
+            updateEstimate();
+
+            return true;
+        }
+
+        function updateEstimate() {
+            // Simple estimation logic
+            const quantity = formData.quantity;
+            const locations = parseInt(formData.locations);
+            const colors = formData.colors;
+
+            let baseLow = 8;
+            let baseHigh = 12;
+
+            // Adjust for quantity
+            if (quantity === '144+') {
+                baseLow -= 2;
+                baseHigh -= 2;
+            } else if (quantity === '24-47') {
+                baseLow += 2;
+                baseHigh += 2;
+            }
+
+            // Adjust for locations
+            if (locations > 1) {
+                baseLow += (locations - 1) * 2;
+                baseHigh += (locations - 1) * 3;
+            }
+
+            // Adjust for colors
+            if (colors === '5-6') {
+                baseLow += 2;
+                baseHigh += 3;
+            } else if (colors === '3-4') {
+                baseLow += 1;
+                baseHigh += 1;
+            }
+
+            document.getElementById('estimateRange').textContent =
+                `$${baseLow} - $${baseHigh} per piece`;
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                if (!validateStep1()) return;
+            }
+
+            currentStep++;
+            showStep(currentStep);
+        }
+
+        function prevStep() {
+            currentStep--;
+            showStep(currentStep);
+        }
+
+        async function submitQuote() {
+            // Validate contact info
+            const name = document.getElementById('customerName').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                alert('Please fill in all required fields (Name, Email, Phone)');
+                return;
+            }
+
+            // Collect all form data
+            formData.customerName = name;
+            formData.customerEmail = email;
+            formData.customerPhone = phone;
+            formData.companyName = document.getElementById('companyName').value.trim();
+            formData.deadline = document.getElementById('deadline').value;
+            formData.notes = document.getElementById('notes').value.trim();
+
+            // Disable submit button
+            const submitBtn = event.target;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                // Use the service to submit
+                const service = new ScreenPrintFastQuoteService();
+                const result = await service.submitQuote(formData);
+
+                if (result.success) {
+                    // Update success screen
+                    document.getElementById('displayQuoteId').textContent = result.quoteId;
+                    document.getElementById('confirmEmail').textContent = email;
+
+                    // Show success step
+                    currentStep = 3;
+                    showStep(currentStep);
+                } else {
+                    throw new Error(result.error || 'Failed to submit quote');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('There was an error submitting your quote. Please try again or call us at (253) 922-5793.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Get My Quote <i class="fas fa-check"></i>';
+            }
+        }
+    </script>
+</body>
+</html>

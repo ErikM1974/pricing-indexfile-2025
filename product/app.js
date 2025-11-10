@@ -129,12 +129,20 @@ class ProductPageApp {
 
     async checkUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
+        console.log('[DEBUG] Full URL search params:', window.location.search);
+
         // Check for both 'style' (lowercase) and 'StyleNumber' (uppercase) for compatibility
         const styleNumber = urlParams.get('style') || urlParams.get('StyleNumber');
         const colorParam = urlParams.get('color') || urlParams.get('COLOR');
-        
+
+        console.log('[DEBUG] Extracted styleNumber:', styleNumber);
+        console.log('[DEBUG] Extracted colorParam:', colorParam);
+
         if (styleNumber) {
+            console.log('[DEBUG] Calling loadProduct with:', { styleNumber, colorParam });
             await this.loadProduct(styleNumber, colorParam);
+        } else {
+            console.warn('[DEBUG] No style parameter found in URL - product page will be blank');
         }
     }
 
@@ -144,11 +152,13 @@ class ProductPageApp {
 
     async loadProduct(styleNumber, requestedColorName = null) {
         try {
+            console.log('[DEBUG] loadProduct called with:', { styleNumber, requestedColorName });
             this.showLoading(true);
-            
+
             // Fetch product data
+            console.log('[DEBUG] Fetching product data for:', styleNumber);
             const productData = await this.api.getProduct(styleNumber);
-            console.log('Product data received:', productData);
+            console.log('[DEBUG] Product data received:', productData);
             
             if (!productData || !productData.colors || productData.colors.length === 0) {
                 throw new Error('Product not found or has no colors');
@@ -190,9 +200,12 @@ class ProductPageApp {
             }
             
         } catch (error) {
-            console.error('Failed to load product:', error);
+            console.error('[DEBUG] Failed to load product - Error details:', error);
+            console.error('[DEBUG] Error message:', error.message);
+            console.error('[DEBUG] Error stack:', error.stack);
             this.showError(`Failed to load product: ${error.message}`);
         } finally {
+            console.log('[DEBUG] loadProduct finished, hiding loading state');
             this.showLoading(false);
         }
     }
@@ -293,30 +306,9 @@ class ProductPageApp {
     }
     
     addProductDescription() {
-        // Check if product info component has description
-        if (this.components.info && this.components.info.getProductDescription) {
-            const description = this.components.info.getProductDescription();
-            
-            // Find or create description container
-            let descContainer = document.getElementById('product-description-section');
-            if (!descContainer) {
-                descContainer = document.createElement('div');
-                descContainer.id = 'product-description-section';
-                descContainer.className = 'product-description-section';
-                
-                const infoColumn = document.querySelector('.product-info-column');
-                if (infoColumn) {
-                    infoColumn.appendChild(descContainer);
-                }
-            }
-            
-            if (descContainer && description) {
-                descContainer.innerHTML = `
-                    <h3>Description</h3>
-                    <p>${description}</p>
-                `;
-            }
-        }
+        // DISABLED: Description already rendered in ProductInfo component (info.js lines 40-44)
+        // This was creating a duplicate description at the bottom of the page
+        // Keeping function stub for compatibility with existing calls
     }
     
     addProductResources() {

@@ -236,14 +236,274 @@
         box-shadow: none;
         border: 1px solid #d1d5db;
     }
-    
+
     .sp-current-tier {
         background-color: #f3f4f6 !important;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
-    
+
     .sp-current-tier::before {
         display: none;
+    }
+}
+
+/* ===== Detailed Pricing Breakdown Styles - 2025 Modern Design ===== */
+.sp-pricing-details-breakdown {
+    margin-top: 24px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.95);  /* Glass morphism effect */
+    backdrop-filter: blur(10px);
+    border-radius: 16px;  /* Softer, modern corners */
+    border: 1px solid rgba(76, 179, 84, 0.1);  /* Subtle branded border */
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.06),
+        0 0 1px rgba(0, 0, 0, 0.04);  /* Elevated card effect */
+}
+
+.sp-breakdown-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sp-breakdown-section {
+    background: linear-gradient(to bottom, #ffffff, #fafbfc);  /* Subtle depth gradient */
+    border-radius: 12px;
+    padding: 20px;  /* More breathing room */
+    border: none;  /* Remove hard borders */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);  /* Subtle elevation */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-breakdown-section:hover {
+    transform: translateY(-2px);  /* Lift on hover - modern micro-interaction */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* LTM Section - Modern Warning Style (replaces old yellow box) */
+.sp-breakdown-ltm-section {
+    background: linear-gradient(135deg, #fffbf0 0%, #fff8e6 100%);  /* Warm, soft gradient */
+    border-left: 4px solid #f59e0b;  /* Modern accent bar */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);  /* Branded shadow */
+}
+
+.sp-breakdown-ltm-section .sp-breakdown-header {
+    color: #92400e;  /* Warm brown for better readability */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sp-breakdown-ltm-section .sp-breakdown-header::before {
+    content: "⚡";  /* Modern icon instead of FontAwesome */
+    font-size: 18px;
+    filter: grayscale(100%) brightness(0.6) sepia(100%) hue-rotate(5deg) saturate(5);
+}
+
+.sp-breakdown-header {
+    font-weight: 600;
+    color: #111827;
+    font-size: 16px;  /* Larger, more readable */
+    margin-bottom: 16px;  /* More breathing room */
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;  /* Softer, thicker separator */
+    letter-spacing: 0.3px;  /* Modern letter spacing */
+}
+
+.sp-breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;  /* More breathing room */
+    font-size: 15px;  /* Larger, easier to read */
+    color: #374151;
+    transition: all 0.2s ease;  /* Smooth interactions */
+}
+
+.sp-breakdown-item:hover {
+    background: rgba(76, 179, 84, 0.03);  /* Subtle highlight on hover */
+    border-radius: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.sp-breakdown-item span:first-child {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.sp-breakdown-item span:last-child {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;  /* Modern system fonts - NO MORE MONOSPACE */
+    font-weight: 600;
+    color: #111827;
+    font-size: 15px;
+}
+
+.sp-breakdown-addon {
+    padding-left: 12px;
+    border-left: 2px solid #fbbf24;
+    background-color: #fffbeb;
+    margin: 4px 0;
+    border-radius: 4px;
+}
+
+.sp-breakdown-addon-price {
+    color: #b45309 !important;
+    font-weight: 600 !important;
+}
+
+.sp-breakdown-subtotal {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.sp-breakdown-subtotal span {
+    color: #111827 !important;
+}
+
+/* 🎨 THE BEAUTIFUL 2025 REDESIGN - Replaces that ugly 2005 green bar! */
+.sp-breakdown-grand-total {
+    padding: 24px;  /* Generous padding */
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);  /* Soft, elegant green gradient */
+    border: 2px solid #4cb354;  /* Clean, defined border */
+    border-radius: 16px;  /* Modern, soft corners */
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.15);  /* Elevated shadow */
+}
+
+/* Subtle shine animation effect */
+.sp-breakdown-grand-total::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+
+.sp-breakdown-grand-total span {
+    color: inherit !important;  /* Use gradient background colors */
+    position: relative;
+    z-index: 1;  /* Above shine effect */
+}
+
+.sp-breakdown-grand-total span:last-child {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;  /* Modern system font */
+    font-size: 1.15em;
+}
+
+/* Total breakdown items inside the grand total */
+.sp-breakdown-total-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    font-size: 15px;
+    position: relative;
+    z-index: 1;  /* Above shine effect */
+}
+
+.sp-breakdown-total-item span:first-child {
+    color: #065f46;  /* Dark green for excellent readability */
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.sp-breakdown-total-item span:last-child {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    color: #047857;
+    font-size: 16px;
+}
+
+/* Divider between subtotal and final total */
+.sp-breakdown-total-divider {
+    height: 2px;
+    background: #4cb354;
+    margin: 10px 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* The final total price - make it POP! */
+.sp-breakdown-final-total {
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 2px solid #4cb354;
+}
+
+.sp-breakdown-final-total span:first-child {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #064e3b !important;
+}
+
+.sp-breakdown-final-total span:last-child {
+    font-size: 32px !important;  /* Big, bold, beautiful */
+    font-weight: 800 !important;
+    color: #059669 !important;
+    letter-spacing: -0.5px !important;  /* Tighter, more modern */
+}
+
+/* Modern note/info boxes */
+.sp-breakdown-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);  /* Soft blue gradient */
+    border-left: 4px solid #0ea5e9;
+    border-radius: 10px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #0c4a6e;
+    line-height: 1.6;
+}
+
+.sp-breakdown-note i {
+    color: #0ea5e9;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Mobile responsive - 2025 optimized */
+@media (max-width: 480px) {
+    .sp-pricing-details-breakdown {
+        padding: 16px;
+        margin-left: -4px;
+        margin-right: -4px;
+        border-radius: 12px;
+    }
+
+    .sp-breakdown-section {
+        padding: 16px;
+    }
+
+    .sp-breakdown-item {
+        font-size: 14px;
+    }
+
+    .sp-breakdown-grand-total {
+        padding: 20px;
+    }
+
+    .sp-breakdown-final-total span:last-child {
+        font-size: 28px !important;  /* Slightly smaller on mobile, still prominent */
     }
 }

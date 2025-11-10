@@ -2,6 +2,20 @@
  * DTG Quote Pricing Calculator
  * Wrapper around DTGPricingService for quote-specific calculations
  * Handles aggregate pricing, LTM distribution, and quote totals
+ *
+ * ⚠️ SHARED COMPONENT - USED BY DTG QUOTE BUILDER
+ * This file contains critical LTM (Less Than Minimum) fee logic used by:
+ * - DTG Quote Builder (/quote-builders/dtg-quote-builder.html)
+ *
+ * CRITICAL LTM CALCULATION (Lines 41-48):
+ * Uses Math.floor() to round DOWN and prevent over-charging customers.
+ * Example: $50 ÷ 18 = 2.777... → $2.77 (not $2.78)
+ * Result: 18 × $2.77 = $49.86 (14¢ under $50, customer-friendly)
+ *
+ * NEVER change Math.floor() to Math.round() or Math.ceil() in LTM calculation.
+ * This ensures we never accidentally overcharge customers.
+ *
+ * See CLAUDE.md "DTG Calculator Synchronization" section for testing requirements.
  */
 
 class DTGQuotePricing {
@@ -36,10 +50,13 @@ class DTGQuotePricing {
     
     /**
      * Calculate LTM fee per unit if applicable
+     * IMPORTANT: Round DOWN to prevent over-charging customers
      */
     calculateLTMPerUnit(totalQuantity) {
         if (totalQuantity < this.LTM_THRESHOLD) {
-            return this.LTM_FEE / totalQuantity;
+            // Use Math.floor to round DOWN - better to under-charge slightly than over-charge
+            // Example: $50 ÷ 11 = $4.545... → $4.54 (not $4.55)
+            return Math.floor((this.LTM_FEE / totalQuantity) * 100) / 100;
         }
         return 0;
     }
@@ -90,6 +107,7 @@ class DTGQuotePricing {
             // Get tier based on aggregate quantity
             const tier = this.getTierForQuantity(aggregateQuantity);
             const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
+// 🔍 DEBUG: Log pricingData structure BEFORE passing to service            console.log('🔍 [DTGQuotePricing] BEFORE calculateAllLocationPrices:', {                productStyleNumber: product.styleNumber,                hasPricingData: !!product.pricingData,                pricingDataType: typeof product.pricingData,                pricingDataKeys: product.pricingData ? Object.keys(product.pricingData) : [],                tiersType: typeof product.pricingData?.tiers,                tiersIsArray: Array.isArray(product.pricingData?.tiers),                tiersLength: product.pricingData?.tiers?.length,                costsLength: product.pricingData?.costs?.length,                sizesLength: product.pricingData?.sizes?.length            });
             
             // Calculate all location prices using DTGPricingService
             const allPrices = this.pricingService.calculateAllLocationPrices(
@@ -98,9 +116,15 @@ class DTGQuotePricing {
             );
             
             // Get prices for selected location
+            console.log('[DTGQuotePricing] Looking for location:', location, 'Available:', Object.keys(allPrices));
             const locationPrices = allPrices[location];
             if (!locationPrices) {
-                throw new Error(`No pricing found for location: ${location}`);
+                console.error('[DTGQuotePricing] Pricing data structure:', {
+                    requestedLocation: location,
+                    availableLocations: Object.keys(allPrices),
+                    allPricesStructure: allPrices
+                });
+                throw new Error(`No pricing found for location: ${location}. Available locations: ${Object.keys(allPrices).join(', ')}`);
             }
             
             // Group sizes by price (standard vs upcharge sizes)
@@ -109,13 +133,20 @@ class DTGQuotePricing {
             // Calculate totals
             let subtotal = 0;
             let totalQuantity = 0;
-            
-            sizeGroups.forEach(group => {
+
+            console.log(`[DTGQuotePricing] Processing ${sizeGroups.length} size groups for product`);
+            sizeGroups.forEach((group, index) => {
+                console.log(`  Size Group ${index + 1}:`, {
+                    quantity: group.quantity,
+                    total: group.total,
+                    basePrice: group.basePrice,
+                    unitPrice: group.unitPrice
+                });
                 subtotal += group.total;
                 totalQuantity += group.quantity;
             });
-            
-            return {
+
+            const result = {
                 sizeGroups: sizeGroups,
                 subtotal: subtotal,
                 totalQuantity: totalQuantity,
@@ -123,6 +154,15 @@ class DTGQuotePricing {
                 ltmPerUnit: ltmPerUnit,
                 hasLTM: aggregateQuantity < this.LTM_THRESHOLD
             };
+
+            console.log(`[DTGQuotePricing] Product pricing result:`, {
+                subtotal: result.subtotal,
+                totalQuantity: result.totalQuantity,
+                tier: result.tier,
+                sizeGroupsCount: result.sizeGroups.length
+            });
+
+            return result;
             
         } catch (error) {
             console.error('[DTGQuotePricing] Error calculating product pricing:', error);
@@ -135,14 +175,16 @@ class DTGQuotePricing {
      */
     groupSizesByPrice(sizeQuantities, locationPrices, tier, ltmPerUnit) {
         const groups = new Map();
-        
+
         Object.entries(sizeQuantities).forEach(([size, quantity]) => {
             if (quantity > 0) {
                 // Get base price for this size
-                const basePrice = locationPrices[size]?.[tier] || 0;
-                
+                // DTGPricingService returns prices nested by tier label
+                const tierLabel = typeof tier === 'string' ? tier : tier.TierLabel || tier;
+                const basePrice = locationPrices[size]?.[tierLabel] || 0;
+
                 if (basePrice === 'N/A' || basePrice === 0) {
-                    console.warn(`[DTGQuotePricing] No price for size ${size}`);
+                    console.warn(`[DTGQuotePricing] No price for size ${size}, tier ${tierLabel}`);
                     return;
                 }
                 
@@ -167,7 +209,8 @@ class DTGQuotePricing {
                 const group = groups.get(groupKey);
                 group.sizes[size] = quantity;
                 group.quantity += quantity;
-                group.total = group.quantity * finalPrice;
+                // Round to 2 decimal places to prevent floating point errors
+                group.total = Math.round((group.quantity * finalPrice) * 100) / 100;
             }
         });
         
@@ -203,10 +246,18 @@ class DTGQuotePricing {
      * Format size group for display
      */
     formatSizeGroup(group) {
+        console.log('[DTGQuotePricing] Formatting size group:', {
+            sizes: group.sizes,
+            quantity: group.quantity,
+            basePrice: group.basePrice,
+            unitPrice: group.unitPrice,
+            total: group.total
+        });
+
         const sizeList = Object.entries(group.sizes)
             .map(([size, qty]) => `${size}(${qty})`)
             .join(' ');
-        
+
         // Determine display label
         let label = '';
         if (group.sizeRange === 'standard') {
@@ -236,15 +287,25 @@ class DTGQuotePricing {
             label = Object.keys(group.sizes).join(', ');
         }
         
-        return {
+        const formatted = {
             label: label,
             details: sizeList,
+            sizes: group.sizes,  // Include original sizes object for detailed breakdown
             quantity: group.quantity,
             basePrice: group.basePrice,
             ltmPerUnit: group.ltmPerUnit,
             unitPrice: group.unitPrice,
             total: group.total
         };
+
+        console.log('[DTGQuotePricing] Formatted size group result:', {
+            hasSizes: !!formatted.sizes,
+            sizesKeys: formatted.sizes ? Object.keys(formatted.sizes) : [],
+            label: formatted.label,
+            quantity: formatted.quantity
+        });
+
+        return formatted;
     }
     
     /**
@@ -257,28 +318,48 @@ class DTGQuotePricing {
         const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
         
         // Process each product
-        const processedProducts = products.map(product => {
+        const processedProducts = products.map((product, index) => {
+            console.log(`[DTGQuotePricing] Processing product ${index + 1}:`, product.styleNumber);
+
             const pricing = this.calculateProductPricing(
                 product,
                 location,
                 product.sizeQuantities,
                 aggregateQuantity
             );
-            
+
+            console.log(`[DTGQuotePricing] Pricing calculated for ${product.styleNumber}:`, {
+                subtotal: pricing.subtotal,
+                totalQuantity: pricing.totalQuantity,
+                sizeGroupsCount: pricing.sizeGroups?.length
+            });
+
             subtotal += pricing.subtotal;
             totalQuantity += pricing.totalQuantity;
-            
-            return {
+
+            // Format the product for display - include subtotal at top level
+            const formatted = {
                 ...product,
                 pricing: pricing,
+                subtotal: pricing.subtotal,  // Add subtotal at top level for easy access
+                quantity: pricing.totalQuantity,
                 sizeGroups: pricing.sizeGroups.map(g => this.formatSizeGroup(g))
             };
+
+            console.log(`[DTGQuotePricing] Formatted product ${product.styleNumber}:`, {
+                hasSubtotal: formatted.subtotal !== undefined,
+                subtotalValue: formatted.subtotal,
+                hasSizeGroups: !!formatted.sizeGroups,
+                sizeGroupsCount: formatted.sizeGroups?.length
+            });
+
+            return formatted;
         });
         
         // Calculate LTM fee if applicable
         const ltmFee = aggregateQuantity < this.LTM_THRESHOLD ? this.LTM_FEE : 0;
-        
-        return {
+
+        const result = {
             products: processedProducts,
             subtotal: subtotal,
             ltmFee: ltmFee,
@@ -287,6 +368,56 @@ class DTGQuotePricing {
             tier: tier,
             hasLTM: aggregateQuantity < this.LTM_THRESHOLD
         };
+
+        console.log('📊 [DTGQuotePricing] Quote Totals Summary:', {
+            productCount: processedProducts.length,
+            subtotal: subtotal,
+            ltmFee: ltmFee,
+            total: result.total,
+            totalQuantity: totalQuantity,
+            tier: tier,
+            hasLTM: result.hasLTM
+        });
+
+        // Verify each product has required fields
+        processedProducts.forEach((p, i) => {
+            if (!p.subtotal) {
+                console.error(`❌ Product ${i} missing subtotal:`, p);
+            }
+            if (!p.sizeGroups || p.sizeGroups.length === 0) {
+                console.error(`❌ Product ${i} missing sizeGroups:`, p);
+            }
+        });
+
+        // 🔍 PRICING VERIFICATION TABLE
+        console.log('\n' + '='.repeat(80));
+        console.log('💰 DTG PRICING VERIFICATION - Compare with Pricing Page');
+        console.log('='.repeat(80));
+        processedProducts.forEach((product, index) => {
+            console.log(`\n📦 Product ${index + 1}: ${product.styleNumber} - ${product.color}`);
+            console.log(`   Location: ${location}`);
+            console.log(`   Total Quantity: ${totalQuantity} pieces (Tier: ${tier})`);
+            console.log(`   Product Subtotal: $${product.subtotal.toFixed(2)}`);
+            console.log('\n   📏 Size Breakdown:');
+
+            // Create verification table
+            const verificationData = product.sizeGroups.map(sg => ({
+                'Sizes': Object.entries(sg.sizes || {}).map(([s, q]) => `${s}(${q})`).join(', '),
+                'Qty': sg.quantity,
+                'Base $': sg.basePrice?.toFixed(2) || 'N/A',
+                'LTM $': sg.ltmPerUnit > 0 ? sg.ltmPerUnit.toFixed(2) : '-',
+                'Unit $': sg.unitPrice?.toFixed(2) || 'N/A',
+                'Total $': sg.total?.toFixed(2) || 'N/A'
+            }));
+            console.table(verificationData);
+
+            console.log(`\n   ✅ Verify on pricing page:`);
+            console.log(`      /calculators/dtg-pricing.html?styleNumber=${product.styleNumber}`);
+            console.log(`      Select location: ${location}, enter same quantities above`);
+        });
+        console.log('\n' + '='.repeat(80) + '\n');
+
+        return result;
     }
     
     /**

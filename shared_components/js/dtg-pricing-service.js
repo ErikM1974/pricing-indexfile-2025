@@ -1,7 +1,22 @@
 /**
  * DTG Pricing Service - Direct API Implementation
  * Replaces the complex Caspio master bundle approach with direct API calls
- * 
+ *
+ * ⚠️ SHARED SERVICE - AFFECTS MULTIPLE CALCULATORS
+ * This service is used by BOTH:
+ * - DTG Quote Builder (/quote-builders/dtg-quote-builder.html)
+ * - DTG Pricing Calculator (/calculators/dtg-pricing.html)
+ *
+ * CRITICAL: Any changes to pricing formulas here will affect both calculators.
+ * Always test BOTH calculators after making changes to ensure pricing remains synchronized.
+ *
+ * Key Pricing Formulas (MUST NOT CHANGE):
+ * - Base garment cost: Math.min(...sizes.map(s => s.price))  [Use 'price' NOT 'maxCasePrice']
+ * - Margin denominator: From API tier data (tiersR[].MarginDenominator)
+ * - Rounding: Math.ceil(basePrice * 2) / 2 (round UP to half dollar)
+ *
+ * See CLAUDE.md "DTG Calculator Synchronization" section for testing requirements.
+ *
  * @author Claude & Erik
  * @date 2025-08-18
  * @version 1.0.0
@@ -54,16 +69,25 @@ class DTGPricingService {
             
             const data = await response.json();
             console.log('[DTGPricingService] Bundle data received successfully');
-            
+
             // Transform bundle data to match existing format
+            // NEW API structure (Oct 2025): { product: {...}, pricing: { tiers, costs, sizes, upcharges } }
+            const pricing = data.pricing || data; // Try new structure first, fallback to old
+
+            // Transform sizes array to use 'price' field name (code expects 'price' not 'maxCasePrice')
+            const transformedSizes = (pricing.sizes || data.sizes || []).map(s => ({
+                ...s,
+                price: s.price || s.maxCasePrice // Support both field names
+            }));
+
             return {
-                tiers: data.pricing?.tiers || [],
-                costs: data.pricing?.costs || [],
-                sizes: data.pricing?.sizes || [],
-                upcharges: data.pricing?.upcharges || {},
-                styleNumber: data.product?.styleNumber || styleNumber,
+                tiers: pricing.tiers || data.tiersR || [],
+                costs: pricing.costs || data.allDtgCostsR || [],
+                sizes: transformedSizes,
+                upcharges: pricing.upcharges || data.sellingPriceDisplayAddOns || {},
+                styleNumber: data.product?.styleNumber || data.styleNumber || styleNumber,
                 color: color,
-                locations: data.pricing?.locations || this.locations,
+                locations: pricing.locations || data.locations || this.locations,
                 productInfo: data.product || {},
                 timestamp: Date.now(),
                 source: 'bundle'
@@ -76,18 +100,180 @@ class DTGPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        // Check URL parameter first (priority)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[DTGPricingService] Manual cost from URL:', cost);
+            // Store in sessionStorage for persistence during navigation
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        // Check sessionStorage (persistent within session)
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[DTGPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[DTGPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Fetch DTG pricing bundle from API using reference product
+     * @returns {Object} Complete pricing bundle from API
+     * @throws {Error} If API request fails
+     */
+    async fetchPricingBundle() {
+        const url = `${this.apiBase}/pricing-bundle?method=DTG&styleNumber=PC61`;
+        console.log('[DTGPricingService] Fetching complete pricing bundle from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch DTG pricing bundle from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate required fields
+        if (!data.tiersR || !data.allDtgCostsR) {
+            throw new Error('Invalid API response: missing required DTG pricing data');
+        }
+
+        // DEBUG: Log complete API response to investigate tier-specific costs
+        console.log('[DTGPricingService] 🔍 DEBUG: Complete API response:', {
+            totalTiers: data.tiersR?.length,
+            totalCosts: data.allDtgCostsR?.length,
+            tiers: data.tiersR,
+            allCosts: data.allDtgCostsR
+        });
+
+        // DEBUG: Show LC costs specifically
+        const lcCosts = data.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
+        console.log('[DTGPricingService] 🔍 DEBUG: LC costs from API:', lcCosts);
+
+        console.log('[DTGPricingService] Successfully fetched complete pricing bundle from API');
+        return data;
+    }
+
+    /**
+     * Generate pricing data using manual cost + API pricing rules
+     * Fetches everything from API except garment base cost
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Pricing data with API rules + manual garment cost
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // CRITICAL: Clear cache to ensure fresh API data for manual mode
+        console.log('[DTGPricingService] Clearing cache for fresh API data...');
+        this.cache.clear();
+
+        // Fetch complete pricing bundle from API (throws error if fails - no fallback)
+        const apiBundle = await this.fetchPricingBundle();
+
+        // VALIDATION: Ensure API data is complete and correct
+        console.log('[Manual Pricing] 🔍 API Data Validation:', {
+            totalTiers: apiBundle.tiersR?.length,
+            totalCosts: apiBundle.allDtgCostsR?.length,
+            tierLabels: apiBundle.tiersR?.map(t => t.TierLabel),
+        });
+
+        // VALIDATION: Check LC costs specifically
+        const lcCosts = apiBundle.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
+        console.log('[Manual Pricing] 🔍 LC Costs from API:', lcCosts?.map(c => ({
+            tier: c.TierLabel,
+            cost: c.PrintCost,
+            fullData: c
+        })));
+
+        if (!apiBundle.allDtgCostsR || apiBundle.allDtgCostsR.length === 0) {
+            console.error('[Manual Pricing] ❌ No cost data received from API!');
+            throw new Error('API returned no cost data');
+        }
+
+        // Build sizes array using manual cost
+        const manualSizes = [
+            { size: 'S', price: manualCost, sortOrder: 1 },
+            { size: 'M', price: manualCost, sortOrder: 2 },
+            { size: 'L', price: manualCost, sortOrder: 3 },
+            { size: 'XL', price: manualCost, sortOrder: 4 },
+            { size: '2XL', price: manualCost, sortOrder: 5 },
+            { size: '3XL', price: manualCost, sortOrder: 6 },
+            { size: '4XL', price: manualCost, sortOrder: 7 }
+        ];
+
+        // Return API data with manual cost substituted into sizes
+        // Wrapped in 'pricing' object to match regular DTG product-bundle API structure
+        const manualPricingData = {
+            pricing: {
+                tiers: apiBundle.tiersR,                          // From API
+                costs: apiBundle.allDtgCostsR,                   // From API
+                upcharges: apiBundle.sellingPriceDisplayAddOns,   // From API
+                sizes: manualSizes,                               // Manual cost here
+                locations: apiBundle.locations || this.locations  // From API with fallback
+            },
+            styleNumber: 'MANUAL',
+            color: null,
+            productInfo: {
+                name: 'Manual Pricing (Non-SanMar Product)',
+                styleNumber: 'MANUAL',
+                brand: 'Various'
+            },
+            timestamp: Date.now(),
+            source: 'manual',
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // FINAL VALIDATION: Verify costs array is complete
+        console.log('[Manual Pricing] 🔍 Final data structure validation:', {
+            totalCosts: manualPricingData.pricing.costs?.length,
+            lcCostsCount: manualPricingData.pricing.costs?.filter(c => c.PrintLocationCode === 'LC').length,
+            firstFewLcCosts: manualPricingData.pricing.costs
+                ?.filter(c => c.PrintLocationCode === 'LC')
+                ?.slice(0, 4)
+                ?.map(c => `${c.TierLabel}: $${c.PrintCost}`)
+        });
+
+        return manualPricingData;
+    }
+
+    /**
      * Fetch all pricing data from APIs (with bundle endpoint support)
      * @param {string} styleNumber - Product style number (e.g., 'PC61')
      * @param {string} color - Color name (optional, for inventory filtering)
      * @returns {Object} Combined pricing data
      */
     async fetchPricingData(styleNumber, color = null, forceRefresh = false) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[DTGPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            return await this.generateManualPricingData(manualCost);
+        }
+
         const cacheKey = `${styleNumber}-${color || 'all'}`;
-        
+
         // Special debug logging for problematic styles
         const debugStyles = ['PC78ZH', 'PC78', 'S700'];
         const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
-        
+
         if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
             console.log(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
                 styleNumber: styleNumber,
@@ -96,7 +282,7 @@ class DTGPricingService {
                 forceRefresh: forceRefresh
             });
         }
-        
+
         // Check cache first (unless force refresh)
         if (!forceRefresh && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
@@ -114,23 +300,23 @@ class DTGPricingService {
 
         // Use bundle endpoint only - no fallback to individual endpoints
         console.log('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
-        
+
         try {
             const bundleData = await this.fetchBundledData(styleNumber, color);
-            
+
             // Bundle endpoint is required - no fallback
             if (!bundleData) {
                 throw new Error(`Failed to fetch DTG pricing data for ${styleNumber}. API bundle endpoint is required.`);
             }
-            
+
             console.log('[DTGPricingService] Bundle endpoint data received successfully');
-            
+
             // Cache the bundled data
             this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
             console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
-            
+
             return bundleData;
-            
+
         } catch (error) {
             console.error('[DTGPricingService] Error fetching bundle data:', error);
             // Clear cache on error to prevent stale data
@@ -146,6 +332,7 @@ class DTGPricingService {
      * @returns {Object} Price matrix for all locations and sizes
      */
     calculateAllLocationPrices(data, quantity) {
+// 🔍 DEBUG: Log what data parameter looks like when received        console.log('🔍 [DTGPricingService] calculateAllLocationPrices RECEIVED:', {            dataType: typeof data,            dataKeys: data ? Object.keys(data) : [],            tiersType: typeof data?.tiers,            tiersIsArray: Array.isArray(data?.tiers),            tiersLength: data?.tiers?.length,            costsLength: data?.costs?.length,            sizesLength: data?.sizes?.length,            upchargesLength: data?.upcharges ? Object.keys(data.upcharges).length : 0        });
         console.log('[DTGPricingService] Calculating prices for quantity:', quantity);
         
         const { tiers, costs, sizes, upcharges } = data;
@@ -197,8 +384,9 @@ class DTGPricingService {
         });
         
         // Find the base garment cost (lowest valid price, excluding zeros)
+        // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
         const validPrices = sizes
-            .map(s => parseFloat(s.maxCasePrice))
+            .map(s => parseFloat(s.price))
             .filter(price => !isNaN(price) && price > 0);
         
         if (validPrices.length === 0) {
@@ -221,8 +409,9 @@ class DTGPricingService {
         // Apply size-specific upcharges
         sizes.forEach(sizeInfo => {
             const size = sizeInfo.size;
-            const sizePrice = parseFloat(sizeInfo.maxCasePrice);
-            
+            // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
+            const sizePrice = parseFloat(sizeInfo.price);
+
             // If this size has no valid price ($0), mark as unavailable
             if (isNaN(sizePrice) || sizePrice <= 0) {
                 prices[size] = {};
@@ -243,6 +432,19 @@ class DTGPricingService {
      * @private
      */
     getTierForQuantity(tiers, quantity) {
+        // Defensive null checking - prevent crash if tiers is undefined
+        if (!tiers || !Array.isArray(tiers) || tiers.length === 0) {
+            console.error('[DTGPricingService] ERROR: Invalid tiers parameter:', tiers);
+            // Return a safe fallback tier
+            return {
+                TierLabel: '24-47',
+                MinQuantity: 1,
+                MaxQuantity: 47,
+                MarginDenominator: 0.6,
+                Note: 'Fallback tier - tiers parameter was invalid'
+            };
+        }
+
         // Debug logging for specific problematic cases
         if ((quantity === 166 || quantity < 24) && window.DTG_PERFORMANCE?.debug) {
             console.log('[DTGPricingService DEBUG] Finding tier for quantity ' + quantity + ':', {
@@ -254,7 +456,7 @@ class DTGPricingService {
                 }))
             });
         }
-        
+
         // For quantities under 24, use the 24-47 tier (with LTM fee applied elsewhere)
         if (quantity < 24) {
             const tier2447 = tiers.find(t => t.TierLabel === '24-47');

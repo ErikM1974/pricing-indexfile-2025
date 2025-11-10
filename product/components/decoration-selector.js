@@ -17,7 +17,7 @@ export class DecorationSelector {
                 name: 'Embroidery',
                 label: 'Embroidery',
                 tagline: 'Professional thread embroidery for logos and text',
-                feature: { icon: 'fas fa-star', text: 'Premium quality', color: '#ffa500' },
+                feature: { icon: 'fas fa-award', text: 'Experts Since 1977', color: '#ffa500' },
                 path: '/pricing/embroidery',
                 cta: 'View Embroidery Pricing'
             },
@@ -26,7 +26,7 @@ export class DecorationSelector {
                 name: 'Cap Embroidery',
                 label: 'Cap\nEmbroidery',
                 tagline: 'Specialized embroidery for headwear',
-                feature: { icon: 'fas fa-hat-cowboy', text: '3D puff available', color: '#2f661e' },
+                feature: { icon: 'fas fa-layer-group', text: 'Add up to 4 Designs', color: '#2f661e' },
                 path: '/pricing/cap-embroidery',
                 cta: 'View Cap Pricing'
             },
@@ -35,7 +35,7 @@ export class DecorationSelector {
                 name: 'DTG',
                 label: 'DTG',
                 tagline: 'Full-color printing for complex designs',
-                feature: { icon: 'fas fa-palette', text: 'Unlimited colors', color: '#e91e63' },
+                feature: { icon: 'fas fa-palette', text: 'Full Color on Cotton', color: '#e91e63' },
                 path: '/pricing/dtg',
                 cta: 'View DTG Pricing'
             },
@@ -44,7 +44,7 @@ export class DecorationSelector {
                 name: 'Screen Print',
                 label: 'Screen\nPrint',
                 tagline: 'Classic printing for bold graphics',
-                feature: { icon: 'fas fa-dollar-sign', text: 'Great for bulk', color: '#4caf50' },
+                feature: { icon: 'fas fa-dollar-sign', text: 'Bulk Pricing Available', color: '#4caf50' },
                 path: '/pricing/screen-print',
                 cta: 'View Screen Print Pricing'
             },
@@ -53,7 +53,7 @@ export class DecorationSelector {
                 name: 'DTF',
                 label: 'DTF',
                 tagline: 'Versatile heat transfer for any fabric',
-                feature: { icon: 'fas fa-tshirt', text: 'Works on all fabrics', color: '#2196f3' },
+                feature: { icon: 'fas fa-fill-drip', text: 'Colors Pop on Nylon', color: '#2196f3' },
                 path: '/pricing/dtf',
                 cta: 'View DTF Pricing'
             }
@@ -73,88 +73,48 @@ export class DecorationSelector {
         }
 
         this.container.classList.remove('hidden');
-        
+
         this.container.innerHTML = `
-            <h3>How would you like to customize this?</h3>
-            
-            <div class="segmented-control">
+            <div class="decoration-methods-grid">
                 ${Object.entries(this.methods).map(([key, method]) => `
-                    <button class="segment ${key === this.selectedMethod ? 'active' : ''}" 
-                            data-method="${key}">
-                        <span class="segment-icon">${method.icon}</span>
-                        <span class="segment-label">${method.label}</span>
+                    <button class="method-card"
+                            data-method="${key}"
+                            data-path="${method.path}"
+                            title="Click to view ${method.name} pricing">
+                        <span class="method-icon">${method.icon}</span>
+                        <span class="method-name">${method.name}</span>
+                        <span class="method-feature" style="color: ${method.feature.color};">
+                            <i class="${method.feature.icon}"></i>
+                            ${method.feature.text}
+                        </span>
                     </button>
                 `).join('')}
             </div>
-
-            <div class="method-content" id="method-content">
-                ${this.renderMethodContent(this.methods[this.selectedMethod])}
-            </div>
         `;
 
-        // Add event listeners
-        this.container.querySelectorAll('.segment').forEach(button => {
+        // Add direct navigation listeners
+        this.container.querySelectorAll('.method-card').forEach(button => {
             button.addEventListener('click', (e) => {
                 const method = e.currentTarget.dataset.method;
-                this.selectMethod(method);
+                this.navigateToMethod(method);
             });
         });
-
-        // Add CTA button listener
-        const ctaButton = this.container.querySelector('.cta-button');
-        if (ctaButton) {
-            ctaButton.addEventListener('click', () => {
-                this.navigateToPricing();
-            });
-        }
     }
 
-    renderMethodContent(method) {
-        return `
-            <div class="method-info">
-                <h4 class="method-title">${method.name}</h4>
-                <p class="method-tagline">${method.tagline}</p>
-            </div>
-            <div class="method-details">
-                <div class="detail-item">
-                    <i class="${method.feature.icon}" style="color: ${method.feature.color};"></i>
-                    <span>${method.feature.text}</span>
-                </div>
-            </div>
-            <button class="cta-button">
-                ${method.cta}
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        `;
-    }
-
-    selectMethod(methodKey) {
-        this.selectedMethod = methodKey;
-        
-        // Update active state
-        this.container.querySelectorAll('.segment').forEach(button => {
-            button.classList.toggle('active', button.dataset.method === methodKey);
-        });
-
-        // Update content
+    navigateToMethod(methodKey) {
         const method = this.methods[methodKey];
-        const contentEl = this.container.querySelector('#method-content');
-        if (contentEl) {
-            contentEl.innerHTML = this.renderMethodContent(method);
-            
-            // Re-add CTA listener
-            const ctaButton = contentEl.querySelector('.cta-button');
-            if (ctaButton) {
-                ctaButton.addEventListener('click', () => {
-                    this.navigateToPricing();
-                });
-            }
-        }
-    }
 
-    navigateToPricing() {
-        const method = this.methods[this.selectedMethod];
+        // Optional: Add subtle loading state to the clicked card
+        const clickedCard = this.container.querySelector(`[data-method="${methodKey}"]`);
+        if (clickedCard) {
+            clickedCard.style.opacity = '0.7';
+            clickedCard.style.pointerEvents = 'none';
+        }
+
+        // Build URL with product context
         const url = `${method.path}?StyleNumber=${encodeURIComponent(this.styleNumber)}&COLOR=${encodeURIComponent(this.colorCode)}`;
+
+        // Navigate directly
         window.location.href = url;
     }
 }

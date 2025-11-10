@@ -13,11 +13,141 @@ class EmbroideryPricingService {
     }
 
     /**
+     * Check for manual cost override from URL parameter or sessionStorage
+     * @returns {number|null} Manual cost or null if not set
+     */
+    getManualCostOverride() {
+        // Check URL parameter first (priority)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
+        if (urlCost && !isNaN(parseFloat(urlCost))) {
+            const cost = parseFloat(urlCost);
+            console.log('[EmbroideryPricingService] Manual cost from URL:', cost);
+            sessionStorage.setItem('manualCostOverride', cost.toString());
+            return cost;
+        }
+
+        // Check sessionStorage
+        const storedCost = sessionStorage.getItem('manualCostOverride');
+        if (storedCost && !isNaN(parseFloat(storedCost))) {
+            const cost = parseFloat(storedCost);
+            console.log('[EmbroideryPricingService] Manual cost from storage:', cost);
+            return cost;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear manual cost override
+     */
+    clearManualCostOverride() {
+        sessionStorage.removeItem('manualCostOverride');
+        console.log('[EmbroideryPricingService] Manual cost override cleared');
+    }
+
+    /**
+     * Fetch embroidery costs from API using reference product
+     * @returns {Array} Embroidery costs from API
+     * @throws {Error} If API request fails
+     */
+    async fetchEmbroideryCosts() {
+        const url = `${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC61`;
+        console.log('[EmbroideryPricingService] Fetching embroidery costs from API...');
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch embroidery costs from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.allEmbroideryCostsR) {
+            throw new Error('Invalid API response: missing embroidery costs');
+        }
+
+        console.log('[EmbroideryPricingService] Successfully fetched embroidery costs from API');
+        return data.allEmbroideryCostsR;
+    }
+
+    /**
+     * Generate synthetic pricing data using manual cost
+     * @param {number} manualCost - Base garment cost
+     * @returns {Object} Synthetic API-compatible data
+     */
+    async generateManualPricingData(manualCost) {
+        console.log('[EmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
+
+        // Default tiers matching API structure
+        const defaultTiers = [
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+        ];
+
+        // Fetch current embroidery costs from API (throws error if fails - no silent fallback)
+        const defaultEmbroideryCosts = await this.fetchEmbroideryCosts();
+
+        // Standard sizes with manual cost
+        const defaultSizes = [
+            { size: 'S', price: manualCost, sortOrder: 1 },
+            { size: 'M', price: manualCost, sortOrder: 2 },
+            { size: 'L', price: manualCost, sortOrder: 3 },
+            { size: 'XL', price: manualCost, sortOrder: 4 },
+            { size: '2XL', price: manualCost, sortOrder: 5 },
+            { size: '3XL', price: manualCost, sortOrder: 6 },
+            { size: '4XL', price: manualCost, sortOrder: 7 }
+        ];
+
+        // Standard upcharges
+        const defaultUpcharges = {
+            'S': 0, 'M': 0, 'L': 0, 'XL': 0,
+            '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
+        };
+
+        // Default rules
+        const defaultRules = {
+            RoundingMethod: 'HalfDollarUp'
+        };
+
+        // Create synthetic API data structure
+        const syntheticAPIData = {
+            styleNumber: 'MANUAL',
+            tiersR: defaultTiers,
+            allEmbroideryCostsR: defaultEmbroideryCosts,
+            sizes: defaultSizes,
+            sellingPriceDisplayAddOns: defaultUpcharges,
+            rulesR: defaultRules,
+            manualMode: true,
+            manualCost: manualCost
+        };
+
+        // Use existing calculatePricing method
+        const calculatedData = this.calculatePricing(syntheticAPIData);
+
+        // Transform using existing method
+        const transformedData = this.transformToExistingFormat(calculatedData, syntheticAPIData);
+
+        // Mark as manual mode
+        transformedData.manualMode = true;
+        transformedData.manualCost = manualCost;
+        transformedData.source = 'manual';
+
+        return transformedData;
+    }
+
+    /**
      * Main entry point - fetches and calculates pricing data
      */
     async fetchPricingData(styleNumber, options = {}) {
+        // FIRST: Check for manual cost override
+        const manualCost = this.getManualCostOverride();
+        if (manualCost !== null) {
+            console.log('[EmbroideryPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            return await this.generateManualPricingData(manualCost);
+        }
+
         console.log(`[EmbroideryPricingService] Fetching pricing data for ${styleNumber}`);
-        
+
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
@@ -29,16 +159,16 @@ class EmbroideryPricingService {
         try {
             // Fetch from API
             const apiData = await this.fetchFromAPI(styleNumber);
-            
+
             // Calculate pricing using exact logic
             const calculatedData = this.calculatePricing(apiData);
-            
+
             // Transform to match existing format expected by embroidery-pricing-v3.js
             const transformedData = this.transformToExistingFormat(calculatedData, apiData);
-            
+
             // Cache the result
             this.saveToCache(cacheKey, transformedData);
-            
+
             return transformedData;
         } catch (error) {
             console.error('[EmbroideryPricingService] Error:', error);

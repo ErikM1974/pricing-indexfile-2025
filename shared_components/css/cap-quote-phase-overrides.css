@@ -1,0 +1,273 @@
+/**
+ * Cap Quote Builder - Phase Override CSS
+ *
+ * Purpose: Final word on phase visibility and Step 3 layout
+ * Load Order: LAST in cascade (highest priority)
+ *
+ * This file exists because 17+ CSS files were creating conflicts.
+ * It provides ONE authoritative set of rules with !important to
+ * override everything and ensure clean phase transitions.
+ *
+ * Created: 2025-10-16
+ */
+
+/* =============================================================================
+   PHASE VISIBILITY - FINAL AUTHORITY
+   ============================================================================= */
+
+/**
+ * Phase sections - Only .active is visible
+ * Using !important to override all 17 CSS files in the cascade
+ */
+.phase-section {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: relative !important;
+}
+
+.phase-section.active {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    animation: phaseTransition 0.3s ease-in-out;
+}
+
+@keyframes phaseTransition {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================================================
+   STEP 3 SPECIFIC FIXES
+   ============================================================================= */
+
+/**
+ * Force Step 3 to be a single clean page
+ * Prevents "two pages going through" appearance
+ */
+#summary-phase {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+#summary-phase.active {
+    display: block !important;
+}
+
+/**
+ * Ensure Step 3 content container fills properly
+ */
+#summary-phase .phase-header {
+    margin: 0 0 2rem 0 !important;
+    padding: 0 2.5rem !important;
+}
+
+/**
+ * Force quote summary to be the primary visible element
+ */
+#quote-summary {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 2rem !important;
+}
+
+/**
+ * Prevent multiple summary sections from stacking
+ */
+.quote-summary {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* =============================================================================
+   COLLAPSIBLE SECTIONS - PROPER BEHAVIOR
+   ============================================================================= */
+
+/**
+ * Save & Send section should be collapsible
+ */
+.save-send-section {
+    display: block !important;
+    margin: 24px 0 !important;
+}
+
+#save-send-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+#save-send-content.expanded {
+    max-height: 2000px;
+    overflow: visible;
+}
+
+/**
+ * Toggle icon rotation
+ */
+#save-send-icon {
+    transition: transform 0.3s ease;
+}
+
+#save-send-icon.rotated {
+    transform: rotate(180deg);
+}
+
+/* =============================================================================
+   PHASE 3 UNIFIED CONTAINER - FORCE CLEAN LAYOUT
+   ============================================================================= */
+
+/**
+ * Ensure Phase 3 container doesn't create extra white boxes
+ */
+.phase3-unified-container {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/**
+ * Phase 3 sections should not create visual separation
+ */
+.phase3-section {
+    padding: 2rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.phase3-section:last-child {
+    border-bottom: none !important;
+}
+
+/* =============================================================================
+   PRODUCT CARDS - CONSISTENT SPACING
+   ============================================================================= */
+
+.product-card {
+    margin-bottom: 1.5rem !important;
+}
+
+.product-card:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* =============================================================================
+   QUICK ACTIONS - PROPER POSITIONING
+   ============================================================================= */
+
+.quick-actions-section {
+    display: block !important;
+    margin: 24px 0 !important;
+}
+
+/* =============================================================================
+   PHASE NAVIGATION - NO BLEEDING
+   ============================================================================= */
+
+/**
+ * Phase navigation buttons should only affect their phase
+ */
+.phase-actions {
+    display: flex !important;
+    gap: 1rem !important;
+    justify-content: space-between !important;
+    margin-top: 2rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 2px solid #e5e7eb !important;
+}
+
+/* =============================================================================
+   DEFENSIVE CSS - PREVENT CONFLICTS
+   ============================================================================= */
+
+/**
+ * Prevent other phases from showing when on Step 3
+ */
+#summary-phase.active ~ #logo-phase,
+#summary-phase.active ~ #product-phase {
+    display: none !important;
+}
+
+/**
+ * Force hide non-active phases regardless of other CSS
+ */
+.phase-section:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/**
+ * Restore active phase to normal flow
+ */
+.phase-section.active {
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: relative !important;
+    left: auto !important;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    #summary-phase .phase-header {
+        padding: 0 1.5rem !important;
+    }
+
+    .phase3-section {
+        padding: 1.5rem 1.25rem !important;
+    }
+
+    .phase-actions {
+        flex-direction: column !important;
+    }
+
+    .phase-actions button {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #summary-phase .phase-header {
+        padding: 0 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .phase3-section {
+        padding: 1.25rem 1rem !important;
+    }
+}
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+
+@media print {
+    /* Hide non-active phases in print */
+    .phase-section:not(.active) {
+        display: none !important;
+    }
+
+    /* Ensure Step 3 prints cleanly */
+    #summary-phase.active {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+}

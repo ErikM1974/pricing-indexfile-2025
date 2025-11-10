@@ -9,15 +9,17 @@
     <!-- Preconnect to CDN for faster resource loading -->
     <link rel="preconnect" href="https://cdn.caspio.com">
     <link rel="preconnect" href="https://c3eku948.caspio.com">
+    <link rel="preconnect" href="https://cdnm.sanmar.com" crossorigin="anonymous">
     <link rel="dns-prefetch" href="https://cdn.caspio.com">
     <link rel="dns-prefetch" href="https://c3eku948.caspio.com">
+    <link rel="dns-prefetch" href="https://cdnm.sanmar.com">
     
     <!-- Preload hero image for immediate loading -->
-    <link rel="preload" as="image" href="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9097824" fetchpriority="high">
+    <link rel="preload" as="image" href="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148453" fetchpriority="high">
     
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     
-    <link rel="stylesheet" href="main-redesign.css?v=10">
+    <link rel="stylesheet" href="main-redesign.css?v=12">
     <link rel="stylesheet" href="catalog-search.css?v=4">
 </head>
 <body>
@@ -41,8 +43,27 @@
                     <a href="#" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">Products <span class="nav-arrow">▼</span></a>
                     <div class="nav-dropdown mega-dropdown">
                         <div class="dropdown-content">
+                            <!-- Search bar container - Full width at top -->
+                            <div id="navDropdownSearch"></div>
+
+                            <!-- Categories grid - Below search bar -->
                             <div class="dropdown-categories" id="navCategories">
                                 <!-- Categories will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">Brands <span class="nav-arrow">▼</span></a>
+                    <div class="nav-dropdown brands-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div class="brands-grid" id="navBrandsGrid">
+                                <div class="brands-loading">Loading brands...</div>
+                            </div>
+                            <div class="brands-footer">
+                                <a href="/brands.html" class="view-all-brands-link">
+                                    View All Brands →
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -96,6 +117,32 @@
             <ul class="category-list" id="categoryList">
                 <!-- Categories will be dynamically generated from CATEGORY_DATA -->
             </ul>
+
+            <!-- Brand Filters Section -->
+            <div class="filters-section" id="filtersSection" style="display: none;">
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <h3 class="filter-title">Brands</h3>
+                        <button class="filter-toggle" id="brandFilterToggle" aria-label="Toggle brand filters">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="filter-options" id="brandFilterOptions">
+                        <!-- Brand checkboxes will be dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Clear Filters Button -->
+                <button class="clear-filters-btn" id="clearFiltersBtn" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Clear All Filters
+                </button>
+            </div>
         </nav>
         
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -104,15 +151,40 @@
             
             <div class="hero-section">
                 <div class="hero-background">
-                    <!-- Clickable hero image for Carhartt brand -->
-                    <div class="hero-image-placeholder" onclick="window.catalogSearch && window.catalogSearch.searchByBrand('Carhartt')" style="cursor: pointer;">
-                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9097824" 
-                             alt="Carhartt Workwear Collection" 
+                    <!-- Clickable hero image for Richardson 112 product -->
+                    <div class="hero-image-placeholder" onclick="window.location.href='/richardson-112-product.html'" style="cursor: pointer;">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148453"
+                             alt="Richardson 112 Trucker Hat with Leatherette Laser Patch and Custom Tumbler - Sterino Farms"
                              class="hero-bg-img"
                              loading="eager"
-                             width="763"
-                             height="443"
+                             width="1920"
+                             height="650"
                              onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%)'">
+
+                        <!-- Richardson Logo Badge -->
+                        <div class="richardson-logo-badge">
+                            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/richardson-sports-logo-vector.png?ver=1"
+                                 alt="Richardson Sports"
+                                 class="richardson-logo-img">
+                        </div>
+
+                        <!-- Gradient overlay for text readability -->
+                        <div class="hero-gradient"></div>
+
+                        <!-- Text overlay -->
+                        <div class="hero-text-overlay">
+                            <h2 class="hero-headline">Premium Leatherette Laser Patches</h2>
+                            <p class="hero-subheadline">Custom trucker hats with durable leatherette patches and laser engraving. Perfect for promotional campaigns, corporate gifts, and branded merchandise.</p>
+                            <a href="/richardson-112-product.html" class="hero-cta-button" onclick="event.stopPropagation();">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9153612"
+                                     alt="Richardson Sports"
+                                     class="button-brand-logo">
+                                <span class="button-text">Explore Richardson 112</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,53 +192,175 @@
             <div class="homepage-sections">
                 <div class="quick-access-section">
                     <div class="section-header">
-                        <h2 class="section-title">🔥 Top Sellers 2025</h2>
-                        <p class="section-subtitle">Browse our 60 most popular products</p>
-                    </div>
-                    <div style="background: linear-gradient(135deg, #4cb354, #409a47); padding: 2rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);">
-                        <h3 style="color: white; font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600;">Discover Our Best Sellers</h3>
-                        <p style="color: rgba(255, 255, 255, 0.95); margin-bottom: 1.5rem; font-size: 1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-                            Explore our curated collection of top-selling products with advanced search, filtering by category, and detailed product views.
-                        </p>
-                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                            <a href="/top-sellers-showcase.html" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #4cb354; padding: 0.875rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.125rem; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                    <path d="M12 12l-2 2m0 0l2 2m-2-2h6"/>
-                                </svg>
-                                View Full Catalog
+                        <h2 class="section-title">🔥 2025 Best Sellers - Free Sample Program</h2>
+                        <p class="section-subtitle">See what 500+ businesses order most. Request samples at no cost.</p>
+                        <div class="trust-signals">
+                            <span class="trust-item">✓ Free samples on 60+ products</span>
+                            <span class="trust-item">✓ Fast 2-3 day shipping</span>
+                            <span class="trust-item">✓ No minimum order</span>
+                        </div>
+                        <div class="single-cta-container">
+                            <a href="/pages/top-sellers-showcase.html" class="secondary-cta-link">
+                                Browse Full Collection →
+                                <span class="product-count-badge">60 Products</span>
                             </a>
-                            <div style="color: white; display: flex; align-items: center; gap: 2rem; font-size: 0.9rem;">
-                                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        </div>
+                    </div>
+                    <div class="bestsellers-grid">
+                        <!-- PC61 Cotton T-Shirt -->
+                        <div class="bestseller-card">
+                            <div class="bestseller-image">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464"
+                                     alt="PC61 Cotton T-Shirt"
+                                     loading="lazy">
+                            </div>
+                            <div class="bestseller-info">
+                                <img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg"
+                                     alt="Port & Company"
+                                     class="bestseller-brand-logo"
+                                     loading="lazy"
+                                     style="max-width: 120px; height: auto; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;">
+                                <div class="bestseller-style">PC61</div>
+                                <div class="bestseller-name">Essential Cotton T-Shirt</div>
+                                <div class="bestseller-description">Classic 100% cotton tee. Perfect for DTG printing, screen printing, and everyday wear.</div>
+                                <a href="/product.html?style=PC61&color=Jet+Black" class="bestseller-link">
+                                    View Product
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
                                     </svg>
-                                    Searchable
-                                </span>
-                                <span style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 4h18M3 8h18M7 12h10M9 16h6"/>
-                                    </svg>
-                                    Filterable
-                                </span>
-                                <span style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a6 6 0 00-12 0v4a2 2 0 002 2z"/>
-                                    </svg>
-                                    All Colors
-                                </span>
+                                </a>
                             </div>
                         </div>
-                        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2);">
-                            <p style="color: rgba(255, 255, 255, 0.9); font-size: 0.875rem; margin: 0;">
-                                <strong>Featured Categories:</strong> DTG Printing • Screen Printing • Embroidery • Caps & Headwear
-                            </p>
+
+                        <!-- Polar Camel Tumbler -->
+                        <div class="bestseller-card">
+                            <div class="bestseller-image">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9171981"
+                                     alt="Polar Camel 16 oz Pint"
+                                     loading="lazy">
+                            </div>
+                            <div class="bestseller-info">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173436"
+                                     alt="Polar Camel"
+                                     class="bestseller-brand-logo"
+                                     loading="lazy"
+                                     style="max-width: 90px; height: auto; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;">
+                                <div class="bestseller-style">LTM752</div>
+                                <div class="bestseller-name">Polar Camel 16 oz Pint</div>
+                                <div class="bestseller-description">Stainless steel vacuum insulated pint with laser engraving. Perfect for hot or cold beverages.</div>
+                                <a href="/calculators/laser-tumbler-polarcamel.html" class="bestseller-link">
+                                    View Product
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- PC90H Hoodie -->
+                        <div class="bestseller-card">
+                            <div class="bestseller-image">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148462"
+                                     alt="PC90H Hoodie"
+                                     loading="lazy">
+                            </div>
+                            <div class="bestseller-info">
+                                <img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg"
+                                     alt="Port & Company"
+                                     class="bestseller-brand-logo"
+                                     loading="lazy"
+                                     style="max-width: 120px; height: auto; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;">
+                                <div class="bestseller-style">PC90H</div>
+                                <div class="bestseller-name">Ultimate Fleece Hoodie</div>
+                                <div class="bestseller-description">Premium pullover hoodie with superior comfort. Great for screen printing and DTG.</div>
+                                <a href="/product.html?style=PC90H&color=Royal" class="bestseller-link">
+                                    View Product
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Carhartt Detroit Jacket -->
+                        <div class="bestseller-card">
+                            <div class="bestseller-image">
+                                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148461"
+                                     alt="Carhartt Detroit Jacket"
+                                     loading="lazy">
+                            </div>
+                            <div class="bestseller-info">
+                                <img src="https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg"
+                                     alt="Carhartt"
+                                     class="bestseller-brand-logo"
+                                     loading="lazy"
+                                     style="max-width: 120px; height: auto; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;">
+                                <div class="bestseller-style">CT103828</div>
+                                <div class="bestseller-name">Detroit Duck Jacket</div>
+                                <div class="bestseller-description">Iconic workwear jacket with blanket lining. Perfect for embroidered company logos.</div>
+                                <a href="/product.html?style=CT103828&color=Carhartt+Brown" class="bestseller-link">
+                                    View Product
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            
+
+            <!-- Horizontal Filter Bar - Modern Floating Card Design -->
+            <div class="filters-bar-container" id="filtersBarContainer" style="display: none;">
+                <div class="filters-bar">
+                    <!-- Row 1: Filters Label + Filter Buttons -->
+                    <div class="filters-bar-top-row">
+                        <span class="filters-label">Filters:</span>
+
+                        <div class="filter-controls">
+                            <button class="filter-dropdown-btn" id="brandFilterBtn" data-filter="brand">
+                                <span>Brand</span>
+                                <svg class="filter-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                                <span class="filter-count" id="brandCount" style="display: none;"></span>
+                            </button>
+
+                            <!-- Brand Dropdown Panel -->
+                            <div class="filter-dropdown-panel" id="brandFilterPanel">
+                                <div class="filter-panel-header">
+                                    <h4>Filter by Brand</h4>
+                                    <button class="filter-panel-close" data-panel="brandFilterPanel">×</button>
+                                </div>
+                                <div class="filter-panel-search">
+                                    <input type="text" id="brandSearchInput" placeholder="Search brands..." autocomplete="off">
+                                </div>
+                                <div class="filter-panel-options" id="brandFilterOptionsNew">
+                                    <!-- Brand checkboxes will be populated here -->
+                                </div>
+                                <div class="filter-panel-footer">
+                                    <button class="btn-apply-filter" id="applyBrandFilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Active Filter Chips -->
+                    <div class="active-filters" id="activeFilters">
+                        <!-- Active filter chips will appear here dynamically -->
+                    </div>
+
+                    <!-- Clear All Button (will be positioned by JavaScript) -->
+                    <button class="clear-all-filters-btn" id="clearAllFiltersBtn" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
             <div class="results-section" style="display: none;">
                 <div class="results-header">
                     <h3 class="results-title">
@@ -186,6 +380,7 @@
     <script src="product-search-service.js?v=4"></script>
     <script src="autocomplete-new.js?v=4"></script>
     <script src="catalog-search.js?v=4"></script>
+    <script src="brands-flyout.js?v=4"></script>
     <script src="app-modern.js?v=4" defer></script>
 </body>
 </html>

@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fast 3-Day Turnaround Service - Custom DTG printed t-shirts with guaranteed 72-hour delivery">
+    <meta name="robots" content="index, follow">
+
+    <title>3-Day Tees - Fast Turnaround Service | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Shared Components -->
+    <script src="../shared_components/js/dtg-pricing-service.js"></script>
+    <script src="../shared_components/js/sample-inventory-service.js"></script>
+    <script src="../shared_components/js/sample-order-service.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #ff6b35;
+            --primary-dark: #e55a2b;
+            --primary-light: #ff7d4f;
+            --accent-color: #004e89;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 3px solid var(--primary-color);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .logo-text .service-name {
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-cta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .contact-cta .phone {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            margin: 2rem auto;
+            max-width: 1200px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.03) 10px,
+                rgba(255, 255, 255, 0.03) 20px
+            );
+            pointer-events: none;
+        }
+
+        .hero-banner h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-banner .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-banner .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-banner .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-banner .feature i {
+            font-size: 1.5rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            font-size: 1.375rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--bg-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.375rem;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* Product Display */
+        .product-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-image {
+            width: 100%;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .product-image:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        /* Color Selector */
+        .color-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .color-option {
+            position: relative;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--card-bg);
+        }
+
+        .color-option:hover {
+            border-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .color-option.selected {
+            border-color: var(--primary-color);
+            background: #fef3f0;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .color-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stock-badge.in-stock {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .stock-badge.low-stock {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .stock-badge.out-of-stock {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Size-Specific Stock Badges */
+        .size-stock-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .size-stock-badge.adequate {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .size-stock-badge.low {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .size-stock-badge.critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .size-stock-badge.out {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        /* Location Selector */
+        .location-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .location-option {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .location-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .location-option.selected {
+            border-color: var(--primary-color);
+            background: #fef3f0;
+        }
+
+        .location-option i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .location-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .location-price {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Size Breakdown */
+        .size-breakdown {
+            margin-bottom: 1.5rem;
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .size-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .size-input-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .size-input-group input {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .size-input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .size-price {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            text-align: center;
+        }
+
+        /* Pricing Display */
+        .pricing-summary {
+            background: linear-gradient(135deg, #fef3f0, #fff);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--primary-color);
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pricing-row:last-child {
+            border-bottom: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .pricing-label {
+            color: var(--text-secondary);
+        }
+
+        .pricing-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* File Upload */
+        .file-upload {
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: #fef3f0;
+        }
+
+        .upload-zone i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--bg-color);
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        .file-item .file-name {
+            font-weight: 500;
+        }
+
+        .file-item .file-size {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .file-item button {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-item button:hover {
+            background: #dc2626;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #003d6e;
+            transform: translateY(-2px);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .modal-content i {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .order-number {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .size-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-banner h2 {
+                font-size: 1.5rem;
+            }
+
+            .hero-banner .features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <i class="fas fa-check-circle"></i>
+            <h3>Order Submitted Successfully!</h3>
+            <p>Your 3-Day Tees rush order has been submitted.</p>
+            <div class="order-number" id="orderNumber"></div>
+            <p>A confirmation email has been sent to your inbox. We'll begin production immediately upon artwork approval.</p>
+            <button class="btn btn-primary" onclick="location.reload()">Start New Order</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <div class="logo-text">
+                    <h1>Northwest Custom Apparel</h1>
+                    <div class="service-name">3-Day Tees - Fast Turnaround</div>
+                </div>
+            </div>
+            <div class="contact-cta">
+                <span class="phone"><i class="fas fa-phone"></i> 253-922-5793</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <h2>⚡ 3-Day Rush Service</h2>
+        <p class="subtitle">Custom DTG printed t-shirts delivered in just 72 hours</p>
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-shipping-fast"></i>
+                <span>Ships in 3 Days</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Guaranteed Quality</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-palette"></i>
+                <span>Full Color DTG</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-star"></i>
+                <span>Premium PC54</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="product-grid">
+            <!-- Left Column: Product Configuration -->
+            <div>
+                <div class="card">
+                    <h3>1. Select Product</h3>
+                    <div class="product-info">
+                        <p><strong>Port & Company PC54</strong></p>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Premium 100% cotton tee, perfect for DTG printing</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>2. Choose Color</h3>
+                    <div class="color-selector">
+                        <div class="color-grid" id="colorGrid">
+                            <!-- Colors populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Images Preview -->
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>Product Preview</h3>
+                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p style="font-size: 0.875rem;">Select a color to see product images</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>3. Print Location</h3>
+                    <div class="location-selector">
+                        <div class="location-grid" id="locationGrid">
+                            <!-- Locations populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>4. Size Breakdown</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter quantity for each size (minimum 12 total pieces)</p>
+                    <div class="size-breakdown">
+                        <div class="size-grid" id="sizeGrid">
+                            <!-- Sizes populated by JavaScript -->
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600;">Total Pieces:</span>
+                                <span id="totalQuantity" style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color);">0</span>
+                            </div>
+                            <div id="ltmWarning" style="margin-top: 0.5rem; color: var(--warning-color); font-size: 0.875rem; display: none;">
+                                <i class="fas fa-exclamation-triangle"></i> Orders under 12 pieces include a $75 LTM fee
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>5. Upload Artwork</h3>
+                    <div class="file-upload">
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Files Here</p>
+                            <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                        </div>
+                        <input type="file" id="fileInput" style="display: none;" multiple accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary & Checkout -->
+            <div>
+                <div class="card">
+                    <h3>Order Summary</h3>
+                    <div class="pricing-summary">
+                        <div class="pricing-row">
+                            <span class="pricing-label">Subtotal:</span>
+                            <span class="pricing-value" id="subtotal">$0.00</span>
+                        </div>
+                        <div class="pricing-row" id="ltmFeeRow" style="display: none;">
+                            <span class="pricing-label">LTM Fee:</span>
+                            <span class="pricing-value" id="ltmFee">$0.00</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span class="pricing-label">Sales Tax (10.1%):</span>
+                            <span class="pricing-value" id="salesTax">$0.00</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span class="pricing-label">Shipping (UPS Ground):</span>
+                            <span class="pricing-value">$30.00</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span>Grand Total:</span>
+                            <span id="grandTotal">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div style="background: #fff7ed; border: 2px solid var(--warning-color); border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Rush Service Terms
+                        </p>
+                        <p style="color: #92400e; font-size: 0.875rem;">
+                            Orders ship within 72 hours from artwork approval. 25% rush fee included in pricing. Minimum 12 pieces required (or $75 LTM fee applies).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>Contact Information</h3>
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Company Name</label>
+                        <input type="text" id="company">
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <h3>Shipping Address</h3>
+                    <div class="form-group">
+                        <label for="address1">Street Address *</label>
+                        <input type="text" id="address1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" required maxlength="2" placeholder="WA">
+                    </div>
+                    <div class="form-group">
+                        <label for="zip">ZIP Code *</label>
+                        <input type="text" id="zip" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Special Instructions</label>
+                        <textarea id="notes" placeholder="Any special requirements or notes..."></textarea>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="submitOrder" style="margin-top: 1rem;">
+                    <i class="fas fa-bolt"></i> Submit 3-Day Rush Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
+        // State
+        const state = {
+            selectedColor: null,
+            selectedLocation: null,
+            pricingData: null,
+            inventoryData: null,
+            sizeBreakdown: {},
+            uploadedFiles: [],
+            colors: [
+                { name: 'Jet Black', catalogColor: 'Jet Black', hex: '#000000' },
+                { name: 'White', catalogColor: 'White', hex: '#FFFFFF' },
+                { name: 'Navy', catalogColor: 'Navy', hex: '#001f3f' },
+                { name: 'Athletic Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' },
+                { name: 'Dark Heather Grey', catalogColor: 'Dk Hthr Grey', hex: '#6b7280' }
+            ],
+            locations: [
+                { code: 'LC', name: 'Left Chest', icon: 'fa-tshirt' },
+                { code: 'FF', name: 'Full Front', icon: 'fa-tshirt' },
+                { code: 'FB', name: 'Full Back', icon: 'fa-tshirt' }
+            ],
+            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL']
+        };
+
+        // Initialize services
+        const pricingService = new DTGPricingService();
+        const inventoryService = new SampleInventoryService();
+        const orderService = new SampleOrderService();
+
+        // Load available colors from API
+        async function loadAvailableColors() {
+            try {
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=PC54');
+                const products = await response.json();
+
+                // Deduplicate by CATALOG_COLOR and filter to desired colors
+                // Match exact color names from ShopWorks inventory
+                const desiredColors = [
+                    'Jet Black',                        // Black (exact match from inventory)
+                    'White',                            // White (exact match from inventory)
+                    'Navy',                             // Navy (exact match from inventory)
+                    'Ath Heather',                      // Athletic Heather (exact match from inventory)
+                    'Dk Hthr Grey'                      // Dark Heather Grey (exact match from inventory)
+                ];
+                const uniqueColors = [...new Map(
+                    products.map(p => [p.CATALOG_COLOR, p])
+                ).values()];
+
+                const apiColors = uniqueColors
+                    .filter(p => desiredColors.includes(p.CATALOG_COLOR))
+                    .map(p => ({
+                        name: p.COLOR_NAME || p.CATALOG_COLOR,
+                        catalogColor: p.CATALOG_COLOR,
+                        hex: getHexForColor(p.CATALOG_COLOR), // Fallback hex
+                        swatchImage: p.COLOR_SQUARE_IMAGE,
+                        frontModel: p.FRONT_MODEL,
+                        backModel: p.BACK_MODEL,
+                        frontFlat: p.FRONT_FLAT || p.PRODUCT_IMAGE
+                    }));
+
+                console.log('[3-Day Tees] Loaded colors from API:', apiColors);
+                return apiColors.length > 0 ? apiColors : state.colors; // Fallback to hardcoded if API fails
+            } catch (error) {
+                console.error('[3-Day Tees] Error loading colors from API:', error);
+                return state.colors; // Fallback to hardcoded colors
+            }
+        }
+
+        // Fallback hex colors for color swatches
+        function getHexForColor(catalogColor) {
+            const hexMap = {
+                // Exact color names from ShopWorks inventory
+                'Jet Black': '#000000',
+                'White': '#FFFFFF',
+                'Navy': '#001f3f',
+                'Ath Heather': '#9ca3af',
+                'Dk Hthr Grey': '#6b7280'
+            };
+            return hexMap[catalogColor] || '#cccccc';
+        }
+
+        // Load pricing data on page load
+        async function init() {
+            try {
+                showLoading(true);
+
+                // Fetch DTG pricing bundle
+                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC54');
+                state.pricingData = await response.json();
+
+                console.log('[3-Day Tees] Pricing data loaded:', state.pricingData);
+
+                // Load colors from API
+                state.colors = await loadAvailableColors();
+
+                // Render UI
+                renderColors();
+                renderLocations();
+                renderSizes();
+
+                showLoading(false);
+            } catch (error) {
+                console.error('[3-Day Tees] Initialization error:', error);
+                alert('Failed to load pricing data. Please refresh the page or call 253-922-5793.');
+                showLoading(false);
+            }
+        }
+
+        // Render color selector
+        function renderColors() {
+            const grid = document.getElementById('colorGrid');
+            grid.innerHTML = state.colors.map(color => {
+                // Use swatch image if available, otherwise use hex color
+                const swatchStyle = color.swatchImage
+                    ? `background-image: url('${color.swatchImage}'); background-size: cover; background-position: center;`
+                    : `background: ${color.hex};`;
+                const whiteBorder = color.name === 'White' ? 'border: 2px solid #ccc;' : '';
+
+                return `
+                    <div class="color-option" onclick="selectColor('${color.catalogColor}')">
+                        <div class="color-swatch" style="${swatchStyle} ${whiteBorder}"></div>
+                        <div class="color-name">${color.name}</div>
+                        <div class="stock-badge" id="stock-${color.catalogColor}">Loading...</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Load inventory for all colors
+            state.colors.forEach(color => {
+                loadInventory(color.catalogColor);
+            });
+        }
+
+        // Load inventory for a color from local warehouse (ManageOrders)
+        async function loadInventory(catalogColor) {
+            try {
+                // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
+                const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+                ]);
+
+                // Parse all responses
+                const standardData = await standardRes.json();
+                const twoXLData = await twoXLRes.json();
+                const threeXLData = await threeXLRes.json();
+
+                let total = 0;
+
+                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                if (standardData.result && standardData.result.length > 0) {
+                    const inventory = standardData.result[0];
+                    total += (inventory.Size01 || 0) + (inventory.Size02 || 0) +
+                            (inventory.Size03 || 0) + (inventory.Size04 || 0);
+                }
+
+                // PC54_2X: Size05=2XL
+                if (twoXLData.result && twoXLData.result.length > 0) {
+                    total += twoXLData.result[0].Size05 || 0;
+                }
+
+                // PC54_3X: Size06=3XL
+                if (threeXLData.result && threeXLData.result.length > 0) {
+                    total += threeXLData.result[0].Size06 || 0;
+                }
+
+                const badge = document.getElementById(`stock-${catalogColor}`);
+
+                // Adjusted thresholds for local warehouse inventory
+                if (total > 25) {
+                    badge.className = 'stock-badge in-stock';
+                    badge.textContent = 'In Stock';
+                } else if (total > 0) {
+                    badge.className = 'stock-badge low-stock';
+                    badge.textContent = 'Low Stock';
+                } else {
+                    badge.className = 'stock-badge out-of-stock';
+                    badge.textContent = 'Out of Stock';
+                }
+
+                console.log(`[3-Day Tees] Multi-SKU inventory for ${displayColor}:`, {
+                    PC54: standardData.result?.[0] || 'No data',
+                    PC54_2X: twoXLData.result?.[0] || 'No data',
+                    PC54_3X: threeXLData.result?.[0] || 'No data',
+                    total: total
+                });
+            } catch (error) {
+                console.error('[3-Day Tees] Multi-SKU inventory load error:', catalogColor, error);
+                const badge = document.getElementById(`stock-${catalogColor}`);
+                badge.className = 'stock-badge';
+                badge.textContent = 'Check Stock';
+            }
+        }
+
+        // Load size-specific inventory for selected color from local warehouse
+        async function loadSizeInventory(catalogColor) {
+            try {
+                // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
+                const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+                ]);
+
+                // Parse all responses
+                const standardData = await standardRes.json();
+                const twoXLData = await twoXLRes.json();
+                const threeXLData = await threeXLRes.json();
+
+                // Build inventory by size
+                const sizeInventory = {};
+
+                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                if (standardData.result && standardData.result.length > 0) {
+                    const inventory = standardData.result[0];
+                    sizeInventory['S'] = inventory.Size01 || 0;
+                    sizeInventory['M'] = inventory.Size02 || 0;
+                    sizeInventory['L'] = inventory.Size03 || 0;
+                    sizeInventory['XL'] = inventory.Size04 || 0;
+                } else {
+                    // No standard sizes found
+                    sizeInventory['S'] = 0;
+                    sizeInventory['M'] = 0;
+                    sizeInventory['L'] = 0;
+                    sizeInventory['XL'] = 0;
+                }
+
+                // PC54_2X: Size05=2XL
+                if (twoXLData.result && twoXLData.result.length > 0) {
+                    sizeInventory['2XL'] = twoXLData.result[0].Size05 || 0;
+                } else {
+                    sizeInventory['2XL'] = 0;
+                }
+
+                // PC54_3X: Size06=3XL
+                if (threeXLData.result && threeXLData.result.length > 0) {
+                    sizeInventory['3XL'] = threeXLData.result[0].Size06 || 0;
+                } else {
+                    sizeInventory['3XL'] = 0;
+                }
+
+                // Update each size badge and input max attribute
+                state.sizes.forEach(size => {
+                    const stock = sizeInventory[size] || 0;
+                    const badge = document.getElementById(`stock-size-${size}`);
+                    const input = document.getElementById(`size-${size}`);
+
+                    if (badge) {
+                        if (stock === 0) {
+                            badge.className = 'size-stock-badge out';
+                            badge.textContent = 'Out of Stock';
+                            if (input) {
+                                input.disabled = true;
+                                input.value = 0;
+                            }
+                        } else {
+                            // Always show exact inventory count for non-zero stock
+                            badge.textContent = `${stock} available`;
+
+                            // Determine badge color based on stock level
+                            if (stock < 10) {
+                                badge.className = 'size-stock-badge critical';
+                            } else if (stock < 25) {
+                                badge.className = 'size-stock-badge low';
+                            } else {
+                                badge.className = 'size-stock-badge adequate';
+                            }
+
+                            if (input) {
+                                input.disabled = false;
+                                input.max = stock;
+                            }
+                        }
+                    }
+                });
+
+                console.log(`[3-Day Tees] Multi-SKU size inventory for ${displayColor}:`, {
+                    sizes: sizeInventory,
+                    PC54: standardData.result?.[0] || 'No data',
+                    PC54_2X: twoXLData.result?.[0] || 'No data',
+                    PC54_3X: threeXLData.result?.[0] || 'No data'
+                });
+            } catch (error) {
+                console.error('[3-Day Tees] Size inventory load error:', catalogColor, error);
+            }
+        }
+
+        // Select color
+        function selectColor(catalogColor) {
+            state.selectedColor = catalogColor;
+
+            // Update UI
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Update product images
+            const colorData = state.colors.find(c => c.catalogColor === catalogColor);
+            if (colorData) {
+                const imagesContainer = document.getElementById('productImages');
+                if (imagesContainer) {
+                    let imagesHTML = '';
+
+                    if (colorData.frontModel) {
+                        imagesHTML += `<img src="${colorData.frontModel}" alt="Front View" style="width: 100%; border-radius: 6px;">`;
+                    }
+                    if (colorData.backModel) {
+                        imagesHTML += `<img src="${colorData.backModel}" alt="Back View" style="width: 100%; border-radius: 6px;">`;
+                    }
+                    if (colorData.frontFlat && !colorData.frontModel) {
+                        imagesHTML += `<img src="${colorData.frontFlat}" alt="Flat View" style="width: 100%; border-radius: 6px;">`;
+                    }
+
+                    if (imagesHTML) {
+                        imagesContainer.innerHTML = imagesHTML;
+                    } else {
+                        imagesContainer.innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                                <p style="font-size: 0.875rem;">Images not available for this color</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // Load size-specific inventory
+            loadSizeInventory(catalogColor);
+
+            console.log('[3-Day Tees] Color selected:', catalogColor);
+            updatePricing();
+        }
+
+        // Render locations
+        function renderLocations() {
+            const grid = document.getElementById('locationGrid');
+            grid.innerHTML = state.locations.map(loc => `
+                <div class="location-option" onclick="selectLocation('${loc.code}')">
+                    <i class="fas ${loc.icon}"></i>
+                    <div class="location-name">${loc.name}</div>
+                    <div class="location-price" id="price-${loc.code}">Select quantity</div>
+                </div>
+            `).join('');
+        }
+
+        // Select location
+        function selectLocation(code) {
+            state.selectedLocation = code;
+
+            // Update UI
+            document.querySelectorAll('.location-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            console.log('[3-Day Tees] Location selected:', code);
+            updatePricing();
+        }
+
+        // Render sizes
+        function renderSizes() {
+            const grid = document.getElementById('sizeGrid');
+            grid.innerHTML = state.sizes.map(size => `
+                <div class="size-input-group">
+                    <label for="size-${size}">${size}</label>
+                    <input type="number"
+                           id="size-${size}"
+                           min="0"
+                           value="0"
+                           onchange="updateSizeBreakdown()">
+                    <div class="size-price" id="price-size-${size}">$0.00/pc</div>
+                    <div class="size-stock-badge" id="stock-size-${size}"></div>
+                </div>
+            `).join('');
+
+            // Initialize size breakdown
+            state.sizes.forEach(size => {
+                state.sizeBreakdown[size] = { quantity: 0, unitPrice: 0 };
+            });
+        }
+
+        // Update size breakdown
+        function updateSizeBreakdown() {
+            let total = 0;
+
+            state.sizes.forEach(size => {
+                const input = document.getElementById(`size-${size}`);
+                const qty = parseInt(input.value) || 0;
+                state.sizeBreakdown[size].quantity = qty;
+                total += qty;
+            });
+
+            // Update total display
+            document.getElementById('totalQuantity').textContent = total;
+
+            // Show/hide LTM warning
+            const ltmWarning = document.getElementById('ltmWarning');
+            if (total > 0 && total < 12) {
+                ltmWarning.style.display = 'block';
+            } else {
+                ltmWarning.style.display = 'none';
+            }
+
+            updatePricing();
+        }
+
+        // Calculate price (7-step formula + 25% rush fee)
+        function calculatePrice(quantity, location, size) {
+            if (!state.pricingData || !location || quantity === 0) return 0;
+
+            // Find tier
+            const tier = state.pricingData.tiersR.find(t =>
+                quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+            ) || state.pricingData.tiersR[0];
+
+            // Step 1: Base garment cost
+            const baseCost = Math.min(...state.pricingData.sizes
+                .map(s => parseFloat(s.price))
+                .filter(p => p > 0)
+            );
+
+            // Step 2: Marked up garment
+            const markedUpGarment = baseCost / tier.MarginDenominator;
+
+            // Step 3: Print cost
+            const printCost = state.pricingData.allDtgCostsR.find(c =>
+                c.PrintLocationCode === location && c.TierLabel === tier.TierLabel
+            )?.PrintCost || 0;
+
+            // Step 4: Base DTG price
+            const baseDTGPrice = markedUpGarment + printCost;
+
+            // Step 5: Round base
+            const roundedBase = Math.ceil(baseDTGPrice * 2) / 2;
+
+            // Step 6: Apply 25% rush fee
+            const rushFee = roundedBase * 0.25;
+            const priceWithRush = roundedBase + rushFee;
+
+            // Step 7: Final rounding
+            const finalPrice = Math.ceil(priceWithRush * 2) / 2;
+
+            // Step 8: Add size upcharge
+            const upcharge = state.pricingData.upcharges[size] || 0;
+
+            return finalPrice + upcharge;
+        }
+
+        // Update pricing display
+        function updatePricing() {
+            const totalQty = Object.values(state.sizeBreakdown).reduce((sum, s) => sum + s.quantity, 0);
+
+            if (!state.selectedLocation || totalQty === 0) return;
+
+            let subtotal = 0;
+
+            // Calculate price for each size
+            state.sizes.forEach(size => {
+                const qty = state.sizeBreakdown[size].quantity;
+                const price = calculatePrice(totalQty, state.selectedLocation, size);
+                state.sizeBreakdown[size].unitPrice = price;
+
+                // Update UI
+                document.getElementById(`price-size-${size}`).textContent = `$${price.toFixed(2)}/pc`;
+
+                subtotal += qty * price;
+            });
+
+            // LTM fee
+            const ltmFee = totalQty < 12 ? 75 : 0;
+
+            // Sales tax
+            const salesTax = (subtotal + ltmFee) * 0.101;
+
+            // Shipping
+            const shipping = 30;
+
+            // Grand total
+            const grandTotal = subtotal + ltmFee + salesTax + shipping;
+
+            // Update display
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('salesTax').textContent = `$${salesTax.toFixed(2)}`;
+            document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(2)}`;
+
+            // Show/hide LTM fee row
+            const ltmRow = document.getElementById('ltmFeeRow');
+            if (ltmFee > 0) {
+                ltmRow.style.display = 'flex';
+                document.getElementById('ltmFee').textContent = `$${ltmFee.toFixed(2)}`;
+            } else {
+                ltmRow.style.display = 'none';
+            }
+        }
+
+        // File upload handling
+        document.getElementById('uploadZone').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (file.size > 20 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large. Maximum size is 20MB.`);
+                    return;
+                }
+                state.uploadedFiles.push(file);
+            });
+            renderFileList();
+        });
+
+        function renderFileList() {
+            const list = document.getElementById('fileList');
+            if (state.uploadedFiles.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+
+            list.innerHTML = state.uploadedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${(file.size / 1024).toFixed(1)} KB</div>
+                    </div>
+                    <button onclick="removeFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            state.uploadedFiles.splice(index, 1);
+            renderFileList();
+        }
+
+        // Submit order
+        document.getElementById('submitOrder').addEventListener('click', async () => {
+            // Validate
+            const totalQty = Object.values(state.sizeBreakdown).reduce((sum, s) => sum + s.quantity, 0);
+
+            if (!state.selectedColor) {
+                alert('Please select a color');
+                return;
+            }
+
+            if (!state.selectedLocation) {
+                alert('Please select a print location');
+                return;
+            }
+
+            if (totalQty === 0) {
+                alert('Please enter quantities for at least one size');
+                return;
+            }
+
+            if (!document.getElementById('firstName').value || !document.getElementById('lastName').value) {
+                alert('Please fill in all required contact information');
+                return;
+            }
+
+            if (!document.getElementById('email').value) {
+                alert('Please provide an email address');
+                return;
+            }
+
+            if (!document.getElementById('address1').value || !document.getElementById('city').value || !document.getElementById('state').value || !document.getElementById('zip').value) {
+                alert('Please fill in all required shipping address fields');
+                return;
+            }
+
+            if (state.uploadedFiles.length === 0) {
+                if (!confirm('No artwork files uploaded. Continue anyway? (Not recommended)')) {
+                    return;
+                }
+            }
+
+            try {
+                showLoading(true);
+
+                // Generate order number
+                const orderNumber = generateOrderNumber();
+
+                // Build line items
+                const lineItems = [];
+                state.sizes.forEach(size => {
+                    const qty = state.sizeBreakdown[size].quantity;
+                    if (qty === 0) return;
+
+                    const price = state.sizeBreakdown[size].unitPrice;
+                    lineItems.push({
+                        partNumber: 'PC54',
+                        description: 'Port & Company Core Cotton Tee - 3-Day Rush',
+                        color: state.selectedColor,
+                        size: size,
+                        quantity: qty,
+                        price: price,
+                        notes: `DTG - ${state.locations.find(l => l.code === state.selectedLocation).name} - 3-Day Rush Service (+25%)`
+                    });
+                });
+
+                // Calculate totals
+                const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                const ltmFee = totalQty < 12 ? 75 : 0;
+                const salesTax = (subtotal + ltmFee) * 0.101;
+                const shipping = 30;
+                const grandTotal = subtotal + ltmFee + salesTax + shipping;
+
+                // Build order data
+                const orderData = {
+                    orderNumber: orderNumber,
+                    orderDate: new Date().toISOString().split('T')[0],
+                    dateNeeded: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    salesRep: 'erik@nwcustomapparel.com',
+                    terms: 'Net 30',
+                    customer: {
+                        firstName: document.getElementById('firstName').value,
+                        lastName: document.getElementById('lastName').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        company: document.getElementById('company').value || ''
+                    },
+                    shipping: {
+                        company: document.getElementById('company').value || `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                        address1: document.getElementById('address1').value,
+                        city: document.getElementById('city').value,
+                        state: document.getElementById('state').value,
+                        zip: document.getElementById('zip').value,
+                        country: 'USA',
+                        method: 'UPS Ground'
+                    },
+                    lineItems: lineItems,
+                    designs: state.uploadedFiles.map(file => ({
+                        name: file.name,
+                        externalKey: `3dt_${orderNumber}_${file.name}`,
+                        instructions: `DTG print - ${state.locations.find(l => l.code === state.selectedLocation).name}`
+                    })),
+                    notes: [{
+                        type: 'Notes On Order',
+                        text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${document.getElementById('notes').value || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)`
+                    }],
+                    total: grandTotal
+                };
+
+                console.log('[3-Day Tees] Submitting order:', orderData);
+
+                let finalOrderNumber = orderNumber;
+                let orderCreatedSuccessfully = false;
+
+                // Attempt to submit order to ManageOrders API
+                try {
+                    const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('[3-Day Tees] ✓ Order created in ManageOrders:', result);
+                        finalOrderNumber = result.orderNumber || orderNumber;
+                        orderCreatedSuccessfully = true;
+                    } else {
+                        throw new Error(`API returned ${response.status}`);
+                    }
+                } catch (apiError) {
+                    console.error('[3-Day Tees] ManageOrders API failed:', apiError);
+
+                    // FALLBACK: Save to quote database
+                    try {
+                        console.log('[3-Day Tees] Attempting quote database fallback...');
+
+                        // Save quote session
+                        await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                SessionID: orderNumber,
+                                QuoteID: orderNumber,
+                                DecorationType: '3-Day Tees',
+                                CustomerName: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
+                                CustomerEmail: orderData.customer.email,
+                                CustomerPhone: orderData.customer.phone || '',
+                                CompanyName: orderData.customer.company || '',
+                                TotalAmount: orderData.total,
+                                Status: 'Active',
+                                Notes: 'ORDER FAILED - ManageOrders API error. See quote items for details.',
+                                CreatedDate: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                                ModifiedDate: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                            })
+                        });
+
+                        // Save line items
+                        for (const item of orderData.lineItems) {
+                            await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    SessionID: orderNumber,
+                                    ItemType: 'Product',
+                                    StyleNumber: item.partNumber,
+                                    Description: item.description,
+                                    Color: item.color,
+                                    Size: item.size,
+                                    Quantity: item.quantity,
+                                    UnitPrice: item.price,
+                                    TotalPrice: item.price * item.quantity,
+                                    Notes: item.notes
+                                })
+                            });
+                        }
+
+                        console.log('[3-Day Tees] ✓ Saved to quote database as fallback');
+
+                        // Send error notification to admin
+                        await emailjs.send('service_1c4k67j', 'template_sample_sales', {
+                            to_email: 'erik@nwcustomapparel.com',
+                            subject: `3-Day Tees Order Failed - ${orderNumber}`,
+                            order_number: orderNumber,
+                            customer_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
+                            customer_email: orderData.customer.email,
+                            error_details: apiError.message,
+                            action_required: 'Manual entry into ShopWorks required',
+                            order_data: JSON.stringify(orderData, null, 2)
+                        });
+
+                    } catch (fallbackError) {
+                        console.error('[3-Day Tees] Quote database fallback also failed:', fallbackError);
+                    }
+                }
+
+                // Always send confirmation emails (even if API failed)
+                try {
+                    await sendEmails(orderData, finalOrderNumber);
+                    console.log('[3-Day Tees] ✓ Confirmation emails sent');
+                } catch (emailError) {
+                    console.error('[3-Day Tees] Email send failed:', emailError);
+                }
+
+                // Show success message
+                document.getElementById('orderNumber').textContent = `Order #${finalOrderNumber}`;
+
+                if (!orderCreatedSuccessfully) {
+                    // Show warning if order saved to database but not ManageOrders
+                    const successText = document.querySelector('#successModal p');
+                    if (successText) {
+                        successText.innerHTML += '<br><br><strong>Note:</strong> Your order has been saved. Our sales team will contact you to complete processing.';
+                    }
+                }
+
+                document.getElementById('successModal').classList.add('active');
+                showLoading(false);
+
+            } catch (error) {
+                console.error('[3-Day Tees] Critical error:', error);
+                showLoading(false);
+                alert(`Order submission encountered an error. Your order ID is ${orderNumber}. Please call 253-922-5793 to complete your order.`);
+            }
+        });
+
+        // Generate order number (daily sequence with millisecond uniqueness)
+        function generateOrderNumber() {
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            // Daily sequence from localStorage (shared across tabs, resets each day)
+            const dateKey = `${month}${day}`;
+            const storageKey = `3dt_order_seq_${dateKey}`;
+            let sequence = parseInt(localStorage.getItem(storageKey) || '0') + 1;
+            localStorage.setItem(storageKey, sequence.toString());
+
+            // Clean up old sequences (keep only today's)
+            for (let key in localStorage) {
+                if (key.startsWith('3dt_order_seq_') && key !== storageKey) {
+                    localStorage.removeItem(key);
+                }
+            }
+
+            // Add millisecond timestamp suffix for uniqueness
+            const ms = String(now.getMilliseconds()).padStart(3, '0');
+            const orderNumber = `3DT${month}${day}-${sequence}-${ms}`;
+            console.log('[3-Day Tees] Generated order number:', orderNumber);
+
+            return orderNumber;
+        }
+
+        // Send confirmation emails
+        async function sendEmails(orderData, orderNumber) {
+            try {
+                // Build products table for email
+                const productsTable = orderData.lineItems.map((item, index) => `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 0.75rem;">${item.size}</td>
+                        <td style="padding: 0.75rem;">${item.quantity}</td>
+                        <td style="padding: 0.75rem;">$${item.price.toFixed(2)}</td>
+                        <td style="padding: 0.75rem;">$${(item.quantity * item.price).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                const emailData = {
+                    to_email: orderData.customer.email,
+                    to_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
+                    order_number: orderNumber,
+                    customer_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
+                    customer_email: orderData.customer.email,
+                    customer_phone: orderData.customer.phone,
+                    company_name: orderData.customer.company || '',
+                    color: state.selectedColor,
+                    location: state.locations.find(l => l.code === state.selectedLocation).name,
+                    products_table: `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: #f3f4f6; border-bottom: 2px solid #d1d5db;">
+                                <th style="padding: 0.75rem; text-align: left;">Size</th>
+                                <th style="padding: 0.75rem; text-align: left;">Qty</th>
+                                <th style="padding: 0.75rem; text-align: left;">Price</th>
+                                <th style="padding: 0.75rem; text-align: left;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>${productsTable}</tbody>
+                    </table>`,
+                    subtotal: `$${(orderData.total - 30 - (orderData.total - 30) * 0.101 / 1.101).toFixed(2)}`,
+                    total: `$${orderData.total.toFixed(2)}`,
+                    company_phone: '253-922-5793',
+                    reply_to: 'erik@nwcustomapparel.com',
+                    message: orderData.notes[0]?.text || 'No special instructions'
+                };
+
+                // Customer confirmation email
+                await emailjs.send('service_1c4k67j', 'template_sample_customer', emailData);
+
+                // Sales team notification (BCC Erik)
+                emailData.bcc_email = 'erik@nwcustomapparel.com';
+                await emailjs.send('service_1c4k67j', 'template_sample_sales', emailData);
+
+                console.log('[3-Day Tees] Emails sent successfully');
+            } catch (error) {
+                console.error('[3-Day Tees] Email error:', error);
+                // Don't fail the order if email fails
+            }
+        }
+
+        // Loading overlay
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

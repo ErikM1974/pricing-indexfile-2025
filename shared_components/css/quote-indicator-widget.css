@@ -1,0 +1,491 @@
+/*
+ * Quote Indicator Widget Styles
+ * Created: 2025-10-15
+ * Purpose: Persistent floating widget that shows quote contents during Phase 2
+ * Features: Collapsible/expandable, real-time updates, responsive design
+ */
+
+/* Main widget container */
+.quote-indicator-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    min-width: 280px;
+    max-width: 400px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideUp 0.4s ease-out;
+}
+
+/* Hide widget by default when no products */
+.quote-indicator-widget {
+    display: none;
+}
+
+/* Show widget when it has products, regardless of phase */
+.quote-indicator-widget.has-products {
+    display: block;
+}
+
+/* Additional visibility for Phase 2 (legacy support) */
+#product-phase .quote-indicator-widget.has-products {
+    display: block;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Widget header (always visible) */
+.quote-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.quote-widget-header:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+}
+
+/* Widget collapsed state */
+.quote-indicator-widget.collapsed .quote-widget-header {
+    border-radius: 12px;
+}
+
+.quote-indicator-widget.collapsed .quote-widget-content {
+    display: none;
+}
+
+/* Header content */
+.quote-widget-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.quote-widget-title i {
+    font-size: 16px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Product count badge */
+.quote-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 24px;
+}
+
+/* Toggle icon */
+.quote-widget-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: transform 0.3s ease, background 0.2s ease;
+}
+
+.quote-widget-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.quote-widget-toggle i {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.quote-indicator-widget.collapsed .quote-widget-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Widget content (product list) */
+.quote-widget-content {
+    padding: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Custom scrollbar for content */
+.quote-widget-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.quote-widget-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.quote-widget-content::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 3px;
+}
+
+.quote-widget-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Product list */
+.quote-product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Individual product item */
+.quote-product-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Product thumbnail */
+.quote-product-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.quote-product-item:hover {
+    background: #f0f2f5;
+    border-color: #d6dade;
+    transform: translateX(2px);
+}
+
+/* Product info */
+.quote-product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.quote-product-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+/* Product meta - quantity and size text */
+.quote-product-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.quote-qty-badge {
+    background: #4CAF50;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.quote-size-text {
+    font-size: 10px;
+    color: #6c757d;
+}
+
+/* Product quantity */
+.quote-product-qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    font-size: 12px;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Remove button */
+.quote-remove-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    margin-left: 8px;
+}
+
+.quote-product-item:hover .quote-remove-btn {
+    opacity: 1;
+}
+
+.quote-remove-btn:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.quote-remove-btn i {
+    font-size: 10px;
+}
+
+/* Footer summary */
+.quote-widget-footer {
+    padding: 12px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 12px 12px;
+}
+
+.quote-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.quote-summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.quote-summary-label {
+    color: #6c757d;
+}
+
+.quote-summary-value {
+    font-weight: 600;
+    color: #212529;
+}
+
+.quote-total-row {
+    padding-top: 8px;
+    border-top: 1px solid #dee2e6;
+    font-size: 14px;
+}
+
+.quote-total-row .quote-summary-value {
+    color: #28a745;
+    font-size: 16px;
+}
+
+/* Continue button - Green to match theme */
+.quote-continue-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quote-continue-btn:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Empty state */
+.quote-empty-state {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.quote-empty-icon {
+    font-size: 32px;
+    color: #dee2e6;
+    margin-bottom: 8px;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .quote-indicator-widget {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-width: none;
+        min-width: auto;
+    }
+
+    .quote-widget-content {
+        max-height: 240px;
+    }
+
+    /* Make it more compact on mobile */
+    .quote-widget-header {
+        padding: 10px 12px;
+    }
+
+    .quote-widget-title {
+        font-size: 13px;
+    }
+
+    .quote-product-item {
+        padding: 8px;
+    }
+
+    .quote-product-name {
+        font-size: 12px;
+    }
+
+    .quote-product-details {
+        font-size: 10px;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .quote-indicator-widget {
+        right: 15px;
+        bottom: 15px;
+        max-width: 350px;
+    }
+}
+
+/* Animation for item removal */
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+.quote-product-item.removing {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+/* Update animation for count changes */
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.quote-count-badge.updating {
+    animation: bounce 0.3s ease-out;
+}
+
+/* Success state flash */
+@keyframes successFlash {
+    0%, 100% {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    }
+    50% {
+        background: linear-gradient(135deg, #5cbf60 0%, #52ad56 100%);
+    }
+}
+
+.quote-widget-header.success {
+    animation: successFlash 0.6s ease-out;
+}
+
+/* Minimized state for very small screens */
+@media (max-width: 480px) {
+    .quote-indicator-widget.collapsed {
+        min-width: auto;
+        right: 10px;
+        bottom: 60px; /* Above mobile navigation if present */
+    }
+
+    .quote-indicator-widget.collapsed .quote-widget-header {
+        padding: 8px 12px;
+    }
+
+    .quote-indicator-widget.collapsed .quote-widget-title span:not(.quote-count-badge) {
+        display: none; /* Hide text, show only icon and count */
+    }
+}
+
+/* CRITICAL: Hide widget completely in Phase 3 (Summary Phase) to avoid duplicate information */
+/* When summary phase is active, hide the widget entirely */
+#summary-phase.active ~ .quote-indicator-widget,
+#summary-phase:not([style*="display: none"]) ~ .quote-indicator-widget,
+body:has(#summary-phase.active) .quote-indicator-widget,
+body:has(#summary-phase:not([style*="display: none"])) .quote-indicator-widget {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Print styles - hide widget when printing */
+@media print {
+    .quote-indicator-widget {
+        display: none !important;
+    }
+}

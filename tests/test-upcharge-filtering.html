@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Upcharge Filtering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+        }
+        .upcharge-info {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            min-height: 50px;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upcharge Filtering Test for PC61</h1>
+
+    <div class="test-section">
+        <h2>Test Setup</h2>
+        <p>This test verifies that the universal-pricing-grid.js properly filters size upcharges to only show sizes that exist for the selected product.</p>
+        <p><strong>Product:</strong> PC61</p>
+        <p><strong>Expected Available Sizes:</strong> S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL</p>
+        <p><strong>Sizes that should NOT appear:</strong> LT, XLT, 2XLT, 3XLT, 4XLT (tall sizes)</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Upcharge Display (Should only show available sizes)</h2>
+        <div class="upcharge-info" id="upcharge-display">Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <pre id="debug-info"></pre>
+    </div>
+
+    <script src="/shared_components/js/universal-pricing-grid.js"></script>
+    <script>
+        // Test data mimicking the API response
+        const testData = {
+            sizes: [
+                { size: "S", price: 5.50 },
+                { size: "M", price: 5.50 },
+                { size: "L", price: 5.50 },
+                { size: "XL", price: 5.50 },
+                { size: "2XL", price: 7.50 },
+                { size: "3XL", price: 8.50 },
+                { size: "4XL", price: 9.50 },
+                { size: "5XL", price: 10.50 },
+                { size: "6XL", price: 11.50 }
+            ],
+            sellingPriceDisplayAddOns: {
+                "S": 0,
+                "M": 0,
+                "L": 0,
+                "XL": 0,
+                "2XL": 2.00,
+                "2XLT": 2.00,  // Should be filtered out
+                "3XL": 3.00,
+                "3XLT": 3.00,  // Should be filtered out
+                "4XL": 4.00,
+                "4XLT": 4.00,  // Should be filtered out
+                "5XL": 5.00,
+                "6XL": 6.00,
+                "LT": 0,       // Should be filtered out
+                "XLT": 0,      // Should be filtered out
+                "XXL": 2.00    // Should be filtered out
+            }
+        };
+
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the upcharge container
+            const container = document.getElementById('upcharge-display');
+            container.className = 'upcharge-info';
+
+            // Initialize the universal pricing grid if needed
+            if (window.UniversalPricingGrid) {
+                window.UniversalPricingGrid.upchargeContainer = container;
+
+                // Update with test data
+                window.UniversalPricingGrid.updateWithData(
+                    testData.sizes,
+                    testData.sellingPriceDisplayAddOns
+                );
+
+                // Run tests
+                runTests();
+            } else {
+                container.innerHTML = '<span class="status error">Universal Pricing Grid not loaded!</span>';
+            }
+        });
+
+        function runTests() {
+            const results = document.getElementById('test-results');
+            const debug = document.getElementById('debug-info');
+
+            let testsPassed = 0;
+            let testsFailed = 0;
+            let resultsHTML = '';
+
+            // Test 1: Check that tall sizes are not displayed
+            const displayedContent = document.getElementById('upcharge-display').textContent;
+            const tallSizes = ['LT', 'XLT', '2XLT', '3XLT', '4XLT'];
+
+            tallSizes.forEach(size => {
+                if (displayedContent.includes(size)) {
+                    resultsHTML += `<div class="status error">❌ FAILED: Size ${size} should not be displayed (tall size doesn't exist for PC61)</div>`;
+                    testsFailed++;
+                } else {
+                    resultsHTML += `<div class="status success">✓ PASSED: Size ${size} correctly filtered out</div>`;
+                    testsPassed++;
+                }
+            });
+
+            // Test 2: Check that valid sizes ARE displayed
+            const validUpchargeSizes = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+
+            validUpchargeSizes.forEach(size => {
+                // Make sure we're not matching the tall versions
+                const regex = new RegExp(`\\b${size}\\b(?!T)`);
+                if (regex.test(displayedContent)) {
+                    resultsHTML += `<div class="status success">✓ PASSED: Size ${size} correctly displayed</div>`;
+                    testsPassed++;
+                } else {
+                    resultsHTML += `<div class="status error">❌ FAILED: Size ${size} should be displayed</div>`;
+                    testsFailed++;
+                }
+            });
+
+            // Display results
+            resultsHTML = `<h3>Summary: ${testsPassed} passed, ${testsFailed} failed</h3>` + resultsHTML;
+            results.innerHTML = resultsHTML;
+
+            // Debug information
+            debug.textContent = JSON.stringify({
+                availableSizes: window.UniversalPricingGrid?.availableSizes,
+                filteredUpcharges: window.UniversalPricingGrid?.filterUpchargesByAvailableSizes(),
+                allUpcharges: testData.sellingPriceDisplayAddOns
+            }, null, 2);
+        }
+    </script>
+</body>
+</html>
