@@ -1096,7 +1096,378 @@ curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/admin/
 
 ---
 
+## 🔄 SANMAR TO SHOPWORKS MAPPING
+
+### Overview
+**Purpose**: Centralized API for Sanmar product data transformation and ShopWorks integration
+**Architecture**: Provides programmatic access to ShopWorks-ready JSON or granular mapping data
+**Status**: ✅ Production-ready (deployed 2025-11-09)
+**Recommended**: Use `/import-format` endpoint for direct ShopWorks imports (returns pre-mapped JSON)
+**Key Features**: ShopWorks-ready JSON export, SKU pattern detection, Size06 field reuse patterns, CATALOG_COLOR mapping
+
+### Business Rules
+- **SKU Pattern Detection**: Single-SKU vs multi-SKU variants (standard 3 or extended 4-6 SKUs)
+- **Suffix Mapping**: _2XL/_2X use Size05 (ONLY exceptions), all other suffixes use Size06
+- **Color Normalization**: COLOR_NAME (display) vs CATALOG_COLOR (API/ShopWorks queries)
+- **Size06 Field Reuse**: Multiple SKUs can reuse Size06 field position in separate records
+- **1-hour cache**: In-memory caching for mapping data to optimize performance
+
+### Use Cases
+- Programmatic product catalog transformation
+- Automated ShopWorks data import preparation
+- Size field mapping automation
+- Color name standardization for inventory systems
+- SKU variant detection for order processing
+
+---
+
+### Mapping Endpoints
+
+#### ⭐ RECOMMENDED: Import Format Endpoint (ShopWorks-Ready JSON)
+**Endpoint**: `GET /api/sanmar-shopworks/import-format`
+**Purpose**: Get ShopWorks-ready JSON with Size01-06 fields pre-mapped and CASE_PRICE included
+**Status**: ✅ Active (1-hour cache)
+**Cache**: 1 hour in-memory
+**Use Case**: Direct import into ShopWorks - no transformation needed
+
+**Query Parameters**:
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| styleNumber | string | Yes | Product style number | PC850 |
+| color | string | Yes | CATALOG_COLOR value | Cardinal |
+
+**Success Response (200 OK)**:
+```json
+[
+  {
+    "ID_Product": "PC850_XS",
+    "CATALOG_COLOR": "Team Cardinal",
+    "COLOR_NAME": "Team Cardinal",
+    "Description": "Port & Co Fan Favorite Fleece Crewneck Sweatshirt",
+    "Brand": "Port & Company",
+    "CASE_PRICE": 10.51,
+    "Size01": null,
+    "Size02": null,
+    "Size03": null,
+    "Size04": null,
+    "Size05": null,
+    "Size06": "XS"
+  },
+  {
+    "ID_Product": "PC850",
+    "CATALOG_COLOR": "Team Cardinal",
+    "COLOR_NAME": "Team Cardinal",
+    "Description": "Port & Co Fan Favorite Fleece Crewneck Sweatshirt",
+    "Brand": "Port & Company",
+    "CASE_PRICE": 10.51,
+    "Size01": "S",
+    "Size02": "M",
+    "Size03": "L",
+    "Size04": "XL",
+    "Size05": null,
+    "Size06": null
+  }
+]
+```
+
+**Key Features**:
+- Returns only exact style matches (PC850 returns 5 SKUs, not 22)
+- Size fields pre-mapped (Size01-Size06 already assigned, null = disabled)
+- Current CASE_PRICE from Sanmar_Bulk table
+- Handles all extended sizes (5XL, 6XL, LT, XLT, etc.)
+- Sorted by price (lowest to highest)
+- One API call gets everything you need
+
+**Example Request**:
+```bash
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/import-format?styleNumber=PC850&color=Cardinal"
+```
+
+**Complete Documentation**: See memory/SANMAR_TO_SHOPWORKS_GUIDE.md
+
+---
+
+#### 2. Detailed Mapping Endpoint (Advanced Use)
+**Endpoint**: `GET /api/sanmar-shopworks/mapping`
+**Purpose**: Complete product mapping with SKU pattern detection, size fields, and color normalization
+**Status**: ✅ Active (1-hour cache)
+**Cache**: 1 hour in-memory
+**Use Case**: Advanced automation requiring SKU pattern detection and metadata
+
+**Query Parameters**:
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| styleNumber | string | Yes | Product style number | PC61 |
+| includeInventory | boolean | No | Include inventory placeholder | true |
+| colors | string | No | Filter colors (comma-separated) | Forest,Black |
+
+**Success Response (200 OK)**:
+```json
+{
+  "styleNumber": "PC61",
+  "productTitle": "Port & Co Essential Tee. PC61",
+  "brand": "Port & Company",
+  "skuPattern": "single-sku",
+  "skuCount": 1,
+  "skus": [
+    {
+      "sku": "PC61",
+      "type": "base",
+      "fields": ["Size01", "Size02", "Size03", "Size04"],
+      "sizes": ["S", "M", "L", "XL"],
+      "suffix": null
+    }
+  ],
+  "colors": [
+    {
+      "displayName": "Forest Green",
+      "catalogName": "Forest Green",
+      "imageUrl": "https://cdnm.sanmar.com/swatch/gifs/port_darkgreen.gif"
+    }
+  ],
+  "mappingRules": {
+    "_2XL": "Size05",
+    "_2X": "Size05",
+    "_3XL": "Size06",
+    "_4XL": "Size06",
+    "_5XL": "Size06",
+    "_6XL": "Size06"
+  },
+  "cached": false
+}
+```
+
+**Example Usage**:
+```bash
+# Get complete mapping for PC61
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/mapping?styleNumber=PC61"
+
+# Get mapping with color filter
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/mapping?styleNumber=PC61&colors=Forest,Black"
+
+# Get mapping with inventory placeholder
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/mapping?styleNumber=PC61&includeInventory=true"
+```
+
+**SKU Pattern Types**:
+- **single-sku**: All sizes in one SKU (e.g., hoodies, jackets)
+- **standard-multi-sku**: Base + _2XL + _3XL pattern (e.g., PC54) - 3 SKUs
+- **extended-multi-sku**: Extended pattern with 4-6 SKUs (e.g., PC61)
+
+**Field Mapping Examples**:
+```javascript
+// Base SKU (PC61)
+{
+  "fields": ["Size01", "Size02", "Size03", "Size04"],
+  "sizes": ["S", "M", "L", "XL"]
+}
+
+// _2XL SKU (PC61_2XL) - ONLY suffix using Size05
+{
+  "fields": ["Size05"],
+  "sizes": ["2XL"]
+}
+
+// _3XL SKU (PC61_3XL) - Uses Size06
+{
+  "fields": ["Size06"],
+  "sizes": ["3XL"]
+}
+
+// _4XL SKU (PC61_4XL) - Reuses Size06 in separate record
+{
+  "fields": ["Size06"],
+  "sizes": ["4XL"]
+}
+```
+
+#### 3. Suffix Mapping Rules (Advanced Reference)
+**Endpoint**: `GET /api/sanmar-shopworks/suffix-mapping`
+**Purpose**: Reference for all suffix-to-field mappings and Size06 reuse pattern
+**Status**: ✅ Active (static data, no cache needed)
+**Use Case**: Advanced automation requiring suffix-to-field rule lookup
+
+**Success Response (200 OK)**:
+```json
+{
+  "mappingRules": {
+    "_2XL": "Size05",
+    "_2X": "Size05",
+    "_3XL": "Size06",
+    "_3X": "Size06",
+    "_4XL": "Size06",
+    "_4X": "Size06",
+    "_5XL": "Size06",
+    "_5X": "Size06",
+    "_6XL": "Size06",
+    "_6X": "Size06",
+    "_XXL": "Size06",
+    "_OSFA": "Size06",
+    "_XS": "Size06",
+    "_LT": "Size06",
+    "_XLT": "Size06",
+    "_2XLT": "Size06",
+    "_3XLT": "Size06",
+    "_4XLT": "Size06",
+    "_YXS": "Size06",
+    "_YS": "Size06",
+    "_YM": "Size06",
+    "_YL": "Size06",
+    "_YXL": "Size06"
+  },
+  "notes": {
+    "Size05Exception": "_2XL and _2X are the ONLY suffixes using Size05",
+    "Size06Reuse": "All other suffixes use Size06 (field reuse pattern)",
+    "Examples": {
+      "_2XL": "Size05 - Standard 2XL",
+      "_XXL": "Size06 - Womens 2XL (different from _2XL!)",
+      "_3XL": "Size06 - First use of Size06",
+      "_4XL": "Size06 - Reuses Size06 field",
+      "_OSFA": "Size06 - One size fits all"
+    }
+  }
+}
+```
+
+**Example Usage**:
+```bash
+# Get all suffix mapping rules
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/suffix-mapping"
+```
+
+**Key Concepts**:
+- **Size05 Exception**: ONLY _2XL and _2X use Size05
+- **Size06 Reuse**: All other suffixes (23 total) use Size06 field
+- **Field Reuse Pattern**: Multiple SKUs can share Size06 by creating separate records
+- **Youth Sizes**: _YXS, _YS, _YM, _YL, _YXL all use Size06
+- **Tall Sizes**: _LT, _XLT, _2XLT, _3XLT, _4XLT all use Size06
+
+#### 4. Color Mapping (Advanced Reference)
+**Endpoint**: `GET /api/sanmar-shopworks/color-mapping`
+**Purpose**: Color name normalization (display names vs catalog names for API queries)
+**Status**: ✅ Active (1-hour cache)
+**Cache**: 1 hour in-memory
+**Use Case**: Advanced automation requiring COLOR_NAME to CATALOG_COLOR mapping
+
+**Query Parameters**:
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| styleNumber | string | Yes | Product style number | PC61 |
+
+**Success Response (200 OK)**:
+```json
+{
+  "styleNumber": "PC61",
+  "colorCount": 62,
+  "colors": [
+    {
+      "displayName": "Forest Green",
+      "catalogName": "Forest Green",
+      "imageUrl": "https://cdnm.sanmar.com/swatch/gifs/port_darkgreen.gif"
+    },
+    {
+      "displayName": "Jet Black",
+      "catalogName": "Jet Black",
+      "imageUrl": "https://cdnm.sanmar.com/swatch/gifs/port_black.gif"
+    }
+  ],
+  "usage": {
+    "displayName": "Use for UI display",
+    "catalogName": "Use for API queries and ShopWorks imports"
+  }
+}
+```
+
+**Example Usage**:
+```bash
+# Get all colors for PC61
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/color-mapping?styleNumber=PC61"
+
+# Get all colors for CT104670
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/color-mapping?styleNumber=CT104670"
+```
+
+**Color Field Distinction**:
+- **displayName (COLOR_NAME)**: User-friendly display name for UI
+- **catalogName (CATALOG_COLOR)**: Exact name for ShopWorks catalog matching
+- **imageUrl (COLOR_SQUARE_IMAGE)**: Color swatch image URL
+
+**Use Cases**:
+- Building product color selectors
+- Normalizing color names for inventory queries
+- Generating ShopWorks import files
+- Color swatch image display
+
+---
+
+### Integration Examples
+
+#### Example 1: Detect SKU Pattern
+```javascript
+// Check if product has multiple SKUs
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/mapping?styleNumber=PC54'
+);
+const data = await response.json();
+
+console.log(`SKU Pattern: ${data.skuPattern}`);
+console.log(`SKU Count: ${data.skuCount}`);
+console.log(`SKUs: ${data.skus.map(s => s.sku).join(', ')}`);
+
+// Output:
+// SKU Pattern: standard-multi-sku
+// SKU Count: 3
+// SKUs: PC54, PC54_2XL, PC54_3XL
+```
+
+#### Example 2: Map Suffix to ShopWorks Field
+```javascript
+// Get field mapping for a specific suffix
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/suffix-mapping'
+);
+const data = await response.json();
+
+const suffix = '_4XL';
+const field = data.mappingRules[suffix];
+console.log(`${suffix} → ${field}`);
+
+// Output: _4XL → Size06
+```
+
+#### Example 3: Get Color for ShopWorks Import
+```javascript
+// Get catalog color name for ShopWorks
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/color-mapping?styleNumber=PC61'
+);
+const data = await response.json();
+
+// Find specific color
+const color = data.colors.find(c => c.displayName === 'Forest Green');
+console.log(`Use for ShopWorks: ${color.catalogName}`);
+
+// Output: Use for ShopWorks: Forest Green
+```
+
+---
+
+### API Endpoint Summary
+
+| Endpoint | Method | Purpose | Status | Cache | Priority |
+|----------|--------|---------|--------|-------|----------|
+| ⭐ `/api/sanmar-shopworks/import-format` | GET | ShopWorks-ready JSON | ✅ Active | 1 hour | **RECOMMENDED** |
+| `/api/sanmar-shopworks/mapping` | GET | Complete product mapping | ✅ Active | 1 hour | Advanced |
+| `/api/sanmar-shopworks/suffix-mapping` | GET | Suffix-to-field rules | ✅ Active | None (static) | Advanced |
+| `/api/sanmar-shopworks/color-mapping` | GET | Color normalization | ✅ Active | 1 hour | Advanced |
+
+**Total Endpoints**: 4
+**Recommended Endpoint**: Use `/import-format` for direct ShopWorks imports (no transformation needed)
+**Documentation**: See memory/SANMAR_TO_SHOPWORKS_GUIDE.md for complete import guide
+
+---
+
 **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
-**Documentation Version**: 2.4.0
-**Last Updated**: 2025-11-03
+**Documentation Version**: 2.5.0
+**Last Updated**: 2025-11-09
 **Module**: Products & Inventory APIs

@@ -849,6 +849,43 @@ Transform Sanmar vendor products correctly for ShopWorks/ManageOrders inventory 
 
 **Complete Guide:** See [memory/SANMAR_TO_SHOPWORKS_GUIDE.md](memory/SANMAR_TO_SHOPWORKS_GUIDE.md) for full documentation
 
+### 🔌 ShopWorks Import API (Production Ready)
+
+**Get ShopWorks-ready product data in one API call:**
+
+```javascript
+// Get complete ShopWorks import format for any Sanmar product
+const response = await fetch(
+  'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/import-format?styleNumber=PC850&color=Cardinal'
+);
+const skus = await response.json();
+
+// Response includes ShopWorks-ready JSON with Size01-06 fields pre-mapped
+skus.forEach(sku => {
+  console.log(`SKU: ${sku.ID_Product}`);           // "PC850" or "PC850_2XL"
+  console.log(`Color: ${sku.CATALOG_COLOR}`);      // "Team Cardinal"
+  console.log(`Price: $${sku.CASE_PRICE}`);        // 10.51
+  console.log(`Size01: ${sku.Size01}`);            // "S" or null
+  console.log(`Size05: ${sku.Size05}`);            // "2XL" or null
+});
+```
+
+**Key Benefits:**
+- ✅ Returns only exact style matches (PC850 returns 5 SKUs, not 22)
+- ✅ Size fields pre-mapped (Size01-Size06 already assigned)
+- ✅ Current CASE_PRICE from Sanmar_Bulk table
+- ✅ Handles all extended sizes (5XL, 6XL, LT, XLT, etc.)
+- ✅ Sorted by price (lowest to highest)
+- ✅ One API call gets everything needed for ShopWorks import
+
+**Use Cases:**
+- Import Sanmar products into ShopWorks inventory
+- Get size-specific pricing for quotes
+- Check available sizes for any product
+- Automated product catalog imports
+
+**Complete Guide:** See [memory/SANMAR_TO_SHOPWORKS_GUIDE.md](memory/SANMAR_TO_SHOPWORKS_GUIDE.md)
+
 ### Quick Reference: Two SKU Patterns
 
 #### Pattern A: Multi-SKU (T-Shirts, Polos)

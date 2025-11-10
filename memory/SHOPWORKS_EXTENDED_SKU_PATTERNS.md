@@ -91,6 +91,225 @@ class PC61InventoryManager {
 
 ---
 
+## 🔌 Programmatic API Access
+
+### ⭐ RECOMMENDED: Import Format API
+
+**The simplest approach**: Get ShopWorks-ready JSON with Size01-06 fields pre-mapped and CASE_PRICE included.
+
+**Endpoint**: `GET /api/sanmar-shopworks/import-format`
+**Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+**Cache**: 1 hour in-memory
+**Status**: ✅ Production-ready
+
+**Example:**
+```javascript
+// Get all SKUs for a style + color with Size01-06 pre-mapped
+const response = await fetch(
+    'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar-shopworks/import-format?styleNumber=PC61&color=Forest'
+);
+const skus = await response.json();
+
+// Response includes all SKU data ready for ShopWorks import
+console.log(skus);
+// [
+//   { ID_Product: "PC61", CATALOG_COLOR: "Forest", Size01: "S", Size02: "M", ... },
+//   { ID_Product: "PC61_2X", CATALOG_COLOR: "Forest", Size05: "2XL", ... },
+//   { ID_Product: "PC61_3X", CATALOG_COLOR: "Forest", Size06: "3XL", ... }
+// ]
+```
+
+**See**: [SANMAR_TO_SHOPWORKS_GUIDE.md](SANMAR_TO_SHOPWORKS_GUIDE.md#-the-main-endpoint) for complete import format documentation.
+
+---
+
+### Advanced: Suffix Mapping API (For Reference)
+
+**For advanced use cases**: Query suffix-to-field mapping rules programmatically.
+
+**Endpoint**: `GET /api/sanmar-shopworks/suffix-mapping`
+**Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+**Cache**: 1 hour in-memory
+**Status**: ✅ Production-ready
+
+### API Response Structure
+
+```json
+{
+  "mappingRules": {
+    "_2XL": "Size05",
+    "_2X": "Size05",
+    "_3XL": "Size06",
+    "_3X": "Size06",
+    "_4XL": "Size06",
+    "_4X": "Size06",
+    "_5XL": "Size06",
+    "_5X": "Size06",
+    "_6XL": "Size06",
+    "_6X": "Size06",
+    "_XXL": "Size06",
+    "_OSFA": "Size06",
+    "_XS": "Size06",
+    "_LT": "Size06",
+    "_XLT": "Size06",
+    "_2XLT": "Size06",
+    "_3XLT": "Size06",
+    "_4XLT": "Size06",
+    "_YXS": "Size06",
+    "_YS": "Size06",
+    "_YM": "Size06",
+    "_YL": "Size06",
+    "_YXL": "Size06"
+  },
+  "notes": {
+    "Size05Exception": "_2XL and _2X are the ONLY suffixes using Size05",
+    "Size06Reuse": "All other suffixes use Size06 (field reuse pattern)",
+    "Examples": {
+      "_2XL": "Size05 - Standard 2XL",
+      "_XXL": "Size06 - Womens 2XL (different from _2XL!)",
+      "_3XL": "Size06 - First use of Size06",
+      "_4XL": "Size06 - Reuses Size06 field",
+      "_OSFA": "Size06 - One size fits all"
+    }
+  }
+}
+```
+
+### Integration Example
+
+```javascript
+class SuffixMapper {
+    constructor() {
+        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.mappingCache = null;
+    }
+
+    async getSuffixMapping() {
+        // Use cached mapping if available
+        if (this.mappingCache) {
+            return this.mappingCache;
+        }
+
+        const response = await fetch(`${this.apiBase}/api/sanmar-shopworks/suffix-mapping`);
+        const data = await response.json();
+
+        // Cache the mapping rules
+        this.mappingCache = data.mappingRules;
+        return this.mappingCache;
+    }
+
+    async getFieldForSuffix(suffix) {
+        const mappingRules = await this.getSuffixMapping();
+
+        // Return the field for the suffix, or null for base SKU
+        return mappingRules[suffix] || null;
+    }
+
+    async validateSKUPattern(sku) {
+        const parts = sku.split('_');
+
+        if (parts.length === 1) {
+            return {
+                isValid: true,
+                field: 'Size01-04',
+                type: 'Base SKU'
+            };
+        }
+
+        const suffix = '_' + parts[1];
+        const field = await this.getFieldForSuffix(suffix);
+
+        if (!field) {
+            return {
+                isValid: false,
+                error: `Unknown suffix: ${suffix}`
+            };
+        }
+
+        return {
+            isValid: true,
+            field: field,
+            type: 'Extended SKU',
+            suffix: suffix
+        };
+    }
+}
+
+// Usage examples
+const mapper = new SuffixMapper();
+
+// Example 1: Get mapping for specific suffix
+const field = await mapper.getFieldForSuffix('_4XL');
+console.log('_4XL uses:', field);  // "Size06"
+
+// Example 2: Validate SKU pattern
+const validation = await mapper.validateSKUPattern('PC61_2XL');
+console.log(validation);
+// { isValid: true, field: "Size05", type: "Extended SKU", suffix: "_2XL" }
+
+// Example 3: Build inventory queries dynamically
+async function buildInventoryQuery(sku, catalogColor) {
+    const validation = await mapper.validateSKUPattern(sku);
+
+    if (!validation.isValid) {
+        throw new Error(`Invalid SKU: ${sku}`);
+    }
+
+    const query = {
+        PartNumber: sku,
+        Color: catalogColor,
+        expectedField: validation.field,
+        skuType: validation.type
+    };
+
+    console.log('Query for', sku, ':', query);
+    // Query for PC61_4XL : {
+    //   PartNumber: "PC61_4XL",
+    //   Color: "Forest",
+    //   expectedField: "Size06",
+    //   skuType: "Extended SKU"
+    // }
+
+    return query;
+}
+
+await buildInventoryQuery('PC61_4XL', 'Forest');
+```
+
+### API Benefits
+
+| Feature | Manual Reference | API Access |
+|---------|-----------------|------------|
+| **Always Current** | Must update docs | Automatic via deployment |
+| **Integration** | Copy/paste mapping table | Programmatic access |
+| **Validation** | Manual checks | Built-in validation |
+| **Cache** | N/A | 1-hour server-side cache |
+| **Error Handling** | Manual | Structured response |
+| **Documentation** | Separate files | Built into API response |
+
+### Advanced: Complete Mapping API (For Pattern Detection)
+
+For advanced use cases requiring SKU pattern detection and metadata, use:
+
+```javascript
+// Get complete mapping with pattern detection for a product
+const response = await fetch(
+    `${apiBase}/api/sanmar-shopworks/mapping?styleNumber=PC61`
+);
+const data = await response.json();
+
+console.log('SKU Pattern:', data.skuPattern);       // "extended-multi-sku"
+console.log('SKU Count:', data.skuCount);           // 6
+console.log('All SKUs:', data.skus);                // Array of SKU mappings
+console.log('Suffix Rules:', data.mappingRules);   // Complete mapping table
+```
+
+**Note**: For most use cases, the `/import-format` endpoint (above) is simpler and recommended.
+
+**See also**: [SANMAR_TO_SHOPWORKS_GUIDE.md](SANMAR_TO_SHOPWORKS_GUIDE.md#-the-main-endpoint) for complete import format guide.
+
+---
+
 ## 📊 Universal Suffix-to-Column Mapping Rules
 
 ### Complete Suffix Mapping Table (From CSV Analysis)

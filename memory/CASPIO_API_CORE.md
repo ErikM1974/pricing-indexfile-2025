@@ -16,12 +16,12 @@
 **Version**: 2.0
 **Base URL**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api`
 **Authentication**: None (Public API)
-**Total Active Endpoints**: 60 (includes 4 JDS Industries endpoints)
+**Total Active Endpoints**: 63 (includes 4 JDS Industries endpoints + 3 Sanmar-ShopWorks mapping endpoints)
 
 ## 📋 Quick Reference Table
 | Module | Documentation | Primary Resources | Status |
 |--------|--------------|-------------------|--------|
-| Products | [products-api.md](api/products-api.md) | products, inventory, colors | ✅ Active |
+| Products | [products-api.md](api/products-api.md) | products, inventory, colors, **Sanmar-ShopWorks mapping** | ✅ Active |
 | Cart & Pricing | [cart-pricing-api.md](api/cart-pricing-api.md) | cart, pricing, tiers | ✅ Active |
 | Orders & Quotes | [orders-quotes-api.md](api/orders-quotes-api.md) | orders, quotes, sessions | ✅ Active |
 | JDS Industries | [jds-industries-api.md](api/jds-industries-api.md) | engravable products (mugs, tumblers) | ✅ Active |
@@ -146,10 +146,10 @@ When implementing against this API:
 ## 💬 Inter-Application Communication
 
 ### 🔄 Version Control & Tracking
-- **Current Version**: 2.3.0
-- **Last Updated By**: API Provider Claude at 2025-09-04T11:30:00
-- **Last Checked by Consumer**: 2025-09-04T11:30:00
-- **Last Checked by Provider**: 2025-08-30T17:00:00
+- **Current Version**: 2.4.0
+- **Last Updated By**: API Provider Claude at 2025-11-09T14:30:00
+- **Last Checked by Consumer**: 2025-11-09T14:30:00
+- **Last Checked by Provider**: 2025-11-09T14:30:00
 
 ### 📨 Communication Log
 
@@ -166,6 +166,15 @@ Use these prefixes for clear communication:
 #### Active Conversations
 *[Messages requiring response or acknowledgment - move to History when resolved]*
 
+**2025-11-09 14:30** - ✅ **IMPLEMENTED** from API Provider:
+Added four Sanmar-ShopWorks mapping endpoints:
+- ⭐ `GET /api/sanmar-shopworks/import-format` - **RECOMMENDED** - ShopWorks-ready JSON with Size01-06 pre-mapped (simplest approach)
+- `GET /api/sanmar-shopworks/mapping` - Complete product mapping with SKU pattern detection (advanced use)
+- `GET /api/sanmar-shopworks/suffix-mapping` - Suffix mapping rules (_2XL/_2X use Size05, all others use Size06)
+- `GET /api/sanmar-shopworks/color-mapping` - Color normalization (COLOR_NAME vs CATALOG_COLOR)
+
+All endpoints deployed to production with 1-hour in-memory caching. The `/import-format` endpoint is the recommended approach for direct ShopWorks imports. See [products-api.md](api/products-api.md#-sanmar-to-shopworks-mapping) for complete documentation.
+
 **2025-09-04 11:30** - ✅ **IMPLEMENTED** from API Provider:
 Added two new endpoints for Additional Logo pricing:
 - `GET /api/pricing-bundle?method=EMB-AL` - Embroidery additional logo pricing (ItemType='AL')
@@ -176,6 +185,7 @@ Both endpoints are deployed to production and tested on Heroku. Postman collecti
 ### 🤝 Recent Updates Requiring Acknowledgment
 *[Check off when acknowledged/implemented]*
 
+- [x] Provider: Sanmar-ShopWorks mapping endpoints - PRODUCTION READY ✅ 2025-11-09
 - [x] Provider: DTG Product Bundle endpoint (v1.1.1) DEPLOYED & TESTED - Ready for DTG page integration ✅ 2025-08-30
 - [x] Provider: EMB-AL and CAP-AL endpoints for additional logo pricing - PRODUCTION READY ✅ 2025-09-04
 
@@ -234,5 +244,5 @@ If both Claudes update simultaneously:
 - [Order & Quote APIs](api/orders-quotes-api.md) - Order processing, quote management
 - [Utility APIs](api/utility-api.md) - Transfers, production, utilities, health checks
 
-**Last Updated**: September 28, 2025
+**Last Updated**: November 9, 2025
 **Documentation Type**: Core API Reference with Module Links

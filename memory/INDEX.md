@@ -192,10 +192,15 @@ This documentation has been reorganized into modular components for better perfo
 4. Reference implementation examples for your quote builder type
 
 ### "I need to add a Sanmar product to ShopWorks/ManageOrders inventory"
+
+**🔌 Programmatic Access Available**: Use the [Sanmar-ShopWorks Import Format API](./SANMAR_TO_SHOPWORKS_GUIDE.md#-the-main-endpoint) for automated workflows:
+- `GET /api/sanmar-shopworks/import-format?styleNumber=PC850&color=Cardinal` - Get ShopWorks-ready JSON with all SKU data
+
+**Manual Workflow**:
 1. **Determine SKU pattern** - Check **[PRODUCT_SKU_PATTERNS.md](./PRODUCT_SKU_PATTERNS.md)**
    - T-shirts/Polos → Multi-SKU (PC54, PC54_2X, PC54_3X)
    - Hoodies/Sweatshirts → Single-SKU (PC90H only)
-2. **Get CATALOG_COLOR format** - Read **[SANMAR_TO_SHOPWORKS_GUIDE.md](./SANMAR_TO_SHOPWORKS_GUIDE.md)** § "Color Transformation"
+2. **Get CATALOG_COLOR format** - Read **[SANMAR_TO_SHOPWORKS_GUIDE.md](./SANMAR_TO_SHOPWORKS_GUIDE.md)** § "Key Fields Explained"
    - Must use CATALOG_COLOR (not COLOR_NAME) for ShopWorks
    - Example: "Athletic Heather" → "Athletic Hthr"
 3. **Create ShopWorks entries:**
