@@ -443,6 +443,32 @@
             text-align: center;
         }
 
+        /* Size Stock Indicator */
+        .size-stock-indicator {
+            display: block;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            text-align: center;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .size-stock-indicator.in-stock {
+            color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .size-stock-indicator.low-stock {
+            color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .size-stock-indicator.out-of-stock {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+
         /* Pricing Display */
         .pricing-summary {
             background: linear-gradient(135deg, #fef3f0, #fff);
@@ -826,7 +852,7 @@
                 <!-- Product Images Preview -->
                 <div class="card" style="margin-top: 1rem;">
                     <h3>Product Preview</h3>
-                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; min-height: 200px;">
                         <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
                             <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
                             <p style="font-size: 0.875rem;">Select a color to see product images</p>
@@ -983,6 +1009,7 @@
             selectedLocation: null,
             pricingData: null,
             uploadedFiles: [],
+            inventoryCache: {},           // Cache inventory API responses to prevent rate limiting
             colors: [
                 { name: 'Jet Black', catalogColor: 'Jet Black', hex: '#000000' },
                 { name: 'White', catalogColor: 'White', hex: '#FFFFFF' },
@@ -1072,7 +1099,6 @@
                 // Render UI
                 renderColors();
                 renderLocations();
-                renderSizes();
 
                 showLoading(false);
             } catch (error) {
@@ -1111,15 +1137,65 @@
                 `;
             }).join('');
 
-            // Load inventory for all colors
-            state.colors.forEach(color => {
-                loadInventory(color.catalogColor);
-            });
+            // Populate badges after DOM is updated (deferred by one tick)
+            // This ensures badge elements exist before updateInventoryBadge() tries to find them
+            setTimeout(() => {
+                state.colors.forEach(color => {
+                    const cached = state.inventoryCache[color.catalogColor];
+                    if (cached) {
+                        // Update badge from cache
+                        updateInventoryBadge(color.catalogColor, cached.total);
+                    } else {
+                        // Only fetch from API if not cached (initial load)
+                        loadInventory(color.catalogColor);
+                    }
+                });
+            }, 0);
+        }
+
+        // Helper function to update inventory badge display
+        function updateInventoryBadge(catalogColor, total) {
+            const badgeId = `stock-${catalogColor}`;
+            const badge = document.getElementById(badgeId);
+
+            if (!badge) {
+                console.error(`[3-Day Tees] Badge not found for ${catalogColor}`);
+                return;
+            }
+
+            // Adjusted thresholds for local warehouse inventory
+            if (total > 25) {
+                badge.className = 'stock-badge in-stock';
+                badge.textContent = 'In Stock';
+            } else if (total > 0) {
+                badge.className = 'stock-badge low-stock';
+                badge.textContent = 'Low Stock';
+            } else {
+                badge.className = 'stock-badge out-of-stock';
+                badge.textContent = 'Out of Stock';
+            }
         }
 
         // Load inventory for a color from local warehouse (ManageOrders)
         async function loadInventory(catalogColor) {
             try {
+                // Check cache first to avoid rate limiting
+                if (state.inventoryCache[catalogColor]) {
+                    console.log(`[3-Day Tees] Using cached inventory for ${catalogColor}`);
+                    const cached = state.inventoryCache[catalogColor];
+                    updateInventoryBadge(catalogColor, cached.total);
+                    return;
+                }
+
+                // DEBUG: Log the API URLs being called
+                const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels';
+                const url1 = `${apiBase}?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`;
+                const url2 = `${apiBase}?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`;
+                const url3 = `${apiBase}?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`;
+
+                console.log(`[DEBUG] Loading inventory for color: "${catalogColor}"`);
+                console.log(`[DEBUG] API URLs:`, { url1, url2, url3 });
+
                 // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
                 // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
                 const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
@@ -1128,10 +1204,37 @@
                     fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
                 ]);
 
+                // DEBUG: Log HTTP status codes
+                console.log(`[DEBUG] HTTP Responses:`, {
+                    PC54: { status: standardRes.status, ok: standardRes.ok },
+                    PC54_2X: { status: twoXLRes.status, ok: twoXLRes.ok },
+                    PC54_3X: { status: threeXLRes.status, ok: threeXLRes.ok }
+                });
+
                 // Parse all responses
                 const standardData = await standardRes.json();
                 const twoXLData = await twoXLRes.json();
                 const threeXLData = await threeXLRes.json();
+
+                // DEBUG: Log parsed data
+                console.log(`[DEBUG] Parsed API Data:`, {
+                    PC54: standardData,
+                    PC54_2X: twoXLData,
+                    PC54_3X: threeXLData
+                });
+
+                // DEBUG: Show what we got from each API call
+                console.log(`[DEBUG INVENTORY] ${catalogColor} - Raw response data:`, {
+                    PC54_result_length: standardData.result?.length,
+                    PC54_has_Size01: standardData.result?.[0]?.Size01,
+                    PC54_has_Size02: standardData.result?.[0]?.Size02,
+                    PC54_has_Size03: standardData.result?.[0]?.Size03,
+                    PC54_has_Size04: standardData.result?.[0]?.Size04,
+                    PC54_2X_result_length: twoXLData.result?.length,
+                    PC54_2X_has_Size05: twoXLData.result?.[0]?.Size05,
+                    PC54_3X_result_length: threeXLData.result?.length,
+                    PC54_3X_has_Size06: threeXLData.result?.[0]?.Size06
+                });
 
                 let total = 0;
 
@@ -1152,19 +1255,21 @@
                     total += threeXLData.result[0].Size06 || 0;
                 }
 
-                const badge = document.getElementById(`stock-${catalogColor}`);
+                console.log(`[DEBUG INVENTORY] ${catalogColor} - CALCULATED TOTAL: ${total} units`);
+                console.log(`[DEBUG INVENTORY] ${catalogColor} - Badge decision: ${total > 25 ? 'IN STOCK' : total > 0 ? 'LOW STOCK' : 'OUT OF STOCK'}`);
 
-                // Adjusted thresholds for local warehouse inventory
-                if (total > 25) {
-                    badge.className = 'stock-badge in-stock';
-                    badge.textContent = 'In Stock';
-                } else if (total > 0) {
-                    badge.className = 'stock-badge low-stock';
-                    badge.textContent = 'Low Stock';
-                } else {
-                    badge.className = 'stock-badge out-of-stock';
-                    badge.textContent = 'Out of Stock';
-                }
+                // Store in cache to prevent rate limiting on subsequent calls
+                state.inventoryCache[catalogColor] = {
+                    total: total,
+                    standardData: standardData,
+                    twoXLData: twoXLData,
+                    threeXLData: threeXLData,
+                    timestamp: Date.now()
+                };
+                console.log(`[3-Day Tees] Cached inventory for ${catalogColor}`);
+
+                // Update badge using helper function
+                updateInventoryBadge(catalogColor, total);
 
                 console.log(`[3-Day Tees] Multi-SKU inventory for ${catalogColor}:`, {
                     PC54: standardData.result?.[0] || 'No data',
@@ -1174,27 +1279,55 @@
                 });
             } catch (error) {
                 console.error('[3-Day Tees] Multi-SKU inventory load error:', catalogColor, error);
-                const badge = document.getElementById(`stock-${catalogColor}`);
-                badge.className = 'stock-badge';
-                badge.textContent = 'Check Stock';
+                const badge = document.getElementById(`stock-${catalogColor.replace(/\s+/g, '-')}`);
+
+                // Differentiate between network errors and API errors
+                if (error.message.includes('fetch') || error.message.includes('network') || !navigator.onLine) {
+                    badge.className = 'stock-badge';
+                    badge.textContent = 'Network Error';
+                    badge.title = 'Unable to connect to inventory system. Please check your internet connection and try again.';
+                } else if (error.name === 'SyntaxError') {
+                    // JSON parse error - API returned invalid data
+                    badge.className = 'stock-badge';
+                    badge.textContent = 'API Error';
+                    badge.title = 'Inventory system returned invalid data. Please try again or contact support.';
+                } else {
+                    // Generic error
+                    badge.className = 'stock-badge';
+                    badge.textContent = 'Check Stock';
+                    badge.title = 'Unable to load inventory. Click the color card to try again.';
+                }
             }
         }
 
         // Load size-specific inventory for selected color from local warehouse
         async function loadSizeInventory(catalogColor) {
             try {
-                // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
-                // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
-                const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
-                    fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
-                ]);
+                // Check cache first to avoid rate limiting
+                let standardData, twoXLData, threeXLData;
 
-                // Parse all responses
-                const standardData = await standardRes.json();
-                const twoXLData = await twoXLRes.json();
-                const threeXLData = await threeXLRes.json();
+                if (state.inventoryCache[catalogColor]) {
+                    console.log(`[3-Day Tees] Using cached size inventory for ${catalogColor}`);
+                    const cached = state.inventoryCache[catalogColor];
+
+                    // Use cached data (property names match cache structure)
+                    standardData = cached.standardData || { result: [] };
+                    twoXLData = cached.twoXLData || { result: [] };
+                    threeXLData = cached.threeXLData || { result: [] };
+                } else {
+                    // Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+                    // catalogColor is already in correct format for ManageOrders API (e.g., "Ath Heather", "Dk Hthr Grey")
+                    const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                        fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                        fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                        fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+                    ]);
+
+                    // Parse all responses
+                    standardData = await standardRes.json();
+                    twoXLData = await twoXLRes.json();
+                    threeXLData = await threeXLRes.json();
+                }
 
                 // Build inventory by size
                 const sizeInventory = {};
@@ -1228,37 +1361,58 @@
                     sizeInventory['3XL'] = 0;
                 }
 
-                // Update each size badge and input max attribute
+                // Update each size input with max constraint and enforcement
                 state.sizes.forEach(size => {
                     const stock = sizeInventory[size] || 0;
-                    const badge = document.getElementById(`stock-size-${size}`);
-                    const input = document.getElementById(`size-${size}`);
+                    const input = document.getElementById(`qty-${catalogColor}-${size}`);
+                    const stockIndicator = document.getElementById(`stock-qty-${catalogColor}-${size}`);
 
-                    if (badge) {
+                    if (input) {
                         if (stock === 0) {
-                            badge.className = 'size-stock-badge out';
-                            badge.textContent = 'Out of Stock';
-                            if (input) {
-                                input.disabled = true;
-                                input.value = 0;
+                            // Out of stock: disable input
+                            input.disabled = true;
+                            input.value = 0;
+                            input.max = 0;
+
+                            // Update stock indicator
+                            if (stockIndicator) {
+                                stockIndicator.textContent = '0 units';
+                                stockIndicator.className = 'size-stock-indicator out-of-stock';
                             }
                         } else {
-                            // Always show exact inventory count for non-zero stock
-                            badge.textContent = `${stock} available`;
+                            // In stock: set max and add enforcement
+                            input.disabled = false;
+                            input.max = stock;
 
-                            // Determine badge color based on stock level
-                            if (stock < 10) {
-                                badge.className = 'size-stock-badge critical';
-                            } else if (stock < 25) {
-                                badge.className = 'size-stock-badge low';
-                            } else {
-                                badge.className = 'size-stock-badge adequate';
+                            // Update stock indicator
+                            if (stockIndicator) {
+                                stockIndicator.textContent = `Available: ${stock}`;
+                                if (stock <= 10) {
+                                    stockIndicator.className = 'size-stock-indicator low-stock';
+                                } else {
+                                    stockIndicator.className = 'size-stock-indicator in-stock';
+                                }
                             }
 
-                            if (input) {
-                                input.disabled = false;
-                                input.max = stock;
-                            }
+                            // Add input event listener to enforce max constraint
+                            // Remove existing listener to avoid duplicates
+                            input.removeEventListener('input', input._inventoryEnforcer);
+
+                            // Create new enforcer function
+                            input._inventoryEnforcer = function() {
+                                const maxStock = parseInt(this.max);
+                                const currentValue = parseInt(this.value) || 0;
+
+                                if (currentValue > maxStock) {
+                                    alert(`Only ${maxStock} units of size ${size} available in ${catalogColor}.\n\nYour quantity has been adjusted to ${maxStock}.`);
+                                    this.value = maxStock;
+                                    // Trigger the onchange handler to update pricing
+                                    updateSizeQuantity(catalogColor, size, maxStock);
+                                }
+                            };
+
+                            // Attach the enforcer
+                            input.addEventListener('input', input._inventoryEnforcer);
                         }
                     }
                 });
@@ -1271,6 +1425,27 @@
                 });
             } catch (error) {
                 console.error('[3-Day Tees] Size inventory load error:', catalogColor, error);
+
+                // Provide specific error feedback
+                let errorMessage = 'Unable to load size-specific inventory.';
+
+                if (error.message.includes('fetch') || error.message.includes('network') || !navigator.onLine) {
+                    errorMessage = 'Network error: Unable to connect to inventory system. Please check your internet connection and try again.';
+                } else if (error.name === 'SyntaxError') {
+                    errorMessage = 'API error: Inventory system returned invalid data. Please try again or contact support.';
+                }
+
+                // Disable all size inputs for this color as a safety measure
+                state.sizes.forEach(size => {
+                    const input = document.getElementById(`qty-${catalogColor}-${size}`);
+                    if (input) {
+                        input.disabled = true;
+                        input.value = 0;
+                        input.title = errorMessage;
+                    }
+                });
+
+                console.warn(`[3-Day Tees] ${errorMessage}`);
             }
         }
 
@@ -1310,6 +1485,8 @@
                 });
 
                 console.log('[3-Day Tees] Color added:', catalogColor);
+
+                // Inventory will be loaded by renderColors() below (prevents race condition)
             } else {
                 // Remove color
                 state.selectedColors.splice(index, 1);
@@ -1321,7 +1498,86 @@
             // Update UI
             renderColors();
             renderSelectedColors();
-            updatePricing();
+            updateProductImages();
+            recalculateAllPricing();
+
+            // Load size-specific inventory for this color (if it was just added)
+            if (state.selectedColors.includes(catalogColor)) {
+                requestAnimationFrame(() => loadSizeInventory(catalogColor));
+            }
+        }
+
+        // Update product images based on selected colors
+        function updateProductImages() {
+            const container = document.getElementById('productImages');
+            if (!container) return;
+
+            if (state.selectedColors.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary); grid-column: 1 / -1;">
+                        <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p style="font-size: 0.875rem;">Select a color to see product images</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show images for all selected colors
+            const imageHTML = state.selectedColors.map(catalogColor => {
+                const config = state.colorConfigs[catalogColor];
+                const colorData = state.colors.find(c => c.catalogColor === catalogColor);
+
+                const images = [];
+
+                // Front Model
+                if (config.images.frontModel) {
+                    images.push(`
+                        <div style="text-align: center;">
+                            <img src="${config.images.frontModel}" alt="${config.displayColor} - Front"
+                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Front</p>
+                        </div>
+                    `);
+                }
+
+                // Back Model
+                if (config.images.backModel) {
+                    images.push(`
+                        <div style="text-align: center;">
+                            <img src="${config.images.backModel}" alt="${config.displayColor} - Back"
+                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Back</p>
+                        </div>
+                    `);
+                }
+
+                // Front Flat
+                if (config.images.frontFlat) {
+                    images.push(`
+                        <div style="text-align: center;">
+                            <img src="${config.images.frontFlat}" alt="${config.displayColor} - Flat"
+                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Flat</p>
+                        </div>
+                    `);
+                }
+
+                // If no images available, show placeholder
+                if (images.length === 0) {
+                    return `
+                        <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">
+                            <i class="fas fa-tshirt" style="font-size: 2rem; opacity: 0.3;"></i>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">${config.displayColor}</p>
+                            <p style="font-size: 0.75rem;">Images not available</p>
+                        </div>
+                    `;
+                }
+
+                return images.join('');
+            }).join('');
+
+            container.innerHTML = imageHTML;
+            console.log('[3-Day Tees] Product images updated for colors:', state.selectedColors);
         }
 
         // Render selected colors list with size grids
@@ -1365,6 +1621,7 @@
                                            min="0"
                                            value="0"
                                            onchange="updateSizeQuantity('${catalogColor}', '${size}', this.value)">
+                                    <span id="stock-qty-${catalogColor}-${size}" class="size-stock-indicator">Checking...</span>
                                     <div class="size-price" id="price-${catalogColor}-${size}">$0.00</div>
                                 </div>
                             `).join('')}
@@ -1381,7 +1638,7 @@
 
             // Load size-specific inventory for all selected colors
             state.selectedColors.forEach(catalogColor => {
-                loadSizeInventory(catalogColor);
+                requestAnimationFrame(() => loadSizeInventory(catalogColor));
             });
         }
 
@@ -1397,7 +1654,7 @@
                 // Update UI
                 renderColors();
                 renderSelectedColors();
-                updatePricing();
+                recalculateAllPricing();
             }
         }
 
@@ -1537,54 +1794,7 @@
             event.currentTarget.classList.add('selected');
 
             console.log('[3-Day Tees] Location selected:', code);
-            updatePricing();
-        }
-
-        // Render sizes
-        function renderSizes() {
-            const grid = document.getElementById('sizeGrid');
-            grid.innerHTML = state.sizes.map(size => `
-                <div class="size-input-group">
-                    <label for="size-${size}">${size}</label>
-                    <input type="number"
-                           id="size-${size}"
-                           min="0"
-                           value="0"
-                           onchange="updateSizeBreakdown()">
-                    <div class="size-price" id="price-size-${size}">$0.00/pc</div>
-                    <div class="size-stock-badge" id="stock-size-${size}"></div>
-                </div>
-            `).join('');
-
-            // Initialize size breakdown
-            state.sizes.forEach(size => {
-                state.sizeBreakdown[size] = { quantity: 0, unitPrice: 0 };
-            });
-        }
-
-        // Update size breakdown
-        function updateSizeBreakdown() {
-            let total = 0;
-
-            state.sizes.forEach(size => {
-                const input = document.getElementById(`size-${size}`);
-                const qty = parseInt(input.value) || 0;
-                state.sizeBreakdown[size].quantity = qty;
-                total += qty;
-            });
-
-            // Update total display
-            document.getElementById('totalQuantity').textContent = total;
-
-            // Show/hide LTM warning
-            const ltmWarning = document.getElementById('ltmWarning');
-            if (total > 0 && total < 12) {
-                ltmWarning.style.display = 'block';
-            } else {
-                ltmWarning.style.display = 'none';
-            }
-
-            updatePricing();
+            recalculateAllPricing();
         }
 
         // Calculate price (7-step formula + 25% rush fee)
@@ -1627,53 +1837,6 @@
             const upcharge = state.pricingData.upcharges[size] || 0;
 
             return finalPrice + upcharge;
-        }
-
-        // Update pricing display
-        function updatePricing() {
-            const totalQty = Object.values(state.sizeBreakdown).reduce((sum, s) => sum + s.quantity, 0);
-
-            if (!state.selectedLocation || totalQty === 0) return;
-
-            let subtotal = 0;
-
-            // Calculate price for each size
-            state.sizes.forEach(size => {
-                const qty = state.sizeBreakdown[size].quantity;
-                const price = calculatePrice(totalQty, state.selectedLocation, size);
-                state.sizeBreakdown[size].unitPrice = price;
-
-                // Update UI
-                document.getElementById(`price-size-${size}`).textContent = `$${price.toFixed(2)}/pc`;
-
-                subtotal += qty * price;
-            });
-
-            // LTM fee
-            const ltmFee = totalQty < 12 ? 75 : 0;
-
-            // Sales tax
-            const salesTax = (subtotal + ltmFee) * 0.101;
-
-            // Shipping
-            const shipping = 30;
-
-            // Grand total
-            const grandTotal = subtotal + ltmFee + salesTax + shipping;
-
-            // Update display
-            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('salesTax').textContent = `$${salesTax.toFixed(2)}`;
-            document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(2)}`;
-
-            // Show/hide LTM fee row
-            const ltmRow = document.getElementById('ltmFeeRow');
-            if (ltmFee > 0) {
-                ltmRow.style.display = 'flex';
-                document.getElementById('ltmFee').textContent = `$${ltmFee.toFixed(2)}`;
-            } else {
-                ltmRow.style.display = 'none';
-            }
         }
 
         // File upload handling

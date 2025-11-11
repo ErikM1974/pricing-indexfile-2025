@@ -1,7 +1,7 @@
 # 3-Day Tees - Inventory Integration Guide
 
-**Last Updated:** 2025-11-08
-**Purpose:** Multi-SKU inventory architecture, real-time stock checks, and API integration patterns
+**Last Updated:** 2025-11-11
+**Purpose:** Multi-SKU inventory architecture, real-time stock checks, API integration patterns, and cache optimization
 **Status:** Implementation Ready
 
 ---
@@ -121,6 +121,244 @@ const lineItem = {
     quantity: 5,
     price: 17.50
 };
+```
+
+---
+
+## 💾 Cache Pattern for Multi-SKU Inventory
+
+### The Critical Pattern
+
+**Problem:** Multi-SKU inventory requires fetching from 3 separate APIs (PC54, PC54_2X, PC54_3X). Without proper caching, toggling colors triggers unnecessary API calls leading to:
+- Rate limiting (15 API calls per page load)
+- "No data" errors when API calls fail
+- Poor performance (2-3 second delays)
+
+**Solution:** Both inventory functions must check cache before fetching
+
+### Required: Two-Function Cache Pattern
+
+When implementing multi-color inventory, you need **TWO separate functions**:
+
+1. **`loadInventory(catalogColor)`** - Loads inventory badges (totals only)
+2. **`loadSizeInventory(catalogColor)`** - Loads per-size inventory for input constraints
+
+**⚠️ CRITICAL:** Both functions must check cache independently!
+
+### Implementation Pattern
+
+**Function 1: Badge Inventory (with cache)**
+```javascript
+async function loadInventory(catalogColor) {
+    try {
+        // ✅ CHECK CACHE FIRST
+        if (state.inventoryCache[catalogColor]) {
+            console.log(`[3-Day Tees] Using cached inventory for ${catalogColor}`);
+            const cached = state.inventoryCache[catalogColor];
+            updateInventoryBadge(catalogColor, cached.total);
+            return; // Exit early with cached data
+        }
+
+        // Fetch from API only if not cached
+        const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+            fetch(`/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+            fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+            fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+        ]);
+
+        const standardData = await standardRes.json();
+        const twoXLData = await twoXLRes.json();
+        const threeXLData = await threeXLRes.json();
+
+        // Calculate total
+        const total = calculateTotal(standardData, twoXLData, threeXLData);
+
+        // ✅ STORE IN CACHE
+        state.inventoryCache[catalogColor] = {
+            total: total,
+            standardData: standardData,
+            twoXLData: twoXLData,
+            threeXLData: threeXLData,
+            timestamp: Date.now()
+        };
+
+        console.log(`[3-Day Tees] Cached inventory for ${catalogColor}`);
+        updateInventoryBadge(catalogColor, total);
+    } catch (error) {
+        console.error('[3-Day Tees] Inventory load error:', catalogColor, error);
+    }
+}
+```
+
+**Function 2: Size-Specific Inventory (with cache)**
+```javascript
+async function loadSizeInventory(catalogColor) {
+    try {
+        // ✅ CHECK CACHE FIRST (uses same cache as loadInventory)
+        let standardData, twoXLData, threeXLData;
+
+        if (state.inventoryCache[catalogColor]) {
+            console.log(`[3-Day Tees] Using cached size inventory for ${catalogColor}`);
+            const cached = state.inventoryCache[catalogColor];
+
+            // Extract cached data (property names match cache structure)
+            standardData = cached.standardData || { result: [] };
+            twoXLData = cached.twoXLData || { result: [] };
+            threeXLData = cached.threeXLData || { result: [] };
+        } else {
+            // Fetch from API only if not cached
+            const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
+                fetch(`/api/manageorders/inventorylevels?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`),
+                fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`),
+                fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`)
+            ]);
+
+            standardData = await standardRes.json();
+            twoXLData = await twoXLRes.json();
+            threeXLData = await threeXLRes.json();
+        }
+
+        // Build size inventory from cached or fresh data
+        const sizeInventory = {
+            'S': standardData.result?.[0]?.Size01 || 0,
+            'M': standardData.result?.[0]?.Size02 || 0,
+            'L': standardData.result?.[0]?.Size03 || 0,
+            'XL': standardData.result?.[0]?.Size04 || 0,
+            '2XL': twoXLData.result?.[0]?.Size05 || 0,
+            '3XL': threeXLData.result?.[0]?.Size06 || 0
+        };
+
+        // Update UI with size constraints
+        updateSizeInputs(catalogColor, sizeInventory);
+    } catch (error) {
+        console.error('[3-Day Tees] Size inventory load error:', catalogColor, error);
+    }
+}
+```
+
+### Cache Data Structure
+
+**Initialize cache in state object:**
+```javascript
+const state = {
+    selectedColors: [],
+    inventoryCache: {},  // ← Cache object
+    // ... other state
+};
+```
+
+**Cache structure per color:**
+```javascript
+state.inventoryCache['Forest'] = {
+    total: 605,                          // Sum across all SKUs
+    standardData: { result: [{...}] },   // PC54 response
+    twoXLData: { result: [{...}] },      // PC54_2X response
+    threeXLData: { result: [{...}] },    // PC54_3X response
+    timestamp: 1699468800000             // Cache timestamp
+};
+```
+
+### Common Mistake: One Function Checks, Other Doesn't
+
+**❌ WRONG - Only badge function checks cache:**
+```javascript
+// Function 1: Checks cache ✅
+async function loadInventory(catalogColor) {
+    if (state.inventoryCache[catalogColor]) {
+        // Use cache
+    } else {
+        // Fetch from API
+    }
+}
+
+// Function 2: ALWAYS fetches ❌
+async function loadSizeInventory(catalogColor) {
+    // Missing cache check!
+    const [standardRes, twoXLRes, threeXLRes] = await Promise.all([...]);
+}
+```
+
+**Result:** Color toggles trigger 3 unnecessary API calls every time
+
+**✅ CORRECT - Both functions check cache:**
+```javascript
+// Function 1: Checks cache ✅
+async function loadInventory(catalogColor) {
+    if (state.inventoryCache[catalogColor]) { /* use cache */ }
+    else { /* fetch */ }
+}
+
+// Function 2: Checks cache ✅
+async function loadSizeInventory(catalogColor) {
+    if (state.inventoryCache[catalogColor]) { /* use cache */ }
+    else { /* fetch */ }
+}
+```
+
+**Result:** Color toggles use cached data, zero API calls
+
+### Performance Impact
+
+**Without proper caching:**
+- Initial page load: 15 API calls (5 colors × 3 SKUs)
+- Each color toggle: 3 additional API calls
+- 10 toggles = 45 total API calls ⚠️
+- Rate limiting triggers at ~30 requests/minute
+
+**With proper caching:**
+- Initial page load: 15 API calls (5 colors × 3 SKUs)
+- Each color toggle: 0 additional API calls ✅
+- 10 toggles = 15 total API calls
+- No rate limiting issues
+
+### Verification & Testing
+
+**Console logs to verify cache is working:**
+```javascript
+// Initial load (expected - fetches from API)
+[3-Day Tees] Cached inventory for Forest
+
+// Subsequent toggles (expected - uses cache)
+[3-Day Tees] Using cached inventory for Forest
+[3-Day Tees] Using cached size inventory for Forest
+```
+
+**Test procedure:**
+1. Load page (watch console for cache messages)
+2. Select all 5 colors (should see "Cached inventory" for each)
+3. Toggle colors on/off repeatedly (should see "Using cached" messages)
+4. Verify no new API calls in Network tab
+5. Verify inventory data persists correctly
+
+**Expected console output:**
+```
+✅ First time selecting color:
+[3-Day Tees] Cached inventory for Forest
+
+✅ Second time selecting same color:
+[3-Day Tees] Using cached inventory for Forest
+[3-Day Tees] Using cached size inventory for Forest
+
+❌ If you see this, cache isn't working:
+[DEBUG] Loading inventory for color: "Forest"  ← Shouldn't repeat
+[DEBUG] HTTP Responses: Object                  ← Shouldn't repeat
+```
+
+### Cache Duration
+
+**Current implementation:** In-memory cache (clears on page reload)
+
+**Future enhancement:** Add time-based expiration:
+```javascript
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function isCacheValid(catalogColor) {
+    const cached = state.inventoryCache[catalogColor];
+    if (!cached) return false;
+
+    const age = Date.now() - cached.timestamp;
+    return age < CACHE_TTL;
+}
 ```
 
 ---
