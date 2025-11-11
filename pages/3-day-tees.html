@@ -321,6 +321,15 @@
             color: #991b1b;
         }
 
+        .stock-badge.loading {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .stock-badge.loading i {
+            margin-right: 0.25rem;
+        }
+
         /* Size-Specific Stock Badges */
         .size-stock-badge {
             font-size: 0.7rem;
@@ -730,6 +739,164 @@
             margin: 1rem 0;
         }
 
+        /* Timeline Steps */
+        .timeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-left: 3px solid var(--primary-color);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-step:hover {
+            background: var(--bg-light);
+            transform: translateX(5px);
+        }
+
+        .timeline-step i {
+            font-size: 1.5rem;
+            min-width: 24px;
+            margin-top: 2px;
+        }
+
+        .timeline-step span {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .timeline-step small {
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid;
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success-color);
+        }
+
+        .toast.error .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast.warning .toast-icon {
+            color: #f59e0b;
+        }
+
+        .toast.info .toast-icon {
+            color: #3b82f6;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            font-size: 1.25rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hiding {
+            animation: slideOut 0.3s ease-in;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .product-grid {
@@ -756,6 +923,12 @@
                 flex-direction: column;
                 gap: 1rem;
             }
+
+            .toast-container {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
         }
 
         @media (max-width: 375px) {
@@ -780,12 +953,52 @@
         <div class="modal-content">
             <i class="fas fa-check-circle"></i>
             <h3>Order Submitted Successfully!</h3>
-            <p>Your 3-Day Tees rush order has been submitted.</p>
-            <div class="order-number" id="orderNumber"></div>
-            <p>A confirmation email has been sent to your inbox. We'll begin production immediately upon artwork approval.</p>
-            <button class="btn btn-primary" onclick="location.reload()">Start New Order</button>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Your 3-Day Tees rush order has been submitted.</p>
+            <div class="order-number" id="orderNumber" style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); margin: 1rem 0;"></div>
+
+            <!-- Estimated Delivery -->
+            <div style="background: var(--bg-light); padding: 1rem; border-radius: 6px; margin: 1.5rem 0;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fas fa-calendar-check" style="color: var(--success-color);"></i>
+                    <strong>Estimated Delivery:</strong>
+                    <span id="estimatedDelivery" style="color: var(--primary-color); font-weight: bold;"></span>
+                </div>
+            </div>
+
+            <!-- Next Steps Timeline -->
+            <div style="text-align: left; margin: 1.5rem 0; padding: 0 1rem;">
+                <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">What Happens Next:</h4>
+                <div class="timeline-steps">
+                    <div class="timeline-step">
+                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                        <span><strong>Confirmation Email Sent</strong><br><small>Check your inbox for order details</small></span>
+                    </div>
+                    <div class="timeline-step">
+                        <i class="fas fa-palette" style="color: var(--primary-color);"></i>
+                        <span><strong>Artwork Review (Today)</strong><br><small>Our team will contact you to approve artwork</small></span>
+                    </div>
+                    <div class="timeline-step">
+                        <i class="fas fa-print" style="color: var(--primary-color);"></i>
+                        <span><strong>Production Begins (Day 1)</strong><br><small>DTG printing starts after artwork approval</small></span>
+                    </div>
+                    <div class="timeline-step">
+                        <i class="fas fa-shipping-fast" style="color: var(--primary-color);"></i>
+                        <span><strong>Ships Within 72 Hours</strong><br><small>Guaranteed delivery in 3 business days</small></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
+                Questions? Call us at <strong style="color: var(--primary-color);">253-922-5793</strong>
+            </p>
+
+            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">Start New Order</button>
         </div>
     </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <!-- Header -->
     <header class="header">
@@ -1001,6 +1214,52 @@
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
 
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            // Icon based on type
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            // Title based on type
+            const titles = {
+                success: 'Success',
+                error: 'Error',
+                warning: 'Warning',
+                info: 'Information'
+            };
+
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.add('hiding');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+
+            return toast;
+        }
+
         // State - MULTI-COLOR SUPPORT
         const state = {
             selectedColors: [],           // Array of catalog colors (multi-color support)
@@ -1103,7 +1362,7 @@
                 showLoading(false);
             } catch (error) {
                 console.error('[3-Day Tees] Initialization error:', error);
-                alert('Failed to load pricing data. Please refresh the page or call 253-922-5793.');
+                showToast('Failed to load pricing data. Please refresh the page or call 253-922-5793.', 'error', 0);  // 0 = don't auto-hide
                 showLoading(false);
             }
         }
@@ -1185,6 +1444,14 @@
                     const cached = state.inventoryCache[catalogColor];
                     updateInventoryBadge(catalogColor, cached.total);
                     return;
+                }
+
+                // Show loading state on badge
+                const badgeId = `stock-${catalogColor}`;
+                const badge = document.getElementById(badgeId);
+                if (badge) {
+                    badge.className = 'stock-badge loading';
+                    badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
                 }
 
                 // DEBUG: Log the API URLs being called
@@ -1286,16 +1553,19 @@
                     badge.className = 'stock-badge';
                     badge.textContent = 'Network Error';
                     badge.title = 'Unable to connect to inventory system. Please check your internet connection and try again.';
+                    showToast('Unable to check inventory. Please check your internet connection and try again.', 'error');
                 } else if (error.name === 'SyntaxError') {
                     // JSON parse error - API returned invalid data
                     badge.className = 'stock-badge';
                     badge.textContent = 'API Error';
                     badge.title = 'Inventory system returned invalid data. Please try again or contact support.';
+                    showToast('Inventory system error. Please try again or call 253-922-5793 for assistance.', 'error');
                 } else {
                     // Generic error
                     badge.className = 'stock-badge';
                     badge.textContent = 'Check Stock';
                     badge.title = 'Unable to load inventory. Click the color card to try again.';
+                    showToast(`Unable to load inventory for ${catalogColor}. Please try again.`, 'warning');
                 }
             }
         }
@@ -1404,7 +1674,11 @@
                                 const currentValue = parseInt(this.value) || 0;
 
                                 if (currentValue > maxStock) {
-                                    alert(`Only ${maxStock} units of size ${size} available in ${catalogColor}.\n\nYour quantity has been adjusted to ${maxStock}.`);
+                                    showToast(
+                                        `Only ${maxStock} units of size ${size} available in ${catalogColor}. Your quantity has been adjusted to ${maxStock}.`,
+                                        'warning',
+                                        7000
+                                    );
                                     this.value = maxStock;
                                     // Trigger the onchange handler to update pricing
                                     updateSizeQuantity(catalogColor, size, maxStock);
@@ -1833,8 +2107,8 @@
             // Step 7: Final rounding
             const finalPrice = Math.ceil(priceWithRush * 2) / 2;
 
-            // Step 8: Add size upcharge
-            const upcharge = state.pricingData.upcharges[size] || 0;
+            // Step 8: Add size upcharge (API uses 'sellingPriceDisplayAddOns' not 'upcharges')
+            const upcharge = (state.pricingData.sellingPriceDisplayAddOns || {})[size] || 0;
 
             return finalPrice + upcharge;
         }
@@ -1848,7 +2122,11 @@
             const files = Array.from(e.target.files);
             files.forEach(file => {
                 if (file.size > 20 * 1024 * 1024) {
-                    alert(`File ${file.name} is too large. Maximum size is 20MB.`);
+                    showToast(
+                        `File "${file.name}" is too large. Maximum file size is 20MB.`,
+                        'error',
+                        8000
+                    );
                     return;
                 }
                 state.uploadedFiles.push(file);
@@ -1883,12 +2161,12 @@
         document.getElementById('submitOrder').addEventListener('click', async () => {
             // Validate multi-color selections
             if (state.selectedColors.length === 0) {
-                alert('Please select at least one color');
+                showToast('Please select at least one color to continue', 'warning');
                 return;
             }
 
             if (!state.selectedLocation) {
-                alert('Please select a print location');
+                showToast('Please select a print location', 'warning');
                 return;
             }
 
@@ -1902,22 +2180,22 @@
             });
 
             if (grandTotalQuantity === 0) {
-                alert('Please enter quantities for at least one size');
+                showToast('Please enter quantities for at least one size', 'warning');
                 return;
             }
 
             if (!document.getElementById('firstName').value || !document.getElementById('lastName').value) {
-                alert('Please fill in all required contact information');
+                showToast('Please fill in your first and last name', 'warning');
                 return;
             }
 
             if (!document.getElementById('email').value) {
-                alert('Please provide an email address');
+                showToast('Please provide your email address', 'warning');
                 return;
             }
 
             if (!document.getElementById('address1').value || !document.getElementById('city').value || !document.getElementById('state').value || !document.getElementById('zip').value) {
-                alert('Please fill in all required shipping address fields');
+                showToast('Please fill in all required shipping address fields', 'warning');
                 return;
             }
 
@@ -1968,6 +2246,10 @@
                     // Show success message
                     document.getElementById('orderNumber').textContent = `Order #${result.orderNumber}`;
 
+                    // Calculate and display estimated delivery date (3 business days)
+                    const estimatedDeliveryDate = calculateDeliveryDate(3);
+                    document.getElementById('estimatedDelivery').textContent = estimatedDeliveryDate;
+
                     // Show warning if API failed but saved to database
                     if (result.warning) {
                         const successText = document.querySelector('#successModal p');
@@ -1978,18 +2260,46 @@
 
                     document.getElementById('successModal').classList.add('active');
                 } else {
-                    // Show error
-                    alert(`Order submission failed: ${result.error}. Please call 253-922-5793 for assistance.`);
+                    // Show error with toast
+                    showToast(
+                        `Order submission failed: ${result.error}. Please call 253-922-5793 for assistance.`,
+                        'error',
+                        10000  // 10 seconds for errors
+                    );
                 }
 
             } catch (error) {
                 console.error('[3-Day Tees] Critical error:', error);
                 showLoading(false);
-                alert(`Order submission encountered an error. Please call 253-922-5793 for assistance.`);
+                showToast(
+                    'An unexpected error occurred during order submission. Please call 253-922-5793 for assistance.',
+                    'error',
+                    10000  // 10 seconds for critical errors
+                );
             }
         });
 
         // NOTE: Order number generation and email sending now handled by ThreeDayTeesOrderService
+
+        // Calculate delivery date (business days)
+        function calculateDeliveryDate(businessDays) {
+            const today = new Date();
+            let daysAdded = 0;
+            let currentDate = new Date(today);
+
+            while (daysAdded < businessDays) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                // Skip weekends (0 = Sunday, 6 = Saturday)
+                const dayOfWeek = currentDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    daysAdded++;
+                }
+            }
+
+            // Format: "Monday, January 15, 2025"
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return currentDate.toLocaleDateString('en-US', options);
+        }
 
         // Loading overlay
         function showLoading(show) {
