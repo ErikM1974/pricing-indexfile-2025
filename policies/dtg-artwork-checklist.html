@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Artwork Information Checklist - NWCA Policies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --nwca-green: #2d5f3f;
+            --nwca-light-green: #4a8c5f;
+            --nwca-accent: #7fb069;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .policy-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .policy-header {
+            background: linear-gradient(135deg, var(--nwca-green) 0%, var(--nwca-light-green) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .policy-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .policy-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .policy-meta {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--nwca-accent);
+        }
+
+        .policy-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .policy-meta-item i {
+            color: var(--nwca-green);
+            font-size: 1.2rem;
+        }
+
+        .policy-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: var(--nwca-green);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--nwca-accent);
+        }
+
+        .section h3 {
+            color: var(--nwca-light-green);
+            font-size: 1.4rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .checklist {
+            background: #f8f9fa;
+            border-left: 4px solid var(--nwca-accent);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .checklist-item i {
+            color: var(--nwca-green);
+            margin-right: 15px;
+            margin-top: 3px;
+        }
+
+        .info-box {
+            background: #e7f5ff;
+            border-left: 4px solid #0c5ba0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .back-button {
+            margin: 20px 40px;
+        }
+
+        .back-button a {
+            color: var(--nwca-green);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-button a:hover {
+            color: var(--nwca-light-green);
+            transform: translateX(-5px);
+        }
+
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        table th {
+            background: var(--nwca-green);
+            color: white;
+            padding: 12px;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="policy-container">
+        <div class="policy-header">
+            <h1><i class="fas fa-palette"></i> DTG Artwork Information Checklist</h1>
+            <p class="subtitle">The Sales-to-Art Playbook: A Complete Guide to Customer Intake for Direct-to-Garment (DTG) Printing</p>
+        </div>
+
+        <div class="policy-meta">
+            <div class="policy-meta-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div>
+                    <strong>Effective Date:</strong> November 11, 2025
+                </div>
+            </div>
+            <div class="policy-meta-item">
+                <i class="fas fa-user-tie"></i>
+                <div>
+                    <strong>Owner:</strong> Art Department
+                </div>
+            </div>
+            <div class="policy-meta-item">
+                <i class="fas fa-tag"></i>
+                <div>
+                    <strong>Category:</strong> Operations
+                </div>
+            </div>
+        </div>
+
+        <div class="back-button">
+            <a href="../policies-hub.html"><i class="fas fa-arrow-left"></i> Back to Policies Hub</a>
+        </div>
+
+        <div class="policy-content">
+            <!-- Introduction -->
+            <section class="section">
+                <h2>Overview</h2>
+                <p>This comprehensive guide provides a systematic approach to gathering critical information from customers for Direct-to-Garment (DTG) printing projects. By following this playbook, our sales team ensures that the art department receives all necessary details to create high-quality, production-ready artwork.</p>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Purpose:</strong> This checklist bridges the gap between customer vision and technical production requirements, minimizing revisions and ensuring customer satisfaction.
+                </div>
+            </section>
+
+            <!-- Phase 1: Garment & Order Foundation -->
+            <section class="section">
+                <h2>Phase 1: Garment & Order Foundation</h2>
+                <p>Understanding the garment and order basics is critical before any artwork discussion begins.</p>
+
+                <h3>1.1 Garment Identification</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Product Style Number:</strong> Capture the exact style number (e.g., PC54, G500, DT5000)
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Garment Type:</strong> T-shirt, hoodie, polo, tank top, long sleeve, etc.
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Brand & Manufacturer:</strong> Port & Company, Gildan, Next Level, etc.
+                        </div>
+                    </div>
+                </div>
+
+                <h3>1.2 Fabric Composition</h3>
+                <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Critical:</strong> Fabric content affects ink absorption, print quality, and pretreatment requirements.
+                </div>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>100% Cotton:</strong> Best for DTG, requires standard pretreatment
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Cotton/Poly Blends:</strong> Note exact percentage (e.g., 50/50, 60/40)
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>100% Polyester:</strong> Requires special DTG inks or alternative decoration method
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Tri-Blend:</strong> Typically 50% polyester, 25% cotton, 25% rayon
+                        </div>
+                    </div>
+                </div>
+
+                <h3>1.3 Garment Color Selection</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Light Garments:</strong> White, natural, light gray - use CMYK inks only
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Dark Garments:</strong> Black, navy, forest - require white underbase
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Color Accuracy:</strong> Note exact color name from catalog (e.g., "Cardinal" not "dark red")
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phase 2: Creative Brief & Design Specifications -->
+            <section class="section">
+                <h2>Phase 2: Creative Brief & Design Specifications</h2>
+
+                <h3>2.1 Customer-Supplied Artwork</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Logo/Artwork Files:</strong> Request original vector files (AI, EPS, PDF) or high-res raster (PNG, TIFF at 300+ DPI)
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>File Format Check:</strong> Verify files are not compressed JPEGs or low-resolution screenshots
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Multiple Versions:</strong> If customer has variations, collect all versions needed
+                        </div>
+                    </div>
+                </div>
+
+                <h3>2.2 Design Requirements (If We're Creating Artwork)</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Text Elements:</strong> Exact wording, fonts (if known), text hierarchy
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Graphic Elements:</strong> Photos, illustrations, icons - provide references
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Color Preferences:</strong> Specific colors or flexible color scheme
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Style References:</strong> Examples of designs they like or want to emulate
+                        </div>
+                    </div>
+                </div>
+
+                <h3>2.3 Color Mode Specifications</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Garment Color</th>
+                            <th>Ink Type</th>
+                            <th>Color Mode</th>
+                            <th>Special Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>White/Light</td>
+                            <td>CMYK only</td>
+                            <td>CMYK</td>
+                            <td>No white underbase needed</td>
+                        </tr>
+                        <tr>
+                            <td>Dark</td>
+                            <td>CMYK + White</td>
+                            <td>CMYK + White layer</td>
+                            <td>White underbase required</td>
+                        </tr>
+                        <tr>
+                            <td>Neon/Bright</td>
+                            <td>CMYK + White</td>
+                            <td>CMYK + White layer</td>
+                            <td>May need color adjustment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Phase 3: Print Placement & Sizing -->
+            <section class="section">
+                <h2>Phase 3: Print Placement & Sizing</h2>
+
+                <h3>3.1 Print Location</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Left Chest:</strong> Standard 3-4" wide logo placement
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Full Front:</strong> Up to 12" x 16" print area
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Full Back:</strong> Up to 12" x 16" print area
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Sleeves:</strong> Limited to smaller designs, note left vs. right
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Multiple Locations:</strong> Document each location separately
+                        </div>
+                    </div>
+                </div>
+
+                <h3>3.2 Print Size Guidelines</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Maximum Size</th>
+                            <th>Recommended Size</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Left Chest</td>
+                            <td>4" x 4"</td>
+                            <td>3.5" x 3.5"</td>
+                            <td>Keep proportional</td>
+                        </tr>
+                        <tr>
+                            <td>Full Front</td>
+                            <td>12" x 16"</td>
+                            <td>10" x 14"</td>
+                            <td>Account for seams</td>
+                        </tr>
+                        <tr>
+                            <td>Full Back</td>
+                            <td>12" x 16"</td>
+                            <td>11" x 15"</td>
+                            <td>Larger area available</td>
+                        </tr>
+                        <tr>
+                            <td>Sleeve</td>
+                            <td>3" x 10"</td>
+                            <td>2.5" x 8"</td>
+                            <td>Vertical orientation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> Designs exceeding maximum print area require resizing or alternative decoration method.
+                </div>
+            </section>
+
+            <!-- Phase 4: Technical Artwork Audit -->
+            <section class="section">
+                <h2>Phase 4: Technical Artwork Audit</h2>
+
+                <h3>4.1 File Format Requirements</h3>
+                <div class="success-box">
+                    <strong><i class="fas fa-check-circle"></i> Preferred Formats:</strong>
+                    <ul>
+                        <li><strong>Vector Files:</strong> AI, EPS, PDF (with fonts outlined)</li>
+                        <li><strong>Raster Files:</strong> PNG, TIFF at 300 DPI minimum</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <strong><i class="fas fa-times-circle"></i> Avoid:</strong>
+                    <ul>
+                        <li>Low-resolution JPEGs (especially from websites or screenshots)</li>
+                        <li>Word documents or PowerPoint files with embedded images</li>
+                        <li>Compressed or heavily artifacted files</li>
+                    </ul>
+                </div>
+
+                <h3>4.2 Resolution Check</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Minimum:</strong> 300 DPI at final print size
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Preferred:</strong> Vector artwork (scalable without quality loss)
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Large Prints:</strong> For 12" x 16" prints, need 3600 x 4800 pixels minimum
+                        </div>
+                    </div>
+                </div>
+
+                <h3>4.3 Color Mode Verification</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Light Garments:</strong> Artwork in CMYK or RGB (will convert to CMYK)
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Dark Garments:</strong> Create separate white underbase layer
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Pantone Colors:</strong> Note that DTG uses CMYK - Pantone colors will be converted
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phase 5: Sales Communication Toolkit -->
+            <section class="section">
+                <h2>Phase 5: Sales Communication Toolkit</h2>
+
+                <h3>5.1 Questions to Ask Every Customer</h3>
+                <div class="info-box">
+                    <strong>Essential Questions Checklist:</strong>
+                    <ol>
+                        <li>What is the exact garment style number and color?</li>
+                        <li>What is the fabric composition? (Critical for DTG compatibility)</li>
+                        <li>Where do you want the design printed? (Front, back, sleeve, etc.)</li>
+                        <li>What size should the print be?</li>
+                        <li>Do you have existing artwork, or do we need to create it?</li>
+                        <li>If creating artwork: What text, colors, and graphics do you want?</li>
+                        <li>Do you have a deadline or in-hands date?</li>
+                        <li>What is the quantity? (Affects pricing and minimum order fees)</li>
+                    </ol>
+                </div>
+
+                <h3>5.2 Common Customer Scenarios</h3>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Scenario 1: Customer has logo file</strong>
+                            <p>Request the original file, verify it's high resolution or vector, and confirm print locations and sizes.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Scenario 2: Customer needs design created</strong>
+                            <p>Gather detailed creative brief, collect any reference images, and set expectations for design revisions.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Scenario 3: Customer unsure about garment</strong>
+                            <p>Recommend 100% cotton for best DTG results, provide fabric samples if needed, explain poly limitations.</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Scenario 4: Rush order request</strong>
+                            <p>Verify artwork is production-ready, confirm quick turnaround availability, communicate rush fees.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>5.3 Setting Customer Expectations</h3>
+                <div class="warning-box">
+                    <strong>Key Points to Communicate:</strong>
+                    <ul>
+                        <li><strong>Artwork Approval:</strong> Customer must approve digital proof before production</li>
+                        <li><strong>Color Matching:</strong> DTG colors may vary slightly from screen colors</li>
+                        <li><strong>Garment Color Impact:</strong> Dark garments may show white underbase edges</li>
+                        <li><strong>Fabric Content:</strong> Best results on 100% cotton; poly blends may have different hand feel</li>
+                        <li><strong>Turnaround Time:</strong> Standard is 5-7 business days after artwork approval</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Summary & Best Practices -->
+            <section class="section">
+                <h2>Summary & Best Practices</h2>
+
+                <div class="success-box">
+                    <strong><i class="fas fa-star"></i> The Art Department Success Formula:</strong>
+                    <ol>
+                        <li><strong>Gather Complete Information:</strong> Use this checklist for every DTG order</li>
+                        <li><strong>Verify Technical Requirements:</strong> Check file formats, resolution, and color modes</li>
+                        <li><strong>Document Everything:</strong> Save all customer communications and artwork versions</li>
+                        <li><strong>Set Clear Expectations:</strong> Communicate turnaround times and approval processes</li>
+                        <li><strong>Follow Up:</strong> Confirm receipt of files and clarify any questions before production</li>
+                    </ol>
+                </div>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-phone"></i> Need Help?</strong>
+                    <p>Contact the Art Department for questions about:</p>
+                    <ul>
+                        <li>File format compatibility</li>
+                        <li>Design feasibility for DTG</li>
+                        <li>Color matching concerns</li>
+                        <li>Print size recommendations</li>
+                        <li>Rush artwork requests</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <div class="back-button">
+            <a href="../policies-hub.html"><i class="fas fa-arrow-left"></i> Back to Policies Hub</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
