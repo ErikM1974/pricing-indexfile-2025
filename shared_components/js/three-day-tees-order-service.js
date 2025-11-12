@@ -146,7 +146,7 @@ class ThreeDayTeesOrderService {
                 })),
                 notes: [{
                     type: 'Notes On Order',
-                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)`
+                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)${orderSettings.paymentId ? ` | PAYMENT CONFIRMED: Stripe ${orderSettings.paymentId}` : ''}`
                 }],
                 total: grandTotal
             };
@@ -218,6 +218,11 @@ class ThreeDayTeesOrderService {
      * Save order to quote database as fallback
      */
     async saveToQuoteDatabase(orderNumber, orderData, lineItems, totalQuantity) {
+        // Build notes with payment ID if present
+        const paymentNote = orderData.notes[0]?.text?.match(/PAYMENT CONFIRMED: Stripe (pi_\w+)/)
+            ? ` Payment ID: ${orderData.notes[0].text.match(/PAYMENT CONFIRMED: Stripe (pi_\w+)/)[1]}`
+            : '';
+
         // Save quote session
         await fetch(`${this.apiBase}/api/quote_sessions`, {
             method: 'POST',
@@ -233,7 +238,7 @@ class ThreeDayTeesOrderService {
                 TotalQuantity: totalQuantity,
                 TotalAmount: orderData.total,
                 Status: 'Active',
-                Notes: 'ORDER FAILED - ManageOrders API error. See quote items for details.',
+                Notes: `ORDER FAILED - ManageOrders API error. See quote items for details.${paymentNote}`,
                 CreatedDate: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 ModifiedDate: new Date().toISOString().replace(/\.\d{3}Z$/, '')
             })
@@ -293,6 +298,15 @@ class ThreeDayTeesOrderService {
 
         const subtotal = orderData.lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
+        // Extract payment ID if present
+        const paymentIdMatch = orderData.notes[0]?.text?.match(/PAYMENT CONFIRMED: Stripe (pi_\w+)/);
+        const paymentConfirmation = paymentIdMatch
+            ? `<div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0;">
+                <strong style="color: #065f46;">✓ Payment Confirmed</strong><br>
+                <span style="color: #047857; font-size: 0.875rem;">Transaction ID: ${paymentIdMatch[1]}</span>
+               </div>`
+            : '';
+
         const emailData = {
             to_email: orderData.customer.email,
             to_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
@@ -302,6 +316,7 @@ class ThreeDayTeesOrderService {
             customer_phone: orderData.customer.phone,
             company_name: orderData.customer.company || '',
             print_location: orderSettings.printLocationName,
+            payment_confirmation: paymentConfirmation,
             products_table: `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
                 <thead>
                     <tr style="background: #f3f4f6; border-bottom: 2px solid #d1d5db;">
@@ -341,6 +356,19 @@ class ThreeDayTeesOrderService {
 
         const subtotal = orderData.lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
+        // Extract payment ID if present
+        const paymentIdMatch = orderData.notes[0]?.text?.match(/PAYMENT CONFIRMED: Stripe (pi_\w+)/);
+        const paymentStatus = paymentIdMatch
+            ? `<div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0;">
+                <strong style="color: #065f46;">✓ PAYMENT RECEIVED</strong><br>
+                <span style="color: #047857; font-size: 0.875rem;">Stripe Payment ID: ${paymentIdMatch[1]}</span><br>
+                <span style="color: #047857; font-size: 0.875rem;">Status: Confirmed and processed</span>
+               </div>`
+            : `<div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 0.5rem; padding: 1rem; margin: 1rem 0;">
+                <strong style="color: #92400e;">⚠ PAYMENT PENDING</strong><br>
+                <span style="color: #78350f; font-size: 0.875rem;">No payment confirmation received - follow up with customer</span>
+               </div>`;
+
         const emailData = {
             to_email: 'erik@nwcustomapparel.com',
             bcc_email: 'erik@nwcustomapparel.com',
@@ -350,6 +378,7 @@ class ThreeDayTeesOrderService {
             customer_phone: orderData.customer.phone,
             company_name: orderData.customer.company || '',
             print_location: orderSettings.printLocationName,
+            payment_status: paymentStatus,
             products_table: `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
                 <thead>
                     <tr style="background: #f3f4f6; border-bottom: 2px solid #d1d5db;">
