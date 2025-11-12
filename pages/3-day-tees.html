@@ -2497,14 +2497,36 @@
 
             // Get pricing from service
             const pricing = state.pricingData?.pricing || {};
-            const tier = Object.values(pricing.tierData || {}).find(t =>
+            const tierData = pricing.tierData || {};
+
+            console.log('[Payment] Looking for tier for quantity:', grandTotalQuantity);
+            console.log('[Payment] Available tiers:', Object.keys(tierData).map(key => {
+                const t = tierData[key];
+                return `${key}: ${t.MinQuantity}-${t.MaxQuantity}`;
+            }));
+
+            // Find tier for quantity - Handle LTM (Less Than Minimum) case
+            let tier = Object.values(tierData).find(t =>
                 grandTotalQuantity >= t.MinQuantity && grandTotalQuantity <= t.MaxQuantity
             );
 
+            // If no tier found and quantity is under 24, use the 24-47 tier (lowest tier)
+            if (!tier && grandTotalQuantity < 24) {
+                const lowestTier = Object.values(tierData).sort((a, b) => a.MinQuantity - b.MinQuantity)[0];
+                if (lowestTier) {
+                    console.log('[Payment] Quantity under minimum, using lowest tier:', lowestTier.TierLabel);
+                    tier = lowestTier;
+                }
+            }
+
             if (!tier) {
                 console.error('[Payment] No tier found for quantity:', grandTotalQuantity);
+                console.error('[Payment] Available tiers:', tierData);
                 return { subtotal: 0, rushFee: 0, tax: 0, total: 0 };
             }
+
+            console.log('[Payment] Using tier:', tier.TierLabel, `(${tier.MinQuantity}-${tier.MaxQuantity})`);
+
 
             // Calculate base cost per piece
             const baseCost = Math.min(...(pricing.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
@@ -2650,6 +2672,108 @@
             }
         }
 
+        // Pay button - Process payment then submit order
+        document.getElementById('payButton').addEventListener('click', async () => {
+            console.log('[3-Day Tees] Pay button clicked, processing payment...');
+
+            // Process payment
+            const paymentId = await processPayment();
+
+            if (!paymentId) {
+                // Payment failed - modal stays open, user can retry
+                console.log('[3-Day Tees] Payment failed, modal remains open for retry');
+                return;
+            }
+
+            console.log('[3-Day Tees] Payment successful:', paymentId);
+
+            // Close payment modal
+            closePaymentModal();
+
+            // Payment succeeded - now submit order with payment ID
+            try {
+                showLoading(true);
+
+                // Collect customer data
+                const customerData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    company: document.getElementById('company').value || '',
+                    address1: document.getElementById('address1').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value,
+                    notes: document.getElementById('notes').value || ''
+                };
+
+                // Collect order settings with payment ID
+                const orderSettings = {
+                    printLocationCode: state.selectedLocation,
+                    printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
+                    uploadedFiles: state.uploadedFiles,
+                    paymentId: paymentId  // Include payment ID
+                };
+
+                // Calculate total quantity
+                let grandTotalQuantity = 0;
+                state.selectedColors.forEach(catalogColor => {
+                    const config = state.colorConfigs[catalogColor];
+                    grandTotalQuantity += config.totalQuantity || 0;
+                });
+
+                console.log('[3-Day Tees] Submitting order with payment ID...');
+                console.log('[3-Day Tees] Colors:', state.selectedColors);
+                console.log('[3-Day Tees] Total quantity:', grandTotalQuantity);
+                console.log('[3-Day Tees] Payment ID:', paymentId);
+
+                // Submit order using ThreeDayTeesOrderService
+                const result = await orderService.submitOrder(
+                    customerData,
+                    state.colorConfigs,
+                    orderSettings
+                );
+
+                showLoading(false);
+
+                if (result.success) {
+                    // Show success message
+                    document.getElementById('orderNumber').textContent = `Order #${result.orderNumber}`;
+
+                    // Calculate and display estimated delivery date (3 business days)
+                    const estimatedDeliveryDate = calculateDeliveryDate(3);
+                    document.getElementById('estimatedDelivery').textContent = estimatedDeliveryDate;
+
+                    // Show warning if API failed but saved to database
+                    if (result.warning) {
+                        const successText = document.querySelector('#successModal p');
+                        if (successText) {
+                            successText.innerHTML += `<br><br><strong>Note:</strong> ${result.warning}`;
+                        }
+                    }
+
+                    document.getElementById('successModal').classList.add('active');
+                } else {
+                    // Show error with toast
+                    showToast(
+                        `Order submission failed: ${result.error}. Payment was processed (ID: ${paymentId}). Please call 253-922-5793 immediately.`,
+                        'error',
+                        15000
+                    );
+                }
+
+            } catch (error) {
+                console.error('[3-Day Tees] Critical error after payment:', error);
+                showLoading(false);
+                showToast(
+                    `Order submission error. Payment was processed (ID: ${paymentId}). Please call 253-922-5793 immediately.`,
+                    'error',
+                    15000
+                );
+            }
+        });
+
         // Submit order - MULTI-COLOR SUPPORT
         document.getElementById('submitOrder').addEventListener('click', async () => {
             // Validate multi-color selections
@@ -2698,78 +2822,17 @@
                 }
             }
 
-            try {
-                showLoading(true);
+            // Validation passed - show payment modal
+            console.log('[3-Day Tees] Validation passed, showing payment modal...');
+            console.log('[3-Day Tees] Colors:', state.selectedColors);
+            console.log('[3-Day Tees] Total quantity:', grandTotalQuantity);
 
-                // Collect customer data
-                const customerData = {
-                    firstName: document.getElementById('firstName').value,
-                    lastName: document.getElementById('lastName').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    company: document.getElementById('company').value || '',
-                    address1: document.getElementById('address1').value,
-                    city: document.getElementById('city').value,
-                    state: document.getElementById('state').value,
-                    zip: document.getElementById('zip').value,
-                    notes: document.getElementById('notes').value || ''
-                };
+            // Calculate order total
+            const orderTotal = calculateOrderTotal();
+            console.log('[3-Day Tees] Order total:', orderTotal);
 
-                // Collect order settings
-                const orderSettings = {
-                    printLocationCode: state.selectedLocation,
-                    printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
-                    uploadedFiles: state.uploadedFiles
-                };
-
-                console.log('[3-Day Tees] Submitting multi-color order...');
-                console.log('[3-Day Tees] Colors:', state.selectedColors);
-                console.log('[3-Day Tees] Total quantity:', grandTotalQuantity);
-
-                // Submit order using ThreeDayTeesOrderService
-                const result = await orderService.submitOrder(
-                    customerData,
-                    state.colorConfigs,
-                    orderSettings
-                );
-
-                showLoading(false);
-
-                if (result.success) {
-                    // Show success message
-                    document.getElementById('orderNumber').textContent = `Order #${result.orderNumber}`;
-
-                    // Calculate and display estimated delivery date (3 business days)
-                    const estimatedDeliveryDate = calculateDeliveryDate(3);
-                    document.getElementById('estimatedDelivery').textContent = estimatedDeliveryDate;
-
-                    // Show warning if API failed but saved to database
-                    if (result.warning) {
-                        const successText = document.querySelector('#successModal p');
-                        if (successText) {
-                            successText.innerHTML += `<br><br><strong>Note:</strong> ${result.warning}`;
-                        }
-                    }
-
-                    document.getElementById('successModal').classList.add('active');
-                } else {
-                    // Show error with toast
-                    showToast(
-                        `Order submission failed: ${result.error}. Please call 253-922-5793 for assistance.`,
-                        'error',
-                        10000  // 10 seconds for errors
-                    );
-                }
-
-            } catch (error) {
-                console.error('[3-Day Tees] Critical error:', error);
-                showLoading(false);
-                showToast(
-                    'An unexpected error occurred during order submission. Please call 253-922-5793 for assistance.',
-                    'error',
-                    10000  // 10 seconds for critical errors
-                );
-            }
+            // Show payment modal (Pay button will handle order submission)
+            showPaymentModal(orderTotal);
         });
 
         // NOTE: Order number generation and email sending now handled by ThreeDayTeesOrderService
