@@ -10,7 +10,8 @@
       "Bash(npx kill-port:*)",
       "Bash(temp-sanmar-colors.json)",
       "Bash(node:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git rebase:*)"
     ],
     "deny": [],
     "ask": [],

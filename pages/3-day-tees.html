@@ -14,6 +14,9 @@
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Stripe.js SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
+
     <!-- Shared Components -->
     <script src="../shared_components/js/dtg-pricing-service.js"></script>
     <script src="../shared_components/js/sample-inventory-service.js"></script>
@@ -948,6 +951,64 @@
         <div class="spinner"></div>
     </div>
 
+    <!-- Payment Modal (Stripe) -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0;">Complete Payment</h3>
+                <button onclick="closePaymentModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Order Summary -->
+            <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h4 style="margin-top: 0; color: var(--text-primary);">Order Summary</h4>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Subtotal:</span>
+                    <span id="paymentSubtotal">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Rush Fee (25%):</span>
+                    <span id="paymentRushFee">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Sales Tax (10.1%):</span>
+                    <span id="paymentTax">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; border-top: 2px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span>Total:</span>
+                    <span id="paymentTotal" style="color: var(--primary-color);">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Stripe Card Element -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                    Card Information
+                </label>
+                <div id="card-element" style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: white;">
+                    <!-- Stripe Elements will be inserted here -->
+                </div>
+                <div id="card-errors" role="alert" style="color: var(--danger-color); font-size: 0.875rem; margin-top: 0.5rem;"></div>
+            </div>
+
+            <!-- Payment Button -->
+            <button id="payButton" class="btn btn-primary btn-full" style="margin-bottom: 0.5rem;">
+                <i class="fas fa-lock"></i> Pay <span id="payButtonAmount">$0.00</span>
+            </button>
+            <button onclick="closePaymentModal()" class="btn btn-secondary btn-full">
+                Cancel
+            </button>
+
+            <!-- Security Badge -->
+            <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+                <i class="fas fa-shield-alt" style="color: var(--success-color);"></i>
+                Secure payment powered by Stripe
+            </div>
+        </div>
+    </div>
+
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content">
@@ -1213,6 +1274,47 @@
     <script>
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
+
+        // Initialize Stripe (will be set after loading config)
+        let stripe = null;
+        let cardElement = null;
+        let paymentIntentClientSecret = null;
+
+        // Load Stripe publishable key from server and initialize
+        async function initializeStripe() {
+            try {
+                const response = await fetch('/api/stripe-config');
+                const { publishableKey } = await response.json();
+                stripe = Stripe(publishableKey);
+
+                // Create Stripe Elements
+                const elements = stripe.elements();
+                cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#1f2937',
+                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            '::placeholder': {
+                                color: '#9ca3af'
+                            }
+                        },
+                        invalid: {
+                            color: '#ef4444'
+                        }
+                    }
+                });
+
+                // Mount card element when payment modal is shown
+                // (We'll mount it when the modal opens)
+            } catch (error) {
+                console.error('[Stripe] Failed to initialize:', error);
+                showToast('Payment system initialization failed. Please refresh the page.', 'error');
+            }
+        }
+
+        // Call initialize on page load
+        initializeStripe();
 
         // Toast Notification System
         function showToast(message, type = 'info', duration = 5000) {
@@ -2155,6 +2257,272 @@
         function removeFile(index) {
             state.uploadedFiles.splice(index, 1);
             renderFileList();
+        }
+
+        // Payment Modal Functions
+        function showPaymentModal(orderTotal) {
+            // Calculate pricing breakdown
+            const subtotal = orderTotal.subtotal || 0;
+            const rushFee = orderTotal.rushFee || 0;
+            const tax = orderTotal.tax || 0;
+            const total = orderTotal.total || 0;
+
+            // Update payment modal with amounts
+            document.getElementById('paymentSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('paymentRushFee').textContent = `$${rushFee.toFixed(2)}`;
+            document.getElementById('paymentTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('paymentTotal').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('payButtonAmount').textContent = `$${total.toFixed(2)}`;
+
+            // Mount Stripe card element if not already mounted
+            if (cardElement && !cardElement._parent) {
+                cardElement.mount('#card-element');
+
+                // Handle real-time validation errors
+                cardElement.on('change', (event) => {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+            }
+
+            // Show modal
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            // Clear errors
+            document.getElementById('card-errors').textContent = '';
+        }
+
+        async function processPayment() {
+            if (!stripe || !cardElement) {
+                showToast('Payment system not ready. Please refresh the page.', 'error');
+                return null;
+            }
+
+            try {
+                showLoading(true);
+
+                // Calculate order total
+                const orderTotal = calculateOrderTotal();
+
+                // Create payment intent on server
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: Math.round(orderTotal.total * 100), // Convert to cents
+                        currency: 'usd'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create payment intent');
+                }
+
+                const { clientSecret } = await response.json();
+                paymentIntentClientSecret = clientSecret;
+
+                // Confirm card payment
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                            email: document.getElementById('email').value
+                        }
+                    }
+                });
+
+                showLoading(false);
+
+                if (error) {
+                    // Payment failed
+                    showToast(`Payment failed: ${error.message}`, 'error', 10000);
+                    return null;
+                } else if (paymentIntent.status === 'succeeded') {
+                    // Payment succeeded
+                    return paymentIntent.id; // Return payment ID
+                } else {
+                    showToast('Payment status uncertain. Please contact support.', 'warning');
+                    return null;
+                }
+
+            } catch (error) {
+                showLoading(false);
+                console.error('[Payment] Error:', error);
+                showToast('Payment processing error. Please try again.', 'error');
+                return null;
+            }
+        }
+
+        function calculateOrderTotal() {
+            // Calculate total quantity across all colors
+            let grandTotalQuantity = 0;
+            state.selectedColors.forEach(catalogColor => {
+                const config = state.colorConfigs[catalogColor];
+                const qty = Object.values(config.sizeBreakdown).reduce((sum, s) => sum + s.quantity, 0);
+                grandTotalQuantity += qty;
+            });
+
+            // Get pricing from service
+            const pricing = state.pricingData?.pricing || {};
+            const tier = Object.values(pricing.tierData || {}).find(t =>
+                grandTotalQuantity >= t.MinQuantity && grandTotalQuantity <= t.MaxQuantity
+            );
+
+            if (!tier) {
+                console.error('[Payment] No tier found for quantity:', grandTotalQuantity);
+                return { subtotal: 0, rushFee: 0, tax: 0, total: 0 };
+            }
+
+            // Calculate base cost per piece
+            const baseCost = Math.min(...(pricing.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
+            const markedUp = baseCost / tier.MarginDenominator;
+
+            // Get print cost for location
+            const printCost = (pricing.allDtgCostsR || []).find(c =>
+                c.PrintLocationCode === state.selectedLocation &&
+                c.TierLabel === tier.TierLabel
+            )?.PrintCost || 0;
+
+            // Calculate base price per piece
+            const basePrice = markedUp + printCost;
+            const roundedBase = Math.ceil(basePrice * 2) / 2;
+
+            // Calculate subtotal with size upcharges
+            let subtotal = 0;
+            state.selectedColors.forEach(catalogColor => {
+                const config = state.colorConfigs[catalogColor];
+                Object.entries(config.sizeBreakdown).forEach(([size, sizeData]) => {
+                    const upcharge = (pricing.upcharges || {})[size] || 0;
+                    const pricePerPiece = roundedBase + upcharge;
+                    subtotal += pricePerPiece * sizeData.quantity;
+                });
+            });
+
+            // Apply 25% rush fee
+            const rushFee = subtotal * 0.25;
+            const subtotalWithRush = subtotal + rushFee;
+
+            // Apply 10.1% sales tax
+            const tax = subtotalWithRush * 0.101;
+            const total = subtotalWithRush + tax;
+
+            return {
+                subtotal: subtotal,
+                rushFee: rushFee,
+                tax: tax,
+                total: total
+            };
+        }
+
+        // Payment button handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const payButton = document.getElementById('payButton');
+            if (payButton) {
+                payButton.addEventListener('click', async () => {
+                    // Disable button during processing
+                    payButton.disabled = true;
+                    payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                    // Process payment
+                    const paymentId = await processPayment();
+
+                    if (paymentId) {
+                        // Close payment modal
+                        closePaymentModal();
+
+                        // Submit order with payment ID
+                        await submitOrderWithPayment(paymentId);
+                    } else {
+                        // Re-enable button on failure
+                        payButton.disabled = false;
+                        const total = calculateOrderTotal().total;
+                        payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
+                    }
+                });
+            }
+        });
+
+        // Submit order with payment ID
+        async function submitOrderWithPayment(paymentId) {
+            try {
+                showLoading(true);
+
+                // Collect customer data
+                const customerData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    company: document.getElementById('company').value || '',
+                    address1: document.getElementById('address1').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value,
+                    notes: document.getElementById('notes').value || ''
+                };
+
+                // Collect order settings
+                const orderSettings = {
+                    printLocationCode: state.selectedLocation,
+                    printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
+                    uploadedFiles: state.uploadedFiles,
+                    paymentId: paymentId  // Include payment ID
+                };
+
+                console.log('[3-Day Tees] Submitting order with payment ID:', paymentId);
+
+                // Submit order using ThreeDayTeesOrderService
+                const result = await orderService.submitOrder(
+                    customerData,
+                    state.colorConfigs,
+                    orderSettings
+                );
+
+                showLoading(false);
+
+                if (result.success) {
+                    // Show success message
+                    document.getElementById('orderNumber').textContent = `Order #${result.orderNumber}`;
+
+                    // Calculate and display estimated delivery date (3 business days)
+                    const estimatedDeliveryDate = calculateDeliveryDate(3);
+                    document.getElementById('estimatedDelivery').textContent = estimatedDeliveryDate;
+
+                    // Show warning if API failed but saved to database
+                    if (result.warning) {
+                        const successText = document.querySelector('#successModal p');
+                        if (successText) {
+                            successText.innerHTML += `<br><br><strong>Note:</strong> ${result.warning}`;
+                        }
+                    }
+
+                    document.getElementById('successModal').classList.add('active');
+                } else {
+                    // Show error with toast
+                    showToast(
+                        `Order submission failed: ${result.error}. Payment was processed successfully (ID: ${paymentId}). Please call 253-922-5793 for assistance.`,
+                        'error',
+                        15000  // 15 seconds for errors
+                    );
+                }
+
+            } catch (error) {
+                showLoading(false);
+                console.error('[Order] Error:', error);
+                showToast(
+                    `Order submission error. Payment was processed (ID: ${paymentId}). Please call 253-922-5793 immediately.`,
+                    'error',
+                    15000
+                );
+            }
         }
 
         // Submit order - MULTI-COLOR SUPPORT

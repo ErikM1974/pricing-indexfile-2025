@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const compression = require('compression');
+const stripe = require('stripe');
 
 // Load environment variables
 dotenv.config();
@@ -474,6 +475,71 @@ app.get('/api/status', (req, res) => {
     apiBaseUrl: API_BASE_URL,
     environment: process.env.NODE_ENV || 'development'
   });
+});
+
+// Stripe Payment Integration - 3-Day Tees
+// GET /api/stripe-config - Return Stripe publishable key
+app.get('/api/stripe-config', (req, res) => {
+  try {
+    const mode = process.env.STRIPE_MODE || 'development';
+    const publishableKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_PUBLIC_KEY
+      : process.env.STRIPE_TEST_PUBLIC_KEY;
+
+    if (!publishableKey) {
+      console.error('[Stripe] Publishable key not configured for mode:', mode);
+      return res.status(500).json({ error: 'Stripe publishable key not configured' });
+    }
+
+    console.log('[Stripe] Returning publishable key for mode:', mode);
+    res.json({ publishableKey });
+  } catch (error) {
+    console.error('[Stripe] Error in stripe-config endpoint:', error);
+    res.status(500).json({ error: 'Failed to retrieve Stripe configuration' });
+  }
+});
+
+// POST /api/create-payment-intent - Create Stripe payment intent
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const mode = process.env.STRIPE_MODE || 'development';
+    const secretKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_SECRET_KEY
+      : process.env.STRIPE_TEST_SECRET_KEY;
+
+    if (!secretKey) {
+      console.error('[Stripe] Secret key not configured for mode:', mode);
+      return res.status(500).json({ error: 'Stripe secret key not configured' });
+    }
+
+    // Initialize Stripe with the appropriate secret key
+    const stripeInstance = stripe(secretKey);
+
+    const { amount, currency } = req.body;
+
+    if (!amount || !currency) {
+      return res.status(400).json({ error: 'Missing required fields: amount and currency' });
+    }
+
+    console.log('[Stripe] Creating payment intent:', { amount, currency, mode });
+
+    // Create payment intent
+    const paymentIntent = await stripeInstance.paymentIntents.create({
+      amount,
+      currency,
+      automatic_payment_methods: { enabled: true }
+    });
+
+    console.log('[Stripe] Payment intent created:', paymentIntent.id);
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error('[Stripe] Error creating payment intent:', error);
+    res.status(500).json({
+      error: 'Failed to create payment intent',
+      message: error.message
+    });
+  }
 });
 
 // Monitoring API endpoints (if enabled)
