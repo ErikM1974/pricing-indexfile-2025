@@ -2299,6 +2299,92 @@
             document.getElementById('card-errors').textContent = '';
         }
 
+        /**
+         * Get user-friendly error message for Stripe error
+         */
+        function getStripeErrorMessage(error) {
+            console.error('[Payment] Stripe error:', error);
+
+            // Map Stripe error codes to user-friendly messages
+            const errorMessages = {
+                // Card errors
+                'card_declined': 'Your card was declined. Please try a different payment method or contact your bank.',
+                'insufficient_funds': 'Insufficient funds. Please try a different card or add funds to your account.',
+                'lost_card': 'This card has been reported lost. Please use a different card.',
+                'stolen_card': 'This card has been reported stolen. Please use a different card.',
+                'expired_card': 'Your card has expired. Please check the expiration date or use a different card.',
+                'incorrect_cvc': 'Incorrect security code (CVC). Please check the 3-digit code on the back of your card.',
+                'incorrect_number': 'Invalid card number. Please check your card number and try again.',
+                'invalid_expiry_month': 'Invalid expiration month. Please check your card\'s expiration date.',
+                'invalid_expiry_year': 'Invalid expiration year. Please check your card\'s expiration date.',
+                'invalid_cvc': 'Invalid security code. Please enter the 3-digit CVC from your card.',
+
+                // Processing errors
+                'processing_error': 'Error processing your payment. Please try again in a moment.',
+                'rate_limit': 'Too many payment attempts. Please wait a moment before trying again.',
+
+                // Authentication errors
+                'authentication_required': 'Your bank requires additional authentication. Please complete the verification step.',
+                'approve_with_id': 'Your payment requires approval. Please contact your bank to authorize this transaction.',
+
+                // Network/system errors
+                'api_connection_error': 'Connection error. Please check your internet connection and try again.',
+                'api_error': 'Payment system error. Please try again or contact support at 253-922-5793.',
+
+                // Generic decline
+                'generic_decline': 'Your card was declined. Please contact your bank or try a different card.'
+            };
+
+            // Get specific error message or construct helpful default
+            if (error.code && errorMessages[error.code]) {
+                return {
+                    message: errorMessages[error.code],
+                    code: error.code,
+                    canRetry: !['lost_card', 'stolen_card'].includes(error.code) // Don't allow retry for lost/stolen
+                };
+            }
+
+            // Check for specific decline codes in error.decline_code
+            if (error.decline_code) {
+                const declineMessages = {
+                    'do_not_honor': 'Your bank declined this transaction. Please contact your bank or try a different card.',
+                    'fraudulent': 'This transaction was flagged as potentially fraudulent. Please contact your bank.',
+                    'generic_decline': 'Your card was declined. Please contact your bank for more information.',
+                    'invalid_account': 'The card account is invalid. Please check your card details or use a different card.',
+                    'new_account_information_available': 'Your card information may be outdated. Please check with your bank.',
+                    'no_action_taken': 'Your bank did not approve this payment. Please try a different card or contact your bank.',
+                    'not_permitted': 'This type of transaction is not permitted on your card. Please try a different card.',
+                    'pickup_card': 'This card cannot be used. Please contact your bank or use a different card.',
+                    'restricted_card': 'This card has restrictions. Please contact your bank or use a different card.',
+                    'revocation_of_all_authorizations': 'All authorizations have been revoked for this card. Please use a different card.',
+                    'revocation_of_authorization': 'Authorization was revoked for this card. Please use a different card.',
+                    'security_violation': 'Security violation detected. Please contact your bank.',
+                    'service_not_allowed': 'This service is not allowed on your card. Please try a different card.',
+                    'stolen_card': 'This card has been reported stolen. Please use a different card.',
+                    'stop_payment_order': 'A stop payment order exists for this card. Please contact your bank.',
+                    'testmode_decline': 'Test card declined. Please use a real card number.',
+                    'transaction_not_allowed': 'This transaction is not allowed. Please try a different card or contact your bank.',
+                    'try_again_later': 'Temporary issue with your bank. Please try again in a few moments.',
+                    'withdrawal_count_limit_exceeded': 'You have exceeded your card\'s transaction limit. Please try again later or use a different card.'
+                };
+
+                if (declineMessages[error.decline_code]) {
+                    return {
+                        message: declineMessages[error.decline_code],
+                        code: error.decline_code,
+                        canRetry: ['try_again_later', 'generic_decline'].includes(error.decline_code)
+                    };
+                }
+            }
+
+            // Default error message
+            return {
+                message: error.message || 'Payment failed. Please check your card details and try again, or contact support at 253-922-5793.',
+                code: error.code || 'unknown',
+                canRetry: true
+            };
+        }
+
         async function processPayment() {
             if (!stripe || !cardElement) {
                 showToast('Payment system not ready. Please refresh the page.', 'error');
@@ -2322,7 +2408,9 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to create payment intent');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('[Payment] Server error:', errorData);
+                    throw new Error(errorData.error || 'Failed to create payment intent');
                 }
 
                 const { clientSecret } = await response.json();
@@ -2342,21 +2430,58 @@
                 showLoading(false);
 
                 if (error) {
-                    // Payment failed
-                    showToast(`Payment failed: ${error.message}`, 'error', 10000);
+                    // Payment failed - get user-friendly error message
+                    const errorInfo = getStripeErrorMessage(error);
+                    console.error('[Payment] Payment failed:', errorInfo.code, errorInfo.message);
+
+                    // Show error to user with longer display time for important messages
+                    const displayTime = errorInfo.canRetry ? 10000 : 15000;
+                    showToast(errorInfo.message, 'error', displayTime);
+
+                    // Log for debugging
+                    console.error('[Payment] Full error details:', {
+                        code: error.code,
+                        decline_code: error.decline_code,
+                        type: error.type,
+                        message: error.message,
+                        canRetry: errorInfo.canRetry
+                    });
+
                     return null;
                 } else if (paymentIntent.status === 'succeeded') {
                     // Payment succeeded
+                    console.log('[Payment] Payment succeeded:', paymentIntent.id);
                     return paymentIntent.id; // Return payment ID
+                } else if (paymentIntent.status === 'requires_action') {
+                    // 3D Secure or other authentication required
+                    console.log('[Payment] Additional authentication required');
+                    showToast('Additional authentication required. Please complete the verification step.', 'warning', 8000);
+                    return null;
+                } else if (paymentIntent.status === 'requires_payment_method') {
+                    // Payment method failed, need new one
+                    console.log('[Payment] Payment method failed, needs replacement');
+                    showToast('Payment method failed. Please try a different card.', 'error', 10000);
+                    return null;
                 } else {
-                    showToast('Payment status uncertain. Please contact support.', 'warning');
+                    // Other unexpected status
+                    console.warn('[Payment] Unexpected payment status:', paymentIntent.status);
+                    showToast('Payment status uncertain. Please contact support at 253-922-5793.', 'warning', 12000);
                     return null;
                 }
 
             } catch (error) {
                 showLoading(false);
-                console.error('[Payment] Error:', error);
-                showToast('Payment processing error. Please try again.', 'error');
+                console.error('[Payment] Unexpected error:', error);
+
+                // Check if network error
+                if (error.message === 'Failed to fetch' || error.message.includes('network')) {
+                    showToast('Network error. Please check your internet connection and try again.', 'error', 10000);
+                } else if (error.message.includes('payment intent')) {
+                    showToast('Payment system error. Please try again or contact support at 253-922-5793.', 'error', 12000);
+                } else {
+                    showToast('Unexpected error processing payment. Please try again or contact support at 253-922-5793.', 'error', 12000);
+                }
+
                 return null;
             }
         }
