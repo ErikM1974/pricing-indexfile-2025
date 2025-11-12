@@ -2316,19 +2316,59 @@
         function getStripeErrorMessage(error) {
             console.error('[Payment] Stripe error:', error);
 
-            // Map Stripe error codes to user-friendly messages
+            // CRITICAL: Check decline_code FIRST (more specific than error.code)
+            // This is essential for security-sensitive errors like lost/stolen cards
+            if (error.decline_code) {
+                const declineMessages = {
+                    // SECURITY: Lost/stolen cards - NO RETRY
+                    'lost_card': 'This card has been reported lost. Please use a different card.\n\nIf you need assistance, please call us at 253-922-5793.',
+                    'stolen_card': 'This card has been reported stolen. Please use a different card.\n\nIf you need assistance, please call us at 253-922-5793.',
+
+                    // FINANCIAL: Insufficient funds
+                    'insufficient_funds': 'Insufficient funds. Please try a different card or add funds to your account.',
+
+                    // Bank decline reasons
+                    'do_not_honor': 'Your bank declined this transaction. Please contact your bank or try a different card.',
+                    'fraudulent': 'This transaction was flagged as potentially fraudulent. Please contact your bank.',
+                    'generic_decline': 'Your card was declined. Please contact your bank for more information.',
+                    'invalid_account': 'The card account is invalid. Please check your card details or use a different card.',
+                    'new_account_information_available': 'Your card information may be outdated. Please check with your bank.',
+                    'no_action_taken': 'Your bank did not approve this payment. Please try a different card or contact your bank.',
+                    'not_permitted': 'This type of transaction is not permitted on your card. Please try a different card.',
+                    'pickup_card': 'This card cannot be used. Please contact your bank or use a different card.',
+                    'restricted_card': 'This card has restrictions. Please contact your bank or use a different card.',
+                    'revocation_of_all_authorizations': 'All authorizations have been revoked for this card. Please use a different card.',
+                    'revocation_of_authorization': 'Authorization was revoked for this card. Please use a different card.',
+                    'security_violation': 'Security violation detected. Please contact your bank.',
+                    'service_not_allowed': 'This service is not allowed on your card. Please try a different card.',
+                    'stop_payment_order': 'A stop payment order exists for this card. Please contact your bank.',
+                    'testmode_decline': 'Test card declined. Please use a real card number.',
+                    'transaction_not_allowed': 'This transaction is not allowed. Please try a different card or contact your bank.',
+                    'try_again_later': 'Temporary issue with your bank. Please try again in a few moments.',
+                    'withdrawal_count_limit_exceeded': 'You have exceeded your card\'s transaction limit. Please try again later or use a different card.'
+                };
+
+                if (declineMessages[error.decline_code]) {
+                    return {
+                        message: declineMessages[error.decline_code],
+                        code: error.decline_code,
+                        canRetry: !['lost_card', 'stolen_card'].includes(error.decline_code) // SECURITY: No retry for lost/stolen
+                    };
+                }
+            }
+
+            // Then check generic error codes
             const errorMessages = {
                 // Card errors
                 'card_declined': 'Your card was declined. Please try a different payment method or contact your bank.',
                 'insufficient_funds': 'Insufficient funds. Please try a different card or add funds to your account.',
-                'lost_card': 'This card has been reported lost. Please use a different card.',
-                'stolen_card': 'This card has been reported stolen. Please use a different card.',
                 'expired_card': 'Your card has expired. Please check the expiration date or use a different card.',
                 'incorrect_cvc': 'Incorrect security code (CVC). Please check the 3-digit code on the back of your card.',
                 'incorrect_number': 'Invalid card number. Please check your card number and try again.',
                 'invalid_expiry_month': 'Invalid expiration month. Please check your card\'s expiration date.',
                 'invalid_expiry_year': 'Invalid expiration year. Please check your card\'s expiration date.',
                 'invalid_cvc': 'Invalid security code. Please enter the 3-digit CVC from your card.',
+                'invalid_number': 'Your card number is invalid.',
 
                 // Processing errors
                 'processing_error': 'Error processing your payment. Please try again in a moment.',
@@ -2346,46 +2386,13 @@
                 'generic_decline': 'Your card was declined. Please contact your bank or try a different card.'
             };
 
-            // Get specific error message or construct helpful default
+            // Get specific error message based on error.code
             if (error.code && errorMessages[error.code]) {
                 return {
                     message: errorMessages[error.code],
                     code: error.code,
-                    canRetry: !['lost_card', 'stolen_card'].includes(error.code) // Don't allow retry for lost/stolen
+                    canRetry: true // Generic errors can be retried
                 };
-            }
-
-            // Check for specific decline codes in error.decline_code
-            if (error.decline_code) {
-                const declineMessages = {
-                    'do_not_honor': 'Your bank declined this transaction. Please contact your bank or try a different card.',
-                    'fraudulent': 'This transaction was flagged as potentially fraudulent. Please contact your bank.',
-                    'generic_decline': 'Your card was declined. Please contact your bank for more information.',
-                    'invalid_account': 'The card account is invalid. Please check your card details or use a different card.',
-                    'new_account_information_available': 'Your card information may be outdated. Please check with your bank.',
-                    'no_action_taken': 'Your bank did not approve this payment. Please try a different card or contact your bank.',
-                    'not_permitted': 'This type of transaction is not permitted on your card. Please try a different card.',
-                    'pickup_card': 'This card cannot be used. Please contact your bank or use a different card.',
-                    'restricted_card': 'This card has restrictions. Please contact your bank or use a different card.',
-                    'revocation_of_all_authorizations': 'All authorizations have been revoked for this card. Please use a different card.',
-                    'revocation_of_authorization': 'Authorization was revoked for this card. Please use a different card.',
-                    'security_violation': 'Security violation detected. Please contact your bank.',
-                    'service_not_allowed': 'This service is not allowed on your card. Please try a different card.',
-                    'stolen_card': 'This card has been reported stolen. Please use a different card.',
-                    'stop_payment_order': 'A stop payment order exists for this card. Please contact your bank.',
-                    'testmode_decline': 'Test card declined. Please use a real card number.',
-                    'transaction_not_allowed': 'This transaction is not allowed. Please try a different card or contact your bank.',
-                    'try_again_later': 'Temporary issue with your bank. Please try again in a few moments.',
-                    'withdrawal_count_limit_exceeded': 'You have exceeded your card\'s transaction limit. Please try again later or use a different card.'
-                };
-
-                if (declineMessages[error.decline_code]) {
-                    return {
-                        message: declineMessages[error.decline_code],
-                        code: error.decline_code,
-                        canRetry: ['try_again_later', 'generic_decline'].includes(error.decline_code)
-                    };
-                }
             }
 
             // Default error message
