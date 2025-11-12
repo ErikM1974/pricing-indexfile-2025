@@ -2300,6 +2300,16 @@
         }
 
         /**
+         * Restore Pay button to its original enabled state
+         * Used when payment fails and user needs to retry
+         */
+        function restorePayButton() {
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = false;
+            payButton.innerHTML = 'Pay Now';
+        }
+
+        /**
          * Get user-friendly error message for Stripe error
          */
         function getStripeErrorMessage(error) {
@@ -2674,12 +2684,19 @@
         document.getElementById('payButton').addEventListener('click', async () => {
             console.log('[3-Day Tees] Pay button clicked, processing payment...');
 
+            // Disable button immediately to prevent double-clicks
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = true;
+            payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
+
             // Process payment
             const paymentId = await processPayment();
 
             if (!paymentId) {
                 // Payment failed - modal stays open, user can retry
                 console.log('[3-Day Tees] Payment failed, modal remains open for retry');
+                // Re-enable button for retry
+                restorePayButton();
                 return;
             }
 
