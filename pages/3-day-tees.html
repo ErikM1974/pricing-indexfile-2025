@@ -2495,24 +2495,22 @@
                 grandTotalQuantity += qty;
             });
 
-            // Get pricing from service
-            const pricing = state.pricingData?.pricing || {};
-            const tierData = pricing.tierData || {};
+            // Get pricing data directly (not nested under .pricing)
+            const pricingData = state.pricingData || {};
 
             console.log('[Payment] Looking for tier for quantity:', grandTotalQuantity);
-            console.log('[Payment] Available tiers:', Object.keys(tierData).map(key => {
-                const t = tierData[key];
-                return `${key}: ${t.MinQuantity}-${t.MaxQuantity}`;
+            console.log('[Payment] Available tiers:', (pricingData.tiersR || []).map(t => {
+                return `${t.TierLabel}: ${t.MinQuantity}-${t.MaxQuantity}`;
             }));
 
             // Find tier for quantity - Handle LTM (Less Than Minimum) case
-            let tier = Object.values(tierData).find(t =>
+            let tier = (pricingData.tiersR || []).find(t =>
                 grandTotalQuantity >= t.MinQuantity && grandTotalQuantity <= t.MaxQuantity
             );
 
             // If no tier found and quantity is under 24, use the 24-47 tier (lowest tier)
             if (!tier && grandTotalQuantity < 24) {
-                const lowestTier = Object.values(tierData).sort((a, b) => a.MinQuantity - b.MinQuantity)[0];
+                const lowestTier = (pricingData.tiersR || []).sort((a, b) => a.MinQuantity - b.MinQuantity)[0];
                 if (lowestTier) {
                     console.log('[Payment] Quantity under minimum, using lowest tier:', lowestTier.TierLabel);
                     tier = lowestTier;
@@ -2521,7 +2519,7 @@
 
             if (!tier) {
                 console.error('[Payment] No tier found for quantity:', grandTotalQuantity);
-                console.error('[Payment] Available tiers:', tierData);
+                console.error('[Payment] Available tiers:', pricingData.tiersR);
                 return { subtotal: 0, rushFee: 0, tax: 0, total: 0 };
             }
 
@@ -2529,11 +2527,11 @@
 
 
             // Calculate base cost per piece
-            const baseCost = Math.min(...(pricing.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
+            const baseCost = Math.min(...(pricingData.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
             const markedUp = baseCost / tier.MarginDenominator;
 
             // Get print cost for location
-            const printCost = (pricing.allDtgCostsR || []).find(c =>
+            const printCost = (pricingData.allDtgCostsR || []).find(c =>
                 c.PrintLocationCode === state.selectedLocation &&
                 c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
@@ -2547,7 +2545,7 @@
             state.selectedColors.forEach(catalogColor => {
                 const config = state.colorConfigs[catalogColor];
                 Object.entries(config.sizeBreakdown).forEach(([size, sizeData]) => {
-                    const upcharge = (pricing.upcharges || {})[size] || 0;
+                    const upcharge = (pricingData.sellingPriceDisplayAddOns || {})[size] || 0;
                     const pricePerPiece = roundedBase + upcharge;
                     subtotal += pricePerPiece * sizeData.quantity;
                 });
