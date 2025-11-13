@@ -102,8 +102,12 @@ class ThreeDayTeesOrderService {
 
             // Calculate totals
             const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-            const ltmFee = grandTotalQuantity < 12 ? 75 : 0;
-            const salesTax = (subtotal + ltmFee) * 0.101;
+            // LTM (Less Than Minimum) fee: $75 for orders of 6-23 pieces (updated Phase 2.4)
+            const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
+            // Conditional sales tax: Only apply 10.1% if shipping to Washington state (Phase 2.3)
+            const shippingState = orderSettings.shippingState ? orderSettings.shippingState.trim().toUpperCase() : '';
+            const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
+            const salesTax = (subtotal + ltmFee) * salesTaxRate;
             const shipping = 30;
             const grandTotal = subtotal + ltmFee + salesTax + shipping;
 

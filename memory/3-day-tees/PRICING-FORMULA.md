@@ -316,6 +316,118 @@ Display these components in the order summary:
 
 ---
 
+## ⚠️ Order Summary Calculation Pattern (Critical)
+
+**Purpose:** Prevent rush fee double-counting in order summaries
+
+### The Problem
+
+Rush fee is calculated in two stages:
+1. **Per-piece calculation:** Base price → Rush fee applied → Final price per piece
+2. **Order summary calculation:** Sum of all pieces → Rush fee as line item → Grand total
+
+**Common Mistake:** Using `finalPrice` (which already includes rush fee) when calculating subtotal.
+
+### ❌ INCORRECT Pattern (Double-Counts Rush Fee)
+
+```javascript
+// WRONG: Using finalPrice that already includes rush fee
+let subtotal = 0;
+selectedColors.forEach(color => {
+    config.sizeBreakdown.forEach(([size, qty]) => {
+        const upcharge = upcharges[size] || 0;
+        const pricePerPiece = finalPrice + upcharge;  // ❌ finalPrice includes rush fee
+        subtotal += pricePerPiece * qty;
+    });
+});
+
+const rushFee = subtotal * 0.25;  // ❌ Adds rush fee AGAIN
+const total = subtotal + rushFee;
+```
+
+**Result:** Order shows inflated subtotal because rush fee is included in both `finalPrice` and as separate line item.
+
+### ✅ CORRECT Pattern (Separate Rush Fee)
+
+```javascript
+// CORRECT: Use basePrice (before rush fee) for subtotal
+let subtotal = 0;
+selectedColors.forEach(color => {
+    config.sizeBreakdown.forEach(([size, qty]) => {
+        const upcharge = upcharges[size] || 0;
+        const pricePerPiece = basePrice + upcharge;  // ✅ basePrice = before rush fee
+        subtotal += pricePerPiece * qty;
+    });
+});
+
+const rushFee = subtotal * 0.25;  // ✅ Rush fee calculated once on subtotal
+const total = subtotal + rushFee;
+```
+
+**Result:** Order Summary correctly shows:
+- Subtotal: Sum of (basePrice + upcharge) × quantity
+- Rush Fee (25%): Calculated once on subtotal
+- Total: Subtotal + Rush Fee
+
+### Price Component Definitions
+
+| Component | Definition | Includes Rush Fee? |
+|-----------|------------|-------------------|
+| `baseCost` | Lowest garment price from API | ❌ No |
+| `markedUpGarment` | baseCost ÷ MarginDenominator | ❌ No |
+| `printCost` | Decoration cost | ❌ No |
+| `baseDTGPrice` | markedUpGarment + printCost | ❌ No |
+| `roundedBase` | Half-dollar ceiling of baseDTGPrice | ❌ No |
+| `rushFee` | roundedBase × 0.25 | N/A |
+| `priceWithRush` | roundedBase + rushFee | ✅ Yes |
+| `finalPrice` | Half-dollar ceiling of priceWithRush | ✅ Yes |
+| `upcharge` | Size-specific upcharge | ❌ No |
+| `sizeSpecificPrice` | finalPrice + upcharge | ✅ Yes |
+
+**Key Insight:** Use `roundedBase` (not `finalPrice`) when building Order Summary subtotals.
+
+### Implementation Examples
+
+**Payment Modal (Stripe Integration):**
+```javascript
+// File: 3-day-tees.html, lines 3190-3203
+const pricePerPiece = roundedBase + upcharge;  // ✅ Uses roundedBase
+subtotal += pricePerPiece * sizeData.quantity;
+const rushFee = subtotal * 0.25;  // ✅ Separate rush fee
+```
+
+**Order Summary Display:**
+```javascript
+// File: 3-day-tees.html, lines 2507-2514
+const priceWithoutRush = priceBreakdown.basePrice + priceBreakdown.upcharge;
+colorSubtotal += qty * priceWithoutRush;  // ✅ Uses basePrice
+const rushFee = subtotal * 0.25;  // ✅ Separate rush fee
+```
+
+### Testing Verification
+
+**Test Case:** 24 pieces, Left Chest, all standard sizes (S-XL)
+
+```javascript
+// Expected calculations:
+roundedBase = $12.50      // Before rush fee applied
+rushFee = $3.13           // $12.50 × 0.25
+priceWithRush = $15.63    // $12.50 + $3.13
+finalPrice = $16.00       // ceil($15.63 × 2) ÷ 2
+
+// Order Summary (24 pieces):
+subtotal = 24 × $12.50 = $300.00  // ✅ Using roundedBase
+rushFee = $300.00 × 0.25 = $75.00 // ✅ Separate line item
+total = $300.00 + $75.00 = $375.00
+
+// WRONG if using finalPrice:
+subtotal = 24 × $16.00 = $384.00  // ❌ Rush fee already included
+rushFee = $384.00 × 0.25 = $96.00 // ❌ Double-counting
+total = $384.00 + $96.00 = $480.00 // ❌ Inflated by $105.00
+```
+
+---
+
 ## 🧾 Complete Price Breakdown Example
 
 **Order Details:**

@@ -274,6 +274,7 @@
             cursor: pointer;
             transition: all 0.3s;
             background: var(--card-bg);
+            min-height: 260px;
         }
 
         .color-option:hover {
@@ -943,6 +944,216 @@
                 padding: 1rem;
             }
         }
+
+        /* Location Card Hover States */
+        .location-card:hover .location-card-content {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .location-card:active .location-card-content {
+            transform: translateY(0);
+        }
+
+        /* Ensure smooth transitions on all location cards */
+        .location-card-content {
+            transition: all 0.3s ease !important;
+        }
+
+        /* Pricing Tooltip Styles */
+        .price-with-tooltip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .price-info-icon {
+            color: var(--info-color);
+            font-size: 0.875rem;
+            cursor: help;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .price-info-icon:hover {
+            opacity: 1;
+        }
+
+        .price-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;
+        }
+
+        .price-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        .price-info-icon:hover + .price-tooltip,
+        .price-tooltip:hover {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .price-tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .price-tooltip-row.total {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        .price-tooltip-label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .price-tooltip-value {
+            font-weight: 600;
+            color: white;
+        }
+
+        .price-tooltip-value.warning {
+            color: #fbbf24;
+        }
+
+        /* Progressive Disclosure - Collapsible Sections */
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .collapsible-header:hover {
+            opacity: 0.8;
+        }
+
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        /* Enhanced Mobile Optimization */
+        @media (max-width: 768px) {
+            /* Improve touch targets */
+            button, .btn, input[type="radio"], input[type="checkbox"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .location-card, .color-swatch {
+                min-height: 44px;
+            }
+
+            /* Better spacing for mobile */
+            .card {
+                margin-bottom: 1rem !important;
+            }
+
+            /* Sticky payment button on mobile */
+            .payment-section {
+                position: sticky;
+                bottom: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+                z-index: 100;
+                margin-left: -2rem;
+                margin-right: -2rem;
+                margin-bottom: -2rem;
+            }
+
+            /* Optimize size breakdown table for mobile */
+            .size-input-cell {
+                padding: 0.5rem !important;
+            }
+
+            .size-input {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
+
+            /* Stack order summary items vertically */
+            .order-summary-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            /* Larger tap targets for file upload */
+            .upload-zone {
+                padding: 2rem 1rem !important;
+            }
+
+            /* Hide non-essential hover effects on mobile */
+            .card:hover {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 375px) {
+            /* Extra small screens */
+            h3 {
+                font-size: 1.125rem !important;
+            }
+
+            .size-grid, .color-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Reduce font sizes slightly */
+            body {
+                font-size: 0.9375rem;
+            }
+        }
+
+        /* Ensure smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
@@ -972,9 +1183,17 @@
                     <span>Rush Fee (25%):</span>
                     <span id="paymentRushFee">$0.00</span>
                 </div>
+                <div id="paymentLtmFeeRow" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>LTM Fee:</span>
+                    <span id="paymentLtmFee">$0.00</span>
+                </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Sales Tax (10.1%):</span>
+                    <span>Sales Tax (WA only: 10.1%):</span>
                     <span id="paymentTax">$0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Shipping (UPS Ground):</span>
+                    <span id="paymentShipping">$30.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; border-top: 2px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem;">
                     <span>Total:</span>
@@ -1123,23 +1342,112 @@
                     </div>
                 </div>
 
-                <!-- Product Images Preview -->
-                <div class="card" style="margin-top: 1rem;">
-                    <h3>Product Preview</h3>
-                    <div id="productImages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; min-height: 200px;">
-                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                            <p style="font-size: 0.875rem;">Select a color to see product images</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card" style="margin-top: 1rem;">
                     <h3>3. Print Location</h3>
                     <div class="location-selector">
-                        <div class="location-grid" id="locationGrid">
-                            <!-- Locations populated by JavaScript -->
+                        <!-- Front Print Location (Radio Buttons - Choose ONE) -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+                                Front Print Location <span style="color: var(--error-color);">*</span>
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <!-- Left Chest Option -->
+                                <label class="location-card" style="cursor: pointer; position: relative;">
+                                    <input type="radio" name="frontLocation" value="LC"
+                                           onchange="selectFrontLocation('LC')"
+                                           style="position: absolute; opacity: 0;">
+                                    <div class="location-card-content" id="location-LC" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; transition: all 0.3s;">
+                                        <i class="fas fa-tshirt" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary-color);"></i>
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Left Chest</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">4" × 4"</div>
+                                        <div class="location-price" id="price-LC" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
+                                    </div>
+                                </label>
+
+                                <!-- Full Front Option -->
+                                <label class="location-card" style="cursor: pointer; position: relative;">
+                                    <input type="radio" name="frontLocation" value="FF"
+                                           onchange="selectFrontLocation('FF')"
+                                           style="position: absolute; opacity: 0;">
+                                    <div class="location-card-content" id="location-FF" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; transition: all 0.3s;">
+                                        <i class="fas fa-tshirt" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary-color);"></i>
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Full Front</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">12" × 16"</div>
+                                        <div class="location-price" id="price-FF" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
+
+                        <!-- Back Print Location (Optional Checkbox) -->
+                        <div>
+                            <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+                                Back Print <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-secondary);">(Optional)</span>
+                            </h4>
+                            <label class="location-card" style="cursor: pointer; position: relative; display: block;">
+                                <input type="checkbox" id="backLocationCheckbox" value="FB"
+                                       onchange="toggleBackLocation()"
+                                       style="position: absolute; opacity: 0;">
+                                <div class="location-card-content" id="location-FB" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; gap: 1rem; transition: all 0.3s;">
+                                    <i class="fas fa-tshirt" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Full Back</div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">12" × 16"</div>
+                                        <div class="location-price" id="price-FB" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
+                                    </div>
+                                    <i class="fas fa-check-circle" id="back-check-icon" style="font-size: 1.5rem; color: var(--border-color); transition: color 0.3s;"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Live Pricing Display Panel -->
+                    <div id="pricingPanel" style="display: none; margin-top: 1.5rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 1.5rem;">
+                        <h4 style="margin-top: 0; margin-bottom: 1rem; color: #0c4a6e; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-calculator"></i> Pricing Breakdown
+                        </h4>
+
+                        <div style="display: grid; gap: 0.75rem;">
+                            <!-- Base Price -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: white; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">
+                                    <i class="fas fa-tshirt" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                                    Base Price (Garment + Print)
+                                </span>
+                                <span id="liveBasePrice" style="font-weight: 600; color: var(--text-primary);">$0.00</span>
+                            </div>
+
+                            <!-- Rush Fee -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: #fff7ed; border-radius: 4px;">
+                                <span style="color: #92400e;">
+                                    <i class="fas fa-bolt" style="margin-right: 0.5rem; color: var(--warning-color);"></i>
+                                    Rush Fee (25%)
+                                </span>
+                                <span id="liveRushFee" style="font-weight: 600; color: var(--warning-color);">$0.00</span>
+                            </div>
+
+                            <!-- Size Upcharge (conditional) -->
+                            <div id="liveUpchargeRow" style="display: none; justify-content: space-between; align-items: center; padding: 0.5rem; background: white; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">
+                                    <i class="fas fa-plus-circle" style="margin-right: 0.5rem; color: var(--info-color);"></i>
+                                    Size Upcharge
+                                </span>
+                                <span id="liveUpcharge" style="font-weight: 600; color: var(--text-primary);">$0.00</span>
+                            </div>
+
+                            <!-- Final Price -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--primary-color); border-radius: 4px; margin-top: 0.5rem;">
+                                <span style="color: white; font-weight: 600;">
+                                    <i class="fas fa-tag" style="margin-right: 0.5rem;"></i>
+                                    Price Per Piece
+                                </span>
+                                <span id="liveFinalPrice" style="font-size: 1.5rem; font-weight: 700; color: white;">$0.00</span>
+                            </div>
+                        </div>
+
+                        <p style="margin-top: 1rem; margin-bottom: 0; font-size: 0.875rem; color: #0c4a6e; text-align: center;">
+                            <i class="fas fa-info-circle"></i> Price shown is for a standard size (S-XL). 2XL and larger incur additional upcharges.
+                        </p>
                     </div>
                 </div>
 
@@ -1159,22 +1467,27 @@
                                 <span id="totalQuantity" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">0 pieces</span>
                             </div>
                             <div id="ltmWarning" style="margin-top: 0.5rem; color: var(--warning-color); font-size: 0.875rem; display: none;">
-                                <i class="fas fa-exclamation-triangle"></i> Orders under 12 pieces include a $75 LTM fee
+                                <i class="fas fa-exclamation-triangle"></i> Orders of 6-23 pieces include a $75 LTM (Less Than Minimum) fee
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h3>5. Upload Artwork</h3>
-                    <div class="file-upload">
-                        <div class="upload-zone" id="uploadZone">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Files Here</p>
-                            <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                <div class="card" id="uploadArtworkCard" style="margin-top: 1rem;">
+                    <h3 class="collapsible-header">
+                        5. Upload Artwork
+                        <i class="fas fa-chevron-down collapse-icon"></i>
+                    </h3>
+                    <div class="collapsible-content">
+                        <div class="file-upload" style="margin-top: 1rem;">
+                            <div class="upload-zone" id="uploadZone">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Files Here</p>
+                                <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                            </div>
+                            <input type="file" id="fileInput" style="display: none;" multiple accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                            <div class="file-list" id="fileList"></div>
                         </div>
-                        <input type="file" id="fileInput" style="display: none;" multiple accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
-                        <div class="file-list" id="fileList"></div>
                     </div>
                 </div>
             </div>
@@ -1188,12 +1501,16 @@
                             <span class="pricing-label">Subtotal:</span>
                             <span class="pricing-value" id="subtotal">$0.00</span>
                         </div>
+                        <div class="pricing-row" id="rushFeeRow" style="display: none;">
+                            <span class="pricing-label">Rush Fee (25%):</span>
+                            <span class="pricing-value" id="rushFee" style="color: var(--warning-color);">$0.00</span>
+                        </div>
                         <div class="pricing-row" id="ltmFeeRow" style="display: none;">
                             <span class="pricing-label">LTM Fee:</span>
                             <span class="pricing-value" id="ltmFee">$0.00</span>
                         </div>
                         <div class="pricing-row">
-                            <span class="pricing-label">Sales Tax (10.1%):</span>
+                            <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
                             <span class="pricing-value" id="salesTax">$0.00</span>
                         </div>
                         <div class="pricing-row">
@@ -1211,7 +1528,7 @@
                             <i class="fas fa-info-circle"></i> Rush Service Terms
                         </p>
                         <p style="color: #92400e; font-size: 0.875rem;">
-                            Orders ship within 72 hours from artwork approval. 25% rush fee included in pricing. Minimum 12 pieces required (or $75 LTM fee applies).
+                            Orders ship within 72 hours from artwork approval. 25% rush fee shown separately above. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
                         </p>
                     </div>
                 </div>
@@ -1368,7 +1685,8 @@
             selectedColors: [],           // Array of catalog colors (multi-color support)
             colorConfigs: {},             // Object keyed by catalogColor with per-color state
                                          // Structure: { 'Jet Black': { displayColor, catalogColor, sizeBreakdown, totalQuantity, images }, ... }
-            selectedLocation: null,
+            selectedLocation: null,       // Front location: 'LC' or 'FF'
+            hasBackPrint: false,          // Optional back print: true/false
             pricingData: null,
             uploadedFiles: [],
             inventoryCache: {},           // Cache inventory API responses to prevent rate limiting
@@ -1460,7 +1778,10 @@
 
                 // Render UI
                 renderColors();
-                renderLocations();
+                // Note: Location selector is now static HTML (radio buttons + checkbox)
+
+                // Initialize collapsible sections
+                initCollapsibleSections();
 
                 showLoading(false);
             } catch (error) {
@@ -1468,6 +1789,50 @@
                 showToast('Failed to load pricing data. Please refresh the page or call 253-922-5793.', 'error', 0);  // 0 = don't auto-hide
                 showLoading(false);
             }
+        }
+
+        // Initialize collapsible sections for progressive disclosure
+        function initCollapsibleSections() {
+            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+
+            collapsibleHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.collapse-icon');
+
+                    if (content && content.classList.contains('collapsible-content')) {
+                        content.classList.toggle('collapsed');
+                        if (icon) {
+                            icon.classList.toggle('collapsed');
+                        }
+
+                        // Save collapse state to localStorage
+                        const sectionId = header.closest('.card').id || header.id;
+                        if (sectionId) {
+                            const isCollapsed = content.classList.contains('collapsed');
+                            localStorage.setItem(`collapse_${sectionId}`, isCollapsed);
+                        }
+                    }
+                });
+            });
+
+            // Restore collapse states from localStorage
+            collapsibleHeaders.forEach(header => {
+                const sectionId = header.closest('.card').id || header.id;
+                if (sectionId) {
+                    const isCollapsed = localStorage.getItem(`collapse_${sectionId}`) === 'true';
+                    if (isCollapsed) {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('.collapse-icon');
+                        if (content && content.classList.contains('collapsible-content')) {
+                            content.classList.add('collapsed');
+                            if (icon) {
+                                icon.classList.add('collapsed');
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Render color selector - MULTI-COLOR SUPPORT
@@ -1486,11 +1851,19 @@
                 const buttonText = isSelected ? '✓ Added' : 'Add Color';
                 const buttonClass = isSelected ? 'btn-secondary' : 'btn-primary';
 
+                // Show thumbnail when color is selected
+                const thumbnailHTML = isSelected && color.frontModel
+                    ? `<img src="${color.frontModel}" alt="${color.name}"
+                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;
+                                   margin-top: 8px; border: 2px solid var(--primary-color); display: block; margin-left: auto; margin-right: auto;">`
+                    : '';
+
                 return `
                     <div class="color-option ${selectedClass}">
                         <div class="color-swatch" style="${swatchStyle} ${whiteBorder}"></div>
                         <div class="color-name">${color.name}</div>
                         <div class="stock-badge" id="stock-${color.catalogColor}">Loading...</div>
+                        ${thumbnailHTML}
                         <button class="btn ${buttonClass}" style="margin-top: 8px; font-size: 0.875rem; padding: 6px 12px;"
                                 onclick="toggleColor('${color.catalogColor}', event)">
                             ${buttonText}
@@ -1875,7 +2248,6 @@
             // Update UI
             renderColors();
             renderSelectedColors();
-            updateProductImages();
             recalculateAllPricing();
 
             // Load size-specific inventory for this color (if it was just added)
@@ -1884,78 +2256,6 @@
             }
         }
 
-        // Update product images based on selected colors
-        function updateProductImages() {
-            const container = document.getElementById('productImages');
-            if (!container) return;
-
-            if (state.selectedColors.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary); grid-column: 1 / -1;">
-                        <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                        <p style="font-size: 0.875rem;">Select a color to see product images</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Show images for all selected colors
-            const imageHTML = state.selectedColors.map(catalogColor => {
-                const config = state.colorConfigs[catalogColor];
-                const colorData = state.colors.find(c => c.catalogColor === catalogColor);
-
-                const images = [];
-
-                // Front Model
-                if (config.images.frontModel) {
-                    images.push(`
-                        <div style="text-align: center;">
-                            <img src="${config.images.frontModel}" alt="${config.displayColor} - Front"
-                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Front</p>
-                        </div>
-                    `);
-                }
-
-                // Back Model
-                if (config.images.backModel) {
-                    images.push(`
-                        <div style="text-align: center;">
-                            <img src="${config.images.backModel}" alt="${config.displayColor} - Back"
-                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Back</p>
-                        </div>
-                    `);
-                }
-
-                // Front Flat
-                if (config.images.frontFlat) {
-                    images.push(`
-                        <div style="text-align: center;">
-                            <img src="${config.images.frontFlat}" alt="${config.displayColor} - Flat"
-                                 class="product-image" style="width: 100%; border-radius: 8px; border: 2px solid var(--border-color);">
-                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">${config.displayColor} - Flat</p>
-                        </div>
-                    `);
-                }
-
-                // If no images available, show placeholder
-                if (images.length === 0) {
-                    return `
-                        <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">
-                            <i class="fas fa-tshirt" style="font-size: 2rem; opacity: 0.3;"></i>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">${config.displayColor}</p>
-                            <p style="font-size: 0.75rem;">Images not available</p>
-                        </div>
-                    `;
-                }
-
-                return images.join('');
-            }).join('');
-
-            container.innerHTML = imageHTML;
-            console.log('[3-Day Tees] Product images updated for colors:', state.selectedColors);
-        }
 
         // Render selected colors list with size grids
         function renderSelectedColors() {
@@ -2067,6 +2367,7 @@
 
             // Step 2: Calculate prices using COMBINED quantity for ALL colors
             let grandSubtotal = 0;
+            let totalRushFee = 0;
 
             state.selectedColors.forEach(catalogColor => {
                 const config = state.colorConfigs[catalogColor];
@@ -2077,18 +2378,68 @@
                     const sizeData = config.sizeBreakdown[size];
                     const qty = sizeData.quantity;
 
-                    if (qty > 0) {
-                        // Use COMBINED grandTotalQuantity for tier determination
-                        const unitPrice = calculatePrice(grandTotalQuantity, state.selectedLocation, size);
-                        sizeData.unitPrice = unitPrice;
+                    // Calculate price for this size (even if qty is 0, for display purposes)
+                    const priceBreakdown = calculatePrice(grandTotalQuantity || 1, state.selectedLocation, size);
+                    sizeData.unitPrice = priceBreakdown.finalPrice;
 
-                        // Update price display
-                        const priceEl = document.getElementById(`price-${catalogColor}-${size}`);
-                        if (priceEl) {
-                            priceEl.textContent = `$${unitPrice.toFixed(2)}`;
+                    // Update price display (always show pricing with tooltip)
+                    const priceEl = document.getElementById(`price-${catalogColor}-${size}`);
+                    if (priceEl) {
+                        // Build tooltip content
+                        const locationDisplay = state.hasBackPrint
+                            ? `${state.locations.find(l => l.code === state.selectedLocation).name} + Full Back`
+                            : state.locations.find(l => l.code === state.selectedLocation).name;
+
+                        const tooltipContent = `
+                            <div class="price-tooltip-row">
+                                <span class="price-tooltip-label">Base (Garment + ${locationDisplay}):</span>
+                                <span class="price-tooltip-value">$${priceBreakdown.basePrice.toFixed(2)}</span>
+                            </div>
+                            <div class="price-tooltip-row">
+                                <span class="price-tooltip-label">Rush Fee (25%):</span>
+                                <span class="price-tooltip-value warning">$${priceBreakdown.rushFee.toFixed(2)}</span>
+                            </div>
+                            ${priceBreakdown.upcharge > 0 ? `
+                                <div class="price-tooltip-row">
+                                    <span class="price-tooltip-label">Size Upcharge:</span>
+                                    <span class="price-tooltip-value">$${priceBreakdown.upcharge.toFixed(2)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="price-tooltip-row total">
+                                <span class="price-tooltip-label">Total Per Piece:</span>
+                                <span class="price-tooltip-value">$${priceBreakdown.finalPrice.toFixed(2)}</span>
+                            </div>
+                        `;
+
+                        if (qty > 0) {
+                            // Active size: show price in primary color with tooltip
+                            priceEl.innerHTML = `
+                                <div class="price-with-tooltip">
+                                    <strong style="color: var(--primary-color);">$${priceBreakdown.finalPrice.toFixed(2)}</strong>
+                                    <i class="fas fa-info-circle price-info-icon"></i>
+                                    <div class="price-tooltip">${tooltipContent}</div>
+                                </div>
+                            `;
+                        } else {
+                            // Inactive size: show price in muted color with tooltip
+                            priceEl.innerHTML = `
+                                <div class="price-with-tooltip">
+                                    <span style="color: var(--text-secondary);">$${priceBreakdown.finalPrice.toFixed(2)}</span>
+                                    <i class="fas fa-info-circle price-info-icon"></i>
+                                    <div class="price-tooltip">${tooltipContent}</div>
+                                </div>
+                            `;
                         }
+                    }
 
-                        colorSubtotal += qty * unitPrice;
+                    // Only accumulate to subtotal if quantity > 0 (use basePrice + upcharge, NOT finalPrice)
+                    if (qty > 0) {
+                        // Calculate unrounded rush fee (25% of base price) for accurate total
+                        const unroundedRushFee = priceBreakdown.basePrice * 0.25;
+                        totalRushFee += qty * unroundedRushFee;
+                        // Calculate subtotal WITHOUT rush fee (rush fee shown as separate line item)
+                        const priceWithoutRush = priceBreakdown.basePrice + priceBreakdown.upcharge;
+                        colorSubtotal += qty * priceWithoutRush;
                     }
                 });
 
@@ -2107,7 +2458,7 @@
             // Step 4: Show/hide LTM warning
             const ltmWarning = document.getElementById('ltmWarning');
             if (ltmWarning) {
-                if (grandTotalQuantity > 0 && grandTotalQuantity < 12) {
+                if (grandTotalQuantity >= 6 && grandTotalQuantity < 24) {
                     ltmWarning.style.display = 'block';
                 } else {
                     ltmWarning.style.display = 'none';
@@ -2115,10 +2466,17 @@
             }
 
             // Step 5: Calculate and update order summary
-            const ltmFee = grandTotalQuantity < 12 ? 75 : 0;
-            const salesTax = (grandSubtotal + ltmFee) * 0.101;
+            // LTM (Less Than Minimum) fee: $75 for orders of 6-23 pieces
+            const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
+
+            // Conditional sales tax: Only apply 10.1% if shipping to Washington state
+            const stateField = document.getElementById('state');
+            const shippingState = stateField ? stateField.value.trim().toUpperCase() : '';
+            const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
+            const salesTax = (grandSubtotal + totalRushFee + ltmFee) * salesTaxRate;
+
             const shipping = 30;
-            const grandTotal = grandSubtotal + ltmFee + salesTax + shipping;
+            const grandTotal = grandSubtotal + totalRushFee + ltmFee + salesTax + shipping;
 
             // Update order summary displays
             const subtotalEl = document.getElementById('subtotal');
@@ -2126,11 +2484,14 @@
             const grandTotalEl = document.getElementById('grandTotal');
             const ltmFeeEl = document.getElementById('ltmFee');
             const ltmRowEl = document.getElementById('ltmFeeRow');
+            const rushFeeEl = document.getElementById('rushFee');
+            const rushRowEl = document.getElementById('rushFeeRow');
 
             if (subtotalEl) subtotalEl.textContent = `$${grandSubtotal.toFixed(2)}`;
             if (salesTaxEl) salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
             if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
 
+            // Show/hide LTM fee
             if (ltmFee > 0 && ltmFeeEl && ltmRowEl) {
                 ltmRowEl.style.display = 'flex';
                 ltmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
@@ -2138,9 +2499,51 @@
                 ltmRowEl.style.display = 'none';
             }
 
+            // Show rush fee (always visible when pricing is calculated)
+            if (totalRushFee > 0 && rushFeeEl && rushRowEl) {
+                rushRowEl.style.display = 'flex';
+                rushFeeEl.textContent = `$${totalRushFee.toFixed(2)}`;
+            } else if (rushRowEl) {
+                rushRowEl.style.display = 'none';
+            }
+
+            // Step 6: Update live pricing display panel
+            const pricingPanel = document.getElementById('pricingPanel');
+            if (pricingPanel && state.selectedLocation && grandTotalQuantity > 0) {
+                // Calculate sample price for standard size (M) to display in panel
+                const sampleSize = 'M';
+                const samplePricing = calculatePrice(grandTotalQuantity, state.selectedLocation, sampleSize);
+
+                // Update panel elements
+                const liveBasePrice = document.getElementById('liveBasePrice');
+                const liveRushFee = document.getElementById('liveRushFee');
+                const liveUpcharge = document.getElementById('liveUpcharge');
+                const liveUpchargeRow = document.getElementById('liveUpchargeRow');
+                const liveFinalPrice = document.getElementById('liveFinalPrice');
+
+                if (liveBasePrice) liveBasePrice.textContent = `$${samplePricing.basePrice.toFixed(2)}`;
+                if (liveRushFee) liveRushFee.textContent = `$${samplePricing.rushFee.toFixed(2)}`;
+                if (liveFinalPrice) liveFinalPrice.textContent = `$${samplePricing.finalPrice.toFixed(2)}`;
+
+                // Show/hide upcharge row
+                if (samplePricing.upcharge > 0 && liveUpcharge && liveUpchargeRow) {
+                    liveUpchargeRow.style.display = 'flex';
+                    liveUpcharge.textContent = `$${samplePricing.upcharge.toFixed(2)}`;
+                } else if (liveUpchargeRow) {
+                    liveUpchargeRow.style.display = 'none';
+                }
+
+                // Show panel
+                pricingPanel.style.display = 'block';
+            } else if (pricingPanel) {
+                // Hide panel if no location selected or no quantity
+                pricingPanel.style.display = 'none';
+            }
+
             console.log('[3-Day Tees] Pricing recalculated:', {
                 grandTotalQuantity,
                 subtotal: grandSubtotal.toFixed(2),
+                totalRushFee: totalRushFee.toFixed(2),
                 ltmFee: ltmFee.toFixed(2),
                 salesTax: salesTax.toFixed(2),
                 shipping: shipping.toFixed(2),
@@ -2148,35 +2551,66 @@
             });
         }
 
-        // Render locations
-        function renderLocations() {
-            const grid = document.getElementById('locationGrid');
-            grid.innerHTML = state.locations.map(loc => `
-                <div class="location-option" onclick="selectLocation('${loc.code}')">
-                    <i class="fas ${loc.icon}"></i>
-                    <div class="location-name">${loc.name}</div>
-                    <div class="location-price" id="price-${loc.code}">Select quantity</div>
-                </div>
-            `).join('');
-        }
-
-        // Select location
-        function selectLocation(code) {
+        // Select front location (LC OR FF - mutually exclusive)
+        function selectFrontLocation(code) {
             state.selectedLocation = code;
 
-            // Update UI
-            document.querySelectorAll('.location-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
+            // Update visual state for radio buttons
+            const lcCard = document.getElementById('location-LC');
+            const ffCard = document.getElementById('location-FF');
 
-            console.log('[3-Day Tees] Location selected:', code);
+            // Reset both cards
+            lcCard.style.borderColor = 'var(--border-color)';
+            lcCard.style.backgroundColor = 'white';
+            ffCard.style.borderColor = 'var(--border-color)';
+            ffCard.style.backgroundColor = 'white';
+
+            // Highlight selected card
+            if (code === 'LC') {
+                lcCard.style.borderColor = 'var(--primary-color)';
+                lcCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
+            } else if (code === 'FF') {
+                ffCard.style.borderColor = 'var(--primary-color)';
+                ffCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
+            }
+
+            console.log('[3-Day Tees] Front location selected:', code);
+            recalculateAllPricing();
+        }
+
+        // Toggle back location (optional checkbox)
+        function toggleBackLocation() {
+            const checkbox = document.getElementById('backLocationCheckbox');
+            const fbCard = document.getElementById('location-FB');
+            const checkIcon = document.getElementById('back-check-icon');
+
+            if (checkbox.checked) {
+                // Enable back print
+                state.hasBackPrint = true;
+                fbCard.style.borderColor = 'var(--primary-color)';
+                fbCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
+                checkIcon.style.color = 'var(--primary-color)';
+
+                console.log('[3-Day Tees] Back print enabled');
+            } else {
+                // Disable back print
+                state.hasBackPrint = false;
+                fbCard.style.borderColor = 'var(--border-color)';
+                fbCard.style.backgroundColor = 'white';
+                checkIcon.style.color = 'var(--border-color)';
+
+                console.log('[3-Day Tees] Back print disabled');
+            }
+
             recalculateAllPricing();
         }
 
         // Calculate price (7-step formula + 25% rush fee)
+        // Returns: { finalPrice, basePrice, rushFee, upcharge }
         function calculatePrice(quantity, location, size) {
-            if (!state.pricingData || !location || quantity === 0) return 0;
+            if (!state.pricingData || !location || quantity === 0) {
+                return { finalPrice: 0, basePrice: 0, rushFee: 0, upcharge: 0 };
+            }
 
             // Find tier
             const tier = state.pricingData.tiersR.find(t =>
@@ -2192,18 +2626,34 @@
             // Step 2: Marked up garment
             const markedUpGarment = baseCost / tier.MarginDenominator;
 
-            // Step 3: Print cost
-            const printCost = state.pricingData.allDtgCostsR.find(c =>
+            // Step 3: Print cost - Handle combo locations (LC + FB or FF + FB)
+            let totalPrintCost = 0;
+
+            // Add front location cost
+            const frontCost = state.pricingData.allDtgCostsR.find(c =>
                 c.PrintLocationCode === location && c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
+            totalPrintCost += frontCost;
+
+            // Add back location cost if Full Back checkbox is checked
+            if (state.hasBackPrint) {
+                const backCost = state.pricingData.allDtgCostsR.find(c =>
+                    c.PrintLocationCode === 'FB' && c.TierLabel === tier.TierLabel
+                )?.PrintCost || 0;
+                totalPrintCost += backCost;
+
+                console.log(`[3-Day Tees] Combo location pricing: ${location} ($${frontCost.toFixed(2)}) + FB ($${backCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+            } else {
+                console.log(`[3-Day Tees] Single location pricing: ${location} = $${frontCost.toFixed(2)}`);
+            }
 
             // Step 4: Base DTG price
-            const baseDTGPrice = markedUpGarment + printCost;
+            const baseDTGPrice = markedUpGarment + totalPrintCost;
 
             // Step 5: Round base
             const roundedBase = Math.ceil(baseDTGPrice * 2) / 2;
 
-            // Step 6: Apply 25% rush fee
+            // Step 6: Calculate 25% rush fee
             const rushFee = roundedBase * 0.25;
             const priceWithRush = roundedBase + rushFee;
 
@@ -2213,7 +2663,13 @@
             // Step 8: Add size upcharge (API uses 'sellingPriceDisplayAddOns' not 'upcharges')
             const upcharge = (state.pricingData.sellingPriceDisplayAddOns || {})[size] || 0;
 
-            return finalPrice + upcharge;
+            // Return breakdown for transparent pricing
+            return {
+                finalPrice: finalPrice + upcharge,
+                basePrice: roundedBase,
+                rushFee: Math.ceil(rushFee * 2) / 2,  // Round rush fee separately
+                upcharge: upcharge
+            };
         }
 
         // File upload handling
@@ -2236,6 +2692,96 @@
             });
             renderFileList();
         });
+
+        // State field event listener for real-time sales tax calculation
+        // Triggers pricing recalculation when shipping state is entered or changed
+        const stateField = document.getElementById('state');
+        if (stateField) {
+            stateField.addEventListener('input', () => {
+                // Recalculate pricing to update sales tax based on state
+                recalculateAllPricing();
+                console.log('[3-Day Tees] State field changed, sales tax recalculated');
+            });
+        }
+
+        // Drag and drop file upload functionality
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            // Highlight drop zone when dragging over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, () => {
+                    uploadZone.style.borderColor = 'var(--primary-color)';
+                    uploadZone.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
+                }, false);
+            });
+
+            // Remove highlight when dragging leaves
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, () => {
+                    uploadZone.style.borderColor = '';
+                    uploadZone.style.backgroundColor = '';
+                }, false);
+            });
+
+            // Handle dropped files
+            uploadZone.addEventListener('drop', (e) => {
+                const files = Array.from(e.dataTransfer.files);
+
+                // Filter for accepted file types
+                const acceptedExtensions = ['.ai', '.eps', '.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.tif', '.psd'];
+                const validFiles = files.filter(file => {
+                    const fileName = file.name.toLowerCase();
+                    return acceptedExtensions.some(ext => fileName.endsWith(ext));
+                });
+
+                // Process valid files
+                validFiles.forEach(file => {
+                    if (file.size > 20 * 1024 * 1024) {
+                        showToast(
+                            `File "${file.name}" is too large. Maximum file size is 20MB.`,
+                            'error',
+                            8000
+                        );
+                        return;
+                    }
+                    state.uploadedFiles.push(file);
+                });
+
+                // Show warning for invalid files
+                const invalidFiles = files.filter(file => {
+                    const fileName = file.name.toLowerCase();
+                    return !acceptedExtensions.some(ext => fileName.endsWith(ext));
+                });
+
+                if (invalidFiles.length > 0) {
+                    showToast(
+                        `${invalidFiles.length} file(s) rejected. Only AI, EPS, PDF, PNG, JPG, TIFF, and PSD files are accepted.`,
+                        'warning',
+                        6000
+                    );
+                }
+
+                // Update display
+                renderFileList();
+
+                // Show success message for valid uploads
+                if (validFiles.length > 0) {
+                    showToast(
+                        `${validFiles.length} file(s) uploaded successfully`,
+                        'success',
+                        3000
+                    );
+                }
+            }, false);
+        }
 
         function renderFileList() {
             const list = document.getElementById('fileList');
@@ -2261,17 +2807,34 @@
         }
 
         // Payment Modal Functions
-        function showPaymentModal(orderTotal) {
-            // Calculate pricing breakdown
-            const subtotal = orderTotal.subtotal || 0;
-            const rushFee = orderTotal.rushFee || 0;
-            const tax = orderTotal.tax || 0;
-            const total = orderTotal.total || 0;
+        function showPaymentModal() {
+            // Read pricing breakdown directly from Order Summary DOM (single source of truth)
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '').replace(',', '')) || 0;
+            const rushFee = parseFloat(document.getElementById('rushFee').textContent.replace('$', '').replace(',', '')) || 0;
+
+            // LTM fee row may be hidden, check if element exists
+            const ltmFeeEl = document.getElementById('ltmFee');
+            const ltmFee = ltmFeeEl ? parseFloat(ltmFeeEl.textContent.replace('$', '').replace(',', '')) || 0 : 0;
+
+            const tax = parseFloat(document.getElementById('salesTax').textContent.replace('$', '').replace(',', '')) || 0;
+            const shipping = 30; // Fixed shipping amount
+            const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
 
             // Update payment modal with amounts
             document.getElementById('paymentSubtotal').textContent = `$${subtotal.toFixed(2)}`;
             document.getElementById('paymentRushFee').textContent = `$${rushFee.toFixed(2)}`;
+
+            // Show/hide LTM fee row based on whether it applies
+            const ltmFeeRow = document.getElementById('paymentLtmFeeRow');
+            if (ltmFee > 0) {
+                ltmFeeRow.style.display = 'flex';
+                document.getElementById('paymentLtmFee').textContent = `$${ltmFee.toFixed(2)}`;
+            } else {
+                ltmFeeRow.style.display = 'none';
+            }
+
             document.getElementById('paymentTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('paymentShipping').textContent = `$${shipping.toFixed(2)}`;
             document.getElementById('paymentTotal').textContent = `$${total.toFixed(2)}`;
             document.getElementById('payButtonAmount').textContent = `$${total.toFixed(2)}`;
 
@@ -2421,15 +2984,15 @@
             try {
                 showLoading(true);
 
-                // Calculate order total
-                const orderTotal = calculateOrderTotal();
+                // Read order total from Order Summary DOM (single source of truth)
+                const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
 
                 // Create payment intent on server
                 const response = await fetch('/api/create-payment-intent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: Math.round(orderTotal.total * 100), // Convert to cents
+                        amount: Math.round(total * 100), // Convert to cents
                         currency: 'usd'
                     })
                 });
@@ -2560,14 +3123,31 @@
             const baseCost = Math.min(...(pricingData.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
             const markedUp = baseCost / tier.MarginDenominator;
 
-            // Get print cost for location
-            const printCost = (pricingData.allDtgCostsR || []).find(c =>
+            // Get print cost - check for combo locations
+            let totalPrintCost = 0;
+
+            // Add front location cost
+            const frontPrintCost = (pricingData.allDtgCostsR || []).find(c =>
                 c.PrintLocationCode === state.selectedLocation &&
                 c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
+            totalPrintCost += frontPrintCost;
 
-            // Calculate base price per piece
-            const basePrice = markedUp + printCost;
+            // Add back print cost if Full Back checkbox is checked
+            if (state.hasBackPrint) {
+                const backPrintCost = (pricingData.allDtgCostsR || []).find(c =>
+                    c.PrintLocationCode === 'FB' &&
+                    c.TierLabel === tier.TierLabel
+                )?.PrintCost || 0;
+                totalPrintCost += backPrintCost;
+
+                console.log(`[Payment] Combo location pricing: ${state.selectedLocation} ($${frontPrintCost.toFixed(2)}) + FB ($${backPrintCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+            } else {
+                console.log(`[Payment] Single location pricing: ${state.selectedLocation} = $${frontPrintCost.toFixed(2)}`);
+            }
+
+            // Calculate base price per piece using total print cost
+            const basePrice = markedUp + totalPrintCost;
             const roundedBase = Math.ceil(basePrice * 2) / 2;
 
             // Calculate subtotal with size upcharges
@@ -2585,14 +3165,27 @@
             const rushFee = subtotal * 0.25;
             const subtotalWithRush = subtotal + rushFee;
 
-            // Apply 10.1% sales tax
-            const tax = subtotalWithRush * 0.101;
-            const total = subtotalWithRush + tax;
+            // Calculate LTM fee for orders 6-23 pieces
+            const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
+
+            // Add shipping fee
+            const shipping = 30;
+
+            // Apply conditional sales tax (10.1% for WA only, includes LTM in taxable base)
+            const stateField = document.getElementById('state');
+            const shippingState = stateField ? stateField.value.trim().toUpperCase() : '';
+            const taxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
+            const tax = (subtotalWithRush + ltmFee) * taxRate;
+
+            // Calculate grand total with all fees
+            const total = subtotalWithRush + ltmFee + tax + shipping;
 
             return {
                 subtotal: subtotal,
                 rushFee: rushFee,
+                ltmFee: ltmFee,
                 tax: tax,
+                shipping: shipping,
                 total: total
             };
         }
@@ -2618,7 +3211,7 @@
                     } else {
                         // Re-enable button on failure
                         payButton.disabled = false;
-                        const total = calculateOrderTotal().total;
+                        const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
                         payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
                     }
                 });
@@ -2649,7 +3242,8 @@
                     printLocationCode: state.selectedLocation,
                     printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
                     uploadedFiles: state.uploadedFiles,
-                    paymentId: paymentId  // Include payment ID
+                    paymentId: paymentId,  // Include payment ID
+                    shippingState: document.getElementById('state').value  // Required for conditional sales tax (Phase 2.3)
                 };
 
                 console.log('[3-Day Tees] Submitting order with payment ID:', paymentId);
@@ -2731,6 +3325,12 @@
                 return;
             }
 
+            // Validate minimum order quantity (6 pieces)
+            if (grandTotalQuantity < 6) {
+                showToast('Minimum order is 6 pieces. Please add more items to your order.', 'error', 0);
+                return;
+            }
+
             if (!document.getElementById('firstName').value || !document.getElementById('lastName').value) {
                 showToast('Please fill in your first and last name', 'warning');
                 return;
@@ -2757,12 +3357,8 @@
             console.log('[3-Day Tees] Colors:', state.selectedColors);
             console.log('[3-Day Tees] Total quantity:', grandTotalQuantity);
 
-            // Calculate order total
-            const orderTotal = calculateOrderTotal();
-            console.log('[3-Day Tees] Order total:', orderTotal);
-
-            // Show payment modal (Pay button will handle order submission)
-            showPaymentModal(orderTotal);
+            // Show payment modal (reads Order Summary DOM values automatically)
+            showPaymentModal();
         });
 
         // NOTE: Order number generation and email sending now handled by ThreeDayTeesOrderService
