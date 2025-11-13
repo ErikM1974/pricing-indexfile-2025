@@ -1710,6 +1710,19 @@
         const inventoryService = new SampleInventoryService();
         const orderService = new ThreeDayTeesOrderService();
 
+        // Helper function to convert file to base64 (pattern from sample-cart.html)
+        async function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => {
+                    console.error('[3-Day Tees] File read error:', error);
+                    reject(error);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         // Load available colors from API
         async function loadAvailableColors() {
             try {
@@ -3041,7 +3054,15 @@
                 } else if (paymentIntent.status === 'succeeded') {
                     // Payment succeeded
                     console.log('[Payment] Payment succeeded:', paymentIntent.id);
-                    return paymentIntent.id; // Return payment ID
+
+                    // Return complete payment object for API
+                    return {
+                        paymentId: paymentIntent.id,
+                        paymentDate: new Date(paymentIntent.created * 1000).toISOString().split('T')[0], // Unix timestamp to YYYY-MM-DD
+                        amount: paymentIntent.amount / 100, // Convert cents to dollars
+                        status: paymentIntent.status,
+                        paymentIntent: paymentIntent // Keep full object for reference
+                    };
                 } else if (paymentIntent.status === 'requires_action') {
                     // 3D Secure or other authentication required
                     console.log('[Payment] Additional authentication required');
@@ -3237,13 +3258,36 @@
                     notes: document.getElementById('notes').value || ''
                 };
 
+                // Convert uploaded files to base64
+                console.log('[3-Day Tees] Converting uploaded files to base64...');
+                const convertedFiles = [];
+
+                for (let i = 0; i < state.uploadedFiles.length; i++) {
+                    const file = state.uploadedFiles[i];
+                    try {
+                        const base64Data = await convertFileToBase64(file);
+                        convertedFiles.push({
+                            fileName: file.name,
+                            fileData: base64Data,
+                            category: 'artwork',
+                            description: i === 0 ? 'Front Artwork' : 'Back Artwork'
+                        });
+                        console.log(`[3-Day Tees] ✓ Converted ${file.name} to base64`);
+                    } catch (error) {
+                        console.error(`[3-Day Tees] Failed to convert ${file.name}:`, error);
+                        // Continue with other files even if one fails
+                    }
+                }
+
                 // Collect order settings
                 const orderSettings = {
                     printLocationCode: state.selectedLocation,
                     printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
-                    uploadedFiles: state.uploadedFiles,
-                    paymentId: paymentId,  // Include payment ID
-                    shippingState: document.getElementById('state').value  // Required for conditional sales tax (Phase 2.3)
+                    hasBackPrint: state.hasBackPrint, // Track back print
+                    uploadedFiles: convertedFiles, // Use converted base64 files
+                    paymentData: paymentId, // Complete payment object (not just ID)
+                    shippingState: document.getElementById('state').value, // Required for conditional sales tax (Phase 2.3)
+                    colorConfigs: state.colorConfigs // Pass color configurations
                 };
 
                 console.log('[3-Day Tees] Submitting order with payment ID:', paymentId);

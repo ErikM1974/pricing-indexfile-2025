@@ -143,15 +143,36 @@ class ThreeDayTeesOrderService {
                     method: 'UPS Ground'
                 },
                 lineItems: lineItems,
-                designs: orderSettings.uploadedFiles.map(file => ({
-                    name: file.name,
-                    externalKey: `3dt_${orderNumber}_${file.name}`,
-                    instructions: `DTG print - ${orderSettings.printLocationName}`
-                })),
+                designs: [{
+                    name: orderNumber, // Use order number as design name
+                    externalId: `DESIGN-${orderNumber}`, // Format: DESIGN-3DT0115-1
+                    designTypeId: 45, // DTG design type (proxy expects designTypeId not designType)
+                    artist: 224, // Artist ID
+                    productColor: Object.keys(orderSettings.colorConfigs).join(', '), // All t-shirt colors (proxy expects productColor not forProductColor)
+                    locations: this.buildDesignLocations(orderNumber, orderSettings.colorConfigs, orderSettings)
+                }],
                 notes: [{
                     type: 'Notes On Order',
-                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)${orderSettings.paymentId ? ` | PAYMENT CONFIRMED: Stripe ${orderSettings.paymentId}` : ''}`
+                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)`
                 }],
+                // Payments block - Stripe payment data
+                payments: orderSettings.paymentData ? [{
+                    date: orderSettings.paymentData.paymentDate, // YYYY-MM-DD format
+                    accountNumber: orderSettings.paymentData.paymentId, // Full Stripe payment ID
+                    amount: orderSettings.paymentData.amount, // Dollars (converted from cents)
+                    authCode: orderSettings.paymentData.paymentId, // Same as account number
+                    cardCompany: 'Stripe',
+                    gateway: 'Stripe',
+                    responseCode: '200',
+                    responseReasonCode: '1',
+                    responseReasonText: 'Payment successful',
+                    status: orderSettings.paymentData.status, // e.g., "succeeded"
+                    feeOther: 0,
+                    feeProcessing: (orderSettings.paymentData.amount * 0.029) + 0.30 // Stripe fee formula
+                }] : [],
+                // Files array for attachment upload (proxy expects 'files' not 'attachments')
+                // Files are already correctly formatted from frontend with fileData field
+                files: orderSettings.uploadedFiles,
                 total: grandTotal
             };
 
@@ -216,6 +237,73 @@ class ThreeDayTeesOrderService {
                 error: error.message
             };
         }
+    }
+
+    /**
+     * Build Designs.Locations array for front and optional back prints
+     * @param {string} orderNumber - Order number (e.g., "3DT0115-1")
+     * @param {Object} colorConfigs - Color configurations with size breakdowns
+     * @param {Object} orderSettings - Order settings including files and location
+     * @returns {Array} Locations array for Designs block
+     */
+    buildDesignLocations(orderNumber, colorConfigs, orderSettings) {
+        const locations = [];
+
+        // Get uploaded artwork files
+        const frontArtwork = orderSettings.uploadedFiles[0] || null;
+        const backArtwork = orderSettings.uploadedFiles[1] || null;
+
+        const frontLocationCode = orderSettings.printLocationCode; // 'LC' or 'FF'
+        const frontLocationName = orderSettings.printLocationName; // 'Left Chest' or 'Full Front'
+
+        // Front location (always present)
+        locations.push({
+            location: `${frontLocationCode} ${frontLocationName}`, // e.g., "FF Full Front"
+            code: orderNumber, // Proxy expects 'code' not 'designCode'
+            imageUrl: frontArtwork ? frontArtwork.fileData : '', // Base64 data (proxy expects 'imageUrl' not 'imageURL')
+            notes: this.buildLocationNotes(colorConfigs)
+        });
+
+        // Back location (if customer selected back print)
+        if (orderSettings.hasBackPrint && backArtwork) {
+            locations.push({
+                location: 'FB Full Back',
+                code: orderNumber, // Proxy expects 'code' not 'designCode'
+                imageUrl: backArtwork.fileData, // Base64 data (proxy expects 'imageUrl' not 'imageURL')
+                notes: this.buildLocationNotes(colorConfigs)
+            });
+        }
+
+        return locations;
+    }
+
+    /**
+     * Build location notes in format: "Forest Green: S(2), M(5), L(3); Navy: M(3), L(5)"
+     * @param {Object} colorConfigs - Color configurations keyed by catalogColor
+     * @returns {string} Formatted notes string
+     */
+    buildLocationNotes(colorConfigs) {
+        const colorNotes = [];
+
+        // Iterate through each color
+        Object.entries(colorConfigs).forEach(([catalogColor, config]) => {
+            const sizesList = [];
+
+            // Build size list: S(2), M(5), L(3)
+            Object.entries(config.sizeBreakdown).forEach(([size, sizeData]) => {
+                if (sizeData.quantity > 0) {
+                    sizesList.push(`${size}(${sizeData.quantity})`);
+                }
+            });
+
+            // Add color note if it has sizes
+            if (sizesList.length > 0) {
+                colorNotes.push(`${catalogColor}: ${sizesList.join(', ')}`);
+            }
+        });
+
+        // Join all colors with semicolon
+        return colorNotes.join('; ');
     }
 
     /**
