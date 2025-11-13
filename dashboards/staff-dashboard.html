@@ -392,6 +392,29 @@
             background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
         }
 
+        /* 3 Day Tees - Blue/Teal Gradient */
+        .seasonal-btn-3day {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            position: relative;
+        }
+
+        .seasonal-btn-3day:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #fbbf24;
+            color: #78350f;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+
         /* Christmas Bundles - Red/Christmas Gradient */
         .seasonal-btn-christmas {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -4060,6 +4083,12 @@
                     <div class="bundles-section" style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #e5e7eb;">
                         <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">Seasonal & Promotions</h3>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                            <!-- 3 Day Tees Coming Soon Button -->
+                            <a href="/pages/3-day-tees.html" class="seasonal-btn seasonal-btn-3day">
+                                <i class="fas fa-clock"></i>
+                                <span>3 Day Tees</span>
+                                <span class="coming-soon-badge">COMING SOON</span>
+                            </a>
                             <a href="/bundle-orders-dashboard.html" class="seasonal-btn seasonal-btn-orders">
                                 <i class="fas fa-box-open"></i>
                                 <span>Bundle Orders</span>
