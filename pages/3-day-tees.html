@@ -2247,7 +2247,9 @@
                     };
                 });
 
-                console.log('[3-Day Tees] Color added:', catalogColor);
+                if (DEBUG_PRICING) {
+                    console.log('[3-Day Tees] Color added:', catalogColor);
+                }
 
                 // Inventory will be loaded by renderColors() below (prevents race condition)
             } else {
@@ -2255,7 +2257,9 @@
                 state.selectedColors.splice(index, 1);
                 delete state.colorConfigs[catalogColor];
 
-                console.log('[3-Day Tees] Color removed:', catalogColor);
+                if (DEBUG_PRICING) {
+                    console.log('[3-Day Tees] Color removed:', catalogColor);
+                }
             }
 
             // Update UI
@@ -2339,7 +2343,9 @@
                 state.selectedColors.splice(index, 1);
                 delete state.colorConfigs[catalogColor];
 
-                console.log('[3-Day Tees] Color removed:', catalogColor);
+                if (DEBUG_PRICING) {
+                    console.log('[3-Day Tees] Color removed:', catalogColor);
+                }
 
                 // Update UI
                 renderColors();
@@ -2357,9 +2363,18 @@
             // Update quantity
             state.colorConfigs[catalogColor].sizeBreakdown[size].quantity = quantity;
 
-            // Recalculate pricing for all colors (combined quantity pricing)
-            recalculateAllPricing();
+            // Debounce the recalculation to prevent excessive updates
+            clearTimeout(recalculationTimer);
+            recalculationTimer = setTimeout(() => {
+                recalculateAllPricing();
+            }, 150);  // 150ms delay
         }
+
+        // Debug flag - set to false in production to reduce console logging
+        const DEBUG_PRICING = false;
+
+        // Debounce timer for recalculation
+        let recalculationTimer = null;
 
         // Recalculate pricing for all colors - CRITICAL: Uses COMBINED quantity for tier
         function recalculateAllPricing() {
@@ -2376,7 +2391,9 @@
                 grandTotalQuantity += config.totalQuantity;
             });
 
-            console.log('[3-Day Tees] Recalculating pricing with combined quantity:', grandTotalQuantity);
+            if (DEBUG_PRICING) {
+                console.log('[3-Day Tees] Recalculating pricing with combined quantity:', grandTotalQuantity);
+            }
 
             // Step 2: Calculate prices using COMBINED quantity for ALL colors
             let grandSubtotal = 0;
@@ -2553,7 +2570,8 @@
                 pricingPanel.style.display = 'none';
             }
 
-            console.log('[3-Day Tees] Pricing recalculated:', {
+            if (DEBUG_PRICING) {
+                console.log('[3-Day Tees] Pricing recalculated:', {
                 grandTotalQuantity,
                 subtotal: grandSubtotal.toFixed(2),
                 totalRushFee: totalRushFee.toFixed(2),
@@ -2561,7 +2579,8 @@
                 salesTax: salesTax.toFixed(2),
                 shipping: shipping.toFixed(2),
                 grandTotal: grandTotal.toFixed(2)
-            });
+                });
+            }
         }
 
         // Select front location (LC OR FF - mutually exclusive)
@@ -2587,7 +2606,9 @@
                 ffCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
             }
 
-            console.log('[3-Day Tees] Front location selected:', code);
+            if (DEBUG_PRICING) {
+                console.log('[3-Day Tees] Front location selected:', code);
+            }
             recalculateAllPricing();
         }
 
@@ -2604,7 +2625,9 @@
                 fbCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
                 checkIcon.style.color = 'var(--primary-color)';
 
-                console.log('[3-Day Tees] Back print enabled');
+                if (DEBUG_PRICING) {
+                    console.log('[3-Day Tees] Back print enabled');
+                }
             } else {
                 // Disable back print
                 state.hasBackPrint = false;
@@ -2612,7 +2635,9 @@
                 fbCard.style.backgroundColor = 'white';
                 checkIcon.style.color = 'var(--border-color)';
 
-                console.log('[3-Day Tees] Back print disabled');
+                if (DEBUG_PRICING) {
+                    console.log('[3-Day Tees] Back print disabled');
+                }
             }
 
             recalculateAllPricing();
@@ -2655,9 +2680,13 @@
                 )?.PrintCost || 0;
                 totalPrintCost += backCost;
 
-                console.log(`[3-Day Tees] Combo location pricing: ${location} ($${frontCost.toFixed(2)}) + FB ($${backCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+                if (DEBUG_PRICING) {
+                    console.log(`[3-Day Tees] Combo location pricing: ${location} ($${frontCost.toFixed(2)}) + FB ($${backCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+                }
             } else {
-                console.log(`[3-Day Tees] Single location pricing: ${location} = $${frontCost.toFixed(2)}`);
+                if (DEBUG_PRICING) {
+                    console.log(`[3-Day Tees] Single location pricing: ${location} = $${frontCost.toFixed(2)}`);
+                }
             }
 
             // Step 4: Base DTG price

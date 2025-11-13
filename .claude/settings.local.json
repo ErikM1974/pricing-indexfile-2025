@@ -11,7 +11,8 @@
       "Bash(temp-sanmar-colors.json)",
       "Bash(node:*)",
       "Bash(python:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": [],
