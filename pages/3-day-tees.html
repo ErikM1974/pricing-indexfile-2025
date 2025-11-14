@@ -2532,14 +2532,16 @@
                         }
                     }
 
-                    // Only accumulate to subtotal if quantity > 0 (use basePrice + upcharge, NOT finalPrice)
+                    // Only accumulate to subtotal if quantity > 0
                     if (qty > 0) {
-                        // Calculate rush fee per piece (25% of base price), rounded to cents to prevent floating-point errors
+                        // Use finalPrice (what customer sees) for accurate line item total
+                        // This ensures Stripe charge matches exactly what customer sees
+                        colorSubtotal += qty * priceBreakdown.finalPrice;
+
+                        // Calculate rush fee component for display purposes only (not used in calculations)
+                        // This is just to show the breakdown to customer
                         const rushFeePerPiece = Math.round(priceBreakdown.basePrice * 0.25 * 100) / 100;
                         totalRushFee += qty * rushFeePerPiece;
-                        // Calculate subtotal WITHOUT rush fee (rush fee shown as separate line item)
-                        const priceWithoutRush = priceBreakdown.basePrice + priceBreakdown.upcharge;
-                        colorSubtotal += qty * priceWithoutRush;
                     }
                 });
 
@@ -2573,10 +2575,13 @@
             const stateField = document.getElementById('state');
             const shippingState = stateField ? stateField.value.trim().toUpperCase() : '';
             const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
-            const salesTax = (grandSubtotal + totalRushFee + ltmFee) * salesTaxRate;
+            // Tax calculated on line items total (grandSubtotal now includes rush fee)
+            const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
 
             const shipping = 30;
-            const grandTotal = grandSubtotal + totalRushFee + ltmFee + salesTax + shipping;
+            console.log('[DEBUG A] Shipping calculated:', shipping, 'Type:', typeof shipping);
+            // Grand total now matches exactly: line items + LTM + tax + shipping
+            const grandTotal = grandSubtotal + ltmFee + salesTax + shipping;
 
             // Store calculated totals in state (single source of truth)
             state.orderTotals = {
@@ -2587,6 +2592,7 @@
                 shipping: shipping,
                 grandTotal: grandTotal
             };
+            console.log('[DEBUG B] State updated with shipping:', state.orderTotals.shipping, 'Full state:', state.orderTotals);
 
             // Update DOM from state (one-way data flow: state → DOM)
             updateOrderSummaryDOM();
@@ -3407,14 +3413,17 @@
                     uploadedFiles: uploadedFiles, // Use uploaded file URLs (not base64)
                     paymentData: paymentId, // Complete payment object (not just ID)
                     shippingState: document.getElementById('state').value, // Required for conditional sales tax (Phase 2.3)
-                    colorConfigs: state.colorConfigs // Pass color configurations
+                    colorConfigs: state.colorConfigs, // Pass color configurations
+                    ltmFee: state.orderTotals.ltmFee || 0 // Add LTM fee for orders under 24 pieces
                 };
 
                 console.log('[3-Day Tees] Submitting order with payment ID:', paymentId);
 
                 // Get pricing totals from state (single source of truth)
                 const { grandTotal: orderTotal, salesTax, shipping: shippingCost } = state.orderTotals;
+                console.log('[DEBUG C] Shipping extracted from state:', shippingCost, 'Type:', typeof shippingCost);
 
+                console.log('[DEBUG D] About to call submitOrder with shipping:', shippingCost);
                 // Submit order using ThreeDayTeesOrderService
                 const result = await orderService.submitOrder(
                     customerData,

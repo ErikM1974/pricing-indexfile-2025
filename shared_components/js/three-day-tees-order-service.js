@@ -68,6 +68,7 @@ class ThreeDayTeesOrderService {
      */
     async submitOrder(customerData, colorConfigs, orderSettings, orderTotal, salesTax, shippingCost) {
         try {
+            console.log('[DEBUG E] submitOrder called with shippingCost:', shippingCost, 'Type:', typeof shippingCost);
             console.log('[3DTOrderService] Submitting order...');
             console.log('[3DTOrderService] Customer:', customerData);
             console.log('[3DTOrderService] Colors:', Object.keys(colorConfigs));
@@ -100,6 +101,22 @@ class ThreeDayTeesOrderService {
                     });
                 });
             });
+
+            // Add LTM (Less Than Minimum) fee if applicable (6-23 pieces)
+            if (orderSettings.ltmFee && orderSettings.ltmFee > 0) {
+                lineItems.push({
+                    partNumber: 'LTM-75',
+                    description: 'Less Than Minimum $75.00',
+                    color: '',
+                    size: '',
+                    quantity: 1,
+                    price: orderSettings.ltmFee,
+                    notes: '',  // No notes per user requirement
+                    // Metadata for ManageOrders transformation
+                    productClass: 10,  // Fee item (id_ProductClass: 10), not product (id_ProductClass: 1)
+                    useSizeColumn: true  // Put quantity in Size01 column instead of regular size breakdown
+                });
+            }
 
             console.log('[3DTOrderService] Generated line items:', lineItems);
             console.log('[3DTOrderService] Total quantity:', grandTotalQuantity);
@@ -165,7 +182,7 @@ class ThreeDayTeesOrderService {
                     responseReasonText: orderSettings.paymentData.outcome?.reason || 'Payment successful',
                     status: orderSettings.paymentData.status, // e.g., "succeeded"
                     feeOther: 0,
-                    feeProcessing: (orderSettings.paymentData.amount * 0.029) + 0.30 // Stripe fee formula
+                    feeProcessing: 0  // Processing fee absorbed by business, not tracked in ShopWorks
                 }] : [],
                 // Files: DO NOT include in ManageOrders API call
                 // Files are already uploaded separately and stored with the order
@@ -185,6 +202,7 @@ class ThreeDayTeesOrderService {
                 // Shipping - $30 UPS Ground
                 cur_Shipping: shippingCost
             };
+            console.log('[DEBUG F] orderData.cur_Shipping set to:', orderData.cur_Shipping, 'Type:', typeof orderData.cur_Shipping);
 
             let finalOrderNumber = orderNumber;
             let orderCreatedSuccessfully = false;
@@ -192,6 +210,7 @@ class ThreeDayTeesOrderService {
             // Attempt to submit order to ManageOrders API
             try {
                 console.log('[3DTOrderService] Calling ManageOrders API...');
+                console.log('[DEBUG G] Before API call - orderData.cur_Shipping:', orderData.cur_Shipping);
                 const response = await fetch(`${this.apiBase}/api/manageorders/orders/create`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
