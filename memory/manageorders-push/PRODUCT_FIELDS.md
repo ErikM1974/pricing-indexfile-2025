@@ -42,14 +42,60 @@ This document covers **67 fields** across two blocks:
 | `Qty` | string | ✅ Used | `lineItems[].quantity` | Quantity | "1" |
 | `Price` | string | ✅ Used | `lineItems[].price` | Unit price | "0.01" |
 
-**Size Translation:** Proxy automatically translates web sizes to OnSite format:
-- S → Size01
-- M → Size02
-- L → Size03
-- XL → Size04
-- 2XL → Size05
-- 3XL → Size06
-- OSFA → Other XXXL
+**Size Translation:** Proxy automatically translates web sizes to OnSite format.
+
+**Complete SIZE_MAPPING Table:**
+
+| Frontend Size | ShopWorks Field | Category | Notes |
+|---------------|-----------------|----------|-------|
+| **Standard Sizes** | | | |
+| "S" | Size01 | Standard | Most common |
+| "M" | Size02 | Standard | Most common |
+| "L" | Size03 | Standard | Most common |
+| "XL" | Size04 | Standard | Most common |
+| "2XL" | Size05 | Oversize | Standard oversize |
+| "3XL" | Size06 | Oversize | Standard oversize |
+| **Extended Sizes** | | | |
+| "4XL" | Other S | Extended | Uses "Other" fields |
+| "5XL" | Other M | Extended | Uses "Other" fields |
+| "6XL" | Other L | Extended | Uses "Other" fields |
+| **Youth Sizes** | | | |
+| "XS" | Other XS | Youth/Small | Extra small |
+| "YXS" | Other YXS | Youth | Youth extra small |
+| "YS" | Other YS | Youth | Youth small |
+| "YM" | Other YM | Youth | Youth medium |
+| "YL" | Other YL | Youth | Youth large |
+| "YXL" | Other YXL | Youth | Youth extra large |
+| **Tall Sizes** | | | |
+| "LT" | Other LT | Tall | Large tall |
+| "XLT" | Other XLT | Tall | Extra large tall |
+| "2XLT" | Other 2XLT | Tall | 2XL tall |
+| "3XLT" | Other 3XLT | Tall | 3XL tall |
+| "4XLT" | Other 4XLT | Tall | 4XL tall |
+| **Special Sizes** | | | |
+| "OSFA" | Other XXXL | One Size | One Size Fits All |
+| "OS" | Other XXXL | One Size | One Size (alternate) |
+
+**Implementation Example:**
+```javascript
+// ✅ You send:
+lineItems: [{
+  size: "2XL",
+  quantity: 3
+}]
+
+// ✅ Proxy transforms to:
+LinesOE: [{
+  Size05: 3,
+  Size01: 0,
+  Size02: 0,
+  Size03: 0,
+  Size04: 0,
+  Size06: 0
+}]
+```
+
+**Complete size translation logic documented in:** [FIELD_REFERENCE_CORE.md § Size Translation](FIELD_REFERENCE_CORE.md#3-size-translation)
 
 ### Display Override Fields
 
@@ -177,15 +223,115 @@ lineItems: samples.map(sample => ({
 
 ### Design-Level Fields
 
-| Field | Data Type | Description | Example | Use Case |
-|-------|-----------|-------------|---------|----------|
-| `DesignName` | string | Design name | "Team Logo" | Identify design |
-| `ExtDesignID` | string | Your design ID | "DESIGN-001" | Track in your system |
-| `id_Design` | number | ShopWorks design ID | 123 | Link existing design |
-| `id_DesignType` | number | Design type ID | 1 | Screen print, embroidery, etc. |
-| `id_Artist` | number | Artist ID | 5 | Assign to artist |
-| `ForProductColor` | string | Product color | "Red" | Color-specific designs |
-| `VendorDesignID` | string | Vendor design ID | "VENDOR-123" | Third-party tracking |
+| Field | Data Type | Proxy Maps From | Description | Example | Use Case |
+|-------|-----------|-----------------|-------------|---------|----------|
+| `DesignName` | string | `designName` | Design name | "Team Logo" | Identify design |
+| `ExtDesignID` | string | `designId` | Your design ID | "DESIGN-001" | Track in your system |
+| `id_Design` | number | `shopworksDesignId` | ShopWorks design ID | 123 | Link existing design |
+| `id_DesignType` | number | `designTypeId` | Design type ID | 1 | Screen print, embroidery, etc. |
+| `id_Artist` | number | `artistId` | Artist ID | 5 | Assign to artist |
+| `ForProductColor` | string | `productColor` | Product color | "Red" | Color-specific designs |
+| `VendorDesignID` | string | `vendorDesignId` | Vendor design ID | "VENDOR-123" | Third-party tracking |
+
+**⚠️ Frontend Field Names:**
+Use camelCase names in your frontend code - the proxy automatically maps them to Swagger format:
+- `designName` → `DesignName`
+- `designId` → `ExtDesignID`
+- `shopworksDesignId` → `id_Design`
+- `designTypeId` → `id_DesignType`
+- `artistId` → `id_Artist`
+- `productColor` → `ForProductColor`
+- `vendorDesignId` → `VendorDesignID`
+
+**Complete field name mapping documented in:** [FIELD_REFERENCE_CORE.md § Proxy Transformations](FIELD_REFERENCE_CORE.md#proxy-transformations-reference)
+
+---
+
+### 🎨 Design Type IDs Reference
+
+These are standard design type IDs in ShopWorks OnSite 7. Verify these match your system configuration.
+
+| ID | Design Type | Use Case | Quote Builder |
+|----|-------------|----------|---------------|
+| 1 | Screen Print | Traditional screen printing | Screen Print Quote Builder |
+| 15 | DTG (Direct-to-Garment) | Water-based digital printing | DTG Quote Builder |
+| 17 | Embroidery | Thread-based decoration | Embroidery Quote Builder |
+| 18 | Cap Embroidery | Structured cap embroidery | Cap Quote Builder |
+| 45 | DTG Alternate | Some systems use this for DTG | **3-Day Tees uses this** |
+
+**Important Notes:**
+- **3-Day Tees currently uses `id_DesignType: 45`** - Verify this matches your ShopWorks DTG configuration
+- DTG systems may use either ID 15 or ID 45 depending on setup
+- To find design type IDs in ShopWorks: **Settings → Design Types → View ID column**
+
+**Implementation:**
+```javascript
+// Screen Print Quote Builder
+designs: [{
+  designName: "Team Logo",
+  designTypeId: 1,  // Screen Print
+  locations: [{
+    location: "Full Front",
+    totalColors: "4",
+    totalFlashes: "1"
+  }]
+}]
+
+// 3-Day Tees (DTG)
+designs: [{
+  designName: "Logo",
+  designTypeId: 45,  // DTG (verify your system uses 45 not 15)
+  artistId: 224,
+  locations: [{
+    location: "Left Chest"
+  }]
+}]
+```
+
+### 👨‍🎨 Artist ID Assignment
+
+The `id_Artist` field assigns design work to a specific artist in ShopWorks for production routing.
+
+**3-Day Tees Configuration:**
+- **Artist ID: 224** - Verify this corresponds to correct artist in your system
+
+**How to Find Artist IDs:**
+1. Open ShopWorks OnSite 7
+2. Navigate to: **Settings → Artists**
+3. View the **ID column** to see artist IDs
+4. Match the ID to the correct artist for your workflow
+
+**Implementation Example:**
+```javascript
+// Assign to specific artist
+designs: [{
+  designName: "Customer Logo",
+  designTypeId: 15,  // DTG
+  artistId: 224,     // Artist ID from ShopWorks
+  locations: [...]
+}]
+
+// No artist assignment (OnSite will use default routing)
+designs: [{
+  designName: "Standard Design",
+  designTypeId: 1,   // Screen Print
+  // artistId omitted - uses default routing
+  locations: [...]
+}]
+```
+
+**When to Use Artist ID:**
+- **Rush orders** - Route to specific artist for faster turnaround
+- **Specialized work** - Route to artist with specific skills (e.g., complex embroidery)
+- **Workflow routing** - Automatically assign based on decoration type
+- **3-Day Tees** - Always routes to Artist 224 for DTG work
+
+**When to Omit Artist ID:**
+- Standard orders using default ShopWorks routing
+- When artist assignment happens manually in OnSite
+- Testing/sample orders
+
+---
 
 ### Custom Fields (Design Level)
 

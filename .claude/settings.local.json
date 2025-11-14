@@ -12,7 +12,8 @@
       "Bash(node:*)",
       "Bash(python:*)",
       "Bash(git rebase:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": [],

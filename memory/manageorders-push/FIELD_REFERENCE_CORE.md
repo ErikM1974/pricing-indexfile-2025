@@ -254,6 +254,332 @@ This table shows how your frontend fields map to proxy fields and finally to Swa
 
 ---
 
+## 🔄 Proxy Transformations Reference
+
+**CRITICAL:** The caspio-pricing-proxy server automatically transforms your frontend data before sending to ManageOrders API. Understanding these transformations is essential for debugging and development.
+
+### Overview
+
+Your frontend code sends data in a simple, developer-friendly format. The proxy server automatically:
+- Adds required prefixes
+- Converts date formats
+- Translates sizes to ShopWorks format
+- Applies fallback logic for missing fields
+- Maps camelCase to Swagger field names
+
+**You don't need to handle these transformations in your frontend code** - the proxy does it all automatically.
+
+### 1. ExtOrderID Prefix
+
+**What it does:** Adds "NWCA-" prefix (or "NWCA-TEST-" in test mode)
+
+```javascript
+// ✅ You send:
+orderNumber: "SAMPLE-1027-1"
+
+// ✅ Proxy transforms to:
+ExtOrderID: "NWCA-SAMPLE-1027-1"        // Production mode (isTest: false)
+ExtOrderID: "NWCA-TEST-SAMPLE-1027-1"   // Test mode (isTest: true)
+```
+
+**Why it matters:** Identifies orders as coming from your webstore/form in ShopWorks
+
+**Debug tip:** Search OnSite for "NWCA-TEST-" to find test orders
+
+### 2. Date Format Conversion
+
+**What it does:** Converts ISO format (YYYY-MM-DD) to US format (MM/DD/YYYY)
+
+```javascript
+// ✅ You send (ISO format):
+orderDate: "2025-11-14"
+
+// ✅ Proxy transforms to:
+date_OrderPlaced: "11/14/2025"
+```
+
+**Why it matters:** ShopWorks OnSite expects US date format
+
+**Debug tip:** Always send dates in YYYY-MM-DD format - proxy handles conversion
+
+### 3. Size Translation (SIZE_MAPPING)
+
+**What it does:** Converts frontend size names to ShopWorks Size01-06 format
+
+**Complete SIZE_MAPPING Table:**
+
+| Frontend Size | ShopWorks Field | Notes |
+|---------------|-----------------|-------|
+| `"S"` | `Size01` | Standard |
+| `"M"` | `Size02` | Standard |
+| `"L"` | `Size03` | Standard |
+| `"XL"` | `Size04` | Standard |
+| `"2XL"` | `Size05` | Oversize |
+| `"3XL"` | `Size06` | Oversize |
+| `"4XL"` | `Other S` | Extended |
+| `"5XL"` | `Other M` | Extended |
+| `"6XL"` | `Other L` | Extended |
+| `"XS"` | `Other XS` | Youth/Small |
+| `"YXS"` | `Other YXS` | Youth |
+| `"YS"` | `Other YS` | Youth |
+| `"YM"` | `Other YM` | Youth |
+| `"YL"` | `Other YL` | Youth |
+| `"YXL"` | `Other YXL` | Youth |
+| `"LT"` | `Other LT` | Tall |
+| `"XLT"` | `Other XLT` | Tall |
+| `"2XLT"` | `Other 2XLT` | Tall |
+| `"3XLT"` | `Other 3XLT` | Tall |
+| `"4XLT"` | `Other 4XLT` | Tall |
+| `"OSFA"` | `Other XXXL` | One Size Fits All |
+| `"OS"` | `Other XXXL` | One Size (alternate) |
+
+**Example usage:**
+
+```javascript
+// ✅ You send:
+lineItems: [{
+  size: "2XL",
+  quantity: 3
+}]
+
+// ✅ Proxy transforms to:
+LinesOE: [{
+  Size05: 3,
+  Size01: 0,
+  Size02: 0,
+  Size03: 0,
+  Size04: 0,
+  Size06: 0
+}]
+```
+
+**Why it matters:** ShopWorks uses numbered size fields (Size01-06) plus "Other" fields for extended sizes
+
+**Debug tip:** Check OnSite import logs if sizes aren't appearing correctly
+
+### 4. Fallback Logic
+
+**What it does:** Auto-populates missing fields with intelligent defaults
+
+```javascript
+// ✅ Scenario 1: Missing BillingCompany
+customer: {
+  firstName: "John",
+  lastName: "Doe"
+  // No company provided
+}
+
+// ✅ Proxy fills in:
+Customer: {
+  BillingCompany: "John Doe",  // Fallback to full name
+  NameFirst: "John",
+  NameLast: "Doe"
+}
+
+// ✅ Scenario 2: Missing ShipCompany
+shipping: {
+  address1: "123 Main St",
+  city: "Seattle"
+  // No company provided
+}
+
+// ✅ Proxy fills in:
+ShippingAddresses: [{
+  ShipCompany: "John Doe",     // Fallback to customer name
+  ShipAddress01: "123 Main St",
+  ShipCity: "Seattle"
+}]
+```
+
+**Why it matters:** Prevents import errors from missing company names
+
+**Debug tip:** Company fields are NOT required in your frontend - proxy handles them
+
+### 5. Auto-Generated Fields
+
+**What it does:** Creates required fields you don't need to send
+
+```javascript
+// ✅ You send:
+orderNumber: "SAMPLE-1027-1",
+shipping: {
+  address1: "123 Main St"
+}
+
+// ✅ Proxy auto-generates:
+ExtShipID: "SHIP-1",                     // Always "SHIP-1"
+ExtSource: "NWCA Web Form",              // Identifies source
+Notes: [{
+  Note: "Customer: John Doe\nEmail: john@example.com\nPhone: 253-555-1234"
+}]
+```
+
+**Why it matters:** Reduces fields you need to track in frontend
+
+**Debug tip:** ExtShipID is always "SHIP-1" - OnSite uses this for single-address orders
+
+### 6. Field Name Mapping (camelCase → Swagger)
+
+**What it does:** Converts developer-friendly names to Swagger API format
+
+**Common Mappings:**
+
+| Your Field (camelCase) | Proxy Maps To | Swagger Field |
+|------------------------|---------------|---------------|
+| `orderNumber` | `extOrderId` | `ExtOrderID` |
+| `orderDate` | `date_Order` | `date_Order` |
+| `partNumber` | `PartNumber` | `PartNumber` |
+| `productColor` | `ForProductColor` | `ForProductColor` |
+| `designTypeId` | `id_DesignType` | `id_DesignType` |
+| `firstName` | `NameFirst` | `NameFirst` |
+| `lastName` | `NameLast` | `NameLast` |
+
+**Example:**
+
+```javascript
+// ✅ You send (camelCase - developer friendly):
+{
+  orderNumber: "SAMPLE-1027-1",
+  customer: {
+    firstName: "John",
+    lastName: "Doe"
+  }
+}
+
+// ✅ Proxy transforms to (Swagger format):
+{
+  ExtOrderID: "NWCA-SAMPLE-1027-1",
+  Customer: {
+    NameFirst: "John",
+    NameLast: "Doe"
+  }
+}
+```
+
+**Why it matters:** You can use familiar camelCase naming - proxy handles Swagger format
+
+**Debug tip:** Always check proxy client code for latest field mappings
+
+### 7. Default Values
+
+**What it does:** Sets reasonable defaults for optional fields
+
+```javascript
+// ✅ Defaults applied automatically:
+TaxExempt: ""                            // Empty string (converts to 0)
+OnHold: 0                                // Not on hold by default
+DropShipAllow: 1                         // Allow drop shipping
+id_CompanyLocation: 2                    // Default location ID
+InHandsDate: ""                          // Optional rush date
+ShipEarly: 0                             // Don't ship early
+TaxTotal: 0                              // No tax by default
+```
+
+**Why it matters:** Reduces required fields - only send what you need
+
+### 8. Address Smart Routing
+
+**What it does:** Routes billing vs shipping addresses to correct blocks
+
+```javascript
+// ✅ You send:
+customer: {
+  firstName: "John",
+  address: "123 Main St",      // Billing address
+  city: "Seattle"
+}
+shipping: {
+  address1: "456 Oak Ave",     // Shipping address (different)
+  city: "Portland"
+}
+
+// ✅ Proxy routes to:
+Customer: {
+  NameFirst: "John",
+  BillingAddress01: "123 Main St",     // Billing goes here
+  BillingCity: "Seattle"
+}
+ShippingAddresses: [{
+  ShipAddress01: "456 Oak Ave",        // Shipping goes here
+  ShipCity: "Portland"
+}]
+```
+
+**Why it matters:** Supports separate billing/shipping addresses
+
+**Debug tip:** If shipping address is same as billing, only send shipping block
+
+### 9. Email Cleaning
+
+**What it does:** Removes invisible characters from email addresses
+
+```javascript
+// ✅ You send (may contain \r from database):
+customer: {
+  email: "john@example.com\r"
+}
+
+// ✅ Proxy cleans to:
+Customer: {
+  Email: "john@example.com"              // \r removed
+}
+```
+
+**Why it matters:** Prevents email validation errors in OnSite
+
+**Debug tip:** If emails aren't working, check for hidden characters
+
+### 10. Phone Format Preservation
+
+**What it does:** Preserves phone formatting without validation
+
+```javascript
+// ✅ You send (any format):
+customer: {
+  phone: "(253) 555-1234"
+}
+
+// ✅ Proxy preserves:
+Customer: {
+  Phone: "(253) 555-1234"                // Exact format preserved
+}
+```
+
+**Why it matters:** OnSite handles phone validation - proxy doesn't modify
+
+**Debug tip:** Send phone in any format your users prefer
+
+---
+
+### Testing Proxy Transformations
+
+**View transformed data before sending:**
+
+```javascript
+// Enable debug mode in proxy client
+const client = new ManageOrdersPushClient({
+  debug: true  // Logs transformed data
+});
+
+// Check console for:
+// "[ManageOrdersPushClient] Transformed order: {...}"
+```
+
+**Common debugging steps:**
+
+1. Check proxy client logs for transformation details
+2. Verify SIZE_MAPPING for size translation issues
+3. Check ExtOrderID includes correct prefix
+4. Confirm dates are in MM/DD/YYYY format in OnSite
+5. Verify auto-generated fields (ExtShipID, Notes) appear
+
+**Production implementations:**
+- 3-Day Tees: `shared_components/js/three-day-tees-order-service.js`
+- Sample Cart: `pages/sample-order-service.js`
+- Proxy Client: `caspio-pricing-proxy/lib/manageorders-push-client.js`
+
+---
+
 ## 🚀 Version History
 
 ### v2.0.1 (October 29, 2025)

@@ -1,6 +1,6 @@
 # 📚 NWCA Documentation Index
 
-**Last Updated:** 2025-11-08
+**Last Updated:** 2025-11-14
 **Purpose:** Master navigation for all documentation files
 **Performance Note:** All files optimized to stay under 40k character limit for optimal Claude performance
 
@@ -29,6 +29,7 @@ This documentation has been reorganized into modular components for better perfo
 ├── PRODUCT_SKU_PATTERNS.md          # Quick reference for product SKU patterns
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
+│   ├── product-showcase-api.md      # New Products & Top Sellers showcase
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
 │   ├── orders-quotes-api.md         # Orders & quote management
 │   └── utility-api.md               # Utilities & reference data
@@ -74,6 +75,7 @@ This documentation has been reorganized into modular components for better perfo
 1. Start with **[CASPIO_API_CORE.md](./CASPIO_API_CORE.md)** - Core concepts, authentication, communication protocols
 2. Review specific endpoint modules in **/api/** based on your needs:
    - **[products-api.md](./api/products-api.md)** - Product catalog and search
+   - **[product-showcase-api.md](./api/product-showcase-api.md)** - New Products & Top Sellers showcase
    - **[cart-pricing-api.md](./api/cart-pricing-api.md)** - Shopping cart and pricing bundles
    - **[orders-quotes-api.md](./api/orders-quotes-api.md)** - Order processing and quotes
    - **[utility-api.md](./api/utility-api.md)** - Helper endpoints and reference data

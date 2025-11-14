@@ -186,7 +186,7 @@ curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/top-s
 
 **Note:** Changes take 5 minutes for cache to expire. Force refresh: Ctrl+Shift+R
 
-**Complete Documentation:** @memory/api/products-api.md → "New Products Management" and "Top Sellers Management"
+**Complete Documentation:** @memory/api/product-showcase-api.md
 
 ### Sanmar to ShopWorks Product Import
 

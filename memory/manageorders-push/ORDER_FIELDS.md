@@ -67,6 +67,7 @@ purchaseOrderNumber: customerData.actualPO,    // For real orders
 | `date_OrderPlaced` | string | ✅ Used | `orderDate` | Order date (MM/DD/YYYY) | "10/27/2025" |
 | `date_OrderRequestedToShip` | string | ❌ Not Used | `requestedShipDate` | Requested ship date | "11/03/2025" |
 | `date_OrderDropDead` | string | ❌ Not Used | `dropDeadDate` | Drop-dead date | "11/10/2025" |
+| `date_OrderNeeded` | string | ✅ **NEW** | `dateNeeded` | Rush delivery deadline | "10/30/2025" |
 
 **Format Note:** Proxy auto-converts YYYY-MM-DD → MM/DD/YYYY
 
@@ -99,6 +100,148 @@ dropDeadDate: "2025-11-10"            // Optional
 | `DiscountPartDescription` | string | ❌ Not Used | N/A | Discount description | "" |
 
 **Note:** ShopWorks Swagger shows `CustomerSeviceRep` (typo - missing 'r'), but proxy sends correctly spelled `CustomerServiceRep`.
+
+---
+
+### 🚨 Tax Implementation - CRITICAL
+
+**How Tax Works in ShopWorks OnSite:**
+
+ShopWorks has a specific way of handling sales tax that differs from typical e-commerce platforms. Understanding this is critical to prevent duplicate tax entries.
+
+**The Correct Way:**
+
+1. **Send tax fields at ORDER level** (in the main order object):
+   - `TaxTotal`: Total tax amount for the entire order
+   - `TaxPartNumber`: Must match a product in your ShopWorks catalog (e.g., "Tax_10.1")
+   - `TaxPartDescription`: Must match the product description in your catalog
+
+2. **ShopWorks automatically creates a tax line item** during the hourly import process
+
+3. **❌ DO NOT add tax as a line item** in the `LinesOE[]` array - this causes DUPLICATE tax entries
+
+**Example Implementation:**
+
+```javascript
+// ✅ CORRECT - Tax at order level only
+const order = {
+    extOrderId: "SAMPLE-1027-1",
+    taxTotal: 50.00,                           // Order-level tax
+    taxPartNumber: "Tax_10.1",                 // Must match ShopWorks catalog
+    taxPartDescription: "City of Milton Sales Tax 10.1%",
+    lineItems: [
+        { partNumber: "PC54", quantity: 48, price: 10.00 },
+        { partNumber: "PC61", quantity: 24, price: 12.00 }
+        // ❌ DO NOT include: { partNumber: "TAX", description: "Sales Tax", price: 50.00 }
+    ]
+};
+
+// What ShopWorks does during hourly import:
+// 1. Imports PC54 line item
+// 2. Imports PC61 line item
+// 3. AUTOMATICALLY creates tax line item from TaxTotal field
+```
+
+**What Happens If You Add Tax as Line Item:**
+
+```javascript
+// ❌ WRONG - Creates duplicate tax
+const order = {
+    taxTotal: 50.00,                           // Tax amount here
+    lineItems: [
+        { partNumber: "PC54", quantity: 48, price: 10.00 },
+        { partNumber: "Tax_10.1", quantity: 1, price: 50.00 }  // ❌ AND here = DUPLICATE!
+    ]
+};
+
+// Result in OnSite:
+// - PC54 line item: $480.00
+// - Tax line item (from TaxTotal): $50.00
+// - Tax line item (from lineItems): $50.00  ← DUPLICATE!
+// - Total: $580.00 (should be $530.00)
+```
+
+**Tax Calculation Example:**
+
+```javascript
+// Calculate tax for order
+const lineItems = [
+    { partNumber: "PC54", quantity: 48, price: 10.00 },
+    { partNumber: "PC61", quantity: 24, price: 12.00 }
+];
+
+const subtotal = lineItems.reduce((sum, item) =>
+    sum + (item.quantity * item.price), 0
+);  // $768.00
+
+const taxRate = 0.101;  // 10.1%
+const taxTotal = subtotal * taxRate;  // $77.57
+
+const order = {
+    extOrderId: "SAMPLE-1027-1",
+    taxTotal: 77.57,                           // Order level only
+    taxPartNumber: "Tax_10.1",                 // From ShopWorks catalog
+    taxPartDescription: "City of Milton Sales Tax 10.1%",
+    lineItems: lineItems                       // No tax item here
+};
+```
+
+**TaxPartNumber Configuration:**
+
+The `TaxPartNumber` field must match a product in your ShopWorks product catalog:
+
+| Tax Rate | Part Number | Description |
+|----------|-------------|-------------|
+| 10.1% | `Tax_10.1` | City of Milton Sales Tax 10.1% |
+| 10.5% | `Tax_10.5` | City of Tacoma Sales Tax 10.5% |
+| 9.5% | `Tax_9.5` | Pierce County Sales Tax 9.5% |
+
+**Why Explicitly Send Tax Fields:**
+
+You may notice that code explicitly sends `taxPartNumber` and `taxPartDescription` fields even though ShopWorks auto-creates tax line items. **This is CORRECT and necessary.**
+
+These fields tell ShopWorks **WHICH tax product** to use when auto-creating the line item during hourly import:
+- `TaxTotal` - Amount of tax to charge
+- `taxPartNumber` - ShopWorks product SKU for tax (e.g., "Tax_10.1")
+- `taxPartDescription` - Description of tax (e.g., "City of Milton Sales Tax 10.1%")
+
+Without these fields, ShopWorks wouldn't know which tax product to apply, resulting in import errors or incorrect tax application.
+
+**Production Implementation:**
+
+Both current implementations handle tax correctly:
+
+**3-Day Tees (free samples - no tax):**
+```javascript
+taxTotal: 0,
+taxPartNumber: "",
+taxPartDescription: ""
+```
+
+**Sample Cart (paid samples - with tax):**
+```javascript
+const taxRate = 0.101;
+const taxTotal = subtotal * taxRate;
+
+{
+    taxTotal: taxTotal,
+    taxPartNumber: "Tax_10.1",
+    taxPartDescription: "City of Milton Sales Tax 10.1%"
+}
+```
+
+**Troubleshooting Tax Issues:**
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| **Duplicate tax** | Tax added as line item AND order-level | Remove tax from lineItems array |
+| **Tax not appearing** | Missing TaxPartNumber | Add valid TaxPartNumber from catalog |
+| **Wrong tax amount** | Incorrect TaxTotal calculation | Verify subtotal × tax rate |
+| **Import error** | TaxPartNumber not in catalog | Create product in ShopWorks catalog |
+
+**Key Takeaway:** Tax goes at ORDER level (TaxTotal field), NOT as a line item. ShopWorks creates the tax line item automatically during import.
+
+---
 
 ### Status & Configuration Fields
 

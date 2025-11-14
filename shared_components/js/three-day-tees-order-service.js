@@ -158,11 +158,11 @@ class ThreeDayTeesOrderService {
                     accountNumber: orderSettings.paymentData.paymentId, // Full Stripe payment ID
                     amount: orderSettings.paymentData.amount, // Dollars (converted from cents)
                     authCode: orderSettings.paymentData.paymentId, // Same as account number
-                    cardCompany: 'Stripe',
+                    cardCompany: orderSettings.paymentData.card_brand || orderSettings.paymentData.payment_method_type || 'Stripe',
                     gateway: 'Stripe',
-                    responseCode: '200',
-                    responseReasonCode: '1',
-                    responseReasonText: 'Payment successful',
+                    responseCode: orderSettings.paymentData.outcome?.network_status || '200',
+                    responseReasonCode: orderSettings.paymentData.outcome?.seller_message || 'approved',
+                    responseReasonText: orderSettings.paymentData.outcome?.reason || 'Payment successful',
                     status: orderSettings.paymentData.status, // e.g., "succeeded"
                     feeOther: 0,
                     feeProcessing: (orderSettings.paymentData.amount * 0.029) + 0.30 // Stripe fee formula

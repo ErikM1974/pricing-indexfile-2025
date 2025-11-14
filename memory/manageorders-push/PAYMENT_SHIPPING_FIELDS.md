@@ -60,23 +60,61 @@ This document covers **34 fields** across four blocks:
 - `"pending"` - Payment pending
 - `"refunded"` - Payment refunded
 
-### Stripe Integration Example
+### 💳 Stripe Payment Field Mapping
+
+**CRITICAL:** Always use actual Stripe API response fields. DO NOT hardcode payment response values.
+
+When integrating Stripe Payment Intents, map Stripe API response fields to ManageOrders fields:
+
+| ManageOrders Field | Stripe API Path | Data Type | Example | Notes |
+|-------------------|-----------------|-----------|---------|-------|
+| `accountNumber` | `payment_intent.id` | string | "pi_3QRabcdef123" | Full Payment Intent ID |
+| `authCode` | `payment_intent.id` | string | "pi_3QRabcdef123" | Same as accountNumber |
+| `amount` | `payment_intent.amount / 100` | number | 144.00 | Convert cents → dollars |
+| `responseCode` | `payment_intent.outcome.network_status` | string | "approved_by_network" | Actual network response |
+| `responseReasonCode` | `payment_intent.outcome.seller_message` | string | "approved" | Seller-facing message |
+| `responseReasonText` | `payment_intent.outcome.reason` | string | "Payment successful" | Human-readable reason |
+| `cardCompany` | `payment_method.card.brand` | string | "visa" | Card brand (lowercase) |
+| `status` | `payment_intent.status` | string | "succeeded" | Payment status |
+| `feeProcessing` | Calculated | number | 4.48 | (amount × 0.029) + 0.30 |
+
+**Complete Stripe Integration Example:**
 
 ```javascript
-// After successful Stripe payment
+// After successful Stripe Payment Intent
+const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+const paymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+
 payments: [{
-  date: new Date().toISOString().split('T')[0], // YYYY-MM-DD (proxy converts)
-  amount: stripeCharge.amount / 100, // Convert cents to dollars
-  status: "success",
+  date: new Date().toISOString().split('T')[0], // YYYY-MM-DD (proxy converts to MM/DD/YYYY)
+  amount: paymentIntent.amount / 100, // Convert cents to dollars
+  status: paymentIntent.status, // "succeeded"
   gateway: "Stripe",
-  authCode: stripeCharge.id, // "ch_1234567890"
-  accountNumber: `****${stripeCharge.payment_method_details.card.last4}`,
-  cardCompany: stripeCharge.payment_method_details.card.brand, // "visa"
-  responseCode: stripeCharge.outcome.network_status, // "approved_by_network"
-  responseReasonText: "Approved",
-  feeProcessing: (stripeCharge.amount * 0.029 + 30) / 100 // 2.9% + $0.30
+  authCode: paymentIntent.id, // "pi_3QRabcdef123"
+  accountNumber: paymentIntent.id, // Same as authCode
+  cardCompany: paymentMethod.card.brand, // "visa", "mastercard", "amex", etc.
+  responseCode: paymentIntent.outcome?.network_status || 'approved_by_network',
+  responseReasonCode: paymentIntent.outcome?.seller_message || 'approved',
+  responseReasonText: paymentIntent.outcome?.reason || 'Payment successful',
+  feeProcessing: (paymentIntent.amount * 0.029 + 30) / 100 // Stripe standard fees
 }]
 ```
+
+**Common Mistake - Hardcoding Values:**
+
+```javascript
+// ❌ WRONG - Payment tracking data will be inaccurate
+payments: [{
+  responseCode: '200',              // ❌ Hardcoded
+  responseReasonCode: '1',          // ❌ Hardcoded
+  responseReasonText: 'Payment successful',  // ❌ Hardcoded
+  cardCompany: 'Stripe'             // ❌ Should be card brand
+}]
+```
+
+**Why This Matters:**
+
+If Stripe payment has issues (declined, fraud detection, network error), hardcoded values will show "success" in ShopWorks OnSite even though payment failed. Using actual Stripe response fields ensures accurate payment tracking.
 
 ### PayPal Integration Example
 
@@ -230,32 +268,230 @@ notes: [
 
 ## Attachments Block Fields {#attachments-block-fields}
 
-**Status:** ❌ Not Currently Implemented
-**Future Value:** ⭐⭐⭐ **MEDIUM** - Useful for design files
+**Status:** ✅ **Implemented in v1.1.0** - File upload support with smart routing
+**Current Value:** ⭐⭐⭐ **HIGH** - Essential for artwork tracking
 
-| Field | Data Type | Description | Example | Use Case |
-|-------|-----------|-------------|---------|----------|
-| `MediaURL` | string | URL to media file | "https://s3.../design.pdf" | Design files |
-| `MediaName` | string | Display name | "Team Logo - Vector" | User-friendly name |
-| `LinkURL` | string | URL to external resource | "https://drive.google.com/..." | Google Drive, Dropbox |
-| `LinkNote` | string | Note about link | "Final approved design" | Context |
-| `Link` | number | Link type (0 or 1) | 1 | Unclear purpose |
+| Field | Data Type | Status | Description | Example |
+|-------|-----------|--------|-------------|---------|
+| `MediaURL` | string | ✅ Used | URL to uploaded file | "https://c3eku948.caspio.com/..." |
+| `MediaName` | string | ✅ Used | Original filename | "team-logo.pdf" |
+| `LinkURL` | string | ❌ Not Used | External resource URL | "https://drive.google.com/..." |
+| `LinkNote` | string | ❌ Not Used | Note about link | "Final approved design" |
+| `Link` | number | ❌ Not Used | Link type (unclear) | 1 |
 
-### Future Implementation Example
+---
+
+### 🚨 Critical File Upload Implementation Notes
+
+#### 1MB Payload Limit (CRITICAL)
+
+**The Problem:**
+- ManageOrders API has a **1MB total JSON payload limit**
+- A single high-resolution design file can easily exceed this limit
+- Base64 encoding increases file size by ~33%
+
+**The Solution:**
+Files must be uploaded **separately to Caspio** BEFORE creating the order:
 
 ```javascript
-attachments: [
-  {
-    mediaURL: "https://s3.amazonaws.com/nwca/designs/logo-vector.pdf",
-    mediaName: "Team Logo - Vector File",
-    linkNote: "Final approved design from customer"
-  },
-  {
-    linkURL: "https://drive.google.com/file/d/...",
-    mediaName: "Mockup Images",
-    linkNote: "Customer mockup folder - 5 files"
-  }
-]
+// ❌ WRONG - Including base64 in order payload
+const order = {
+    lineItems: [...],
+    attachments: [{
+        mediaName: "logo.pdf",
+        fileData: "JVBERi0xLjQKJeLjz9MKNCAwIG9iaiA8PC9MZW5..."  // ❌ 5MB base64
+    }]
+};
+// Result: 413 Payload Too Large error
+
+// ✅ CORRECT - Upload file first, then reference
+// Step 1: Upload file to Caspio
+const uploadResponse = await fetch('/api/upload-file', {
+    method: 'POST',
+    body: formData  // Contains actual file
+});
+const { fileUrl } = await uploadResponse.json();
+
+// Step 2: Create order with file URL reference only
+const order = {
+    lineItems: [...],
+    attachments: [{
+        mediaURL: fileUrl,                    // ✅ Reference to uploaded file
+        mediaName: "logo.pdf"                 // ✅ Metadata only
+    }]
+};
+```
+
+#### Separate Upload Process
+
+**Implementation Pattern:**
+
+```javascript
+// Complete file upload workflow
+async function createOrderWithFiles(orderData, files) {
+    // 1. Upload files to Caspio first
+    const uploadedFiles = [];
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadResponse = await fetch(
+            'https://caspio-pricing-proxy.../api/upload-file',
+            {
+                method: 'POST',
+                body: formData
+            }
+        );
+
+        const result = await uploadResponse.json();
+        uploadedFiles.push({
+            mediaURL: result.fileUrl,
+            mediaName: file.name,
+            fileSize: file.size,
+            fileType: file.type
+        });
+    }
+
+    // 2. Create order with file references
+    const order = {
+        ...orderData,
+        attachments: uploadedFiles  // Only metadata, not file data
+    };
+
+    const orderResponse = await fetch('/api/manageorders/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+    });
+
+    return orderResponse.json();
+}
+```
+
+#### Smart Routing (Artwork vs Documents)
+
+**v1.1.0 automatically routes files based on type:**
+
+**Artwork Files** (images, vector files) → Added to BOTH:
+1. **Designs Block:** `Designs.Locations[].ImageURL`
+2. **Attachments Block:** For reference/download
+
+**Document Files** (PDF, Word, Excel) → Added to:
+1. **Attachments Block** only
+
+**Supported File Types (20+ types):**
+
+| Category | Types | Routing |
+|----------|-------|---------|
+| **Artwork** | .ai, .eps, .svg, .psd, .png, .jpg, .jpeg, .gif | Designs + Attachments |
+| **Documents** | .pdf, .doc, .docx, .xls, .xlsx, .txt | Attachments only |
+| **Compressed** | .zip, .rar, .7z | Attachments only |
+
+**Example:**
+
+```javascript
+const files = [
+    { name: "team-logo.ai", type: "image/ai" },        // Artwork
+    { name: "mockup.png", type: "image/png" },         // Artwork
+    { name: "quote.pdf", type: "application/pdf" }     // Document
+];
+
+// After upload and smart routing:
+// Designs.Locations[0].ImageURL = "https://.../team-logo.ai"
+// Designs.Locations[1].ImageURL = "https://.../mockup.png"
+// Attachments[0] = { mediaURL: "https://.../team-logo.ai", mediaName: "team-logo.ai" }
+// Attachments[1] = { mediaURL: "https://.../mockup.png", mediaName: "mockup.png" }
+// Attachments[2] = { mediaURL: "https://.../quote.pdf", mediaName: "quote.pdf" }
+```
+
+### Current Implementation Example (v1.1.0)
+
+```javascript
+// Upload files (done separately before order creation)
+const uploadedFiles = await uploadFilesToCaspio([
+    logoFile,
+    mockupFile,
+    quoteFile
+]);
+
+// Create order with file metadata only
+const order = {
+    orderNumber: "SAMPLE-1027-1",
+    lineItems: [
+        {
+            partNumber: "PC54",
+            quantity: 48,
+            price: 10.00
+        }
+    ],
+    attachments: [
+        {
+            mediaURL: "https://c3eku948.caspio.com/dp/A0E15000/files/team-logo.ai",
+            mediaName: "team-logo.ai",
+            fileSize: 245000,      // Optional metadata
+            fileType: "image/ai"   // Optional metadata
+        },
+        {
+            mediaURL: "https://c3eku948.caspio.com/dp/A0E15000/files/mockup.png",
+            mediaName: "mockup.png",
+            fileSize: 180000,
+            fileType: "image/png"
+        },
+        {
+            mediaURL: "https://c3eku948.caspio.com/dp/A0E15000/files/quote.pdf",
+            mediaName: "quote.pdf",
+            fileSize: 95000,
+            fileType: "application/pdf"
+        }
+    ]
+};
+
+// Send to ManageOrders API
+const response = await fetch('/api/manageorders/orders/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order)
+});
+```
+
+### File Upload Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Max file size** | 20MB | Per individual file |
+| **Max files per order** | Unlimited | No hard limit |
+| **Max total payload** | 1MB | JSON payload only (NOT file data) |
+| **Supported file types** | 20+ types | See table above |
+
+### Troubleshooting File Upload
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| **413 Payload Too Large** | Including file data in order payload | Upload files separately first |
+| **File not appearing in Designs** | Wrong file type or routing | Check file type - only artwork goes to Designs |
+| **Upload fails** | File too large (>20MB) | Compress or split file |
+| **Missing MediaURL** | File upload failed | Check upload response for errors |
+
+### Production Implementation
+
+**3-Day Tees (v1.1.0):**
+- Supports file upload for artwork files
+- Smart routing to Designs block
+- 20MB max file size
+- 20+ file type support
+
+**File Upload Endpoint:**
+```
+POST https://caspio-pricing-proxy.../api/upload-file
+Content-Type: multipart/form-data
+
+Response:
+{
+  "success": true,
+  "fileUrl": "https://c3eku948.caspio.com/dp/A0E15000/files/filename.ext",
+  "fileName": "filename.ext",
+  "fileSize": 245000
+}
 ```
 
 ---
