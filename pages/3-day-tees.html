@@ -2269,7 +2269,9 @@
                 state.sizes.forEach(size => {
                     state.colorConfigs[catalogColor].sizeBreakdown[size] = {
                         quantity: 0,
-                        unitPrice: 0
+                        unitPrice: 0,
+                        basePrice: 0,
+                        upcharge: 0
                     };
                 });
 
@@ -2437,6 +2439,8 @@
                     // Calculate price for this size (even if qty is 0, for display purposes)
                     const priceBreakdown = calculatePrice(grandTotalQuantity || 1, state.selectedLocation, size);
                     sizeData.unitPrice = priceBreakdown.finalPrice;
+                    sizeData.basePrice = priceBreakdown.basePrice;
+                    sizeData.upcharge = priceBreakdown.upcharge;
 
                     // Update price display (always show pricing with tooltip)
                     const priceEl = document.getElementById(`price-${catalogColor}-${size}`);
@@ -2490,9 +2494,9 @@
 
                     // Only accumulate to subtotal if quantity > 0 (use basePrice + upcharge, NOT finalPrice)
                     if (qty > 0) {
-                        // Calculate unrounded rush fee (25% of base price) for accurate total
-                        const unroundedRushFee = priceBreakdown.basePrice * 0.25;
-                        totalRushFee += qty * unroundedRushFee;
+                        // Calculate rush fee per piece (25% of base price), rounded to cents to prevent floating-point errors
+                        const rushFeePerPiece = Math.round(priceBreakdown.basePrice * 0.25 * 100) / 100;
+                        totalRushFee += qty * rushFeePerPiece;
                         // Calculate subtotal WITHOUT rush fee (rush fee shown as separate line item)
                         const priceWithoutRush = priceBreakdown.basePrice + priceBreakdown.upcharge;
                         colorSubtotal += qty * priceWithoutRush;
@@ -3328,10 +3332,20 @@
                 for (let i = 0; i < state.uploadedFiles.length; i++) {
                     const file = state.uploadedFiles[i];
                     try {
-                        const uploadResult = await uploadFileToCaspio(file, tempOrderNumber);
+                        // Generate unique filename: orderNum_timestamp_index_originalName
+                        const timestamp = Date.now();
+                        const fileExt = file.name.split('.').pop();
+                        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                        const uniqueFileName = `${tempOrderNumber}_${timestamp}_${i}_${baseName}.${fileExt}`;
+
+                        // Create renamed file
+                        const renamedFile = new File([file], uniqueFileName, { type: file.type });
+
+                        const uploadResult = await uploadFileToCaspio(renamedFile, tempOrderNumber);
 
                         uploadedFiles.push({
-                            fileName: file.name,
+                            fileName: file.name,  // Original name for display
+                            uniqueFileName: uniqueFileName,  // Unique name for storage
                             fileUrl: uploadResult.url,  // URL instead of base64 data
                             fileSize: file.size,
                             fileType: file.type,
@@ -3339,12 +3353,21 @@
                             description: i === 0 ? 'Front Artwork' : 'Back Artwork'
                         });
 
-                        console.log(`[3-Day Tees] ✓ Uploaded ${file.name}`);
+                        console.log(`[3-Day Tees] ✓ Uploaded ${file.name} as ${uniqueFileName}`);
                     } catch (uploadError) {
                         console.error(`[3-Day Tees] Upload failed for ${file.name}:`, uploadError);
 
-                        // Show user-friendly error
-                        alert(`Failed to upload ${file.name}. Please check your internet connection and try again.`);
+                        // Show specific error based on type
+                        let errorMessage = uploadError.message || 'Unknown error';
+
+                        if (errorMessage.includes('409') || errorMessage.includes('already exists')) {
+                            alert(`File already exists. Please rename and try again.\n\nFile: ${file.name}`);
+                        } else if (errorMessage.includes('Network') || errorMessage.includes('Failed to fetch')) {
+                            alert(`Network error. Please check your internet connection.\n\nFile: ${file.name}`);
+                        } else {
+                            alert(`Upload failed: ${errorMessage}\n\nFile: ${file.name}`);
+                        }
+
                         showLoading(false);
                         throw uploadError;
                     }
