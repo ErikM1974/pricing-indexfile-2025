@@ -38,7 +38,8 @@ This documentation has been reorganized into modular components for better perfo
 │   ├── CUSTOMER_AUTOCOMPLETE.md     # Customer autocomplete implementation
 │   ├── API_REFERENCE.md             # Complete API spec (11 endpoints)
 │   ├── SERVER_PROXY.md              # caspio-pricing-proxy implementation
-│   └── INTEGRATION_EXAMPLES.md      # Working code examples (orders, inventory, payments)
+│   ├── BASIC_EXAMPLES.md            # Simple single-endpoint integrations (~16k)
+│   └── ADVANCED_EXAMPLES.md         # Multi-endpoint workflows & complex patterns (~26k)
 ├── /manageorders-push/               # ManageOrders PUSH API field documentation (NEW - 165 fields)
 │   ├── FIELD_REFERENCE_CORE.md      # Master navigation hub (~15k)
 │   ├── ORDER_FIELDS.md              # Order-Level + Customer (54 fields)
@@ -61,10 +62,11 @@ This documentation has been reorganized into modular components for better perfo
     ├── specialty-calculator-template.md  # Specialty products template
     └── calculator-components.md          # Shared components
 
-## Original files (for reference):
-├── CASPIO_API_TEMPLATE.md           # Original (55.3k chars) - Now split
-├── CLAUDE.md                        # Original (46.9k chars) - Now split
-└── MANUAL_PRICING_CALCULATOR_GUIDE.md # Original (41.7k chars) - Now split
+## Archived files (moved to /docs/archive/):
+├── CASPIO_API_TEMPLATE.md           # Original (55.3k chars) - Archived (replaced by modular structure)
+├── MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md # Original (83.5k chars) - Archived (replaced by modular structure)
+├── MANUAL_PRICING_CALCULATOR_GUIDE.md # Original (41.7k chars) - Split into 3 optimized files
+└── manageorders/INTEGRATION_EXAMPLES.md # Original (40.4k chars) - Split into 2 optimized files
 ```
 
 ## 🎯 Quick Navigation Guide
@@ -337,21 +339,32 @@ PATCH  - Embroidered Emblems
 
 | Original File | Original Size | New Structure | Largest New File |
 |---------------|--------------|---------------|------------------|
-| CASPIO_API_TEMPLATE.md | 55.3k chars | 5 files | ~20k chars |
+| CASPIO_API_TEMPLATE.md | 55.3k chars | 5 files (ARCHIVED) | ~20k chars |
 | CLAUDE.md | 46.9k chars | 3 files | ~25k chars |
-| MANUAL_PRICING_CALCULATOR_GUIDE.md | 41.7k chars | 4 files | ~12k chars |
+| MANUAL_PRICING_CALCULATOR_GUIDE.md | 41.7k chars | 3 files | ~15k chars |
 | SHOPWORKS_EDP_INTEGRATION.md | 158k chars | 8 files | ~40k chars (PRODUCT_BLOCK.md) |
 | MANAGEORDERS_INTEGRATION.md | N/A (new) | 6 files | ~25k chars (API_REFERENCE.md) |
+| MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md | 83.5k chars | Already modular (ARCHIVED) | ~20k chars |
+| manageorders/INTEGRATION_EXAMPLES.md | 40.4k chars | 2 files | 25.5k chars (ADVANCED_EXAMPLES) |
 
-**Result:** All files now under 40k character threshold for optimal Claude performance ✅
+**Result:** All active files now under 40k character threshold for optimal Claude performance ✅
 
-**Latest Optimization (2025-10-26):**
+**Latest Optimization (2025-11-14):**
+- Archived 3 already-replaced files (182.6K total)
+  - MANAGEORDERS_PUSH_COMPLETE_FIELD_REFERENCE.md (83.5K) → Replaced by modular structure
+  - CASPIO_API_TEMPLATE.md (55.6K) → Replaced by CASPIO_API_CORE + /api/ modules
+  - DAY-6-TESTING-SUMMARY.md (43.7K) → Temporal development log
+- Split MANUAL_PRICING_CALCULATOR_GUIDE.md (41.7K) into 3 optimized files (14.4K, 23.7K, 5.2K)
+- Split manageorders/INTEGRATION_EXAMPLES.md (40.4K) into 2 files (15.7K, 25.5K)
+- **Result:** Zero files over 40K threshold, all optimized to 20-30K range ✅
+
+**Previous Optimization (2025-10-26):**
 - Split massive 158KB ShopWorks EDP file into 8 modular files
 - Core file reduced from 158KB → ~25KB (navigation hub)
 - 7 specialized files in /edp/ directory (each < 40KB)
 - **53% context reduction** when querying specific blocks
 
-**Latest Addition (2025-01-27):**
+**Initial Modularization (2025-01-27):**
 - Created ManageOrders API documentation (6 files, ~65k total)
 - Includes complete Swagger specification (10 endpoints, 89 fields)
 - Modular structure: Overview, Autocomplete, API Reference, Server Proxy, Future Integrations
