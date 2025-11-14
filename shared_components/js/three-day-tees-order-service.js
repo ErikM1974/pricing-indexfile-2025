@@ -170,9 +170,16 @@ class ThreeDayTeesOrderService {
                     feeOther: 0,
                     feeProcessing: (orderSettings.paymentData.amount * 0.029) + 0.30 // Stripe fee formula
                 }] : [],
-                // Files array for attachment upload (proxy expects 'files' not 'attachments')
-                // Files are already correctly formatted from frontend with fileData field
-                files: orderSettings.uploadedFiles,
+                // Files: DO NOT include in ManageOrders API call
+                // Files are already uploaded separately and stored with the order
+                // Including base64 file data here causes JSON to exceed 1MB limit
+                // Only include metadata for reference
+                attachments: orderSettings.uploadedFiles ? orderSettings.uploadedFiles.map(file => ({
+                    fileName: file.fileName,
+                    fileSize: file.fileSize,
+                    fileType: file.fileType
+                    // Exclude fileData to keep payload under 1MB limit
+                })) : [],
                 total: grandTotal
             };
 
@@ -260,7 +267,7 @@ class ThreeDayTeesOrderService {
         locations.push({
             location: `${frontLocationCode} ${frontLocationName}`, // e.g., "FF Full Front"
             code: orderNumber, // Proxy expects 'code' not 'designCode'
-            imageUrl: frontArtwork ? frontArtwork.fileData : '', // Base64 data (proxy expects 'imageUrl' not 'imageURL')
+            imageUrl: frontArtwork ? frontArtwork.fileUrl : '', // URL from Caspio storage (proxy expects 'imageUrl' not 'imageURL')
             notes: this.buildLocationNotes(colorConfigs)
         });
 
@@ -269,7 +276,7 @@ class ThreeDayTeesOrderService {
             locations.push({
                 location: 'FB Full Back',
                 code: orderNumber, // Proxy expects 'code' not 'designCode'
-                imageUrl: backArtwork.fileData, // Base64 data (proxy expects 'imageUrl' not 'imageURL')
+                imageUrl: backArtwork.fileUrl, // URL from Caspio storage (proxy expects 'imageUrl' not 'imageURL')
                 notes: this.buildLocationNotes(colorConfigs)
             });
         }
