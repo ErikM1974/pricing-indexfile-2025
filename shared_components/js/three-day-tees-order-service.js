@@ -82,7 +82,8 @@ class ThreeDayTeesOrderService {
                     const qty = sizeData.quantity;
                     if (qty === 0) return; // Skip sizes with 0 quantity
 
-                    const price = sizeData.unitPrice;
+                    // Use basePrice (without rush fee) to match frontend calculation
+                    const price = sizeData.basePrice + (sizeData.upcharge || 0);
                     grandTotalQuantity += qty;
 
                     lineItems.push({
@@ -102,14 +103,21 @@ class ThreeDayTeesOrderService {
 
             // Calculate totals
             const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+
+            // Calculate rush fee separately (25% of base price) to match frontend
+            const rushFee = lineItems.reduce((sum, item) => {
+                const itemRushFee = item.quantity * Math.round(item.price * 0.25 * 100) / 100;
+                return sum + itemRushFee;
+            }, 0);
+
             // LTM (Less Than Minimum) fee: $75 for orders of 6-23 pieces (updated Phase 2.4)
             const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
             // Conditional sales tax: Only apply 10.1% if shipping to Washington state (Phase 2.3)
             const shippingState = orderSettings.shippingState ? orderSettings.shippingState.trim().toUpperCase() : '';
             const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
-            const salesTax = (subtotal + ltmFee) * salesTaxRate;
+            const salesTax = (subtotal + rushFee + ltmFee) * salesTaxRate;
             const shipping = 30;
-            const grandTotal = subtotal + ltmFee + salesTax + shipping;
+            const grandTotal = subtotal + rushFee + ltmFee + salesTax + shipping;
 
             console.log('[3DTOrderService] Pricing:', {
                 subtotal: subtotal.toFixed(2),
@@ -124,8 +132,8 @@ class ThreeDayTeesOrderService {
                 orderNumber: orderNumber,
                 orderDate: new Date().toISOString().split('T')[0],
                 dateNeeded: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                salesRep: 'erik@nwcustomapparel.com',
-                terms: 'Net 30',
+                salesRep: 'Erik Mickelson',
+                terms: 'Prepaid', // Payment made via Stripe
                 customer: {
                     firstName: customerData.firstName,
                     lastName: customerData.lastName,
@@ -180,7 +188,13 @@ class ThreeDayTeesOrderService {
                     fileType: file.fileType
                     // Exclude fileData to keep payload under 1MB limit
                 })) : [],
-                total: grandTotal
+                total: grandTotal,
+                // Tax fields - ShopWorks auto-creates tax line item from these
+                taxTotal: parseFloat(salesTax.toFixed(2)),
+                taxPartNumber: 'Tax_10.1',
+                taxPartDescription: 'City of Milton Sales Tax 10.1%',
+                // Shipping - $30 UPS Ground
+                shipping: shipping
             };
 
             let finalOrderNumber = orderNumber;
