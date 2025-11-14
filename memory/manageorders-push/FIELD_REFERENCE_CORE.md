@@ -23,6 +23,7 @@ This is the master navigation hub for ManageOrders PUSH API field documentation.
 
 | Guide | Purpose | File | Status |
 |-------|---------|------|--------|
+| **Swagger Schema Reference** | Complete API schema specification | [SWAGGER_OVERVIEW.md](SWAGGER_OVERVIEW.md) | ✅ Complete |
 | **Form Development** | Complete form patterns (v2.0) | [FORM_DEVELOPMENT_GUIDE.md](FORM_DEVELOPMENT_GUIDE.md) | ✅ Complete |
 | **Code Examples** | Working implementation snippets | [IMPLEMENTATION_EXAMPLES.md](IMPLEMENTATION_EXAMPLES.md) | ✅ Complete |
 | **Troubleshooting** | Common issues & solutions | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | ✅ Complete |

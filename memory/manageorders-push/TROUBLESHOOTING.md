@@ -25,6 +25,233 @@ This guide helps diagnose and resolve common issues when working with the Manage
 
 ---
 
+## 🔍 Schema Validation (Start Here)
+
+**⭐ FIRST DEBUG STEP:** Always verify your request structure against the official Swagger schema before investigating other issues.
+
+### Quick Validation Checklist
+
+Before troubleshooting field-specific issues, validate your request structure:
+
+1. **Request Envelope Structure**
+   ```javascript
+   // ✅ CORRECT - Proper envelope structure
+   {
+     "order_json": {
+       "ExternalOrderJson": {
+         // Your order data here
+       }
+     }
+   }
+
+   // ❌ WRONG - Missing envelope
+   {
+     "ExternalOrderJson": { /* ... */ }  // Missing order_json wrapper
+   }
+   ```
+
+2. **Required Top-Level Fields**
+   - `ExtOrderID` (string) - Your unique order identifier
+   - `id_Customer` (number) - ShopWorks customer ID (e.g., 2791)
+   - `id_OrderType` (number) - Order type ID (e.g., 6 for Web Order)
+   - At least one item in `LinesOE` array
+
+3. **Date Format Validation**
+   ```javascript
+   // ✅ CORRECT - MM/DD/YYYY format
+   date_OrderPlaced: "11/08/2025"
+   date_OrderRequestedToShip: "11/15/2025"
+
+   // ❌ WRONG - Other formats
+   date_OrderPlaced: "2025-11-08"      // YYYY-MM-DD
+   date_OrderPlaced: "08/11/2025"      // DD/MM/YYYY
+   ```
+
+4. **Array Field Validation**
+   ```javascript
+   // ✅ CORRECT - Arrays exist and have items
+   "LinesOE": [{ /* at least one item */ }]
+   "ShippingAddresses": [{ /* at least one address */ }]
+
+   // ❌ WRONG - Empty or missing arrays
+   "LinesOE": []           // Empty array
+   // Missing LinesOE completely
+   ```
+
+### Common Schema Validation Errors
+
+#### Error: "Invalid request structure"
+
+**Symptom:** 400 Bad Request with message about request format
+
+**Cause:** Request doesn't match Swagger `Orders` schema structure
+
+**Solution:**
+```javascript
+// Verify your request matches this exact structure:
+const request = {
+  order_json: {                    // ✅ Required wrapper
+    ExternalOrderJson: {           // ✅ Required wrapper
+      ExtOrderID: "NWCA-3DT-1",   // ✅ Your fields here
+      id_Customer: 2791,
+      id_OrderType: 6,
+      LinesOE: [{ /* ... */ }],
+      ShippingAddresses: [{ /* ... */ }]
+    }
+  }
+};
+```
+
+**Reference:** [SWAGGER_REQUEST_ENVELOPE.md - Orders Schema](SWAGGER_REQUEST_ENVELOPE.md#orders-schema)
+
+---
+
+#### Error: "Field type mismatch"
+
+**Symptom:** Fields not populating despite being sent correctly
+
+**Cause:** Sending wrong data type (string instead of number, or vice versa)
+
+**Examples:**
+```javascript
+// ❌ WRONG - Type mismatches
+{
+  id_Customer: "2791",           // Should be number
+  id_OrderType: "6",             // Should be number
+  Size01: "4",                   // Should be number
+  cur_UnitPriceUserEntered: "16.00"  // Should be number
+}
+
+// ✅ CORRECT - Proper types
+{
+  id_Customer: 2791,             // Number
+  id_OrderType: 6,               // Number
+  Size01: 4,                     // Number
+  cur_UnitPriceUserEntered: 16.00  // Number
+}
+```
+
+**Reference:** [SWAGGER_ORDER_PAYLOAD.md - Field Types](SWAGGER_ORDER_PAYLOAD.md#field-types-and-validation)
+
+---
+
+#### Error: "Nested object structure invalid"
+
+**Symptom:** Customer or shipping fields not appearing
+
+**Cause:** Incorrect nesting of Customer or ShippingAddresses objects
+
+**Examples:**
+```javascript
+// ❌ WRONG - Flat structure
+{
+  ExtOrderID: "NWCA-3DT-1",
+  CompanyName: "Test Company",        // Should be in Customer object
+  BillingAddress01: "123 Main St"     // Should be in Customer object
+}
+
+// ✅ CORRECT - Proper nesting
+{
+  ExtOrderID: "NWCA-3DT-1",
+  Customer: {                          // Nested object
+    CompanyName: "Test Company",
+    BillingAddress01: "123 Main St"
+  }
+}
+```
+
+**Reference:** [SWAGGER_ORDER_PAYLOAD.md - Customer Fields](SWAGGER_ORDER_PAYLOAD.md#customer-information-fields)
+
+---
+
+#### Error: "Multi-SKU pattern not working"
+
+**Symptom:** 3-Day Tees orders creating separate products instead of consolidated sizes
+
+**Cause:** Using suffixed part numbers (PC54_2X) instead of base style (PC54)
+
+**Solution:**
+```javascript
+// ❌ WRONG - Suffixed part numbers
+"LinesOE": [
+  { PartNumber: "PC54", Size01: 4, Size02: 8 },      // Standard sizes
+  { PartNumber: "PC54_2X", Size05: 2, Size06: 1 }    // Creates separate product!
+]
+
+// ✅ CORRECT - Base part number for ALL sizes
+"LinesOE": [
+  { PartNumber: "PC54", Size01: 4, Size02: 8, Size03: 8, Size04: 2 },  // S-XL
+  { PartNumber: "PC54", Size05: 2, Size06: 1 }                          // 2XL-3XL
+]
+```
+
+**Reference:** [SWAGGER_EXAMPLES_VALIDATION.md - 3-Day Tees Multi-SKU](SWAGGER_EXAMPLES_VALIDATION.md#scenario-2-3-day-tees-multi-sku-approach)
+
+---
+
+### Validation Tools
+
+#### Manual Validation
+
+1. **Compare Against Schema:**
+   - Open [SWAGGER_OVERVIEW.md](SWAGGER_OVERVIEW.md)
+   - Find the relevant schema (Orders, ExternalOrderJson, LinesOE, etc.)
+   - Verify your structure matches exactly
+
+2. **Check Field Types:**
+   - Numbers: `id_Customer`, `id_OrderType`, `Size01-06`, `Quantity`, `cur_UnitPriceUserEntered`
+   - Strings: `ExtOrderID`, `PartNumber`, `ForProductColor`, `ContactEmail`
+   - Arrays: `LinesOE`, `ShippingAddresses`, `Designs`
+
+3. **Validate Required Fields:**
+   - ExternalOrderJson level: `ExtOrderID`, `id_Customer`, `id_OrderType`
+   - LinesOE items: `PartNumber`, `Quantity`, `cur_UnitPriceUserEntered`
+   - ShippingAddresses: `Name`, `Address01`, `City`, `State`, `ZipCode`
+
+#### Console Validation
+
+```javascript
+// Log your complete request structure
+console.log('Order Request:', JSON.stringify(orderRequest, null, 2));
+
+// Verify envelope structure
+console.log('Has order_json?', 'order_json' in orderRequest);
+console.log('Has ExternalOrderJson?', 'ExternalOrderJson' in orderRequest.order_json);
+
+// Check required fields
+const order = orderRequest.order_json.ExternalOrderJson;
+console.log('ExtOrderID:', order.ExtOrderID);
+console.log('id_Customer:', order.id_Customer, typeof order.id_Customer);
+console.log('id_OrderType:', order.id_OrderType, typeof order.id_OrderType);
+console.log('LinesOE count:', order.LinesOE?.length);
+
+// Validate line items
+order.LinesOE?.forEach((line, i) => {
+  console.log(`Line ${i}:`, {
+    PartNumber: line.PartNumber,
+    Quantity: line.Quantity,
+    Price: line.cur_UnitPriceUserEntered,
+    Color: line.ForProductColor
+  });
+});
+```
+
+---
+
+### Schema References
+
+**Complete schema documentation:**
+- [SWAGGER_OVERVIEW.md](SWAGGER_OVERVIEW.md) - Navigation hub for all Swagger schemas
+
+**Specific schemas:**
+- [Authentication (SignIn)](SWAGGER_AUTHENTICATION.md) - How to authenticate
+- [Request Structure (Orders)](SWAGGER_REQUEST_ENVELOPE.md) - Request envelope format
+- [Order Payload (ExternalOrderJson)](SWAGGER_ORDER_PAYLOAD.md) - Complete order structure
+- [Success Response (OrderPushResult)](SWAGGER_RESPONSES.md#success-response-orderpushresult-schema) - What you get back on success
+- [Error Responses](SWAGGER_RESPONSES.md#error-responses-error-schemas) - 401/403/500 error formats
+
+---
+
 ## Fields Not Appearing in ShopWorks
 
 ### Problem: Fields show in console but not in ShopWorks invoice

@@ -15,6 +15,7 @@
 - **[Inventory Integration](INVENTORY-INTEGRATION.md)** - Multi-SKU patterns
 - **[Implementation Timeline](IMPLEMENTATION-TIMELINE.md)** - Development plan
 - **[Business Logic](BUSINESS-LOGIC.md)** - Business rules
+- **[Swagger Schema Overview](../manageorders-push/SWAGGER_OVERVIEW.md)** - Complete API schema specification (NEW)
 
 ---
 
@@ -243,7 +244,27 @@ POST /api/manageorders/orders/create
 
 **Verified Source:** `/shared_components/js/sample-order-service.js:75-121` (expandSampleIntoLineItems function)
 
-### Request Structure
+### Schema Validation
+
+**Before implementing order submission, review the complete Swagger schema structure:**
+
+📘 **[SWAGGER_OVERVIEW.md](../manageorders-push/SWAGGER_OVERVIEW.md)** - Complete API specification
+
+**Key Schemas for 3-Day Tees:**
+- **[Orders Schema](../manageorders-push/SWAGGER_REQUEST_ENVELOPE.md)** - Request envelope structure (`order_json` wrapper)
+- **[ExternalOrderJson](../manageorders-push/SWAGGER_ORDER_PAYLOAD.md)** - Complete order payload (165 fields)
+- **[LinesOE](../manageorders-push/SWAGGER_ORDER_PAYLOAD.md#linesoe-array-line-items)** - Line item structure with Size01-06 fields
+- **[3-Day Tees Examples](../manageorders-push/SWAGGER_EXAMPLES_VALIDATION.md#scenario-2-3-day-tees-multi-sku-approach)** - Complete multi-SKU implementation
+
+**Validation Checklist:**
+- [ ] Request uses `order_json.ExternalOrderJson` envelope
+- [ ] All LinesOE items use `PartNumber: "PC54"` (base style)
+- [ ] Colors use CATALOG_COLOR format (e.g., "Forest" not "Forest Green")
+- [ ] Dates use MM/DD/YYYY format
+- [ ] Numeric fields are numbers (not strings)
+- [ ] Size distribution across Size01-06 fields
+
+### Request Structure (Simplified)
 
 ```json
 {
@@ -448,6 +469,23 @@ async function saveToQuoteDatabase(orderData) {
     return quoteID;
 }
 ```
+
+### Complete Schema Reference
+
+**For production implementation, consult the complete Swagger schemas:**
+
+📘 **[SWAGGER_OVERVIEW.md](../manageorders-push/SWAGGER_OVERVIEW.md)**
+
+This document provides:
+- Complete `ExternalOrderJson` structure (all 165 fields)
+- Authentication flow (`SignIn` schema)
+- Request envelope (`Orders` schema with `order_json` wrapper)
+- Success/error response formats
+- Complete 3-Day Tees multi-SKU examples
+- Field type validation reference
+- Transformation comparison (simplified → Swagger format)
+
+**The request structure shown above is simplified.** For the actual implementation, the proxy transforms it into the full Swagger format automatically. Review the Swagger documentation to understand the complete structure and all available fields.
 
 ---
 

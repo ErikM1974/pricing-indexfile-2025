@@ -42,6 +42,12 @@ This documentation has been reorganized into modular components for better perfo
 │   └── ADVANCED_EXAMPLES.md         # Multi-endpoint workflows & complex patterns (~26k)
 ├── /manageorders-push/               # ManageOrders PUSH API field documentation (NEW - 165 fields)
 │   ├── FIELD_REFERENCE_CORE.md      # Master navigation hub (~15k)
+│   ├── SWAGGER_OVERVIEW.md          # Swagger schema navigation hub (~8k)
+│   ├── SWAGGER_AUTHENTICATION.md    # SignIn schema for JWT tokens (~6k)
+│   ├── SWAGGER_REQUEST_ENVELOPE.md  # Orders schema wrapper pattern (~8k)
+│   ├── SWAGGER_ORDER_PAYLOAD.md     # ExternalOrderJson (165 fields) (~20k)
+│   ├── SWAGGER_RESPONSES.md         # Success & error response schemas (~10k)
+│   ├── SWAGGER_EXAMPLES_VALIDATION.md  # Working examples & validation (~15k)
 │   ├── ORDER_FIELDS.md              # Order-Level + Customer (54 fields)
 │   ├── PRODUCT_FIELDS.md            # Line Items + Design (47 fields)
 │   ├── PAYMENT_SHIPPING_FIELDS.md   # Payment/Shipping/Notes/Attachments (34 fields)
@@ -273,23 +279,31 @@ This documentation has been reorganized into modular components for better perfo
 
 ### "I need to enhance my ManageOrders PUSH API integration"
 1. Start with **[manageorders-push/FIELD_REFERENCE_CORE.md](./manageorders-push/FIELD_REFERENCE_CORE.md)** - Master navigation (165 fields, 100% Swagger coverage)
-2. Review field specifications by category:
+2. **Review complete Swagger schemas** ⭐ **NEW** - **[SWAGGER_OVERVIEW.md](./manageorders-push/SWAGGER_OVERVIEW.md)** (modular):
+   - **[SWAGGER_AUTHENTICATION.md](./manageorders-push/SWAGGER_AUTHENTICATION.md)** - SignIn schema for JWT tokens
+   - **[SWAGGER_REQUEST_ENVELOPE.md](./manageorders-push/SWAGGER_REQUEST_ENVELOPE.md)** - Orders schema wrapper pattern
+   - **[SWAGGER_ORDER_PAYLOAD.md](./manageorders-push/SWAGGER_ORDER_PAYLOAD.md)** - ExternalOrderJson (165 fields)
+   - **[SWAGGER_RESPONSES.md](./manageorders-push/SWAGGER_RESPONSES.md)** - Success & error response schemas
+   - **[SWAGGER_EXAMPLES_VALIDATION.md](./manageorders-push/SWAGGER_EXAMPLES_VALIDATION.md)** - Working examples, 3-Day Tees multi-SKU patterns
+3. Review field specifications by category:
    - **[ORDER_FIELDS.md](./manageorders-push/ORDER_FIELDS.md)** - Order-level & customer (54 fields: 27 order + 27 customer)
    - **[PRODUCT_FIELDS.md](./manageorders-push/PRODUCT_FIELDS.md)** - Line items & design (47 fields: 20 line items + 27 design nested)
    - **[PAYMENT_SHIPPING_FIELDS.md](./manageorders-push/PAYMENT_SHIPPING_FIELDS.md)** - Auxiliary blocks (34 fields total)
-3. Build custom forms with **[FORM_DEVELOPMENT_GUIDE.md](./manageorders-push/FORM_DEVELOPMENT_GUIDE.md)**:
+4. Build custom forms with **[FORM_DEVELOPMENT_GUIDE.md](./manageorders-push/FORM_DEVELOPMENT_GUIDE.md)**:
    - Pattern 1: Basic Sample Request Form
    - Pattern 2: Billing/Shipping Address Separation
    - Pattern 3: File Upload Integration (v1.1.0 - unlimited files, 20+ types)
    - Pattern 4: Customer Autocomplete (389 customers, 24-hour cache)
    - Pattern 5: Real-Time Inventory Check (5-minute cache)
-4. Copy working code from **[IMPLEMENTATION_EXAMPLES.md](./manageorders-push/IMPLEMENTATION_EXAMPLES.md)**
-5. Choose enhancement phase from **[ENHANCEMENT_ROADMAP.md](./manageorders-push/ENHANCEMENT_ROADMAP.md)**:
+5. Copy working code from **[IMPLEMENTATION_EXAMPLES.md](./manageorders-push/IMPLEMENTATION_EXAMPLES.md)**
+6. Choose enhancement phase from **[ENHANCEMENT_ROADMAP.md](./manageorders-push/ENHANCEMENT_ROADMAP.md)**:
    - **Phase 1:** Quick wins (9 custom fields ready - no API changes needed)
    - **Phase 2:** Major features (design tracking, extended shipping)
    - **Phase 3:** Advanced (payment integration, attachments)
-6. Debug with **[TROUBLESHOOTING.md](./manageorders-push/TROUBLESHOOTING.md)**
-7. Test field population in ShopWorks after hourly import
+7. Debug with **[TROUBLESHOOTING.md](./manageorders-push/TROUBLESHOOTING.md)**
+   - Start with Schema Validation section (first debug step)
+   - Reference Swagger schemas for exact field structures
+8. Test field population in ShopWorks after hourly import
 
 ## 🔑 Key Configuration Values
 
