@@ -1690,6 +1690,14 @@
             pricingData: null,
             uploadedFiles: [],
             inventoryCache: {},           // Cache inventory API responses to prevent rate limiting
+            orderTotals: {                // Calculated order totals (single source of truth)
+                subtotal: 0,
+                rushFee: 0,
+                ltmFee: 0,
+                salesTax: 0,
+                shipping: 30,
+                grandTotal: 0
+            },
             colors: [
                 { name: 'Jet Black', catalogColor: 'Jet Black', hex: '#000000' },
                 { name: 'White', catalogColor: 'White', hex: '#FFFFFF' },
@@ -2404,6 +2412,38 @@
         // Debounce timer for recalculation
         let recalculationTimer = null;
 
+        /**
+         * Update Order Summary DOM from state (one-way data flow: state → DOM)
+         * This ensures DOM always reflects the single source of truth (state.orderTotals)
+         */
+        function updateOrderSummaryDOM() {
+            const { subtotal, rushFee, ltmFee, salesTax, shipping, grandTotal } = state.orderTotals;
+
+            // Update all order summary elements
+            const subtotalEl = document.getElementById('subtotal');
+            const rushFeeEl = document.getElementById('rushFee');
+            const ltmFeeEl = document.getElementById('ltmFee');
+            const salesTaxEl = document.getElementById('salesTax');
+            const shippingEl = document.getElementById('shipping');
+            const grandTotalEl = document.getElementById('grandTotal');
+
+            if (subtotalEl) subtotalEl.textContent = `${subtotal.toFixed(2)}`;
+            if (rushFeeEl) rushFeeEl.textContent = `${rushFee.toFixed(2)}`;
+            if (ltmFeeEl) {
+                ltmFeeEl.textContent = `${ltmFee.toFixed(2)}`;
+                // Show/hide LTM fee row
+                const ltmRow = ltmFeeEl.closest('tr');
+                if (ltmRow) {
+                    ltmRow.style.display = ltmFee > 0 ? '' : 'none';
+                }
+            }
+            if (salesTaxEl) salesTaxEl.textContent = `${salesTax.toFixed(2)}`;
+            if (shippingEl) shippingEl.textContent = `${shipping.toFixed(2)}`;
+            if (grandTotalEl) grandTotalEl.textContent = `${grandTotal.toFixed(2)}`;
+
+            console.log('[3DayTees] Order summary DOM updated from state:', state.orderTotals);
+        }
+
         // Recalculate pricing for all colors - CRITICAL: Uses COMBINED quantity for tier
         function recalculateAllPricing() {
             if (!state.pricingData || !state.selectedLocation || state.selectedColors.length === 0) {
@@ -2538,33 +2578,28 @@
             const shipping = 30;
             const grandTotal = grandSubtotal + totalRushFee + ltmFee + salesTax + shipping;
 
-            // Update order summary displays
-            const subtotalEl = document.getElementById('subtotal');
-            const salesTaxEl = document.getElementById('salesTax');
-            const grandTotalEl = document.getElementById('grandTotal');
-            const ltmFeeEl = document.getElementById('ltmFee');
+            // Store calculated totals in state (single source of truth)
+            state.orderTotals = {
+                subtotal: grandSubtotal,
+                rushFee: totalRushFee,
+                ltmFee: ltmFee,
+                salesTax: salesTax,
+                shipping: shipping,
+                grandTotal: grandTotal
+            };
+
+            // Update DOM from state (one-way data flow: state → DOM)
+            updateOrderSummaryDOM();
+
+            // Show/hide fee rows in order summary
             const ltmRowEl = document.getElementById('ltmFeeRow');
-            const rushFeeEl = document.getElementById('rushFee');
             const rushRowEl = document.getElementById('rushFeeRow');
 
-            if (subtotalEl) subtotalEl.textContent = `$${grandSubtotal.toFixed(2)}`;
-            if (salesTaxEl) salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
-            if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
-
-            // Show/hide LTM fee
-            if (ltmFee > 0 && ltmFeeEl && ltmRowEl) {
-                ltmRowEl.style.display = 'flex';
-                ltmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
-            } else if (ltmRowEl) {
-                ltmRowEl.style.display = 'none';
+            if (ltmRowEl) {
+                ltmRowEl.style.display = ltmFee > 0 ? 'flex' : 'none';
             }
-
-            // Show rush fee (always visible when pricing is calculated)
-            if (totalRushFee > 0 && rushFeeEl && rushRowEl) {
-                rushRowEl.style.display = 'flex';
-                rushFeeEl.textContent = `$${totalRushFee.toFixed(2)}`;
-            } else if (rushRowEl) {
-                rushRowEl.style.display = 'none';
+            if (rushRowEl) {
+                rushRowEl.style.display = totalRushFee > 0 ? 'flex' : 'none';
             }
 
             // Step 6: Update live pricing display panel
@@ -2880,17 +2915,8 @@
 
         // Payment Modal Functions
         function showPaymentModal() {
-            // Read pricing breakdown directly from Order Summary DOM (single source of truth)
-            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '').replace(',', '')) || 0;
-            const rushFee = parseFloat(document.getElementById('rushFee').textContent.replace('$', '').replace(',', '')) || 0;
-
-            // LTM fee row may be hidden, check if element exists
-            const ltmFeeEl = document.getElementById('ltmFee');
-            const ltmFee = ltmFeeEl ? parseFloat(ltmFeeEl.textContent.replace('$', '').replace(',', '')) || 0 : 0;
-
-            const tax = parseFloat(document.getElementById('salesTax').textContent.replace('$', '').replace(',', '')) || 0;
-            const shipping = 30; // Fixed shipping amount
-            const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
+            // Read pricing breakdown from state (single source of truth)
+            const { subtotal, rushFee, ltmFee, salesTax: tax, shipping, grandTotal: total } = state.orderTotals;
 
             // Update payment modal with amounts
             document.getElementById('paymentSubtotal').textContent = `$${subtotal.toFixed(2)}`;
@@ -3056,8 +3082,8 @@
             try {
                 showLoading(true);
 
-                // Read order total from Order Summary DOM (single source of truth)
-                const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
+                // Read order total from state (single source of truth)
+                const total = state.orderTotals.grandTotal;
 
                 // Create payment intent on server
                 const response = await fetch('/api/create-payment-intent', {
@@ -3386,11 +3412,17 @@
 
                 console.log('[3-Day Tees] Submitting order with payment ID:', paymentId);
 
+                // Get pricing totals from state (single source of truth)
+                const { grandTotal: orderTotal, salesTax, shipping: shippingCost } = state.orderTotals;
+
                 // Submit order using ThreeDayTeesOrderService
                 const result = await orderService.submitOrder(
                     customerData,
                     state.colorConfigs,
-                    orderSettings
+                    orderSettings,
+                    orderTotal,
+                    salesTax,
+                    shippingCost
                 );
 
                 showLoading(false);

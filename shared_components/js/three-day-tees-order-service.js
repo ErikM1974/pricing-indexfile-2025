@@ -61,9 +61,12 @@ class ThreeDayTeesOrderService {
      * @param {Object} customerData - Customer contact and shipping information
      * @param {Object} colorConfigs - Object keyed by catalogColor with size breakdowns
      * @param {Object} orderSettings - Print location, files, notes, etc.
+     * @param {Number} orderTotal - Frontend's calculated grand total (used for both Stripe and ShopWorks)
+     * @param {Number} salesTax - Frontend's calculated sales tax
+     * @param {Number} shippingCost - Frontend's calculated shipping cost
      * @returns {Promise<Object>} Result with success status and order number
      */
-    async submitOrder(customerData, colorConfigs, orderSettings) {
+    async submitOrder(customerData, colorConfigs, orderSettings, orderTotal, salesTax, shippingCost) {
         try {
             console.log('[3DTOrderService] Submitting order...');
             console.log('[3DTOrderService] Customer:', customerData);
@@ -82,8 +85,8 @@ class ThreeDayTeesOrderService {
                     const qty = sizeData.quantity;
                     if (qty === 0) return; // Skip sizes with 0 quantity
 
-                    // Use basePrice (without rush fee) to match frontend calculation
-                    const price = sizeData.basePrice + (sizeData.upcharge || 0);
+                    // Use unitPrice (includes rush fee + upcharge) - matches frontend's final price
+                    const price = sizeData.unitPrice;
                     grandTotalQuantity += qty;
 
                     lineItems.push({
@@ -101,30 +104,16 @@ class ThreeDayTeesOrderService {
             console.log('[3DTOrderService] Generated line items:', lineItems);
             console.log('[3DTOrderService] Total quantity:', grandTotalQuantity);
 
-            // Calculate totals
+            // Calculate subtotal from line items (for ShopWorks line item total)
+            // Line items now use unitPrice which already includes rush fee + upcharges
             const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
-            // Calculate rush fee separately (25% of base price) to match frontend
-            const rushFee = lineItems.reduce((sum, item) => {
-                const itemRushFee = item.quantity * Math.round(item.price * 0.25 * 100) / 100;
-                return sum + itemRushFee;
-            }, 0);
-
-            // LTM (Less Than Minimum) fee: $75 for orders of 6-23 pieces (updated Phase 2.4)
-            const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
-            // Conditional sales tax: Only apply 10.1% if shipping to Washington state (Phase 2.3)
-            const shippingState = orderSettings.shippingState ? orderSettings.shippingState.trim().toUpperCase() : '';
-            const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
-            const salesTax = (subtotal + rushFee + ltmFee) * salesTaxRate;
-            const shipping = 30;
-            const grandTotal = subtotal + rushFee + ltmFee + salesTax + shipping;
-
-            console.log('[3DTOrderService] Pricing:', {
+            // Use frontend's grand total (single source of truth)
+            // This is the SAME total that Stripe charged - no redundant calculations
+            console.log('[3DTOrderService] Using frontend\'s calculated total:', {
                 subtotal: subtotal.toFixed(2),
-                ltmFee: ltmFee.toFixed(2),
-                salesTax: salesTax.toFixed(2),
-                shipping: shipping.toFixed(2),
-                grandTotal: grandTotal.toFixed(2)
+                grandTotal: orderTotal.toFixed(2),
+                note: 'Grand total from frontend (includes rush fee, LTM, tax, shipping)'
             });
 
             // Build ManageOrders order object
@@ -161,7 +150,7 @@ class ThreeDayTeesOrderService {
                 }],
                 notes: [{
                     type: 'Notes On Order',
-                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${grandTotal.toFixed(2)} (includes sales tax 10.1%)`
+                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${orderTotal.toFixed(2)} (includes sales tax 10.1%)`
                 }],
                 // Payments block - Stripe payment data
                 payments: orderSettings.paymentData ? [{
@@ -188,13 +177,13 @@ class ThreeDayTeesOrderService {
                     fileType: file.fileType
                     // Exclude fileData to keep payload under 1MB limit
                 })) : [],
-                total: grandTotal,
+                total: orderTotal,
                 // Tax fields - ShopWorks auto-creates tax line item from these
                 taxTotal: parseFloat(salesTax.toFixed(2)),
                 taxPartNumber: 'Tax_10.1',
                 taxPartDescription: 'City of Milton Sales Tax 10.1%',
                 // Shipping - $30 UPS Ground
-                shipping: shipping
+                cur_Shipping: shippingCost
             };
 
             let finalOrderNumber = orderNumber;
