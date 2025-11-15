@@ -26,6 +26,135 @@ class ThreeDayTeesOrderService {
     }
 
     /**
+     * Non-business days (US federal holidays + factory closure days)
+     * Factory is closed December 26-31 annually
+     * Update annually at year-end to add next year's holidays
+     */
+    static NON_BUSINESS_DAYS = [
+        // 2025 US Federal Holidays
+        '2025-01-01', // New Year's Day
+        '2025-01-20', // Martin Luther King Jr. Day
+        '2025-02-17', // Presidents' Day
+        '2025-05-26', // Memorial Day
+        '2025-06-19', // Juneteenth
+        '2025-07-04', // Independence Day
+        '2025-09-01', // Labor Day
+        '2025-10-13', // Columbus Day
+        '2025-11-11', // Veterans Day
+        '2025-11-27', // Thanksgiving
+        '2025-12-25', // Christmas
+
+        // 2025 Factory Closure (Dec 26-31)
+        '2025-12-26', '2025-12-27', '2025-12-28',
+        '2025-12-29', '2025-12-30', '2025-12-31',
+
+        // 2026 US Federal Holidays
+        '2026-01-01', // New Year's Day
+        '2026-01-19', // Martin Luther King Jr. Day
+        '2026-02-16', // Presidents' Day
+        '2026-05-25', // Memorial Day
+        '2026-06-19', // Juneteenth
+        '2026-07-03', // Independence Day (observed)
+        '2026-09-07', // Labor Day
+        '2026-10-12', // Columbus Day
+        '2026-11-11', // Veterans Day
+        '2026-11-26', // Thanksgiving
+        '2026-12-25', // Christmas
+
+        // 2026 Factory Closure (Dec 26-31)
+        '2026-12-26', '2026-12-27', '2026-12-28',
+        '2026-12-29', '2026-12-30', '2026-12-31',
+
+        // 2027 US Federal Holidays
+        '2027-01-01', // New Year's Day
+        '2027-01-18', // Martin Luther King Jr. Day
+        '2027-02-15', // Presidents' Day
+        '2027-05-31', // Memorial Day
+        '2027-06-18', // Juneteenth (observed)
+        '2027-07-05', // Independence Day (observed)
+        '2027-09-06', // Labor Day
+        '2027-10-11', // Columbus Day
+        '2027-11-11', // Veterans Day
+        '2027-11-25', // Thanksgiving
+        '2027-12-24', // Christmas (observed)
+
+        // 2027 Factory Closure (Dec 26-31)
+        '2027-12-26', '2027-12-27', '2027-12-28',
+        '2027-12-29', '2027-12-30', '2027-12-31'
+    ];
+
+    /**
+     * Check if current time is before 9 AM PST cutoff
+     * @returns {boolean} True if before 9 AM PST
+     */
+    isBeforeCutoff() {
+        const now = new Date();
+        const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+        return pstTime.getHours() < 9;
+    }
+
+    /**
+     * Get order date based on 9 AM PST cutoff
+     * Orders placed after 9 AM count as next business day
+     * Production clock starts on next business day (skips weekends/holidays)
+     * @returns {string} Order date in YYYY-MM-DD format
+     */
+    getOrderDate() {
+        const now = new Date();
+        if (!this.isBeforeCutoff()) {
+            // After 9 AM - order counts as tomorrow
+            now.setDate(now.getDate() + 1);
+        }
+
+        // Advance to next business day if on weekend or holiday
+        // Production clock only starts Monday-Friday, non-holidays
+        while (now.getDay() === 0 || now.getDay() === 6 || this.isHoliday(now)) {
+            now.setDate(now.getDate() + 1);
+        }
+
+        return now.toISOString().split('T')[0];
+    }
+
+    /**
+     * Check if a date is a non-business day (US federal holiday or factory closure)
+     * @param {Date} date - Date to check
+     * @returns {boolean} True if date is a non-business day
+     */
+    isHoliday(date) {
+        const dateStr = date.toISOString().split('T')[0];
+        return ThreeDayTeesOrderService.NON_BUSINESS_DAYS.includes(dateStr);
+    }
+
+    /**
+     * Calculate ship date (3 business days from order date)
+     * Skips weekends (Sat/Sun), US federal holidays, and factory closures (Dec 26-31)
+     * @param {string} orderDate - Order date in YYYY-MM-DD format
+     * @returns {string} Ship date in YYYY-MM-DD format
+     */
+    calculateShipDate(orderDate) {
+        const date = new Date(orderDate);
+        let businessDaysAdded = 0;
+
+        while (businessDaysAdded < 3) {
+            date.setDate(date.getDate() + 1);
+            const dayOfWeek = date.getDay();
+
+            // Skip weekends (0 = Sunday, 6 = Saturday)
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+            // Skip holidays
+            const isHolidayDate = this.isHoliday(date);
+
+            // Only count if it's a business day
+            if (!isWeekend && !isHolidayDate) {
+                businessDaysAdded++;
+            }
+        }
+
+        return date.toISOString().split('T')[0];
+    }
+
+    /**
      * Generate unique order number: 3DT-MMDD-sequence-milliseconds
      * Example: 3DT-1127-1-347
      */
@@ -133,10 +262,20 @@ class ThreeDayTeesOrderService {
                 note: 'Grand total from frontend (includes rush fee, LTM, tax, shipping)'
             });
 
+            // Calculate order date (respects 9 AM PST cutoff)
+            const orderDate = this.getOrderDate();
+
+            // Calculate ship date (3 business days, skip weekends/holidays)
+            const shipDate = this.calculateShipDate(orderDate);
+
+            console.log('[3DTOrderService] Order date:', orderDate);
+            console.log('[3DTOrderService] Ship date:', shipDate);
+
             // Build ManageOrders order object
             const orderData = {
                 orderNumber: orderNumber,
-                orderDate: new Date().toISOString().split('T')[0],
+                orderDate: orderDate,
+                requestedShipDate: shipDate,  // Ship date field for ShopWorks
                 dateNeeded: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                 salesRep: 'Erik Mickelson',
                 terms: 'Prepaid', // Payment made via Stripe

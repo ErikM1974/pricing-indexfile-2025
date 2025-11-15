@@ -110,11 +110,79 @@
             color: var(--text-primary);
         }
 
+        /* Ship Date Banner */
+        .ship-date-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+            border-bottom: 2px solid #047857;
+        }
+
+        .ship-date-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ship-date-content > i {
+            font-size: 2rem;
+            opacity: 0.95;
+        }
+
+        .ship-date-text {
+            text-align: left;
+        }
+
+        .ship-date-main {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.3px;
+        }
+
+        .ship-date-sub {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .ship-date-banner {
+                padding: 0.75rem 1rem;
+            }
+
+            .ship-date-content {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .ship-date-content > i {
+                font-size: 1.75rem;
+            }
+
+            .ship-date-text {
+                text-align: center;
+            }
+
+            .ship-date-main {
+                font-size: 1rem;
+            }
+
+            .ship-date-sub {
+                font-size: 0.8125rem;
+            }
+        }
+
         /* Hero Banner */
         .hero-banner {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
             color: white;
-            padding: 3rem 2rem;
+            padding: 2rem 1.5rem;
             text-align: center;
             border-radius: 12px;
             margin: 2rem auto;
@@ -142,7 +210,7 @@
         }
 
         .hero-banner h2 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 0.75rem;
             font-weight: 800;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -920,7 +988,7 @@
             }
 
             .hero-banner h2 {
-                font-size: 1.5rem;
+                font-size: 1.25rem;
             }
 
             .hero-banner .features {
@@ -1295,6 +1363,19 @@
             </div>
         </div>
     </header>
+
+    <!-- Ship Date Banner -->
+    <div id="shipDateBanner" class="ship-date-banner">
+        <div class="ship-date-content">
+            <i class="fas fa-shipping-fast"></i>
+            <div class="ship-date-text">
+                <div class="ship-date-main" id="shipDateMessage">
+                    Loading ship date...
+                </div>
+                <div class="ship-date-sub" id="shipDateCountdown"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Banner -->
     <div class="hero-banner">
@@ -3571,6 +3652,149 @@
                 overlay.classList.remove('active');
             }
         }
+
+        // Ship Date Calculation (matches backend logic)
+        // Non-business days: US federal holidays + factory closure (Dec 26-31 annually)
+        const NON_BUSINESS_DAYS = [
+            // 2025 US Federal Holidays
+            '2025-01-01', '2025-01-20', '2025-02-17', '2025-05-26',
+            '2025-06-19', '2025-07-04', '2025-09-01', '2025-10-13',
+            '2025-11-11', '2025-11-27', '2025-12-25',
+            // 2025 Factory Closure (Dec 26-31)
+            '2025-12-26', '2025-12-27', '2025-12-28', '2025-12-29', '2025-12-30', '2025-12-31',
+
+            // 2026 US Federal Holidays
+            '2026-01-01', '2026-01-19', '2026-02-16', '2026-05-25',
+            '2026-06-19', '2026-07-03', '2026-09-07', '2026-10-12',
+            '2026-11-11', '2026-11-26', '2026-12-25',
+            // 2026 Factory Closure (Dec 26-31)
+            '2026-12-26', '2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31',
+
+            // 2027 US Federal Holidays
+            '2027-01-01', '2027-01-18', '2027-02-15', '2027-05-31',
+            '2027-06-18', '2027-07-05', '2027-09-06', '2027-10-11',
+            '2027-11-11', '2027-11-25', '2027-12-24',
+            // 2027 Factory Closure (Dec 26-31)
+            '2027-12-26', '2027-12-27', '2027-12-28', '2027-12-29', '2027-12-30', '2027-12-31'
+        ];
+
+        function isBeforeCutoff() {
+            const now = new Date();
+            const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+            return pstTime.getHours() < 9;
+        }
+
+        function getOrderDate() {
+            const now = new Date();
+            if (!isBeforeCutoff()) {
+                // After 9 AM - order counts as tomorrow
+                now.setDate(now.getDate() + 1);
+            }
+
+            // Advance to next business day if on weekend or holiday
+            // Production clock only starts Monday-Friday, non-holidays
+            while (now.getDay() === 0 || now.getDay() === 6 || isHoliday(now)) {
+                now.setDate(now.getDate() + 1);
+            }
+
+            return now;
+        }
+
+        function isHoliday(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            return NON_BUSINESS_DAYS.includes(dateStr);
+        }
+
+        function calculateShipDate(orderDate) {
+            const date = new Date(orderDate);
+            let businessDaysAdded = 0;
+
+            while (businessDaysAdded < 3) {
+                date.setDate(date.getDate() + 1);
+                const dayOfWeek = date.getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isHolidayDate = isHoliday(date);
+
+                if (!isWeekend && !isHolidayDate) {
+                    businessDaysAdded++;
+                }
+            }
+
+            return date;
+        }
+
+        function formatShipDate(date) {
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getNextBusinessDayCutoff() {
+            const now = new Date();
+            const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+            // Start with tomorrow
+            const nextCutoff = new Date(pstTime);
+            nextCutoff.setDate(nextCutoff.getDate() + 1);
+            nextCutoff.setHours(9, 0, 0, 0);
+
+            // Skip weekends and holidays
+            while (nextCutoff.getDay() === 0 || nextCutoff.getDay() === 6 || isHoliday(nextCutoff)) {
+                nextCutoff.setDate(nextCutoff.getDate() + 1);
+            }
+
+            return nextCutoff;
+        }
+
+        function getTimeUntilCutoff() {
+            const now = new Date();
+            const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+            // Calculate time until 9 AM PST today
+            const cutoff = new Date(pstTime);
+            cutoff.setHours(9, 0, 0, 0);
+
+            // If already past cutoff, use next business day's cutoff
+            let targetCutoff;
+            if (pstTime >= cutoff) {
+                targetCutoff = getNextBusinessDayCutoff();
+            } else {
+                targetCutoff = cutoff;
+            }
+
+            const diff = targetCutoff - pstTime;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            return { hours, minutes, cutoffDate: targetCutoff };
+        }
+
+        function updateShipDateDisplay() {
+            const messageEl = document.getElementById('shipDateMessage');
+            const countdownEl = document.getElementById('shipDateCountdown');
+
+            if (!messageEl || !countdownEl) return;
+
+            const orderDate = getOrderDate();
+            const shipDate = calculateShipDate(orderDate);
+            const formattedShipDate = formatShipDate(shipDate);
+
+            if (isBeforeCutoff()) {
+                messageEl.textContent = `Place your order by 9 AM PST today and it ships ${formattedShipDate}`;
+
+                const { hours, minutes } = getTimeUntilCutoff();
+                countdownEl.textContent = `⏱ ${hours}h ${minutes}m remaining until cutoff`;
+            } else {
+                messageEl.textContent = `Orders placed now will ship ${formattedShipDate}`;
+
+                const { hours, minutes, cutoffDate } = getTimeUntilCutoff();
+                const dayName = cutoffDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'America/Los_Angeles' });
+                countdownEl.textContent = `Next cutoff: ${dayName} at 9 AM PST (${hours}h ${minutes}m)`;
+            }
+        }
+
+        // Update ship date display on load and every minute
+        updateShipDateDisplay();
+        setInterval(updateShipDateDisplay, 60000); // Update every 60 seconds
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
