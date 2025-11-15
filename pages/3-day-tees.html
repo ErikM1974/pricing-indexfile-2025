@@ -52,6 +52,7 @@
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         /* Header */
@@ -252,7 +253,7 @@
 
         .product-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(400px, 450px) 1fr;
             gap: 2.5rem;
             margin-bottom: 2rem;
             align-items: start;
@@ -321,61 +322,144 @@
             transform: scale(1.05);
         }
 
-        /* Color Selector */
+        /* Hero Product Image */
+        .product-hero {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+
+        .product-hero-image {
+            width: 100%;
+            max-width: 400px;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            transition: opacity 0.4s ease, transform 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-hero-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Loading state for hero image */
+        .product-hero-image.loading {
+            opacity: 0.5;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Color Selector - Compact Horizontal Layout */
         .color-selector {
-            margin-bottom: 1.5rem;
+            margin: 2rem 0;
         }
 
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        .color-swatches-container {
+            display: flex;
             gap: 1rem;
-            margin-top: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0.5rem;
+            scroll-behavior: smooth;
+            position: relative;
         }
 
-        .color-option {
-            position: relative;
-            border: 3px solid transparent;
-            border-radius: 8px;
-            padding: 1rem;
+        /* Horizontal scrolling hint gradient */
+        .color-swatches-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(to left, var(--card-bg), transparent);
+            pointer-events: none;
+        }
+
+        .color-swatch-option {
+            flex: 0 0 auto;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            background: var(--card-bg);
-            min-height: 260px;
+            transition: transform 0.2s;
         }
 
-        .color-option:hover {
-            border-color: var(--border-color);
+        .color-swatch-option:hover {
+            transform: translateY(-4px);
+        }
+
+        .color-swatch-option:active {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .color-option.selected {
-            border-color: var(--primary-color);
-            background: #fef3f0;
         }
 
         .color-swatch {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            border: 3px solid transparent;
             margin: 0 auto 0.5rem;
-            border: 2px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .color-name {
-            font-size: 0.875rem;
+        .color-swatch-option.selected .color-swatch {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2), 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Keyboard focus state for accessibility */
+        .color-swatch-option:focus-within .color-swatch {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .color-swatch::after {
+            /* Checkmark for selected state */
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .color-swatch-option.selected .color-swatch::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .color-label {
+            font-size: 0.75rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            max-width: 60px;
+            word-wrap: break-word;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
         }
 
         .stock-badge {
             display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.65rem;
             font-weight: 600;
+            margin-top: 4px;
         }
 
         .stock-badge.in-stock {
@@ -430,6 +514,118 @@
         .size-stock-badge.out {
             background: #e5e7eb;
             color: #6b7280;
+        }
+
+        /* Selected Colors Container - Reserve space to prevent layout shift */
+        #selectedColorsContainer {
+            min-height: 500px;
+        }
+
+        #selectedColorsContainer:empty {
+            min-height: 0;
+        }
+
+        /* Selected Color Cards */
+        .selected-color-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .color-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .color-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-header .color-mini-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: inline-block;
+        }
+
+        .remove-color-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .color-summary {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 2px dashed #ddd;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Color Card Components */
+        .color-swatch-mini {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .color-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-remove-color {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-remove-color:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .color-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+            font-weight: 600;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .color-total span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .color-total-value {
+            font-size: 1.25rem;
+            color: var(--primary-color);
         }
 
         /* Location Selector */
@@ -965,6 +1161,17 @@
             }
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .toast.hiding {
             animation: slideOut 0.3s ease-in;
         }
@@ -1222,6 +1429,53 @@
         html {
             scroll-behavior: smooth;
         }
+
+        /* Mobile Responsive for New Layout */
+        @media (max-width: 768px) {
+            .product-hero-image {
+                max-width: 100%;
+                height: 400px;
+            }
+
+            .color-swatches-container {
+                gap: 0.75rem;
+                padding: 0.75rem 0;
+            }
+
+            .size-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .selected-color-card {
+                padding: 1rem;
+            }
+
+            .color-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            /* Location selector - single column on mobile */
+            .location-selector > div > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-hero-image {
+                height: 350px;
+            }
+
+            .size-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .color-label {
+                font-size: 0.7rem;
+                max-width: 50px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1407,31 +1661,40 @@
             <!-- Left Column: Product Configuration -->
             <div>
                 <div class="card">
-                    <h3>1. Select Product</h3>
-                    <div class="product-info">
-                        <p><strong>Port & Company PC54</strong></p>
-                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Premium 100% cotton tee, perfect for DTG printing</p>
+                    <div class="product-hero">
+                        <img id="heroProductImage" class="product-hero-image"
+                             src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464"
+                             alt="Port & Company PC54 - Jet Black with DTG Print"
+                             style="display: block;">
+                        <div class="product-title">Port & Company PC54</div>
+                        <p class="product-description">Premium 100% cotton tee, perfect for DTG printing</p>
                     </div>
                 </div>
 
                 <div class="card" style="margin-top: 1rem;">
-                    <h3>2. Choose Color</h3>
+                    <h3>1. Choose Colors</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Select all colors needed for your order:</p>
                     <div class="color-selector">
-                        <div class="color-grid" id="colorGrid">
+                        <div class="color-swatches-container" id="colorGrid">
                             <!-- Colors populated by JavaScript -->
                         </div>
                     </div>
+
+                    <!-- Selected Colors with Size Breakdown -->
+                    <div id="selectedColorsContainer" style="margin-top: 1.5rem;">
+                        <!-- Selected color cards populated by JavaScript -->
+                    </div>
                 </div>
 
                 <div class="card" style="margin-top: 1rem;">
-                    <h3>3. Print Location</h3>
+                    <h3>2. Print Location</h3>
                     <div class="location-selector">
                         <!-- Front Print Location (Radio Buttons - Choose ONE) -->
                         <div style="margin-bottom: 2rem;">
                             <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
                                 Front Print Location <span style="color: var(--error-color);">*</span>
                             </h4>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 100%;">
                                 <!-- Left Chest Option -->
                                 <label class="location-card" style="cursor: pointer; position: relative;">
                                     <input type="radio" name="frontLocation" value="LC"
@@ -1533,7 +1796,7 @@
                 </div>
 
                 <div class="card" style="margin-top: 1rem;">
-                    <h3>4. Size Breakdown (Multi-Color)</h3>
+                    <h3>3. Size Breakdown (Multi-Color)</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter quantity for each size per color (minimum 12 total pieces across all colors)</p>
                     <div class="size-breakdown">
                         <!-- Selected colors with per-color size grids -->
@@ -1556,7 +1819,7 @@
 
                 <div class="card" id="uploadArtworkCard" style="margin-top: 1rem;">
                     <h3 class="collapsible-header">
-                        5. Upload Artwork
+                        4. Upload Artwork
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </h3>
                     <div class="collapsible-content">
@@ -1908,6 +2171,41 @@
                 renderColors();
                 // Note: Location selector is now static HTML (radio buttons + checkbox)
 
+                // Set Jet Black as default selected color
+                const jetBlackColor = state.colors.find(c => c.catalogColor === 'Jet Black');
+                if (jetBlackColor) {
+                    // Add Jet Black to selected colors
+                    state.selectedColors.push('Jet Black');
+
+                    // Initialize colorConfig for Jet Black
+                    state.colorConfigs['Jet Black'] = {
+                        displayColor: jetBlackColor.name,
+                        catalogColor: 'Jet Black',
+                        sizeBreakdown: {},
+                        totalQuantity: 0,
+                        images: {
+                            frontModel: jetBlackColor.frontModel || null,
+                            backModel: jetBlackColor.backModel || null,
+                            frontFlat: jetBlackColor.frontFlat || null
+                        }
+                    };
+
+                    // Initialize size breakdown with 0 quantity for all sizes
+                    state.sizes.forEach(size => {
+                        state.colorConfigs['Jet Black'].sizeBreakdown[size] = {
+                            quantity: 0,
+                            unitPrice: 0,
+                            basePrice: 0,
+                            upcharge: 0
+                        };
+                    });
+
+                    // Update UI to show Jet Black as selected
+                    renderColors(); // Re-render to show checkmark on Jet Black
+                    renderSelectedColors(); // Show size breakdown card
+                    recalculateAllPricing(); // Update pricing
+                }
+
                 // Initialize collapsible sections
                 initCollapsibleSections();
 
@@ -1976,26 +2274,12 @@
                 // Check if color is already selected
                 const isSelected = state.selectedColors.includes(color.catalogColor);
                 const selectedClass = isSelected ? 'selected' : '';
-                const buttonText = isSelected ? '✓ Added' : 'Add Color';
-                const buttonClass = isSelected ? 'btn-secondary' : 'btn-primary';
-
-                // Show thumbnail when color is selected
-                const thumbnailHTML = isSelected && color.frontModel
-                    ? `<img src="${color.frontModel}" alt="${color.name}"
-                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;
-                                   margin-top: 8px; border: 2px solid var(--primary-color); display: block; margin-left: auto; margin-right: auto;">`
-                    : '';
 
                 return `
-                    <div class="color-option ${selectedClass}">
+                    <div class="color-swatch-option ${selectedClass}" onclick="toggleColor('${color.catalogColor}', event)">
                         <div class="color-swatch" style="${swatchStyle} ${whiteBorder}"></div>
-                        <div class="color-name">${color.name}</div>
-                        <div class="stock-badge" id="stock-${color.catalogColor}">Loading...</div>
-                        ${thumbnailHTML}
-                        <button class="btn ${buttonClass}" style="margin-top: 8px; font-size: 0.875rem; padding: 6px 12px;"
-                                onclick="toggleColor('${color.catalogColor}', event)">
-                            ${buttonText}
-                        </button>
+                        <div class="color-label">${color.name}</div>
+                        <div class="stock-badge" id="stock-${color.catalogColor}">...</div>
                     </div>
                 `;
             }).join('');
@@ -2014,6 +2298,40 @@
                     }
                 });
             }, 0);
+
+            // Update hero image to show first color or first selected color
+            updateHeroImage();
+        }
+
+        // Update hero product image based on selected colors
+        function updateHeroImage() {
+            const heroImg = document.getElementById('heroProductImage');
+            if (!heroImg) return;
+
+            // Priority: First selected color, otherwise first available color
+            let imageColor;
+            if (state.selectedColors.length > 0) {
+                // Find first selected color's data
+                imageColor = state.colors.find(c => c.catalogColor === state.selectedColors[0]);
+            } else {
+                // Show first available color
+                imageColor = state.colors[0];
+            }
+
+            // Special case: Jet Black always uses the Setina showcase image
+            if (imageColor && (imageColor.catalogColor === 'Jet Black' || imageColor.name === 'Jet Black')) {
+                heroImg.src = 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464';
+                heroImg.style.display = 'block';
+                heroImg.alt = 'Port & Company PC54 - Jet Black with DTG Print';
+            } else if (imageColor && imageColor.frontModel) {
+                // All other colors use API image
+                heroImg.src = imageColor.frontModel;
+                heroImg.style.display = 'block';
+                heroImg.alt = `${imageColor.name} - Port & Company PC54`;
+            } else {
+                // Hide if no image available
+                heroImg.style.display = 'none';
+            }
         }
 
         // Helper function to update inventory badge display
@@ -2101,24 +2419,26 @@
                     PC54_has_Size02: standardData.result?.[0]?.Size02,
                     PC54_has_Size03: standardData.result?.[0]?.Size03,
                     PC54_has_Size04: standardData.result?.[0]?.Size04,
+                    PC54_has_Size05: standardData.result?.[0]?.Size05,
                     PC54_2X_result_length: twoXLData.result?.length,
-                    PC54_2X_has_Size05: twoXLData.result?.[0]?.Size05,
+                    PC54_2X_has_Size06: twoXLData.result?.[0]?.Size06,
                     PC54_3X_result_length: threeXLData.result?.length,
                     PC54_3X_has_Size06: threeXLData.result?.[0]?.Size06
                 });
 
                 let total = 0;
 
-                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                // PC54: Size01=XS, Size02=S, Size03=M, Size04=L, Size05=XL
                 if (standardData.result && standardData.result.length > 0) {
                     const inventory = standardData.result[0];
                     total += (inventory.Size01 || 0) + (inventory.Size02 || 0) +
-                            (inventory.Size03 || 0) + (inventory.Size04 || 0);
+                            (inventory.Size03 || 0) + (inventory.Size04 || 0) +
+                            (inventory.Size05 || 0);
                 }
 
-                // PC54_2X: Size05=2XL
+                // PC54_2X: Size06=2XL
                 if (twoXLData.result && twoXLData.result.length > 0) {
-                    total += twoXLData.result[0].Size05 || 0;
+                    total += twoXLData.result[0].Size06 || 0;
                 }
 
                 // PC54_3X: Size06=3XL
@@ -2150,7 +2470,7 @@
                 });
             } catch (error) {
                 console.error('[3-Day Tees] Multi-SKU inventory load error:', catalogColor, error);
-                const badge = document.getElementById(`stock-${catalogColor.replace(/\s+/g, '-')}`);
+                const badge = document.getElementById(`stock-${catalogColor}`);
 
                 // Differentiate between network errors and API errors
                 if (error.message.includes('fetch') || error.message.includes('network') || !navigator.onLine) {
@@ -2206,13 +2526,13 @@
                 // Build inventory by size
                 const sizeInventory = {};
 
-                // PC54: Size01=S, Size02=M, Size03=L, Size04=XL
+                // PC54: Size01=XS, Size02=S, Size03=M, Size04=L, Size05=XL
                 if (standardData.result && standardData.result.length > 0) {
                     const inventory = standardData.result[0];
-                    sizeInventory['S'] = inventory.Size01 || 0;
-                    sizeInventory['M'] = inventory.Size02 || 0;
-                    sizeInventory['L'] = inventory.Size03 || 0;
-                    sizeInventory['XL'] = inventory.Size04 || 0;
+                    sizeInventory['S'] = inventory.Size02 || 0;
+                    sizeInventory['M'] = inventory.Size03 || 0;
+                    sizeInventory['L'] = inventory.Size04 || 0;
+                    sizeInventory['XL'] = inventory.Size05 || 0;
                 } else {
                     // No standard sizes found
                     sizeInventory['S'] = 0;
@@ -2221,9 +2541,9 @@
                     sizeInventory['XL'] = 0;
                 }
 
-                // PC54_2X: Size05=2XL
+                // PC54_2X: Size06=2XL
                 if (twoXLData.result && twoXLData.result.length > 0) {
-                    sizeInventory['2XL'] = twoXLData.result[0].Size05 || 0;
+                    sizeInventory['2XL'] = twoXLData.result[0].Size06 || 0;
                 } else {
                     sizeInventory['2XL'] = 0;
                 }
@@ -2383,11 +2703,6 @@
             renderColors();
             renderSelectedColors();
             recalculateAllPricing();
-
-            // Load size-specific inventory for this color (if it was just added)
-            if (state.selectedColors.includes(catalogColor)) {
-                requestAnimationFrame(() => loadSizeInventory(catalogColor));
-            }
         }
 
 
@@ -2399,7 +2714,7 @@
             if (state.selectedColors.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <p>No colors selected yet. Click "Add Color" above to get started.</p>
+                        <p>No colors selected yet. Select colors above to get started.</p>
                     </div>
                 `;
                 return;
@@ -2410,13 +2725,13 @@
                 const colorData = state.colors.find(c => c.catalogColor === catalogColor);
 
                 return `
-                    <div class="color-section" id="color-section-${catalogColor}" style="margin-bottom: 2rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div class="color-swatch" style="background: ${colorData.hex}; width: 32px; height: 32px; border-radius: 4px; ${colorData.name === 'White' ? 'border: 2px solid #ccc;' : ''}"></div>
-                                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600;">${config.displayColor}</h3>
+                    <div class="selected-color-card" id="color-section-${catalogColor}">
+                        <div class="color-header">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="color-swatch-mini" style="background: ${colorData.hex}; ${colorData.name === 'White' ? 'border: 2px solid #ccc;' : ''}"></div>
+                                <h3 class="color-title">${config.displayColor}</h3>
                             </div>
-                            <button class="btn btn-danger" onclick="removeColor('${catalogColor}')" style="padding: 6px 12px; font-size: 0.875rem;">
+                            <button class="btn-remove-color" onclick="removeColor('${catalogColor}')">
                                 <i class="fas fa-times"></i> Remove
                             </button>
                         </div>
@@ -2439,9 +2754,9 @@
                         </div>
 
                         <!-- Color Total -->
-                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; text-align: right; font-weight: 600;">
-                            <span style="color: var(--text-secondary);">Total for ${config.displayColor}:</span>
-                            <span id="total-${catalogColor}" style="margin-left: 1rem; font-size: 1.25rem; color: var(--primary-color);">0 pieces</span>
+                        <div class="color-total">
+                            <span>Total for ${config.displayColor}:</span>
+                            <span id="total-${catalogColor}" class="color-total-value">0 pieces</span>
                         </div>
                     </div>
                 `;
@@ -2450,6 +2765,15 @@
             // Load size-specific inventory for all selected colors
             state.selectedColors.forEach(catalogColor => {
                 requestAnimationFrame(() => loadSizeInventory(catalogColor));
+            });
+
+            // Measure and match actual content height to prevent overflow expansion
+            requestAnimationFrame(() => {
+                const container = document.getElementById('selectedColorsContainer');
+                if (container && state.selectedColors.length > 0) {
+                    const actualHeight = container.scrollHeight;
+                    container.style.minHeight = `${actualHeight}px`;
+                }
             });
         }
 
