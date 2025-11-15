@@ -3659,28 +3659,64 @@
             // 2025 US Federal Holidays
             '2025-01-01', '2025-01-20', '2025-02-17', '2025-05-26',
             '2025-06-19', '2025-07-04', '2025-09-01', '2025-10-13',
-            '2025-11-11', '2025-11-27', '2025-12-25',
+            '2025-11-11', '2025-11-27', '2025-11-28', '2025-12-25',
             // 2025 Factory Closure (Dec 26-31)
             '2025-12-26', '2025-12-27', '2025-12-28', '2025-12-29', '2025-12-30', '2025-12-31',
 
             // 2026 US Federal Holidays
-            '2026-01-01', '2026-01-19', '2026-02-16', '2026-05-25',
+            '2026-01-01', '2026-01-02', '2026-01-19', '2026-02-16', '2026-05-25',
             '2026-06-19', '2026-07-03', '2026-09-07', '2026-10-12',
-            '2026-11-11', '2026-11-26', '2026-12-25',
+            '2026-11-11', '2026-11-26', '2026-11-27', '2026-12-25',
             // 2026 Factory Closure (Dec 26-31)
             '2026-12-26', '2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31',
 
             // 2027 US Federal Holidays
-            '2027-01-01', '2027-01-18', '2027-02-15', '2027-05-31',
+            '2027-01-01', '2027-01-02', '2027-01-18', '2027-02-15', '2027-05-31',
             '2027-06-18', '2027-07-05', '2027-09-06', '2027-10-11',
-            '2027-11-11', '2027-11-25', '2027-12-24',
+            '2027-11-11', '2027-11-25', '2027-11-26', '2027-12-24',
             // 2027 Factory Closure (Dec 26-31)
-            '2027-12-26', '2027-12-27', '2027-12-28', '2027-12-29', '2027-12-30', '2027-12-31'
+            '2027-12-26', '2027-12-27', '2027-12-28', '2027-12-29', '2027-12-30', '2027-12-31',
+
+            // 2028 US Federal Holidays
+            '2028-01-01', '2028-01-02', '2028-01-17', '2028-02-21', '2028-05-29',
+            '2028-06-19', '2028-07-04', '2028-09-04', '2028-10-09',
+            '2028-11-10', '2028-11-23', '2028-11-24', '2028-12-25',
+            // 2028 Factory Closure (Dec 26-31)
+            '2028-12-26', '2028-12-27', '2028-12-28', '2028-12-29', '2028-12-30', '2028-12-31',
+
+            // 2029 US Federal Holidays
+            '2029-01-01', '2029-01-02', '2029-01-15', '2029-02-19', '2029-05-28',
+            '2029-06-19', '2029-07-04', '2029-09-03', '2029-10-08',
+            '2029-11-12', '2029-11-22', '2029-11-23', '2029-12-25',
+            // 2029 Factory Closure (Dec 26-31)
+            '2029-12-26', '2029-12-27', '2029-12-28', '2029-12-29', '2029-12-30', '2029-12-31',
+
+            // 2030 US Federal Holidays
+            '2030-01-01', '2030-01-02', '2030-01-21', '2030-02-18', '2030-05-27',
+            '2030-06-19', '2030-07-04', '2030-09-02', '2030-10-14',
+            '2030-11-11', '2030-11-28', '2030-11-29', '2030-12-25',
+            // 2030 Factory Closure (Dec 26-31)
+            '2030-12-26', '2030-12-27', '2030-12-28', '2030-12-29', '2030-12-30', '2030-12-31',
+
+            // 2031 US Federal Holidays (partial - for year boundary)
+            '2031-01-01', '2031-01-02'
         ];
 
         function isBeforeCutoff() {
             const now = new Date();
             const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+            // Check if today is weekend or holiday
+            const dayOfWeek = pstTime.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const isTodayHoliday = isHoliday(pstTime);
+
+            // If today is not a business day, cutoff doesn't apply today
+            if (isWeekend || isTodayHoliday) {
+                return false;
+            }
+
+            // Today is a business day - check if before 9 AM
             return pstTime.getHours() < 9;
         }
 
@@ -3753,9 +3789,14 @@
             const cutoff = new Date(pstTime);
             cutoff.setHours(9, 0, 0, 0);
 
-            // If already past cutoff, use next business day's cutoff
+            // Check if today is a business day
+            const dayOfWeek = pstTime.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const isTodayHoliday = isHoliday(pstTime);
+
+            // If already past cutoff OR today is not a business day, use next business day's cutoff
             let targetCutoff;
-            if (pstTime >= cutoff) {
+            if (pstTime >= cutoff || isWeekend || isTodayHoliday) {
                 targetCutoff = getNextBusinessDayCutoff();
             } else {
                 targetCutoff = cutoff;
@@ -3774,12 +3815,20 @@
 
             if (!messageEl || !countdownEl) return;
 
+            // Get dynamic timezone abbreviation (PST or PDT)
+            const now = new Date();
+            const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+            const tzAbbr = pstTime.toLocaleTimeString('en-US', {
+                timeZone: 'America/Los_Angeles',
+                timeZoneName: 'short'
+            }).split(' ').pop();
+
             const orderDate = getOrderDate();
             const shipDate = calculateShipDate(orderDate);
             const formattedShipDate = formatShipDate(shipDate);
 
             if (isBeforeCutoff()) {
-                messageEl.textContent = `Place your order by 9 AM PST today and it ships ${formattedShipDate}`;
+                messageEl.textContent = `Order by 9 AM ${tzAbbr} today → Ships from our facility ${formattedShipDate}`;
 
                 const { hours, minutes } = getTimeUntilCutoff();
                 countdownEl.textContent = `⏱ ${hours}h ${minutes}m remaining until cutoff`;
@@ -3788,7 +3837,25 @@
 
                 const { hours, minutes, cutoffDate } = getTimeUntilCutoff();
                 const dayName = cutoffDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'America/Los_Angeles' });
-                countdownEl.textContent = `Next cutoff: ${dayName} at 9 AM PST (${hours}h ${minutes}m)`;
+                countdownEl.textContent = `Next cutoff: ${dayName} at 9 AM ${tzAbbr} (${hours}h ${minutes}m)`;
+            }
+        }
+
+        // Year boundary warning - Check if holiday data is current
+        function checkHolidayDataExpiration() {
+            const now = new Date();
+            const lastHoliday = new Date('2030-12-31');
+            const warningDate = new Date('2030-10-01'); // 3 months warning
+
+            if (now > lastHoliday) {
+                console.error('[3-Day Tees] ⚠️ CRITICAL: Holiday data expired! Update NON_BUSINESS_DAYS array for 2031+');
+                // Show warning banner to admin/developer
+                const banner = document.createElement('div');
+                banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#dc3545;color:white;padding:10px;text-align:center;z-index:9999;font-weight:bold;';
+                banner.textContent = '⚠️ ADMIN: Holiday data expired - ship dates may be incorrect. Update NON_BUSINESS_DAYS array.';
+                document.body.prepend(banner);
+            } else if (now > warningDate) {
+                console.warn('[3-Day Tees] ⚡ Holiday data expires soon. Add holidays for 2031+ to NON_BUSINESS_DAYS array.');
             }
         }
 
@@ -3797,7 +3864,10 @@
         setInterval(updateShipDateDisplay, 60000); // Update every 60 seconds
 
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            checkHolidayDataExpiration(); // Check holiday data first
+            init(); // Then initialize the page
+        });
     </script>
 </body>
 </html>
