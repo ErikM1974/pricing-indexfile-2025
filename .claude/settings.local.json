@@ -13,7 +13,14 @@
       "Bash(python:*)",
       "Bash(git rebase:*)",
       "Bash(cat:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(\"memory/MANUAL_CALCULATOR_CONCEPTS.md\")",
+      "Bash(\"memory/MANUAL_CALCULATOR_TEMPLATES.md\")",
+      "Bash(\"memory/MANUAL_CALCULATOR_REFERENCE.md\")",
+      "Bash(\"memory/manageorders/BASIC_EXAMPLES.md\")",
+      "Bash(Remove-Item \"C:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\memory\\manageorders-push\\SWAGGER_SCHEMA_REFERENCE.md\" -Force)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": [],
