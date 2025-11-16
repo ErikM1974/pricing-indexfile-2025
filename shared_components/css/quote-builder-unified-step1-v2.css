@@ -1,0 +1,730 @@
+/**
+ * Quote Builder Unified Step 1 CSS - Version 2
+ * Enhanced standardization based on feedback from Gemini, GROK, Claude, and Claude Code
+ * Stronger specificity and comprehensive fixes
+ */
+
+/* =================================
+   STANDARDIZED COLOR PALETTE
+   ================================= */
+:root {
+    /* Primary Green - NWCA Brand */
+    --primary-green: #28a745;
+    --primary-green-dark: #218838;
+    --primary-green-light: #d4edda;
+    --primary-green-lightest: #e8f5e9;
+    --primary-green-bg: #f0f9f0;
+    
+    /* Secondary Colors */
+    --info-blue: #007bff;
+    --warning-orange: #fd7e14;
+    --warning-bg: #fff3cd;
+    --warning-border: #ffeeba;
+    
+    /* Neutral Colors */
+    --border-gray: #dee2e6;
+    --border-light: #ced4da;
+    --text-gray: #6c757d;
+    --bg-gray: #f8f9fa;
+    --text-primary: #495057;
+    --text-secondary: #6c757d;
+    --text-dark: #212529;
+    
+    /* Unified Background */
+    --unified-bg: #f5f7fa;
+    --unified-card-bg: #ffffff;
+    
+    /* Consistent Spacing System - 8px Grid */
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 32px;
+    --spacing-xl: 48px;
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-focus: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* =================================
+   FORCE BODY BACKGROUND
+   ================================= */
+body {
+    background: var(--unified-bg) !important;
+}
+
+/* =================================
+   UNIFIED CONTAINER - STRONGER
+   ================================= */
+.container,
+.dtg-quote-builder,
+.cap-quote-builder,
+.embroidery-quote-builder,
+.screenprint-quote-builder {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: var(--spacing-md) !important;
+}
+
+/* Inner step container for content */
+.step-container {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
+/* =================================
+   CONTENT CONTAINER - NEW
+   ================================= */
+.content-container,
+.main-content-box {
+    background: var(--unified-card-bg) !important;
+    border: 2px solid var(--primary-green-lightest) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--spacing-md) !important;
+    margin-bottom: var(--spacing-md) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* =================================
+   UNIFIED PAGE TITLE
+   ================================= */
+.page-title,
+.main-title {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: var(--text-dark) !important;
+    text-align: center !important;
+    margin: var(--spacing-lg) 0 var(--spacing-sm) 0 !important;
+    display: block !important;
+}
+
+/* Force hide ALL title icons */
+.page-title i,
+.page-title .fas,
+.page-title .far,
+.page-title .fa,
+.page-title svg,
+.main-title i,
+.main-title .fas,
+.main-title .far,
+.main-title .fa,
+.main-title svg {
+    display: none !important;
+}
+
+.page-description {
+    text-align: center !important;
+    color: var(--text-secondary) !important;
+    font-size: 1.125rem !important;
+    margin-bottom: var(--spacing-lg) !important;
+    max-width: 600px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* =================================
+   SECTION HEADERS - ENHANCED
+   ================================= */
+.phase-header {
+    background: var(--primary-green) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 8px 8px 0 0 !important;
+    margin: -24px -24px 24px -24px !important;
+    text-align: left !important;
+}
+
+.phase-header h2 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 1.25rem !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+    color: white !important;
+}
+
+/* Force consistent number circles */
+.phase-header .phase-number,
+.phase-header span:first-child {
+    display: inline-flex !important;
+    width: 28px !important;
+    height: 28px !important;
+    background: white !important;
+    color: var(--primary-green) !important;
+    border-radius: 50% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+}
+
+.phase-header p {
+    color: rgba(255, 255, 255, 0.95) !important;
+    margin: 6px 0 0 36px !important;
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+    /* Limit to one line with ellipsis if needed */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* =================================
+   PHASE SECTIONS - ENHANCED
+   ================================= */
+.phase-section {
+    background: var(--unified-card-bg) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: var(--spacing-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    margin-bottom: var(--spacing-md) !important;
+}
+
+/* All content should be inside the main container */
+.phase-section > *:not(.phase-header) {
+    /* Ensure all content stays inside */
+}
+
+/* =================================
+   STANDARDIZED CARDS
+   ================================= */
+.setup-card,
+.logo-section,
+.location-section,
+.content-block,
+.selection-container {
+    background: white !important;
+    border: 2px solid var(--primary-green-lightest) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+/* Selection cards for DTG/Screen Print */
+.selection-card,
+.location-card,
+.location-option .location-card {
+    padding: 16px !important;
+    border: 2px solid var(--border-gray) !important;
+    border-radius: var(--radius-md) !important;
+    background: white !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+    text-align: center !important;
+}
+
+.selection-card:hover,
+.location-card:hover {
+    border-color: var(--primary-green) !important;
+    background: var(--bg-gray) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.selection-card.selected,
+.location-card.selected,
+.location-card.active,
+input[type="radio"]:checked + .location-card {
+    border-color: var(--primary-green) !important;
+    background: var(--primary-green-bg) !important;
+}
+
+/* =================================
+   FORM ELEMENTS - STRICT ENFORCEMENT
+   ================================= */
+.form-control,
+select,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+.form-select,
+.form-input {
+    height: 40px !important;
+    padding: 0 12px !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.2s !important;
+    background: white !important;
+    line-height: 38px !important; /* Ensure text is centered */
+}
+
+/* Textareas different height */
+textarea {
+    height: auto !important;
+    min-height: 80px !important;
+    padding: 8px 12px !important;
+    line-height: 1.5 !important;
+}
+
+/* Focus states */
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--primary-green) !important;
+    box-shadow: var(--shadow-focus) !important;
+}
+
+/* Labels */
+label,
+.form-label {
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 6px !important;
+    display: block !important;
+}
+
+/* Form hints */
+.form-hint,
+.form-note,
+.help-text {
+    font-size: 0.875rem !important;
+    color: var(--text-gray) !important;
+    margin-top: 4px !important;
+    font-style: normal !important; /* Remove italics */
+}
+
+/* Form groups */
+.form-group {
+    margin-bottom: var(--spacing-sm) !important;
+}
+
+/* =================================
+   REQUIRED FIELD INDICATORS
+   ================================= */
+.required-star,
+.required-indicator,
+.text-primary {
+    color: var(--info-blue) !important;
+    font-weight: bold !important;
+    margin-left: 4px !important;
+}
+
+/* Hide text-based required indicators */
+.required-text,
+span:contains("Required on all products") {
+    display: none !important;
+}
+
+/* Add star after required labels */
+label.required::after,
+.required-field label::after {
+    content: " ★" !important;
+    color: var(--info-blue) !important;
+    font-weight: bold !important;
+}
+
+/* =================================
+   BUTTON HIERARCHY - STRICT
+   ================================= */
+
+/* Primary Continue Button */
+.btn-primary,
+.continue-btn,
+button[type="submit"]:not(.btn-secondary):not(.btn-add) {
+    background: var(--primary-green) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 10px 24px !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+}
+
+.btn-primary:hover,
+.continue-btn:hover {
+    background: var(--primary-green-dark) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Secondary Add Buttons - Outlined Style */
+.btn-secondary,
+.btn-add,
+.add-button,
+button[id*="add"] {
+    background: white !important;
+    border: 2px solid var(--primary-green) !important;
+    color: var(--primary-green) !important;
+    padding: 8px 16px !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.btn-secondary:hover,
+.btn-add:hover {
+    background: var(--primary-green-lightest) !important;
+    border-color: var(--primary-green-dark) !important;
+}
+
+/* =================================
+   REMOVE PURPLE BUTTON - AGGRESSIVE
+   ================================= */
+button[style*="purple"],
+button[style*="#6f42c1"],
+button[style*="rgb(111, 66, 193)"],
+button[style*="background-color: rgb(111, 66, 193)"],
+button[style*="background: rgb(111, 66, 193)"],
+.stitch-example-btn,
+.purple-btn,
+button.purple {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* =================================
+   UNSAVED INDICATOR - CONTROLLED
+   ================================= */
+.unsaved-indicator {
+    position: fixed !important;
+    top: 120px !important;
+    right: 20px !important;
+    background: var(--warning-orange) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    z-index: 1000 !important;
+    display: none !important; /* Hidden by default */
+}
+
+/* Only show when has changes */
+.unsaved-indicator.has-changes,
+.unsaved-indicator.show {
+    display: block !important;
+}
+
+/* =================================
+   LOCATION/COLOR GRIDS - STANDARDIZED
+   ================================= */
+.location-grid,
+.color-grid,
+.location-selection,
+.location-options,
+.color-swatch-container {
+    display: grid !important;
+    gap: 12px !important;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    margin-bottom: 20px !important;
+}
+
+/* Ensure consistent sizing */
+.location-grid .location-card,
+.color-grid .color-pill {
+    min-height: 100px !important;
+}
+
+/* Color pills */
+.color-pill,
+.color-option {
+    padding: 8px 16px !important;
+    border: 2px solid var(--border-gray) !important;
+    border-radius: 20px !important;
+    background: white !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    display: inline-block !important;
+    margin: 4px !important;
+}
+
+.color-pill.selected,
+.color-option.selected {
+    background: var(--primary-green) !important;
+    color: white !important;
+    border-color: var(--primary-green) !important;
+}
+
+/* =================================
+   WARNING ALERTS - SOFTER
+   ================================= */
+.warning-alert,
+.alert-warning,
+.sp-safety-stripes-section {
+    background: var(--warning-bg) !important;
+    border: 1px solid var(--warning-border) !important;
+    color: #856404 !important;
+    padding: 10px 15px !important;
+    border-radius: var(--radius-sm) !important;
+    margin-bottom: 15px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.warning-icon {
+    color: var(--warning-orange) !important;
+    margin-right: 8px !important;
+    font-size: 1.2em !important;
+}
+
+/* Preserve safety stripes orange */
+.sp-safety-stripes-section {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%) !important;
+    border: 2px solid #ff6b35 !important;
+}
+
+/* =================================
+   PHASE ACTIONS - CONSISTENT
+   ================================= */
+.phase-actions {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: var(--spacing-lg) !important;
+    padding-top: var(--spacing-lg) !important;
+    border-top: 2px solid var(--border-gray) !important;
+}
+
+/* =================================
+   DIVIDERS FOR SECTIONS
+   ================================= */
+hr,
+.section-divider {
+    border: none !important;
+    border-top: 1px solid var(--border-gray) !important;
+    margin: var(--spacing-md) 0 !important;
+}
+
+/* =================================
+   CUSTOM CHECKBOXES
+   ================================= */
+input[type="checkbox"] {
+    accent-color: var(--primary-green) !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 8px !important;
+    cursor: pointer !important;
+}
+
+/* Custom toggle switches */
+.toggle-switch input[type="checkbox"] {
+    display: none !important;
+}
+
+.toggle-switch label {
+    position: relative !important;
+    display: inline-block !important;
+    width: 50px !important;
+    height: 24px !important;
+    background: var(--border-gray) !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: background 0.3s !important;
+}
+
+.toggle-switch input:checked + label {
+    background: var(--primary-green) !important;
+}
+
+.toggle-switch label::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 20px !important;
+    height: 20px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    top: 2px !important;
+    left: 2px !important;
+    transition: transform 0.3s !important;
+}
+
+.toggle-switch input:checked + label::after {
+    transform: translateX(26px) !important;
+}
+
+/* =================================
+   STEP INDICATORS - TOP BAR
+   ================================= */
+.phase-nav {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: var(--spacing-lg) 0 !important;
+    background: var(--unified-card-bg) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    position: relative !important;
+}
+
+.phase-step {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    position: relative !important;
+    flex: 0 0 auto !important;
+}
+
+.phase-connector {
+    flex: 1 !important;
+    height: 2px !important;
+    background: var(--border-gray) !important;
+    margin: 0 1rem !important;
+    align-self: center !important;
+}
+
+.phase-connector.completed {
+    background: var(--primary-green) !important;
+}
+
+.phase-step-number,
+.step-number {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important;
+    background: var(--border-gray) !important;
+    color: var(--text-secondary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    font-size: 1.125rem !important;
+    margin-bottom: var(--spacing-xs) !important;
+    transition: all 0.3s ease !important;
+}
+
+.phase-step.active .phase-step-number,
+.phase-step.active .step-number {
+    background: var(--primary-green) !important;
+    color: white !important;
+    transform: scale(1.1) !important;
+}
+
+/* =================================
+   RESPONSIVE ADJUSTMENTS
+   ================================= */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-sm) !important;
+    }
+    
+    .phase-header p {
+        white-space: normal !important;
+        margin-left: 0 !important;
+    }
+    
+    .location-grid,
+    .color-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .phase-actions {
+        flex-direction: column !important;
+        gap: var(--spacing-sm) !important;
+    }
+    
+    .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+/* =================================
+   OVERRIDE SPECIFICITY ISSUES
+   ================================= */
+
+/* Force consistent spacing */
+.phase-section > *:first-child:not(.phase-header) {
+    margin-top: 0 !important;
+}
+
+.phase-section > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Ensure all "additional" sections stay inside */
+.additional-options,
+.additional-positions {
+    margin-top: var(--spacing-md) !important;
+    padding-top: var(--spacing-md) !important;
+    border-top: 1px solid var(--border-gray) !important;
+}
+
+/* Force hide any conflicting styles */
+.phase-section[style],
+.phase-header[style] {
+    /* Reset inline styles */
+}
+
+/* =================================
+   ACCESSIBILITY
+   ================================= */
+*:focus-visible {
+    outline: 2px solid var(--info-blue) !important;
+    outline-offset: 2px !important;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* =================================
+   FINAL OVERRIDES - NUCLEAR OPTIONS
+   ================================= */
+
+/* Force green theme everywhere */
+.phase-section * {
+    /* Ensure no purple or random colors */
+}
+
+/* Ensure consistent fonts */
+body,
+.phase-section,
+.phase-section * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+/* CRITICAL: Restore Font Awesome for icons - prevents icons showing as boxes */
+.fas, .far, .fab, .fa,
+.phase-section .fas,
+.phase-section .far,
+.phase-section .fab,
+.phase-section .fa,
+.hero-banner .fas,
+.hero-banner .far,
+.hero-banner .fab,
+.hero-banner .fa {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome !important;
+    font-weight: 900 !important;
+}

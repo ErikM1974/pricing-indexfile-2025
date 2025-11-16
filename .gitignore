@@ -31,6 +31,8 @@ training/*-v2.html
 
 # Temporary CSS experiments
 *-unified-*.css
+# Exception: Allow the unified step CSS files (production use)
+!shared_components/css/quote-builder-unified-step1*.css
 *-temp.css
 *-backup.css
 
