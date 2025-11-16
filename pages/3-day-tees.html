@@ -22,6 +22,12 @@
     <script src="../shared_components/js/sample-inventory-service.js"></script>
     <script src="../shared_components/js/three-day-tees-order-service.js"></script>
 
+    <!-- Quote Builder Unified Step 1 Styles (includes toggle switches) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css">
+
+    <!-- DTG Quote Builder Styles (toggle-specific) -->
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css">
+
     <style>
         :root {
             --primary-color: #ff6b35;
@@ -1657,6 +1663,111 @@
 
     <!-- Main Content -->
     <div class="container">
+        <!-- Progress Indicator -->
+        <div class="phase-nav">
+            <div class="phase-step active" id="phase-1-nav">
+                <div class="phase-step-number">1</div>
+                <div class="phase-step-label">Location</div>
+            </div>
+            <div class="phase-connector" id="connector-1"></div>
+            <div class="phase-step" id="phase-2-nav">
+                <div class="phase-step-number">2</div>
+                <div class="phase-step-label">Colors & Qty</div>
+            </div>
+            <div class="phase-connector" id="connector-2"></div>
+            <div class="phase-step" id="phase-3-nav">
+                <div class="phase-step-number">3</div>
+                <div class="phase-step-label">Review & Upload</div>
+            </div>
+        </div>
+
+        <!-- Phase 1: Location Selection -->
+        <section id="location-phase" class="phase-section active">
+            <div class="phase-header">
+                <h2><span class="phase-number">1</span> Print Location</h2>
+                <p>Select print location for your order</p>
+            </div>
+            
+            <div class="content-container">
+                <div class="location-selector">
+                    <div class="toggle-section">
+                        <div class="toggle-section-title">
+                            <i class="fas fa-layer-group"></i>
+                            Front Print Location
+                        </div>
+                        <div class="toggle-section-subtitle">
+                            Choose Left Chest OR Full Front (mutually exclusive)
+                        </div>
+
+                        <!-- Front Locations (mutually exclusive) -->
+                        <div class="location-grid">
+                            <div class="toggle-item" id="toggle-LC" data-location="LC">
+                                <div class="toggle-item-label">
+                                    <span>Left Chest</span>
+                                    <span class="toggle-item-size">4"×4"</span>
+                                </div>
+                                <div class="toggle-switch">
+                                    <div class="toggle-switch-slider"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item" id="toggle-FF" data-location="FF">
+                                <div class="toggle-item-label">
+                                    <span>Full Front</span>
+                                    <span class="toggle-item-size">12"×16"</span>
+                                </div>
+                                <div class="toggle-switch">
+                                    <div class="toggle-switch-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-section-title" style="margin-top: 2rem;">
+                            <i class="fas fa-layer-group"></i>
+                            Back Print Location
+                        </div>
+                        <div class="toggle-section-subtitle">
+                            Optional - Add Full Back printing
+                        </div>
+
+                        <!-- Back Location (optional) -->
+                        <div class="location-grid">
+                            <div class="toggle-item" id="toggle-FB" data-location="FB">
+                                <div class="toggle-item-label">
+                                    <span>Full Back</span>
+                                    <span class="toggle-item-size">12"×16"</span>
+                                </div>
+                                <div class="toggle-switch">
+                                    <div class="toggle-switch-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Location Display -->
+                    <div id="selected-location-display" style="margin-top: 2rem; padding: 1.5rem; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; display: none;">
+                        <h4 style="margin-bottom: 0.5rem; color: #1e40af;">
+                            <i class="fas fa-check-circle"></i> Selected Location
+                        </h4>
+                        <p id="selected-location-text" style="font-size: 1.1rem; font-weight: 600; color: #1e40af; margin: 0;"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-actions">
+                <button id="continue-to-products" class="btn btn-primary" disabled>
+                    Continue to Colors & Quantities <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Phase 2: Colors & Quantities -->
+        <section id="product-phase" class="phase-section" style="display: none;">
+            <div class="phase-header">
+                <h2><span class="phase-number">2</span> Colors & Quantities</h2>
+                <p>Select colors and enter quantities for each size. Location: <strong id="phase2-location"></strong></p>
+            </div>
+
         <div class="product-grid">
             <!-- Left Column: Product Configuration -->
             <div>
@@ -1686,64 +1797,6 @@
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h3>2. Print Location</h3>
-                    <div class="location-selector">
-                        <!-- Front Print Location (Radio Buttons - Choose ONE) -->
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
-                                Front Print Location <span style="color: var(--error-color);">*</span>
-                            </h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 100%;">
-                                <!-- Left Chest Option -->
-                                <label class="location-card" style="cursor: pointer; position: relative;">
-                                    <input type="radio" name="frontLocation" value="LC"
-                                           onchange="selectFrontLocation('LC')"
-                                           style="position: absolute; opacity: 0;">
-                                    <div class="location-card-content" id="location-LC" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; transition: all 0.3s;">
-                                        <i class="fas fa-tshirt" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary-color);"></i>
-                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Left Chest</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">4" × 4"</div>
-                                        <div class="location-price" id="price-LC" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
-                                    </div>
-                                </label>
-
-                                <!-- Full Front Option -->
-                                <label class="location-card" style="cursor: pointer; position: relative;">
-                                    <input type="radio" name="frontLocation" value="FF"
-                                           onchange="selectFrontLocation('FF')"
-                                           style="position: absolute; opacity: 0;">
-                                    <div class="location-card-content" id="location-FF" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; transition: all 0.3s;">
-                                        <i class="fas fa-tshirt" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary-color);"></i>
-                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Full Front</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">12" × 16"</div>
-                                        <div class="location-price" id="price-FF" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Back Print Location (Optional Checkbox) -->
-                        <div>
-                            <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
-                                Back Print <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-secondary);">(Optional)</span>
-                            </h4>
-                            <label class="location-card" style="cursor: pointer; position: relative; display: block;">
-                                <input type="checkbox" id="backLocationCheckbox" value="FB"
-                                       onchange="toggleBackLocation()"
-                                       style="position: absolute; opacity: 0;">
-                                <div class="location-card-content" id="location-FB" style="padding: 1.5rem; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; gap: 1rem; transition: all 0.3s;">
-                                    <i class="fas fa-tshirt" style="font-size: 2rem; color: var(--primary-color);"></i>
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Full Back</div>
-                                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">12" × 16"</div>
-                                        <div class="location-price" id="price-FB" style="font-size: 0.875rem; color: var(--text-secondary);">Select quantity</div>
-                                    </div>
-                                    <i class="fas fa-check-circle" id="back-check-icon" style="font-size: 1.5rem; color: var(--border-color); transition: color 0.3s;"></i>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
 
                     <!-- Live Pricing Display Panel -->
                     <div id="pricingPanel" style="display: none; margin-top: 1.5rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 1.5rem;">
@@ -1930,9 +1983,218 @@
                 </button>
             </div>
         </div>
+        </section>
     </div>
-
     <script>
+        // ========================================
+        // Phase Navigation & Location Selection
+        // ========================================
+
+        let currentPhase = 1;
+        let selectedLocation = null;  // Will be 'LC', 'FF', 'LC_FB', or 'FF_FB'
+        let selectedLocations = [];   // Array of selected location codes
+
+        /**
+         * Handle location toggle clicks
+         */
+        function handleToggleLocation(locationCode) {
+            const toggle = document.getElementById(`toggle-${locationCode}`);
+            const isCurrentlyActive = toggle.classList.contains('active');
+
+            if (isCurrentlyActive) {
+                // Deactivate this location
+                selectedLocations = selectedLocations.filter(loc => loc !== locationCode);
+                toggle.classList.remove('active');
+                toggle.querySelector('.toggle-switch')?.classList.remove('on');
+            } else {
+                // Activate this location
+
+                // Handle mutual exclusivity: LC and FF cannot both be selected
+                if (locationCode === 'LC' && selectedLocations.includes('FF')) {
+                    // User clicked LC while FF is active - deactivate FF
+                    selectedLocations = selectedLocations.filter(loc => loc !== 'FF');
+                    const ffToggle = document.getElementById('toggle-FF');
+                    ffToggle.classList.remove('active');
+                    ffToggle.querySelector('.toggle-switch')?.classList.remove('on');
+                } else if (locationCode === 'FF' && selectedLocations.includes('LC')) {
+                    // User clicked FF while LC is active - deactivate LC
+                    selectedLocations = selectedLocations.filter(loc => loc !== 'LC');
+                    const lcToggle = document.getElementById('toggle-LC');
+                    lcToggle.classList.remove('active');
+                    lcToggle.querySelector('.toggle-switch')?.classList.remove('on');
+                }
+
+                // Add the new location
+                selectedLocations.push(locationCode);
+                toggle.classList.add('active');
+                toggle.querySelector('.toggle-switch')?.classList.add('on');
+            }
+
+            // Update UI based on new selection state
+            updateToggleUI();
+            updateLocationDisplay();
+            updateContinueButton();
+        }
+
+        /**
+         * Update toggle UI states
+         */
+        function updateToggleUI() {
+            // Ensure toggle classes match selectedLocations array
+            ['LC', 'FF', 'FB'].forEach(loc => {
+                const toggle = document.getElementById(`toggle-${loc}`);
+                const toggleSwitch = toggle?.querySelector('.toggle-switch');
+                if (selectedLocations.includes(loc)) {
+                    toggle.classList.add('active');
+                    toggleSwitch?.classList.add('on');
+                } else {
+                    toggle.classList.remove('active');
+                    toggleSwitch?.classList.remove('on');
+                }
+            });
+        }
+
+        /**
+         * Update the selected location display box
+         */
+        function updateLocationDisplay() {
+            const displayBox = document.getElementById('selected-location-display');
+            const displayText = document.getElementById('selected-location-text');
+
+            if (selectedLocations.length === 0) {
+                displayBox.style.display = 'none';
+                selectedLocation = null;
+                return;
+            }
+
+            // Determine final location string
+            const hasFront = selectedLocations.includes('LC') || selectedLocations.includes('FF');
+            const hasBack = selectedLocations.includes('FB');
+
+            if (!hasFront) {
+                // Only FB selected (not valid - should have front location)
+                displayBox.style.display = 'none';
+                selectedLocation = null;
+                return;
+            }
+
+            const frontLocation = selectedLocations.includes('LC') ? 'LC' : 'FF';
+
+            if (hasBack) {
+                selectedLocation = `${frontLocation}_FB`;
+                const frontName = frontLocation === 'LC' ? 'Left Chest' : 'Full Front';
+                displayText.textContent = `${frontName} + Full Back`;
+            } else {
+                selectedLocation = frontLocation;
+                displayText.textContent = frontLocation === 'LC' ? 'Left Chest' : 'Full Front';
+            }
+
+            displayBox.style.display = 'block';
+        }
+
+        /**
+         * Update continue button state
+         */
+        function updateContinueButton() {
+            const continueBtn = document.getElementById('continue-to-products');
+
+            // Button enabled if we have a valid location selection
+            if (selectedLocation) {
+                continueBtn.disabled = false;
+            } else {
+                continueBtn.disabled = true;
+            }
+        }
+
+        /**
+         * Move to a specific phase
+         */
+        function moveToPhase(newPhase) {
+            // Hide all phase sections
+            document.querySelectorAll('.phase-section').forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+
+            // Show the target phase
+            let targetPhaseId;
+            if (newPhase === 1) targetPhaseId = 'location-phase';
+            else if (newPhase === 2) targetPhaseId = 'product-phase';
+            else if (newPhase === 3) targetPhaseId = 'review-phase';
+
+            const targetSection = document.getElementById(targetPhaseId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                targetSection.classList.add('active');
+            }
+
+            // Update phase navigation indicator
+            document.querySelectorAll('.phase-step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                const stepNumber = index + 1;
+
+                if (stepNumber < newPhase) {
+                    step.classList.add('completed');
+                } else if (stepNumber === newPhase) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update phase connectors
+            document.querySelectorAll('.phase-connector').forEach((connector, index) => {
+                const connectorNumber = index + 1;
+                if (connectorNumber < newPhase) {
+                    connector.classList.add('completed');
+                } else {
+                    connector.classList.remove('completed');
+                }
+            });
+
+            currentPhase = newPhase;
+
+            // If moving to Phase 2, update the location display in the header
+            if (newPhase === 2) {
+                const phase2LocationSpan = document.getElementById('phase2-location');
+                if (phase2LocationSpan && selectedLocation) {
+                    const locationNames = {
+                        'LC': 'Left Chest',
+                        'FF': 'Full Front',
+                        'LC_FB': 'Left Chest + Full Back',
+                        'FF_FB': 'Full Front + Full Back'
+                    };
+                    phase2LocationSpan.textContent = locationNames[selectedLocation] || selectedLocation;
+                }
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ========================================
+        // Event Listeners (Phase Navigation)
+        // ========================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Location toggle event listeners
+            document.querySelectorAll('.toggle-item').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const locationCode = this.dataset.location;
+                    handleToggleLocation(locationCode);
+                });
+            });
+
+            // Continue to products button
+            const continueBtn = document.getElementById('continue-to-products');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function() {
+                    if (selectedLocation) {
+                        moveToPhase(2);
+                        // Pricing will be recalculated when products are loaded/added
+                    }
+                });
+            }
+        });
+
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
 
@@ -2048,11 +2310,6 @@
                 { name: 'Navy', catalogColor: 'Navy', hex: '#001f3f' },
                 { name: 'Athletic Heather', catalogColor: 'Ath Heather', hex: '#9ca3af' },
                 { name: 'Dark Heather Grey', catalogColor: 'Dk Hthr Grey', hex: '#6b7280' }
-            ],
-            locations: [
-                { code: 'LC', name: 'Left Chest', icon: 'fa-tshirt' },
-                { code: 'FF', name: 'Full Front', icon: 'fa-tshirt' },
-                { code: 'FB', name: 'Full Back', icon: 'fa-tshirt' }
             ],
             sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL']
         };
@@ -2851,7 +3108,7 @@
 
         // Recalculate pricing for all colors - CRITICAL: Uses COMBINED quantity for tier
         function recalculateAllPricing() {
-            if (!state.pricingData || !state.selectedLocation || state.selectedColors.length === 0) {
+            if (!state.pricingData || !selectedLocation || state.selectedColors.length === 0) {
                 return;
             }
 
@@ -2882,7 +3139,7 @@
                     const qty = sizeData.quantity;
 
                     // Calculate price for this size (even if qty is 0, for display purposes)
-                    const priceBreakdown = calculatePrice(grandTotalQuantity || 1, state.selectedLocation, size);
+                    const priceBreakdown = calculatePrice(grandTotalQuantity || 1, selectedLocation, size);
                     sizeData.unitPrice = priceBreakdown.finalPrice;
                     sizeData.basePrice = priceBreakdown.basePrice;
                     sizeData.upcharge = priceBreakdown.upcharge;
@@ -2890,10 +3147,14 @@
                     // Update price display (always show pricing with tooltip)
                     const priceEl = document.getElementById(`price-${catalogColor}-${size}`);
                     if (priceEl) {
-                        // Build tooltip content
-                        const locationDisplay = state.hasBackPrint
-                            ? `${state.locations.find(l => l.code === state.selectedLocation).name} + Full Back`
-                            : state.locations.find(l => l.code === state.selectedLocation).name;
+                        // Build tooltip content - location names from Phase 1
+                        const locationNames = {
+                            'LC': 'Left Chest',
+                            'FF': 'Full Front',
+                            'LC_FB': 'Left Chest + Full Back',
+                            'FF_FB': 'Full Front + Full Back'
+                        };
+                        const locationDisplay = locationNames[selectedLocation] || selectedLocation;
 
                         const tooltipContent = `
                             <div class="price-tooltip-row">
@@ -3015,10 +3276,10 @@
 
             // Step 6: Update live pricing display panel
             const pricingPanel = document.getElementById('pricingPanel');
-            if (pricingPanel && state.selectedLocation && grandTotalQuantity > 0) {
+            if (pricingPanel && selectedLocation && grandTotalQuantity > 0) {
                 // Calculate sample price for standard size (M) to display in panel
                 const sampleSize = 'M';
-                const samplePricing = calculatePrice(grandTotalQuantity, state.selectedLocation, sampleSize);
+                const samplePricing = calculatePrice(grandTotalQuantity, selectedLocation, sampleSize);
 
                 // Update panel elements
                 const liveBasePrice = document.getElementById('liveBasePrice');
@@ -3059,66 +3320,6 @@
             }
         }
 
-        // Select front location (LC OR FF - mutually exclusive)
-        function selectFrontLocation(code) {
-            state.selectedLocation = code;
-
-            // Update visual state for radio buttons
-            const lcCard = document.getElementById('location-LC');
-            const ffCard = document.getElementById('location-FF');
-
-            // Reset both cards
-            lcCard.style.borderColor = 'var(--border-color)';
-            lcCard.style.backgroundColor = 'white';
-            ffCard.style.borderColor = 'var(--border-color)';
-            ffCard.style.backgroundColor = 'white';
-
-            // Highlight selected card
-            if (code === 'LC') {
-                lcCard.style.borderColor = 'var(--primary-color)';
-                lcCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
-            } else if (code === 'FF') {
-                ffCard.style.borderColor = 'var(--primary-color)';
-                ffCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
-            }
-
-            if (DEBUG_PRICING) {
-                console.log('[3-Day Tees] Front location selected:', code);
-            }
-            recalculateAllPricing();
-        }
-
-        // Toggle back location (optional checkbox)
-        function toggleBackLocation() {
-            const checkbox = document.getElementById('backLocationCheckbox');
-            const fbCard = document.getElementById('location-FB');
-            const checkIcon = document.getElementById('back-check-icon');
-
-            if (checkbox.checked) {
-                // Enable back print
-                state.hasBackPrint = true;
-                fbCard.style.borderColor = 'var(--primary-color)';
-                fbCard.style.backgroundColor = 'rgba(37, 99, 235, 0.05)';
-                checkIcon.style.color = 'var(--primary-color)';
-
-                if (DEBUG_PRICING) {
-                    console.log('[3-Day Tees] Back print enabled');
-                }
-            } else {
-                // Disable back print
-                state.hasBackPrint = false;
-                fbCard.style.borderColor = 'var(--border-color)';
-                fbCard.style.backgroundColor = 'white';
-                checkIcon.style.color = 'var(--border-color)';
-
-                if (DEBUG_PRICING) {
-                    console.log('[3-Day Tees] Back print disabled');
-                }
-            }
-
-            recalculateAllPricing();
-        }
-
         // Calculate price (7-step formula + 25% rush fee)
         // Returns: { finalPrice, basePrice, rushFee, upcharge }
         function calculatePrice(quantity, location, size) {
@@ -3140,28 +3341,32 @@
             // Step 2: Marked up garment
             const markedUpGarment = baseCost / tier.MarginDenominator;
 
-            // Step 3: Print cost - Handle combo locations (LC + FB or FF + FB)
+            // Step 3: Print cost - Handle combo locations (LC_FB, FF_FB)
             let totalPrintCost = 0;
+
+            // Parse location to detect combo (location will be 'LC', 'FF', 'LC_FB', or 'FF_FB')
+            const isComboLocation = location && location.includes('_FB');
+            const frontLocation = isComboLocation ? location.split('_')[0] : location;
 
             // Add front location cost
             const frontCost = state.pricingData.allDtgCostsR.find(c =>
-                c.PrintLocationCode === location && c.TierLabel === tier.TierLabel
+                c.PrintLocationCode === frontLocation && c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
             totalPrintCost += frontCost;
 
-            // Add back location cost if Full Back checkbox is checked
-            if (state.hasBackPrint) {
+            // Add back location cost if combo location
+            if (isComboLocation) {
                 const backCost = state.pricingData.allDtgCostsR.find(c =>
                     c.PrintLocationCode === 'FB' && c.TierLabel === tier.TierLabel
                 )?.PrintCost || 0;
                 totalPrintCost += backCost;
 
                 if (DEBUG_PRICING) {
-                    console.log(`[3-Day Tees] Combo location pricing: ${location} ($${frontCost.toFixed(2)}) + FB ($${backCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+                    console.log(`[3-Day Tees] Combo location pricing: ${frontLocation} ($${frontCost.toFixed(2)}) + FB ($${backCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
                 }
             } else {
                 if (DEBUG_PRICING) {
-                    console.log(`[3-Day Tees] Single location pricing: ${location} = $${frontCost.toFixed(2)}`);
+                    console.log(`[3-Day Tees] Single location pricing: ${frontLocation} = $${frontCost.toFixed(2)}`);
                 }
             }
 
@@ -3640,27 +3845,31 @@
             const baseCost = Math.min(...(pricingData.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0));
             const markedUp = baseCost / tier.MarginDenominator;
 
-            // Get print cost - check for combo locations
+            // Get print cost - parse location from Phase 1 selection
             let totalPrintCost = 0;
+
+            // selectedLocation will be 'LC', 'FF', 'LC_FB', or 'FF_FB' from Phase 1
+            const isComboLocation = selectedLocation && selectedLocation.includes('_FB');
+            const frontLocation = isComboLocation ? selectedLocation.split('_')[0] : selectedLocation;
 
             // Add front location cost
             const frontPrintCost = (pricingData.allDtgCostsR || []).find(c =>
-                c.PrintLocationCode === state.selectedLocation &&
+                c.PrintLocationCode === frontLocation &&
                 c.TierLabel === tier.TierLabel
             )?.PrintCost || 0;
             totalPrintCost += frontPrintCost;
 
-            // Add back print cost if Full Back checkbox is checked
-            if (state.hasBackPrint) {
+            // Add back print cost if location includes Full Back (combo location)
+            if (isComboLocation) {
                 const backPrintCost = (pricingData.allDtgCostsR || []).find(c =>
                     c.PrintLocationCode === 'FB' &&
                     c.TierLabel === tier.TierLabel
                 )?.PrintCost || 0;
                 totalPrintCost += backPrintCost;
 
-                console.log(`[Payment] Combo location pricing: ${state.selectedLocation} ($${frontPrintCost.toFixed(2)}) + FB ($${backPrintCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
+                console.log(`[Payment] Combo location pricing: ${frontLocation} ($${frontPrintCost.toFixed(2)}) + FB ($${backPrintCost.toFixed(2)}) = $${totalPrintCost.toFixed(2)}`);
             } else {
-                console.log(`[Payment] Single location pricing: ${state.selectedLocation} = $${frontPrintCost.toFixed(2)}`);
+                console.log(`[Payment] Single location pricing: ${frontLocation} = $${frontPrintCost.toFixed(2)}`);
             }
 
             // Calculate base price per piece using total print cost
@@ -3811,10 +4020,18 @@
                 }
 
                 // Collect order settings
+                // Location name mapping for new Phase 1 location system
+                const locationNames = {
+                    'LC': 'Left Chest',
+                    'FF': 'Full Front',
+                    'LC_FB': 'Left Chest + Full Back',
+                    'FF_FB': 'Full Front + Full Back'
+                };
+
                 const orderSettings = {
-                    printLocationCode: state.selectedLocation,
-                    printLocationName: state.locations.find(l => l.code === state.selectedLocation).name,
-                    hasBackPrint: state.hasBackPrint, // Track back print
+                    printLocationCode: selectedLocation, // From Phase 1 global variable
+                    printLocationName: locationNames[selectedLocation] || selectedLocation,
+                    hasBackPrint: selectedLocation && selectedLocation.includes('_FB'), // Detect back print from combo location
                     uploadedFiles: uploadedFiles, // Use uploaded file URLs (not base64)
                     paymentData: paymentId, // Complete payment object (not just ID)
                     shippingState: document.getElementById('state').value, // Required for conditional sales tax (Phase 2.3)
@@ -3890,8 +4107,8 @@
                 return;
             }
 
-            if (!state.selectedLocation) {
-                showToast('Please select a print location', 'warning');
+            if (!selectedLocation) {
+                showToast('Please select a print location in Step 1', 'warning');
                 return;
             }
 

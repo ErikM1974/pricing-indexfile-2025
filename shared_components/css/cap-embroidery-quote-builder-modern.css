@@ -253,7 +253,7 @@ body::after,
 
 .phase-nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     max-width: 600px;
     margin: 2rem auto;
@@ -266,6 +266,7 @@ body::after,
     align-items: center;
     gap: 0.5rem;
     position: relative;
+    flex: 0 0 auto;
 }
 
 .phase-step-number {
