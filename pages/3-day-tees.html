@@ -1482,6 +1482,31 @@
                 max-width: 50px;
             }
         }
+
+        /* Phase Navigation - Clickable Step Indicators */
+        .phase-step.completed {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .phase-step.completed:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .phase-step.completed:hover .phase-step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .phase-step.active {
+            cursor: default;
+        }
+
+        .phase-step:not(.completed):not(.active) {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -2193,6 +2218,37 @@
                     }
                 });
             }
+
+            // ========================================
+            // Clickable Phase Navigation (Backward Only)
+            // ========================================
+
+            // Phase 1 indicator - clickable when on Phase 2 or 3
+            const phase1Nav = document.getElementById('phase-1-nav');
+            if (phase1Nav) {
+                phase1Nav.addEventListener('click', function() {
+                    if (currentPhase > 1) {
+                        console.log('[Navigation] User clicked Step 1 from Step', currentPhase);
+                        moveToPhase(1);
+                    }
+                });
+            }
+
+            // Phase 2 indicator - clickable when on Phase 3
+            const phase2Nav = document.getElementById('phase-2-nav');
+            if (phase2Nav) {
+                phase2Nav.addEventListener('click', function() {
+                    if (currentPhase > 2) {
+                        console.log('[Navigation] User clicked Step 2 from Step', currentPhase);
+                        moveToPhase(2);
+                    }
+                });
+            }
+
+            // Phase 3 indicator - not clickable (shows current state only)
+            // No click handler needed - user is already on Step 3
+
+            console.log('[Navigation] Clickable step indicators initialized');
         });
 
         // Initialize EmailJS
