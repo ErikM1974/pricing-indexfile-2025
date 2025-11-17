@@ -223,6 +223,25 @@ catalogColor: product.CATALOG_COLOR
 
 **Complete Guide:** @memory/SAMPLE_INVENTORY_INTEGRATION_GUIDE.md
 
+### Multi-SKU Product Pattern (3-Day Tees)
+
+**⚠️ CRITICAL: Size Field Mapping for Multi-SKU Products**
+
+Some products (like PC54) require **multiple ShopWorks SKUs** due to size field limitations:
+
+| Product | ShopWorks SKUs | Size Range | Size Fields Used |
+|---------|----------------|------------|------------------|
+| PC54 | PC54, PC54_2X, PC54_3X | S-3XL | Size01-Size06 |
+
+**Critical Mapping Rule:**
+- PC54 → Size01-Size04 (S, M, L, XL)
+- PC54_2X → **Size05** (2XL) ⚠️ **NOT Size06!**
+- PC54_3X → Size06 (3XL)
+
+**Quick Reference:** See @memory/PRODUCT_SKU_PATTERNS.md for complete SKU split table
+
+**Complete Guide:** See @memory/3-day-tees/INVENTORY-INTEGRATION.md for implementation details
+
 ## Code Review Checklist
 
 **Before marking ANY task complete:**

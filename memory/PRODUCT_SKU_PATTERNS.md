@@ -1,8 +1,67 @@
 # Product SKU Patterns Reference Guide
 
-**Last Updated:** 2025-11-09
+**Last Updated:** 2025-11-16
 **Purpose:** Quick reference for determining SKU patterns for all products
-**Related:** SANMAR_TO_SHOPWORKS_GUIDE.md, CLAUDE.md
+**Related:** SANMAR_TO_SHOPWORKS_GUIDE.md, CLAUDE.md, 3-day-tees/INVENTORY-INTEGRATION.md
+
+---
+
+## 🔥 Critical: 3-Day Tees Multi-SKU Implementation
+
+**⚠️ MOST COMMON ERROR: PC54_2X Size Mapping**
+
+### The Critical Size05 Rule
+
+For PC54 (and similar multi-SKU t-shirts), the size field mapping is:
+
+| SKU | Sizes Handled | Size Fields Used | **Critical Mapping** |
+|-----|---------------|------------------|---------------------|
+| PC54 | S, M, L, XL | Size01-Size04 | Standard mapping |
+| PC54_2X | 2XL ONLY | **Size05** | ⚠️ **NOT Size06!** |
+| PC54_3X | 3XL ONLY | Size06 | Standard mapping |
+
+**Why This Matters:**
+```javascript
+// ❌ WRONG - Will fail to find inventory
+const inventory_2XL = pc54_2XData.Size06;  // undefined
+
+// ✅ CORRECT - Gets actual inventory
+const inventory_2XL = pc54_2XData.Size05;  // Returns count
+```
+
+### Quick Implementation Checklist
+
+When implementing multi-SKU inventory checks:
+
+- [ ] Query all 3 SKUs in parallel (PC54, PC54_2X, PC54_3X)
+- [ ] Map PC54 → Size01-04 for S, M, L, XL
+- [ ] Map PC54_2X → **Size05** for 2XL (NOT Size06!)
+- [ ] Map PC54_3X → Size06 for 3XL
+- [ ] Aggregate inventory across all SKUs
+- [ ] Cache all 3 SKUs together (5-minute TTL)
+
+### Code Pattern
+
+```javascript
+// Parallel API calls
+const [pc54Data, pc54_2XData, pc54_3XData] = await Promise.all([
+    fetch(`/api/manageorders/inventorylevels?PartNumber=PC54&Color=${color}`),
+    fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_2X&Color=${color}`),
+    fetch(`/api/manageorders/inventorylevels?PartNumber=PC54_3X&Color=${color}`)
+]);
+
+// Size aggregation with CORRECT field mapping
+const inventory = {
+    'S': pc54Data.Size01 || 0,
+    'M': pc54Data.Size02 || 0,
+    'L': pc54Data.Size03 || 0,
+    'XL': pc54Data.Size04 || 0,
+    '2XL': pc54_2XData.Size05 || 0,  // ⚠️ Size05, NOT Size06!
+    '3XL': pc54_3XData.Size06 || 0
+};
+```
+
+**Complete Implementation:** See [3-day-tees/INVENTORY-INTEGRATION.md](3-day-tees/INVENTORY-INTEGRATION.md)
 
 ---
 

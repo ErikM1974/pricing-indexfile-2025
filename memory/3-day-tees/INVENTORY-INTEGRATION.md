@@ -1,6 +1,6 @@
 # 3-Day Tees - Inventory Integration Guide
 
-**Last Updated:** 2025-11-11
+**Last Updated:** 2025-11-16 (Critical Size05/Size06 mapping corrections)
 **Purpose:** Multi-SKU inventory architecture, real-time stock checks, API integration patterns, and cache optimization
 **Status:** Implementation Ready
 
@@ -63,15 +63,17 @@ async function fetchPC54Inventory(color) {
         'M': standardData.Size02 || 0,
         'L': standardData.Size03 || 0,
         'XL': standardData.Size04 || 0,
-        '2XL': twoXLData.Size01 || 0,    // 2XL is Size01 of PC54_2X
-        '3XL': threeXLData.Size01 || 0   // 3XL is Size01 of PC54_3X
+        '2XL': twoXLData.Size05 || 0,    // ⚠️ CRITICAL: Size05 (NOT Size01!)
+        '3XL': threeXLData.Size06 || 0   // Size06 for 3XL
     };
 }
 ```
 
 ### Size Mapping
 
-**CRITICAL**: Different SKUs use different Size fields for the same human-readable size
+**⚠️ CRITICAL**: Different SKUs use different Size fields for the same human-readable size
+
+**THE MOST IMPORTANT RULE:** PC54_2X uses **Size05**, NOT Size06!
 
 | Human Size | PC54 Field | PC54_2X Field | PC54_3X Field |
 |------------|------------|---------------|---------------|
@@ -79,12 +81,28 @@ async function fetchPC54Inventory(color) {
 | M | Size02 | - | - |
 | L | Size03 | - | - |
 | XL | Size04 | - | - |
-| 2XL | - | Size01 | - |
-| 3XL | - | - | Size01 |
+| **2XL** | - | **Size05** ⚠️ | - |
+| 3XL | - | - | Size06 |
 
-**Example:**
-- To get 2XL inventory: Query `PC54_2X` and read `Size01` field
-- To get 3XL inventory: Query `PC54_3X` and read `Size01` field
+**Critical Examples:**
+```javascript
+// ❌ WRONG - Common mistake!
+const inventory_2XL = pc54_2XData.Size06;  // undefined - WRONG FIELD!
+
+// ✅ CORRECT - PC54_2X uses Size05
+const inventory_2XL = pc54_2XData.Size05;  // Correct
+
+// ✅ CORRECT - PC54_3X uses Size06
+const inventory_3XL = pc54_3XData.Size06;  // Correct
+```
+
+**Why Size05 for 2XL?**
+- ShopWorks Size01-04 are reserved for base sizes (S-XL)
+- Size05 is the first extended size field (2XL)
+- Size06 is the second extended size field (3XL)
+- This pattern is consistent across all multi-SKU products
+
+**Verified in Code:** See 3-day-tees.html lines 1772 and 1779
 
 ---
 
