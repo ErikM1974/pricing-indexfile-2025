@@ -337,9 +337,11 @@
                 <div class="card" style="margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h3>1. Choose Colors</h3>
+                        <!-- Development tool - hidden from customers
                         <button onclick="clearInventoryCache()" class="btn btn-sm btn-link" style="font-size: 0.9rem; color: var(--primary-color);">
                             <i class="fas fa-sync"></i> Refresh Inventory
                         </button>
+                        -->
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Select all colors needed for your order:</p>
                     <div class="color-selector">
@@ -1144,45 +1146,34 @@
             const button = event.target?.closest('button');
             const originalText = button?.innerHTML || '<i class="fas fa-sync"></i> Refresh Inventory';
 
-            // Reload inventory for all selected colors SEQUENTIALLY
-            if (state.selectedColors.length > 0) {
-                console.log('[3-Day Tees] Refreshing inventory for', state.selectedColors.length, 'selected colors sequentially');
+            // NEW: Use bulk endpoint for instant refresh (no delays!)
+            if (button) {
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                button.disabled = true;
+            }
 
-                for (let i = 0; i < state.selectedColors.length; i++) {
-                    const catalogColor = state.selectedColors[i];
-                    const colorName = state.colorConfigs[catalogColor]?.displayColor || catalogColor;
+            console.log('[3-Day Tees] Refreshing inventory via bulk endpoint...');
 
-                    // Update button with progress
-                    if (button) {
-                        button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading ${i + 1}/${state.selectedColors.length} (${colorName})`;
-                        button.disabled = true;
-                    }
+            try {
+                // Initialize inventory using bulk endpoint (1 call instead of 15!)
+                const success = await initializeInventory();
 
-                    console.log(`[3-Day Tees] Loading inventory ${i + 1}/${state.selectedColors.length}: ${catalogColor}`);
-
-                    try {
-                        // Force fresh load by clearing cache entry
-                        delete state.inventoryCache[catalogColor];
-                        // Load fresh inventory
-                        await loadSizeInventory(catalogColor);
-
-                        // Wait 7 seconds between colors to respect rate limit
-                        // (Each color makes 3 API calls: PC54, PC54_2X, PC54_3X)
-                        // Rate limit is 30/minute = 1 request every 2 seconds
-                        // 3 requests × 2 sec/request + 1 sec buffer = 7 seconds
-                        if (i < state.selectedColors.length - 1) {
-                            console.log('[3-Day Tees] Waiting 7 seconds before next color to respect rate limit...');
-                            await new Promise(resolve => setTimeout(resolve, 7000));
+                if (success) {
+                    console.log('[3-Day Tees] ✓ Inventory refreshed successfully');
+                } else {
+                    console.warn('[3-Day Tees] Bulk refresh failed, falling back to individual fetches');
+                    // Fallback: reload individual colors if bulk fails
+                    for (const catalogColor of state.selectedColors) {
+                        try {
+                            delete state.inventoryCache[catalogColor];
+                            await loadSizeInventory(catalogColor);
+                        } catch (error) {
+                            console.error(`[3-Day Tees] Failed to load ${catalogColor}:`, error);
                         }
-                    } catch (error) {
-                        console.error(`[3-Day Tees] Failed to load inventory for ${catalogColor}:`, error);
-                        // Continue with next color even if one fails
                     }
                 }
-
-                console.log('[3-Day Tees] ✓ All inventory loaded successfully');
-            } else {
-                console.log('[3-Day Tees] No colors selected, cache cleared');
+            } catch (error) {
+                console.error('[3-Day Tees] Error during refresh:', error);
             }
 
             // Show success feedback
@@ -1373,6 +1364,32 @@
                     recalculateAllPricing(); // Update pricing
                 }
 
+                // NEW: Load all PC54 inventory using bulk endpoint (1 call instead of 15!)
+                await initializeInventory();
+
+                // After initialization, ensure all badges are updated with cached inventory data
+                // Use requestAnimationFrame instead of setTimeout for better reliability
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        console.log('[3-Day Tees] Ensuring all badges show current inventory...');
+                        state.colors.forEach(color => {
+                            const cached = state.inventoryCache[color.catalogColor];
+                            if (cached && cached.total !== undefined) {
+                                updateInventoryBadge(color.catalogColor, cached.total);
+                                console.log(`[3-Day Tees] Badge updated for ${color.catalogColor}: ${cached.total} units`);
+                            } else {
+                                // If no cache yet, show loading state
+                                const badgeId = `stock-${color.catalogColor.replace(/\s+/g, '-')}`;
+                                const badge = document.getElementById(badgeId);
+                                if (badge) {
+                                    badge.className = 'stock-badge loading';
+                                    badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                                }
+                            }
+                        });
+                    });
+                });
+
                 // Initialize collapsible sections
                 initCollapsibleSections();
 
@@ -1446,13 +1463,31 @@
                     <div class="color-swatch-option ${selectedClass}" onclick="toggleColor('${color.catalogColor}', event)">
                         <div class="color-swatch" style="${swatchStyle} ${whiteBorder}"></div>
                         <div class="color-label">${color.name}</div>
-                        <div class="stock-badge" id="stock-${color.catalogColor}">...</div>
+                        <div class="stock-badge" id="stock-${color.catalogColor.replace(/\s+/g, '-')}">...</div>
                     </div>
                 `;
             }).join('');
 
-            // Badges will be updated when size inventory loads for selected colors
-            // (No need to load inventory for all colors upfront)
+            // Update badges with cached inventory data (if available)
+            // Use DOUBLE requestAnimationFrame to ensure DOM elements are painted and queryable
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    state.colors.forEach(color => {
+                        const cached = state.inventoryCache[color.catalogColor];
+                        if (cached && cached.total !== undefined) {
+                            updateInventoryBadge(color.catalogColor, cached.total);
+                        } else {
+                            // Show loading state if inventory not cached yet
+                            const badgeId = `stock-${color.catalogColor.replace(/\s+/g, '-')}`;
+                            const badge = document.getElementById(badgeId);
+                            if (badge && badge.textContent === '...') {
+                                badge.className = 'stock-badge loading';
+                                badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading';
+                            }
+                        }
+                    });
+                });
+            });
 
             // Update hero image to show first color or first selected color
             updateHeroImage();
@@ -1491,8 +1526,12 @@
 
         // Helper function to update inventory badge display
         function updateInventoryBadge(catalogColor, total) {
-            const badgeId = `stock-${catalogColor}`;
+            const badgeId = `stock-${catalogColor.replace(/\s+/g, '-')}`;
+            console.log(`[DEBUG] updateInventoryBadge called for ${catalogColor}, total: ${total}`);
+            console.log(`[DEBUG] Looking for badge ID: ${badgeId}`);
+
             const badge = document.getElementById(badgeId);
+            console.log(`[DEBUG] Badge element found:`, badge !== null);
 
             if (!badge) {
                 console.error(`[3-Day Tees] Badge not found for ${catalogColor}`);
@@ -1509,6 +1548,86 @@
             } else {
                 badge.className = 'stock-badge out-of-stock';
                 badge.textContent = 'Out of Stock';
+            }
+        }
+
+        // NEW: Bulk fetch ALL PC54 inventory at once (93% faster - 1 call vs 15 calls)
+        async function fetchAllPC54Inventory() {
+            try {
+                console.log('[3-Day Tees] Fetching ALL PC54 inventory (bulk endpoint)...');
+
+                const response = await fetch(
+                    'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/pc54-inventory'
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Bulk inventory fetch failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[3-Day Tees] ✓ Bulk inventory received:', data);
+
+                // Return the colors object from the response
+                return data.colors; // { "Jet Black": {...}, "White": {...}, ... }
+            } catch (error) {
+                console.error('[3-Day Tees] Error fetching bulk inventory:', error);
+                return null;
+            }
+        }
+
+        // NEW: Initialize inventory cache from bulk endpoint
+        async function initializeInventory() {
+            console.log('[3-Day Tees] Initializing inventory cache from bulk endpoint...');
+
+            try {
+                // Fetch all colors in one call
+                const bulkData = await fetchAllPC54Inventory();
+
+                if (!bulkData) {
+                    console.error('[3-Day Tees] Bulk fetch failed, falling back to individual fetches');
+                    return false;
+                }
+
+                // Populate cache with all colors
+                Object.keys(bulkData).forEach(catalogColor => {
+                    const colorData = bulkData[catalogColor];
+
+                    // ✅ CORRECTED: Parse sizeInventory from bulk data structure
+                    // Bulk API returns colorData.sizes directly, not colorData.standardData.result[0]
+                    const sizeInventory = {
+                        'S': colorData.sizes?.S || 0,
+                        'M': colorData.sizes?.M || 0,
+                        'L': colorData.sizes?.L || 0,
+                        'XL': colorData.sizes?.XL || 0,
+                        '2XL': colorData.sizes?.['2XL'] || 0,
+                        '3XL': colorData.sizes?.['3XL'] || 0
+                    };
+
+                    // Store in cache with actual bulk data structure
+                    state.inventoryCache[catalogColor] = {
+                        total: colorData.total,
+                        sizeInventory: sizeInventory,  // ✅ Now contains actual inventory, not zeros
+                        skus: colorData.skus,          // ✅ Use actual bulk API field
+                        timestamp: Date.now(),
+                        cacheVersion: CACHE_VERSION
+                    };
+
+                    console.log(`[3-Day Tees] ✓ Cached inventory for ${catalogColor}: ${colorData.total} units with sizeInventory:`, sizeInventory);
+
+                    // CRITICAL FIX: Update badge for ALL colors, not just selected ones
+                    // Badges exist in the color grid regardless of selection state
+                    updateInventoryBadge(catalogColor, colorData.total);
+                });
+
+                // Save to sessionStorage
+                saveInventoryCacheToStorage(state.inventoryCache);
+
+                console.log('[3-Day Tees] ✓ Inventory cache initialized successfully');
+                return true;
+
+            } catch (error) {
+                console.error('[3-Day Tees] Error initializing inventory:', error);
+                return false;
             }
         }
 
@@ -1602,7 +1721,7 @@
                 }
 
                 // Show loading state on badge
-                const badgeId = `stock-${catalogColor}`;
+                const badgeId = `stock-${catalogColor.replace(/\s+/g, '-')}`;
                 const badge = document.getElementById(badgeId);
                 if (badge) {
                     badge.className = 'stock-badge loading';
@@ -1692,7 +1811,7 @@
                 });
             } catch (error) {
                 console.error('[3-Day Tees] Multi-SKU inventory load error:', catalogColor, error);
-                const badge = document.getElementById(`stock-${catalogColor}`);
+                const badge = document.getElementById(`stock-${catalogColor.replace(/\s+/g, '-')}`);
 
                 // Differentiate between network errors and API errors
                 if (error.message.includes('fetch') || error.message.includes('network') || !navigator.onLine) {
@@ -1955,6 +2074,15 @@
                     console.log('[3-Day Tees] Color added:', catalogColor);
                 }
 
+                // Check if inventory is already cached and update badge immediately
+                if (state.inventoryCache[catalogColor]) {
+                    console.log(`[3-Day Tees] Using cached inventory for badge update: ${catalogColor}`);
+                    const cached = state.inventoryCache[catalogColor];
+                    updateInventoryBadge(catalogColor, cached.total);
+                } else {
+                    console.log(`[3-Day Tees] No cached inventory for ${catalogColor}, badge will show loading state`);
+                }
+
                 // Inventory will be loaded by renderColors() below (prevents race condition)
             } else {
                 // Remove color
@@ -1966,8 +2094,39 @@
                 }
             }
 
-            // Update UI
-            renderColors();
+            // Update UI - Toggle visual selection without rebuilding entire DOM
+            // Find the clicked color swatch element and update its class directly
+            const clickedElement = event.target.closest('.color-swatch-option');
+            if (clickedElement) {
+                if (index === -1) {
+                    // Color was added - add selected class
+                    clickedElement.classList.add('selected');
+                } else {
+                    // Color was removed - remove selected class
+                    clickedElement.classList.remove('selected');
+                }
+            }
+
+            // CRITICAL FIX: Refresh inventory badge for ALL colors after toggle
+            // This ensures badges always show current inventory, not placeholder "..."
+            requestAnimationFrame(() => {
+                state.colors.forEach(color => {
+                    const cached = state.inventoryCache[color.catalogColor];
+                    if (cached && cached.total !== undefined) {
+                        updateInventoryBadge(color.catalogColor, cached.total);
+                    } else {
+                        // Show loading state if inventory not cached yet
+                        const badgeId = `stock-${color.catalogColor.replace(/\s+/g, '-')}`;
+                        const badge = document.getElementById(badgeId);
+                        if (badge) {
+                            badge.className = 'stock-badge loading';
+                            badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                        }
+                    }
+                });
+            });
+
+            // Update dependent UI elements (these don't rebuild the color grid)
             renderSelectedColors();
             recalculateAllPricing();
         }
@@ -2106,49 +2265,59 @@
                 console.log('[3-Day Tees] ✓ All new colors loaded');
             }
 
-            // Update UI with cached data
-            state.selectedColors.forEach(catalogColor => {
-                const cached = state.inventoryCache[catalogColor];
-                if (cached) {
-                    console.log(`[3-Day Tees] Using cached size inventory for ${catalogColor}:`, {
-                        hasCached: !!cached,
-                        hasSizeInventory: !!(cached && cached.sizeInventory),
-                        sizeInventory: cached?.sizeInventory || {},
-                        total: cached?.total || 0,
-                        timestamp: cached?.timestamp || null,
-                        age: cached?.timestamp ? `${Math.round((Date.now() - cached.timestamp) / 1000)}s` : 'unknown'
-                    });
-
-                    if (cached.sizeInventory) {
-                        const total = Object.values(cached.sizeInventory).reduce((sum, qty) => sum + qty, 0);
-                        console.log(`[3-Day Tees] Cached inventory total for ${catalogColor}: ${total} units`);
-                        updateInventoryBadge(catalogColor, total);
-
-                        // Also update the size indicators with cached data
-                        state.sizes.forEach(size => {
-                            const stock = cached.sizeInventory[size] || 0;
-                            const stockIndicator = document.getElementById(`stock-qty-${catalogColor}-${size}`);
-                            if (stockIndicator) {
-                                if (stock === 0) {
-                                    stockIndicator.textContent = '0 units';
-                                    stockIndicator.className = 'text-danger';
-                                } else {
-                                    stockIndicator.textContent = `Available: ${stock}`;
-                                    stockIndicator.className = 'text-success';
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-
-            // Measure and match actual content height to prevent overflow expansion
+            // Update UI with ALL colors (new and cached) in requestAnimationFrame to ensure DOM stability
             requestAnimationFrame(() => {
+                console.log('[3-Day Tees] Updating size inventory UI for all selected colors...');
+
+                state.selectedColors.forEach(catalogColor => {
+                    const cached = state.inventoryCache[catalogColor];
+                    if (cached) {
+                        console.log(`[3-Day Tees] Using cached size inventory for ${catalogColor}:`, {
+                            hasCached: !!cached,
+                            hasSizeInventory: !!(cached && cached.sizeInventory),
+                            sizeInventory: cached?.sizeInventory || {},
+                            total: cached?.total || 0,
+                            timestamp: cached?.timestamp || null,
+                            age: cached?.timestamp ? `${Math.round((Date.now() - cached.timestamp) / 1000)}s` : 'unknown'
+                        });
+
+                        if (cached.sizeInventory) {
+                            const total = cached.total;  // ✅ Use cached total directly instead of recalculating
+                            console.log(`[3-Day Tees] Cached inventory total for ${catalogColor}: ${total} units`);
+                            updateInventoryBadge(catalogColor, total);
+
+                            // Update the size indicators with cached data (NOW DOM IS STABLE)
+                            state.sizes.forEach(size => {
+                                const stock = cached.sizeInventory[size] || 0;
+                                const stockIndicator = document.getElementById(`stock-qty-${catalogColor}-${size}`);
+                                if (stockIndicator) {
+                                    if (stock === 0) {
+                                        stockIndicator.textContent = '0 units';
+                                        stockIndicator.className = 'table-stock-indicator out-of-stock';
+                                    } else {
+                                        stockIndicator.textContent = `Available: ${stock}`;
+                                        if (stock <= 10) {
+                                            stockIndicator.className = 'table-stock-indicator low-stock';
+                                        } else {
+                                            stockIndicator.className = 'table-stock-indicator in-stock';
+                                        }
+                                    }
+                                } else {
+                                    console.warn(`[3-Day Tees] Could not find stock indicator element: stock-qty-${catalogColor}-${size}`);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                // Measure and match actual content height to prevent overflow expansion
                 const container = document.getElementById('selectedColorsContainer');
                 if (container && state.selectedColors.length > 0) {
                     const actualHeight = container.scrollHeight;
                     container.style.minHeight = `${actualHeight}px`;
                 }
+
+                console.log('[3-Day Tees] ✓ Size inventory UI update complete');
             });
         }
 
@@ -2163,8 +2332,21 @@
                     console.log('[3-Day Tees] Color removed:', catalogColor);
                 }
 
-                // Update UI
-                renderColors();
+                // Update UI - Find and update the specific color element without rebuilding
+                const colorElements = document.querySelectorAll('.color-swatch-option');
+                colorElements.forEach(element => {
+                    // Extract the catalogColor from the onclick attribute
+                    const onclickAttr = element.getAttribute('onclick');
+                    if (onclickAttr) {
+                        const match = onclickAttr.match(/toggleColor\('([^']+)'/);
+                        if (match && match[1] === catalogColor) {
+                            element.classList.remove('selected');
+                            console.log(`[3-Day Tees] Removed selected class from ${catalogColor} element`);
+                        }
+                    }
+                });
+
+                // Update other UI elements (don't rebuild color grid)
                 renderSelectedColors();
                 recalculateAllPricing();
             }

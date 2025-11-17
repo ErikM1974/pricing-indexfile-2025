@@ -486,7 +486,127 @@ const cartWithInventory = await window.sampleInventoryService.checkCartInventory
 
 ---
 
-### Issue 5: Console Errors About Missing Service
+### Issue 5: Multi-SKU Bulk API Response Parsing (CRITICAL)
+
+**Symptoms:**
+- Size inventory displays "0 units" for all sizes
+- Console shows correct API responses with inventory data
+- Individual color loads work, but multi-color bulk loads fail
+- No JavaScript errors in console (silent failure)
+
+**Root Cause:**
+Bulk inventory endpoint (`/api/manageorders/bulk-inventory`) has different response structure than individual endpoint (`/api/sizes-by-style-color`). Code attempts to access fields from individual endpoint structure that don't exist in bulk response.
+
+**Wrong Code:**
+```javascript
+// Tries to use individual endpoint structure on bulk API response
+const bulkResponse = await fetch(`/api/manageorders/bulk-inventory?colors=Forest,Navy`);
+const bulkData = await bulkResponse.json();
+const colorData = bulkData.colors['Forest'];
+
+const sizeInventory = {
+    'S': colorData.standardData?.result?.[0]?.Size01 || 0,   // ❌ undefined → 0
+    'M': colorData.standardData?.result?.[0]?.Size02 || 0,   // ❌ undefined → 0
+    'L': colorData.standardData?.result?.[0]?.Size03 || 0,   // ❌ undefined → 0
+    'XL': colorData.standardData?.result?.[0]?.Size04 || 0,  // ❌ undefined → 0
+    '2XL': colorData.twoXLData?.result?.[0]?.Size05 || 0,    // ❌ undefined → 0
+    '3XL': colorData.threeXLData?.result?.[0]?.Size06 || 0   // ❌ undefined → 0
+};
+// Result: {S: 0, M: 0, L: 0, XL: 0, 2XL: 0, 3XL: 0} despite API returning correct data
+```
+
+**Correct Code:**
+```javascript
+// Uses bulk endpoint structure correctly
+const bulkResponse = await fetch(`/api/manageorders/bulk-inventory?colors=Forest,Navy`);
+const bulkData = await bulkResponse.json();
+const colorData = bulkData.colors['Forest'];
+
+const sizeInventory = {
+    'S': colorData.sizes?.S || 0,           // ✅ 50 units
+    'M': colorData.sizes?.M || 0,           // ✅ 100 units
+    'L': colorData.sizes?.L || 0,           // ✅ 150 units
+    'XL': colorData.sizes?.XL || 0,         // ✅ 200 units
+    '2XL': colorData.sizes?.['2XL'] || 0,   // ✅ 75 units
+    '3XL': colorData.sizes?.['3XL'] || 0    // ✅ 30 units
+};
+```
+
+**Why This Was Difficult to Debug:**
+1. Individual color loads worked (different API structure) - created false sense of working code
+2. Only bulk endpoint failed - intermittent symptoms based on code path
+3. Optional chaining (`?.`) masked errors silently - no console errors thrown
+4. Console showed "correct" API responses - data looked good, parsing was wrong
+5. API response structure difference was subtle and not immediately obvious
+
+**Solution:**
+
+1. **Verify which endpoint you're using:**
+   ```javascript
+   // Individual endpoint structure
+   const individualData = await fetch(`/api/sizes-by-style-color?styleNumber=PC54&color=Forest`);
+   // Access: data.sizes (array), data.grandTotal, data.sizeTotals
+
+   // Bulk endpoint structure
+   const bulkData = await fetch(`/api/manageorders/bulk-inventory?colors=Forest,Navy`);
+   // Access: data.colors[colorName].sizes (object), data.colors[colorName].total
+   ```
+
+2. **Use correct field paths for bulk API:**
+   ```javascript
+   // Bulk API response has this structure:
+   // {
+   //   colors: {
+   //     "Forest": {
+   //       sizes: { S: 50, M: 100, L: 150, ... },  ← Object with counts
+   //       total: 605,
+   //       skus: [...]
+   //     }
+   //   }
+   // }
+   ```
+
+3. **Cross-reference detailed documentation:**
+   - Complete bulk API documentation: `memory/3-day-tees/API-PATTERNS.md` § 2.5
+   - Multi-SKU inventory patterns: `memory/3-day-tees/INVENTORY-INTEGRATION.md` § "Bulk API Response Structure"
+   - Pitfall reference: `memory/3-day-tees/INVENTORY-INTEGRATION.md` § "Pitfall 4"
+
+**Verification Console Commands:**
+```javascript
+// Test bulk API structure
+fetch('/api/manageorders/bulk-inventory?colors=Forest')
+    .then(r => r.json())
+    .then(data => {
+        console.log('Bulk API structure:', {
+            hasColorsObject: 'colors' in data,
+            firstColor: Object.keys(data.colors)[0],
+            hasSizesObject: 'sizes' in data.colors['Forest'],
+            sizesStructure: typeof data.colors['Forest'].sizes,  // "object"
+            sampleSize: data.colors['Forest'].sizes?.S           // Should be number
+        });
+    });
+
+// Compare with individual API structure
+fetch('/api/sizes-by-style-color?styleNumber=PC54&color=Forest')
+    .then(r => r.json())
+    .then(data => {
+        console.log('Individual API structure:', {
+            hasSizesArray: Array.isArray(data.sizes),  // true
+            hasGrandTotal: 'grandTotal' in data,       // true
+            firstSize: data.sizes?.[0]                  // "S"
+        });
+    });
+```
+
+**Prevention:**
+- Always inspect API response structure before accessing nested properties
+- Don't assume bulk and individual endpoints return same structure
+- Test both single-color and multi-color load paths
+- Add console.log() to verify actual API response shape during development
+
+---
+
+### Issue 6: Console Errors About Missing Service
 
 **Symptoms:**
 ```

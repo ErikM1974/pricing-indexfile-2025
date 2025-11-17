@@ -254,6 +254,137 @@ async function loadSizeInventory(catalogColor) {
 }
 ```
 
+### Bulk API Response Structure (Multi-Color Loads)
+
+**⚠️ CRITICAL: Bulk endpoint has different response structure than individual endpoint**
+
+When loading multiple colors simultaneously, the bulk inventory endpoint returns a fundamentally different data structure than individual color loads. Failing to account for this difference causes silent data corruption.
+
+**Endpoint:**
+```
+GET /api/manageorders/bulk-inventory?colors=Jet%20Black,Navy,White,Dk%20Hthr%20Grey,Ath%20Heather
+```
+
+**Bulk API Response Structure:**
+```javascript
+{
+  "colors": {
+    "Jet Black": {
+      "sizes": {           // ← Direct access to sizes
+        "S": 4,
+        "M": 10,
+        "L": 11,
+        "XL": 79,
+        "2XL": 27,
+        "3XL": 6
+      },
+      "total": 137,
+      "skus": [           // ← SKU details array
+        {
+          "PartNumber": "PC54",
+          "Color": "Jet Black",
+          "Size01": 4,
+          "Size02": 10,
+          "Size03": 11,
+          "Size04": 79
+        },
+        {
+          "PartNumber": "PC54_2X",
+          "Color": "Jet Black",
+          "Size05": 27
+        },
+        {
+          "PartNumber": "PC54_3X",
+          "Color": "Jet Black",
+          "Size06": 6
+        }
+      ]
+    },
+    "Navy": { /* similar structure */ }
+  }
+}
+```
+
+**Individual Color API Response Structure (for comparison):**
+```javascript
+{
+  "standardData": {
+    "result": [
+      {
+        "PartNumber": "PC54",
+        "Color": "Jet Black",
+        "Size01": 4,
+        "Size02": 10,
+        "Size03": 11,
+        "Size04": 79
+      }
+    ]
+  },
+  "twoXLData": {
+    "result": [
+      {
+        "PartNumber": "PC54_2X",
+        "Color": "Jet Black",
+        "Size05": 27
+      }
+    ]
+  },
+  "threeXLData": {
+    "result": [
+      {
+        "PartNumber": "PC54_3X",
+        "Color": "Jet Black",
+        "Size06": 6
+      }
+    ]
+  }
+}
+```
+
+**Critical Parsing Pattern:**
+
+```javascript
+// ❌ WRONG - Tries to access individual endpoint structure (causes silent zeros)
+const sizeInventory = {
+    'S': colorData.standardData?.result?.[0]?.Size01 || 0,   // undefined → 0
+    'M': colorData.standardData?.result?.[0]?.Size02 || 0,   // undefined → 0
+    'L': colorData.standardData?.result?.[0]?.Size03 || 0,   // undefined → 0
+    'XL': colorData.standardData?.result?.[0]?.Size04 || 0,  // undefined → 0
+    '2XL': colorData.twoXLData?.result?.[0]?.Size05 || 0,    // undefined → 0
+    '3XL': colorData.threeXLData?.result?.[0]?.Size06 || 0   // undefined → 0
+};
+
+// ✅ CORRECT - Uses bulk endpoint structure (gets actual inventory)
+const sizeInventory = {
+    'S': colorData.sizes?.S || 0,           // 4 units
+    'M': colorData.sizes?.M || 0,           // 10 units
+    'L': colorData.sizes?.L || 0,           // 11 units
+    'XL': colorData.sizes?.XL || 0,         // 79 units
+    '2XL': colorData.sizes?.['2XL'] || 0,   // 27 units
+    '3XL': colorData.sizes?.['3XL'] || 0    // 6 units
+};
+```
+
+**Why This Matters:**
+
+- **Silent failures**: Optional chaining (`?.`) returns `undefined` when fields don't exist
+- **Fallback triggers**: The `|| 0` fallback activates on undefined, storing zeros
+- **No console errors**: JavaScript silently proceeds with wrong data
+- **Correct totals mask bug**: Total inventory displays correctly while size grid shows zeros
+- **Cache corruption**: Wrong structure stored in cache persists across color switches
+
+**Verification:**
+
+Console logs that indicate this bug:
+```javascript
+// Bug present (zeros despite correct total):
+[3-Day Tees] ✓ Cached inventory for Jet Black: 137 units with sizeInventory: {S: 0, M: 0, L: 0, XL: 0, 2XL: 0, 3XL: 0}
+
+// Bug fixed (actual inventory):
+[3-Day Tees] ✓ Cached inventory for Jet Black: 137 units with sizeInventory: Object
+[DEBUG SIZE INVENTORY] Jet Black - Sizes in stock: S:4, M:10, L:11, XL:79, 2XL:27, 3XL:6
+```
+
 ### Cache Data Structure
 
 **Initialize cache in state object:**
@@ -265,16 +396,53 @@ const state = {
 };
 ```
 
-**Cache structure per color:**
+**Cache structure per color (bulk API format):**
 ```javascript
 state.inventoryCache['Forest'] = {
     total: 605,                          // Sum across all SKUs
-    standardData: { result: [{...}] },   // PC54 response
-    twoXLData: { result: [{...}] },      // PC54_2X response
-    threeXLData: { result: [{...}] },    // PC54_3X response
+    sizeInventory: {                     // Per-size inventory counts
+        'S': 50,
+        'M': 100,
+        'L': 150,
+        'XL': 200,
+        '2XL': 75,
+        '3XL': 30
+    },
+    skus: [                              // SKU details from bulk API
+        {
+            "PartNumber": "PC54",
+            "Color": "Forest",
+            "Size01": 50,
+            "Size02": 100,
+            "Size03": 150,
+            "Size04": 200
+        },
+        {
+            "PartNumber": "PC54_2X",
+            "Color": "Forest",
+            "Size05": 75
+        },
+        {
+            "PartNumber": "PC54_3X",
+            "Color": "Forest",
+            "Size06": 30
+        }
+    ],
     timestamp: 1699468800000             // Cache timestamp
 };
 ```
+
+**⚠️ WARNING: Cache Structure Must Match API Response**
+
+When storing bulk API responses in cache, use the actual field names from the bulk API:
+- ✅ Use `sizeInventory` (aggregated from `colorData.sizes`)
+- ✅ Use `skus` (from `colorData.skus`)
+- ❌ DON'T use `standardData`, `twoXLData`, `threeXLData` (individual API only)
+
+**Why this matters:**
+- Functions reading from cache expect consistent structure
+- Mismatched structure causes undefined access → silent zeros
+- Both `loadInventory()` and `loadSizeInventory()` must use same cache format
 
 ### Common Mistake: One Function Checks, Other Doesn't
 
@@ -766,7 +934,106 @@ async function loadInventory(catalogColor) {
 
 **Solution:** Always use `catalogColor` field (CATALOG_COLOR format) for API queries, never the `name` field (COLOR_NAME format)
 
-### Pitfall 4: Cache Invalidation
+### Pitfall 4: Bulk API Response Parsing (CRITICAL)
+
+**Problem:** Size inventory grid displays "0 units" for all sizes despite API returning correct data and correct totals displaying in badges
+
+**Symptoms:**
+```
+Console shows correct total but zeros for individual sizes:
+[3-Day Tees] ✓ Cached inventory for Jet Black: 137 units with sizeInventory: {S: 0, M: 0, L: 0, XL: 0, 2XL: 0, 3XL: 0}
+
+Individual color loads work fine, only bulk loads fail
+Total inventory displays correctly (137, 144, 30, etc.)
+Switching colors maintains the zero display
+```
+
+**Cause:** Bulk endpoint response structure differs from individual endpoint. Code tried to access `colorData.standardData?.result?.[0]?.Size01` but bulk API actually returns `colorData.sizes.S`
+
+**Root Cause Detail:**
+```javascript
+// Lines 1595-1603 in 3-day-tees.html (BEFORE FIX)
+const sizeInventory = {
+    'S': colorData.standardData?.result?.[0]?.Size01 || 0,   // undefined → 0
+    'M': colorData.standardData?.result?.[0]?.Size02 || 0,   // undefined → 0
+    'L': colorData.standardData?.result?.[0]?.Size03 || 0,   // undefined → 0
+    'XL': colorData.standardData?.result?.[0]?.Size04 || 0,  // undefined → 0
+    '2XL': colorData.twoXLData?.result?.[0]?.Size05 || 0,    // undefined → 0
+    '3XL': colorData.threeXLData?.result?.[0]?.Size06 || 0   // undefined → 0
+};
+// Fields don't exist in bulk API → optional chaining returns undefined → fallback triggers → zeros stored
+```
+
+**Why This Was Difficult to Debug:**
+1. **Individual color loads worked** (different API structure) - created false sense of working code
+2. **Only bulk endpoint failed** - intermittent symptoms based on code path
+3. **Optional chaining masked errors silently** - no console errors, no exceptions thrown
+4. **Console showed "correct" API responses** - data looked good, parsing was wrong
+5. **Previous fixes addressed symptoms** (DOM timing via requestAnimationFrame) - didn't solve root cause
+
+**Solution:**
+```javascript
+// Lines 1595-1603 in 3-day-tees.html (AFTER FIX)
+const sizeInventory = {
+    'S': colorData.sizes?.S || 0,           // ✅ Correct field path
+    'M': colorData.sizes?.M || 0,           // ✅ Correct field path
+    'L': colorData.sizes?.L || 0,           // ✅ Correct field path
+    'XL': colorData.sizes?.XL || 0,         // ✅ Correct field path
+    '2XL': colorData.sizes?.['2XL'] || 0,   // ✅ Correct field path
+    '3XL': colorData.sizes?.['3XL'] || 0    // ✅ Correct field path
+};
+```
+
+**Cache Structure Fix:**
+```javascript
+// Lines 1609-1613 (BEFORE FIX)
+state.inventoryCache[catalogColor] = {
+    total: colorData.total,
+    sizeInventory: sizeInventory,
+    standardData: colorData.standardData,  // ❌ Doesn't exist in bulk API
+    twoXLData: colorData.twoXLData,        // ❌ Doesn't exist in bulk API
+    threeXLData: colorData.threeXLData,    // ❌ Doesn't exist in bulk API
+    timestamp: Date.now(),
+    cacheVersion: CACHE_VERSION
+};
+
+// Lines 1609-1613 (AFTER FIX)
+state.inventoryCache[catalogColor] = {
+    total: colorData.total,
+    sizeInventory: sizeInventory,
+    skus: colorData.skus,  // ✅ Actual bulk API field
+    timestamp: Date.now(),
+    cacheVersion: CACHE_VERSION
+};
+```
+
+**Verification Commands:**
+```javascript
+// In browser console after fix:
+const cache = state.inventoryCache['Jet Black'];
+console.log('Total:', cache.total);           // Should show 137
+console.log('Size Inventory:', cache.sizeInventory);  // Should show {S: 4, M: 10, L: 11, ...}
+console.log('Has skus:', 'skus' in cache);    // Should be true
+console.log('Has standardData:', 'standardData' in cache);  // Should be false
+```
+
+**Expected Console Output After Fix:**
+```
+[DEBUG SIZE INVENTORY] Jet Black: Object
+[DEBUG SIZE INVENTORY] Jet Black - Sizes in stock: S:4, M:10, L:11, XL:79, 2XL:27, 3XL:6
+[3-Day Tees] ✓ Cached inventory for Jet Black: 137 units with sizeInventory: Object
+```
+
+**Prevention:**
+- Always verify API response structure before accessing nested properties
+- Add console.log() to inspect actual API response shape
+- Don't assume bulk and individual endpoints return same structure
+- Test both individual color loads AND multi-color bulk loads
+- Check that cache structure matches the API response you're storing
+
+**Related Documentation:** See [Bulk API Response Structure](#bulk-api-response-structure-multi-color-loads) section above for complete API comparison.
+
+### Pitfall 5: Cache Invalidation
 
 **Problem:** Inventory shows old counts after recent orders
 **Cause:** 5-minute cache not refreshed

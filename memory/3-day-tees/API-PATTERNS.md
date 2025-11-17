@@ -228,6 +228,281 @@ const largeAvailable = largeQty > 0;
 
 ---
 
+## 2.5. Bulk Inventory API (Multi-Color Loads)
+
+**⚠️ CRITICAL: Different response structure than individual inventory endpoint**
+
+### Endpoint
+
+```
+GET /api/manageorders/bulk-inventory?colors={color1},{color2},{color3}...
+```
+
+### Parameters
+
+| Parameter | Type | Required | Example | Notes |
+|-----------|------|----------|---------|-------|
+| `colors` | string | Yes | `Jet Black,Navy,White` | Comma-separated CATALOG_COLOR values (URL encoded) |
+
+**Example URL:**
+```
+GET /api/manageorders/bulk-inventory?colors=Jet%20Black,Navy,White,Dk%20Hthr%20Grey,Ath%20Heather
+```
+
+### Response Structure
+
+**⚠️ CRITICAL DIFFERENCE:** Bulk endpoint returns nested object structure, NOT the same format as individual endpoint.
+
+```json
+{
+  "colors": {
+    "Jet Black": {
+      "sizes": {
+        "S": 4,
+        "M": 10,
+        "L": 11,
+        "XL": 79,
+        "2XL": 27,
+        "3XL": 6
+      },
+      "total": 137,
+      "skus": [
+        {
+          "PartNumber": "PC54",
+          "Color": "Jet Black",
+          "Size01": 4,
+          "Size02": 10,
+          "Size03": 11,
+          "Size04": 79
+        },
+        {
+          "PartNumber": "PC54_2X",
+          "Color": "Jet Black",
+          "Size05": 27
+        },
+        {
+          "PartNumber": "PC54_3X",
+          "Color": "Jet Black",
+          "Size06": 6
+        }
+      ]
+    },
+    "Navy": {
+      "sizes": { /* same structure */ },
+      "total": 144,
+      "skus": [ /* same structure */ ]
+    }
+    /* ...other colors */
+  }
+}
+```
+
+### Key Differences from Individual Endpoint
+
+| Feature | Individual (`/sizes-by-style-color`) | Bulk (`/bulk-inventory`) |
+|---------|-------------------------------------|--------------------------|
+| **Response Root** | Direct object with data | Nested under `colors.{colorName}` |
+| **Sizes Field** | `response.sizes` (array) | `response.colors[colorName].sizes` (object with counts) |
+| **Access Pattern** | `response.grandTotal` | `response.colors[colorName].total` |
+| **SKU Data** | Separate fields (`standardData`, `twoXLData`, `threeXLData`) | Single `skus` array |
+| **Size Values** | Array of size names | Object with size counts |
+
+### Critical Parsing Pattern
+
+**❌ WRONG - Uses individual endpoint structure:**
+```javascript
+// This pattern ONLY works for individual endpoint
+const inventory = await fetch(`/api/sizes-by-style-color?styleNumber=PC54&color=Forest`);
+const data = await inventory.json();
+const sizeInventory = {
+    'S': data.standardData?.result?.[0]?.Size01 || 0,  // ✅ Works for individual
+    'M': data.standardData?.result?.[0]?.Size02 || 0
+};
+```
+
+**❌ WRONG - Tries to use individual structure on bulk endpoint:**
+```javascript
+// This FAILS silently - returns all zeros
+const bulkResponse = await fetch(`/api/manageorders/bulk-inventory?colors=Forest`);
+const bulkData = await bulkResponse.json();
+const colorData = bulkData.colors['Forest'];
+
+const sizeInventory = {
+    'S': colorData.standardData?.result?.[0]?.Size01 || 0,  // ❌ undefined → 0
+    'M': colorData.standardData?.result?.[0]?.Size02 || 0   // ❌ undefined → 0
+};
+// Result: {S: 0, M: 0, L: 0, XL: 0, 2XL: 0, 3XL: 0} despite correct data exists
+```
+
+**✅ CORRECT - Uses bulk endpoint structure:**
+```javascript
+// This WORKS - accesses correct fields
+const bulkResponse = await fetch(`/api/manageorders/bulk-inventory?colors=Forest`);
+const bulkData = await bulkResponse.json();
+const colorData = bulkData.colors['Forest'];
+
+const sizeInventory = {
+    'S': colorData.sizes?.S || 0,           // ✅ 50 units
+    'M': colorData.sizes?.M || 0,           // ✅ 100 units
+    'L': colorData.sizes?.L || 0,           // ✅ 150 units
+    'XL': colorData.sizes?.XL || 0,         // ✅ 200 units
+    '2XL': colorData.sizes?.['2XL'] || 0,   // ✅ 75 units
+    '3XL': colorData.sizes?.['3XL'] || 0    // ✅ 30 units
+};
+```
+
+### Usage Example
+
+```javascript
+// Fetch inventory for multiple colors simultaneously
+async function loadAllColorInventory() {
+    const colors = ['Jet Black', 'Navy', 'White', 'Dk Hthr Grey', 'Ath Heather'];
+    const encodedColors = colors.map(c => encodeURIComponent(c)).join(',');
+
+    const response = await fetch(
+        `/api/manageorders/bulk-inventory?colors=${encodedColors}`
+    );
+    const data = await response.json();
+
+    // Process each color
+    colors.forEach(colorName => {
+        const colorData = data.colors[colorName];
+
+        if (!colorData) {
+            console.warn(`No data for color: ${colorName}`);
+            return;
+        }
+
+        // ✅ Correct access pattern for bulk endpoint
+        const sizeInventory = {
+            'S': colorData.sizes?.S || 0,
+            'M': colorData.sizes?.M || 0,
+            'L': colorData.sizes?.L || 0,
+            'XL': colorData.sizes?.XL || 0,
+            '2XL': colorData.sizes?.['2XL'] || 0,
+            '3XL': colorData.sizes?.['3XL'] || 0
+        };
+
+        // Cache with correct structure
+        state.inventoryCache[colorName] = {
+            total: colorData.total,
+            sizeInventory: sizeInventory,
+            skus: colorData.skus,  // ✅ Use actual bulk API field
+            timestamp: Date.now()
+        };
+    });
+}
+```
+
+### When to Use Bulk vs Individual
+
+| Scenario | Use Endpoint | Reason |
+|----------|--------------|--------|
+| **Initial page load (5 colors)** | Bulk | One API call instead of 5 |
+| **User switches color** | Cache first, then individual if miss | Faster UX with caching |
+| **Single color update** | Individual | Less data transfer for one color |
+| **Background refresh** | Bulk | Efficiently update all colors at once |
+
+### Performance Benefits
+
+**Individual Endpoint (5 separate calls):**
+```javascript
+// 5 separate API calls
+await fetch('/api/sizes-by-style-color?styleNumber=PC54&color=Jet%20Black');
+await fetch('/api/sizes-by-style-color?styleNumber=PC54&color=Navy');
+await fetch('/api/sizes-by-style-color?styleNumber=PC54&color=White');
+await fetch('/api/sizes-by-style-color?styleNumber=PC54&color=Dk%20Hthr%20Grey');
+await fetch('/api/sizes-by-style-color?styleNumber=PC54&color=Ath%20Heather');
+// Total: 5 API requests, ~2-3 seconds
+```
+
+**Bulk Endpoint (1 call):**
+```javascript
+// 1 API call gets all 5 colors
+await fetch('/api/manageorders/bulk-inventory?colors=Jet%20Black,Navy,White,Dk%20Hthr%20Grey,Ath%20Heather');
+// Total: 1 API request, ~0.8-1.2 seconds
+```
+
+### Error Handling
+
+```javascript
+async function loadBulkInventorySafely(colors) {
+    try {
+        const encodedColors = colors.map(c => encodeURIComponent(c)).join(',');
+        const response = await fetch(`/api/manageorders/bulk-inventory?colors=${encodedColors}`);
+
+        if (!response.ok) {
+            throw new Error(`Bulk inventory API failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Validate response structure
+        if (!data.colors || typeof data.colors !== 'object') {
+            throw new Error('Invalid bulk inventory response structure');
+        }
+
+        // Process each color, handling missing data gracefully
+        colors.forEach(colorName => {
+            const colorData = data.colors[colorName];
+
+            if (!colorData) {
+                console.warn(`[Bulk Inventory] No data returned for color: ${colorName}`);
+                state.inventoryCache[colorName] = {
+                    total: 0,
+                    sizeInventory: { S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0 },
+                    skus: [],
+                    timestamp: Date.now()
+                };
+                return;
+            }
+
+            // ✅ Safe access with fallbacks
+            const sizeInventory = {
+                'S': colorData.sizes?.S || 0,
+                'M': colorData.sizes?.M || 0,
+                'L': colorData.sizes?.L || 0,
+                'XL': colorData.sizes?.XL || 0,
+                '2XL': colorData.sizes?.['2XL'] || 0,
+                '3XL': colorData.sizes?.['3XL'] || 0
+            };
+
+            state.inventoryCache[colorName] = {
+                total: colorData.total || 0,
+                sizeInventory: sizeInventory,
+                skus: colorData.skus || [],
+                timestamp: Date.now()
+            };
+        });
+
+        return true;
+
+    } catch (error) {
+        console.error('[Bulk Inventory] Error:', error);
+
+        // Fallback to individual calls on bulk failure
+        console.log('[Bulk Inventory] Falling back to individual calls');
+        for (const colorName of colors) {
+            await loadIndividualColorInventory(colorName);
+        }
+
+        return false;
+    }
+}
+```
+
+### Common Mistakes
+
+1. **Accessing wrong fields** - Using `standardData` instead of `sizes`
+2. **Wrong cache structure** - Storing individual endpoint structure when using bulk
+3. **No error handling** - Not handling missing colors gracefully
+4. **No fallback** - Not falling back to individual calls when bulk fails
+5. **Wrong size access** - Using array index instead of object key access
+
+**Related Documentation:** See [Inventory Integration Guide](INVENTORY-INTEGRATION.md#bulk-api-response-structure-multi-color-loads) for complete cache patterns and debugging.
+
+---
+
 ## 3. Order Creation API
 
 ### Endpoint
