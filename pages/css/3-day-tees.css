@@ -1077,6 +1077,42 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Upload zone variant for optional uploads */
+.upload-zone-optional {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.upload-zone-optional:hover {
+    border-color: #9ca3af;
+    background: #f3f4f6;
+}
+
+/* Badge styles for required/optional labels */
+.required-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: #dc2626;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.optional-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: #6b7280;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .file-list {
     margin-top: 1rem;
 }

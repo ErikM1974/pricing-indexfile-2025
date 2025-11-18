@@ -327,12 +327,17 @@ class ThreeDayTeesOrderService {
                 // Files are already uploaded separately and stored with the order
                 // Including base64 file data here causes JSON to exceed 1MB limit
                 // Only include metadata for reference
-                attachments: orderSettings.uploadedFiles ? orderSettings.uploadedFiles.map(file => ({
-                    fileName: file.fileName,
-                    fileSize: file.fileSize,
-                    fileType: file.fileType
-                    // Exclude fileData to keep payload under 1MB limit
-                })) : [],
+                attachments: (() => {
+                    const files = [];
+                    if (orderSettings.frontLogo) files.push(orderSettings.frontLogo);
+                    if (orderSettings.backLogo) files.push(orderSettings.backLogo);
+                    return files.map(file => ({
+                        fileName: file.fileName,
+                        fileSize: file.fileSize,
+                        fileType: file.fileType
+                        // Exclude fileData to keep payload under 1MB limit
+                    }));
+                })(),
                 total: orderTotal,
                 // Tax fields - ShopWorks auto-creates tax line item from these
                 taxTotal: parseFloat(salesTax.toFixed(2)),
@@ -417,9 +422,9 @@ class ThreeDayTeesOrderService {
     buildDesignLocations(orderNumber, colorConfigs, orderSettings) {
         const locations = [];
 
-        // Get uploaded artwork files
-        const frontArtwork = orderSettings.uploadedFiles[0] || null;
-        const backArtwork = orderSettings.uploadedFiles[1] || null;
+        // Get uploaded artwork files (explicit front/back properties)
+        const frontArtwork = orderSettings.frontLogo || null;
+        const backArtwork = orderSettings.backLogo || null;
 
         const frontLocationCode = orderSettings.printLocationCode; // 'LC' or 'FF'
         const frontLocationName = orderSettings.printLocationName; // 'Left Chest' or 'Full Front'

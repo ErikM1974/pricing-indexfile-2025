@@ -184,30 +184,6 @@
         </div>
     </div>
 
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-        <h2>⚡ 3-Day Rush Service</h2>
-        <p class="subtitle">Custom DTG printed t-shirts delivered in just 72 hours</p>
-        <div class="features">
-            <div class="feature">
-                <i class="fas fa-shipping-fast"></i>
-                <span>Ships in 3 Days</span>
-            </div>
-            <div class="feature">
-                <i class="fas fa-check-circle"></i>
-                <span>Guaranteed Quality</span>
-            </div>
-            <div class="feature">
-                <i class="fas fa-palette"></i>
-                <span>Full Color DTG</span>
-            </div>
-            <div class="feature">
-                <i class="fas fa-star"></i>
-                <span>Premium PC54</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Content -->
     <div class="container">
         <!-- Progress Indicator -->
@@ -368,17 +344,6 @@
             <!-- Left Column: Product Configuration -->
             <div>
                 <div class="card">
-                    <div class="product-hero">
-                        <img id="heroProductImage" class="product-hero-image"
-                             src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464"
-                             alt="Port & Company PC54 - Jet Black with DTG Print"
-                             style="display: block;">
-                        <div class="product-title">Port & Company PC54</div>
-                        <p class="product-description">Premium 100% cotton tee, perfect for DTG printing</p>
-                    </div>
-                </div>
-
-                <div class="card" style="margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h3>1. Choose Colors</h3>
                         <!-- Development tool - hidden from customers
@@ -451,42 +416,40 @@
                     </div>
                 </div>
 
-                <div class="card" style="margin-top: 1rem;">
-                    <h3>3. Size Breakdown (Multi-Color)</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter quantity for each size per color (minimum 12 total pieces across all colors)</p>
-                    <div class="size-breakdown">
-                        <!-- Selected colors with per-color size grids -->
-                        <div id="selectedColorsContainer">
-                            <!-- Per-color size grids populated by JavaScript -->
-                        </div>
-
-                        <!-- Grand Total -->
-                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-color); border-radius: 6px; border: 2px solid var(--primary-color);">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 700; font-size: 1.125rem;">Grand Total (All Colors):</span>
-                                <span id="totalQuantity" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">0 pieces</span>
-                            </div>
-                            <div id="ltmWarning" style="margin-top: 0.5rem; color: var(--warning-color); font-size: 0.875rem; display: none;">
-                                <i class="fas fa-exclamation-triangle"></i> Orders of 6-23 pieces include a $75 LTM (Less Than Minimum) fee
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card" id="uploadArtworkCard" style="margin-top: 1rem;">
                     <h3 class="collapsible-header">
                         4. Upload Artwork
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </h3>
                     <div class="collapsible-content">
+                        <!-- Front Logo Upload (Required) -->
                         <div class="file-upload" style="margin-top: 1rem;">
-                            <div class="upload-zone" id="uploadZone">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h4 style="margin: 0;">Front Logo</h4>
+                                <span class="required-badge">REQUIRED</span>
+                            </div>
+                            <div class="upload-zone" id="frontUploadZone">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Files Here</p>
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Front Logo Here</p>
                                 <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
                             </div>
-                            <input type="file" id="fileInput" style="display: none;" multiple accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
-                            <div class="file-list" id="fileList"></div>
+                            <input type="file" id="frontFileInput" style="display: none;" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                            <div class="file-list" id="frontFileList"></div>
+                        </div>
+
+                        <!-- Back Logo Upload (Optional) -->
+                        <div class="file-upload" style="margin-top: 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h4 style="margin: 0;">Back Logo</h4>
+                                <span class="optional-badge">OPTIONAL</span>
+                            </div>
+                            <div class="upload-zone upload-zone-optional" id="backUploadZone">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Back Logo Here</p>
+                                <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                            </div>
+                            <input type="file" id="backFileInput" style="display: none;" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                            <div class="file-list" id="backFileList"></div>
                         </div>
                     </div>
                 </div>
@@ -2963,26 +2926,68 @@
             };
         }
 
-        // File upload handling
-        document.getElementById('uploadZone').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
+        // Front Logo Upload Handling
+        document.getElementById('frontUploadZone').addEventListener('click', () => {
+            document.getElementById('frontFileInput').click();
         });
 
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (file.size > 20 * 1024 * 1024) {
-                    showToast(
-                        `File "${file.name}" is too large. Maximum file size is 20MB.`,
-                        'error',
-                        8000
-                    );
-                    return;
-                }
-                state.uploadedFiles.push(file);
-            });
-            renderFileList();
+        document.getElementById('frontFileInput').addEventListener('change', (e) => {
+            handleFileUpload(e.target.files, 'front');
         });
+
+        // Back Logo Upload Handling
+        document.getElementById('backUploadZone').addEventListener('click', () => {
+            document.getElementById('backFileInput').click();
+        });
+
+        document.getElementById('backFileInput').addEventListener('change', (e) => {
+            handleFileUpload(e.target.files, 'back');
+        });
+
+        // Common file upload handler
+        function handleFileUpload(files, position) {
+            const filesArray = Array.from(files);
+            if (filesArray.length === 0) return;
+
+            const file = filesArray[0]; // Only take first file for each position
+
+            // Validate file size
+            if (file.size > 20 * 1024 * 1024) {
+                showToast(
+                    `File "${file.name}" is too large. Maximum file size is 20MB.`,
+                    'error',
+                    8000
+                );
+                return;
+            }
+
+            // Validate file type
+            const acceptedExtensions = ['.ai', '.eps', '.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.tif', '.psd'];
+            const fileName = file.name.toLowerCase();
+            const isValidType = acceptedExtensions.some(ext => fileName.endsWith(ext));
+
+            if (!isValidType) {
+                showToast(
+                    'Invalid file type. Only AI, EPS, PDF, PNG, JPG, TIFF, and PSD files are accepted.',
+                    'error',
+                    6000
+                );
+                return;
+            }
+
+            // Store file with position marker
+            if (position === 'front') {
+                state.frontLogo = file;
+                state.frontLogo.position = 'front';
+                renderFileList('front');
+                showToast('Front logo uploaded successfully', 'success', 3000);
+            } else {
+                state.backLogo = file;
+                state.backLogo.position = 'back';
+                renderFileList('back');
+                showToast('Back logo uploaded successfully', 'success', 3000);
+            }
+        }
 
         // State field event listener for real-time sales tax calculation
         // Triggers pricing recalculation when shipping state is entered or changed
@@ -2995,9 +3000,16 @@
             });
         }
 
-        // Drag and drop file upload functionality
-        const uploadZone = document.getElementById('uploadZone');
-        if (uploadZone) {
+        // Front Logo Drag and Drop
+        setupDragAndDrop('frontUploadZone', 'front');
+
+        // Back Logo Drag and Drop
+        setupDragAndDrop('backUploadZone', 'back');
+
+        function setupDragAndDrop(zoneId, position) {
+            const uploadZone = document.getElementById(zoneId);
+            if (!uploadZone) return;
+
             // Prevent default drag behaviors
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 uploadZone.addEventListener(eventName, (e) => {
@@ -3025,76 +3037,39 @@
             // Handle dropped files
             uploadZone.addEventListener('drop', (e) => {
                 const files = Array.from(e.dataTransfer.files);
-
-                // Filter for accepted file types
-                const acceptedExtensions = ['.ai', '.eps', '.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.tif', '.psd'];
-                const validFiles = files.filter(file => {
-                    const fileName = file.name.toLowerCase();
-                    return acceptedExtensions.some(ext => fileName.endsWith(ext));
-                });
-
-                // Process valid files
-                validFiles.forEach(file => {
-                    if (file.size > 20 * 1024 * 1024) {
-                        showToast(
-                            `File "${file.name}" is too large. Maximum file size is 20MB.`,
-                            'error',
-                            8000
-                        );
-                        return;
-                    }
-                    state.uploadedFiles.push(file);
-                });
-
-                // Show warning for invalid files
-                const invalidFiles = files.filter(file => {
-                    const fileName = file.name.toLowerCase();
-                    return !acceptedExtensions.some(ext => fileName.endsWith(ext));
-                });
-
-                if (invalidFiles.length > 0) {
-                    showToast(
-                        `${invalidFiles.length} file(s) rejected. Only AI, EPS, PDF, PNG, JPG, TIFF, and PSD files are accepted.`,
-                        'warning',
-                        6000
-                    );
-                }
-
-                // Update display
-                renderFileList();
-
-                // Show success message for valid uploads
-                if (validFiles.length > 0) {
-                    showToast(
-                        `${validFiles.length} file(s) uploaded successfully`,
-                        'success',
-                        3000
-                    );
-                }
+                handleFileUpload(files, position);
             }, false);
         }
 
-        function renderFileList() {
-            const list = document.getElementById('fileList');
-            if (state.uploadedFiles.length === 0) {
+        function renderFileList(position) {
+            const file = position === 'front' ? state.frontLogo : state.backLogo;
+            const listId = position === 'front' ? 'frontFileList' : 'backFileList';
+            const list = document.getElementById(listId);
+
+            if (!file) {
                 list.innerHTML = '';
                 return;
             }
 
-            list.innerHTML = state.uploadedFiles.map((file, index) => `
+            list.innerHTML = `
                 <div class="file-item">
                     <div>
                         <div class="file-name">${file.name}</div>
                         <div class="file-size">${(file.size / 1024).toFixed(1)} KB</div>
                     </div>
-                    <button onclick="removeFile(${index})">Remove</button>
+                    <button onclick="removeFile('${position}')">Remove</button>
                 </div>
-            `).join('');
+            `;
         }
 
-        function removeFile(index) {
-            state.uploadedFiles.splice(index, 1);
-            renderFileList();
+        function removeFile(position) {
+            if (position === 'front') {
+                state.frontLogo = null;
+                renderFileList('front');
+            } else {
+                state.backLogo = null;
+                renderFileList('back');
+            }
         }
 
         // Payment Modal Functions
@@ -3715,10 +3690,30 @@
                 return;
             }
 
-            if (state.uploadedFiles.length === 0) {
-                if (!confirm('No artwork files uploaded. Continue anyway? (Not recommended)')) {
-                    return;
+            // Validate front logo is uploaded (required)
+            if (!state.frontLogo) {
+                showToast('Front logo is required. Please upload your artwork in Step 2.', 'error', 6000);
+
+                // Scroll to Step 2
+                const step2 = document.querySelector('#step2');
+                if (step2) {
+                    step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
+
+                // Highlight front upload zone with error state
+                const frontZone = document.getElementById('frontUploadZone');
+                if (frontZone) {
+                    frontZone.style.borderColor = '#ef4444';
+                    frontZone.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+
+                    // Remove highlight after 3 seconds
+                    setTimeout(() => {
+                        frontZone.style.borderColor = '';
+                        frontZone.style.backgroundColor = '';
+                    }, 3000);
+                }
+
+                return;
             }
 
             // Validation passed - show payment modal
