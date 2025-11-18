@@ -228,7 +228,7 @@ body {
 
 .product-grid {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 2fr 3fr;
     gap: 2rem;
     margin-bottom: 2rem;
     align-items: start;
@@ -381,7 +381,7 @@ body {
 
 .product-hero-image {
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     height: 500px;
     object-fit: cover;
     border-radius: 12px;
