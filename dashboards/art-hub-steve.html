@@ -242,6 +242,19 @@
             height: auto;
             border: none;
         }
+
+        /* NEW badge styling */
+        .new-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -256,6 +269,7 @@
         <!-- Tab Buttons -->
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
+            <button class="tab-button" onclick="showTab('mockupgallery', event)">Mockup Gallery<span class="new-badge">NEW</span></button>
             <button class="tab-button" onclick="showTab('table', event)">Table View</button>
             <button class="tab-button" onclick="showTab('mockup', event)">Mockup Queue</button>
             <button class="tab-button" onclick="showTab('sendmockup', event)">Send Mockup to AE</button>
@@ -271,7 +285,14 @@
                 <!-- Caspio Gallery DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a28d5718e81646dd900b/emb"></script>
             </div>
-            
+
+            <!-- Mockup Gallery Tab -->
+            <div id="mockupgallery-tab" class="tab-pane">
+                <h2 class="tab-title">Mockup Gallery</h2>
+                <!-- Caspio Mockup Gallery DataPage Embed -->
+                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000bd44fb132a0f4a0f9e1d/emb"></script>
+            </div>
+
             <!-- Table Tab -->
             <div id="table-tab" class="tab-pane">
                 <h2 class="tab-title">Art Request Details</h2>
@@ -729,24 +750,28 @@
                 document.querySelectorAll('.tab-button')[0].classList.add('active');
                 document.getElementById('gallery-tab').classList.add('active');
                 break;
-            case 'table':
+            case 'mockupgallery':
                 document.querySelectorAll('.tab-button')[1].classList.add('active');
+                document.getElementById('mockupgallery-tab').classList.add('active');
+                break;
+            case 'table':
+                document.querySelectorAll('.tab-button')[2].classList.add('active');
                 document.getElementById('table-tab').classList.add('active');
                 break;
             case 'mockup':
-                document.querySelectorAll('.tab-button')[2].classList.add('active');
+                document.querySelectorAll('.tab-button')[3].classList.add('active');
                 document.getElementById('mockup-tab').classList.add('active');
                 break;
             case 'sendmockup':
-                document.querySelectorAll('.tab-button')[3].classList.add('active');
+                document.querySelectorAll('.tab-button')[4].classList.add('active');
                 document.getElementById('sendmockup-tab').classList.add('active');
                 break;
             case 'express':
-                document.querySelectorAll('.tab-button')[4].classList.add('active');
+                document.querySelectorAll('.tab-button')[5].classList.add('active');
                 document.getElementById('express-tab').classList.add('active');
                 break;
             case 'requirements':
-                document.querySelectorAll('.tab-button')[5].classList.add('active');
+                document.querySelectorAll('.tab-button')[6].classList.add('active');
                 document.getElementById('requirements-tab').classList.add('active');
                 break;
         }
@@ -758,7 +783,7 @@
     // Restore saved tab preference on load
     document.addEventListener('DOMContentLoaded', function() {
         const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && ['table', 'mockup', 'sendmockup', 'express', 'requirements'].includes(savedTab)) {
+        if (savedTab && ['mockupgallery', 'table', 'mockup', 'sendmockup', 'express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
         }
         
