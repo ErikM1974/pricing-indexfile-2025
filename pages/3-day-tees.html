@@ -1944,26 +1944,41 @@
                         if (stock === 0) {
                             // Out of stock: disable input
                             input.disabled = true;
-                            input.value = 0;
+                            input.value = '';
                             input.max = 0;
 
-                            // Update stock indicator
+                            // Update stock indicator - "OUT" in red
                             if (stockIndicator) {
-                                stockIndicator.textContent = '0 units';
+                                stockIndicator.textContent = 'OUT';
                                 stockIndicator.className = 'table-stock-indicator out-of-stock';
+                                stockIndicator.style.color = '#dc2626'; // Red
+                                stockIndicator.style.fontWeight = '600';
                             }
                         } else {
                             // In stock: set max and add enforcement
                             input.disabled = false;
                             input.max = stock;
 
-                            // Update stock indicator
+                            // Update stock indicator - "X avail" with color-coding
                             if (stockIndicator) {
-                                stockIndicator.textContent = `Available: ${stock}`;
-                                if (stock <= 10) {
-                                    stockIndicator.className = 'table-stock-indicator low-stock';
+                                stockIndicator.textContent = `${stock} avail`;
+                                stockIndicator.className = 'table-stock-indicator';
+                                stockIndicator.style.fontWeight = '500';
+
+                                // Color-code by stock level
+                                if (stock >= 50) {
+                                    // Green: Excellent stock
+                                    stockIndicator.style.color = '#16a34a';
+                                } else if (stock >= 10) {
+                                    // Yellow: Good stock
+                                    stockIndicator.style.color = '#ca8a04';
+                                } else if (stock >= 3) {
+                                    // Orange: Low stock
+                                    stockIndicator.style.color = '#ea580c';
                                 } else {
-                                    stockIndicator.className = 'table-stock-indicator in-stock';
+                                    // Red-orange: Very low stock (1-2 pieces)
+                                    stockIndicator.style.color = '#dc2626';
+                                    stockIndicator.style.fontWeight = '600';
                                 }
                             }
 
@@ -2149,37 +2164,31 @@
             // Build unified table with sizes as rows, colors as columns
             const tableHTML = `
                 <div class="unified-size-table-container">
-                    <!-- Color Pills Interface -->
-                    <div class="color-pills-container">
-                        ${state.selectedColors.map(catalogColor => {
-                            const config = state.colorConfigs[catalogColor];
-                            const colorData = state.colors.find(c => c.catalogColor === catalogColor);
-                            const colorTotal = state.colorConfigs[catalogColor]?.totalQuantity || 0;
-                            return `
-                                <div class="color-pill">
-                                    <div class="pill-swatch" style="background: ${colorData.hex}; ${colorData.name === 'White' ? 'border-color: #999;' : ''}"></div>
-                                    <span>${config.displayColor}</span>
-                                    <span class="pill-count">(${colorTotal} pcs)</span>
-                                    <button class="pill-remove-btn" onclick="removeColor('${catalogColor}')" title="Remove ${config.displayColor}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-
                     <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; color: var(--text-primary);">
                         Size Selection for All Colors
                     </h3>
                     <table class="unified-size-table">
                         <thead>
                             <tr>
-                                <th>Size</th>
-                                ${state.selectedColors.map(catalogColor => {
-                                    const config = state.colorConfigs[catalogColor];
-                                    const colorData = state.colors.find(c => c.catalogColor === catalogColor);
-                                    return `
-                                        <th>
+                                <th>Color</th>
+                                ${state.sizes.map(size => `
+                                    <th>
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                                            <span style="font-weight: 600;">${size}</span>
+                                            <span id="header-price-${size}" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">$0.00</span>
+                                        </div>
+                                    </th>
+                                `).join('')}
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${state.selectedColors.map(catalogColor => {
+                                const config = state.colorConfigs[catalogColor];
+                                const colorData = state.colors.find(c => c.catalogColor === catalogColor);
+                                return `
+                                    <tr data-color="${catalogColor}">
+                                        <td>
                                             <div class="color-header-cell">
                                                 <div class="table-color-swatch" style="background: ${colorData.hex}; ${colorData.name === 'White' ? 'border-color: #999;' : ''}"></div>
                                                 <span>${config.displayColor}</span>
@@ -2187,46 +2196,43 @@
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
-                                        </th>
-                                    `;
-                                }).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${state.sizes.map(size => `
-                                <tr>
-                                    <td>${size}</td>
-                                    ${state.selectedColors.map(catalogColor => `
-                                        <td>
-                                            <div class="table-cell-content">
-                                                <input type="number"
-                                                       id="qty-${catalogColor}-${size}"
-                                                       class="table-size-input"
-                                                       min="0"
-                                                       value="0"
-                                                       onchange="updateSizeQuantity('${catalogColor}', '${size}', this.value)">
-                                                <span id="stock-qty-${catalogColor}-${size}" class="table-stock-indicator">Checking...</span>
-                                                <div class="table-size-price" id="price-${catalogColor}-${size}">$0.00</div>
-                                            </div>
                                         </td>
-                                    `).join('')}
-                                </tr>
-                            `).join('')}
+                                        ${state.sizes.map(size => `
+                                            <td>
+                                                <div class="table-cell-content">
+                                                    <input type="number"
+                                                           id="qty-${catalogColor}-${size}"
+                                                           class="table-size-input"
+                                                           min="0"
+                                                           value="${state.colorConfigs[catalogColor].sizeBreakdown[size]?.quantity || 0}"
+                                                           placeholder="0"
+                                                           onchange="updateSizeQuantity('${catalogColor}', '${size}', this.value)">
+                                                    <span id="stock-qty-${catalogColor}-${size}" class="table-stock-indicator">Checking...</span>
+                                                </div>
+                                            </td>
+                                        `).join('')}
+                                        <td class="row-total-cell">
+                                            <div id="total-${catalogColor}" class="row-total-value">0 pieces</div>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                            <!-- Subtotal Row -->
+                            <tr class="subtotal-row">
+                                <td style="font-weight: 700; background: #f0f9ff; color: #0369a1; padding: 1rem;">
+                                    <i class="fas fa-calculator"></i> SUBTOTAL
+                                </td>
+                                ${state.sizes.map(size => `
+                                    <td style="background: #f0f9ff; font-weight: 600; text-align: center; padding: 0.75rem;" id="subtotal-${size}">
+                                        0
+                                    </td>
+                                `).join('')}
+                                <td style="background: #0369a1; color: white; font-weight: 700; text-align: center; padding: 1rem;" id="grand-total">
+                                    0 pieces
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
-
-                    <!-- Per-Color Totals -->
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                        ${state.selectedColors.map(catalogColor => {
-                            const config = state.colorConfigs[catalogColor];
-                            return `
-                                <div style="flex: 1; min-width: 150px; padding: 0.75rem; background: #f8f9fa; border-radius: 6px; text-align: center;">
-                                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${config.displayColor}</div>
-                                    <div id="total-${catalogColor}" style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">0 pieces</div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
                 </div>
             `;
 
@@ -2290,16 +2296,42 @@
                             state.sizes.forEach(size => {
                                 const stock = cached.sizeInventory[size] || 0;
                                 const stockIndicator = document.getElementById(`stock-qty-${catalogColor}-${size}`);
+                                const input = document.getElementById(`qty-${catalogColor}-${size}`);
+
                                 if (stockIndicator) {
                                     if (stock === 0) {
-                                        stockIndicator.textContent = '0 units';
+                                        stockIndicator.textContent = 'OUT';
                                         stockIndicator.className = 'table-stock-indicator out-of-stock';
+                                        stockIndicator.style.color = '#dc2626';
+                                        stockIndicator.style.fontWeight = '600';
+
+                                        // Disable input for out-of-stock
+                                        if (input) {
+                                            input.disabled = true;
+                                            input.value = '';
+                                            input.max = 0;
+                                        }
                                     } else {
-                                        stockIndicator.textContent = `Available: ${stock}`;
-                                        if (stock <= 10) {
-                                            stockIndicator.className = 'table-stock-indicator low-stock';
+                                        stockIndicator.textContent = `${stock} avail`;
+                                        stockIndicator.className = 'table-stock-indicator';
+                                        stockIndicator.style.fontWeight = '500';
+
+                                        // Color-code by stock level
+                                        if (stock >= 50) {
+                                            stockIndicator.style.color = '#16a34a'; // Green
+                                        } else if (stock >= 10) {
+                                            stockIndicator.style.color = '#ca8a04'; // Yellow
+                                        } else if (stock >= 3) {
+                                            stockIndicator.style.color = '#ea580c'; // Orange
                                         } else {
-                                            stockIndicator.className = 'table-stock-indicator in-stock';
+                                            stockIndicator.style.color = '#dc2626'; // Red
+                                            stockIndicator.style.fontWeight = '600';
+                                        }
+
+                                        // Enable input and set max
+                                        if (input) {
+                                            input.disabled = false;
+                                            input.max = stock;
                                         }
                                     }
                                 } else {
@@ -2640,6 +2672,82 @@
                 shipping: shipping.toFixed(2),
                 grandTotal: grandTotal.toFixed(2)
                 });
+            }
+
+            // Update header prices after recalculation
+            updateHeaderPrices();
+
+            // Update subtotal row after recalculation
+            updateSubtotalRow();
+        }
+
+        // Update header prices for all sizes
+        function updateHeaderPrices() {
+            if (!state.pricingData || !selectedLocation || state.selectedColors.length === 0) {
+                return;
+            }
+
+            // Calculate combined quantity across all colors
+            let combinedQuantity = 0;
+            state.selectedColors.forEach(catalogColor => {
+                const config = state.colorConfigs[catalogColor];
+                combinedQuantity += Object.values(config.sizeBreakdown)
+                    .reduce((sum, s) => sum + s.quantity, 0);
+            });
+
+            // Use a minimum of 1 for calculation (prevents division by zero)
+            const calcQuantity = Math.max(combinedQuantity, 1);
+
+            // Update price for each size header
+            state.sizes.forEach(size => {
+                const headerPriceEl = document.getElementById(`header-price-${size}`);
+                if (headerPriceEl) {
+                    const priceBreakdown = calculatePrice(calcQuantity, selectedLocation, size);
+                    headerPriceEl.textContent = `$${priceBreakdown.finalPrice.toFixed(2)}`;
+                }
+            });
+
+            if (DEBUG_PRICING) {
+                console.log('[3-Day Tees] Header prices updated for quantity:', calcQuantity);
+            }
+        }
+
+        // Update subtotal row with column totals
+        function updateSubtotalRow() {
+            if (state.selectedColors.length === 0) {
+                return;
+            }
+
+            // Calculate column totals (sum quantities for each size across all colors)
+            const columnTotals = {};
+            let grandTotal = 0;
+
+            state.sizes.forEach(size => {
+                let sizeTotal = 0;
+                state.selectedColors.forEach(catalogColor => {
+                    const qty = state.colorConfigs[catalogColor]?.sizeBreakdown[size]?.quantity || 0;
+                    sizeTotal += qty;
+                });
+                columnTotals[size] = sizeTotal;
+                grandTotal += sizeTotal;
+            });
+
+            // Update subtotal cells
+            state.sizes.forEach(size => {
+                const subtotalEl = document.getElementById(`subtotal-${size}`);
+                if (subtotalEl) {
+                    subtotalEl.textContent = columnTotals[size];
+                }
+            });
+
+            // Update grand total
+            const grandTotalEl = document.getElementById('grand-total');
+            if (grandTotalEl) {
+                grandTotalEl.textContent = `${grandTotal} pieces`;
+            }
+
+            if (DEBUG_PRICING) {
+                console.log('[3-Day Tees] Subtotal row updated:', { columnTotals, grandTotal });
             }
         }
 
