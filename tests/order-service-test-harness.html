@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Service Test Harness | NWCA</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .status-ready {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-not-loaded {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 24px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .test-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .test-button.primary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .test-button.primary:hover {
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
+        }
+
+        .test-button.secondary {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.4);
+        }
+
+        .test-button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.6);
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #2c5282;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .info-box code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box h3 {
+            color: #9c4221;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .console-note {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #4a5568;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+        }
+
+        .test-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .test-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧪 Order Service Test Harness</h1>
+            <p>ManageOrders PUSH API Integration Testing Suite</p>
+            <div id="statusBadge" class="status-badge status-not-loaded">
+                Service Not Loaded
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+            <h2>📖 Getting Started</h2>
+
+            <div class="info-box">
+                <h3>How to Use This Test Harness</h3>
+                <p>This page provides a graphical interface for testing your order service implementation.</p>
+                <ul class="feature-list">
+                    <li>Load your service class using the button below</li>
+                    <li>Run individual tests to verify specific functionality</li>
+                    <li>Use "Run All Tests" for comprehensive validation</li>
+                    <li>Check browser console (F12) for detailed test results</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Before Testing</h3>
+                <p>Make sure your order service class is available. You can either:</p>
+                <p>1. Include your service script in this page's HTML (recommended)</p>
+                <p>2. Load it dynamically using the "Load Service" button below</p>
+                <p>3. Paste your service class directly in the browser console</p>
+            </div>
+        </div>
+
+        <!-- Service Loading -->
+        <div class="card">
+            <h2>🔌 Service Loading</h2>
+
+            <div class="test-section">
+                <h3>Load a Test Service</h3>
+                <div class="button-group">
+                    <button class="test-button secondary" onclick="loadThreeDayTeesService()">
+                        Load 3-Day Tees Service
+                    </button>
+                    <button class="test-button secondary" onclick="checkServiceStatus()">
+                        Check Service Status
+                    </button>
+                </div>
+
+                <div class="console-note">
+                    > Service will be loaded into: window.testOrderService
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Tests -->
+        <div class="card">
+            <h2>🎯 Individual Tests</h2>
+
+            <div class="test-grid">
+                <button class="test-button" onclick="runTest('testOrderNumber')" id="btn-orderNumber">
+                    Test 1: Order Number
+                </button>
+                <button class="test-button" onclick="runTest('testDateCalculations')" id="btn-dates">
+                    Test 2: Date Calculations
+                </button>
+                <button class="test-button" onclick="runTest('testLineItems')" id="btn-lineItems">
+                    Test 3: Line Items
+                </button>
+                <button class="test-button" onclick="runTest('testDesignBlock')" id="btn-designBlock">
+                    Test 4: Design Block
+                </button>
+                <button class="test-button" onclick="runTest('testPaymentFormatting')" id="btn-payment">
+                    Test 5: Payment Format
+                </button>
+                <button class="test-button" onclick="runTest('testCompleteOrderStructure')" id="btn-structure">
+                    Test 6: Order Structure
+                </button>
+            </div>
+        </div>
+
+        <!-- Extended Tests -->
+        <div class="card">
+            <h2>🎯 Extended Tests (Advanced Scenarios)</h2>
+
+            <div class="info-box">
+                <h3>Production Edge Cases</h3>
+                <p>These tests validate complex scenarios and edge cases for production deployment:</p>
+                <ul class="feature-list">
+                    <li>Holiday weekend calculations</li>
+                    <li>Large order performance (50+ items)</li>
+                    <li>Multi-decoration orders</li>
+                    <li>9 AM cutoff boundary testing</li>
+                    <li>International address validation</li>
+                    <li>Payment formatting edge cases</li>
+                </ul>
+            </div>
+
+            <div class="test-grid">
+                <button class="test-button" onclick="runExtendedTest('testHolidayWeekends')" id="btn-ext-holidays">
+                    Extended 1: Holiday Weekends
+                </button>
+                <button class="test-button" onclick="runExtendedTest('testLargeOrder')" id="btn-ext-large">
+                    Extended 2: Large Orders (50+ items)
+                </button>
+                <button class="test-button" onclick="runExtendedTest('testMultiDecoration')" id="btn-ext-multi">
+                    Extended 3: Multi-Decoration
+                </button>
+                <button class="test-button" onclick="runExtendedTest('testCutoffEdgeCases')" id="btn-ext-cutoff">
+                    Extended 4: 9 AM Cutoff
+                </button>
+                <button class="test-button" onclick="runExtendedTest('testInternationalAddresses')" id="btn-ext-intl">
+                    Extended 5: International Addresses
+                </button>
+                <button class="test-button" onclick="runExtendedTest('testPaymentEdgeCases')" id="btn-ext-payment">
+                    Extended 6: Payment Edge Cases
+                </button>
+            </div>
+        </div>
+
+        <!-- Full Test Suite -->
+        <div class="card">
+            <h2>🚀 Complete Test Suite</h2>
+
+            <div class="test-section">
+                <h3>Run All Basic Tests</h3>
+                <button class="test-button primary" onclick="runAllTests()" id="btn-runAll" style="width: 100%;">
+                    ▶️ Run Complete Basic Test Suite (6 tests)
+                </button>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <h3>What This Does</h3>
+                    <p>Runs all 6 basic tests in sequence and provides a comprehensive report in the browser console.</p>
+                    <p>Open Developer Tools (F12) → Console tab to see detailed results.</p>
+                </div>
+            </div>
+
+            <div class="test-section" style="margin-top: 30px;">
+                <h3>Run All Extended Tests</h3>
+                <button class="test-button primary" onclick="runAllExtendedTests()" id="btn-runAllExtended" style="width: 100%;">
+                    ▶️ Run Complete Extended Test Suite (6 tests)
+                </button>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <h3>What This Does</h3>
+                    <p>Runs all 6 extended tests in sequence to validate advanced scenarios and edge cases.</p>
+                    <p>Includes holiday calculations, large orders, multi-decoration, cutoff boundaries, international addresses, and payment edge cases.</p>
+                    <p>Open Developer Tools (F12) → Console tab to see detailed results.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Testing -->
+        <div class="card">
+            <h2>🔧 Manual Testing Tools</h2>
+
+            <div class="test-section">
+                <h3>Developer Utilities</h3>
+                <div class="button-group">
+                    <button class="test-button secondary" onclick="inspectService()">
+                        Inspect Service
+                    </button>
+                    <button class="test-button secondary" onclick="manualOrderNumbers()">
+                        Generate 10 Order Numbers
+                    </button>
+                    <button class="test-button secondary" onclick="manualDateTest()">
+                        Show Date Calculations
+                    </button>
+                    <button class="test-button secondary" onclick="clearConsole()">
+                        Clear Console
+                    </button>
+                </div>
+
+                <div class="console-note">
+                    > These commands output to the browser console
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Access -->
+        <div class="card">
+            <h2>💻 Console Access</h2>
+
+            <div class="info-box">
+                <h3>Direct Console Testing</h3>
+                <p>You can also run tests directly from the browser console:</p>
+            </div>
+
+            <div class="console-note">
+// Run specific basic test<br>
+OrderServiceTest.testOrderNumber(window.testOrderService);<br>
+<br>
+// Run all basic tests<br>
+OrderServiceTest.runAllTests(window.testOrderService);<br>
+<br>
+// Run specific extended test<br>
+OrderServiceTestExtended.testHolidayWeekends(window.testOrderService);<br>
+OrderServiceTestExtended.testLargeOrder(window.testOrderService);<br>
+<br>
+// Run all extended tests<br>
+OrderServiceTestExtended.runAllExtendedTests(window.testOrderService);<br>
+<br>
+// Inspect service configuration<br>
+OrderServiceTest.inspectService(window.testOrderService);<br>
+<br>
+// Manual test helpers<br>
+OrderServiceTest.manualTestOrderNumbers(20);<br>
+OrderServiceTest.manualTestDates();
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Testing Utilities -->
+    <script src="/shared_components/js/order-service-test-utilities.js"></script>
+    <script src="/shared_components/js/order-service-test-extended.js"></script>
+
+    <!-- Test Harness Logic -->
+    <script>
+        // Global test service instance
+        window.testOrderService = null;
+
+        /**
+         * Update status badge
+         */
+        function updateStatus(loaded) {
+            const badge = document.getElementById('statusBadge');
+
+            if (loaded) {
+                badge.textContent = '✅ Service Loaded';
+                badge.className = 'status-badge status-ready';
+
+                // Enable all test buttons
+                document.querySelectorAll('.test-button').forEach(btn => {
+                    btn.disabled = false;
+                });
+            } else {
+                badge.textContent = '⚠️ Service Not Loaded';
+                badge.className = 'status-badge status-not-loaded';
+
+                // Disable test buttons (keep utility buttons enabled)
+                ['btn-orderNumber', 'btn-dates', 'btn-lineItems', 'btn-designBlock', 'btn-payment', 'btn-structure', 'btn-runAll', 'btn-runAllExtended', 'btn-ext-holidays', 'btn-ext-large', 'btn-ext-multi', 'btn-ext-cutoff', 'btn-ext-intl', 'btn-ext-payment'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) btn.disabled = true;
+                });
+            }
+        }
+
+        /**
+         * Load 3-Day Tees service as example
+         */
+        function loadThreeDayTeesService() {
+            console.log('📦 Loading 3-Day Tees service...');
+
+            // Check if service script is available
+            const scriptPath = '/shared_components/js/three-day-tees-order-service.js';
+
+            const script = document.createElement('script');
+            script.src = scriptPath;
+
+            script.onload = function() {
+                console.log('✅ Service script loaded');
+
+                // Check if service is available
+                if (typeof ThreeDayTeesOrderService !== 'undefined') {
+                    window.testOrderService = new ThreeDayTeesOrderService();
+                    console.log('✅ Service instance created');
+                    updateStatus(true);
+                } else {
+                    console.error('❌ ThreeDayTeesOrderService not found in loaded script');
+                    alert('Service class not found. Check if the script defines ThreeDayTeesOrderService.');
+                }
+            };
+
+            script.onerror = function() {
+                console.error('❌ Failed to load service script');
+                alert('Failed to load service script. Check the file path:\n' + scriptPath);
+            };
+
+            document.head.appendChild(script);
+        }
+
+        /**
+         * Check if service is loaded
+         */
+        function checkServiceStatus() {
+            console.group('🔍 Service Status Check');
+
+            if (window.testOrderService) {
+                console.log('✅ Service is loaded');
+                OrderServiceTest.inspectService(window.testOrderService);
+                updateStatus(true);
+            } else {
+                console.warn('⚠️ No service loaded');
+                console.log('Load a service using the "Load Service" button or create one manually:');
+                console.log('window.testOrderService = new YourOrderService();');
+                updateStatus(false);
+            }
+
+            console.groupEnd();
+        }
+
+        /**
+         * Run a specific test
+         */
+        function runTest(testName) {
+            if (!window.testOrderService) {
+                alert('Please load a service first using the "Load Service" button.');
+                return;
+            }
+
+            console.clear();
+            console.log(`🧪 Running test: ${testName}`);
+            console.log('='.repeat(60) + '\n');
+
+            OrderServiceTest[testName](window.testOrderService);
+        }
+
+        /**
+         * Run a specific extended test
+         */
+        function runExtendedTest(testName) {
+            if (!window.testOrderService) {
+                alert('Please load a service first using the "Load Service" button.');
+                return;
+            }
+
+            console.clear();
+            console.log(`🧪 Running extended test: ${testName}`);
+            console.log('='.repeat(60) + '\n');
+
+            OrderServiceTestExtended[testName](window.testOrderService);
+        }
+
+        /**
+         * Run all extended tests
+         */
+        function runAllExtendedTests() {
+            if (!window.testOrderService) {
+                alert('Please load a service first using the "Load Service" button.');
+                return;
+            }
+
+            OrderServiceTestExtended.runAllExtendedTests(window.testOrderService);
+        }
+
+        /**
+         * Run all tests
+         */
+        function runAllTests() {
+            if (!window.testOrderService) {
+                alert('Please load a service first using the "Load Service" button.');
+                return;
+            }
+
+            OrderServiceTest.runAllTests(window.testOrderService);
+        }
+
+        /**
+         * Inspect service
+         */
+        function inspectService() {
+            if (!window.testOrderService) {
+                alert('Please load a service first using the "Load Service" button.');
+                return;
+            }
+
+            OrderServiceTest.inspectService(window.testOrderService);
+        }
+
+        /**
+         * Manual order number test
+         */
+        function manualOrderNumbers() {
+            if (!window.testOrderService) {
+                alert('Please load a service first.');
+                return;
+            }
+
+            console.group('🧪 Generating 10 Order Numbers');
+
+            for (let i = 0; i < 10; i++) {
+                const num = window.testOrderService.generateOrderNumber();
+                console.log(`${i + 1}. ${num}`);
+            }
+
+            console.groupEnd();
+        }
+
+        /**
+         * Manual date calculation test
+         */
+        function manualDateTest() {
+            if (!window.testOrderService) {
+                alert('Please load a service first.');
+                return;
+            }
+
+            console.group('🧪 Date Calculations');
+
+            const orderDate = window.testOrderService.getOrderDate();
+            const shipDate = window.testOrderService.calculateShipDate(
+                orderDate,
+                window.testOrderService.productionDays || 3
+            );
+
+            console.log('Order Date:', orderDate);
+            console.log('Ship Date:', shipDate);
+
+            const daysDiff = Math.floor(
+                (new Date(shipDate) - new Date(orderDate)) / (1000 * 60 * 60 * 24)
+            );
+            console.log('Calendar Days Apart:', daysDiff);
+
+            console.groupEnd();
+        }
+
+        /**
+         * Clear console
+         */
+        function clearConsole() {
+            console.clear();
+            console.log('🧹 Console cleared');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Order Service Test Harness loaded');
+            console.log('📖 Load a service to begin testing');
+
+            updateStatus(false);
+
+            // Check if test utilities are available
+            if (typeof OrderServiceTest === 'undefined') {
+                console.error('❌ OrderServiceTest utilities not found!');
+                console.log('Make sure order-service-test-utilities.js is loaded.');
+            } else {
+                console.log('✅ Test utilities loaded successfully');
+            }
+        });
+    </script>
+</body>
+</html>
