@@ -223,8 +223,8 @@
                         <div class="card" style="padding: 0.5rem;">
                             <div class="product-hero">
                                 <img id="heroProductImage" class="product-hero-image"
-                                     src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464"
-                                     alt="Port & Company PC54 - Jet Black with DTG Print"
+                                     src=""
+                                     alt="Port alt="Port & Company PC54 - Jet Black with DTG Print" Company PC54"
                                      style="display: block;">
                                 <div class="product-title">Port & Company PC54</div>
                                 <p class="product-description">Premium 100% cotton tee, perfect for DTG printing</p>
@@ -1685,13 +1685,9 @@
                 imageColor = state.colors[0];
             }
 
-            // Special case: Jet Black always uses the Setina showcase image
-            if (imageColor && (imageColor.catalogColor === 'Jet Black' || imageColor.name === 'Jet Black')) {
-                heroImg.src = 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464';
-                heroImg.style.display = 'block';
-                heroImg.alt = 'Port & Company PC54 - Jet Black with DTG Print';
-            } else if (imageColor && imageColor.frontModel) {
-                // All other colors use API image
+            // Use API image for all colors
+            if (imageColor && imageColor.frontModel) {
+                // Use API image for all colors
                 heroImg.src = imageColor.frontModel;
                 heroImg.style.display = 'block';
                 heroImg.alt = `${imageColor.name} - Port & Company PC54`;
@@ -2753,7 +2749,7 @@
             });
 
             // Step 3: Update grand total display
-            document.getElementById('totalQuantity').textContent = `${grandTotalQuantity} pieces`;
+            document.getElementById('grand-total').textContent = `${grandTotalQuantity} pieces`;
 
             // Step 4: Show/hide LTM warning
             const ltmWarning = document.getElementById('ltmWarning');
