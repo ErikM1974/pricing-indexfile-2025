@@ -2770,6 +2770,13 @@
             const shippingState = stateField ? stateField.value.trim().toUpperCase() : '';
             const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
             // Tax calculated on line items total (grandSubtotal now includes rush fee)
+            console.log("[DEBUG TAX] Sales Tax Calculation:", {
+                shippingState: shippingState,
+                salesTaxRate: salesTaxRate,
+                taxableAmount: (grandSubtotal + ltmFee).toFixed(2),
+                salesTax: salesTax.toFixed(2)
+            });
+
             const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
 
             const shipping = 30;
@@ -3090,6 +3097,52 @@
                 recalculateAllPricing();
                 console.log('[3-Day Tees] State field changed, sales tax recalculated');
             });
+
+        // Continue to Checkout button event listener
+        const continueToCheckoutBtn = document.getElementById("continueToCheckout");
+        if (continueToCheckoutBtn) {
+            continueToCheckoutBtn.addEventListener("click", function() {
+                console.log("[3-Day Tees] Continue to Checkout clicked");
+
+                // Validate Step 2 requirements
+                if (!validateStep2()) {
+                    showToast("Please complete all required fields before continuing.", "error", 5000);
+                    return;
+                }
+
+                // Navigate to Step 3
+                navigateToStep(3);
+                console.log("[3-Day Tees] Navigated to Step 3 (Checkout)");
+            });
+        }
+
+        // Validation function for Step 2 (Colors & Quantities)
+        function validateStep2() {
+            // Check front logo upload (REQUIRED)
+            const frontFileList = document.getElementById("frontFileList");
+            const hasFrontLogo = frontFileList && frontFileList.children.length > 0;
+
+            if (!hasFrontLogo) {
+                console.log("[3-Day Tees] Validation failed: Front logo required");
+                showToast("Front logo is required. Please upload your artwork.", "error", 5000);
+                return false;
+            }
+
+            // Check if at least one size has quantity > 0
+            const hasQuantity = state.selectedColors.some(color =>
+                Object.values(color.sizes).some(qty => qty > 0)
+            );
+
+            if (!hasQuantity) {
+                console.log("[3-Day Tees] Validation failed: No quantities selected");
+                showToast("Please select at least one size and quantity.", "error", 5000);
+                return false;
+            }
+
+            console.log("[3-Day Tees] Step 2 validation passed");
+            return true;
+        }
+
         }
 
         // Front Logo Drag and Drop
