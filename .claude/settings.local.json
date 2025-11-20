@@ -23,7 +23,9 @@
       "Bash(git log:*)",
       "Bash(Get-FileHash \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\pages\\3-day-tees.html\" -Algorithm MD5)",
       "Bash(Select-Object Hash)",
-      "Bash(start http://localhost:3000/pages/3-day-tees.html)"
+      "Bash(start http://localhost:3000/pages/3-day-tees.html)",
+      "Bash(lsof:*)",
+      "Bash(perl -i -pe:*)"
     ],
     "deny": [],
     "ask": [],

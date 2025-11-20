@@ -560,6 +560,37 @@
                             <textarea id="notes" placeholder="Any special requirements or notes..."></textarea>
                         </div>
                     </div>
+
+                    <!-- Billing Address -->
+                    <div class="card" style="margin-top: 1rem;">
+                        <h3>Billing Address</h3>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="sameAsShipping" style="width: auto; cursor: pointer;">
+                                <span>Same as shipping address</span>
+                            </label>
+                        </div>
+
+                        <div id="billingAddressFields">
+                            <div class="form-group">
+                                <label for="billingAddress1">Street Address *</label>
+                                <input type="text" id="billingAddress1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="billingCity">City *</label>
+                                <input type="text" id="billingCity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="billingState">State *</label>
+                                <input type="text" id="billingState" required maxlength="2" placeholder="WA">
+                            </div>
+                            <div class="form-group">
+                                <label for="billingZip">ZIP Code *</label>
+                                <input type="text" id="billingZip" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Column: Order Summary (Sticky) -->
@@ -575,27 +606,27 @@
                         <div class="pricing-summary">
                             <div class="pricing-row">
                                 <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="subtotal">$0.00</span>
+                                <span class="pricing-value" id="checkout-subtotal">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">25% Rush Fee:</span>
-                                <span class="pricing-value" id="rushFee">$0.00</span>
+                                <span class="pricing-value" id="checkout-rushFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">LTM Fee (if applicable):</span>
-                                <span class="pricing-value" id="ltmFee">$0.00</span>
+                                <span class="pricing-value" id="checkout-ltmFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
-                                <span class="pricing-value" id="salesTax">$0.00</span>
+                                <span class="pricing-value" id="checkout-salesTax">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Shipping (UPS Ground):</span>
-                                <span class="pricing-value">$30.00</span>
+                                <span class="pricing-value" id="checkout-shipping">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span>Grand Total:</span>
-                                <span id="grandTotal">$0.00</span>
+                                <span id="checkout-grandTotal">$-</span>
                             </div>
                         </div>
 
@@ -676,27 +707,27 @@
                         <div class="pricing-summary">
                             <div class="pricing-row">
                                 <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="subtotal">$0.00</span>
+                                <span class="pricing-value" id="review-subtotal">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">25% Rush Fee:</span>
-                                <span class="pricing-value" id="rushFee">$0.00</span>
+                                <span class="pricing-value" id="review-rushFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">LTM Fee (if applicable):</span>
-                                <span class="pricing-value" id="ltmFee">$0.00</span>
+                                <span class="pricing-value" id="review-ltmFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
-                                <span class="pricing-value" id="salesTax">$0.00</span>
+                                <span class="pricing-value" id="review-salesTax">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Shipping (UPS Ground):</span>
-                                <span class="pricing-value">$30.00</span>
+                                <span class="pricing-value" id="review-shipping">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span>Grand Total:</span>
-                                <span id="grandTotal">$0.00</span>
+                                <span id="review-grandTotal">$-</span>
                             </div>
                         </div>
 
@@ -945,7 +976,8 @@
             let targetPhaseId;
             if (newPhase === 1) targetPhaseId = 'location-phase';
             else if (newPhase === 2) targetPhaseId = 'product-phase';
-            else if (newPhase === 3) targetPhaseId = 'review-phase';
+            else if (newPhase === 3) targetPhaseId = 'checkout-phase';
+            else if (newPhase === 4) targetPhaseId = 'review-phase';
 
             const targetSection = document.getElementById(targetPhaseId);
             if (targetSection) {
@@ -989,6 +1021,11 @@
                     };
                     phase2LocationSpan.textContent = locationNames[selectedLocation] || selectedLocation;
                 }
+            }
+
+            // If moving to Phase 4 (review), update the review summary from state
+            if (newPhase === 4) {
+                updateReviewSummaryDOM();
             }
 
             // Scroll to top
@@ -1047,6 +1084,153 @@
 
             // Phase 3 indicator - not clickable (shows current state only)
             // No click handler needed - user is already on Step 3
+
+            // ========================================
+            // "Same as Shipping" Checkbox Handler
+            // ========================================
+            const sameAsShippingCheckbox = document.getElementById('sameAsShipping');
+            if (sameAsShippingCheckbox) {
+                sameAsShippingCheckbox.addEventListener('change', function() {
+                    const billingFields = document.getElementById('billingAddressFields');
+
+                    if (this.checked) {
+                        // Copy shipping address to billing address
+                        const address1 = document.getElementById('address1');
+                        const city = document.getElementById('city');
+                        const state = document.getElementById('state');
+                        const zip = document.getElementById('zip');
+
+                        const billingAddress1 = document.getElementById('billingAddress1');
+                        const billingCity = document.getElementById('billingCity');
+                        const billingState = document.getElementById('billingState');
+                        const billingZip = document.getElementById('billingZip');
+
+                        if (address1) billingAddress1.value = address1.value;
+                        if (city) billingCity.value = city.value;
+                        if (state) billingState.value = state.value;
+                        if (zip) billingZip.value = zip.value;
+
+                        // Disable and dim billing fields to show they're auto-filled
+                        if (billingFields) {
+                            billingFields.style.opacity = '0.5';
+                            billingFields.querySelectorAll('input').forEach(input => {
+                                input.disabled = true;
+                                input.removeAttribute('required'); // Remove required while disabled
+                            });
+                        }
+
+                        console.log('[3DayTees] Billing address copied from shipping address');
+                    } else {
+                        // Enable billing fields for manual entry
+                        if (billingFields) {
+                            billingFields.style.opacity = '1';
+                            billingFields.querySelectorAll('input').forEach(input => {
+                                input.disabled = false;
+                                input.setAttribute('required', 'required'); // Restore required
+                            });
+                        }
+
+                        console.log('[3DayTees] Billing address fields enabled for manual entry');
+                    }
+                });
+            }
+
+            // ========================================
+            // State Field Change - Trigger Sales Tax Recalculation
+            // ========================================
+            const stateField = document.getElementById('state');
+            if (stateField) {
+                stateField.addEventListener('input', function() {
+                    // Recalculate pricing when state changes (affects sales tax)
+                    recalculateAllPricing();
+                    console.log('[3DayTees] State changed to:', this.value, '- sales tax recalculated');
+                });
+            }
+
+            // ========================================
+            // Continue to Review Button (Phase 3 → Phase 4)
+            // ========================================
+            const continueToReviewBtn = document.getElementById('continueToReview');
+            if (continueToReviewBtn) {
+                continueToReviewBtn.addEventListener('click', function() {
+                    console.log('[3DayTees] Validating checkout form...');
+
+                    // Manual field-by-field validation
+                    const fieldsToValidate = [
+                        { id: 'firstName', label: 'First Name', pattern: /^.{2,}$/, message: 'First name must be at least 2 characters' },
+                        { id: 'lastName', label: 'Last Name', pattern: /^.{2,}$/, message: 'Last name must be at least 2 characters' },
+                        { id: 'email', label: 'Email', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Please enter a valid email address' },
+                        { id: 'phone', label: 'Phone', pattern: /^[\d\s\-\(\)]+$/, message: 'Please enter a valid phone number' },
+                        { id: 'address1', label: 'Street Address', pattern: /^.{5,}$/, message: 'Street address must be at least 5 characters' },
+                        { id: 'city', label: 'City', pattern: /^.{2,}$/, message: 'City must be at least 2 characters' },
+                        { id: 'state', label: 'State', pattern: /^[A-Za-z]{2}$/, message: 'State must be 2 letters (e.g., WA)' },
+                        { id: 'zip', label: 'ZIP Code', pattern: /^\d{5}$/, message: 'ZIP code must be 5 digits' }
+                    ];
+
+                    // Check if billing address validation is needed
+                    const sameAsShipping = document.getElementById('sameAsShipping');
+                    const needsBillingValidation = sameAsShipping && !sameAsShipping.checked;
+
+                    if (needsBillingValidation) {
+                        fieldsToValidate.push(
+                            { id: 'billingAddress1', label: 'Billing Street Address', pattern: /^.{5,}$/, message: 'Billing street address must be at least 5 characters' },
+                            { id: 'billingCity', label: 'Billing City', pattern: /^.{2,}$/, message: 'Billing city must be at least 2 characters' },
+                            { id: 'billingState', label: 'Billing State', pattern: /^[A-Za-z]{2}$/, message: 'Billing state must be 2 letters (e.g., WA)' },
+                            { id: 'billingZip', label: 'Billing ZIP Code', pattern: /^\d{5}$/, message: 'Billing ZIP code must be 5 digits' }
+                        );
+                    }
+
+                    // Validate all fields
+                    let isValid = true;
+                    let firstInvalidField = null;
+                    let firstErrorMessage = '';
+
+                    fieldsToValidate.forEach(field => {
+                        const input = document.getElementById(field.id);
+                        if (!input) {
+                            console.warn(`[3DayTees] Field not found: ${field.id}`);
+                            return;
+                        }
+
+                        const value = input.value.trim();
+                        const fieldValid = value !== '' && field.pattern.test(value);
+
+                        // Apply visual feedback
+                        if (fieldValid) {
+                            input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
+                        } else {
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
+                            isValid = false;
+
+                            // Track first invalid field
+                            if (!firstInvalidField) {
+                                firstInvalidField = input;
+                                firstErrorMessage = field.message;
+                            }
+                        }
+                    });
+
+                    if (isValid) {
+                        console.log('[3DayTees] ✓ All fields valid - Moving to review phase');
+                        moveToPhase(4);
+                    } else {
+                        console.log('[3DayTees] ✗ Validation failed');
+
+                        // Scroll to first invalid field and focus it
+                        if (firstInvalidField) {
+                            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => {
+                                firstInvalidField.focus();
+                            }, 300);
+                        }
+
+                        // Show error message
+                        alert(`Please fix the following error:\n\n${firstErrorMessage}`);
+                    }
+                });
+            }
 
             console.log('[Navigation] Clickable step indicators initialized');
         });
@@ -2609,29 +2793,155 @@
         function updateOrderSummaryDOM() {
             const { subtotal, rushFee, ltmFee, salesTax, shipping, grandTotal } = state.orderTotals;
 
-            // Update all order summary elements
-            const subtotalEl = document.getElementById('subtotal');
-            const rushFeeEl = document.getElementById('rushFee');
-            const ltmFeeEl = document.getElementById('ltmFee');
-            const salesTaxEl = document.getElementById('salesTax');
-            const shippingEl = document.getElementById('shipping');
-            const grandTotalEl = document.getElementById('grandTotal');
+            // Update all order summary elements using checkout-prefixed IDs
+            const subtotalEl = document.getElementById('checkout-subtotal');
+            const rushFeeEl = document.getElementById('checkout-rushFee');
+            const ltmFeeEl = document.getElementById('checkout-ltmFee');
+            const salesTaxEl = document.getElementById('checkout-salesTax');
+            const shippingEl = document.getElementById('checkout-shipping');
+            const grandTotalEl = document.getElementById('checkout-grandTotal');
 
-            if (subtotalEl) subtotalEl.textContent = `${subtotal.toFixed(2)}`;
-            if (rushFeeEl) rushFeeEl.textContent = `${rushFee.toFixed(2)}`;
+            // Add dollar signs to values
+            if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+            if (rushFeeEl) rushFeeEl.textContent = `$${rushFee.toFixed(2)}`;
             if (ltmFeeEl) {
-                ltmFeeEl.textContent = `${ltmFee.toFixed(2)}`;
+                ltmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
                 // Show/hide LTM fee row
-                const ltmRow = ltmFeeEl.closest('tr');
+                const ltmRow = ltmFeeEl.closest('.pricing-row');
                 if (ltmRow) {
                     ltmRow.style.display = ltmFee > 0 ? '' : 'none';
                 }
             }
-            if (salesTaxEl) salesTaxEl.textContent = `${salesTax.toFixed(2)}`;
-            if (shippingEl) shippingEl.textContent = `${shipping.toFixed(2)}`;
-            if (grandTotalEl) grandTotalEl.textContent = `${grandTotal.toFixed(2)}`;
+            if (salesTaxEl) salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
+            if (shippingEl) shippingEl.textContent = `$${shipping.toFixed(2)}`;
+            if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
 
             console.log('[3DayTees] Order summary DOM updated from state:', state.orderTotals);
+        }
+
+        // ========================================
+        // Update Review Phase Order Summary
+        // ========================================
+        function updateReviewSummaryDOM() {
+            const { subtotal, rushFee, ltmFee, salesTax, shipping, grandTotal } = state.orderTotals;
+
+            // Update all order summary elements using review-prefixed IDs
+            const reviewSubtotalEl = document.getElementById('review-subtotal');
+            const reviewRushFeeEl = document.getElementById('review-rushFee');
+            const reviewLtmFeeEl = document.getElementById('review-ltmFee');
+            const reviewSalesTaxEl = document.getElementById('review-salesTax');
+            const reviewShippingEl = document.getElementById('review-shipping');
+            const reviewGrandTotalEl = document.getElementById('review-grandTotal');
+
+            // Add dollar signs to values
+            if (reviewSubtotalEl) reviewSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+            if (reviewRushFeeEl) reviewRushFeeEl.textContent = `$${rushFee.toFixed(2)}`;
+            if (reviewLtmFeeEl) {
+                reviewLtmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
+                // Show/hide LTM fee row
+                const ltmRow = reviewLtmFeeEl.closest('.pricing-row');
+                if (ltmRow) {
+                    ltmRow.style.display = ltmFee > 0 ? '' : 'none';
+                }
+            }
+            if (reviewSalesTaxEl) reviewSalesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
+            if (reviewShippingEl) reviewShippingEl.textContent = `$${shipping.toFixed(2)}`;
+            if (reviewGrandTotalEl) reviewGrandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+
+            // Update order review details
+            updateReviewOrderDetails();
+
+            console.log('[3DayTees] Review phase summary DOM updated from state:', state.orderTotals);
+        }
+
+        // ========================================
+        // Update Review Phase Order Details
+        // ========================================
+        function updateReviewOrderDetails() {
+            // Update print location display
+            const reviewLocationEl = document.getElementById('reviewLocation');
+            if (reviewLocationEl && selectedLocation) {
+                const locationNames = {
+                    'LC': 'Left Chest',
+                    'FF': 'Full Front',
+                    'LC_FB': 'Left Chest + Full Back',
+                    'FF_FB': 'Full Front + Full Back'
+                };
+                reviewLocationEl.textContent = locationNames[selectedLocation] || selectedLocation;
+            }
+
+            // Update total pieces
+            const reviewTotalPiecesEl = document.getElementById('reviewTotalPieces');
+            if (reviewTotalPiecesEl) {
+                const totalPieces = state.selectedColors.reduce((sum, colorState) => {
+                    return sum + Object.values(colorState.sizes).reduce((s, qty) => s + qty, 0);
+                }, 0);
+                reviewTotalPiecesEl.textContent = totalPieces;
+            }
+
+            // Update selected colors display
+            const reviewColorsEl = document.getElementById('reviewColors');
+            if (reviewColorsEl) {
+                const colorNames = state.selectedColors
+                    .map(colorState => colorState.colorName)
+                    .join(', ');
+                reviewColorsEl.textContent = colorNames || 'None';
+            }
+
+            // Update contact information
+            const reviewContactEl = document.getElementById('reviewContact');
+            if (reviewContactEl) {
+                const firstName = document.getElementById('firstName')?.value || '';
+                const lastName = document.getElementById('lastName')?.value || '';
+                const email = document.getElementById('email')?.value || '';
+                const phone = document.getElementById('phone')?.value || '';
+
+                let contactInfo = '';
+                if (firstName || lastName) {
+                    contactInfo += `${firstName} ${lastName}`.trim();
+                }
+                if (email) {
+                    contactInfo += contactInfo ? `<br>${email}` : email;
+                }
+                if (phone) {
+                    contactInfo += contactInfo ? `<br>${phone}` : phone;
+                }
+
+                reviewContactEl.innerHTML = contactInfo || 'Not provided';
+            }
+
+            // Update detailed order items in summaryContent
+            const summaryContentEl = document.getElementById('summaryContent');
+            if (summaryContentEl && state.selectedColors.length > 0) {
+                let itemsHTML = '';
+
+                state.selectedColors.forEach((colorState, index) => {
+                    const colorQty = Object.values(colorState.sizes).reduce((sum, qty) => sum + qty, 0);
+                    if (colorQty > 0) {
+                        itemsHTML += `
+                            <div style="padding: 0.75rem; background: #f8fafc; border-radius: 6px; margin-bottom: 0.75rem;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+                                    ${colorState.colorName} (${colorQty} pieces)
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                    ${Object.entries(colorState.sizes)
+                                        .filter(([size, qty]) => qty > 0)
+                                        .map(([size, qty]) => `${size}: ${qty}`)
+                                        .join(' • ')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (itemsHTML) {
+                    summaryContentEl.innerHTML = itemsHTML;
+                } else {
+                    summaryContentEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No items selected yet</p>';
+                }
+            }
+
+            console.log('[3DayTees] Review order details updated');
         }
 
         // Recalculate pricing for all colors - CRITICAL: Uses COMBINED quantity for tier
@@ -2770,14 +3080,14 @@
             const shippingState = stateField ? stateField.value.trim().toUpperCase() : '';
             const salesTaxRate = (shippingState === 'WA' || shippingState === 'WASHINGTON') ? 0.101 : 0;
             // Tax calculated on line items total (grandSubtotal now includes rush fee)
+            const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
+
             console.log("[DEBUG TAX] Sales Tax Calculation:", {
                 shippingState: shippingState,
                 salesTaxRate: salesTaxRate,
                 taxableAmount: (grandSubtotal + ltmFee).toFixed(2),
                 salesTax: salesTax.toFixed(2)
             });
-
-            const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
 
             const shipping = 30;
             console.log('[DEBUG A] Shipping calculated:', shipping, 'Type:', typeof shipping);
@@ -3111,7 +3421,7 @@
                 }
 
                 // Navigate to Step 3
-                navigateToStep(3);
+                moveToPhase(3);
                 console.log("[3-Day Tees] Navigated to Step 3 (Checkout)");
             });
         }
@@ -3129,9 +3439,12 @@
             }
 
             // Check if at least one size has quantity > 0
-            const hasQuantity = state.selectedColors.some(color =>
-                Object.values(color.sizes).some(qty => qty > 0)
-            );
+            const hasQuantity = state.selectedColors.some(catalogColor => {
+                const colorConfig = state.colorConfigs[catalogColor];
+                return colorConfig &&
+                       colorConfig.sizeBreakdown &&
+                       Object.values(colorConfig.sizeBreakdown).some(sizeData => sizeData.quantity > 0);
+            });
 
             if (!hasQuantity) {
                 console.log("[3-Day Tees] Validation failed: No quantities selected");
