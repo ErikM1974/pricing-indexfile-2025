@@ -25,7 +25,12 @@
       "Bash(Select-Object Hash)",
       "Bash(start http://localhost:3000/pages/3-day-tees.html)",
       "Bash(lsof:*)",
-      "Bash(perl -i -pe:*)"
+      "Bash(perl -i -pe:*)",
+      "Bash(\"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\pages\\3-day-tees-temp.html\")",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(start http://localhost:3000/test-3day-tees-fixes.html)",
+      "Bash(start:*)"
     ],
     "deny": [],
     "ask": [],

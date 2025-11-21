@@ -1,8 +1,8 @@
 # 3-Day Tees - Pricing Formula Reference
 
-**Last Updated:** 2025-11-08
+**Last Updated:** 2025-11-20
 **Purpose:** Complete pricing calculation logic including 7-step formula, rush fee, and LTM handling
-**Status:** Implementation Ready
+**Status:** Implementation Complete - Ready for Testing
 
 ---
 
@@ -530,6 +530,78 @@ calculateLocationPrices('PC54', 'LC');  // No rush fee
 // 3-Day Tees (new page)
 calculateLocationPrices('PC54', 'LC', 0.25);  // 25% rush fee
 ```
+
+### Complete JSDoc Documentation
+
+All pricing functions in `/pages/js/3-day-tees.js` include comprehensive JSDoc documentation:
+
+**Documented Functions:**
+- `calculateDTGPrice()` - Complete 7-step pricing calculation with rush fee
+- `calculatePriceForSize()` - Size-specific pricing with upcharges
+- `calculateOrderTotal()` - Order summary with rush fee prevention pattern
+- `applyRushFee()` - Rush fee application with proper rounding
+- `calculateLTMFee()` - LTM fee calculation for orders < 12 pieces
+
+**Example JSDoc Format:**
+```javascript
+/**
+ * Calculate complete 3-Day Tees pricing with rush fee
+ *
+ * @param {number} quantity - Total quantity across all sizes
+ * @param {string} location - Print location code (e.g., 'LC', 'FF', 'FB')
+ * @param {string} size - Size label (e.g., 'S', 'M', 'L', 'XL', '2XL')
+ * @returns {Object} Price breakdown with all components
+ * @property {number} baseCost - Base garment cost
+ * @property {number} roundedBase - Base DTG price before rush fee
+ * @property {number} rushFee - 25% rush fee amount
+ * @property {number} finalPrice - Final price after rush and rounding
+ * @property {number} upcharge - Size-specific upcharge
+ * @property {number} sizeSpecificPrice - Final price with upcharge
+ */
+```
+
+**Access Documentation:** View inline JSDoc comments in `/pages/js/3-day-tees.js` lines 1200-1450
+
+### Automated Testing
+
+The debug toolkit (`/pages/js/3-day-tees-debug.js`) includes automated pricing tests:
+
+**Run All Tests:**
+```javascript
+// In browser console (DEV mode only)
+ThreeDayDebug.tests.runAll()
+```
+
+**Test Scenarios Included:**
+1. **LTM Fee Test** - Verify $75 fee for orders < 12 pieces
+2. **Tier Pricing Test** - Verify prices across quantity tiers (12-23, 24-47, 48-71, 72+)
+3. **Multi-Color Test** - Verify pricing consistency across colors
+4. **Size Upcharge Test** - Verify 2XL (+$2.00), 3XL (+$3.00), 4XL (+$4.00)
+5. **Rush Fee Test** - Verify 25% rush fee application and rounding
+6. **Location Pricing Test** - Verify print costs by location (LC, FF, FB, combos)
+
+**Expected Output:**
+```
+[3-Day Tees Tests] Running 6 test scenarios...
+[Test 1] ✓ LTM Fee: $75.00 for 10 pieces
+[Test 2] ✓ Tier Pricing: Correct prices for 24, 48, 72 pieces
+[Test 3] ✓ Multi-Color: Consistent pricing across 5 colors
+[Test 4] ✓ Size Upcharges: 2XL +$2.00, 3XL +$3.00, 4XL +$4.00
+[Test 5] ✓ Rush Fee: 25% applied correctly with proper rounding
+[Test 6] ✓ Location Pricing: LC, FF, FB, LC_FB prices verified
+[3-Day Tees Tests] ✓ All tests passed (6/6)
+```
+
+**Individual Test Execution:**
+```javascript
+// Run specific test
+ThreeDayDebug.tests.testLTMFee()
+ThreeDayDebug.tests.testTierPricing()
+ThreeDayDebug.tests.testSizeUpcharges()
+ThreeDayDebug.tests.testRushFee()
+```
+
+**Complete Test Documentation:** See [OVERVIEW.md](OVERVIEW.md#developer-tools-6-components) § "Test Harness"
 
 ---
 

@@ -1,8 +1,8 @@
 # 3-Day Tees - Technical Architecture Overview
 
-**Last Updated:** 2025-11-08
+**Last Updated:** 2025-11-20
 **Purpose:** System architecture, reusable components, and inventory structure for 3-Day Tees fast turnaround service
-**Status:** Implementation Ready
+**Status:** Implementation Complete - Ready for Testing
 
 ---
 
@@ -15,6 +15,41 @@
 - **[API Patterns](API-PATTERNS.md)** - Complete API integration specifications
 - **[Implementation Timeline](IMPLEMENTATION-TIMELINE.md)** - 4-day development plan
 - **[Business Logic](BUSINESS-LOGIC.md)** - Terms, fees, and business rules
+
+---
+
+## 📂 File Structure
+
+### Core Application Files
+
+```
+/pages/
+├── 3-day-tees.html          Main HTML page (2,176 lines)
+├── /js/
+│   ├── 3-day-tees.js        Core application logic (1,814 lines)
+│   └── 3-day-tees-debug.js  Debugging toolkit (770 lines) - DEV ONLY
+└── /css/
+    └── 3-day-tees.css       Application styles (1,943 lines)
+```
+
+**Key Architectural Decisions:**
+- ✅ **External JavaScript** - All logic extracted from HTML to separate JS file
+- ✅ **External CSS** - All styles in dedicated CSS file (no embedded `<style>` blocks)
+- ✅ **JSDoc Documentation** - Complete inline documentation for all pricing functions
+- ✅ **Debug Toolkit** - Comprehensive debugging tools for development (not loaded in production)
+- ✅ **Consolidated Initialization** - Single DOMContentLoaded event handler
+
+### Shared Component Dependencies
+
+```
+/shared_components/
+├── /js/
+│   ├── dtg-pricing-service.js        DTG pricing calculations
+│   ├── sample-order-service.js        Order creation via ManageOrders API
+│   └── sample-inventory-service.js    Real-time inventory checks
+└── /css/
+    └── (standard Bootstrap + custom styles)
+```
 
 ---
 
@@ -117,12 +152,26 @@
 | **File Upload System** | `sample-order-service.js` | Upload artwork (20+ types, 20MB max, unlimited files) | 100% |
 | **File Type Validation** | Existing in upload service | Validate file extensions and sizes | 100% |
 
-#### 🛠️ Developer Tools (2 components)
+#### 🛠️ Developer Tools (6 components)
 
 | Component | File Path | Purpose | Reuse % |
 |-----------|-----------|---------|---------|
+| **Debug Console** | `/pages/js/3-day-tees-debug.js` | Structured logging with category/level filtering, export to JSON | NEW |
+| **State Inspector** | `/pages/js/3-day-tees-debug.js` | View application state, take snapshots, compare states | NEW |
+| **Test Harness** | `/pages/js/3-day-tees-debug.js` | Automated pricing tests (6 scenarios: LTM, tiers, multi-color, upcharges) | NEW |
+| **Performance Monitor** | `/pages/js/3-day-tees-debug.js` | Track API calls, render times, memory usage | NEW |
 | **Debug Helpers** | `/pages/top-sellers-product.html:1887-1945` | Console utilities for testing (viewCart, clearCart, toggleDebug) | 100% |
 | **API Test Utilities** | Existing patterns | Test pricing/inventory/order creation from console | 100% |
+
+**New Debug Toolkit Features:**
+```javascript
+// Access via browser console (DEV mode only)
+ThreeDayDebug.help()                  // Show all commands
+ThreeDayDebug.state.inspect()         // View current state
+ThreeDayDebug.tests.runAll()          // Run automated tests
+ThreeDayDebug.performance.summary()   // Show performance metrics
+ThreeDayDebug.console.export()        // Export logs to JSON
+```
 
 **Total Reusable Code**: **~75% of required functionality already exists**
 **Estimated Development Time**: **4 days** (vs. 5 weeks from scratch)
