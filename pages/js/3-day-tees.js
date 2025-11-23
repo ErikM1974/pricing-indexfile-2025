@@ -6,6 +6,23 @@
         let selectedLocation = null;  // Will be 'LC', 'FF', 'LC_FB', or 'FF_FB'
         let selectedLocations = [];   // Array of selected location codes
 
+        // ========================================
+        // Service Layer Initialization (Tier 1)
+        // ========================================
+        const apiService = new ApiService({
+            baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+            retryAttempts: 3,
+            retryDelay: 1000,
+            timeout: 30000,
+            logRequests: true
+        });
+
+        const inventoryService = new InventoryService(apiService, {
+            cacheTTL: 5 * 60 * 1000, // 5 minutes
+            cachePrefix: 'inv_cache_',
+            enableLogging: true
+        });
+
         /**
          * Handle location toggle clicks
          */
@@ -395,11 +412,13 @@
             // ========================================
             const stateField = document.getElementById('state');
             if (stateField) {
-                stateField.addEventListener('input', function() {
+                const debouncedRecalculate = debounce(function() {
                     // Recalculate pricing when state changes (affects sales tax)
                     recalculateAllPricing();
                     console.log('[3DayTees] State changed to:', this.value, '- sales tax recalculated');
-                });
+                }, 300); // 300ms delay to prevent excessive calculations during typing
+
+                stateField.addEventListener('input', debouncedRecalculate);
             }
 
             // ========================================
@@ -499,8 +518,9 @@
         // Load Stripe publishable key from server and initialize
         async function initializeStripe() {
             try {
-                const response = await fetch('/api/stripe-config');
-                const { publishableKey } = await response.json();
+                console.log('[3-Day Tees] Initializing Stripe via ApiService...');
+                const { publishableKey } = await apiService.get('/api/stripe-config');
+                console.log('[3-Day Tees] ✓ Stripe config loaded');
                 stripe = Stripe(publishableKey);
 
                 // Create Stripe Elements
@@ -770,6 +790,8 @@
             hasBackPrint: false,          // Optional back print: true/false
             pricingData: null,
             uploadedFiles: [],
+            frontLogo: null,              // Front logo file object (required)
+            backLogo: null,               // Back logo file object (optional)
             inventoryCache: loadInventoryCacheFromStorage(),  // Load cached inventory from sessionStorage (5-minute TTL)
             orderTotals: {                // Calculated order totals (single source of truth)
                 subtotal: 0,
@@ -791,7 +813,6 @@
 
         // Initialize services
         const pricingService = new DTGPricingService();
-        const inventoryService = new SampleInventoryService();
         const orderService = new ThreeDayTeesOrderService();
 
         // Helper function to upload file to Caspio storage
@@ -881,8 +902,9 @@
         // Load available colors from API
         async function loadAvailableColors() {
             try {
-                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=PC54');
-                const products = await response.json();
+                console.log('[3-Day Tees] Loading available colors via ApiService...');
+                const products = await apiService.get('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=PC54');
+                console.log('[3-Day Tees] ✓ Product details loaded');
 
                 // Deduplicate by CATALOG_COLOR and filter to desired colors
                 // Match exact color names from ShopWorks inventory
@@ -936,8 +958,9 @@
                 showLoading(true);
 
                 // Fetch DTG pricing bundle
-                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC54');
-                state.pricingData = await response.json();
+                console.log('[3-Day Tees] Loading DTG pricing via ApiService...');
+                state.pricingData = await apiService.get('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTG&styleNumber=PC54');
+                console.log('[3-Day Tees] ✓ Pricing data loaded');
 
                 console.log('[3-Day Tees] Pricing data loaded:', state.pricingData);
 
@@ -1171,15 +1194,8 @@
             try {
                 console.log('[3-Day Tees] Fetching ALL PC54 inventory (bulk endpoint)...');
 
-                const response = await fetch(
-                    'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/pc54-inventory'
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Bulk inventory fetch failed: ${response.status}`);
-                }
-
-                const data = await response.json();
+                console.log('[3-Day Tees] Loading bulk PC54 inventory via ApiService...');
+                const data = await apiService.get('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/pc54-inventory');
                 console.log('[3-Day Tees] ✓ Bulk inventory received:', data);
 
                 // Return the colors object from the response
@@ -1247,82 +1263,26 @@
         }
 
         // Load inventory for a color from local warehouse (ManageOrders)
-        // Helper function: Fetch with retry logic for rate limiting (429)
+        // Helper function: Fetch inventory using InventoryService (with caching and retry logic)
         async function fetchInventoryWithRetry(catalogColor, retryCount = 0) {
-            const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/inventorylevels';
+            try {
+                console.log(`[3-Day Tees] Fetching inventory for "${catalogColor}" via InventoryService...`);
 
-            // DEBUG: Log API URLs being called
-            const urls = {
-                PC54: `${apiBase}?PartNumber=PC54&Color=${encodeURIComponent(catalogColor)}`,
-                PC54_2X: `${apiBase}?PartNumber=PC54_2X&Color=${encodeURIComponent(catalogColor)}`,
-                PC54_3X: `${apiBase}?PartNumber=PC54_3X&Color=${encodeURIComponent(catalogColor)}`
-            };
-            console.log(`[DEBUG API] Fetching inventory for "${catalogColor}":`, urls);
+                // Use InventoryService for intelligent caching and retry logic
+                const inventoryData = await inventoryService.fetchMultiSKUInventory(catalogColor);
 
-            // Make all 3 SKU requests in parallel
-            const [standardRes, twoXLRes, threeXLRes] = await Promise.all([
-                fetch(urls.PC54),
-                fetch(urls.PC54_2X),
-                fetch(urls.PC54_3X)
-            ]);
+                console.log(`[3-Day Tees] ✓ Inventory fetched for "${catalogColor}" (cached: ${inventoryData.combined && inventoryData.fromCache ? 'yes' : 'no'})`);
 
-            // DEBUG: Log HTTP status codes
-            console.log(`[DEBUG API] HTTP Status for "${catalogColor}":`, {
-                PC54: standardRes.status,
-                PC54_2X: twoXLRes.status,
-                PC54_3X: threeXLRes.status
-            });
-
-            // Check if any response is 429 (rate limited)
-            const has429 = standardRes.status === 429 || twoXLRes.status === 429 || threeXLRes.status === 429;
-
-            if (has429) {
-                if (retryCount < 3) {
-                    // Exponential backoff: 1s, 2s, 4s
-                    const delay = Math.pow(2, retryCount) * 1000;
-                    console.log(`[3-Day Tees] Rate limited (429), retrying in ${delay}ms... (attempt ${retryCount + 1}/3)`);
-
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchInventoryWithRetry(catalogColor, retryCount + 1);
-                } else {
-                    // Use specific error prefix for detection in error handlers
-                    throw new Error('RATE_LIMIT: Rate limit exceeded. The inventory system is receiving too many requests. Please wait a moment and the system will automatically retry your request.');
-                }
+                // Map service response to expected property names for compatibility
+                return {
+                    standardData: inventoryData.standard,
+                    twoXLData: inventoryData.twoXL,
+                    threeXLData: inventoryData.threeXL
+                };
+            } catch (error) {
+                console.error(`[3-Day Tees] ✗ Inventory fetch failed for "${catalogColor}":`, error);
+                throw error;
             }
-
-            // Parse JSON responses
-            const standardData = await standardRes.json();
-            const twoXLData = await twoXLRes.json();
-            const threeXLData = await threeXLRes.json();
-
-            // DEBUG: Log raw API responses
-            console.log(`[DEBUG API] Raw response data for "${catalogColor}":`, {
-                PC54: {
-                    status: standardRes.status,
-                    hasResult: !!standardData.result,
-                    resultCount: standardData.result?.length || 0,
-                    firstRecord: standardData.result?.[0] || null
-                },
-                PC54_2X: {
-                    status: twoXLRes.status,
-                    hasResult: !!twoXLData.result,
-                    resultCount: twoXLData.result?.length || 0,
-                    firstRecord: twoXLData.result?.[0] || null
-                },
-                PC54_3X: {
-                    status: threeXLRes.status,
-                    hasResult: !!threeXLData.result,
-                    resultCount: threeXLData.result?.length || 0,
-                    firstRecord: threeXLData.result?.[0] || null
-                }
-            });
-
-            // All responses OK - return parsed data
-            return {
-                standardData: standardData,
-                twoXLData: twoXLData,
-                threeXLData: threeXLData
-            };
         }
 
         // Load size-specific inventory for selected color from local warehouse
@@ -1912,59 +1872,77 @@
         /**
          * Update Order Summary DOM from state (one-way data flow: state → DOM)
          * This ensures DOM always reflects the single source of truth (state.orderTotals)
+         * Updates BOTH Step 2 (step2-*) and Step 3 (step3-*) order summary sections
          */
         function updateOrderSummaryDOM() {
             const { subtotal, rushFee, ltmFee, salesTax, shipping, grandTotal } = state.orderTotals;
 
-            // Update all order summary elements using checkout-prefixed IDs
-            const subtotalEl = document.getElementById('checkout-subtotal');
-            const rushFeeEl = document.getElementById('checkout-rushFee');
-            const ltmFeeEl = document.getElementById('checkout-ltmFee');
-            const salesTaxEl = document.getElementById('checkout-salesTax');
-            const shippingEl = document.getElementById('checkout-shipping');
-            const grandTotalEl = document.getElementById('checkout-grandTotal');
+            // Helper function to update a set of pricing elements with a given prefix
+            function updatePricingElements(prefix) {
+                const subtotalEl = document.getElementById(`${prefix}-subtotal`);
+                const rushFeeEl = document.getElementById(`${prefix}-rushFee`);
+                const ltmFeeEl = document.getElementById(`${prefix}-ltmFee`);
+                const salesTaxEl = document.getElementById(`${prefix}-salesTax`);
+                const shippingEl = document.getElementById(`${prefix}-shipping`);
+                const grandTotalEl = document.getElementById(`${prefix}-grandTotal`);
 
-            // Add dollar signs to values
-            if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            if (rushFeeEl) rushFeeEl.textContent = `$${rushFee.toFixed(2)}`;
-            if (ltmFeeEl) {
-                ltmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
-                // Show/hide LTM fee row - Update row ID to match HTML
-                const ltmRow = document.getElementById('checkout-ltmFeeRow') || ltmFeeEl.closest('.pricing-row');
-                if (ltmRow) {
-                    ltmRow.style.display = ltmFee > 0 ? '' : 'none';
+                // Update values with dollar signs
+                if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+                if (rushFeeEl) rushFeeEl.textContent = `$${rushFee.toFixed(2)}`;
+                if (ltmFeeEl) {
+                    ltmFeeEl.textContent = `$${ltmFee.toFixed(2)}`;
+                    // Show/hide LTM fee row
+                    const ltmRow = document.getElementById(`${prefix}-ltmFeeRow`) || ltmFeeEl.closest('.pricing-row');
+                    if (ltmRow) {
+                        ltmRow.style.display = ltmFee > 0 ? '' : 'none';
+                    }
                 }
-            }
 
-            // Show/hide rush fee row - Update row ID to match HTML
-            const rushFeeRow = document.getElementById('checkout-rushFeeRow');
-            if (rushFeeRow) {
-                rushFeeRow.style.display = rushFee > 0 ? '' : 'none';
-            }
-
-            // Handle sales tax display - show deferred message on Step 2
-            if (salesTaxEl) {
-                // Check if we have a shipping state selected (Step 3)
-                const stateField = document.getElementById('state');
-                const hasState = stateField && stateField.value && stateField.value.trim() !== '';
-
-                if (hasState || salesTax > 0) {
-                    // Show actual tax amount on Step 3 or when tax is calculated
-                    salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
-                    salesTaxEl.style.fontSize = '';
-                    salesTaxEl.style.color = '';
-                } else {
-                    // Show deferred message on Step 2
-                    salesTaxEl.textContent = 'Calculated at checkout';
-                    salesTaxEl.style.fontSize = '0.9em';
-                    salesTaxEl.style.color = '#6b7280';
+                // Show/hide rush fee row
+                const rushFeeRow = document.getElementById(`${prefix}-rushFeeRow`);
+                if (rushFeeRow) {
+                    rushFeeRow.style.display = rushFee > 0 ? '' : 'none';
                 }
+
+                // Handle sales tax display
+                if (salesTaxEl) {
+                    // Check if we have a shipping state selected (Step 3)
+                    const stateField = document.getElementById('state');
+                    const hasState = stateField && stateField.value && stateField.value.trim() !== '';
+
+                    // Step 2 shows deferred message, Step 3 shows actual amount
+                    if (prefix === 'step3' && hasState) {
+                        // Show actual tax amount on Step 3 when state is selected
+                        salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
+                        salesTaxEl.style.fontSize = '';
+                        salesTaxEl.style.color = '';
+                    } else if (prefix === 'step2') {
+                        // Show deferred message on Step 2
+                        salesTaxEl.textContent = 'Calculated at checkout';
+                        salesTaxEl.style.fontSize = '0.9em';
+                        salesTaxEl.style.color = '#6b7280';
+                    } else if (salesTax > 0) {
+                        // Show actual tax if calculated
+                        salesTaxEl.textContent = `$${salesTax.toFixed(2)}`;
+                        salesTaxEl.style.fontSize = '';
+                        salesTaxEl.style.color = '';
+                    } else {
+                        // Fallback to deferred message
+                        salesTaxEl.textContent = 'Calculated at checkout';
+                        salesTaxEl.style.fontSize = '0.9em';
+                        salesTaxEl.style.color = '#6b7280';
+                    }
+                }
+
+                if (shippingEl) shippingEl.textContent = `$${shipping.toFixed(2)}`;
+                if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
             }
 
-            if (shippingEl) shippingEl.textContent = `$${shipping.toFixed(2)}`;
-            if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+            // Update both Step 2 and Step 3 order summaries
+            updatePricingElements('step2');
+            updatePricingElements('step3');
 
-            console.log('[3DayTees] Order summary DOM updated from state:', state.orderTotals);
+            console.log('[3DayTees] Order summary DOM updated from state (Step 2 & Step 3):', state.orderTotals);
         }
 
         // ========================================
@@ -2922,16 +2900,6 @@
             console.log('[3-Day Tees] Synced uploadedFiles array:', state.uploadedFiles.length, 'files');
         }
 
-        // State field event listener for real-time sales tax calculation
-        // Triggers pricing recalculation when shipping state is entered or changed
-        const stateField = document.getElementById('state');
-        if (stateField) {
-            stateField.addEventListener('input', () => {
-                // Recalculate pricing to update sales tax based on state
-                recalculateAllPricing();
-                console.log('[3-Day Tees] State field changed, sales tax recalculated');
-            });
-
         // Continue to Checkout button event listener
         const continueToCheckoutBtn = document.getElementById("continueToCheckout");
         if (continueToCheckoutBtn) {
@@ -2978,8 +2946,6 @@
 
             console.log("[3-Day Tees] Step 2 validation passed");
             return true;
-        }
-
         }
 
         // Front Logo Drag and Drop
@@ -3246,24 +3212,14 @@
                 // Read order total from state (single source of truth)
                 const total = state.orderTotals.grandTotal;
 
-                // Create payment intent on server
-                const response = await fetch('/api/create-payment-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: Math.round(total * 100), // Convert to cents
-                        currency: 'usd'
-                    })
+                // Create payment intent on server via ApiService
+                console.log('[Payment] Creating payment intent via ApiService...');
+                const { clientSecret } = await apiService.post('/api/create-payment-intent', {
+                    amount: Math.round(total * 100), // Convert to cents
+                    currency: 'usd'
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error('[Payment] Server error:', errorData);
-                    throw new Error(errorData.error || 'Failed to create payment intent');
-                }
-
-                const { clientSecret } = await response.json();
                 paymentIntentClientSecret = clientSecret;
+                console.log('[Payment] ✓ Payment intent created');
 
                 // Confirm card payment
                 const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {

@@ -1,0 +1,566 @@
+/* ===================================
+   3-Day Tees Utility Classes
+   Purpose: Eliminate inline styles, provide reusable classes
+   Last Updated: 2025-11-22
+   =================================== */
+
+/* ===================================
+   SPACING UTILITIES
+   =================================== */
+
+/* Margin utilities */
+.m-0 { margin: 0; }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.ml-0 { margin-left: 0; }
+.mr-0 { margin-right: 0; }
+
+.m-xs { margin: 0.25rem; }
+.mt-xs { margin-top: 0.25rem; }
+.mb-xs { margin-bottom: 0.25rem; }
+.ml-xs { margin-left: 0.25rem; }
+.mr-xs { margin-right: 0.25rem; }
+
+.m-sm { margin: 0.5rem; }
+.mt-sm { margin-top: 0.5rem; }
+.mb-sm { margin-bottom: 0.5rem; }
+.ml-sm { margin-left: 0.5rem; }
+.mr-sm { margin-right: 0.5rem; }
+
+.m-md { margin: 1rem; }
+.mt-md { margin-top: 1rem; }
+.mb-md { margin-bottom: 1rem; }
+.ml-md { margin-left: 1rem; }
+.mr-md { margin-right: 1rem; }
+
+.m-lg { margin: 1.5rem; }
+.mt-lg { margin-top: 1.5rem; }
+.mb-lg { margin-bottom: 1.5rem; }
+.ml-lg { margin-left: 1.5rem; }
+.mr-lg { margin-right: 1.5rem; }
+
+.m-xl { margin: 2rem; }
+.mt-xl { margin-top: 2rem; }
+.mb-xl { margin-bottom: 2rem; }
+.ml-xl { margin-left: 2rem; }
+.mr-xl { margin-right: 2rem; }
+
+/* Padding utilities */
+.p-0 { padding: 0; }
+.pt-0 { padding-top: 0; }
+.pb-0 { padding-bottom: 0; }
+.pl-0 { padding-left: 0; }
+.pr-0 { padding-right: 0; }
+
+.p-sm { padding: 0.5rem; }
+.pt-sm { padding-top: 0.5rem; }
+.pb-sm { padding-bottom: 0.5rem; }
+.pl-sm { padding-left: 0.5rem; }
+.pr-sm { padding-right: 0.5rem; }
+
+.p-md { padding: 1rem; }
+.pt-md { padding-top: 1rem; }
+.pb-md { padding-bottom: 1rem; }
+.pl-md { padding-left: 1rem; }
+.pr-md { padding-right: 1rem; }
+
+.p-lg { padding: 1.5rem; }
+.pt-lg { padding-top: 1.5rem; }
+.pb-lg { padding-bottom: 1.5rem; }
+.pl-lg { padding-left: 1.5rem; }
+.pr-lg { padding-right: 1.5rem; }
+
+.p-xl { padding: 2rem; }
+.pt-xl { padding-top: 2rem; }
+.pb-xl { padding-bottom: 2rem; }
+.pl-xl { padding-left: 2rem; }
+.pr-xl { padding-right: 2rem; }
+
+/* Special padding (for lists, indented content) */
+.pl-nested { padding-left: 1.75rem; }
+.p-card { padding: 12px; }
+
+/* ===================================
+   DISPLAY & LAYOUT UTILITIES
+   =================================== */
+
+/* Display */
+.d-none { display: none; }
+.d-block { display: block; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+.d-flex { display: flex; }
+
+/* Flex utilities */
+.flex-row { flex-direction: row; }
+.flex-column { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.align-start { align-items: flex-start; }
+.align-end { align-items: flex-end; }
+.align-center { align-items: center; }
+.align-stretch { align-items: stretch; }
+
+/* Common flex combinations */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-between-center {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-start-center {
+    display: flex;
+    align-items: center;
+}
+
+/* Gap utilities */
+.gap-xs { gap: 0.25rem; }
+.gap-sm { gap: 0.5rem; }
+.gap-md { gap: 1rem; }
+.gap-lg { gap: 1.5rem; }
+
+/* ===================================
+   TYPOGRAPHY UTILITIES
+   =================================== */
+
+/* Font sizes */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.1rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+
+/* Font weights */
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* Text alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* ===================================
+   COLOR UTILITIES
+   =================================== */
+
+/* Text colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.text-accent { color: var(--primary-color); }
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+.text-danger { color: var(--danger-color); }
+.text-info { color: var(--info-color, #3b82f6); }
+
+/* Special text colors (from inline styles) */
+.text-amber-dark {
+    color: #92400e;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.text-blue-dark {
+    color: #0c4a6e;
+}
+
+.text-gray-600 {
+    color: #6b7280;
+}
+
+/* Background colors */
+.bg-white { background: white; }
+.bg-light { background: var(--bg-color); }
+.bg-card { background: var(--card-bg); }
+.bg-glass { background: var(--glass-bg); }
+
+/* ===================================
+   BORDER UTILITIES
+   =================================== */
+
+/* Border radius */
+.rounded-none { border-radius: 0; }
+.rounded-sm { border-radius: 4px; }
+.rounded { border-radius: 6px; }
+.rounded-md { border-radius: 8px; }
+.rounded-lg { border-radius: 12px; }
+.rounded-full { border-radius: 9999px; }
+
+/* Borders */
+.border { border: 1px solid var(--border-color); }
+.border-top { border-top: 1px solid var(--border-color); }
+.border-bottom { border-bottom: 1px solid var(--border-color); }
+.border-left { border-left: 1px solid var(--border-color); }
+.border-right { border-right: 1px solid var(--border-color); }
+
+.border-2 { border-width: 2px; }
+.border-3 { border-width: 3px; }
+
+.border-primary { border-color: var(--primary-color); }
+
+/* ===================================
+   BUTTON UTILITIES
+   =================================== */
+
+.btn-reset {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* ===================================
+   MODAL & CARD UTILITIES
+   =================================== */
+
+/* Modal content width */
+.modal-content-md {
+    max-width: 650px;
+}
+
+/* Card spacing */
+.card-spacing {
+    margin-top: 1rem;
+}
+
+/* Order summary row */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+/* Grand total row */
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-top: 2px solid var(--border-color);
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.grand-total-row {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-top: 3px solid var(--primary-color);
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Order number display */
+.order-number {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 1rem 0;
+}
+
+/* Info box */
+.info-box {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+}
+
+/* ===================================
+   FORM UTILITIES
+   =================================== */
+
+/* Form labels */
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+/* Card element (for payment forms) */
+.card-element {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: white;
+}
+
+/* Error display */
+.error-text {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* ===================================
+   CHECKBOX UTILITIES
+   (from original utilities.css)
+   =================================== */
+
+.checkbox-group {
+    margin-bottom: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.checkbox-label:hover {
+    color: var(--primary-color);
+}
+
+.modern-checkbox {
+    width: auto;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+/* ===================================
+   TABLE UTILITIES
+   =================================== */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.table thead {
+    background: #f3f4f6;
+}
+
+.table-header {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+}
+
+.table-header-right {
+    padding: 12px;
+    text-align: right;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Pricing table heading */
+.pricing-table-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+/* Pricing table notes */
+.pricing-notes {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pricing-notes p {
+    margin: 0.25rem 0;
+}
+
+/* ===================================
+   ICON UTILITIES
+   =================================== */
+
+.icon-success {
+    color: var(--success-color);
+}
+
+.icon-primary {
+    color: var(--primary-color);
+}
+
+.icon-info {
+    color: var(--info-color, #3b82f6);
+}
+
+.icon-warning {
+    color: var(--warning-color);
+}
+
+/* Icon with margin */
+.icon-mr {
+    margin-right: 0.5rem;
+}
+
+/* ===================================
+   SECURITY & STATUS BADGES
+   =================================== */
+
+.security-badge {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* ===================================
+   WIDTH UTILITIES
+   =================================== */
+
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.max-w-650 { max-width: 650px; }
+
+/* ===================================
+   SELECTED LOCATION DISPLAY
+   =================================== */
+
+.selected-location-box {
+    background: #f0f9ff;
+    border: 2px solid #3b82f6;
+}
+
+.selected-location-heading {
+    color: #1e40af;
+}
+
+.selected-location-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0;
+}
+
+/* ===================================
+   PRICING PANEL
+   =================================== */
+
+.pricing-panel {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #0ea5e9;
+}
+
+.pricing-panel-heading {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #0c4a6e;
+}
+
+.price-range-display {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.price-tier {
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.tier-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.tier-label-icon {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.tier-label-icon-info {
+    margin-right: 0.5rem;
+    color: var(--info-color);
+}
+
+.tier-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.tier-price-info {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--info-color);
+}
+
+/* ===================================
+   MISC UTILITIES
+   =================================== */
+
+.cursor-pointer { cursor: pointer; }
+.user-select-none { user-select: none; }
+.overflow-hidden { overflow: hidden; }
+
+/* Hide visually but keep for screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ===================================
+   COMPONENT UTILITIES (3-Day Tees)
+   =================================== */
+
+/* Rush Terms Warning Box */
+.rush-terms-box {
+    background: #fff7ed;
+    border: 2px solid var(--warning-color);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+/* Summary Placeholder */
+.summary-placeholder {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Link Utilities */
+.link-primary {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.link-primary:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+}

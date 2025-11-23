@@ -30,6 +30,7 @@
 
     <!-- External CSS -->
     <link rel="stylesheet" href="css/3-day-tees.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -39,56 +40,56 @@
 
     <!-- Payment Modal (Stripe) -->
     <div class="modal" id="paymentModal">
-        <div class="modal-content" style="max-width: 650px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="margin: 0;">Complete Payment</h3>
-                <button onclick="closePaymentModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);">
+        <div class="modal-content modal-content-md">
+            <div class="flex-between-center mb-lg">
+                <h3 class="m-0">Complete Payment</h3>
+                <button onclick="closePaymentModal()" class="btn-reset text-xl cursor-pointer text-secondary">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <!-- Order Summary -->
-            <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <h4 style="margin-top: 0; color: var(--text-primary);">Order Summary</h4>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <div class="bg-light p-md rounded-md mb-lg">
+                <h4 class="mt-0 text-primary">Order Summary</h4>
+                <div class="summary-row">
                     <span>Subtotal:</span>
                     <span id="paymentSubtotal">$0.00</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="summary-row">
                     <span>Rush Fee (25%):</span>
                     <span id="paymentRushFee">$0.00</span>
                 </div>
-                <div id="paymentLtmFeeRow" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div id="paymentLtmFeeRow" class="summary-row">
                     <span>LTM Fee:</span>
                     <span id="paymentLtmFee">$0.00</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="summary-row">
                     <span>Sales Tax (WA only: 10.1%):</span>
                     <span id="paymentTax">$0.00</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="summary-row">
                     <span>Shipping (UPS Ground):</span>
                     <span id="paymentShipping">$30.00</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; border-top: 2px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem;">
+                <div class="summary-total">
                     <span>Total:</span>
-                    <span id="paymentTotal" style="color: var(--primary-color);">$0.00</span>
+                    <span id="paymentTotal" class="text-accent">$0.00</span>
                 </div>
             </div>
 
             <!-- Stripe Card Element -->
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+            <div class="mb-lg">
+                <label class="form-label">
                     Card Information
                 </label>
-                <div id="card-element" style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: white;">
+                <div id="card-element" class="card-element">
                     <!-- Stripe Elements will be inserted here -->
                 </div>
-                <div id="card-errors" role="alert" style="color: var(--danger-color); font-size: 0.875rem; margin-top: 0.5rem;"></div>
+                <div id="card-errors" role="alert" class="error-text"></div>
             </div>
 
             <!-- Payment Button -->
-            <button id="payButton" class="btn btn-primary btn-full" style="margin-bottom: 0.5rem;">
+            <button id="payButton" class="btn btn-primary btn-full mb-sm">
                 <i class="fas fa-lock"></i> Pay <span id="payButtonAmount">$0.00</span>
             </button>
             <button onclick="closePaymentModal()" class="btn btn-secondary btn-full">
@@ -96,8 +97,8 @@
             </button>
 
             <!-- Security Badge -->
-            <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
-                <i class="fas fa-shield-alt" style="color: var(--success-color);"></i>
+            <div class="security-badge">
+                <i class="fas fa-shield-alt icon-success"></i>
                 Secure payment powered by Stripe
             </div>
         </div>
@@ -108,47 +109,47 @@
         <div class="modal-content">
             <i class="fas fa-check-circle"></i>
             <h3>Order Submitted Successfully!</h3>
-            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Your 3-Day Tees rush order has been submitted.</p>
-            <div class="order-number" id="orderNumber" style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); margin: 1rem 0;"></div>
+            <p class="text-lg mb-sm">Your 3-Day Tees rush order has been submitted.</p>
+            <div class="order-number" id="orderNumber"></div>
 
             <!-- Estimated Delivery -->
-            <div style="background: var(--bg-light); padding: 1rem; border-radius: 6px; margin: 1.5rem 0;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                    <i class="fas fa-calendar-check" style="color: var(--success-color);"></i>
+            <div class="info-box">
+                <div class="flex-center gap-sm">
+                    <i class="fas fa-calendar-check icon-success"></i>
                     <strong>Estimated Delivery:</strong>
-                    <span id="estimatedDelivery" style="color: var(--primary-color); font-weight: bold;"></span>
+                    <span id="estimatedDelivery" class="text-accent font-bold"></span>
                 </div>
             </div>
 
             <!-- Next Steps Timeline -->
-            <div style="text-align: left; margin: 1.5rem 0; padding: 0 1rem;">
-                <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">What Happens Next:</h4>
+            <div class="text-left mb-lg p-md">
+                <h4 class="text-center mb-md text-primary">What Happens Next:</h4>
                 <div class="timeline-steps">
                     <div class="timeline-step">
-                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                        <i class="fas fa-check-circle icon-success"></i>
                         <span><strong>Confirmation Email Sent</strong><br><small>Check your inbox for order details</small></span>
                     </div>
                     <div class="timeline-step">
-                        <i class="fas fa-palette" style="color: var(--primary-color);"></i>
+                        <i class="fas fa-palette icon-primary"></i>
                         <span><strong>Artwork Review (Today)</strong><br><small>Our team will contact you to approve artwork</small></span>
                     </div>
                     <div class="timeline-step">
-                        <i class="fas fa-print" style="color: var(--primary-color);"></i>
+                        <i class="fas fa-print icon-primary"></i>
                         <span><strong>Production Begins (Day 1)</strong><br><small>DTG printing starts after artwork approval</small></span>
                     </div>
                     <div class="timeline-step">
-                        <i class="fas fa-shipping-fast" style="color: var(--primary-color);"></i>
+                        <i class="fas fa-shipping-fast icon-primary"></i>
                         <span><strong>Ships Within 72 Hours</strong><br><small>Guaranteed delivery in 3 business days</small></span>
                     </div>
                 </div>
             </div>
 
             <!-- Contact Information -->
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
-                Questions? Call us at <strong style="color: var(--primary-color);">253-922-5793</strong>
+            <p class="text-sm text-muted mt-md">
+                Questions? Call us at <strong class="text-accent">253-922-5793</strong>
             </p>
 
-            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">Start New Order</button>
+            <button class="btn btn-primary mt-md" onclick="location.reload()">Start New Order</button>
         </div>
     </div>
 
@@ -205,7 +206,7 @@
             <div class="phase-connector" id="connector-3"></div>
             <div class="phase-step" id="phase-4-nav">
                 <div class="phase-step-number">4</div>
-                <div class="phase-step-label">Review & Upload</div>
+                <div class="phase-step-label">Review & Pay</div>
             </div>
         </div>
 
@@ -220,12 +221,11 @@
                 <div class="product-grid">
                     <!-- Left Column: Product Image -->
                     <div>
-                        <div class="card" style="padding: 0.5rem;">
+                        <div class="card p-sm">
                             <div class="product-hero">
-                                <img id="heroProductImage" class="product-hero-image"
+                                <img id="heroProductImage" class="product-hero-image d-block"
                                      src=""
-                                     alt="Port alt="Port & Company PC54 - Jet Black with DTG Print" Company PC54"
-                                     style="display: block;">
+                                     alt="Port alt="Port & Company PC54 - Jet Black with DTG Print" Company PC54">
                                 <div class="product-title">Port & Company PC54</div>
                                 <p class="product-description">Premium 100% cotton tee, perfect for DTG printing</p>
                             </div>
@@ -267,7 +267,7 @@
                                     </div>
                                 </div>
 
-                                <div class="toggle-section-title" style="margin-top: 2rem;">
+                                <div class="toggle-section-title mt-xl">
                                     <i class="fas fa-layer-group"></i>
                                     Back Print Location
                                 </div>
@@ -290,17 +290,17 @@
                             </div>
 
                             <!-- Pricing Information Table -->
-                            <div id="pricing-info-table" style="display: none; margin-top: 2rem;">
-                                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937;">
+                            <div id="pricing-info-table" class="d-none mt-xl">
+                                <h3 class="pricing-table-heading">
                                     Pricing Information
                                 </h3>
 
-                                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                    <thead style="background: #f3f4f6;">
+                                <table class="table">
+                                    <thead>
                                         <tr>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Quantity Range</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">Price Per Piece</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Notes</th>
+                                            <th class="table-header">Quantity Range</th>
+                                            <th class="table-header-right">Price Per Piece</th>
+                                            <th class="table-header">Notes</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pricing-table-body">
@@ -308,18 +308,18 @@
                                     </tbody>
                                 </table>
 
-                                <div style="margin-top: 0.75rem; font-size: 0.875rem; color: #6b7280;">
-                                    <p style="margin: 0.25rem 0;">* All prices include 25% rush fee for 3-day service</p>
-                                    <p style="margin: 0.25rem 0;">* 2XL adds $2/piece, 3XL adds $3/piece</p>
+                                <div class="pricing-notes">
+                                    <p>* All prices include 25% rush fee for 3-day service</p>
+                                    <p>* 2XL adds $2/piece, 3XL adds $3/piece</p>
                                 </div>
                             </div>
 
                             <!-- Selected Location Display -->
-                            <div id="selected-location-display" style="margin-top: 2rem; padding: 1.5rem; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; display: none;">
-                                <h4 style="margin-bottom: 0.5rem; color: #1e40af;">
+                            <div id="selected-location-display" class="mt-xl p-lg selected-location-box rounded-md d-none">
+                                <h4 class="mb-sm selected-location-heading">
                                     <i class="fas fa-check-circle"></i> Selected Location
                                 </h4>
-                                <p id="selected-location-text" style="font-size: 1.1rem; font-weight: 600; color: #1e40af; margin: 0;"></p>
+                                <p id="selected-location-text" class="selected-location-text"></p>
                             </div>
                         </div>
                     </div>
@@ -334,7 +334,7 @@
         </section>
 
         <!-- Phase 2: Colors & Quantities -->
-        <section id="product-phase" class="phase-section" style="display: none;">
+        <section id="product-phase" class="phase-section d-none">
             <div class="phase-header">
                 <h2><span class="phase-number">2</span> Colors & Quantities</h2>
                 <p>Select colors and enter quantities for each size. Location: <strong id="phase2-location"></strong></p>
@@ -344,15 +344,15 @@
             <!-- Left Column: Product Configuration -->
             <div>
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="flex-between-center">
                         <h3>1. Choose Colors</h3>
                         <!-- Development tool - hidden from customers
-                        <button onclick="clearInventoryCache()" class="btn btn-sm btn-link" style="font-size: 0.9rem; color: var(--primary-color);">
+                        <button onclick="clearInventoryCache()" class="btn btn-sm btn-link text-sm text-accent">
                             <i class="fas fa-sync"></i> Refresh Inventory
                         </button>
                         -->
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Select all colors needed for your order:</p>
+                    <p class="text-secondary text-sm mb-md">Select all colors needed for your order:</p>
                     <div class="color-selector">
                         <div class="color-swatches-container" id="colorGrid">
                             <!-- Colors populated by JavaScript -->
@@ -360,97 +360,97 @@
                     </div>
 
                     <!-- Selected Colors with Size Breakdown -->
-                    <div id="selectedColorsContainer" style="margin-top: 1.5rem;">
+                    <div id="selectedColorsContainer" class="mt-lg">
                         <!-- Selected color cards populated by JavaScript -->
                     </div>
                 </div>
 
 
                     <!-- Live Pricing Display Panel -->
-                    <div id="pricingPanel" style="display: none; margin-top: 1.5rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 1.5rem;">
-                        <h4 style="margin-top: 0; margin-bottom: 1rem; color: #0c4a6e; display: flex; align-items: center; gap: 0.5rem;">
+                    <div id="pricingPanel" class="d-none mt-lg pricing-panel rounded-md p-lg">
+                        <h4 class="pricing-panel-heading flex-start-center gap-sm">
                             <i class="fas fa-calculator"></i> Your Pricing
                         </h4>
 
-                        <div class="price-range-display" style="display: grid; gap: 0.75rem;">
+                        <div class="price-range-display">
                             <!-- Standard Sizes -->
-                            <div class="price-tier" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                                <span class="tier-label" style="color: var(--text-secondary); font-weight: 500;">
-                                    <i class="fas fa-tshirt" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                            <div class="price-tier flex-between-center rounded">
+                                <span class="tier-label">
+                                    <i class="fas fa-tshirt tier-label-icon"></i>
                                     Standard Sizes (S-XL)
                                 </span>
-                                <span id="standardSizesPrice" class="tier-price" style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color);">$0.00 each</span>
+                                <span id="standardSizesPrice" class="tier-price">$0.00 each</span>
                             </div>
 
                             <!-- 2XL Pricing (conditional) -->
-                            <div id="pricing-2xl" class="price-tier" style="display: none; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                                <span class="tier-label" style="color: var(--text-secondary); font-weight: 500;">
-                                    <i class="fas fa-expand-arrows-alt" style="margin-right: 0.5rem; color: var(--info-color);"></i>
+                            <div id="pricing-2xl" class="price-tier flex-between-center rounded d-none">
+                                <span class="tier-label">
+                                    <i class="fas fa-expand-arrows-alt tier-label-icon-info"></i>
                                     2XL
                                 </span>
-                                <span id="price2XL" class="tier-price" style="font-size: 1.25rem; font-weight: 700; color: var(--info-color);">$0.00 each</span>
+                                <span id="price2XL" class="tier-price-info">$0.00 each</span>
                             </div>
 
                             <!-- 3XL Pricing (conditional) -->
-                            <div id="pricing-3xl" class="price-tier" style="display: none; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                                <span class="tier-label" style="color: var(--text-secondary); font-weight: 500;">
-                                    <i class="fas fa-expand-arrows-alt" style="margin-right: 0.5rem; color: var(--info-color);"></i>
+                            <div id="pricing-3xl" class="price-tier flex-between-center rounded d-none">
+                                <span class="tier-label">
+                                    <i class="fas fa-expand-arrows-alt tier-label-icon-info"></i>
                                     3XL
                                 </span>
-                                <span id="price3XL" class="tier-price" style="font-size: 1.25rem; font-weight: 700; color: var(--info-color);">$0.00 each</span>
+                                <span id="price3XL" class="tier-price-info">$0.00 each</span>
                             </div>
                         </div>
 
                         <!-- Selection Summary -->
-                        <div class="selection-summary" style="margin-top: 1rem; padding: 0.75rem; background: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: var(--text-secondary); font-weight: 500;">
-                                    <i class="fas fa-shopping-bag" style="margin-right: 0.5rem;"></i>
+                        <div class="selection-summary mt-md p-sm bg-white rounded border">
+                            <div class="flex-between-center">
+                                <span class="text-secondary font-medium">
+                                    <i class="fas fa-shopping-bag mr-sm"></i>
                                     Your Selection:
                                 </span>
-                                <span id="selection-breakdown" style="font-weight: 600; color: var(--text-primary);">0 pieces</span>
+                                <span id="selection-breakdown" class="font-semibold text-primary">0 pieces</span>
                             </div>
                         </div>
 
-                        <p style="margin-top: 1rem; margin-bottom: 0; font-size: 0.875rem; color: #0c4a6e; text-align: center; background: white; padding: 0.5rem; border-radius: 4px;">
-                            <i class="fas fa-check-circle" style="color: #10b981;"></i> All prices shown include rush production (25% surcharge)
+                        <p class="mt-md mb-0 text-sm text-center bg-white p-sm rounded-sm text-blue-dark">
+                            <i class="fas fa-check-circle text-success"></i> All prices shown include rush production (25% surcharge)
                         </p>
                     </div>
                 </div>
 
-                <div class="card" id="uploadArtworkCard" style="margin-top: 1rem;">
+                <div class="card mt-md" id="uploadArtworkCard">
                     <h3 class="collapsible-header">
                         4. Upload Artwork
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </h3>
                     <div class="collapsible-content">
                         <!-- Front Logo Upload (Required) -->
-                        <div class="file-upload" style="margin-top: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <h4 style="margin: 0;">Front Logo</h4>
+                        <div class="file-upload mt-md">
+                            <div class="flex-start-center gap-sm mb-sm">
+                                <h4 class="m-0">Front Logo</h4>
                                 <span class="required-badge">REQUIRED</span>
                             </div>
                             <div class="upload-zone" id="frontUploadZone">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Front Logo Here</p>
-                                <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                                <p class="font-semibold mb-sm">Click or Drag Front Logo Here</p>
+                                <p class="text-sm">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
                             </div>
-                            <input type="file" id="frontFileInput" style="display: none;" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                            <input type="file" id="frontFileInput" class="d-none" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
                             <div class="file-list" id="frontFileList"></div>
                         </div>
 
                         <!-- Back Logo Upload (Optional) -->
-                        <div class="file-upload" style="margin-top: 1.5rem;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <h4 style="margin: 0;">Back Logo</h4>
+                        <div class="file-upload mt-lg">
+                            <div class="flex-start-center gap-sm mb-sm">
+                                <h4 class="m-0">Back Logo</h4>
                                 <span class="optional-badge">OPTIONAL</span>
                             </div>
                             <div class="upload-zone upload-zone-optional" id="backUploadZone">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Click or Drag Back Logo Here</p>
-                                <p style="font-size: 0.875rem;">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
+                                <p class="font-semibold mb-sm">Click or Drag Back Logo Here</p>
+                                <p class="text-sm">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
                             </div>
-                            <input type="file" id="backFileInput" style="display: none;" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
+                            <input type="file" id="backFileInput" class="d-none" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
                             <div class="file-list" id="backFileList"></div>
                         </div>
                     </div>
@@ -464,41 +464,41 @@
                     <div class="pricing-summary">
                         <div class="pricing-row">
                             <span class="pricing-label">Subtotal:</span>
-                            <span class="pricing-value" id="checkout-subtotal">$0.00</span>
+                            <span class="pricing-value" id="step2-subtotal">$0.00</span>
                         </div>
-                        <div class="pricing-row" id="checkout-rushFeeRow" style="display: none;">
+                        <div class="pricing-row d-none" id="step2-rushFeeRow">
                             <span class="pricing-label">Rush Fee (25%):</span>
-                            <span class="pricing-value" id="checkout-rushFee" style="color: var(--warning-color);">$0.00</span>
+                            <span class="pricing-value text-warning" id="step2-rushFee">$0.00</span>
                         </div>
-                        <div class="pricing-row" id="checkout-ltmFeeRow" style="display: none;">
+                        <div class="pricing-row d-none" id="step2-ltmFeeRow">
                             <span class="pricing-label">LTM Fee:</span>
-                            <span class="pricing-value" id="checkout-ltmFee">$0.00</span>
+                            <span class="pricing-value" id="step2-ltmFee">$0.00</span>
                         </div>
                         <div class="pricing-row">
                             <span class="pricing-label">Sales Tax:</span>
-                            <span class="pricing-value" id="checkout-salesTax" style="font-size: 0.9em; color: #6b7280;">Calculated at checkout</span>
+                            <span class="pricing-value text-sm text-gray-600" id="step2-salesTax">Calculated at checkout</span>
                         </div>
                         <div class="pricing-row">
                             <span class="pricing-label">Shipping (UPS Ground):</span>
-                            <span class="pricing-value" id="checkout-shipping">$30.00</span>
+                            <span class="pricing-value" id="step2-shipping">$30.00</span>
                         </div>
                         <div class="pricing-row">
                             <span>Grand Total:</span>
-                            <span id="checkout-grandTotal">$0.00</span>
+                            <span id="step2-grandTotal">$0.00</span>
                         </div>
                     </div>
 
-                    <div style="background: #fff7ed; border: 2px solid var(--warning-color); border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
-                        <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+                    <div class="rush-terms-box mb-lg">
+                        <p class="text-amber-dark font-semibold mb-sm">
                             <i class="fas fa-info-circle"></i> Rush Service Terms
                         </p>
-                        <p style="color: #92400e; font-size: 0.875rem;">
+                        <p class="text-amber-dark text-sm">
                             Orders ship within 72 hours from artwork approval. 25% rush fee shown separately above. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
                         </p>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full" id="continueToCheckout" style="margin-top: 1rem;">
+                <button class="btn btn-primary btn-full mt-md" id="continueToCheckout">
                     Continue to Checkout <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -506,7 +506,7 @@
         </section>
 
         <!-- Phase 3: Contact & Shipping -->
-        <section id="checkout-phase" class="phase-section" style="display: none;">
+        <section id="checkout-phase" class="phase-section d-none">
             <div class="phase-header">
                 <h2><span class="phase-number">3</span> Contact & Shipping</h2>
                 <p>Enter your contact and shipping information</p>
@@ -539,7 +539,7 @@
                         </div>
                     </div>
 
-                    <div class="card" style="margin-top: 1rem;">
+                    <div class="card mt-md">
                         <h3>Shipping Address</h3>
                         <div class="form-group">
                             <label for="address1">Street Address *</label>
@@ -564,12 +564,12 @@
                     </div>
 
                     <!-- Billing Address -->
-                    <div class="card" style="margin-top: 1rem;">
+                    <div class="card card-spacing">
                         <h3>Billing Address</h3>
 
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="sameAsShipping" style="width: auto; cursor: pointer;">
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="sameAsShipping" class="modern-checkbox">
                                 <span>Same as shipping address</span>
                             </label>
                         </div>
@@ -599,8 +599,8 @@
                 <div class="sticky-sidebar">
                     <div class="card" id="orderSummary">
                         <h3>Order Summary</h3>
-                        <div id="summaryContent" style="margin-bottom: 1rem;">
-                            <p style="color: var(--text-secondary); text-align: center; padding: 1rem;">
+                        <div id="summaryContent" class="mb-md">
+                            <p class="summary-placeholder">
                                 No items selected yet
                             </p>
                         </div>
@@ -608,49 +608,49 @@
                         <div class="pricing-summary">
                             <div class="pricing-row">
                                 <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="checkout-subtotal">$-</span>
+                                <span class="pricing-value" id="step3-subtotal">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">25% Rush Fee:</span>
-                                <span class="pricing-value" id="checkout-rushFee">$-</span>
+                                <span class="pricing-value" id="step3-rushFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">LTM Fee (if applicable):</span>
-                                <span class="pricing-value" id="checkout-ltmFee">$-</span>
+                                <span class="pricing-value" id="step3-ltmFee">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
-                                <span class="pricing-value" id="checkout-salesTax">$-</span>
+                                <span class="pricing-value" id="step3-salesTax">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span class="pricing-label">Shipping (UPS Ground):</span>
-                                <span class="pricing-value" id="checkout-shipping">$-</span>
+                                <span class="pricing-value" id="step3-shipping">$-</span>
                             </div>
                             <div class="pricing-row">
                                 <span>Grand Total:</span>
-                                <span id="checkout-grandTotal">$-</span>
+                                <span id="step3-grandTotal">$-</span>
                             </div>
                         </div>
 
-                        <div style="background: #fff7ed; border: 2px solid var(--warning-color); border-radius: 6px; padding: 1rem; margin-top: 1.5rem;">
-                            <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+                        <div class="rush-terms-box mt-lg">
+                            <p class="text-amber-dark font-semibold mb-sm">
                                 <i class="fas fa-info-circle"></i> Rush Service Terms
                             </p>
-                            <p style="color: #92400e; font-size: 0.875rem;">
+                            <p class="text-amber-dark text-sm">
                                 Orders ship within 72 hours from artwork approval. 25% rush fee shown separately above. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
                             </p>
                         </div>
                     </div>
 
-                    <button class="btn btn-primary btn-full" id="continueToReview" style="margin-top: 1rem;">
-                        Continue to Review & Upload <i class="fas fa-arrow-right"></i>
+                    <button class="btn btn-primary btn-full mt-md" id="continueToReview">
+                        Continue to Review & Pay <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
         </section>
 
         <!-- Phase 4: Review Order -->
-        <section id="review-phase" class="phase-section" style="display: none;">
+        <section id="review-phase" class="phase-section d-none">
             <div class="phase-header">
                 <h2><span class="phase-number">4</span> Review Order</h2>
                 <p>Review your order details and complete checkout</p>
@@ -662,44 +662,44 @@
                     <div class="card">
                         <h3><i class="fas fa-palette"></i> Artwork Files</h3>
                         <div id="artworkReview">
-                            <div style="margin-bottom: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <i class="fas fa-file-image" style="color: var(--primary-color);"></i>
+                            <div class="mb-md">
+                                <div class="flex-start-center gap-sm mb-sm">
+                                    <i class="fas fa-file-image icon-primary"></i>
                                     <strong>Front Logo:</strong>
                                 </div>
-                                <div id="frontFileReview" style="padding-left: 1.75rem; color: var(--text-secondary);">
+                                <div id="frontFileReview" class="pl-nested text-secondary">
                                     No file uploaded
                                 </div>
                             </div>
                             <div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <i class="fas fa-file-image" style="color: var(--info-color);"></i>
+                                <div class="flex-start-center gap-sm mb-sm">
+                                    <i class="fas fa-file-image icon-info"></i>
                                     <strong>Back Logo:</strong>
-                                    <span class="optional-badge" style="margin-left: 0.25rem;">OPTIONAL</span>
+                                    <span class="optional-badge ml-xs">OPTIONAL</span>
                                 </div>
-                                <div id="backFileReview" style="padding-left: 1.75rem; color: var(--text-secondary);">
+                                <div id="backFileReview" class="pl-nested text-secondary">
                                     No file uploaded
                                 </div>
                             </div>
-                            <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-light); border-radius: 6px; font-size: 0.875rem; color: var(--text-secondary);">
-                                <i class="fas fa-info-circle" style="color: var(--info-color);"></i>
-                                Need to change files? Go back to <a href="#" onclick="goToPhase(2); return false;" style="color: var(--primary-color); text-decoration: underline;">Step 2</a>.
+                            <div class="mt-md p-md bg-light rounded text-sm text-secondary">
+                                <i class="fas fa-info-circle icon-info"></i>
+                                Need to change files? Go back to <a href="#" onclick="goToPhase(2); return false;" class="link-primary">Step 2</a>.
                             </div>
                         </div>
                     </div>
 
-                    <div class="card" style="margin-top: 1rem;">
+                    <div class="card mt-md">
                         <h3><i class="fas fa-clipboard-check"></i> Order Details</h3>
                         <div id="reviewSummary">
-                            <div style="margin-bottom: 1rem;">
+                            <div class="mb-md">
                                 <strong>Print Location:</strong>
                                 <span id="reviewLocation"></span>
                             </div>
-                            <div style="margin-bottom: 1rem;">
+                            <div class="mb-md">
                                 <strong>Total Pieces:</strong>
                                 <span id="reviewTotalPieces"></span>
                             </div>
-                            <div style="margin-bottom: 1rem;">
+                            <div class="mb-md">
                                 <strong>Colors Selected:</strong>
                                 <span id="reviewColors"></span>
                             </div>
@@ -715,8 +715,8 @@
                 <div class="sticky-sidebar">
                     <div class="card" id="orderSummary">
                         <h3>Order Summary</h3>
-                        <div id="summaryContent" style="margin-bottom: 1rem;">
-                            <p style="color: var(--text-secondary); text-align: center; padding: 1rem;">
+                        <div id="summaryContent" class="mb-md">
+                            <p class="summary-placeholder">
                                 No items selected yet
                             </p>
                         </div>
@@ -748,11 +748,11 @@
                             </div>
                         </div>
 
-                        <div style="background: #fff7ed; border: 2px solid var(--warning-color); border-radius: 6px; padding: 1rem; margin-top: 1.5rem;">
-                            <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+                        <div class="rush-terms-box mt-lg">
+                            <p class="text-amber-dark font-semibold mb-sm">
                                 <i class="fas fa-info-circle"></i> Rush Service Terms
                             </p>
-                            <p style="color: #92400e; font-size: 0.875rem;">
+                            <p class="text-amber-dark text-sm">
                                 Orders ship within 72 hours from artwork approval. 25% rush fee shown separately above. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
                             </p>
                         </div>
@@ -766,6 +766,11 @@
         </section>
     </div>
     <!-- External JavaScript -->
+    <!-- Tier 1: Service Layer (loads before main application) -->
+    <script src="js/utils/debounce.js"></script>
+    <script src="js/services/ApiService.js"></script>
+    <script src="js/services/InventoryService.js"></script>
+    <!-- Main Application -->
     <script src="js/3-day-tees.js"></script>
 </body>
 </html>

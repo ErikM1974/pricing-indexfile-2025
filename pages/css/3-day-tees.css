@@ -457,12 +457,12 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 .product-image {
     width: 100%;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     border: 2px solid var(--border-color);
     cursor: pointer;
     transition: all 0.3s;
@@ -562,7 +562,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 .color-selector h3::after {
@@ -577,7 +577,7 @@ body {
     display: flex;
     gap: 1.25rem;
     overflow-x: auto;
-    padding: 1rem 0.5rem 2.5rem 0.5rem;
+    padding: var(--space-md) 0.5rem 2.5rem 0.5rem;
     scroll-behavior: smooth;
     position: relative;
     background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.5));
@@ -902,7 +902,7 @@ body {
 /* Selected Color Cards */
 .selected-color-card {
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: 1.5rem;
     margin-bottom: 1rem;
     border-left: 4px solid var(--primary-color);
@@ -1004,7 +1004,7 @@ body {
 
 /* Location Selector */
 .location-selector {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 .location-grid {
@@ -1016,8 +1016,8 @@ body {
 
 .location-option {
     border: 2px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
@@ -1051,7 +1051,7 @@ body {
 
 /* Size Breakdown */
 .size-breakdown {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
 }
 
 .size-grid {
@@ -1167,7 +1167,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
 }
@@ -1245,7 +1245,7 @@ body {
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     border: 1px solid var(--border-color);
     overflow-x: auto;
 }
@@ -1413,7 +1413,7 @@ body {
     background: linear-gradient(135deg, #fef3f0, #fff);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     border: 2px solid var(--primary-color);
     transition: all var(--transition-spring);
     position: relative;
@@ -1585,7 +1585,7 @@ body {
 .upload-zone i {
     font-size: 3.5rem;
     color: var(--primary-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     transition: all var(--transition-spring);
     filter: drop-shadow(0 4px 12px var(--primary-glow));
     animation: iconPulse 2s ease-in-out infinite;
@@ -2001,7 +2001,7 @@ body {
 /* Enhanced Button Styles with Micro-animations */
 .btn {
     display: inline-block;
-    padding: 1rem 2rem;
+    padding: var(--space-md) 2rem;
     border: none;
     border-radius: var(--radius-lg);
     font-size: 1rem;
@@ -2333,7 +2333,7 @@ body {
 }
 
 .modal-content p {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     color: var(--text-secondary);
     animation: contentSlideIn 0.5s ease-out 0.5s backwards;
 }
@@ -2411,7 +2411,7 @@ body {
 .toast {
     background: white;
     border-radius: 12px;
-    padding: 1rem 1.25rem;
+    padding: var(--space-md) 1.25rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
                 0 0 0 1px rgba(0, 0, 0, 0.05);
     display: flex;
@@ -2660,7 +2660,7 @@ body {
 
     .color-swatches-container {
         gap: 1.25rem;
-        padding: 1rem;
+        padding: var(--space-md);
     }
 
     /* Color pills mobile optimization */
@@ -2680,7 +2680,7 @@ body {
 
     /* Unified size table mobile optimization */
     .unified-size-table-container {
-        padding: 1rem;
+        padding: var(--space-md);
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
@@ -2726,11 +2726,11 @@ body {
 
 @media (max-width: 375px) {
     .container {
-        padding: 1rem;
+        padding: var(--space-md);
     }
 
     .card {
-        padding: 1rem;
+        padding: var(--space-md);
     }
 }
 
@@ -2895,7 +2895,7 @@ body {
         position: sticky;
         bottom: 0;
         background: white;
-        padding: 1rem;
+        padding: var(--space-md);
         box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
         z-index: 100;
         margin-left: -2rem;
@@ -2967,7 +2967,7 @@ html {
     }
 
     .selected-color-card {
-        padding: 1rem;
+        padding: var(--space-md);
     }
 
     .color-header {
@@ -3048,7 +3048,7 @@ html {
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
     background: white;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     transition: all 0.2s ease;
 }
 
@@ -3158,7 +3158,7 @@ html {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     #pricingPanel {
-        padding: 1rem;
+        padding: var(--space-md);
         margin-top: 1rem;
     }
 
@@ -3239,7 +3239,7 @@ html {
     /* Reduce vertical spacing in landscape */
     .card {
         margin-bottom: 0.75rem !important;
-        padding: 1rem !important;
+        padding: var(--space-md) !important;
     }
 
     .hero-banner {
@@ -3296,7 +3296,7 @@ html {
 
     /* Reduce modal padding */
     .modal-content {
-        padding: 1rem !important;
+        padding: var(--space-md) !important;
         max-height: 90vh;
         overflow-y: auto;
     }
@@ -3417,7 +3417,7 @@ html {
 @media (max-width: 768px) {
     /* Consistent vertical rhythm */
     .section-spacing {
-        margin-bottom: 1.5rem;
+        margin-bottom: var(--space-lg);
     }
 
     /* Consistent card spacing */
@@ -3547,7 +3547,7 @@ html {
 /* Better modal experience on mobile */
 @media (max-width: 768px) {
     .modal {
-        padding: 1rem;
+        padding: var(--space-md);
     }
 
     .modal-content {
@@ -3580,7 +3580,7 @@ html {
 /* Enhanced color swatch interaction on mobile */
 @media (max-width: 768px) {
     .color-swatches-container {
-        padding: 1rem;
+        padding: var(--space-md);
         gap: 1rem;
     }
 
@@ -3758,7 +3758,7 @@ html {
 /* File Upload Progress */
 .file-upload-progress {
     margin-top: 1rem;
-    padding: 1rem;
+    padding: var(--space-md);
     background: var(--glass-bg);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
@@ -3953,9 +3953,9 @@ html {
 .form-completion {
     background: var(--glass-bg);
     border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
+    padding: var(--space-md) 1.25rem;
     border: 1px solid var(--border-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-lg);
     animation: fadeIn 0.4s ease-out;
 }
 
