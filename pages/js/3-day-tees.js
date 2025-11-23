@@ -2106,8 +2106,10 @@
             // Update total pieces
             const reviewTotalPiecesEl = document.getElementById('reviewTotalPieces');
             if (reviewTotalPiecesEl) {
-                const totalPieces = state.selectedColors.reduce((sum, colorState) => {
-                    return sum + Object.values(colorState.sizes).reduce((s, qty) => s + qty, 0);
+                const totalPieces = state.selectedColors.reduce((sum, catalogColor) => {
+                    const config = state.colorConfigs[catalogColor];
+                    if (!config || !config.sizeBreakdown) return sum;
+                    return sum + Object.values(config.sizeBreakdown).reduce((s, sizeData) => s + (sizeData.quantity || 0), 0);
                 }, 0);
                 reviewTotalPiecesEl.textContent = totalPieces;
             }
@@ -2116,7 +2118,7 @@
             const reviewColorsEl = document.getElementById('reviewColors');
             if (reviewColorsEl) {
                 const colorNames = state.selectedColors
-                    .map(colorState => colorState.colorName)
+                    .map(catalogColor => state.colorConfigs[catalogColor]?.displayColor || catalogColor)
                     .join(', ');
                 reviewColorsEl.textContent = colorNames || 'None';
             }
@@ -2148,18 +2150,21 @@
             if (summaryContentEl && state.selectedColors.length > 0) {
                 let itemsHTML = '';
 
-                state.selectedColors.forEach((colorState, index) => {
-                    const colorQty = Object.values(colorState.sizes).reduce((sum, qty) => sum + qty, 0);
+                state.selectedColors.forEach((catalogColor) => {
+                    const config = state.colorConfigs[catalogColor];
+                    if (!config || !config.sizeBreakdown) return;
+
+                    const colorQty = Object.values(config.sizeBreakdown).reduce((sum, sizeData) => sum + (sizeData.quantity || 0), 0);
                     if (colorQty > 0) {
                         itemsHTML += `
                             <div style="padding: 0.75rem; background: #f8fafc; border-radius: 6px; margin-bottom: 0.75rem;">
                                 <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
-                                    ${colorState.colorName} (${colorQty} pieces)
+                                    ${config.displayColor} (${colorQty} pieces)
                                 </div>
                                 <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                                    ${Object.entries(colorState.sizes)
-                                        .filter(([size, qty]) => qty > 0)
-                                        .map(([size, qty]) => `${size}: ${qty}`)
+                                    ${Object.entries(config.sizeBreakdown)
+                                        .filter(([size, sizeData]) => sizeData.quantity > 0)
+                                        .map(([size, sizeData]) => `${size}: ${sizeData.quantity}`)
                                         .join(' • ')}
                                 </div>
                             </div>
