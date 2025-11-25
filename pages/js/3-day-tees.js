@@ -5,12 +5,20 @@
         let currentPhase = 1;
         let selectedLocation = null;  // Will be 'LC', 'FF', 'LC_FB', or 'FF_FB'
         let selectedLocations = [];   // Array of selected location codes
+        let stripeElementsMounted = false;  // Track if Stripe elements have been mounted
 
         // ========================================
         // Service Layer Initialization (Tier 1)
         // ========================================
+        // Determine API base URL based on environment
+        // Use relative path ('') for localhost to leverage the local server's proxy/endpoints
+        // Use explicit Heroku URL for production/other environments
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const apiBaseURL = isLocalhost ? '' : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        console.log(`[3-Day Tees] Initializing API Service (Environment: ${isLocalhost ? 'Local' : 'Production'})`);
+
         const apiService = new ApiService({
-            baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+            baseURL: apiBaseURL,
             retryAttempts: 3,
             retryDelay: 1000,
             timeout: 30000,
@@ -236,6 +244,7 @@
             document.querySelectorAll('.phase-section').forEach(section => {
                 section.style.display = 'none';
                 section.classList.remove('active');
+                section.classList.add('d-none');  // Re-add Bootstrap d-none class for hidden sections
             });
 
             // Show the target phase
@@ -247,6 +256,7 @@
 
             const targetSection = document.getElementById(targetPhaseId);
             if (targetSection) {
+                targetSection.classList.remove('d-none');  // Remove Bootstrap d-none class (critical for Stripe)
                 targetSection.style.display = 'block';
                 targetSection.classList.add('active');
             }
@@ -273,6 +283,12 @@
                 }
             });
 
+            // Show/hide payment section (outside grid to avoid stacking context isolation)
+            const paymentSection = document.getElementById('payment-section');
+            if (paymentSection) {
+                paymentSection.classList.toggle('d-none', newPhase !== 4);
+            }
+
             currentPhase = newPhase;
 
             // If moving to Phase 2, update the location display in the header
@@ -297,6 +313,14 @@
             // If moving to Phase 4 (review), update the review summary from state
             if (newPhase === 4) {
                 updateReviewSummaryDOM();
+                // CRITICAL: Defer Stripe mounting until after browser has painted the container
+                // Stripe iframes require the container to be fully visible in the DOM before mounting
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        showPaymentModal();  // Mount Stripe card element to DOM
+                        console.log('[3-Day Tees] ✓ Payment modal triggered after DOM paint');
+                    });
+                });
             }
 
             // Scroll to top
@@ -427,9 +451,68 @@
             const continueToReviewBtn = document.getElementById('continueToReview');
             if (continueToReviewBtn) {
                 continueToReviewBtn.addEventListener('click', function() {
-                    console.log('[3DayTees] Validating checkout form...');
+                    console.log('[3DayTees] Validating entire order before review...');
 
-                    // Manual field-by-field validation
+                    // Step 1: Validate color selections
+                    if (state.selectedColors.length === 0) {
+                        showToast('Please select at least one color to continue', 'warning');
+                        return;
+                    }
+
+                    // Step 2: Validate print location
+                    if (!selectedLocation) {
+                        showToast('Please select a print location in Step 1', 'warning');
+                        return;
+                    }
+
+                    // Step 3: Validate quantities (minimum 6 pieces)
+                    let grandTotalQuantity = 0;
+                    state.selectedColors.forEach(catalogColor => {
+                        const config = state.colorConfigs[catalogColor];
+                        config.totalQuantity = Object.values(config.sizeBreakdown)
+                            .reduce((sum, s) => sum + s.quantity, 0);
+                        grandTotalQuantity += config.totalQuantity;
+                    });
+
+                    if (grandTotalQuantity === 0) {
+                        showToast('Please enter quantities for at least one size', 'warning');
+                        return;
+                    }
+
+                    if (grandTotalQuantity < 6) {
+                        showToast('Minimum order is 6 pieces. Please add more items to your order.', 'error', 0);
+                        return;
+                    }
+
+                    // Step 4: Validate front logo upload (required)
+                    if (!state.frontLogo) {
+                        showToast('Front logo is required. Please upload your artwork in Step 2.', 'error', 6000);
+
+                        // Scroll to Step 2
+                        const step2 = document.querySelector('#step2');
+                        if (step2) {
+                            step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+
+                        // Highlight front upload zone with error state
+                        const frontZone = document.getElementById('frontUploadZone');
+                        if (frontZone) {
+                            frontZone.style.borderColor = '#ef4444';
+                            frontZone.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+
+                            // Remove highlight after 3 seconds
+                            setTimeout(() => {
+                                frontZone.style.borderColor = '';
+                                frontZone.style.backgroundColor = '';
+                            }, 3000);
+                        }
+
+                        return;
+                    }
+
+                    console.log('[3DayTees] ✓ Order validation passed - validating customer form...');
+
+                    // Step 5: Manual field-by-field validation of customer form
                     const fieldsToValidate = [
                         { id: 'firstName', label: 'First Name', pattern: /^.{2,}$/, message: 'First name must be at least 2 characters' },
                         { id: 'lastName', label: 'Last Name', pattern: /^.{2,}$/, message: 'Last name must be at least 2 characters' },
@@ -511,11 +594,16 @@
 
         // Initialize Stripe (will be set after loading config)
         let stripe = null;
-        let cardElement = null;
+        let stripeElements = null;  // Store the elements instance for lazy element creation
+        let cardNumberElement = null;
+        let cardExpiryElement = null;
+        let cardCvcElement = null;
         let paymentIntentClientSecret = null;
         let isProcessingPayment = false;  // Flag to prevent duplicate payment processing
 
         // Load Stripe publishable key from server and initialize
+        // NOTE: Elements are created LAZILY in showPaymentModal() when container is visible
+        // This fixes the race condition where elements created during page load cached 0px width
         async function initializeStripe() {
             try {
                 console.log('[3-Day Tees] Initializing Stripe via ApiService...');
@@ -523,26 +611,11 @@
                 console.log('[3-Day Tees] ✓ Stripe config loaded');
                 stripe = Stripe(publishableKey);
 
-                // Create Stripe Elements
-                const elements = stripe.elements();
-                cardElement = elements.create('card', {
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#1f2937',
-                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                            '::placeholder': {
-                                color: '#9ca3af'
-                            }
-                        },
-                        invalid: {
-                            color: '#ef4444'
-                        }
-                    }
-                });
+                // Create Stripe Elements instance (but NOT individual elements yet)
+                // Individual elements will be created in showPaymentModal() when container is visible
+                stripeElements = stripe.elements();
 
-                // Mount card element when payment modal is shown
-                // (We'll mount it when the modal opens)
+                console.log('[3-Day Tees] ✓ Stripe initialized (elements will be created when payment form shown)');
             } catch (error) {
                 console.error('[Stripe] Failed to initialize:', error);
                 showToast('Payment system initialization failed. Please refresh the page.', 'error');
@@ -3045,52 +3118,135 @@
             syncUploadedFilesArray();
         }
 
-        // Payment Modal Functions
+        // Payment Form Functions (Embedded in Step 4)
         function showPaymentModal() {
-            // Read pricing breakdown from state (single source of truth)
-            const { subtotal, rushFee, ltmFee, salesTax: tax, shipping, grandTotal: total } = state.orderTotals;
+            // Read total from state (single source of truth)
+            const { grandTotal: total } = state.orderTotals;
 
-            // Update payment modal with amounts
-            document.getElementById('paymentSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('paymentRushFee').textContent = `$${rushFee.toFixed(2)}`;
-
-            // Show/hide LTM fee row based on whether it applies
-            const ltmFeeRow = document.getElementById('paymentLtmFeeRow');
-            if (ltmFee > 0) {
-                ltmFeeRow.style.display = 'flex';
-                document.getElementById('paymentLtmFee').textContent = `$${ltmFee.toFixed(2)}`;
-            } else {
-                ltmFeeRow.style.display = 'none';
+            // Update payment button amount (embedded in Step 4)
+            const payButtonAmount = document.getElementById('payButtonAmount');
+            if (payButtonAmount) {
+                payButtonAmount.textContent = `$${total.toFixed(2)}`;
             }
 
-            document.getElementById('paymentTax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('paymentShipping').textContent = `$${shipping.toFixed(2)}`;
-            document.getElementById('paymentTotal').textContent = `$${total.toFixed(2)}`;
-            document.getElementById('payButtonAmount').textContent = `$${total.toFixed(2)}`;
+            // Check if Stripe is initialized
+            if (!stripeElements) {
+                console.error('[3-Day Tees] Stripe not initialized yet');
+                showToast('Payment system loading. Please wait...', 'info');
+                return;
+            }
 
-            // Mount Stripe card element if not already mounted
-            if (cardElement && !cardElement._parent) {
-                cardElement.mount('#card-element');
+            // Wait for container to have actual width (not 0 from display:none)
+            // CRITICAL: We CREATE fresh elements here, not just remount existing ones
+            // Stripe Elements cache internal measurements at CREATION time, not mount time
+            const waitForVisibility = () => {
+                const container = document.getElementById('card-number-element');
+                if (!container || container.offsetWidth === 0) {
+                    console.log('[3-Day Tees] Container not visible yet, waiting...');
+                    requestAnimationFrame(waitForVisibility);
+                    return;
+                }
 
-                // Handle real-time validation errors
-                cardElement.on('change', (event) => {
-                    const displayError = document.getElementById('card-errors');
+                console.log('[3-Day Tees] Container visible with width:', container.offsetWidth);
+
+                // DESTROY old elements if they exist (releases cached measurements)
+                if (cardNumberElement) {
+                    try { cardNumberElement.unmount(); } catch(e) {}
+                    cardNumberElement = null;
+                }
+                if (cardExpiryElement) {
+                    try { cardExpiryElement.unmount(); } catch(e) {}
+                    cardExpiryElement = null;
+                }
+                if (cardCvcElement) {
+                    try { cardCvcElement.unmount(); } catch(e) {}
+                    cardCvcElement = null;
+                }
+
+                // Shared styling for all elements
+                const elementStyles = {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#1f2937',
+                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            '::placeholder': {
+                                color: '#9ca3af'
+                            }
+                        },
+                        invalid: {
+                            color: '#ef4444'
+                        }
+                    }
+                };
+
+                // CREATE FRESH ELEMENTS now that container is visible
+                // This is the key fix - elements will measure the correct container width
+                cardNumberElement = stripeElements.create('cardNumber', elementStyles);
+                cardExpiryElement = stripeElements.create('cardExpiry', elementStyles);
+                cardCvcElement = stripeElements.create('cardCvc', elementStyles);
+
+                console.log('[3-Day Tees] ✓ Created fresh Stripe Elements');
+
+                // Mount fresh elements immediately
+                cardNumberElement.mount('#card-number-element');
+                cardExpiryElement.mount('#card-expiry-element');
+                cardCvcElement.mount('#card-cvc-element');
+
+                stripeElementsMounted = true;
+                console.log('[3-Day Tees] ✓ Stripe Elements mounted successfully');
+
+                // Handle real-time validation errors from all three elements
+                const displayError = document.getElementById('card-errors');
+
+                const handleElementChange = (event) => {
                     if (event.error) {
                         displayError.textContent = event.error.message;
                     } else {
                         displayError.textContent = '';
                     }
-                });
-            }
+                };
 
-            // Show modal
-            document.getElementById('paymentModal').classList.add('active');
+                // Add change listeners
+                cardNumberElement.on('change', handleElementChange);
+                cardExpiryElement.on('change', handleElementChange);
+                cardCvcElement.on('change', handleElementChange);
+
+                // Add ready event handlers for debugging
+                cardNumberElement.on('ready', () => {
+                    console.log('[3-Day Tees] ✓ Card number element READY for input');
+                });
+                cardExpiryElement.on('ready', () => {
+                    console.log('[3-Day Tees] ✓ Card expiry element READY');
+                });
+                cardCvcElement.on('ready', () => {
+                    console.log('[3-Day Tees] ✓ Card CVC element READY');
+                });
+
+                // Add focus event handler for debugging
+                cardNumberElement.on('focus', () => {
+                    console.log('[Stripe Debug] ✓ Card NUMBER received focus');
+                });
+
+                // Focus on card number after short delay
+                setTimeout(() => {
+                    console.log('[3-Day Tees] Attempting to focus card number element...');
+                    cardNumberElement.focus();
+                }, 200);
+            };
+            requestAnimationFrame(waitForVisibility);
+
+            // Note: Order summary is updated separately by updateReviewSummaryDOM()
+            // No modal to show - payment form is embedded in Step 4
         }
 
         function closePaymentModal() {
-            document.getElementById('paymentModal').classList.remove('active');
+            // No modal to close - payment form is embedded
             // Clear errors
-            document.getElementById('card-errors').textContent = '';
+            const cardErrors = document.getElementById('card-errors');
+            if (cardErrors) {
+                cardErrors.textContent = '';
+            }
         }
 
         /**
@@ -3099,8 +3255,9 @@
          */
         function restorePayButton() {
             const payButton = document.getElementById('payButton');
+            const total = state.orderTotals.grandTotal || 0;
             payButton.disabled = false;
-            payButton.innerHTML = 'Pay Now';
+            payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
         }
 
         /**
@@ -3203,7 +3360,7 @@
                 return null;
             }
 
-            if (!stripe || !cardElement) {
+            if (!stripe || !cardNumberElement) {
                 showToast('Payment system not ready. Please refresh the page.', 'error');
                 return null;
             }
@@ -3226,13 +3383,20 @@
                 paymentIntentClientSecret = clientSecret;
                 console.log('[Payment] ✓ Payment intent created');
 
-                // Confirm card payment
+                // Confirm card payment (using cardNumberElement from split layout)
                 const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
                     payment_method: {
-                        card: cardElement,
+                        card: cardNumberElement,
                         billing_details: {
                             name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
-                            email: document.getElementById('email').value
+                            email: document.getElementById('email').value,
+                            phone: document.getElementById('phone').value,
+                            address: {
+                                postal_code: document.getElementById('billingZip').value,
+                                line1: document.getElementById('billingAddress1').value,
+                                city: document.getElementById('billingCity').value,
+                                state: document.getElementById('billingState').value
+                            }
                         }
                     }
                 });
@@ -3531,7 +3695,7 @@
                     } else {
                         // Re-enable button on failure
                         payButton.disabled = false;
-                        const total = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '').replace(',', '')) || 0;
+                        const total = state.orderTotals.grandTotal || 0;
                         payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
                     }
                 });
@@ -3718,92 +3882,10 @@
             }
         }
 
-        // DUPLICATE EVENT LISTENER REMOVED - Pay button listener is now only attached in DOMContentLoaded
-        // This duplicate was causing race conditions and "in-flight confirmCardPayment" errors
-        // The correct listener is at lines 2581-2606 inside DOMContentLoaded
-
-        // Submit order - MULTI-COLOR SUPPORT
-        document.getElementById('submitOrder').addEventListener('click', async () => {
-            // Validate multi-color selections
-            if (state.selectedColors.length === 0) {
-                showToast('Please select at least one color to continue', 'warning');
-                return;
-            }
-
-            if (!selectedLocation) {
-                showToast('Please select a print location in Step 1', 'warning');
-                return;
-            }
-
-            // Calculate total quantity across all colors
-            let grandTotalQuantity = 0;
-            state.selectedColors.forEach(catalogColor => {
-                const config = state.colorConfigs[catalogColor];
-                config.totalQuantity = Object.values(config.sizeBreakdown)
-                    .reduce((sum, s) => sum + s.quantity, 0);
-                grandTotalQuantity += config.totalQuantity;
-            });
-
-            if (grandTotalQuantity === 0) {
-                showToast('Please enter quantities for at least one size', 'warning');
-                return;
-            }
-
-            // Validate minimum order quantity (6 pieces)
-            if (grandTotalQuantity < 6) {
-                showToast('Minimum order is 6 pieces. Please add more items to your order.', 'error', 0);
-                return;
-            }
-
-            if (!document.getElementById('firstName').value || !document.getElementById('lastName').value) {
-                showToast('Please fill in your first and last name', 'warning');
-                return;
-            }
-
-            if (!document.getElementById('email').value) {
-                showToast('Please provide your email address', 'warning');
-                return;
-            }
-
-            if (!document.getElementById('address1').value || !document.getElementById('city').value || !document.getElementById('state').value || !document.getElementById('zip').value) {
-                showToast('Please fill in all required shipping address fields', 'warning');
-                return;
-            }
-
-            // Validate front logo is uploaded (required)
-            if (!state.frontLogo) {
-                showToast('Front logo is required. Please upload your artwork in Step 2.', 'error', 6000);
-
-                // Scroll to Step 2
-                const step2 = document.querySelector('#step2');
-                if (step2) {
-                    step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-
-                // Highlight front upload zone with error state
-                const frontZone = document.getElementById('frontUploadZone');
-                if (frontZone) {
-                    frontZone.style.borderColor = '#ef4444';
-                    frontZone.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-
-                    // Remove highlight after 3 seconds
-                    setTimeout(() => {
-                        frontZone.style.borderColor = '';
-                        frontZone.style.backgroundColor = '';
-                    }, 3000);
-                }
-
-                return;
-            }
-
-            // Validation passed - show payment modal
-            console.log('[3-Day Tees] Validation passed, showing payment modal...');
-            console.log('[3-Day Tees] Colors:', state.selectedColors);
-            console.log('[3-Day Tees] Total quantity:', grandTotalQuantity);
-
-            // Show payment modal (reads Order Summary DOM values automatically)
-            showPaymentModal();
-        });
+        // ORPHANED EVENT LISTENER REMOVED
+        // This was trying to attach to a non-existent 'submitOrder' button
+        // The validation logic has been moved into the continueToReview listener (lines 436-575)
+        // which properly validates colors, quantities, logos, and customer form before moving to Step 4
 
         // NOTE: Order number generation and email sending now handled by ThreeDayTeesOrderService
 

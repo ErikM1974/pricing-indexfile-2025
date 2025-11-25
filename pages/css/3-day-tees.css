@@ -431,6 +431,86 @@ body {
     }
 }
 
+/* Fix: Establish proper stacking context for review phase */
+/* This ensures z-index values work correctly for Stripe iframe focus/keyboard events */
+#review-phase {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure payment card doesn't block Stripe input */
+#paymentCard::after,
+#paymentCard::before {
+    display: none !important;
+}
+
+#paymentCard:hover::after,
+#paymentCard:active::after {
+    display: none !important;
+}
+
+/* Fix: Remove transforms/animations that block Stripe iframe interaction */
+#paymentCard {
+    transform: none !important;
+    animation: none !important;
+    position: relative;
+    z-index: 1050;  /* Above loading overlay (1000) and modal (1001) */
+    overflow: visible !important;  /* Critical: Allow Stripe iframes to render */
+    isolation: isolate;  /* Creates fresh stacking context for Stripe keyboard events */
+}
+
+#paymentCard:hover {
+    transform: none !important;
+    box-shadow: var(--shadow-md);  /* Keep normal shadow, no lift */
+    background: var(--card-bg);    /* No gradient on hover */
+}
+
+/* Ensure Stripe elements themselves are accessible */
+#paymentCard .stripe-element {
+    position: relative;
+    z-index: 1100;  /* Above payment card (1050) and overlays */
+    overflow: visible !important;
+    /* REMOVED: isolation: auto - was contributing to cursor positioning issue */
+    pointer-events: auto !important;  /* Explicit: ensure clickable */
+}
+
+/* Stripe iframe container - SIMPLIFIED for proper cursor positioning */
+/* REMOVED: position: relative and high z-index that caused cursor to escape container */
+#paymentCard .stripe-element iframe {
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure all parent containers of Stripe elements don't block interaction */
+#paymentCard > div,
+#paymentCard .mb-lg,
+#paymentCard .mb-md {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Explicit styles for Stripe element containers by ID - highest specificity */
+#card-number-element,
+#card-expiry-element,
+#card-cvc-element {
+    position: relative !important;
+    z-index: 1100 !important;
+    pointer-events: auto !important;
+    cursor: text !important;
+}
+
+#card-number-element iframe,
+#card-expiry-element iframe,
+#card-cvc-element iframe {
+    /* Fix for race condition: Container may report 0 width when display:none → block */
+    /* min-width forces Stripe iframe to full width even if measured during transition */
+    min-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: auto !important;
+}
+
 .card h3 {
     font-size: 1.375rem;
     margin-bottom: 1.25rem;
@@ -4384,5 +4464,48 @@ html {
     .progress-bar-fill::after,
     .step-circle::after {
         animation: none !important;
+    }
+}
+
+/* ========================================
+   Stripe Elements (Split Layout)
+   ======================================== */
+.stripe-element {
+    position: relative;  /* Required for z-index to work */
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    height: 48px;
+    display: flex;
+    align-items: stretch;  /* Changed from center - stretch allows iframe to fill full height naturally */
+}
+
+.stripe-element:hover {
+    border-color: #9ca3af;
+}
+
+.stripe-element:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Row for Expiry and CVC Side-by-Side */
+.stripe-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.stripe-col {
+    flex: 1;
+}
+
+/* Mobile: Stack Expiry and CVC Vertically */
+@media (max-width: 640px) {
+    .stripe-row {
+        flex-direction: column;
+        gap: 16px;
     }
 }

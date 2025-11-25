@@ -30,7 +30,11 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(start http://localhost:3000/test-3day-tees-fixes.html)",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(dir:*)",
+      "Bash(nul)",
+      "Bash(ls:*)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": [],

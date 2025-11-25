@@ -38,72 +38,6 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- Payment Modal (Stripe) -->
-    <div class="modal" id="paymentModal">
-        <div class="modal-content modal-content-md">
-            <div class="flex-between-center mb-lg">
-                <h3 class="m-0">Complete Payment</h3>
-                <button onclick="closePaymentModal()" class="btn-reset text-xl cursor-pointer text-secondary">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Order Summary -->
-            <div class="bg-light p-md rounded-md mb-lg">
-                <h4 class="mt-0 text-primary">Order Summary</h4>
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span id="paymentSubtotal">$0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Rush Fee (25%):</span>
-                    <span id="paymentRushFee">$0.00</span>
-                </div>
-                <div id="paymentLtmFeeRow" class="summary-row">
-                    <span>LTM Fee:</span>
-                    <span id="paymentLtmFee">$0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Sales Tax (WA only: 10.1%):</span>
-                    <span id="paymentTax">$0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Shipping (UPS Ground):</span>
-                    <span id="paymentShipping">$30.00</span>
-                </div>
-                <div class="summary-total">
-                    <span>Total:</span>
-                    <span id="paymentTotal" class="text-accent">$0.00</span>
-                </div>
-            </div>
-
-            <!-- Stripe Card Element -->
-            <div class="mb-lg">
-                <label class="form-label">
-                    Card Information
-                </label>
-                <div id="card-element" class="card-element">
-                    <!-- Stripe Elements will be inserted here -->
-                </div>
-                <div id="card-errors" role="alert" class="error-text"></div>
-            </div>
-
-            <!-- Payment Button -->
-            <button id="payButton" class="btn btn-primary btn-full mb-sm">
-                <i class="fas fa-lock"></i> Pay <span id="payButtonAmount">$0.00</span>
-            </button>
-            <button onclick="closePaymentModal()" class="btn btn-secondary btn-full">
-                Cancel
-            </button>
-
-            <!-- Security Badge -->
-            <div class="security-badge">
-                <i class="fas fa-shield-alt icon-success"></i>
-                Secure payment powered by Stripe
-            </div>
-        </div>
-    </div>
-
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content">
@@ -709,6 +643,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Right Column: Order Summary (Sticky) -->
@@ -758,9 +693,73 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-primary btn-full" id="submitOrder">
-                        <i class="fas fa-bolt"></i> Submit 3-Day Rush Order
+                    <!-- Submit Button Removed (Payment is now embedded) -->
+                    <div class="text-center text-sm text-secondary mt-md">
+                        <i class="fas fa-arrow-down"></i> Please complete payment in the form below
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Section - OUTSIDE grid to avoid stacking context isolation -->
+            <div id="payment-section" class="d-none">
+                <div class="card mt-md" id="paymentCard">
+                    <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
+
+                    <!-- Stripe Card Elements (Split Layout) -->
+                    <div class="mb-lg">
+                        <!-- Card Number -->
+                        <div class="mb-md">
+                            <label class="form-label">
+                                Card Number
+                            </label>
+                            <div id="card-number-element" class="stripe-element">
+                                <!-- Stripe card number element will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Expiry and CVC (Side by Side) -->
+                        <div class="stripe-row">
+                            <div class="stripe-col">
+                                <label class="form-label">
+                                    Expiration
+                                </label>
+                                <div id="card-expiry-element" class="stripe-element">
+                                    <!-- Stripe expiry element will be inserted here -->
+                                </div>
+                            </div>
+                            <div class="stripe-col">
+                                <label class="form-label">
+                                    CVC
+                                </label>
+                                <div id="card-cvc-element" class="stripe-element">
+                                    <!-- Stripe CVC element will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        <div id="card-errors" role="alert" class="error-text"></div>
+
+                        <!-- Billing Address Reminder -->
+                        <div class="billing-info-reminder mb-md">
+                            <small class="text-secondary">
+                                <i class="fas fa-info-circle"></i>
+                                Using billing address from Step 3.
+                                <a href="#" onclick="moveToPhase(3); return false;">Edit address</a>
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Payment Button -->
+                    <button id="payButton" class="btn btn-primary btn-full mb-sm">
+                        <i class="fas fa-lock"></i> Pay <span id="payButtonAmount">$0.00</span>
                     </button>
+
+                    <!-- Security Badge -->
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt icon-success"></i>
+                        Secure payment powered by Stripe
+                    </div>
                 </div>
             </div>
         </section>
