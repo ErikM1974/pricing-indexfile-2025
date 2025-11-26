@@ -330,4 +330,4 @@ GET /api/manageorders/inventorylevels?PartNumber={SKU}&Color={CATALOG_COLOR}
 ---
 
 **Documentation Type:** Import Guide
-**Related:** CLAUDE.md, INDEX.md, MANAGEORDERS_INTEGRATION.md
+**Related:** DOCS_INDEX.md, INDEX.md, MANAGEORDERS_INTEGRATION.md

@@ -300,4 +300,4 @@ const salesTax = subtotal * 0.101;
 ---
 
 **Documentation Type:** Pricing Guide
-**Related:** CLAUDE.md, cart-pricing-api.md
+**Related:** DOCS_INDEX.md, cart-pricing-api.md

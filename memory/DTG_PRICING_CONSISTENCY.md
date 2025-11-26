@@ -621,7 +621,7 @@ DTG_PERFORMANCE.track('UI_RENDERED');
 ---
 
 **Documentation Type:** Technical Reference & Troubleshooting Guide
-**Parent Document:** [CLAUDE.md](/CLAUDE.md) "DTG Calculator Synchronization" section
+**Parent Document:** [DOCS_INDEX.md](/docs/DOCS_INDEX.md) "DTG Calculator Synchronization" section
 **Related Files:**
 - `/shared_components/js/dtg-pricing-service.js` (shared formulas)
 - `/shared_components/js/dtg-quote-pricing.js` (shared LTM logic)

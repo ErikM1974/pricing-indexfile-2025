@@ -1024,4 +1024,4 @@ fetch('/api/sizes-by-style-color?styleNumber=NKDC1963&color=BrillOrng')
 **Last Updated:** 2025-11-02
 **Tested With:** NKDC1963, C112, multiple color variations
 **Status:** ✅ Production-ready
-**Contact:** See CLAUDE.md for support resources
+**Contact:** See DOCS_INDEX.md for support resources

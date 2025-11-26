@@ -195,9 +195,9 @@ console.log('Element found:', document.getElementById('element-id'));
 ## 📚 Related Documentation
 
 - [API Documentation](CASPIO_API_CORE.md) - Complete API endpoint reference
-- [Architecture Patterns](CLAUDE_ARCHITECTURE.md) - System design patterns
-- [Common Patterns](CLAUDE_PATTERNS.md) - Reusable code patterns
-- [Main Guide](../CLAUDE.md) - Primary development guidelines
+- [Architecture Patterns](ARCHITECTURE.md) - System design patterns
+- [Common Patterns](PATTERNS.md) - Reusable code patterns
+- [Main Guide](../docs/DOCS_INDEX.md) - Primary development guidelines
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Last Updated:** 2025-11-16
 **Purpose:** Quick reference for determining SKU patterns for all products
-**Related:** SANMAR_TO_SHOPWORKS_GUIDE.md, CLAUDE.md, 3-day-tees/INVENTORY-INTEGRATION.md
+**Related:** SANMAR_TO_SHOPWORKS_GUIDE.md, DOCS_INDEX.md, 3-day-tees/INVENTORY-INTEGRATION.md
 
 ---
 

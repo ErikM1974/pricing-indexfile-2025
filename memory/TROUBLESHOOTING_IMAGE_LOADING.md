@@ -327,8 +327,8 @@ Look for: TTFB (Time To First Byte) > 5000ms
 
 ## 📚 Related Documentation
 
-- **[CLAUDE.md](../CLAUDE.md)** - Main development guide (Common Issues & Fixes section)
-- **[CLAUDE_PATTERNS.md](CLAUDE_PATTERNS.md)** - Code patterns and common solutions
+- **[DOCS_INDEX.md](../docs/DOCS_INDEX.md)** - Main development guide (Common Issues & Fixes section)
+- **[PATTERNS.md](PATTERNS.md)** - Code patterns and common solutions
 - **[CASPIO_API_CORE.md](CASPIO_API_CORE.md)** - API architecture and endpoints
 - **Product images source:** Sanmar_Bulk_251816_Feb2024 table in Caspio database
 

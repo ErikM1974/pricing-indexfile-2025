@@ -14,8 +14,8 @@ This documentation has been reorganized into modular components for better perfo
 /memory/
 ├── INDEX.md                           # This file - Master navigation
 ├── CASPIO_API_CORE.md                # Core API documentation (~20k chars)
-├── CLAUDE_ARCHITECTURE.md            # System architecture patterns
-├── CLAUDE_PATTERNS.md                # Code patterns and solutions
+├── ARCHITECTURE.md                   # System architecture patterns
+├── PATTERNS.md                       # Code patterns and solutions
 ├── PRICING_MANUAL_CORE.md            # Manual pricing calculator core
 ├── SHOPWORKS_EDP_INTEGRATION.md      # ShopWorks EDP integration & pricing sync
 ├── QUOTE_BUILDER_GUIDE.md            # Complete quote builder development guide
@@ -98,13 +98,13 @@ This documentation has been reorganized into modular components for better perfo
    - **[INTEGRATION_EXAMPLES.md](./manageorders/INTEGRATION_EXAMPLES.md)** - Working code examples
 
 ### For System Architecture
-1. **[CLAUDE_ARCHITECTURE.md](./CLAUDE_ARCHITECTURE.md)** - Advanced architecture patterns
+1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Advanced architecture patterns
    - Adapter pattern implementation
    - Quote builder safety features
    - Dual API integration strategy
    - Configuration management system
 
-2. **[CLAUDE_PATTERNS.md](./CLAUDE_PATTERNS.md)** - Reusable code patterns
+2. **[PATTERNS.md](./PATTERNS.md)** - Reusable code patterns
    - API error handling
    - EmailJS integration
    - Debug utilities
@@ -168,7 +168,7 @@ This documentation has been reorganized into modular components for better perfo
 3. Use patterns from **[CLAUDE_PATTERNS.md](./CLAUDE_PATTERNS.md)**
 
 ### "I need to add/remove products from New Products showcase"
-1. Read workflow guide in **CLAUDE.md** § "Managing 'New Products' Showcase"
+1. Read workflow guide in **DOCS_INDEX.md** (in docs/ directory) § "Managing 'New Products' Showcase"
 2. Use quick reference curl commands for common operations:
    - **Add products:** `POST /api/admin/products/mark-as-new`
    - **Remove all:** `POST /api/admin/products/clear-isnew`
@@ -178,17 +178,17 @@ This documentation has been reorganized into modular components for better perfo
 5. Verify on website: `/pages/top-sellers-showcase.html` → "New Products" button
 
 ### "I need to understand the system architecture"
-1. Start with **[CLAUDE_ARCHITECTURE.md](./CLAUDE_ARCHITECTURE.md)**
+1. Start with **[ARCHITECTURE.md](./ARCHITECTURE.md)**
 2. Review adapter pattern if working with pricing
 3. Check quote system patterns for database work
 
 ### "I need to fix an error or debug"
-1. Check **[CLAUDE_PATTERNS.md](./CLAUDE_PATTERNS.md)** for common solutions
+1. Check **[PATTERNS.md](./PATTERNS.md)** for common solutions
 2. Review error handling patterns
 3. Use debug utilities and console commands
 
 ### "I need to fix 'Unable to Verify' inventory errors"
-1. **⚠️ CRITICAL: Use CATALOG_COLOR not COLOR_NAME** - See **CLAUDE.md** § "Sample Cart Inventory Integration" for comprehensive documentation
+1. **⚠️ CRITICAL: Use CATALOG_COLOR not COLOR_NAME** - See **DOCS_INDEX.md** (in docs/ directory) § "Sample Cart Inventory Integration" for comprehensive documentation
 2. Review complete pattern guide in **[SAMPLE_INVENTORY_INTEGRATION_GUIDE.md](./SAMPLE_INVENTORY_INTEGRATION_GUIDE.md)** § "Critical Concepts"
 3. Verify cart items use `catalogColor: product.CATALOG_COLOR` (not `product.COLOR_NAME`)
 4. Check API queries use `color=${product.CATALOG_COLOR}` parameter format
@@ -410,7 +410,7 @@ PATCH  - Embroidered Emblems
 ## 🔗 Related Documentation
 
 ### Active Development Files (in root)
-- **CLAUDE.md** - Main development instructions (references this structure)
+- **DOCS_INDEX.md** (in docs/ directory) - Main development instructions (references this structure)
 - **ACTIVE_FILES.md** - Registry of all active files in the project
 
 ### Supporting Documentation
