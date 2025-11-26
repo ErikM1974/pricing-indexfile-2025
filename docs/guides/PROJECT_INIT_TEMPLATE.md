@@ -164,7 +164,7 @@ temp/
 # CLAUDE.md - Project Guidelines
 
 ## MANDATORY: Read Before Coding
-- **[CLAUDE_CODING_STANDARDS.md](./CLAUDE_CODING_STANDARDS.md)** - REQUIRED reading
+- **[CODING_STANDARDS.md](./CODING_STANDARDS.md)** - REQUIRED reading
 - Follow all standards to prevent code chaos
 
 ## Project Overview
@@ -304,7 +304,7 @@ public/        # Static assets
 ```
 
 ## Development Guidelines
-- Read `CLAUDE_CODING_STANDARDS.md` before contributing
+- Read `CODING_STANDARDS.md` before contributing
 - Update `ACTIVE_FILES.md` when adding/removing files
 - No inline styles or scripts
 - No test files in production folders

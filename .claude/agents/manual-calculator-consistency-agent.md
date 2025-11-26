@@ -267,6 +267,6 @@ Apply fixes automatically? (y/n)
 ## Related Documentation
 
 - [CLAUDE.md](../CLAUDE.md) - Main coding standards
-- [CLAUDE_PATTERNS.md](../memory/CLAUDE_PATTERNS.md) - Code patterns
+- [PATTERNS.md](../memory/PATTERNS.md) - Code patterns
 - [manual-calculator-styles.css](../calculators/manual-calculator-styles.css) - Shared styles
 - [Staff Dashboard](../dashboards/staff-dashboard.html) - Main navigation hub

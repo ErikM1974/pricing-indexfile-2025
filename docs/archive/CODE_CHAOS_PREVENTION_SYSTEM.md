@@ -10,7 +10,7 @@ This comprehensive system prevents Claude (and all developers) from creating mes
 
 ## 🛡️ The Prevention System Components
 
-### 1. **CLAUDE_CODING_STANDARDS.md**
+### 1. **CODING_STANDARDS.md**
 **Purpose:** Mandatory rules that MUST be followed
 - Forbidden practices (no backup files, no inline code)
 - Required practices (proper structure, external files)
@@ -176,7 +176,7 @@ Result:   CLEAN, MAINTAINABLE CODE
 ### Install Everything
 ```bash
 # 1. Copy standards to project
-cp CLAUDE_CODING_STANDARDS.md /your-project/
+cp CODING_STANDARDS.md /your-project/
 cp ACTIVE_FILES.md /your-project/
 cp scripts/prevent-code-chaos.js /your-project/scripts/
 
@@ -198,7 +198,7 @@ npm run audit
 ## 📋 Checklist for Claude/Developers
 
 ### Before Writing Any Code
-- [ ] Read CLAUDE_CODING_STANDARDS.md
+- [ ] Read CODING_STANDARDS.md
 - [ ] Check project structure exists
 - [ ] Review ACTIVE_FILES.md
 
@@ -278,7 +278,7 @@ Instead:
 
 ## 📚 Resources
 
-1. **Standards:** CLAUDE_CODING_STANDARDS.md
+1. **Standards:** CODING_STANDARDS.md
 2. **Registry:** ACTIVE_FILES.md
 3. **Template:** PROJECT_INIT_TEMPLATE.md
 4. **Scanner:** scripts/prevent-code-chaos.js
