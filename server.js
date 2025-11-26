@@ -507,6 +507,15 @@ app.post('/api/create-payment-intent', async (req, res) => {
       ? process.env.STRIPE_LIVE_SECRET_KEY
       : process.env.STRIPE_TEST_SECRET_KEY;
 
+    // DEBUG: Log key info (without exposing full key)
+    console.log('[Stripe Debug] Mode:', mode);
+    console.log('[Stripe Debug] Key exists:', !!secretKey);
+    console.log('[Stripe Debug] Key prefix:', secretKey?.substring(0, 12) + '...');
+    console.log('[Stripe Debug] Key length:', secretKey?.length);
+    console.log('[Stripe Debug] ENV STRIPE_MODE:', process.env.STRIPE_MODE);
+    console.log('[Stripe Debug] ENV TEST_KEY exists:', !!process.env.STRIPE_TEST_SECRET_KEY);
+    console.log('[Stripe Debug] ENV LIVE_KEY exists:', !!process.env.STRIPE_LIVE_SECRET_KEY);
+
     if (!secretKey) {
       console.error('[Stripe] Secret key not configured for mode:', mode);
       return res.status(500).json({ error: 'Stripe secret key not configured' });
@@ -515,28 +524,234 @@ app.post('/api/create-payment-intent', async (req, res) => {
     // Initialize Stripe with the appropriate secret key
     const stripeInstance = stripe(secretKey);
 
-    const { amount, currency } = req.body;
+    const { amount, currency, orderId, idempotencyKey } = req.body;
 
     if (!amount || !currency) {
       return res.status(400).json({ error: 'Missing required fields: amount and currency' });
     }
 
-    console.log('[Stripe] Creating payment intent:', { amount, currency, mode });
+    console.log('[Stripe] Creating payment intent:', { amount, currency, mode, orderId });
 
-    // Create payment intent
-    const paymentIntent = await stripeInstance.paymentIntents.create({
+    // Create payment intent with idempotency key to prevent duplicate charges
+    const createOptions = {
       amount,
       currency,
-      automatic_payment_methods: { enabled: true }
-    });
+      automatic_payment_methods: { enabled: true },
+      metadata: {
+        order_id: orderId || 'unknown',
+        source: '3-day-tees'
+      }
+    };
+
+    // Create payment intent (with optional idempotency key to prevent duplicate charges)
+    let paymentIntent;
+    if (idempotencyKey) {
+      console.log('[Stripe] Using idempotency key:', idempotencyKey.substring(0, 20) + '...');
+      paymentIntent = await stripeInstance.paymentIntents.create(createOptions, {
+        idempotencyKey: idempotencyKey
+      });
+    } else {
+      paymentIntent = await stripeInstance.paymentIntents.create(createOptions);
+    }
 
     console.log('[Stripe] Payment intent created:', paymentIntent.id);
 
-    res.json({ clientSecret: paymentIntent.client_secret });
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    });
   } catch (error) {
     console.error('[Stripe] Error creating payment intent:', error);
     res.status(500).json({
       error: 'Failed to create payment intent',
+      message: error.message
+    });
+  }
+});
+
+// POST /api/create-checkout-session - Create Stripe Checkout Session (hosted page)
+app.post('/api/create-checkout-session', async (req, res) => {
+  try {
+    const mode = process.env.STRIPE_MODE || 'development';
+    const secretKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_SECRET_KEY
+      : process.env.STRIPE_TEST_SECRET_KEY;
+
+    if (!secretKey) {
+      console.error('[Stripe Checkout] Secret key not configured for mode:', mode);
+      return res.status(500).json({ error: 'Stripe secret key not configured' });
+    }
+
+    // Initialize Stripe with the appropriate secret key
+    const stripeInstance = stripe(secretKey);
+
+    const {
+      orderDetails,      // { items: [...], totalQuantity, rushFee }
+      customerInfo,      // { name, email, phone }
+      totalAmount,       // Total in dollars (will convert to cents)
+      successUrl,        // Redirect URL on success
+      cancelUrl,         // Redirect URL on cancel
+      orderId            // Order reference ID
+    } = req.body;
+
+    // Validate required fields
+    if (!totalAmount || !successUrl || !cancelUrl) {
+      return res.status(400).json({
+        error: 'Missing required fields: totalAmount, successUrl, and cancelUrl are required'
+      });
+    }
+
+    console.log('[Stripe Checkout] Creating session:', {
+      totalAmount,
+      mode,
+      orderId,
+      customerEmail: customerInfo?.email
+    });
+
+    // Build line items for checkout
+    const lineItems = [];
+
+    // Add order items
+    if (orderDetails?.items && orderDetails.items.length > 0) {
+      orderDetails.items.forEach(item => {
+        lineItems.push({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.name || '3-Day Tees Order Item',
+              description: item.description || `${item.color || ''} - ${item.size || ''}`
+            },
+            unit_amount: Math.round((item.unitPrice || 0) * 100) // Convert to cents
+          },
+          quantity: item.quantity || 1
+        });
+      });
+    } else {
+      // Fallback: single line item for total
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: '3-Day Tees Custom Order',
+            description: orderId ? `Order ${orderId}` : 'Custom printed t-shirts with rush delivery'
+          },
+          unit_amount: Math.round(totalAmount * 100) // Convert to cents
+        },
+        quantity: 1
+      });
+    }
+
+    // Add rush fee as separate line item if present
+    if (orderDetails?.rushFee && orderDetails.rushFee > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: '3-Day Rush Fee (25%)',
+            description: 'Expedited production and delivery'
+          },
+          unit_amount: Math.round(orderDetails.rushFee * 100)
+        },
+        quantity: 1
+      });
+    }
+
+    // Create checkout session
+    const sessionConfig = {
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        order_id: orderId || 'unknown',
+        source: '3-day-tees',
+        total_quantity: orderDetails?.totalQuantity || 0
+      }
+    };
+
+    // Add customer email if provided
+    if (customerInfo?.email) {
+      sessionConfig.customer_email = customerInfo.email;
+    }
+
+    // Add shipping address collection if needed
+    // sessionConfig.shipping_address_collection = { allowed_countries: ['US'] };
+
+    const session = await stripeInstance.checkout.sessions.create(sessionConfig);
+
+    console.log('[Stripe Checkout] Session created:', session.id);
+
+    res.json({
+      sessionId: session.id,
+      url: session.url
+    });
+
+  } catch (error) {
+    console.error('[Stripe Checkout] Error creating session:', error);
+    res.status(500).json({
+      error: 'Failed to create checkout session',
+      message: error.message
+    });
+  }
+});
+
+// POST /api/verify-checkout-session - Verify Stripe Checkout session after redirect
+app.post('/api/verify-checkout-session', async (req, res) => {
+  try {
+    const mode = process.env.STRIPE_MODE || 'development';
+    const secretKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_SECRET_KEY
+      : process.env.STRIPE_TEST_SECRET_KEY;
+
+    if (!secretKey) {
+      console.error('[Stripe Verify] Secret key not configured for mode:', mode);
+      return res.status(500).json({ error: 'Stripe secret key not configured' });
+    }
+
+    const stripeInstance = stripe(secretKey);
+    const { sessionId } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Missing sessionId parameter' });
+    }
+
+    console.log('[Stripe Verify] Verifying session:', sessionId);
+
+    // Retrieve the checkout session from Stripe
+    const session = await stripeInstance.checkout.sessions.retrieve(sessionId, {
+      expand: ['payment_intent', 'line_items']
+    });
+
+    console.log('[Stripe Verify] Session status:', session.payment_status);
+
+    // Check if payment was successful
+    if (session.payment_status !== 'paid') {
+      console.warn('[Stripe Verify] Payment not complete:', session.payment_status);
+      return res.status(400).json({
+        error: 'Payment not completed',
+        status: session.payment_status,
+        sessionId: sessionId
+      });
+    }
+
+    // Return success with payment details
+    res.json({
+      success: true,
+      paymentStatus: session.payment_status,
+      sessionId: sessionId,
+      paymentIntentId: session.payment_intent?.id || session.payment_intent,
+      amountTotal: session.amount_total / 100, // Convert from cents to dollars
+      currency: session.currency,
+      customerEmail: session.customer_email,
+      metadata: session.metadata,
+      lineItems: session.line_items?.data || []
+    });
+
+  } catch (error) {
+    console.error('[Stripe Verify] Error verifying session:', error);
+    res.status(500).json({
+      error: 'Failed to verify checkout session',
       message: error.message
     });
   }

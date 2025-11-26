@@ -34,7 +34,13 @@
       "Bash(dir:*)",
       "Bash(nul)",
       "Bash(ls:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(timeout:*)",
+      "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\docs\\CLAUDE.md\" \"DOCS_INDEX.md\")",
+      "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\docs\\CLAUDE_CODING_STANDARDS.md\" \"CODING_STANDARDS.md\")",
+      "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\memory\\CLAUDE_ARCHITECTURE.md\" \"ARCHITECTURE.md\")",
+      "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\memory\\CLAUDE_PATTERNS.md\" \"PATTERNS.md\")",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": [],

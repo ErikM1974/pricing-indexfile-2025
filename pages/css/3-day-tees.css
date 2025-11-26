@@ -511,6 +511,52 @@ body {
     pointer-events: auto !important;
 }
 
+/* CRITICAL FIX: Prevent focus animations from causing Stripe iframe reflow
+   The transform: translateY(-1px) and animation: focusGlow on .form-group input:focus
+   cause the Stripe iframe to reflow, triggering blur → refocus loops that block keyboard input */
+#card-number-element,
+#card-expiry-element,
+#card-cvc-element,
+#card-number-element *,
+#card-expiry-element *,
+#card-cvc-element * {
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Also exclude parent form-groups containing Stripe elements from focus animations */
+.form-group:has(#card-number-element),
+.form-group:has(#card-expiry-element),
+.form-group:has(#card-cvc-element) {
+    transform: none !important;
+}
+
+.form-group:has(#card-number-element) *:focus,
+.form-group:has(#card-expiry-element) *:focus,
+.form-group:has(#card-cvc-element) *:focus {
+    transform: none !important;
+    animation: none !important;
+}
+
+/* CRITICAL: Prevent focus animations from causing Stripe iframe reflow - COMBINED ELEMENT */
+#card-element,
+#card-element *,
+.stripe-combined-element,
+.stripe-combined-element * {
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Also exclude parent form-groups containing combined Stripe element from focus animations */
+.form-group:has(#card-element) {
+    transform: none !important;
+}
+
+.form-group:has(#card-element) *:focus {
+    transform: none !important;
+    animation: none !important;
+}
+
 .card h3 {
     font-size: 1.375rem;
     margin-bottom: 1.25rem;
@@ -4500,6 +4546,8 @@ html {
 
 .stripe-col {
     flex: 1;
+    width: calc(50% - 8px);  /* Explicit width for Stripe to measure at mount time */
+    min-width: 120px;        /* Ensure minimum usable width on small screens */
 }
 
 /* Mobile: Stack Expiry and CVC Vertically */
@@ -4508,4 +4556,52 @@ html {
         flex-direction: column;
         gap: 16px;
     }
+}
+
+/* ========================================
+   Combined Stripe Card Element
+   Single element containing all fields
+   ======================================== */
+.stripe-combined-element {
+    position: relative;
+    z-index: 10010;  /* Higher than feedback-overlay (10001) and toast-container (10000) */
+    padding: 14px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    height: 52px;  /* Slightly taller for combined layout */
+    min-width: 280px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.stripe-combined-element:hover {
+    border-color: #3b82f6;
+}
+
+.stripe-combined-element:focus-within {
+    border-color: var(--primary-color, #3b82f6);
+    /* Use outline instead of box-shadow - outline doesn't trigger reflow that blocks iframe keyboard events */
+    outline: 2px solid rgba(59, 130, 246, 0.3);
+    outline-offset: 2px;
+}
+
+/* Ensure iframe inside combined element is visible and interactive */
+.stripe-combined-element iframe {
+    pointer-events: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Payment modal needs high z-index to be above overlays */
+.payment-modal,
+.modal-overlay {
+    z-index: 10005 !important;
+}
+
+/* Ensure payment form content is above overlays */
+.payment-modal .modal-content {
+    position: relative;
+    z-index: 10006;
 }

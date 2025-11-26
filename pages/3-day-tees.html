@@ -22,6 +22,9 @@
     <script src="../shared_components/js/sample-inventory-service.js"></script>
     <script src="../shared_components/js/three-day-tees-order-service.js"></script>
 
+    <!-- Stripe Payment Service -->
+    <script src="js/stripe-service.js"></script>
+
     <!-- Quote Builder Unified Step 1 Styles (includes toggle switches) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css">
 
@@ -705,49 +708,20 @@
                 <div class="card mt-md" id="paymentCard">
                     <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
 
-                    <!-- Stripe Card Elements (Split Layout) -->
+                    <!-- Stripe Checkout Info -->
                     <div class="mb-lg">
-                        <!-- Card Number -->
-                        <div class="mb-md">
-                            <label class="form-label">
-                                Card Number
-                            </label>
-                            <div id="card-number-element" class="stripe-element">
-                                <!-- Stripe card number element will be inserted here -->
-                            </div>
-                        </div>
-
-                        <!-- Expiry and CVC (Side by Side) -->
-                        <div class="stripe-row">
-                            <div class="stripe-col">
-                                <label class="form-label">
-                                    Expiration
-                                </label>
-                                <div id="card-expiry-element" class="stripe-element">
-                                    <!-- Stripe expiry element will be inserted here -->
-                                </div>
-                            </div>
-                            <div class="stripe-col">
-                                <label class="form-label">
-                                    CVC
-                                </label>
-                                <div id="card-cvc-element" class="stripe-element">
-                                    <!-- Stripe CVC element will be inserted here -->
-                                </div>
-                            </div>
+                        <div class="stripe-checkout-info text-center py-md">
+                            <i class="fas fa-external-link-alt text-primary mb-sm" style="font-size: 2rem;"></i>
+                            <p class="mb-sm">
+                                Click the button below to securely complete your payment on Stripe's checkout page.
+                            </p>
+                            <p class="text-secondary text-sm">
+                                <i class="fas fa-lock"></i> Your payment information is handled directly by Stripe - we never see your card details.
+                            </p>
                         </div>
 
                         <!-- Error Display -->
                         <div id="card-errors" role="alert" class="error-text"></div>
-
-                        <!-- Billing Address Reminder -->
-                        <div class="billing-info-reminder mb-md">
-                            <small class="text-secondary">
-                                <i class="fas fa-info-circle"></i>
-                                Using billing address from Step 3.
-                                <a href="#" onclick="moveToPhase(3); return false;">Edit address</a>
-                            </small>
-                        </div>
                     </div>
 
                     <!-- Payment Button -->

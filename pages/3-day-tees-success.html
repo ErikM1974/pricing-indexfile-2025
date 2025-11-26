@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - 3-Day Rush Tees | Northwest Custom Apparel</title>
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b35;
+            --accent-color: #004e89;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            height: 50px;
+        }
+
+        .header-contact {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .header-contact a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .header-contact a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Status Card */
+        .status-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        /* Loading State */
+        .loading-state {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state h2 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-state p {
+            color: var(--text-secondary);
+        }
+
+        /* Success State */
+        .success-header {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        /* Order Details */
+        .order-details {
+            padding: 2rem;
+        }
+
+        .order-number-box {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid var(--accent-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-number-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-number-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .info-item-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .info-item-value.highlight {
+            color: var(--success-color);
+        }
+
+        /* Timeline Steps */
+        .timeline-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline-title i {
+            color: var(--primary-color);
+        }
+
+        .timeline-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-color);
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+        }
+
+        .timeline-step:hover {
+            background: #eef2f7;
+        }
+
+        .timeline-step i {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .timeline-step i.icon-success { color: var(--success-color); }
+        .timeline-step i.icon-primary { color: var(--primary-color); }
+        .timeline-step i.icon-accent { color: var(--accent-color); }
+
+        .timeline-step-content strong {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .timeline-step-content small {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Actions */
+        .actions {
+            padding: 1.5rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e55a2b;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Error State */
+        .error-header {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+        }
+
+        .error-details {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .error-details p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .error-code {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: inline-block;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+
+            .main-container {
+                margin: 1rem auto;
+            }
+
+            .success-header,
+            .error-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .order-details {
+                padding: 1.5rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+                padding: 1rem 1.5rem 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="/">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel"
+                 class="header-logo">
+        </a>
+        <div class="header-contact">
+            <i class="fas fa-phone"></i>
+            <span>Questions? Call <a href="tel:253-922-5793">253-922-5793</a></span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <div class="status-card">
+            <!-- Loading State (shown initially) -->
+            <div id="loadingState" class="loading-state">
+                <div class="loading-spinner"></div>
+                <h2>Verifying Your Payment...</h2>
+                <p>Please wait while we confirm your order.</p>
+            </div>
+
+            <!-- Success State (hidden initially) -->
+            <div id="successState" style="display: none;">
+                <div class="success-header">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h1>Order Confirmed!</h1>
+                    <p>Thank you for your order. You'll receive a confirmation email shortly.</p>
+                </div>
+
+                <div class="order-details">
+                    <div class="order-number-box">
+                        <div class="order-number-label">Order Number</div>
+                        <div class="order-number-value" id="orderNumber">---</div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-item-label">Amount Paid</div>
+                            <div class="info-item-value highlight" id="amountPaid">$0.00</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Estimated Delivery</div>
+                            <div class="info-item-value" id="estimatedDelivery">---</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Email</div>
+                            <div class="info-item-value" id="customerEmail">---</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Total Items</div>
+                            <div class="info-item-value" id="totalItems">---</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h3 class="timeline-title">
+                            <i class="fas fa-list-check"></i>
+                            What Happens Next
+                        </h3>
+                        <div class="timeline-steps">
+                            <div class="timeline-step">
+                                <i class="fas fa-check-circle icon-success"></i>
+                                <div class="timeline-step-content">
+                                    <strong>Confirmation Email Sent</strong>
+                                    <small>Check your inbox for order details</small>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <i class="fas fa-palette icon-primary"></i>
+                                <div class="timeline-step-content">
+                                    <strong>Artwork Review</strong>
+                                    <small>Our team will review your uploaded artwork</small>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <i class="fas fa-print icon-accent"></i>
+                                <div class="timeline-step-content">
+                                    <strong>Rush Production</strong>
+                                    <small>Your order enters our 3-day priority queue</small>
+                                </div>
+                            </div>
+                            <div class="timeline-step">
+                                <i class="fas fa-truck icon-primary"></i>
+                                <div class="timeline-step-content">
+                                    <strong>Fast Shipping</strong>
+                                    <small>Ships within 3 business days</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="/pages/3-day-tees.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Place Another Order
+                    </a>
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-home"></i>
+                        Return Home
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error State (hidden initially) -->
+            <div id="errorState" style="display: none;">
+                <div class="error-header">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h1>Payment Issue</h1>
+                    <p>We couldn't verify your payment.</p>
+                </div>
+
+                <div class="error-details">
+                    <p id="errorMessage">Something went wrong while processing your order. Please try again or contact support.</p>
+                    <div class="error-code" id="errorCode"></div>
+                </div>
+
+                <div class="actions">
+                    <a href="/pages/3-day-tees.html" class="btn btn-primary">
+                        <i class="fas fa-redo"></i>
+                        Try Again
+                    </a>
+                    <a href="tel:253-922-5793" class="btn btn-secondary">
+                        <i class="fas fa-phone"></i>
+                        Call Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * 3-Day Tees Success Page
+         * Verifies Stripe Checkout payment and displays order confirmation
+         */
+
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const successState = document.getElementById('successState');
+        const errorState = document.getElementById('errorState');
+
+        // Get session_id from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        /**
+         * Show success state with order details
+         */
+        function showSuccess(data) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            successState.style.display = 'block';
+
+            // Populate order details
+            document.getElementById('orderNumber').textContent = data.orderId || data.orderNumber || 'Processing...';
+            document.getElementById('amountPaid').textContent = '$' + (data.amount / 100).toFixed(2);
+            document.getElementById('customerEmail').textContent = data.customerEmail || '---';
+            document.getElementById('totalItems').textContent = data.totalItems || '---';
+
+            // Calculate estimated delivery (3 business days from now)
+            const estimatedDate = calculateEstimatedDelivery();
+            document.getElementById('estimatedDelivery').textContent = estimatedDate;
+        }
+
+        /**
+         * Show error state
+         */
+        function showError(message, code) {
+            loadingState.style.display = 'none';
+            successState.style.display = 'none';
+            errorState.style.display = 'block';
+
+            document.getElementById('errorMessage').textContent = message ||
+                'Something went wrong while processing your order. Please try again or contact support.';
+
+            if (code) {
+                document.getElementById('errorCode').textContent = 'Error: ' + code;
+                document.getElementById('errorCode').style.display = 'inline-block';
+            } else {
+                document.getElementById('errorCode').style.display = 'none';
+            }
+        }
+
+        /**
+         * Calculate estimated delivery date (3 business days)
+         */
+        function calculateEstimatedDelivery() {
+            const today = new Date();
+            let businessDays = 0;
+            const deliveryDate = new Date(today);
+
+            while (businessDays < 3) {
+                deliveryDate.setDate(deliveryDate.getDate() + 1);
+                const dayOfWeek = deliveryDate.getDay();
+                // Skip weekends (0 = Sunday, 6 = Saturday)
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    businessDays++;
+                }
+            }
+
+            return deliveryDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        /**
+         * Verify payment session with backend
+         */
+        async function verifyPayment() {
+            if (!sessionId) {
+                showError('No payment session found. Please return to the order page and try again.', 'NO_SESSION');
+                return;
+            }
+
+            try {
+                // Verify payment with our backend
+                const response = await fetch('/api/verify-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sessionId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Payment verification failed');
+                }
+
+                if (data.status === 'complete' || data.status === 'paid') {
+                    // Payment successful - show success and submit order to ShopWorks
+                    showSuccess(data);
+
+                    // If order hasn't been submitted yet, submit to ShopWorks
+                    if (!data.orderSubmitted) {
+                        await submitOrderToShopWorks(data);
+                    }
+                } else if (data.status === 'expired') {
+                    showError('This payment session has expired. Please start a new order.', 'SESSION_EXPIRED');
+                } else {
+                    showError('Payment was not completed. Please try again.', 'PAYMENT_INCOMPLETE');
+                }
+
+            } catch (error) {
+                console.error('[3-Day Tees Success] Verification error:', error);
+                showError(error.message || 'Unable to verify payment. Please contact support.', 'VERIFY_ERROR');
+            }
+        }
+
+        /**
+         * Submit order to ShopWorks (ManageOrders API)
+         */
+        async function submitOrderToShopWorks(paymentData) {
+            try {
+                // Retrieve order data from sessionStorage (saved before redirect)
+                const savedOrderData = sessionStorage.getItem('3day_pending_order');
+
+                if (!savedOrderData) {
+                    console.warn('[3-Day Tees Success] No pending order data found in session');
+                    return;
+                }
+
+                const orderData = JSON.parse(savedOrderData);
+
+                // Add payment confirmation details
+                orderData.paymentConfirmed = true;
+                orderData.stripeSessionId = sessionId;
+                orderData.paymentAmount = paymentData.amount;
+
+                // Submit to ShopWorks via our API
+                const response = await fetch('/api/submit-3day-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log('[3-Day Tees Success] Order submitted to ShopWorks:', result.orderNumber);
+
+                    // Update order number display
+                    if (result.orderNumber) {
+                        document.getElementById('orderNumber').textContent = result.orderNumber;
+                    }
+
+                    // Clear pending order from session
+                    sessionStorage.removeItem('3day_pending_order');
+                } else {
+                    console.error('[3-Day Tees Success] ShopWorks submission failed:', result.error);
+                    // Don't show error to user - payment was successful, order can be processed manually
+                }
+
+            } catch (error) {
+                console.error('[3-Day Tees Success] Error submitting to ShopWorks:', error);
+                // Silent fail - payment was successful, support can process manually
+            }
+        }
+
+        // Start verification when page loads
+        document.addEventListener('DOMContentLoaded', verifyPayment);
+    </script>
+</body>
+</html>

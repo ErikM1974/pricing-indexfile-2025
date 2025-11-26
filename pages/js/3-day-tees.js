@@ -592,30 +592,17 @@
             console.log('[Navigation] Clickable step indicators initialized');
         }
 
-        // Initialize Stripe (will be set after loading config)
-        let stripe = null;
-        let stripeElements = null;  // Store the elements instance for lazy element creation
-        let cardNumberElement = null;
-        let cardExpiryElement = null;
-        let cardCvcElement = null;
-        let paymentIntentClientSecret = null;
-        let isProcessingPayment = false;  // Flag to prevent duplicate payment processing
-
-        // Load Stripe publishable key from server and initialize
+        // Stripe Payment Service (uses StripePaymentService from stripe-service.js)
         // NOTE: Elements are created LAZILY in showPaymentModal() when container is visible
         // This fixes the race condition where elements created during page load cached 0px width
+        let isProcessingPayment = false;  // Flag to prevent duplicate payment processing
+
+        // Initialize Stripe using the StripePaymentService
         async function initializeStripe() {
             try {
-                console.log('[3-Day Tees] Initializing Stripe via ApiService...');
-                const { publishableKey } = await apiService.get('/api/stripe-config');
-                console.log('[3-Day Tees] ✓ Stripe config loaded');
-                stripe = Stripe(publishableKey);
-
-                // Create Stripe Elements instance (but NOT individual elements yet)
-                // Individual elements will be created in showPaymentModal() when container is visible
-                stripeElements = stripe.elements();
-
-                console.log('[3-Day Tees] ✓ Stripe initialized (elements will be created when payment form shown)');
+                console.log('[3-Day Tees] Initializing Stripe via StripePaymentService...');
+                await window.StripePaymentService.initialize();
+                console.log('[3-Day Tees] ✓ Stripe initialized via StripePaymentService');
             } catch (error) {
                 console.error('[Stripe] Failed to initialize:', error);
                 showToast('Payment system initialization failed. Please refresh the page.', 'error');
@@ -3120,6 +3107,12 @@
 
         // Payment Form Functions (Embedded in Step 4)
         function showPaymentModal() {
+            // CRITICAL: Guard against re-mounting elements (prevents multiple overlapping iframes)
+            if (stripeElementsMounted) {
+                console.log('[3-Day Tees] Stripe elements already mounted, skipping re-mount');
+                return;
+            }
+
             // Read total from state (single source of truth)
             const { grandTotal: total } = state.orderTotals;
 
@@ -3129,110 +3122,89 @@
                 payButtonAmount.textContent = `$${total.toFixed(2)}`;
             }
 
-            // Check if Stripe is initialized
-            if (!stripeElements) {
-                console.error('[3-Day Tees] Stripe not initialized yet');
+            // Check if StripePaymentService is initialized
+            if (!window.StripePaymentService.isReady()) {
+                console.error('[3-Day Tees] StripePaymentService not initialized yet');
                 showToast('Payment system loading. Please wait...', 'info');
                 return;
             }
 
             // Wait for container to have actual width (not 0 from display:none)
-            // CRITICAL: We CREATE fresh elements here, not just remount existing ones
-            // Stripe Elements cache internal measurements at CREATION time, not mount time
+            // CRITICAL: Elements must be created when container is visible
+            // Stripe Elements cache internal measurements at CREATION time
             const waitForVisibility = () => {
-                const container = document.getElementById('card-number-element');
-                if (!container || container.offsetWidth === 0) {
-                    console.log('[3-Day Tees] Container not visible yet, waiting...');
+                // OPTION A FIX: Check PARENT section first, not just child element
+                const paymentSection = document.getElementById('payment-section');
+                const container = document.getElementById('card-element');
+
+                // Force browser to compute layout before measuring
+                if (paymentSection) {
+                    paymentSection.offsetHeight; // Force reflow - browser must recalculate layout
+                }
+
+                // Check both parent AND child have proper width
+                const parentWidth = paymentSection ? paymentSection.offsetWidth : 0;
+                const containerWidth = container ? container.offsetWidth : 0;
+
+                if (!container || containerWidth === 0 || parentWidth < 100) {
+                    console.log('[3-Day Tees] Container not visible yet, waiting... Parent:', parentWidth, 'Child:', containerWidth);
                     requestAnimationFrame(waitForVisibility);
                     return;
                 }
 
-                console.log('[3-Day Tees] Container visible with width:', container.offsetWidth);
+                console.log('[3-Day Tees] Container visible - Parent:', parentWidth, 'Child:', containerWidth);
 
-                // DESTROY old elements if they exist (releases cached measurements)
-                if (cardNumberElement) {
-                    try { cardNumberElement.unmount(); } catch(e) {}
-                    cardNumberElement = null;
-                }
-                if (cardExpiryElement) {
-                    try { cardExpiryElement.unmount(); } catch(e) {}
-                    cardExpiryElement = null;
-                }
-                if (cardCvcElement) {
-                    try { cardCvcElement.unmount(); } catch(e) {}
-                    cardCvcElement = null;
+                // Double-check guard in case multiple waitForVisibility loops were queued
+                if (stripeElementsMounted) {
+                    console.log('[3-Day Tees] Elements already mounted during wait, aborting');
+                    return;
                 }
 
-                // Shared styling for all elements
-                const elementStyles = {
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#1f2937',
-                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                            '::placeholder': {
-                                color: '#9ca3af'
-                            }
-                        },
-                        invalid: {
-                            color: '#ef4444'
-                        }
-                    }
-                };
-
-                // CREATE FRESH ELEMENTS now that container is visible
-                // This is the key fix - elements will measure the correct container width
-                cardNumberElement = stripeElements.create('cardNumber', elementStyles);
-                cardExpiryElement = stripeElements.create('cardExpiry', elementStyles);
-                cardCvcElement = stripeElements.create('cardCvc', elementStyles);
-
-                console.log('[3-Day Tees] ✓ Created fresh Stripe Elements');
-
-                // Mount fresh elements immediately
-                cardNumberElement.mount('#card-number-element');
-                cardExpiryElement.mount('#card-expiry-element');
-                cardCvcElement.mount('#card-cvc-element');
-
-                stripeElementsMounted = true;
-                console.log('[3-Day Tees] ✓ Stripe Elements mounted successfully');
-
-                // Handle real-time validation errors from all three elements
-                const displayError = document.getElementById('card-errors');
-
-                const handleElementChange = (event) => {
-                    if (event.error) {
-                        displayError.textContent = event.error.message;
-                    } else {
-                        displayError.textContent = '';
-                    }
-                };
-
-                // Add change listeners
-                cardNumberElement.on('change', handleElementChange);
-                cardExpiryElement.on('change', handleElementChange);
-                cardCvcElement.on('change', handleElementChange);
-
-                // Add ready event handlers for debugging
-                cardNumberElement.on('ready', () => {
-                    console.log('[3-Day Tees] ✓ Card number element READY for input');
-                });
-                cardExpiryElement.on('ready', () => {
-                    console.log('[3-Day Tees] ✓ Card expiry element READY');
-                });
-                cardCvcElement.on('ready', () => {
-                    console.log('[3-Day Tees] ✓ Card CVC element READY');
-                });
-
-                // Add focus event handler for debugging
-                cardNumberElement.on('focus', () => {
-                    console.log('[Stripe Debug] ✓ Card NUMBER received focus');
-                });
-
-                // Focus on card number after short delay
+                // OPTION B FIX: Add small delay to ensure CSS has fully computed
+                // This gives the browser extra time after visibility check passes
                 setTimeout(() => {
-                    console.log('[3-Day Tees] Attempting to focus card number element...');
-                    cardNumberElement.focus();
-                }, 200);
+                    // Guard again in case another loop created elements during the delay
+                    if (stripeElementsMounted) {
+                        console.log('[3-Day Tees] Elements mounted during delay, skipping');
+                        return;
+                    }
+
+                    console.log('[3-Day Tees] Creating combined Stripe card element...');
+
+                    // Use combined card element - simpler, more reliable than split elements
+                    // Single iframe = fewer CSS/DOM conflicts, no flex layout issues
+                    const cardElement = window.StripePaymentService.createCombinedCardElement('#card-element');
+
+                    stripeElementsMounted = true;
+
+                    // Handle real-time validation errors
+                    const displayError = document.getElementById('card-errors');
+
+                    cardElement.on('change', (event) => {
+                        if (event.error) {
+                            displayError.textContent = event.error.message;
+                        } else {
+                            displayError.textContent = '';
+                        }
+                    });
+
+                    // Ready event for debugging
+                    cardElement.on('ready', () => {
+                        console.log('[3-Day Tees] ✓ Combined card element READY for input');
+                    });
+
+                    // Focus event for debugging
+                    cardElement.on('focus', () => {
+                        console.log('[Stripe Debug] ✓ Combined card element received focus');
+                    });
+
+                    // NOTE: Programmatic focus removed - Safari blocks focus on third-party iframes
+                    // Users must click into the Stripe field to start typing (this is correct behavior)
+
+                    // Note: Option C auto-recreate safety net removed - CSS fix addresses root cause
+                    // The explicit width on .stripe-col ensures Stripe can measure containers correctly
+
+                }, 100); // End of Option B setTimeout
             };
             requestAnimationFrame(waitForVisibility);
 
@@ -3353,15 +3325,25 @@
             };
         }
 
+        /**
+         * Process payment using Stripe Checkout (hosted page redirect)
+         *
+         * This function:
+         * 1. Uploads artwork files to Caspio storage (MUST happen before redirect)
+         * 2. Collects all order data
+         * 3. Saves order data to sessionStorage for retrieval after redirect
+         * 4. Creates a Stripe Checkout Session
+         * 5. Redirects to Stripe's hosted checkout page
+         *
+         * After successful payment, Stripe redirects to success page which:
+         * - Verifies the payment with Stripe
+         * - Retrieves order data from sessionStorage
+         * - Submits the order to ShopWorks
+         */
         async function processPayment() {
             // Check if payment is already being processed
             if (isProcessingPayment) {
                 console.log('[Payment] Already processing payment, ignoring duplicate request');
-                return null;
-            }
-
-            if (!stripe || !cardNumberElement) {
-                showToast('Payment system not ready. Please refresh the page.', 'error');
                 return null;
             }
 
@@ -3370,105 +3352,262 @@
 
             try {
                 showLoading(true);
+                console.log('[Payment] Starting Stripe Checkout flow...');
 
-                // Read order total from state (single source of truth)
-                const total = state.orderTotals.grandTotal;
+                // ===== STEP 1: Upload files to Caspio BEFORE redirect =====
+                // (File objects cannot be serialized to sessionStorage)
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const sequence = Math.floor(Math.random() * 1000);
+                const tempOrderNumber = `3DT-${month}${day}-${hours}-${sequence}`;
 
-                // Create payment intent on server via ApiService
-                console.log('[Payment] Creating payment intent via ApiService...');
-                const { clientSecret } = await apiService.post('/api/create-payment-intent', {
-                    amount: Math.round(total * 100), // Convert to cents
-                    currency: 'usd'
-                });
-                paymentIntentClientSecret = clientSecret;
-                console.log('[Payment] ✓ Payment intent created');
+                console.log('[Payment] Uploading files to Caspio storage...');
+                console.log('[Payment] Files to upload:', state.uploadedFiles.length);
+                const uploadedFiles = [];
 
-                // Confirm card payment (using cardNumberElement from split layout)
-                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: {
-                        card: cardNumberElement,
-                        billing_details: {
-                            name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
-                            email: document.getElementById('email').value,
-                            phone: document.getElementById('phone').value,
-                            address: {
-                                postal_code: document.getElementById('billingZip').value,
-                                line1: document.getElementById('billingAddress1').value,
-                                city: document.getElementById('billingCity').value,
-                                state: document.getElementById('billingState').value
-                            }
+                for (let i = 0; i < state.uploadedFiles.length; i++) {
+                    const file = state.uploadedFiles[i];
+                    const position = file.position || (i === 0 ? 'front' : 'back');
+
+                    try {
+                        console.log(`[Payment] Uploading ${position} logo: ${file.name}`);
+
+                        // Generate unique filename: orderNum_timestamp_position_originalName
+                        const timestamp = Date.now();
+                        const fileExt = file.name.split('.').pop();
+                        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                        const uniqueFileName = `${tempOrderNumber}_${timestamp}_${position}_${baseName}.${fileExt}`;
+
+                        // Create renamed file
+                        const renamedFile = new File([file], uniqueFileName, { type: file.type });
+
+                        const uploadResult = await uploadFileToCaspio(renamedFile, tempOrderNumber);
+
+                        uploadedFiles.push({
+                            position: position,
+                            fileName: file.name,
+                            uniqueFileName: uniqueFileName,
+                            fileUrl: uploadResult.url,
+                            fileSize: file.size,
+                            fileType: file.type,
+                            category: 'artwork',
+                            description: position === 'front' ? 'Front Artwork' : 'Back Artwork'
+                        });
+
+                        console.log(`[Payment] ✓ Uploaded ${position} logo: ${file.name} → ${uniqueFileName}`);
+                    } catch (uploadError) {
+                        console.error(`[Payment] Upload failed for ${file.name}:`, uploadError);
+
+                        let errorMessage = uploadError.message || 'Unknown error';
+                        if (errorMessage.includes('409') || errorMessage.includes('already exists')) {
+                            showToast(`File already exists. Please rename "${file.name}" and try again.`, 'error', 8000);
+                        } else if (errorMessage.includes('Network') || errorMessage.includes('Failed to fetch')) {
+                            showToast(`Network error uploading "${file.name}". Please check your internet connection.`, 'error', 8000);
+                        } else {
+                            showToast(`Upload failed for "${file.name}": ${errorMessage}`, 'error', 8000);
                         }
+
+                        showLoading(false);
+                        isProcessingPayment = false;
+                        return null;
                     }
+                }
+
+                // ===== STEP 2: Collect all order data =====
+                const customerData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    company: document.getElementById('company').value || '',
+                    address1: document.getElementById('address1').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value,
+                    notes: document.getElementById('notes').value || ''
+                };
+
+                // Location name mapping
+                const locationNames = {
+                    'LC': 'Left Chest',
+                    'FF': 'Full Front',
+                    'LC_FB': 'Left Chest + Full Back',
+                    'FF_FB': 'Full Front + Full Back'
+                };
+
+                // Extract front and back logos from uploaded files
+                const frontLogo = uploadedFiles.find(f => f.position === 'front');
+                const backLogo = uploadedFiles.find(f => f.position === 'back');
+
+                const orderSettings = {
+                    printLocationCode: selectedLocation,
+                    printLocationName: locationNames[selectedLocation] || selectedLocation,
+                    hasBackPrint: selectedLocation && selectedLocation.includes('_FB'),
+                    uploadedFiles: uploadedFiles,
+                    frontLogo: frontLogo,
+                    backLogo: backLogo,
+                    shippingState: document.getElementById('state').value,
+                    colorConfigs: state.colorConfigs,
+                    ltmFee: state.orderTotals.ltmFee || 0
+                };
+
+                // ===== STEP 3: Save order data to sessionStorage =====
+                // (Will be retrieved by success page after Stripe redirect)
+                const pendingOrder = {
+                    tempOrderNumber: tempOrderNumber,
+                    customerData: customerData,
+                    colorConfigs: state.colorConfigs,
+                    orderSettings: orderSettings,
+                    orderTotals: state.orderTotals,
+                    pricingData: {
+                        // Include minimal pricing data needed for order submission
+                        styleNumber: pricingData?.styleNumber || 'PC54',
+                        productName: pricingData?.productName || 'Port & Company Core Cotton Tee'
+                    },
+                    createdAt: new Date().toISOString()
+                };
+
+                sessionStorage.setItem('3day_pending_order', JSON.stringify(pendingOrder));
+                console.log('[Payment] ✓ Order data saved to sessionStorage');
+
+                // ===== STEP 4: Build line items for Stripe Checkout =====
+                const lineItems = [];
+
+                // Add product line items (simplified for Stripe display)
+                const totalQty = Object.values(state.colorConfigs).reduce((sum, config) => {
+                    return sum + Object.values(config.sizes || {}).reduce((s, q) => s + (parseInt(q) || 0), 0);
+                }, 0);
+
+                // Main product line item
+                lineItems.push({
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: '3-Day Custom Printed T-Shirts',
+                            description: `${totalQty} shirts with ${locationNames[selectedLocation] || 'custom print'}`,
+                        },
+                        unit_amount: Math.round(state.orderTotals.subtotal * 100), // Stripe uses cents
+                    },
+                    quantity: 1,
                 });
 
-                showLoading(false);
-
-                if (error) {
-                    // Payment failed - get user-friendly error message
-                    const errorInfo = getStripeErrorMessage(error);
-                    console.error('[Payment] Payment failed:', errorInfo.code, errorInfo.message);
-
-                    // Show error to user with longer display time for important messages
-                    const displayTime = errorInfo.canRetry ? 10000 : 15000;
-                    showToast(errorInfo.message, 'error', displayTime);
-
-                    // Log for debugging
-                    console.error('[Payment] Full error details:', {
-                        code: error.code,
-                        decline_code: error.decline_code,
-                        type: error.type,
-                        message: error.message,
-                        canRetry: errorInfo.canRetry
+                // Rush fee line item
+                if (state.orderTotals.rushFee > 0) {
+                    lineItems.push({
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: '3-Day Rush Fee (25%)',
+                                description: 'Priority processing for 3-day turnaround',
+                            },
+                            unit_amount: Math.round(state.orderTotals.rushFee * 100),
+                        },
+                        quantity: 1,
                     });
-
-                    return null;
-                } else if (paymentIntent.status === 'succeeded') {
-                    // Payment succeeded
-                    console.log('[Payment] Payment succeeded:', paymentIntent.id);
-
-                    // Return complete payment object for API
-                    return {
-                        paymentId: paymentIntent.id,
-                        paymentDate: new Date(paymentIntent.created * 1000).toISOString().split('T')[0], // Unix timestamp to YYYY-MM-DD
-                        amount: paymentIntent.amount / 100, // Convert cents to dollars
-                        status: paymentIntent.status,
-                        paymentIntent: paymentIntent // Keep full object for reference
-                    };
-                } else if (paymentIntent.status === 'requires_action') {
-                    // 3D Secure or other authentication required
-                    console.log('[Payment] Additional authentication required');
-                    showToast('Additional authentication required. Please complete the verification step.', 'warning', 8000);
-                    return null;
-                } else if (paymentIntent.status === 'requires_payment_method') {
-                    // Payment method failed, need new one
-                    console.log('[Payment] Payment method failed, needs replacement');
-                    showToast('Payment method failed. Please try a different card.', 'error', 10000);
-                    return null;
-                } else {
-                    // Other unexpected status
-                    console.warn('[Payment] Unexpected payment status:', paymentIntent.status);
-                    showToast('Payment status uncertain. Please contact support at 253-922-5793.', 'warning', 12000);
-                    return null;
                 }
+
+                // LTM fee line item (if applicable)
+                if (state.orderTotals.ltmFee > 0) {
+                    lineItems.push({
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: 'Less Than Minimum Fee',
+                                description: 'Small order processing fee (6-23 pieces)',
+                            },
+                            unit_amount: Math.round(state.orderTotals.ltmFee * 100),
+                        },
+                        quantity: 1,
+                    });
+                }
+
+                // Shipping line item
+                if (state.orderTotals.shipping > 0) {
+                    lineItems.push({
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: 'Shipping',
+                                description: 'Ground shipping',
+                            },
+                            unit_amount: Math.round(state.orderTotals.shipping * 100),
+                        },
+                        quantity: 1,
+                    });
+                }
+
+                // Tax line item (if applicable)
+                if (state.orderTotals.salesTax > 0) {
+                    lineItems.push({
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: 'Sales Tax (WA 10.1%)',
+                                description: 'Washington State sales tax',
+                            },
+                            unit_amount: Math.round(state.orderTotals.salesTax * 100),
+                        },
+                        quantity: 1,
+                    });
+                }
+
+                // ===== STEP 5: Create Stripe Checkout Session =====
+                console.log('[Payment] Creating Stripe Checkout Session...');
+
+                const checkoutResponse = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        line_items: lineItems,
+                        customer_email: customerData.email,
+                        metadata: {
+                            tempOrderNumber: tempOrderNumber,
+                            customerName: `${customerData.firstName} ${customerData.lastName}`,
+                            totalQty: totalQty.toString(),
+                            printLocation: selectedLocation
+                        },
+                        success_url: `${window.location.origin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}`,
+                        cancel_url: `${window.location.origin}/pages/3-day-tees.html?payment=cancelled`
+                    }),
+                });
+
+                if (!checkoutResponse.ok) {
+                    const errorData = await checkoutResponse.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Failed to create checkout session');
+                }
+
+                const { url: checkoutUrl } = await checkoutResponse.json();
+
+                if (!checkoutUrl) {
+                    throw new Error('No checkout URL returned from server');
+                }
+
+                console.log('[Payment] ✓ Checkout session created, redirecting to Stripe...');
+
+                // ===== STEP 6: Redirect to Stripe Checkout =====
+                window.location.href = checkoutUrl;
+
+                // Note: Function doesn't return - browser redirects to Stripe
+                // After successful payment, Stripe redirects to success page
 
             } catch (error) {
                 showLoading(false);
+                isProcessingPayment = false;
                 console.error('[Payment] Unexpected error:', error);
 
-                // Check if network error
                 if (error.message === 'Failed to fetch' || error.message.includes('network')) {
                     showToast('Network error. Please check your internet connection and try again.', 'error', 10000);
-                } else if (error.message.includes('payment intent')) {
-                    showToast('Payment system error. Please try again or contact support at 253-922-5793.', 'error', 12000);
                 } else {
-                    showToast('Unexpected error processing payment. Please try again or contact support at 253-922-5793.', 'error', 12000);
+                    showToast(`Payment error: ${error.message}. Please try again or contact support at 253-922-5793.`, 'error', 12000);
                 }
 
                 return null;
-            } finally {
-                // Always reset the processing flag
-                isProcessingPayment = false;
             }
+            // Note: isProcessingPayment is not reset here because we're redirecting away
         }
 
         /**
@@ -3675,29 +3814,31 @@
         }
 
         // Initialize payment button handler
+        // With Stripe Checkout redirect flow:
+        // - processPayment() redirects to Stripe on success (never returns)
+        // - Only returns null on error (validation fail, network error, etc.)
+        // - Order submission happens on success page after redirect
         function initPaymentHandlers() {
             const payButton = document.getElementById('payButton');
             if (payButton) {
                 payButton.addEventListener('click', async () => {
                     // Disable button during processing
                     payButton.disabled = true;
-                    payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
 
-                    // Process payment
-                    const paymentId = await processPayment();
+                    // Process payment - redirects to Stripe on success
+                    // Only returns null on error
+                    const result = await processPayment();
 
-                    if (paymentId) {
-                        // Close payment modal
-                        closePaymentModal();
-
-                        // Submit order with payment ID
-                        await submitOrderWithPayment(paymentId);
-                    } else {
+                    // If we get here, payment initiation failed (redirect didn't happen)
+                    if (!result) {
                         // Re-enable button on failure
                         payButton.disabled = false;
                         const total = state.orderTotals.grandTotal || 0;
                         payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
                     }
+                    // Note: On success, user is redirected to Stripe Checkout
+                    // and then to success page - this code never executes in that case
                 });
             }
         }
