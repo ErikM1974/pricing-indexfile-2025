@@ -641,20 +641,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
       });
     }
 
-    // Add rush fee as separate line item if present
-    if (orderDetails?.rushFee && orderDetails.rushFee > 0) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: '3-Day Rush Fee (25%)',
-            description: 'Expedited production and delivery'
-          },
-          unit_amount: Math.round(orderDetails.rushFee * 100)
-        },
-        quantity: 1
-      });
-    }
+    // NOTE: Rush fee is already included in per-shirt prices (not a separate line item)
+    // The subtotal already contains the 25% rush fee built into each unit price
 
     // Create checkout session
     const sessionConfig = {
@@ -873,7 +861,8 @@ app.post('/api/submit-3day-order', async (req, res) => {
         city: customerData.city || '',
         state: customerData.state || '',
         zip: customerData.zip || customerData.zipCode || '',
-        country: 'USA'
+        country: 'USA',
+        method: 'UPS Ground'
       },
       // Billing block - proxy reads from orderData.billing (not Customer)
       billing: {
@@ -901,11 +890,11 @@ app.post('/api/submit-3day-order', async (req, res) => {
       // Payment information from Stripe
       payments: paymentConfirmed ? [{
         date: new Date().toISOString().split('T')[0],  // YYYY-MM-DD format
-        amount: paymentAmount ? paymentAmount / 100 : orderTotals?.grandTotal || 0,  // Convert cents to dollars
+        amount: parseFloat((paymentAmount ? paymentAmount / 100 : orderTotals?.grandTotal || 0).toFixed(2)),  // Round to 2 decimals
         status: 'success',
         gateway: 'Stripe',
         authCode: stripeSessionId || '',
-        accountNumber: stripeSessionId || '',
+        accountNumber: String(stripeSessionId || ''),  // Ensure string type for full session ID
         cardCompany: 'Stripe Checkout',
         responseCode: 'approved',
         responseReasonCode: 'checkout_complete',

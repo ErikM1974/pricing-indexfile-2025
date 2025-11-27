@@ -2511,9 +2511,10 @@
             const grandTotal = grandSubtotal + ltmFee + salesTax + shipping;
 
             // Store calculated totals in state (single source of truth)
+            // NOTE: Rush fee is already included in per-shirt prices, not shown as separate line item
             state.orderTotals = {
                 subtotal: grandSubtotal,
-                rushFee: totalRushFee,
+                rushFee: 0,  // Rush fee is built into unit prices, not a separate charge
                 ltmFee: ltmFee,
                 salesTax: salesTax,
                 shipping: shipping,
