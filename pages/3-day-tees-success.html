@@ -670,10 +670,6 @@
 
                 const orderData = JSON.parse(savedOrderData);
 
-                // DEBUG: Log what we retrieved from sessionStorage
-                console.log('[3-Day Tees Success] DEBUG - orderTotals from sessionStorage:', JSON.stringify(orderData.orderTotals, null, 2));
-                console.log('[3-Day Tees Success] DEBUG - full orderData keys:', Object.keys(orderData));
-
                 // Add payment confirmation details
                 orderData.paymentConfirmed = true;
                 orderData.stripeSessionId = sessionId;

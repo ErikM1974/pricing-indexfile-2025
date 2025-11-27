@@ -1061,11 +1061,7 @@
         // Helper function to update inventory badge display
         function updateInventoryBadge(catalogColor, total) {
             const badgeId = `stock-${catalogColor.replace(/\s+/g, '-')}`;
-            console.log(`[DEBUG] updateInventoryBadge called for ${catalogColor}, total: ${total}`);
-            console.log(`[DEBUG] Looking for badge ID: ${badgeId}`);
-
             const badge = document.getElementById(badgeId);
-            console.log(`[DEBUG] Badge element found:`, badge !== null);
 
             if (!badge) {
                 console.error(`[3-Day Tees] Badge not found for ${catalogColor}`);
@@ -1235,11 +1231,6 @@
                 } else {
                     sizeInventory['3XL'] = 0;
                 }
-
-                // Debug: Log size inventory for this color
-                console.log(`[DEBUG SIZE INVENTORY] ${catalogColor}:`, sizeInventory);
-                console.log(`[DEBUG SIZE INVENTORY] ${catalogColor} - Sizes in stock:`,
-                    Object.entries(sizeInventory).filter(([size, qty]) => qty > 0).map(([size, qty]) => `${size}:${qty}`).join(', '));
 
                 // Calculate total inventory and update badge
                 const total = Object.values(sizeInventory).reduce((sum, qty) => sum + qty, 0);
@@ -1838,6 +1829,12 @@
             updatePricingElements('step2');
             updatePricingElements('step3');
 
+            // Also update Pay button amount to stay in sync with grandTotal
+            const payButtonAmount = document.getElementById('payButtonAmount');
+            if (payButtonAmount) {
+                payButtonAmount.textContent = `$${grandTotal.toFixed(2)}`;
+            }
+
             console.log('[3DayTees] Order summary DOM updated from state (Step 2 & Step 3):', state.orderTotals);
         }
 
@@ -2350,15 +2347,7 @@
             // Tax calculated on line items total (grandSubtotal now includes rush fee)
             const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
 
-            console.log("[DEBUG TAX] Sales Tax Calculation:", {
-                shippingState: shippingState,
-                salesTaxRate: salesTaxRate,
-                taxableAmount: (grandSubtotal + ltmFee).toFixed(2),
-                salesTax: salesTax.toFixed(2)
-            });
-
             const shipping = 30;
-            console.log('[DEBUG A] Shipping calculated:', shipping, 'Type:', typeof shipping);
             // Grand total now matches exactly: line items + LTM + tax + shipping
             const grandTotal = grandSubtotal + ltmFee + salesTax + shipping;
 
@@ -2372,8 +2361,6 @@
                 shipping: shipping,
                 grandTotal: grandTotal
             };
-            console.log('[DEBUG B] State updated with shipping:', state.orderTotals.shipping, 'Full state:', state.orderTotals);
-
             // Update DOM from state (one-way data flow: state → DOM)
             updateOrderSummaryDOM();
 
@@ -3089,10 +3076,6 @@
                     createdAt: new Date().toISOString()
                 };
 
-                // DEBUG: Log what we're about to save
-                console.log('[Payment] DEBUG - state.orderTotals at save time:', JSON.stringify(state.orderTotals, null, 2));
-                console.log('[Payment] DEBUG - pendingOrder.orderTotals:', JSON.stringify(pendingOrder.orderTotals, null, 2));
-
                 sessionStorage.setItem('3day_pending_order', JSON.stringify(pendingOrder));
                 console.log('[Payment] ✓ Order data saved to sessionStorage');
 
@@ -3661,9 +3644,6 @@
 
                 // Get pricing totals from state (single source of truth)
                 const { grandTotal: orderTotal, salesTax, shipping: shippingCost } = state.orderTotals;
-                console.log('[DEBUG C] Shipping extracted from state:', shippingCost, 'Type:', typeof shippingCost);
-
-                console.log('[DEBUG D] About to call submitOrder with shipping:', shippingCost);
                 // Submit order using ThreeDayTeesOrderService
                 const result = await orderService.submitOrder(
                     customerData,

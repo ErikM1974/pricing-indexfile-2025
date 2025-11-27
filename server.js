@@ -766,10 +766,6 @@ app.post('/api/submit-3day-order', async (req, res) => {
       stripeSessionId
     });
 
-    // DEBUG: Trace orderTotals to find tax/shipping bug
-    console.log('[3-Day Order] DEBUG orderTotals received:', JSON.stringify(orderTotals, null, 2));
-    console.log('[3-Day Order] DEBUG orderSettings received:', JSON.stringify(orderSettings, null, 2));
-
     // Validate required fields
     if (!tempOrderNumber || !customerData || !colorConfigs) {
       return res.status(400).json({
