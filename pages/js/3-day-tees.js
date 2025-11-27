@@ -247,12 +247,11 @@
                 section.classList.add('d-none');  // Re-add Bootstrap d-none class for hidden sections
             });
 
-            // Show the target phase
+            // Show the target phase (3 phases: 1=Location, 2=Colors, 3=Checkout)
             let targetPhaseId;
             if (newPhase === 1) targetPhaseId = 'location-phase';
             else if (newPhase === 2) targetPhaseId = 'product-phase';
             else if (newPhase === 3) targetPhaseId = 'checkout-phase';
-            else if (newPhase === 4) targetPhaseId = 'review-phase';
 
             const targetSection = document.getElementById(targetPhaseId);
             if (targetSection) {
@@ -261,7 +260,7 @@
                 targetSection.classList.add('active');
             }
 
-            // Update phase navigation indicator
+            // Update phase navigation indicator (3 steps)
             document.querySelectorAll('.phase-step').forEach((step, index) => {
                 step.classList.remove('active', 'completed');
                 const stepNumber = index + 1;
@@ -273,7 +272,7 @@
                 }
             });
 
-            // Update phase connectors
+            // Update phase connectors (2 connectors for 3 steps)
             document.querySelectorAll('.phase-connector').forEach((connector, index) => {
                 const connectorNumber = index + 1;
                 if (connectorNumber < newPhase) {
@@ -282,12 +281,6 @@
                     connector.classList.remove('completed');
                 }
             });
-
-            // Show/hide payment section (outside grid to avoid stacking context isolation)
-            const paymentSection = document.getElementById('payment-section');
-            if (paymentSection) {
-                paymentSection.classList.toggle('d-none', newPhase !== 4);
-            }
 
             currentPhase = newPhase;
 
@@ -305,13 +298,9 @@
                 }
             }
 
-            // If moving to Phase 3 (checkout), update the checkout summary from state
+            // If moving to Phase 3 (checkout), update all summaries and payment button
             if (newPhase === 3) {
                 updateOrderSummaryDOM();
-            }
-
-            // If moving to Phase 4 (review), update the review summary from state
-            if (newPhase === 4) {
                 updateReviewSummaryDOM();
                 // Update payment button amount for Stripe Checkout redirect
                 const payButtonAmount = document.getElementById('payButtonAmount');
@@ -319,7 +308,12 @@
                     const { grandTotal } = state.orderTotals;
                     payButtonAmount.textContent = `$${grandTotal.toFixed(2)}`;
                 }
-                console.log('[3-Day Tees] ✓ Review phase ready - Stripe Checkout redirect enabled');
+                // Update item count in Order Summary
+                const itemCountEl = document.getElementById('step3-itemCount');
+                if (itemCountEl && state.orderTotals.totalQuantity) {
+                    itemCountEl.textContent = state.orderTotals.totalQuantity;
+                }
+                console.log('[3-Day Tees] ✓ Checkout phase ready - Stripe Checkout redirect enabled');
             }
 
             // Scroll to top
@@ -405,8 +399,9 @@
                         if (state) billingState.value = state.value;
                         if (zip) billingZip.value = zip.value;
 
-                        // Disable and dim billing fields to show they're auto-filled
+                        // Hide billing fields when "Same as Shipping" is checked
                         if (billingFields) {
+                            billingFields.classList.add('d-none');  // HIDE billing fields
                             billingFields.style.opacity = '0.5';
                             billingFields.querySelectorAll('input').forEach(input => {
                                 input.disabled = true;
@@ -416,8 +411,9 @@
 
                         console.log('[3DayTees] Billing address copied from shipping address');
                     } else {
-                        // Enable billing fields for manual entry
+                        // Show and enable billing fields for manual entry
                         if (billingFields) {
+                            billingFields.classList.remove('d-none');  // SHOW billing fields
                             billingFields.style.opacity = '1';
                             billingFields.querySelectorAll('input').forEach(input => {
                                 input.disabled = false;
@@ -442,150 +438,6 @@
                 }, 300); // 300ms delay to prevent excessive calculations during typing
 
                 stateField.addEventListener('input', debouncedRecalculate);
-            }
-
-            // ========================================
-            // Continue to Review Button (Phase 3 → Phase 4)
-            // ========================================
-            const continueToReviewBtn = document.getElementById('continueToReview');
-            if (continueToReviewBtn) {
-                continueToReviewBtn.addEventListener('click', function() {
-                    console.log('[3DayTees] Validating entire order before review...');
-
-                    // Step 1: Validate color selections
-                    if (state.selectedColors.length === 0) {
-                        showToast('Please select at least one color to continue', 'warning');
-                        return;
-                    }
-
-                    // Step 2: Validate print location
-                    if (!selectedLocation) {
-                        showToast('Please select a print location in Step 1', 'warning');
-                        return;
-                    }
-
-                    // Step 3: Validate quantities (minimum 6 pieces)
-                    let grandTotalQuantity = 0;
-                    state.selectedColors.forEach(catalogColor => {
-                        const config = state.colorConfigs[catalogColor];
-                        config.totalQuantity = Object.values(config.sizeBreakdown)
-                            .reduce((sum, s) => sum + s.quantity, 0);
-                        grandTotalQuantity += config.totalQuantity;
-                    });
-
-                    if (grandTotalQuantity === 0) {
-                        showToast('Please enter quantities for at least one size', 'warning');
-                        return;
-                    }
-
-                    if (grandTotalQuantity < 6) {
-                        showToast('Minimum order is 6 pieces. Please add more items to your order.', 'error', 0);
-                        return;
-                    }
-
-                    // Step 4: Validate front logo upload (required)
-                    if (!state.frontLogo) {
-                        showToast('Front logo is required. Please upload your artwork in Step 2.', 'error', 6000);
-
-                        // Scroll to Step 2
-                        const step2 = document.querySelector('#step2');
-                        if (step2) {
-                            step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-
-                        // Highlight front upload zone with error state
-                        const frontZone = document.getElementById('frontUploadZone');
-                        if (frontZone) {
-                            frontZone.style.borderColor = '#ef4444';
-                            frontZone.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-
-                            // Remove highlight after 3 seconds
-                            setTimeout(() => {
-                                frontZone.style.borderColor = '';
-                                frontZone.style.backgroundColor = '';
-                            }, 3000);
-                        }
-
-                        return;
-                    }
-
-                    console.log('[3DayTees] ✓ Order validation passed - validating customer form...');
-
-                    // Step 5: Manual field-by-field validation of customer form
-                    const fieldsToValidate = [
-                        { id: 'firstName', label: 'First Name', pattern: /^.{2,}$/, message: 'First name must be at least 2 characters' },
-                        { id: 'lastName', label: 'Last Name', pattern: /^.{2,}$/, message: 'Last name must be at least 2 characters' },
-                        { id: 'email', label: 'Email', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Please enter a valid email address' },
-                        { id: 'phone', label: 'Phone', pattern: /^[\d\s\-\(\)]+$/, message: 'Please enter a valid phone number' },
-                        { id: 'address1', label: 'Street Address', pattern: /^.{5,}$/, message: 'Street address must be at least 5 characters' },
-                        { id: 'city', label: 'City', pattern: /^.{2,}$/, message: 'City must be at least 2 characters' },
-                        { id: 'state', label: 'State', pattern: /^[A-Za-z]{2}$/, message: 'State must be 2 letters (e.g., WA)' },
-                        { id: 'zip', label: 'ZIP Code', pattern: /^\d{5}$/, message: 'ZIP code must be 5 digits' }
-                    ];
-
-                    // Check if billing address validation is needed
-                    const sameAsShipping = document.getElementById('sameAsShipping');
-                    const needsBillingValidation = sameAsShipping && !sameAsShipping.checked;
-
-                    if (needsBillingValidation) {
-                        fieldsToValidate.push(
-                            { id: 'billingAddress1', label: 'Billing Street Address', pattern: /^.{5,}$/, message: 'Billing street address must be at least 5 characters' },
-                            { id: 'billingCity', label: 'Billing City', pattern: /^.{2,}$/, message: 'Billing city must be at least 2 characters' },
-                            { id: 'billingState', label: 'Billing State', pattern: /^[A-Za-z]{2}$/, message: 'Billing state must be 2 letters (e.g., WA)' },
-                            { id: 'billingZip', label: 'Billing ZIP Code', pattern: /^\d{5}$/, message: 'Billing ZIP code must be 5 digits' }
-                        );
-                    }
-
-                    // Validate all fields
-                    let isValid = true;
-                    let firstInvalidField = null;
-                    let firstErrorMessage = '';
-
-                    fieldsToValidate.forEach(field => {
-                        const input = document.getElementById(field.id);
-                        if (!input) {
-                            console.warn(`[3DayTees] Field not found: ${field.id}`);
-                            return;
-                        }
-
-                        const value = input.value.trim();
-                        const fieldValid = value !== '' && field.pattern.test(value);
-
-                        // Apply visual feedback
-                        if (fieldValid) {
-                            input.classList.remove('is-invalid');
-                            input.classList.add('is-valid');
-                        } else {
-                            input.classList.remove('is-valid');
-                            input.classList.add('is-invalid');
-                            isValid = false;
-
-                            // Track first invalid field
-                            if (!firstInvalidField) {
-                                firstInvalidField = input;
-                                firstErrorMessage = field.message;
-                            }
-                        }
-                    });
-
-                    if (isValid) {
-                        console.log('[3DayTees] ✓ All fields valid - Moving to review phase');
-                        moveToPhase(4);
-                    } else {
-                        console.log('[3DayTees] ✗ Validation failed');
-
-                        // Scroll to first invalid field and focus it
-                        if (firstInvalidField) {
-                            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            setTimeout(() => {
-                                firstInvalidField.focus();
-                            }, 300);
-                        }
-
-                        // Show error message
-                        alert(`Please fix the following error:\n\n${firstErrorMessage}`);
-                    }
-                });
             }
 
             console.log('[Navigation] Clickable step indicators initialized');
@@ -2230,7 +2082,7 @@
         }
 
         // ========================================
-        // Update Artwork Review Display (Phase 4)
+        // Update Artwork Review Display (Phase 3 - Checkout)
         // ========================================
         function updateArtworkReview() {
             // Update front logo review
@@ -3237,6 +3089,10 @@
                     createdAt: new Date().toISOString()
                 };
 
+                // DEBUG: Log what we're about to save
+                console.log('[Payment] DEBUG - state.orderTotals at save time:', JSON.stringify(state.orderTotals, null, 2));
+                console.log('[Payment] DEBUG - pendingOrder.orderTotals:', JSON.stringify(pendingOrder.orderTotals, null, 2));
+
                 sessionStorage.setItem('3day_pending_order', JSON.stringify(pendingOrder));
                 console.log('[Payment] ✓ Order data saved to sessionStorage');
 
@@ -3591,6 +3447,71 @@
             const payButton = document.getElementById('payButton');
             if (payButton) {
                 payButton.addEventListener('click', async () => {
+                    console.log('[3DayTees] Pay button clicked - validating form...');
+
+                    // Validate customer form before payment
+                    const fieldsToValidate = [
+                        { id: 'firstName', label: 'First Name', pattern: /^.{2,}$/, message: 'First name must be at least 2 characters' },
+                        { id: 'lastName', label: 'Last Name', pattern: /^.{2,}$/, message: 'Last name must be at least 2 characters' },
+                        { id: 'email', label: 'Email', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Please enter a valid email address' },
+                        { id: 'phone', label: 'Phone', pattern: /^[\d\s\-\(\)]+$/, message: 'Please enter a valid phone number' },
+                        { id: 'address1', label: 'Street Address', pattern: /^.{5,}$/, message: 'Street address must be at least 5 characters' },
+                        { id: 'city', label: 'City', pattern: /^.{2,}$/, message: 'City must be at least 2 characters' },
+                        { id: 'state', label: 'State', pattern: /^[A-Za-z]{2}$/, message: 'State must be 2 letters (e.g., WA)' },
+                        { id: 'zip', label: 'ZIP Code', pattern: /^\d{5}$/, message: 'ZIP code must be 5 digits' }
+                    ];
+
+                    // Check if billing address validation is needed
+                    const sameAsShipping = document.getElementById('sameAsShipping');
+                    const needsBillingValidation = sameAsShipping && !sameAsShipping.checked;
+
+                    if (needsBillingValidation) {
+                        fieldsToValidate.push(
+                            { id: 'billingAddress1', label: 'Billing Street Address', pattern: /^.{5,}$/, message: 'Billing street address must be at least 5 characters' },
+                            { id: 'billingCity', label: 'Billing City', pattern: /^.{2,}$/, message: 'Billing city must be at least 2 characters' },
+                            { id: 'billingState', label: 'Billing State', pattern: /^[A-Za-z]{2}$/, message: 'Billing state must be 2 letters (e.g., WA)' },
+                            { id: 'billingZip', label: 'Billing ZIP Code', pattern: /^\d{5}$/, message: 'Billing ZIP code must be 5 digits' }
+                        );
+                    }
+
+                    // Validate all fields
+                    let isValid = true;
+                    let firstInvalidField = null;
+                    let firstErrorMessage = '';
+
+                    fieldsToValidate.forEach(field => {
+                        const input = document.getElementById(field.id);
+                        if (!input) return;
+
+                        const value = input.value.trim();
+                        const fieldValid = value !== '' && field.pattern.test(value);
+
+                        if (fieldValid) {
+                            input.classList.remove('is-invalid');
+                            input.classList.add('is-valid');
+                        } else {
+                            input.classList.remove('is-valid');
+                            input.classList.add('is-invalid');
+                            isValid = false;
+                            if (!firstInvalidField) {
+                                firstInvalidField = input;
+                                firstErrorMessage = field.message;
+                            }
+                        }
+                    });
+
+                    if (!isValid) {
+                        console.log('[3DayTees] Form validation failed');
+                        if (firstInvalidField) {
+                            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => firstInvalidField.focus(), 300);
+                        }
+                        showToast(firstErrorMessage, 'error');
+                        return;
+                    }
+
+                    console.log('[3DayTees] Form validation passed - processing payment...');
+
                     // Disable button during processing
                     payButton.disabled = true;
                     payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
@@ -3604,7 +3525,7 @@
                         // Re-enable button on failure
                         payButton.disabled = false;
                         const total = state.orderTotals.grandTotal || 0;
-                        payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
+                        payButton.innerHTML = `<i class="fas fa-lock"></i> Proceed to Secure Checkout - $${total.toFixed(2)}`;
                     }
                     // Note: On success, user is redirected to Stripe Checkout
                     // and then to success page - this code never executes in that case
@@ -4039,7 +3960,7 @@
         updateShipDateDisplay();
         setInterval(updateShipDateDisplay, 60000); // Update every 60 seconds
 
-/**         * Handle payment cancellation - user returned from Stripe without completing payment         * Restores order state from sessionStorage and returns user to review phase         */        function handlePaymentCancellation() {            const urlParams = new URLSearchParams(window.location.search);            if (urlParams.get('payment') === 'cancelled') {                console.log('[3-Day Tees] Payment cancelled - attempting to restore order state');                const savedOrder = sessionStorage.getItem('3day_pending_order');                if (savedOrder) {                    try {                        const orderData = JSON.parse(savedOrder);                        console.log('[3-Day Tees] Order data found, restoring state...');                        setTimeout(() => {                            showToast('Payment was cancelled. Your order information has been preserved. Click Proceed to Secure Checkout to try again.', 'info', 8000);                            if (orderData.customerData || orderData.colorConfigs) {                                moveToPhase(4);                            }                        }, 500);                    } catch (e) {                        console.error('[3-Day Tees] Failed to parse saved order:', e);                        showToast('Payment was cancelled. Please review your order and try again.', 'warning', 6000);                    }                } else {                    setTimeout(() => {                        showToast('Payment was cancelled. Please complete your order details and try again.', 'warning', 6000);                    }, 500);                }                window.history.replaceState({}, '', window.location.pathname);            }        }
+/**         * Handle payment cancellation - user returned from Stripe without completing payment         * Restores order state from sessionStorage and returns user to checkout phase         */        function handlePaymentCancellation() {            const urlParams = new URLSearchParams(window.location.search);            if (urlParams.get('payment') === 'cancelled') {                console.log('[3-Day Tees] Payment cancelled - attempting to restore order state');                const savedOrder = sessionStorage.getItem('3day_pending_order');                if (savedOrder) {                    try {                        const orderData = JSON.parse(savedOrder);                        console.log('[3-Day Tees] Order data found, restoring state...');                        setTimeout(() => {                            showToast('Payment was cancelled. Your order information has been preserved. Click Proceed to Secure Checkout to try again.', 'info', 8000);                            if (orderData.customerData || orderData.colorConfigs) {                                moveToPhase(3);                            }                        }, 500);                    } catch (e) {                        console.error('[3-Day Tees] Failed to parse saved order:', e);                        showToast('Payment was cancelled. Please review your order and try again.', 'warning', 6000);                    }                } else {                    setTimeout(() => {                        showToast('Payment was cancelled. Please complete your order details and try again.', 'warning', 6000);                    }, 500);                }                window.history.replaceState({}, '', window.location.pathname);            }        }
         // Initialize on page load - Unified initialization block
         document.addEventListener('DOMContentLoaded', () => {
             checkHolidayDataExpiration();  // Check holiday data first

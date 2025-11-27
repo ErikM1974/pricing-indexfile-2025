@@ -766,6 +766,10 @@ app.post('/api/submit-3day-order', async (req, res) => {
       stripeSessionId
     });
 
+    // DEBUG: Trace orderTotals to find tax/shipping bug
+    console.log('[3-Day Order] DEBUG orderTotals received:', JSON.stringify(orderTotals, null, 2));
+    console.log('[3-Day Order] DEBUG orderSettings received:', JSON.stringify(orderSettings, null, 2));
+
     // Validate required fields
     if (!tempOrderNumber || !customerData || !colorConfigs) {
       return res.status(400).json({
@@ -880,6 +884,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
         : `3-Day Rush Order - Stripe Session: ${stripeSessionId || 'N/A'}`,
       rushOrder: true,
       printLocation: orderSettings?.printLocationName || 'Left Chest',
+      // Tax fields - proxy expects at root level (not nested in totals)
+      taxTotal: orderTotals?.salesTax || 0,
+      taxPartNumber: 'Tax_10.1',
+      taxPartDescription: 'City of Milton Sales Tax 10.1%',
+      // Shipping - proxy expects at root level
+      cur_Shipping: orderTotals?.shipping || 0,
       totals: {
         subtotal: orderTotals?.subtotal || 0,
         rushFee: orderTotals?.rushFee || 0,

@@ -123,7 +123,7 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Progress Indicator -->
+        <!-- Progress Indicator (3 steps) -->
         <div class="phase-nav">
             <div class="phase-step active" id="phase-1-nav">
                 <div class="phase-step-number">1</div>
@@ -137,12 +137,7 @@
             <div class="phase-connector" id="connector-2"></div>
             <div class="phase-step" id="phase-3-nav">
                 <div class="phase-step-number">3</div>
-                <div class="phase-step-label">Contact & Shipping</div>
-            </div>
-            <div class="phase-connector" id="connector-3"></div>
-            <div class="phase-step" id="phase-4-nav">
-                <div class="phase-step-number">4</div>
-                <div class="phase-step-label">Review & Pay</div>
+                <div class="phase-step-label">Checkout</div>
             </div>
         </div>
 
@@ -438,157 +433,17 @@
         </div>
         </section>
 
-        <!-- Phase 3: Contact & Shipping -->
+        <!-- Phase 3: Checkout (Combined Contact, Shipping, Review & Pay) -->
         <section id="checkout-phase" class="phase-section d-none">
             <div class="phase-header">
-                <h2><span class="phase-number">3</span> Contact & Shipping</h2>
-                <p>Enter your contact and shipping information</p>
+                <h2><span class="phase-number">3</span> Checkout</h2>
+                <p>Review your order and complete checkout</p>
             </div>
 
             <div class="product-grid">
-                <!-- Left Column: Contact & Shipping Forms -->
+                <!-- Left Column: Review Cards + Forms + Payment -->
                 <div>
-                    <div class="card">
-                        <h3>Contact Information</h3>
-                        <div class="form-group">
-                            <label for="firstName">First Name *</label>
-                            <input type="text" id="firstName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name *</label>
-                            <input type="text" id="lastName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input type="email" id="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone *</label>
-                            <input type="tel" id="phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company Name</label>
-                            <input type="text" id="company">
-                        </div>
-                    </div>
-
-                    <div class="card mt-md">
-                        <h3>Shipping Address</h3>
-                        <div class="form-group">
-                            <label for="address1">Street Address *</label>
-                            <input type="text" id="address1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City *</label>
-                            <input type="text" id="city" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State *</label>
-                            <input type="text" id="state" required maxlength="2" placeholder="WA">
-                        </div>
-                        <div class="form-group">
-                            <label for="zip">ZIP Code *</label>
-                            <input type="text" id="zip" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="notes">Special Instructions</label>
-                            <textarea id="notes" placeholder="Any special requirements or notes..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Billing Address -->
-                    <div class="card card-spacing">
-                        <h3>Billing Address</h3>
-
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="sameAsShipping" class="modern-checkbox">
-                                <span>Same as shipping address</span>
-                            </label>
-                        </div>
-
-                        <div id="billingAddressFields">
-                            <div class="form-group">
-                                <label for="billingAddress1">Street Address *</label>
-                                <input type="text" id="billingAddress1" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="billingCity">City *</label>
-                                <input type="text" id="billingCity" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="billingState">State *</label>
-                                <input type="text" id="billingState" required maxlength="2" placeholder="WA">
-                            </div>
-                            <div class="form-group">
-                                <label for="billingZip">ZIP Code *</label>
-                                <input type="text" id="billingZip" required>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Order Summary (Sticky) -->
-                <div class="sticky-sidebar">
-                    <div class="card" id="orderSummary">
-                        <h3>Order Summary</h3>
-                        <div id="summaryContent" class="mb-md">
-                            <p class="summary-placeholder">
-                                No items selected yet
-                            </p>
-                        </div>
-
-                        <div class="pricing-summary">
-                            <div class="pricing-row">
-                                <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="step3-subtotal">$-</span>
-                            </div>
-                            <!-- Rush fee is built into per-shirt prices, not shown as separate line -->
-                            <div class="pricing-row">
-                                <span class="pricing-label">LTM Fee (if applicable):</span>
-                                <span class="pricing-value" id="step3-ltmFee">$-</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
-                                <span class="pricing-value" id="step3-salesTax">$-</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span class="pricing-label">Shipping (UPS Ground):</span>
-                                <span class="pricing-value" id="step3-shipping">$-</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span>Grand Total:</span>
-                                <span id="step3-grandTotal">$-</span>
-                            </div>
-                        </div>
-
-                        <div class="rush-terms-box mt-lg">
-                            <p class="text-amber-dark font-semibold mb-sm">
-                                <i class="fas fa-info-circle"></i> Rush Service Terms
-                            </p>
-                            <p class="text-amber-dark text-sm">
-                                Orders ship within 72 hours from artwork approval. All prices include 25% rush fee. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
-                            </p>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary btn-full mt-md" id="continueToReview">
-                        Continue to Review & Pay <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Phase 4: Review Order -->
-        <section id="review-phase" class="phase-section d-none">
-            <div class="phase-header">
-                <h2><span class="phase-number">4</span> Review Order</h2>
-                <p>Review your order details and complete checkout</p>
-            </div>
-
-            <div class="product-grid">
-                <!-- Left Column: Artwork & Order Review -->
-                <div>
+                    <!-- Artwork Files Review -->
                     <div class="card">
                         <h3><i class="fas fa-palette"></i> Artwork Files</h3>
                         <div id="artworkReview">
@@ -618,6 +473,7 @@
                         </div>
                     </div>
 
+                    <!-- Order Details Review -->
                     <div class="card mt-md">
                         <h3><i class="fas fa-clipboard-check"></i> Order Details</h3>
                         <div id="reviewSummary">
@@ -633,9 +489,84 @@
                                 <strong>Colors Selected:</strong>
                                 <span id="reviewColors"></span>
                             </div>
-                            <div>
-                                <strong>Contact:</strong>
-                                <span id="reviewContact"></span>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="card mt-md">
+                        <h3><i class="fas fa-user"></i> Contact Information</h3>
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone *</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company Name</label>
+                            <input type="text" id="company">
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="card mt-md">
+                        <h3><i class="fas fa-shipping-fast"></i> Shipping Address</h3>
+                        <div class="form-group">
+                            <label for="address1">Street Address *</label>
+                            <input type="text" id="address1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <input type="text" id="state" required maxlength="2" placeholder="WA">
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">ZIP Code *</label>
+                            <input type="text" id="zip" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Special Instructions</label>
+                            <textarea id="notes" placeholder="Any special requirements or notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Billing Address -->
+                    <div class="card mt-md">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Billing Address</h3>
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="sameAsShipping" class="modern-checkbox" checked>
+                                <span>Same as shipping address</span>
+                            </label>
+                        </div>
+                        <div id="billingAddressFields" class="d-none">
+                            <div class="form-group">
+                                <label for="billingAddress1">Street Address *</label>
+                                <input type="text" id="billingAddress1">
+                            </div>
+                            <div class="form-group">
+                                <label for="billingCity">City *</label>
+                                <input type="text" id="billingCity">
+                            </div>
+                            <div class="form-group">
+                                <label for="billingState">State *</label>
+                                <input type="text" id="billingState" maxlength="2" placeholder="WA">
+                            </div>
+                            <div class="form-group">
+                                <label for="billingZip">ZIP Code *</label>
+                                <input type="text" id="billingZip">
                             </div>
                         </div>
                     </div>
@@ -647,80 +578,40 @@
                     <div class="card" id="orderSummary">
                         <h3>Order Summary</h3>
                         <div id="summaryContent" class="mb-md">
-                            <p class="summary-placeholder">
-                                No items selected yet
-                            </p>
+                            <p class="summary-placeholder">No items selected yet</p>
                         </div>
 
                         <div class="pricing-summary">
                             <div class="pricing-row">
                                 <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="review-subtotal">$-</span>
+                                <span class="pricing-value" id="step3-subtotal">$0.00</span>
                             </div>
-                            <!-- Rush fee is built into per-shirt prices, not shown as separate line -->
-                            <div class="pricing-row">
-                                <span class="pricing-label">LTM Fee (if applicable):</span>
-                                <span class="pricing-value" id="review-ltmFee">$-</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span class="pricing-label">Sales Tax (WA only: 10.1%):</span>
-                                <span class="pricing-value" id="review-salesTax">$-</span>
+                            <div class="pricing-row d-none" id="step3-ltmFeeRow">
+                                <span class="pricing-label">LTM Fee:</span>
+                                <span class="pricing-value" id="step3-ltmFee">$0.00</span>
                             </div>
                             <div class="pricing-row">
-                                <span class="pricing-label">Shipping (UPS Ground):</span>
-                                <span class="pricing-value" id="review-shipping">$-</span>
+                                <span class="pricing-label">Shipping:</span>
+                                <span class="pricing-value" id="step3-shipping">$30.00</span>
                             </div>
                             <div class="pricing-row">
-                                <span>Grand Total:</span>
-                                <span id="review-grandTotal">$-</span>
+                                <span class="pricing-label">Tax:</span>
+                                <span class="pricing-value" id="step3-salesTax">$0.00</span>
+                            </div>
+                            <div class="pricing-row order-total">
+                                <span>Order Total:</span>
+                                <span id="step3-grandTotal">$0.00</span>
                             </div>
                         </div>
-
-                        <div class="rush-terms-box mt-lg">
-                            <p class="text-amber-dark font-semibold mb-sm">
-                                <i class="fas fa-info-circle"></i> Rush Service Terms
-                            </p>
-                            <p class="text-amber-dark text-sm">
-                                Orders ship within 72 hours from artwork approval. All prices include 25% rush fee. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Submit Button Removed (Payment is now embedded) -->
-                    <div class="text-center text-sm text-secondary mt-md">
-                        <i class="fas fa-arrow-down"></i> Please complete payment in the form below
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Section - OUTSIDE grid to avoid stacking context isolation -->
-            <div id="payment-section" class="d-none">
-                <div class="card mt-md" id="paymentCard">
-                    <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
-
-                    <!-- Stripe Checkout Info -->
-                    <div class="mb-lg">
-                        <div class="stripe-checkout-info text-center py-md">
-                            <i class="fas fa-external-link-alt text-primary mb-sm" style="font-size: 2rem;"></i>
-                            <p class="mb-sm">
-                                Click the button below to securely complete your payment on Stripe's checkout page.
-                            </p>
-                            <p class="text-secondary text-sm">
-                                <i class="fas fa-lock"></i> Your payment information is handled directly by Stripe - we never see your card details.
-                            </p>
-                        </div>
-
-                        <!-- Error Display -->
-                        <div id="card-errors" role="alert" class="error-text"></div>
                     </div>
 
                     <!-- Payment Button -->
-                    <button id="payButton" class="btn btn-primary btn-full mb-sm">
-                        <i class="fas fa-external-link-alt"></i> Proceed to Secure Checkout - <span id="payButtonAmount">$0.00</span>
+                    <button id="payButton" class="btn btn-primary btn-full mt-md">
+                        <i class="fas fa-lock"></i> Proceed to Secure Checkout - <span id="payButtonAmount">$0.00</span>
                     </button>
 
                     <!-- Security Badge -->
-                    <div class="security-badge">
+                    <div class="security-badge mt-sm text-center">
                         <i class="fas fa-shield-alt icon-success"></i>
                         Secure payment powered by Stripe
                     </div>
