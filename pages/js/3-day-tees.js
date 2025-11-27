@@ -5,7 +5,7 @@
         let currentPhase = 1;
         let selectedLocation = null;  // Will be 'LC', 'FF', 'LC_FB', or 'FF_FB'
         let selectedLocations = [];   // Array of selected location codes
-        let stripeElementsMounted = false;  // Track if Stripe elements have been mounted
+        // Stripe Checkout redirect used instead of embedded elements
 
         // ========================================
         // Service Layer Initialization (Tier 1)
@@ -313,14 +313,13 @@
             // If moving to Phase 4 (review), update the review summary from state
             if (newPhase === 4) {
                 updateReviewSummaryDOM();
-                // CRITICAL: Defer Stripe mounting until after browser has painted the container
-                // Stripe iframes require the container to be fully visible in the DOM before mounting
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        showPaymentModal();  // Mount Stripe card element to DOM
-                        console.log('[3-Day Tees] ✓ Payment modal triggered after DOM paint');
-                    });
-                });
+                // Update payment button amount for Stripe Checkout redirect
+                const payButtonAmount = document.getElementById('payButtonAmount');
+                if (payButtonAmount) {
+                    const { grandTotal } = state.orderTotals;
+                    payButtonAmount.textContent = `$${grandTotal.toFixed(2)}`;
+                }
+                console.log('[3-Day Tees] ✓ Review phase ready - Stripe Checkout redirect enabled');
             }
 
             // Scroll to top
@@ -592,30 +591,15 @@
             console.log('[Navigation] Clickable step indicators initialized');
         }
 
-        // Stripe Payment Service (uses StripePaymentService from stripe-service.js)
-        // NOTE: Elements are created LAZILY in showPaymentModal() when container is visible
-        // This fixes the race condition where elements created during page load cached 0px width
+        // Payment Processing State
         let isProcessingPayment = false;  // Flag to prevent duplicate payment processing
 
-        // Initialize Stripe using the StripePaymentService
-        async function initializeStripe() {
-            try {
-                console.log('[3-Day Tees] Initializing Stripe via StripePaymentService...');
-                await window.StripePaymentService.initialize();
-                console.log('[3-Day Tees] ✓ Stripe initialized via StripePaymentService');
-            } catch (error) {
-                console.error('[Stripe] Failed to initialize:', error);
-                showToast('Payment system initialization failed. Please refresh the page.', 'error');
-            }
-        }
 
         // Initialize third-party services (EmailJS and Stripe)
         function initThirdPartyServices() {
             // Initialize EmailJS
             emailjs.init('4qSbDO-SQs19TbP80');
 
-            // Initialize Stripe payment processing
-            initializeStripe();
         }
 
         // Toast Notification System
@@ -3106,240 +3090,6 @@
         }
 
         // Payment Form Functions (Embedded in Step 4)
-        function showPaymentModal() {
-            // CRITICAL: Guard against re-mounting elements (prevents multiple overlapping iframes)
-            if (stripeElementsMounted) {
-                console.log('[3-Day Tees] Stripe elements already mounted, skipping re-mount');
-                return;
-            }
-
-            // Read total from state (single source of truth)
-            const { grandTotal: total } = state.orderTotals;
-
-            // Update payment button amount (embedded in Step 4)
-            const payButtonAmount = document.getElementById('payButtonAmount');
-            if (payButtonAmount) {
-                payButtonAmount.textContent = `$${total.toFixed(2)}`;
-            }
-
-            // Check if StripePaymentService is initialized
-            if (!window.StripePaymentService.isReady()) {
-                console.error('[3-Day Tees] StripePaymentService not initialized yet');
-                showToast('Payment system loading. Please wait...', 'info');
-                return;
-            }
-
-            // Wait for container to have actual width (not 0 from display:none)
-            // CRITICAL: Elements must be created when container is visible
-            // Stripe Elements cache internal measurements at CREATION time
-            const waitForVisibility = () => {
-                // OPTION A FIX: Check PARENT section first, not just child element
-                const paymentSection = document.getElementById('payment-section');
-                const container = document.getElementById('card-element');
-
-                // Force browser to compute layout before measuring
-                if (paymentSection) {
-                    paymentSection.offsetHeight; // Force reflow - browser must recalculate layout
-                }
-
-                // Check both parent AND child have proper width
-                const parentWidth = paymentSection ? paymentSection.offsetWidth : 0;
-                const containerWidth = container ? container.offsetWidth : 0;
-
-                if (!container || containerWidth === 0 || parentWidth < 100) {
-                    console.log('[3-Day Tees] Container not visible yet, waiting... Parent:', parentWidth, 'Child:', containerWidth);
-                    requestAnimationFrame(waitForVisibility);
-                    return;
-                }
-
-                console.log('[3-Day Tees] Container visible - Parent:', parentWidth, 'Child:', containerWidth);
-
-                // Double-check guard in case multiple waitForVisibility loops were queued
-                if (stripeElementsMounted) {
-                    console.log('[3-Day Tees] Elements already mounted during wait, aborting');
-                    return;
-                }
-
-                // OPTION B FIX: Add small delay to ensure CSS has fully computed
-                // This gives the browser extra time after visibility check passes
-                setTimeout(() => {
-                    // Guard again in case another loop created elements during the delay
-                    if (stripeElementsMounted) {
-                        console.log('[3-Day Tees] Elements mounted during delay, skipping');
-                        return;
-                    }
-
-                    console.log('[3-Day Tees] Creating combined Stripe card element...');
-
-                    // Use combined card element - simpler, more reliable than split elements
-                    // Single iframe = fewer CSS/DOM conflicts, no flex layout issues
-                    const cardElement = window.StripePaymentService.createCombinedCardElement('#card-element');
-
-                    stripeElementsMounted = true;
-
-                    // Handle real-time validation errors
-                    const displayError = document.getElementById('card-errors');
-
-                    cardElement.on('change', (event) => {
-                        if (event.error) {
-                            displayError.textContent = event.error.message;
-                        } else {
-                            displayError.textContent = '';
-                        }
-                    });
-
-                    // Ready event for debugging
-                    cardElement.on('ready', () => {
-                        console.log('[3-Day Tees] ✓ Combined card element READY for input');
-                    });
-
-                    // Focus event for debugging
-                    cardElement.on('focus', () => {
-                        console.log('[Stripe Debug] ✓ Combined card element received focus');
-                    });
-
-                    // NOTE: Programmatic focus removed - Safari blocks focus on third-party iframes
-                    // Users must click into the Stripe field to start typing (this is correct behavior)
-
-                    // Note: Option C auto-recreate safety net removed - CSS fix addresses root cause
-                    // The explicit width on .stripe-col ensures Stripe can measure containers correctly
-
-                }, 100); // End of Option B setTimeout
-            };
-            requestAnimationFrame(waitForVisibility);
-
-            // Note: Order summary is updated separately by updateReviewSummaryDOM()
-            // No modal to show - payment form is embedded in Step 4
-        }
-
-        function closePaymentModal() {
-            // No modal to close - payment form is embedded
-            // Clear errors
-            const cardErrors = document.getElementById('card-errors');
-            if (cardErrors) {
-                cardErrors.textContent = '';
-            }
-        }
-
-        /**
-         * Restore Pay button to its original enabled state
-         * Used when payment fails and user needs to retry
-         */
-        function restorePayButton() {
-            const payButton = document.getElementById('payButton');
-            const total = state.orderTotals.grandTotal || 0;
-            payButton.disabled = false;
-            payButton.innerHTML = `<i class="fas fa-lock"></i> Pay $${total.toFixed(2)}`;
-        }
-
-        /**
-         * Get user-friendly error message for Stripe error
-         */
-        function getStripeErrorMessage(error) {
-            console.error('[Payment] Stripe error:', error);
-
-            // CRITICAL: Check decline_code FIRST (more specific than error.code)
-            // This is essential for security-sensitive errors like lost/stolen cards
-            if (error.decline_code) {
-                const declineMessages = {
-                    // SECURITY: Lost/stolen cards - NO RETRY
-                    'lost_card': 'This card has been reported lost. Please use a different card.\n\nIf you need assistance, please call us at 253-922-5793.',
-                    'stolen_card': 'This card has been reported stolen. Please use a different card.\n\nIf you need assistance, please call us at 253-922-5793.',
-
-                    // FINANCIAL: Insufficient funds
-                    'insufficient_funds': 'Insufficient funds. Please try a different card or add funds to your account.',
-
-                    // Bank decline reasons
-                    'do_not_honor': 'Your bank declined this transaction. Please contact your bank or try a different card.',
-                    'fraudulent': 'This transaction was flagged as potentially fraudulent. Please contact your bank.',
-                    'generic_decline': 'Your card was declined. Please contact your bank for more information.',
-                    'invalid_account': 'The card account is invalid. Please check your card details or use a different card.',
-                    'new_account_information_available': 'Your card information may be outdated. Please check with your bank.',
-                    'no_action_taken': 'Your bank did not approve this payment. Please try a different card or contact your bank.',
-                    'not_permitted': 'This type of transaction is not permitted on your card. Please try a different card.',
-                    'pickup_card': 'This card cannot be used. Please contact your bank or use a different card.',
-                    'restricted_card': 'This card has restrictions. Please contact your bank or use a different card.',
-                    'revocation_of_all_authorizations': 'All authorizations have been revoked for this card. Please use a different card.',
-                    'revocation_of_authorization': 'Authorization was revoked for this card. Please use a different card.',
-                    'security_violation': 'Security violation detected. Please contact your bank.',
-                    'service_not_allowed': 'This service is not allowed on your card. Please try a different card.',
-                    'stop_payment_order': 'A stop payment order exists for this card. Please contact your bank.',
-                    'testmode_decline': 'Test card declined. Please use a real card number.',
-                    'transaction_not_allowed': 'This transaction is not allowed. Please try a different card or contact your bank.',
-                    'try_again_later': 'Temporary issue with your bank. Please try again in a few moments.',
-                    'withdrawal_count_limit_exceeded': 'You have exceeded your card\'s transaction limit. Please try again later or use a different card.'
-                };
-
-                if (declineMessages[error.decline_code]) {
-                    return {
-                        message: declineMessages[error.decline_code],
-                        code: error.decline_code,
-                        canRetry: !['lost_card', 'stolen_card'].includes(error.decline_code) // SECURITY: No retry for lost/stolen
-                    };
-                }
-            }
-
-            // Then check generic error codes
-            const errorMessages = {
-                // Card errors
-                'card_declined': 'Your card was declined. Please try a different payment method or contact your bank.',
-                'insufficient_funds': 'Insufficient funds. Please try a different card or add funds to your account.',
-                'expired_card': 'Your card has expired. Please check the expiration date or use a different card.',
-                'incorrect_cvc': 'Incorrect security code (CVC). Please check the 3-digit code on the back of your card.',
-                'incorrect_number': 'Invalid card number. Please check your card number and try again.',
-                'invalid_expiry_month': 'Invalid expiration month. Please check your card\'s expiration date.',
-                'invalid_expiry_year': 'Invalid expiration year. Please check your card\'s expiration date.',
-                'invalid_cvc': 'Invalid security code. Please enter the 3-digit CVC from your card.',
-                'invalid_number': 'Your card number is invalid.',
-
-                // Processing errors
-                'processing_error': 'Error processing your payment. Please try again in a moment.',
-                'rate_limit': 'Too many payment attempts. Please wait a moment before trying again.',
-
-                // Authentication errors
-                'authentication_required': 'Your bank requires additional authentication. Please complete the verification step.',
-                'approve_with_id': 'Your payment requires approval. Please contact your bank to authorize this transaction.',
-
-                // Network/system errors
-                'api_connection_error': 'Connection error. Please check your internet connection and try again.',
-                'api_error': 'Payment system error. Please try again or contact support at 253-922-5793.',
-
-                // Generic decline
-                'generic_decline': 'Your card was declined. Please contact your bank or try a different card.'
-            };
-
-            // Get specific error message based on error.code
-            if (error.code && errorMessages[error.code]) {
-                return {
-                    message: errorMessages[error.code],
-                    code: error.code,
-                    canRetry: true // Generic errors can be retried
-                };
-            }
-
-            // Default error message
-            return {
-                message: error.message || 'Payment failed. Please check your card details and try again, or contact support at 253-922-5793.',
-                code: error.code || 'unknown',
-                canRetry: true
-            };
-        }
-
-        /**
-         * Process payment using Stripe Checkout (hosted page redirect)
-         *
-         * This function:
-         * 1. Uploads artwork files to Caspio storage (MUST happen before redirect)
-         * 2. Collects all order data
-         * 3. Saves order data to sessionStorage for retrieval after redirect
-         * 4. Creates a Stripe Checkout Session
-         * 5. Redirects to Stripe's hosted checkout page
-         *
-         * After successful payment, Stripe redirects to success page which:
-         * - Verifies the payment with Stripe
-         * - Retrieves order data from sessionStorage
-         * - Submits the order to ShopWorks
-         */
         async function processPayment() {
             // Check if payment is already being processed
             if (isProcessingPayment) {
@@ -3416,6 +3166,9 @@
                 }
 
                 // ===== STEP 2: Collect all order data =====
+                // Check if "Same as Shipping" is checked - if so, use shipping values for billing
+                const sameAsShipping = document.getElementById('sameAsShipping')?.checked;
+
                 const customerData = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
@@ -3426,7 +3179,21 @@
                     city: document.getElementById('city').value,
                     state: document.getElementById('state').value,
                     zip: document.getElementById('zip').value,
-                    notes: document.getElementById('notes').value || ''
+                    notes: document.getElementById('notes').value || '',
+                    // Billing address - use shipping values if "Same as Shipping" is checked
+                    billingCompany: document.getElementById('company').value || '',
+                    billingAddress1: sameAsShipping
+                        ? document.getElementById('address1').value
+                        : (document.getElementById('billingAddress1')?.value || ''),
+                    billingCity: sameAsShipping
+                        ? document.getElementById('city').value
+                        : (document.getElementById('billingCity')?.value || ''),
+                    billingState: sameAsShipping
+                        ? document.getElementById('state').value
+                        : (document.getElementById('billingState')?.value || ''),
+                    billingZip: sameAsShipping
+                        ? document.getElementById('zip').value
+                        : (document.getElementById('billingZip')?.value || '')
                 };
 
                 // Location name mapping
@@ -3463,8 +3230,8 @@
                     orderTotals: state.orderTotals,
                     pricingData: {
                         // Include minimal pricing data needed for order submission
-                        styleNumber: pricingData?.styleNumber || 'PC54',
-                        productName: pricingData?.productName || 'Port & Company Core Cotton Tee'
+                        styleNumber: state.pricingData?.styleNumber || 'PC54',
+                        productName: state.pricingData?.productName || 'Port & Company Core Cotton Tee'
                     },
                     createdAt: new Date().toISOString()
                 };
@@ -3564,14 +3331,15 @@
                     body: JSON.stringify({
                         line_items: lineItems,
                         customer_email: customerData.email,
+                        totalAmount: state.orderTotals.grandTotal,
                         metadata: {
                             tempOrderNumber: tempOrderNumber,
                             customerName: `${customerData.firstName} ${customerData.lastName}`,
                             totalQty: totalQty.toString(),
                             printLocation: selectedLocation
                         },
-                        success_url: `${window.location.origin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}`,
-                        cancel_url: `${window.location.origin}/pages/3-day-tees.html?payment=cancelled`
+                        successUrl: `${window.location.origin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}`,
+                        cancelUrl: `${window.location.origin}/pages/3-day-tees.html?payment=cancelled`
                     }),
                 });
 
@@ -4270,6 +4038,7 @@
         updateShipDateDisplay();
         setInterval(updateShipDateDisplay, 60000); // Update every 60 seconds
 
+/**         * Handle payment cancellation - user returned from Stripe without completing payment         * Restores order state from sessionStorage and returns user to review phase         */        function handlePaymentCancellation() {            const urlParams = new URLSearchParams(window.location.search);            if (urlParams.get('payment') === 'cancelled') {                console.log('[3-Day Tees] Payment cancelled - attempting to restore order state');                const savedOrder = sessionStorage.getItem('3day_pending_order');                if (savedOrder) {                    try {                        const orderData = JSON.parse(savedOrder);                        console.log('[3-Day Tees] Order data found, restoring state...');                        setTimeout(() => {                            showToast('Payment was cancelled. Your order information has been preserved. Click Proceed to Secure Checkout to try again.', 'info', 8000);                            if (orderData.customerData || orderData.colorConfigs) {                                moveToPhase(4);                            }                        }, 500);                    } catch (e) {                        console.error('[3-Day Tees] Failed to parse saved order:', e);                        showToast('Payment was cancelled. Please review your order and try again.', 'warning', 6000);                    }                } else {                    setTimeout(() => {                        showToast('Payment was cancelled. Please complete your order details and try again.', 'warning', 6000);                    }, 500);                }                window.history.replaceState({}, '', window.location.pathname);            }        }
         // Initialize on page load - Unified initialization block
         document.addEventListener('DOMContentLoaded', () => {
             checkHolidayDataExpiration();  // Check holiday data first
@@ -4277,4 +4046,5 @@
             initEventListeners();           // Setup UI event handlers
             initPaymentHandlers();          // Setup payment button
             init();                         // Initialize the page with data
+            handlePaymentCancellation();    // Check for payment cancellation
         });

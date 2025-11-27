@@ -454,14 +454,6 @@
                             <div class="info-item-label">Estimated Delivery</div>
                             <div class="info-item-value" id="estimatedDelivery">---</div>
                         </div>
-                        <div class="info-item">
-                            <div class="info-item-label">Email</div>
-                            <div class="info-item-value" id="customerEmail">---</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-item-label">Total Items</div>
-                            <div class="info-item-value" id="totalItems">---</div>
-                        </div>
                     </div>
 
                     <div class="timeline-section">
@@ -568,9 +560,7 @@
 
             // Populate order details
             document.getElementById('orderNumber').textContent = data.orderId || data.orderNumber || 'Processing...';
-            document.getElementById('amountPaid').textContent = '$' + (data.amount / 100).toFixed(2);
-            document.getElementById('customerEmail').textContent = data.customerEmail || '---';
-            document.getElementById('totalItems').textContent = data.totalItems || '---';
+            document.getElementById('amountPaid').textContent = '$' + (data.amountTotal || data.amount / 100).toFixed(2);
 
             // Calculate estimated delivery (3 business days from now)
             const estimatedDate = calculateEstimatedDelivery();
@@ -645,7 +635,7 @@
                     throw new Error(data.error || 'Payment verification failed');
                 }
 
-                if (data.status === 'complete' || data.status === 'paid') {
+                if (data.paymentStatus === 'complete' || data.paymentStatus === 'paid') {
                     // Payment successful - show success and submit order to ShopWorks
                     showSuccess(data);
 
@@ -653,7 +643,7 @@
                     if (!data.orderSubmitted) {
                         await submitOrderToShopWorks(data);
                     }
-                } else if (data.status === 'expired') {
+                } else if (data.paymentStatus === 'expired') {
                     showError('This payment session has expired. Please start a new order.', 'SESSION_EXPIRED');
                 } else {
                     showError('Payment was not completed. Please try again.', 'PAYMENT_INCOMPLETE');

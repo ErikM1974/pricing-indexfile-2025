@@ -757,6 +757,206 @@ app.post('/api/verify-checkout-session', async (req, res) => {
   }
 });
 
+// POST /api/submit-3day-order - Submit 3-Day Tees order to ShopWorks via ManageOrders PUSH API
+app.post('/api/submit-3day-order', async (req, res) => {
+  try {
+    const {
+      tempOrderNumber,
+      customerData,
+      colorConfigs,
+      orderTotals,
+      pricingData,
+      orderSettings,
+      paymentConfirmed,
+      stripeSessionId,
+      paymentAmount
+    } = req.body;
+
+    console.log('[3-Day Order] Received order submission:', {
+      orderNumber: tempOrderNumber,
+      paymentConfirmed,
+      stripeSessionId
+    });
+
+    // Validate required fields
+    if (!tempOrderNumber || !customerData || !colorConfigs) {
+      return res.status(400).json({
+        error: 'Missing required order data'
+      });
+    }
+
+    // Build line items from colorConfigs
+    // Structure: { catalogColor: { displayColor, sizeBreakdown: { size: { quantity, unitPrice } } } }
+    const lineItems = [];
+    const styleNumber = pricingData?.styleNumber || 'PC54';
+    const productName = pricingData?.productName || 'Port & Company Core Cotton Tee';
+
+    for (const [catalogColor, config] of Object.entries(colorConfigs)) {
+      if (config.sizeBreakdown) {
+        for (const [size, sizeData] of Object.entries(config.sizeBreakdown)) {
+          if (sizeData && sizeData.quantity > 0) {
+            lineItems.push({
+              partNumber: styleNumber,
+              description: productName,
+              color: config.displayColor || catalogColor,
+              size: size,
+              quantity: parseInt(sizeData.quantity),
+              price: sizeData.unitPrice || 0
+            });
+          }
+        }
+      }
+    }
+
+    console.log('[3-Day Order] Built lineItems:', lineItems.length, 'items');
+
+    // Extract artwork URLs and build designs block
+    const designs = [];
+    const frontLogo = orderSettings?.frontLogo?.fileUrl || orderSettings?.uploadedFiles?.front;
+    const backLogo = orderSettings?.backLogo?.fileUrl || orderSettings?.uploadedFiles?.back;
+    const printLocation = orderSettings?.printLocationCode || 'LC';
+
+    console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation });
+
+    if (frontLogo || backLogo) {
+      const design = {
+        designName: `${tempOrderNumber} - Customer Logo`,
+        designTypeId: 45,  // DTG
+        artistId: 224,     // 3-Day Tees routing
+        locations: []
+      };
+
+      // Add front/left chest location if we have a front logo and location isn't Full Back only
+      if (frontLogo && printLocation !== 'FB') {
+        design.locations.push({
+          location: orderSettings?.printLocationName || 'Left Chest',
+          imageUrl: frontLogo,
+          notes: 'Customer uploaded artwork'
+        });
+      }
+
+      // Add back location if we have a back logo or location includes back
+      if (backLogo) {
+        design.locations.push({
+          location: 'Full Back',
+          imageUrl: backLogo,
+          notes: 'Customer uploaded artwork (back)'
+        });
+      }
+
+      // Only add design if we have at least one location
+      if (design.locations.length > 0) {
+        designs.push(design);
+      }
+    }
+
+    console.log('[3-Day Order] Built designs:', designs.length, 'design(s)');
+
+    // Transform to ManageOrders API format
+    const manageOrdersPayload = {
+      orderNumber: tempOrderNumber,
+      customer: {
+        company: customerData.company || '',  // Maps to CompanyName in proxy
+        firstName: customerData.firstName || '',
+        lastName: customerData.lastName || '',
+        email: customerData.email || '',
+        phone: customerData.phone || ''
+      },
+      lineItems: lineItems,
+      designs: designs,  // Artwork URLs for production
+      shipping: {
+        company: customerData.company || '',
+        firstName: customerData.firstName || '',
+        lastName: customerData.lastName || '',
+        address1: customerData.address1 || customerData.address || '',
+        address2: customerData.address2 || '',
+        city: customerData.city || '',
+        state: customerData.state || '',
+        zip: customerData.zip || customerData.zipCode || '',
+        country: 'USA'
+      },
+      // Billing block - proxy reads from orderData.billing (not Customer)
+      billing: {
+        company: customerData.billingCompany || customerData.company || '',
+        address1: customerData.billingAddress1 || customerData.address1 || '',
+        address2: '',
+        city: customerData.billingCity || customerData.city || '',
+        state: customerData.billingState || customerData.state || '',
+        zip: customerData.billingZip || customerData.zip || '',
+        country: 'USA'
+      },
+      // Additional metadata - include customer special instructions
+      notes: customerData.notes
+        ? `3-Day Rush Order\nSpecial Instructions: ${customerData.notes}\nStripe Session: ${stripeSessionId || 'N/A'}`
+        : `3-Day Rush Order - Stripe Session: ${stripeSessionId || 'N/A'}`,
+      rushOrder: true,
+      printLocation: orderSettings?.printLocationName || 'Left Chest',
+      totals: {
+        subtotal: orderTotals?.subtotal || 0,
+        rushFee: orderTotals?.rushFee || 0,
+        salesTax: orderTotals?.salesTax || 0,
+        shipping: orderTotals?.shipping || 0,
+        grandTotal: orderTotals?.grandTotal || 0
+      },
+      // Payment information from Stripe
+      payments: paymentConfirmed ? [{
+        date: new Date().toISOString().split('T')[0],  // YYYY-MM-DD format
+        amount: paymentAmount ? paymentAmount / 100 : orderTotals?.grandTotal || 0,  // Convert cents to dollars
+        status: 'success',
+        gateway: 'Stripe',
+        authCode: stripeSessionId || '',
+        accountNumber: stripeSessionId || '',
+        cardCompany: 'Stripe Checkout',
+        responseCode: 'approved',
+        responseReasonCode: 'checkout_complete',
+        responseReasonText: 'Payment completed via Stripe Checkout'
+      }] : []
+    };
+
+    console.log('[3-Day Order] Submitting to ManageOrders:', JSON.stringify(manageOrdersPayload, null, 2));
+
+    // Forward to ManageOrders PUSH API on caspio-pricing-proxy
+    const MANAGEORDERS_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create';
+
+    const response = await fetch(MANAGEORDERS_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(manageOrdersPayload)
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      console.log('[3-Day Order] ✓ Order created in ShopWorks:', result.orderNumber);
+      res.json({
+        success: true,
+        orderNumber: result.orderNumber || tempOrderNumber,
+        shopWorksId: result.shopWorksId,
+        message: 'Order submitted to ShopWorks successfully'
+      });
+    } else {
+      console.error('[3-Day Order] ShopWorks API error:', result);
+      // Return partial success - payment was taken, order needs manual processing
+      res.json({
+        success: false,
+        orderNumber: tempOrderNumber,
+        error: result.error || 'ShopWorks submission failed',
+        message: 'Payment successful but order requires manual processing. Reference: ' + tempOrderNumber
+      });
+    }
+
+  } catch (error) {
+    console.error('[3-Day Order] Error submitting order:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit order to ShopWorks',
+      message: error.message
+    });
+  }
+});
+
 // Monitoring API endpoints (if enabled)
 if (monitor) {
   app.get('/api/monitor/stats', (req, res) => {
