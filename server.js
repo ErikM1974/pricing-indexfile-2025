@@ -798,17 +798,39 @@ app.post('/api/submit-3day-order', async (req, res) => {
 
     console.log('[3-Day Order] Built lineItems:', lineItems.length, 'items');
 
+    // Extract unique product colors from the order for "For Product Colors" field
+    const uniqueColors = [...new Set(
+      Object.values(colorConfigs)
+        .map(config => config.displayColor)
+        .filter(Boolean)
+    )];
+    const productColorsString = uniqueColors.join(', ');
+
+    console.log('[3-Day Order] Product colors for design:', productColorsString);
+
     // Extract artwork URLs and build designs block
     const designs = [];
     const frontLogo = orderSettings?.frontLogo?.fileUrl || orderSettings?.uploadedFiles?.front;
     const backLogo = orderSettings?.backLogo?.fileUrl || orderSettings?.uploadedFiles?.back;
     const printLocation = orderSettings?.printLocationCode || 'LC';
 
-    console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation });
+    // Map location codes to exact ShopWorks dropdown values
+    // ShopWorks accepts: 'Full Back', 'Full Front', 'Left Chest', 'Right Chest'
+    const shopWorksLocationMap = {
+      'LC': 'Left Chest',
+      'FF': 'Full Front',
+      'LC_FB': 'Left Chest',   // Front part of combo
+      'FF_FB': 'Full Front'    // Front part of combo
+    };
+    const frontLocationName = shopWorksLocationMap[printLocation] || 'Left Chest';
+
+    console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation, frontLocationName });
 
     if (frontLogo || backLogo) {
       const design = {
-        designName: `${tempOrderNumber} - Customer Logo`,
+        name: `${tempOrderNumber} - Customer Logo`,  // "name" field expected by proxy transformDesigns
+        externalId: `3DT-${tempOrderNumber}`,  // External ID for tracking
+        productColor: productColorsString,  // T-shirt colors from order → "For Product Colors" field
         designTypeId: 45,  // DTG
         artistId: 224,     // 3-Day Tees routing
         locations: []
@@ -817,9 +839,17 @@ app.post('/api/submit-3day-order', async (req, res) => {
       // Add front/left chest location if we have a front logo and location isn't Full Back only
       if (frontLogo && printLocation !== 'FB') {
         design.locations.push({
-          location: orderSettings?.printLocationName || 'Left Chest',
+          location: frontLocationName,  // Exact ShopWorks dropdown value
+          colors: 'Full Color',  // DTG = Full Color
+          code: `${tempOrderNumber}-FRONT`,
           imageUrl: frontLogo,
-          notes: 'Customer uploaded artwork'
+          customField01: frontLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
+          notes: 'Customer uploaded artwork',
+          details: [{
+            color: 'Full Color DTG',
+            paramLabel: 'Print Type',
+            paramValue: 'Direct to Garment'
+          }]
         });
       }
 
@@ -827,8 +857,16 @@ app.post('/api/submit-3day-order', async (req, res) => {
       if (backLogo) {
         design.locations.push({
           location: 'Full Back',
+          colors: 'Full Color',  // DTG = Full Color
+          code: `${tempOrderNumber}-BACK`,
           imageUrl: backLogo,
-          notes: 'Customer uploaded artwork (back)'
+          customField01: backLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
+          notes: 'Customer uploaded artwork (back) - See Attachments tab for image',
+          details: [{
+            color: 'Full Color DTG',
+            paramLabel: 'Print Type',
+            paramValue: 'Direct to Garment'
+          }]
         });
       }
 
@@ -839,6 +877,25 @@ app.post('/api/submit-3day-order', async (req, res) => {
     }
 
     console.log('[3-Day Order] Built designs:', designs.length, 'design(s)');
+
+    // Build attachments array for artwork files (OnSite may download from Attachments)
+    const attachments = [];
+    if (frontLogo) {
+      attachments.push({
+        mediaUrl: frontLogo,
+        mediaName: `${tempOrderNumber} - Front Artwork`,
+        linkNote: 'Customer uploaded artwork (front)'
+      });
+    }
+    if (backLogo) {
+      attachments.push({
+        mediaUrl: backLogo,
+        mediaName: `${tempOrderNumber} - Back Artwork`,
+        linkNote: 'Customer uploaded artwork (back)'
+      });
+    }
+
+    console.log('[3-Day Order] Built attachments:', attachments.length, 'attachment(s)');
 
     // Transform to ManageOrders API format
     const manageOrdersPayload = {
@@ -852,6 +909,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
       },
       lineItems: lineItems,
       designs: designs,  // Artwork URLs for production
+      attachments: attachments,  // File attachments for OnSite download
       shipping: {
         company: customerData.company || '',
         firstName: customerData.firstName || '',
@@ -874,10 +932,18 @@ app.post('/api/submit-3day-order', async (req, res) => {
         zip: customerData.billingZip || customerData.zip || '',
         country: 'USA'
       },
-      // Additional metadata - include customer special instructions
-      notes: customerData.notes
-        ? `3-Day Rush Order\nSpecial Instructions: ${customerData.notes}\nStripe Session: ${stripeSessionId || 'N/A'}`
-        : `3-Day Rush Order - Stripe Session: ${stripeSessionId || 'N/A'}`,
+      // Additional notes - send as array for proxy to process
+      notes: customerData.notes ? [
+        {
+          note: `3-Day Rush Order\nSpecial Instructions: ${customerData.notes}\nStripe Session: ${stripeSessionId || 'N/A'}`,
+          type: 'Production'  // Shows in Work Order Notes
+        }
+      ] : [
+        {
+          note: `3-Day Rush Order - Stripe Session: ${stripeSessionId || 'N/A'}`,
+          type: 'Notes On Order'
+        }
+      ],
       rushOrder: true,
       printLocation: orderSettings?.printLocationName || 'Left Chest',
       // Tax fields - proxy expects at root level (not nested in totals)
