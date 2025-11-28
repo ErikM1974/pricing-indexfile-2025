@@ -936,7 +936,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
       notes: customerData.notes ? [
         {
           note: `3-Day Rush Order\nSpecial Instructions: ${customerData.notes}\nStripe Session: ${stripeSessionId || 'N/A'}`,
-          type: 'Production'  // Shows in Work Order Notes
+          type: 'Notes To Production'  // Shows in Work Order Notes
         }
       ] : [
         {

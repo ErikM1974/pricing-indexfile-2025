@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --primary-color: #ff6b35;
@@ -541,6 +543,9 @@
          * Verifies Stripe Checkout payment and displays order confirmation
          */
 
+        // Initialize EmailJS
+        emailjs.init('4qSbDO-SQs19TbP80');
+
         // DOM Elements
         const loadingState = document.getElementById('loadingState');
         const successState = document.getElementById('successState');
@@ -608,6 +613,224 @@
                 month: 'long',
                 day: 'numeric'
             });
+        }
+
+        /**
+         * Send customer confirmation email via EmailJS
+         */
+        async function sendCustomerConfirmationEmail(orderData, paymentData) {
+            try {
+                // Extract data from sessionStorage order
+                const customerData = orderData.customerData || {};
+                const orderTotals = orderData.orderTotals || {};
+                const orderSettings = orderData.orderSettings || {};
+                const colorConfigs = orderData.colorConfigs || {};
+
+                // Build products table HTML
+                let productsTable = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Color</th>
+                                <th>Size</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // Iterate through colorConfigs to build line items
+                for (const [catalogColor, config] of Object.entries(colorConfigs)) {
+                    if (config.sizeBreakdown) {
+                        for (const [size, sizeData] of Object.entries(config.sizeBreakdown)) {
+                            if (sizeData && sizeData.quantity > 0) {
+                                const productName = orderData.pricingData?.productName || 'Port & Company Core Cotton Tee';
+                                productsTable += `
+                                    <tr>
+                                        <td>${productName}</td>
+                                        <td>${config.displayColor || catalogColor}</td>
+                                        <td>${size}</td>
+                                        <td>${sizeData.quantity}</td>
+                                        <td>$${(sizeData.unitPrice || 0).toFixed(2)}</td>
+                                    </tr>
+                                `;
+                            }
+                        }
+                    }
+                }
+
+                productsTable += `
+                        </tbody>
+                    </table>
+                `;
+
+                // Build payment confirmation HTML
+                const paymentConfirmation = `
+                    <div class="alert-success">
+                        <strong>✓ Payment Confirmed</strong><br>
+                        <span style="font-size: 14px;">Amount: $${paymentData.amountTotal?.toFixed(2) || '0.00'}</span><br>
+                        <span style="font-size: 12px; color: #6b7280;">Stripe Session: ${paymentData.sessionId?.substring(0, 20)}...</span>
+                    </div>
+                `;
+
+                // Build message section (special instructions)
+                const messageSection = customerData.notes ? `
+                    <div class="section">
+                        <h2>📝 Special Instructions</h2>
+                        <p style="background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 4px solid #2d5f3f;">
+                            ${customerData.notes}
+                        </p>
+                    </div>
+                ` : '';
+
+                // Prepare template parameters
+                const templateParams = {
+                    to_email: customerData.email,
+                    to_name: `${customerData.firstName} ${customerData.lastName}`,
+                    order_number: orderData.tempOrderNumber,
+                    customer_name: `${customerData.firstName} ${customerData.lastName}`,
+                    customer_email: customerData.email,
+                    customer_phone: customerData.phone || '',
+                    company_name: customerData.company || '',
+                    print_location: orderSettings.printLocationName || 'Left Chest',
+                    payment_confirmation: paymentConfirmation,
+                    products_table: productsTable,
+                    subtotal: `$${(orderTotals.subtotal || 0).toFixed(2)}`,
+                    total: `$${(orderTotals.grandTotal || 0).toFixed(2)}`,
+                    message_section: messageSection,
+                    company_phone: '253-922-5793',
+                    reply_to: 'erik@nwcustomapparel.com'
+                };
+
+                console.log('[EmailJS] Sending customer confirmation email to:', customerData.email);
+
+                // Send email via EmailJS
+                await emailjs.send(
+                    'service_1c4k67j',           // Service ID
+                    'template_sample_customer',   // Template ID
+                    templateParams
+                );
+
+                console.log('[EmailJS] ✓ Customer confirmation email sent successfully');
+
+            } catch (error) {
+                console.error('[EmailJS] Failed to send customer confirmation email:', error);
+                // Don't throw - email failure shouldn't break the success page
+            }
+        }
+
+        /**
+         * Send staff notification email via EmailJS
+         */
+        async function sendStaffNotificationEmail(orderData, paymentData) {
+            try {
+                // Extract data from sessionStorage order
+                const customerData = orderData.customerData || {};
+                const orderTotals = orderData.orderTotals || {};
+                const orderSettings = orderData.orderSettings || {};
+                const colorConfigs = orderData.colorConfigs || {};
+
+                // Build products table HTML (same as customer email)
+                let productsTable = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Color</th>
+                                <th>Size</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // Iterate through colorConfigs to build line items
+                for (const [catalogColor, config] of Object.entries(colorConfigs)) {
+                    if (config.sizeBreakdown) {
+                        for (const [size, sizeData] of Object.entries(config.sizeBreakdown)) {
+                            if (sizeData && sizeData.quantity > 0) {
+                                const productName = orderData.pricingData?.productName || 'Port & Company Core Cotton Tee';
+                                productsTable += `
+                                    <tr>
+                                        <td>${productName}</td>
+                                        <td>${config.displayColor || catalogColor}</td>
+                                        <td>${size}</td>
+                                        <td>${sizeData.quantity}</td>
+                                        <td>$${(sizeData.unitPrice || 0).toFixed(2)}</td>
+                                    </tr>
+                                `;
+                            }
+                        }
+                    }
+                }
+
+                productsTable += `
+                        </tbody>
+                    </table>
+                `;
+
+                // Build payment status alert
+                const paymentStatus = `
+                    <div class="alert alert-success">
+                        <strong>✓ PAYMENT CONFIRMED</strong><br>
+                        <span style="font-size: 14px;">Amount: $${paymentData.amountTotal?.toFixed(2) || '0.00'}</span><br>
+                        <span style="font-size: 12px;">Stripe Session: ${paymentData.sessionId || 'N/A'}</span><br>
+                        <span style="font-size: 12px;">Payment Status: ${paymentData.paymentStatus || 'paid'}</span>
+                    </div>
+                `;
+
+                // Build message section (special instructions)
+                const messageSection = customerData.notes ? `
+                    <div class="section">
+                        <h3>📝 Special Instructions from Customer</h3>
+                        <p style="background: #fff; padding: 15px; border-radius: 6px; border: 2px solid #f59e0b;">
+                            ${customerData.notes}
+                        </p>
+                    </div>
+                ` : '';
+
+                // Error section (empty for successful orders)
+                const errorSection = '';
+
+                // Order data section (empty for successful orders)
+                const orderDataSection = '';
+
+                // Prepare template parameters
+                const templateParams = {
+                    to_email: 'erik@nwcustomapparel.com',
+                    order_number: orderData.tempOrderNumber,
+                    customer_name: `${customerData.firstName} ${customerData.lastName}`,
+                    customer_email: customerData.email,
+                    customer_phone: customerData.phone || '',
+                    company_name: customerData.company || 'N/A',
+                    print_location: orderSettings.printLocationName || 'Left Chest',
+                    payment_status: paymentStatus,
+                    error_section: errorSection,
+                    products_table: productsTable,
+                    subtotal: `$${(orderTotals.subtotal || 0).toFixed(2)}`,
+                    total: `$${(orderTotals.grandTotal || 0).toFixed(2)}`,
+                    message_section: messageSection,
+                    order_data_section: orderDataSection
+                };
+
+                console.log('[EmailJS] Sending staff notification email to: erik@nwcustomapparel.com');
+
+                // Send email via EmailJS
+                await emailjs.send(
+                    'service_1c4k67j',           // Service ID
+                    'template_sample_sales',      // Template ID for staff
+                    templateParams
+                );
+
+                console.log('[EmailJS] ✓ Staff notification email sent successfully');
+
+            } catch (error) {
+                console.error('[EmailJS] Failed to send staff notification email:', error);
+                // Don't throw - email failure shouldn't break the success page
+            }
         }
 
         /**
@@ -693,6 +916,12 @@
                     if (result.orderNumber) {
                         document.getElementById('orderNumber').textContent = result.orderNumber;
                     }
+
+                    // Send customer confirmation email
+                    await sendCustomerConfirmationEmail(orderData, paymentData);
+
+                    // Send staff notification email
+                    await sendStaffNotificationEmail(orderData, paymentData);
 
                     // Clear pending order from session
                     sessionStorage.removeItem('3day_pending_order');
