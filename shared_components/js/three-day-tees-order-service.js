@@ -572,6 +572,15 @@ class ThreeDayTeesOrderService {
                </div>`
             : '';
 
+        // Build special instructions HTML (only if notes exist)
+        const customerNotes = orderData.notes[0]?.text || '';
+        const messageSectionHtml = customerNotes ?
+            `<div class="section" style="margin: 1.5rem 0;">
+                <h2 style="color: #2d5f3f; font-size: 18px; border-bottom: 2px solid #2d5f3f; padding-bottom: 8px; margin-bottom: 15px;">📝 Special Instructions</h2>
+                <p style="background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 4px solid #2d5f3f; margin: 0; white-space: pre-wrap; color: #333;">${customerNotes}</p>
+            </div>`
+            : '';
+
         const emailData = {
             to_email: orderData.customer.email,
             to_name: `${orderData.customer.firstName} ${orderData.customer.lastName}`,
@@ -598,7 +607,7 @@ class ThreeDayTeesOrderService {
             total: `$${orderData.total.toFixed(2)}`,
             company_phone: '253-922-5793',
             reply_to: 'erik@nwcustomapparel.com',
-            message: orderData.notes[0]?.text || 'No special instructions'
+            message_section: messageSectionHtml
         };
 
         await emailjs.send(this.emailServiceId, 'template_sample_customer', emailData);
@@ -634,6 +643,14 @@ class ThreeDayTeesOrderService {
                 <span style="color: #78350f; font-size: 0.875rem;">No payment confirmation received - follow up with customer</span>
                </div>`;
 
+        // Build special instructions HTML for sales team
+        const salesMessageSection = customerNotes ?
+            `<div class="section" style="margin: 1.5rem 0;">
+                <h2 style="color: #2d5f3f; font-size: 18px; border-bottom: 2px solid #2d5f3f; padding-bottom: 8px; margin-bottom: 15px;">📝 Special Instructions</h2>
+                <p style="background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 4px solid #2d5f3f; margin: 0; white-space: pre-wrap; color: #333;">${customerNotes}</p>
+            </div>`
+            : '<p style="color: #6b7280; font-style: italic;">No special instructions provided</p>';
+
         const emailData = {
             to_email: 'erik@nwcustomapparel.com',
             bcc_email: 'erik@nwcustomapparel.com',
@@ -659,7 +676,7 @@ class ThreeDayTeesOrderService {
             subtotal: `$${subtotal.toFixed(2)}`,
             total: `$${orderData.total.toFixed(2)}`,
             company_phone: '253-922-5793',
-            message: orderData.notes[0]?.text || 'No special instructions'
+            message_section: salesMessageSection
         };
 
         await emailjs.send(this.emailServiceId, 'template_sample_sales', emailData);
