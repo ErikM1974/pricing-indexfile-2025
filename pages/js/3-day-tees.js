@@ -709,7 +709,7 @@
 
         // Initialize services
         const pricingService = new DTGPricingService();
-        const orderService = new ThreeDayTeesOrderService();
+        // Note: orderService removed - orders now submitted via server.js endpoint (see success page)
 
         // Helper function to upload file to Caspio storage
         // Returns URL to hosted file instead of base64 data (reduces payload size by 99%)
@@ -3517,6 +3517,8 @@
         }
 
         // Submit order with payment ID
+        // NOTE: This function is NO LONGER USED - Stripe flow redirects to success page instead
+        // Order submission now happens in pages/3-day-tees-success.html → server.js endpoint
         async function submitOrderWithPayment(paymentId) {
             try {
                 showLoading(true);
@@ -3644,15 +3646,11 @@
 
                 // Get pricing totals from state (single source of truth)
                 const { grandTotal: orderTotal, salesTax, shipping: shippingCost } = state.orderTotals;
-                // Submit order using ThreeDayTeesOrderService
-                const result = await orderService.submitOrder(
-                    customerData,
-                    state.colorConfigs,
-                    orderSettings,
-                    orderTotal,
-                    salesTax,
-                    shippingCost
-                );
+                // NOTE: Old code removed - ThreeDayTeesOrderService was deleted
+                // Orders now submit via server.js endpoint from success page
+                // This entire function is unreachable (Stripe redirect happens first)
+                /* REMOVED: orderService.submitOrder() call - service file deleted */
+                const result = { success: false, error: 'This code path is no longer used' };
 
                 showLoading(false);
 
