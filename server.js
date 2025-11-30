@@ -900,6 +900,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
     // Transform to ManageOrders API format
     const manageOrdersPayload = {
       orderNumber: tempOrderNumber,
+      customerPurchaseOrder: tempOrderNumber,  // Set PO Number to Order ID
       customer: {
         company: customerData.company || '',  // Maps to CompanyName in proxy
         firstName: customerData.firstName || '',
@@ -933,17 +934,24 @@ app.post('/api/submit-3day-order', async (req, res) => {
         country: 'USA'
       },
       // Additional notes - send as array for proxy to process
-      notes: customerData.notes ? [
-        {
-          note: `3-Day Rush Order\nSpecial Instructions: ${customerData.notes}\nStripe Session: ${stripeSessionId || 'N/A'}`,
-          type: 'Notes To Production'  // Shows in Work Order Notes
-        }
-      ] : [
-        {
-          note: `3-Day Rush Order - Stripe Session: ${stripeSessionId || 'N/A'}`,
-          type: 'Notes On Order'
-        }
-      ],
+      notes: [{
+        type: 'Notes On Order',
+        note: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.
+
+Customer: ${customerData.firstName} ${customerData.lastName}
+Email: ${customerData.email}
+Phone: ${customerData.phone}
+Company: ${customerData.company || 'N/A'}
+Bill To: ${customerData.billingAddress1 || customerData.address1 || ''}, ${customerData.billingCity || customerData.city || ''}, ${customerData.billingState || customerData.state || ''} ${customerData.billingZip || customerData.zip || ''}
+Special Instructions: ${customerData.notes || 'None'}
+
+Payment Information:
+Stripe Session: ${stripeSessionId || 'N/A'}
+Payment Amount: $${paymentAmount ? (paymentAmount / 100).toFixed(2) : orderTotals?.grandTotal || 0}
+Payment Status: ${paymentConfirmed ? 'succeeded' : 'pending'}
+
+Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
+      }],
       rushOrder: true,
       printLocation: orderSettings?.printLocationName || 'Left Chest',
       // Tax fields - proxy expects at root level (not nested in totals)
