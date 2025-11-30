@@ -279,6 +279,7 @@ class ThreeDayTeesOrderService {
                 dateNeeded: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                 salesRep: 'Erik Mickelson',
                 terms: 'Prepaid', // Payment made via Stripe
+                customerPurchaseOrder: orderNumber, // Set PO Number to Order ID (e.g., "3DT-1129-06-276")
                 customer: {
                     firstName: customerData.firstName,
                     lastName: customerData.lastName,
@@ -306,7 +307,21 @@ class ThreeDayTeesOrderService {
                 }],
                 notes: [{
                     type: 'Notes On Order',
-                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval. ${customerData.notes || ''} Total: $${orderTotal.toFixed(2)} (includes sales tax 10.1%)`
+                    text: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.
+
+Customer: ${customerData.firstName} ${customerData.lastName}
+Email: ${customerData.email}
+Phone: ${customerData.phone}
+Company: ${customerData.company || 'N/A'}
+Bill To: ${customerData.billingAddress1}, ${customerData.billingCity}, ${customerData.billingState} ${customerData.billingZip}
+Special Instructions: ${customerData.notes || 'None'}
+
+Payment Information:
+Stripe Session: ${orderSettings.paymentData?.paymentId || 'N/A'}
+Payment Amount: $${orderTotal.toFixed(2)}
+Payment Status: ${orderSettings.paymentData?.status || 'Unknown'}
+
+Total: $${orderTotal.toFixed(2)} (includes sales tax 10.1%)`
                 }],
                 // Payments block - Stripe payment data
                 payments: orderSettings.paymentData ? [{
