@@ -12,38 +12,14 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 4. **NO Silent API Failures** - ALWAYS show errors when API fails. Never use fallback data silently.
 5. **ALWAYS Update ACTIVE_FILES.md** - Every file create/delete/move must update documentation immediately.
 
-## 🚨 CRITICAL: 3-Day Tees Integration Code Path
+## 🚨 CRITICAL: 3-Day Tees Order Submission
 
-**IMPORTANT:** The 3-Day Tees order submission has a specific code path that is NOT obvious:
+**IMPORTANT:** 3-Day Tees order submission uses `server.js:749` NOT a service class!
 
-### The CORRECT Code Path:
-1. User completes payment via Stripe → Redirects to `pages/3-day-tees-success.html`
-2. Success page retrieves order data from `sessionStorage`
-3. Success page calls `POST /api/submit-3day-order` endpoint
-4. **`server.js:749`** handles the endpoint and builds the ManageOrders payload
-5. Calls ManageOrders PUSH API via `caspio-pricing-proxy`
+- ✅ Edit `server.js` lines 749-1050 for order payload changes
+- ❌ `ThreeDayTeesOrderService` was deleted (unused dead code)
 
-### What NOT to Edit:
-- ❌ `shared_components/js/three-day-tees-order-service.js` - **DELETED** (was unused dead code)
-- ❌ Any "ThreeDayTeesOrderService" class references
-
-### What TO Edit for 3-Day Tees Orders:
-- ✅ **`server.js`** lines 749-1050 - `/api/submit-3day-order` endpoint
-- ✅ `pages/3-day-tees-success.html` - Success page that calls the endpoint
-- ✅ `caspio-pricing-proxy/lib/manageorders-push-client.js` - Backend transformation
-
-### Key Fields in server.js Payload:
-```javascript
-const manageOrdersPayload = {
-  customerPurchaseOrder: tempOrderNumber,  // REQUIRED for ShopWorks PO field
-  notes: [{
-    type: 'Notes On Order',  // NOT "Notes To Production"
-    note: `Full customer details, billing, payment info...`
-  }]
-};
-```
-
-**Why This Matters:** In Nov 2024, we spent hours debugging why edits to the service file weren't working - it was completely unused! Always verify the actual code path before making changes.
+**Full details:** See `/memory/3-day-tees/SHOPWORKS-INTEGRATION.md`
 
 ## Pre-Flight Checklist
 
