@@ -164,7 +164,9 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
           console.log('[Webhook] Retrieved order data from Caspio');
 
           // Call existing ShopWorks submission endpoint
-          const shopWorksResponse = await fetch(`http://localhost:${PORT}/api/submit-3day-order`, {
+          // Use production domain instead of localhost for Heroku compatibility
+          const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+          const shopWorksResponse = await fetch(`${baseUrl}/api/submit-3day-order`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
