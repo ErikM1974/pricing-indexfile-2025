@@ -3179,7 +3179,12 @@
                             printLocation: selectedLocation
                         },
                         successUrl: `${window.location.origin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}`,
-                        cancelUrl: `${window.location.origin}/pages/3-day-tees.html?payment=cancelled`
+                        cancelUrl: `${window.location.origin}/pages/3-day-tees.html?payment=cancelled`,
+                        // NEW: Add full order data for Caspio save + webhook metadata
+                        customerData: customerData,
+                        colorConfigs: state.colorConfigs,
+                        orderTotals: state.orderTotals,
+                        orderSettings: orderSettings
                     }),
                 });
 
@@ -3188,12 +3193,15 @@
                     throw new Error(errorData.error || 'Failed to create checkout session');
                 }
 
-                const { url: checkoutUrl } = await checkoutResponse.json();
+                const { url: checkoutUrl, quoteID } = await checkoutResponse.json();
 
                 if (!checkoutUrl) {
                     throw new Error('No checkout URL returned from server');
                 }
 
+                if (quoteID) {
+                    console.log('[Payment] ✓ Quote saved to Caspio:', quoteID);
+                }
                 console.log('[Payment] ✓ Checkout session created, redirecting to Stripe...');
 
                 // ===== STEP 6: Redirect to Stripe Checkout =====

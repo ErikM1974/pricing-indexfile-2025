@@ -79,6 +79,147 @@ if (autoRecovery) {
 // Compress all responses
 app.use(compression());
 
+// CRITICAL: Stripe webhook needs raw body for signature verification
+// This route MUST be defined BEFORE bodyParser.json() middleware
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const mode = process.env.STRIPE_MODE || 'development';
+    const endpointSecret = mode === 'production'
+      ? process.env.STRIPE_WEBHOOK_SECRET_LIVE
+      : process.env.STRIPE_WEBHOOK_SECRET_TEST;
+
+    if (!endpointSecret) {
+      console.error('[Webhook] Secret not configured for mode:', mode);
+      return res.status(500).send('Webhook secret not configured');
+    }
+
+    const sig = req.headers['stripe-signature'];
+    const stripeInstance = stripe(
+      mode === 'production'
+        ? process.env.STRIPE_LIVE_SECRET_KEY
+        : process.env.STRIPE_TEST_SECRET_KEY
+    );
+
+    // Verify webhook signature (prevents fake webhooks)
+    let event;
+    try {
+      event = stripeInstance.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+      console.error('[Webhook] Signature verification failed:', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log('[Webhook] Event received:', event.type, event.id);
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      const metadata = session.metadata || {};
+      const quoteID = metadata.quoteID;
+
+      if (!quoteID) {
+        console.warn('[Webhook] No quoteID in metadata');
+        return res.json({ received: true });
+      }
+
+      console.log('[Webhook] Processing payment for QuoteID:', quoteID);
+
+      // Check idempotency - has this webhook already been processed?
+      const checkUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=QuoteID='${quoteID}'`;
+      const checkResponse = await fetch(checkUrl);
+      const quoteSessions = await checkResponse.json();
+
+      if (quoteSessions && quoteSessions.length > 0) {
+        const quoteSession = quoteSessions[0];
+
+        // If already processed, skip
+        if (quoteSession.Status === 'Payment Confirmed' || quoteSession.Status === 'Processed') {
+          console.log('[Webhook] Already processed, skipping:', quoteID);
+          return res.json({ received: true, status: 'duplicate' });
+        }
+
+        // Update status to Payment Confirmed
+        const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${quoteSession.PK_ID}`;
+        await fetch(updateUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            Status: 'Payment Confirmed',
+            Notes: `${quoteSession.Notes}\nPayment Confirmed: ${new Date().toISOString()}\nStripe Payment Intent: ${session.payment_intent}\nAmount: $${(session.amount_total / 100).toFixed(2)}`
+          })
+        });
+
+        console.log('[Webhook] ✓ Payment confirmed for:', quoteID);
+
+        // Now submit to ShopWorks
+        try {
+          // Retrieve order data from Caspio (instead of Stripe metadata)
+          // This avoids Stripe's 500-character metadata limit
+          const orderData = {
+            customerData: JSON.parse(quoteSession.CustomerDataJSON || '{}'),
+            colorConfigs: JSON.parse(quoteSession.ColorConfigsJSON || '{}'),
+            orderTotals: JSON.parse(quoteSession.OrderTotalsJSON || '{}'),
+            orderSettings: JSON.parse(quoteSession.OrderSettingsJSON || '{}')
+          };
+
+          console.log('[Webhook] Retrieved order data from Caspio');
+
+          // Call existing ShopWorks submission endpoint
+          const shopWorksResponse = await fetch(`http://localhost:${PORT}/api/submit-3day-order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tempOrderNumber: quoteID,
+              customerData: orderData.customerData,
+              colorConfigs: orderData.colorConfigs,
+              orderTotals: orderData.orderTotals,
+              orderSettings: orderData.orderSettings,
+              paymentConfirmed: true,
+              stripeSessionId: session.id,
+              paymentAmount: session.amount_total
+            })
+          });
+
+          if (shopWorksResponse.ok) {
+            const result = await shopWorksResponse.json();
+
+            // Update to Processed
+            await fetch(updateUrl, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                Status: 'Processed',
+                Notes: `${quoteSession.Notes}\nShopWorks Order Created: ${result.orderNumber || 'N/A'}\nSubmitted: ${new Date().toISOString()}`
+              })
+            });
+
+            console.log('[Webhook] ✓ ShopWorks order created:', quoteID);
+          } else {
+            throw new Error(`ShopWorks API returned ${shopWorksResponse.status}`);
+          }
+
+        } catch (shopWorksError) {
+          console.error('[Webhook] ShopWorks submission failed:', shopWorksError);
+
+          // Update status to indicate failure
+          await fetch(updateUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Status: 'Payment Confirmed - ShopWorks Failed',
+              Notes: `${quoteSession.Notes}\nShopWorks Error: ${shopWorksError.message}\nRequires manual processing`
+            })
+          });
+        }
+      }
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('[Webhook] Error:', error);
+    res.status(500).send('Webhook processing failed');
+  }
+});
+
 // Parse JSON and URL-encoded bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -93,6 +234,66 @@ const staticOptions = {
     res.setHeader('Expires', '0');
   }
 };
+
+// ============================================================================
+// 3-Day Tees Helper Functions (following Christmas Bundles pattern)
+// ============================================================================
+
+// Generate 3-Day Tees Quote ID (following Christmas Bundles pattern)
+function generate3DTQuoteID() {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const sequence = Math.floor(Math.random() * 10000);
+  const paddedSequence = String(sequence).padStart(4, '0');
+  return `3DT${month}${day}-${paddedSequence}`;
+}
+
+// Save 3-Day Tees order to quote_sessions (Christmas Bundles pattern)
+async function save3DTQuoteSession(data) {
+  const { quoteID, customerData, orderTotals, stripeSessionId, colorConfigs, orderSettings } = data;
+
+  const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
+
+  const sessionData = {
+    QuoteID: quoteID,
+    SessionID: stripeSessionId ? `stripe_${stripeSessionId}` : `3dt_${Date.now()}`,
+    Status: 'Pending Payment',
+    CustomerName: `${customerData.firstName} ${customerData.lastName}`,
+    CompanyName: customerData.company || '',
+    CustomerEmail: customerData.email,
+    Phone: customerData.phone || '',
+    TotalQuantity: orderTotals.totalQuantity || 0,
+    SubtotalAmount: parseFloat((orderTotals.subtotal || 0).toFixed(2)),
+    LTMFeeTotal: parseFloat((orderTotals.ltmFee || 0).toFixed(2)),
+    TotalAmount: parseFloat((orderTotals.grandTotal || 0).toFixed(2)),
+    ExpiresAt: formattedExpiresAt,
+    Notes: `3-Day Tees Rush Order${stripeSessionId ? ` | Stripe Session: ${stripeSessionId}` : ''}`,
+
+    // Store full order data as JSON (for webhook retrieval)
+    // This eliminates Stripe metadata size constraints
+    CustomerDataJSON: customerData ? JSON.stringify(customerData) : '{}',
+    ColorConfigsJSON: colorConfigs ? JSON.stringify(colorConfigs) : '{}',
+    OrderTotalsJSON: orderTotals ? JSON.stringify(orderTotals) : '{}',
+    OrderSettingsJSON: orderSettings ? JSON.stringify(orderSettings) : '{}'
+  };
+
+  const apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions';
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(sessionData)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to save quote session: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  console.log('[3-Day Tees] Quote session created:', quoteID);
+  return result;
+}
 
 // Serve product.html routes BEFORE static middleware to avoid conflicts
 app.get('/product', (req, res) => {
@@ -572,6 +773,51 @@ app.post('/api/create-payment-intent', async (req, res) => {
 // POST /api/create-checkout-session - Create Stripe Checkout Session (hosted page)
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
+    const {
+      line_items,         // Stripe line items from frontend
+      customer_email,      // Customer email
+      totalAmount,        // Total in dollars
+      metadata,           // { tempOrderNumber, customerName, totalQty, printLocation }
+      successUrl,         // Redirect URL on success
+      cancelUrl,          // Redirect URL on cancel
+      customerData,       // Full customer data (NEW - for Caspio save)
+      colorConfigs,       // Color configurations (NEW - for webhook metadata)
+      orderTotals,        // Order totals (NEW - for webhook metadata)
+      orderSettings       // Order settings (NEW - for webhook metadata)
+    } = req.body;
+
+    // Validate required fields
+    if (!totalAmount || !successUrl || !cancelUrl) {
+      return res.status(400).json({
+        error: 'Missing required fields: totalAmount, successUrl, and cancelUrl are required'
+      });
+    }
+
+    // Generate QuoteID first (Christmas Bundles pattern)
+    const quoteID = generate3DTQuoteID();
+
+    console.log('[3-Day Tees Checkout] Creating session for QuoteID:', quoteID);
+
+    // Save to Caspio BEFORE Stripe redirect (prevents data loss)
+    if (customerData && orderTotals) {
+      try {
+        await save3DTQuoteSession({
+          quoteID,
+          customerData,
+          orderTotals,
+          colorConfigs,      // NEW: Store full config for webhook retrieval
+          orderSettings,     // NEW: Store settings for webhook retrieval
+          stripeSessionId: null // Will update when Stripe session created
+        });
+        console.log('[3-Day Tees Checkout] ✓ Order saved to Caspio:', quoteID);
+      } catch (error) {
+        console.error('[3-Day Tees Checkout] Failed to save to Caspio:', error);
+        return res.status(500).json({ error: 'Failed to save order data' });
+      }
+    } else {
+      console.warn('[3-Day Tees Checkout] Missing customerData or orderTotals - skipping Caspio save');
+    }
+
     const mode = process.env.STRIPE_MODE || 'development';
     const secretKey = mode === 'production'
       ? process.env.STRIPE_LIVE_SECRET_KEY
@@ -582,96 +828,51 @@ app.post('/api/create-checkout-session', async (req, res) => {
       return res.status(500).json({ error: 'Stripe secret key not configured' });
     }
 
-    // Initialize Stripe with the appropriate secret key
     const stripeInstance = stripe(secretKey);
-
-    const {
-      orderDetails,      // { items: [...], totalQuantity, rushFee }
-      customerInfo,      // { name, email, phone }
-      totalAmount,       // Total in dollars (will convert to cents)
-      successUrl,        // Redirect URL on success
-      cancelUrl,         // Redirect URL on cancel
-      orderId            // Order reference ID
-    } = req.body;
-
-    // Validate required fields
-    if (!totalAmount || !successUrl || !cancelUrl) {
-      return res.status(400).json({
-        error: 'Missing required fields: totalAmount, successUrl, and cancelUrl are required'
-      });
-    }
-
-    console.log('[Stripe Checkout] Creating session:', {
-      totalAmount,
-      mode,
-      orderId,
-      customerEmail: customerInfo?.email
-    });
-
-    // Build line items for checkout
-    const lineItems = [];
-
-    // Add order items
-    if (orderDetails?.items && orderDetails.items.length > 0) {
-      orderDetails.items.forEach(item => {
-        lineItems.push({
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: item.name || '3-Day Tees Order Item',
-              description: item.description || `${item.color || ''} - ${item.size || ''}`
-            },
-            unit_amount: Math.round((item.unitPrice || 0) * 100) // Convert to cents
-          },
-          quantity: item.quantity || 1
-        });
-      });
-    } else {
-      // Fallback: single line item for total
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: '3-Day Tees Custom Order',
-            description: orderId ? `Order ${orderId}` : 'Custom printed t-shirts with rush delivery'
-          },
-          unit_amount: Math.round(totalAmount * 100) // Convert to cents
-        },
-        quantity: 1
-      });
-    }
-
-    // NOTE: Rush fee is already included in per-shirt prices (not a separate line item)
-    // The subtotal already contains the 25% rush fee built into each unit price
 
     // Create checkout session
     const sessionConfig = {
       payment_method_types: ['card'],
-      line_items: lineItems,
+      line_items: line_items || [],
       mode: 'payment',
-      success_url: successUrl,
+      customer_email: customer_email,
+      success_url: successUrl.replace('{CHECKOUT_SESSION_ID}', '{CHECKOUT_SESSION_ID}') + `&quote_id=${quoteID}`,
       cancel_url: cancelUrl,
       metadata: {
-        order_id: orderId || 'unknown',
-        source: '3-day-tees',
-        total_quantity: orderDetails?.totalQuantity || 0
+        quoteID: quoteID,
+        source: '3day-tees'
+        // NOTE: Full order data now stored in Caspio (not Stripe metadata)
+        // Webhook will query Caspio using quoteID to retrieve order data
+        // This eliminates Stripe's 500-character metadata limit
       }
     };
-
-    // Add customer email if provided
-    if (customerInfo?.email) {
-      sessionConfig.customer_email = customerInfo.email;
-    }
-
-    // Add shipping address collection if needed
-    // sessionConfig.shipping_address_collection = { allowed_countries: ['US'] };
 
     const session = await stripeInstance.checkout.sessions.create(sessionConfig);
 
     console.log('[Stripe Checkout] Session created:', session.id);
 
+    // Update Caspio with Stripe session ID
+    if (customerData && orderTotals) {
+      try {
+        const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=QuoteID='${quoteID}'`;
+        await fetch(updateUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            SessionID: `stripe_${session.id}`,
+            Notes: `3-Day Tees Rush Order | Stripe Session: ${session.id} | Status: Checkout Created`
+          })
+        });
+        console.log('[3-Day Tees Checkout] ✓ Updated Caspio with Stripe session ID');
+      } catch (error) {
+        console.error('[3-Day Tees Checkout] Failed to update Caspio with session ID:', error);
+        // Don't fail the request - order is already in Caspio
+      }
+    }
+
     res.json({
       sessionId: session.id,
+      quoteID: quoteID,
       url: session.url
     });
 
