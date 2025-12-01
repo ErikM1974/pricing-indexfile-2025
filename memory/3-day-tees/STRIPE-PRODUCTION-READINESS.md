@@ -190,11 +190,79 @@ if (isLocalDev) {
 
 ---
 
+## 🚨 CRITICAL: Production Deployment - BASE_URL Configuration
+
+**⚠️ MUST READ BEFORE DEPLOYING TO PRODUCTION ⚠️**
+
+### The Localhost Problem
+
+**Issue:** The webhook handler in `server.js:167-169` makes an HTTP call to `/api/submit-3day-order`. In local development, this works fine using `localhost`. **However, on Heroku, `localhost` refers to the dyno itself, NOT the public app URL.**
+
+**Symptoms:**
+- Webhook shows 200 OK in Stripe Dashboard ✅
+- Payment processes successfully in Stripe ✅
+- No order creates in ShopWorks ❌
+- No confirmation emails sent ❌
+- Caspio status: "Payment Confirmed - ShopWorks Failed" ❌
+- Caspio Notes: `connect ECONNREFUSED 127.0.0.1:443`
+
+**Root Cause:**
+```javascript
+// WRONG - Fails in production
+const shopWorksResponse = await fetch(`http://localhost:${PORT}/api/submit-3day-order`, {
+  method: 'POST',
+  body: JSON.stringify(orderData)
+});
+```
+
+**Fix Applied (commit 187ce9b):**
+```javascript
+// CORRECT - Works in both dev and production
+const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+const shopWorksResponse = await fetch(`${baseUrl}/api/submit-3day-order`, {
+  method: 'POST',
+  body: JSON.stringify(orderData)
+});
+```
+
+### Production Testing Results
+
+**First Production Order:** 3DT1201-9867 ($290.94)
+
+**Before Fix:**
+- ❌ Webhook 200 OK but no ShopWorks order
+- ❌ Status: "Payment Confirmed - ShopWorks Failed"
+- ❌ Error: `connect ECONNREFUSED 127.0.0.1:443`
+
+**After Fix:**
+- ✅ Webhook 200 OK and order created
+- ✅ ShopWorks Order #139337 created
+- ✅ Status: "Processed"
+- ✅ All order data correct
+- ✅ Stripe Session ID in Order Notes
+
+**How to Fix Future Deployments:**
+```bash
+# 1. Set BASE_URL environment variable in Heroku
+heroku config:set BASE_URL=https://www.teamnwca.com --app sanmar-inventory-app
+
+# 2. Restart Heroku to load new variable
+heroku restart --app sanmar-inventory-app
+
+# 3. Verify configuration
+heroku config --app sanmar-inventory-app | grep BASE_URL
+```
+
+---
+
 ## 🔧 Environment Configuration
 
 ### Required Environment Variables
 
 ```env
+# Server Configuration
+BASE_URL=https://www.teamnwca.com  # CRITICAL: Required for webhook in production
+
 # Stripe Configuration
 STRIPE_MODE=development              # or 'production'
 
@@ -238,6 +306,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 **2. Update Heroku Config:**
 ```bash
+heroku config:set BASE_URL=https://www.teamnwca.com  # CRITICAL: Must set first!
 heroku config:set STRIPE_MODE=production
 heroku config:set STRIPE_LIVE_PUBLIC_KEY=pk_live_...
 heroku config:set STRIPE_LIVE_SECRET_KEY=sk_live_...
@@ -249,9 +318,16 @@ heroku config:set STRIPE_WEBHOOK_SECRET_LIVE=whsec_...
 git push heroku main
 ```
 
-**4. Test with $0.50 Charge:**
+**4. Restart Heroku (Important!):**
+```bash
+heroku restart --app sanmar-inventory-app
+# Ensures all environment variables are loaded
+```
+
+**5. Test with $0.50 Charge:**
 - Complete test order with real card
 - Verify order creates in ShopWorks
+- Check Caspio status shows "Processed" (NOT "ShopWorks Failed")
 - Refund test payment in Stripe Dashboard
 
 ---
@@ -460,6 +536,90 @@ app.post('/api/create-checkout-session', paymentLimiter, handler);
 1. Add rate limiting on payment endpoints (30 minutes)
 2. Set up monitoring dashboard (1 hour)
 3. Create daily reconciliation report (1 hour)
+
+---
+
+## 🔍 Troubleshooting Production Issues
+
+### Issue: Webhook 200 OK But No Order in ShopWorks
+
+**Symptoms:**
+- ✅ Stripe Dashboard shows webhook delivered (200 OK)
+- ✅ Payment processes successfully
+- ❌ No order appears in ShopWorks ManageOrders
+- ❌ No confirmation emails sent
+- ❌ Caspio status: "Payment Confirmed - ShopWorks Failed"
+
+**Diagnosis Steps:**
+
+**1. Check Caspio Order Status:**
+```bash
+# Look up the order by QuoteID (e.g., 3DT1201-9867)
+curl -s "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=QuoteID='3DT1201-9867'" | python -m json.tool
+```
+
+**Look for:**
+- `Status`: Should be "Processed", not "Payment Confirmed - ShopWorks Failed"
+- `Notes`: Contains error details if submission failed
+- `SessionID`: Stripe session ID for cross-reference
+
+**2. Common Error Messages:**
+
+| Error in Caspio Notes | Cause | Fix |
+|----------------------|-------|-----|
+| `connect ECONNREFUSED 127.0.0.1:443` | BASE_URL not set in Heroku | Set `BASE_URL=https://www.teamnwca.com` |
+| `fetch failed` | Network/firewall issue | Check Heroku logs, verify API endpoint |
+| `Invalid API credentials` | ShopWorks credentials wrong | Check Heroku config vars |
+| `Timeout` | ShopWorks API slow/down | Retry webhook from Stripe Dashboard |
+
+**3. Fix BASE_URL Issue:**
+```bash
+# Set the environment variable
+heroku config:set BASE_URL=https://www.teamnwca.com --app sanmar-inventory-app
+
+# Restart to load new config
+heroku restart --app sanmar-inventory-app
+
+# Verify it's set
+heroku config --app sanmar-inventory-app | grep BASE_URL
+```
+
+**4. Resend Failed Webhook:**
+- Go to Stripe Dashboard → Developers → Webhooks
+- Click on your webhook endpoint
+- Find the failed event (checkout.session.completed)
+- Click "..." menu → "Resend event"
+- Check if order now appears in ShopWorks
+
+**5. Manual Recovery for Failed Orders:**
+```bash
+# Query Caspio for orders stuck in "Payment Confirmed" status
+curl "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=Status='Payment Confirmed - ShopWorks Failed'"
+
+# For each failed order, resend the webhook OR manually submit via API
+```
+
+### Cross-Referencing Stripe and ShopWorks
+
+**Finding Stripe Payment in ShopWorks:**
+
+1. **Order Notes** (Best Method):
+   - ShopWorks Order → Notes tab
+   - Look for: `Payment Information: Stripe Session: cs_live_...`
+   - This is the full Stripe Session ID
+
+2. **Payment AuthCode**:
+   - ShopWorks Order → Payment tab
+   - AuthCode field contains Stripe Session ID
+
+3. **Payment Check Number**:
+   - ShopWorks Order → Payment tab
+   - Check Number = Internal payment reference
+
+**Finding ShopWorks Order from Stripe:**
+- Copy Stripe Session ID (e.g., `cs_live_b1Pg3iIvqWf7bi5...`)
+- Search ShopWorks Order Notes for this ID
+- Or query Caspio by SessionID to find QuoteID
 
 ---
 
