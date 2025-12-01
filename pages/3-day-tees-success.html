@@ -836,108 +836,135 @@
         /**
          * Verify payment session with backend
          */
-        async function verifyPayment() {
+        /**
+         * Check order status from Caspio (webhook-based flow)
+         */
+        async function checkOrderStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quoteID = urlParams.get('quote_id');
+
             if (!sessionId) {
-                showError('No payment session found. Please return to the order page and try again.', 'NO_SESSION');
+                showError('Missing session information. Please contact support.', 'NO_SESSION');
                 return;
             }
 
-            try {
-                // Verify payment with our backend
-                const response = await fetch('/api/verify-checkout-session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ sessionId })
-                });
+            if (!quoteID) {
+                showError('Missing order information. Please contact support.', 'NO_QUOTE_ID');
+                return;
+            }
 
-                const data = await response.json();
+            console.log('[Success Page] Checking order status for QuoteID:', quoteID);
+
+            const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+            try {
+                // Query quote_sessions for this order
+                const response = await fetch(`${apiBase}/api/quote_sessions?filter=QuoteID='${quoteID}'`);
 
                 if (!response.ok) {
-                    throw new Error(data.error || 'Payment verification failed');
+                    throw new Error('Failed to retrieve order status');
                 }
 
-                if (data.paymentStatus === 'complete' || data.paymentStatus === 'paid') {
-                    // Payment successful - show success and submit order to ShopWorks
-                    showSuccess(data);
+                const sessions = await response.json();
 
-                    // If order hasn't been submitted yet, submit to ShopWorks
-                    if (!data.orderSubmitted) {
-                        await submitOrderToShopWorks(data);
+                if (sessions && sessions.length > 0) {
+                    const quoteSession = sessions[0];
+
+                    console.log('[Success Page] Order found. Status:', quoteSession.Status);
+
+                    // Prepare display data
+                    const displayData = {
+                        orderId: quoteSession.QuoteID,
+                        orderNumber: quoteSession.QuoteID,
+                        amountTotal: quoteSession.TotalAmount,
+                        amount: quoteSession.TotalAmount * 100 // Convert to cents for compatibility
+                    };
+
+                    // Show status-specific messages
+                    if (quoteSession.Status === 'Processed') {
+                        showSuccess(displayData);
+                        console.log('[Success Page] ✓ Order successfully processed');
+
+                        // Parse order data from Caspio JSON fields
+                        try {
+                            const orderData = {
+                                tempOrderNumber: quoteSession.QuoteID,
+                                customerData: JSON.parse(quoteSession.CustomerDataJSON || '{}'),
+                                colorConfigs: JSON.parse(quoteSession.ColorConfigsJSON || '{}'),
+                                orderTotals: JSON.parse(quoteSession.OrderTotalsJSON || '{}'),
+                                orderSettings: JSON.parse(quoteSession.OrderSettingsJSON || '{}'),
+                                pricingData: { productName: 'Port & Company Core Cotton Tee' }
+                            };
+
+                            console.log('[Success Page] Parsed order data from Caspio:', orderData);
+
+                            // Send emails (customer + staff)
+                            await sendCustomerConfirmationEmail(orderData, displayData);
+                            await sendStaffNotificationEmail(orderData, displayData);
+                        } catch (emailError) {
+                            console.error('[Success Page] Email sending failed:', emailError);
+                        }
+                    } else if (quoteSession.Status === 'Payment Confirmed') {
+                        showProcessingMessage('Payment confirmed. Your order is being submitted to production...');
+                        // Retry check in 3 seconds (webhook might still be processing)
+                        setTimeout(checkOrderStatus, 3000);
+                    } else if (quoteSession.Status && quoteSession.Status.includes('Failed')) {
+                        showWarningMessage('Payment received! Your order requires manual processing. You will be contacted shortly.');
+                        // Still show order number
+                        document.getElementById('orderNumber').textContent = quoteSession.QuoteID;
+                    } else {
+                        showProcessingMessage('Processing your order...');
+                        setTimeout(checkOrderStatus, 3000);
                     }
-                } else if (data.paymentStatus === 'expired') {
-                    showError('This payment session has expired. Please start a new order.', 'SESSION_EXPIRED');
+
                 } else {
-                    showError('Payment was not completed. Please try again.', 'PAYMENT_INCOMPLETE');
+                    // Order not found yet - webhook hasn't processed
+                    showProcessingMessage('Processing your payment...');
+                    setTimeout(checkOrderStatus, 2000);
                 }
 
             } catch (error) {
-                console.error('[3-Day Tees Success] Verification error:', error);
-                showError(error.message || 'Unable to verify payment. Please contact support.', 'VERIFY_ERROR');
+                console.error('[Success Page] Error checking order status:', error);
+                showError('Unable to retrieve order confirmation. Please contact support with order ID: ' + quoteID, 'STATUS_ERROR');
             }
         }
 
         /**
-         * Submit order to ShopWorks (ManageOrders API)
+         * Show processing message
          */
-        async function submitOrderToShopWorks(paymentData) {
-            try {
-                // Retrieve order data from sessionStorage (saved before redirect)
-                const savedOrderData = sessionStorage.getItem('3day_pending_order');
+        function showProcessingMessage(message) {
+            loadingState.style.display = 'block';
+            successState.style.display = 'none';
+            errorState.style.display = 'none';
 
-                if (!savedOrderData) {
-                    console.warn('[3-Day Tees Success] No pending order data found in session');
-                    return;
-                }
-
-                const orderData = JSON.parse(savedOrderData);
-
-                // Add payment confirmation details
-                orderData.paymentConfirmed = true;
-                orderData.stripeSessionId = sessionId;
-                orderData.paymentAmount = paymentData.amount;
-
-                // Submit to ShopWorks via our API
-                const response = await fetch('/api/submit-3day-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    console.log('[3-Day Tees Success] Order submitted to ShopWorks:', result.orderNumber);
-
-                    // Update order number display
-                    if (result.orderNumber) {
-                        document.getElementById('orderNumber').textContent = result.orderNumber;
-                    }
-
-                    // Send customer confirmation email
-                    await sendCustomerConfirmationEmail(orderData, paymentData);
-
-                    // Send staff notification email
-                    await sendStaffNotificationEmail(orderData, paymentData);
-
-                    // Clear pending order from session
-                    sessionStorage.removeItem('3day_pending_order');
-                } else {
-                    console.error('[3-Day Tees Success] ShopWorks submission failed:', result.error);
-                    // Don't show error to user - payment was successful, order can be processed manually
-                }
-
-            } catch (error) {
-                console.error('[3-Day Tees Success] Error submitting to ShopWorks:', error);
-                // Silent fail - payment was successful, support can process manually
+            const loadingText = document.querySelector('.loading-spinner p');
+            if (loadingText) {
+                loadingText.textContent = message;
             }
         }
 
-        // Start verification when page loads
-        document.addEventListener('DOMContentLoaded', verifyPayment);
+        /**
+         * Show warning message (payment succeeded but order needs manual processing)
+         */
+        function showWarningMessage(message) {
+            loadingState.style.display = 'none';
+            successState.style.display = 'none';
+            errorState.style.display = 'block';
+
+            // Use error state but with warning styling
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorCode').style.display = 'none';
+
+            // Change styling to yellow/warning instead of red/error
+            const errorContainer = document.querySelector('.error-state');
+            if (errorContainer) {
+                errorContainer.style.borderColor = '#f59e0b';
+                errorContainer.style.backgroundColor = '#fef3c7';
+            }
+        }
+
+        // Start checking order status when page loads
+        document.addEventListener('DOMContentLoaded', checkOrderStatus);
     </script>
 </body>
 </html>
