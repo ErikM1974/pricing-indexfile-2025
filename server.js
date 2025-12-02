@@ -1001,6 +1001,19 @@ app.post('/api/submit-3day-order', async (req, res) => {
 
     console.log('[3-Day Order] Built lineItems:', lineItems.length, 'items');
 
+    // Add Less Than Minimum fee as a line item (if applicable)
+    if (orderTotals?.ltmFee && orderTotals.ltmFee > 0) {
+      lineItems.push({
+        partNumber: 'LTM-75',
+        description: 'Less Than Minimum $75.00',
+        color: '',
+        size: '',
+        quantity: 1,
+        price: orderTotals.ltmFee
+      });
+      console.log('[3-Day Order] Added LTM fee line item: $' + orderTotals.ltmFee);
+    }
+
     // Extract unique product colors from the order for "For Product Colors" field
     const uniqueColors = [...new Set(
       Object.values(colorConfigs)
