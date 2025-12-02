@@ -9,11 +9,12 @@ class LaserTumblerPage {
         this.apiService = new JDSApiService();
         this.inventoryService = new ManageOrdersInventoryService();
 
-        // Selected Polar Camel 16oz SKUs (3 color variants)
+        // Selected Polar Camel 16oz SKUs (4 color variants)
         this.POLAR_CAMEL_16OZ_SKUS = [
             'LTM752',  // Black
             'LTM763',  // Maroon
-            'LTM765'   // Green
+            'LTM765',  // Green
+            'LTM761'   // Navy
         ];
 
         // Product state
