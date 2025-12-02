@@ -3835,3 +3835,158 @@
         border-radius: 20px;
     }
 }
+
+/* ===================================
+   3-DAY TEES RUSH SERVICE BANNER
+   =================================== */
+
+.rush-service-banner {
+    background: linear-gradient(135deg, #1a472a 0%, #2f661e 50%, #4cb354 100%);
+    padding: 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid #4cb354;
+    box-shadow: 0 4px 12px rgba(47, 102, 30, 0.2);
+}
+
+/* Animated background pattern */
+.rush-service-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 20px,
+        rgba(255, 255, 255, 0.03) 20px,
+        rgba(255, 255, 255, 0.03) 40px
+    );
+    animation: slidePattern 20s linear infinite;
+}
+
+@keyframes slidePattern {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(50%); }
+}
+
+.rush-banner-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.rush-badge-container {
+    flex-shrink: 0;
+}
+
+.live-badge {
+    background: #fbbf24;
+    color: #000000;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+    animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6); }
+}
+
+.rush-text {
+    flex: 1;
+}
+
+.rush-headline {
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rush-headline i {
+    color: #fbbf24;
+    animation: flash 1.5s ease-in-out infinite;
+}
+
+@keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.rush-subheadline {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.rush-cta-button {
+    background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.125rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    flex-shrink: 0;
+}
+
+.rush-cta-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(255, 107, 53, 0.5);
+}
+
+.rush-cta-button i {
+    transition: transform 0.3s ease;
+}
+
+.rush-cta-button:hover i {
+    transform: translateX(4px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rush-service-banner {
+        padding: 1.5rem 1rem;
+    }
+
+    .rush-banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.25rem;
+    }
+
+    .rush-headline {
+        font-size: 1.5rem;
+        justify-content: center;
+    }
+
+    .rush-subheadline {
+        font-size: 1rem;
+    }
+
+    .rush-cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
