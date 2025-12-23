@@ -321,154 +321,217 @@
             animation: subtle-pulse 3s infinite;
         }
 
-        /* Bento Grid Layout - Modern 2025 Dashboard Design */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
+        /* Live Ready Badge for Christmas Bundles */
+        .live-badge {
+            display: inline-block;
+            margin-left: 8px;
+            background: #22c55e;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            animation: live-pulse 2s infinite;
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
         }
 
-        .bento-card {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            background: white;
-            border-radius: 16px;
-            padding: 1.75rem 2rem;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-                        0 1px 2px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+        @keyframes live-pulse {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+            }
+            50% {
+                opacity: 0.85;
+                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.5);
+            }
         }
 
-        .bento-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12),
-                        0 8px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .bento-card-icon {
+        /* Enhanced Seasonal Promotion Buttons */
+        .seasonal-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            flex-shrink: 0;
+            gap: 0.875rem;
+            padding: 1.25rem 1.75rem;
+            border-radius: 16px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        .bento-card-icon i {
-            font-size: 1.5rem;
+        .seasonal-btn i {
+            font-size: 1.75rem;
+            font-weight: 900;
             color: white;
         }
 
-        .bento-card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+        .seasonal-btn span {
+            color: white;
         }
 
-        .bento-card-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #1f2937;
+        .seasonal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.08);
         }
 
-        .bento-card-subtitle {
-            font-size: 0.875rem;
-            color: #6b7280;
-            font-weight: 400;
+        /* Bundle Orders - Northwest Green */
+        .seasonal-btn-orders {
+            background: linear-gradient(135deg, #27a844 0%, #1e7e34 100%);
         }
 
-        /* 3 Day Tees Card - Blue/Teal */
-        .bento-card-3day .bento-card-icon {
+        .seasonal-btn-orders:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+        }
+
+        /* 3 Day Tees - Blue/Teal Gradient */
+        .seasonal-btn-3day {
             background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            position: relative;
         }
 
-        .bento-card-3day:hover .bento-card-icon {
+        .seasonal-btn-3day:hover {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         }
 
-        /* Top Sellers Card - Orange */
-        .bento-card-sellers .bento-card-icon {
+        .coming-soon-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #fbbf24;
+            color: #000000 !important;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+
+        /* Christmas Bundles - Red/Christmas Gradient */
+        .seasonal-btn-christmas {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            position: relative;
+        }
+
+        .seasonal-btn-christmas:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+        }
+
+        .seasonal-btn-christmas .live-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.8px;
+        }
+
+        /* Top Sellers - Orange Gradient */
+        .seasonal-btn-sellers {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         }
 
-        .bento-card-sellers:hover .bento-card-icon {
+        .seasonal-btn-sellers:hover {
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         }
 
-        /* Bento Badge */
-        .bento-badge {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            padding: 4px 10px;
+        /* Employee Bundles Section */
+        .employee-bundles-section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
             border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            border: 1px solid #e5e7eb;
         }
 
-        .bento-badge-live {
-            background: #22c55e;
-            color: white;
-            animation: bento-pulse 2s ease-in-out infinite;
+        .employee-bundles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
         }
 
-        @keyframes bento-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Sidebar Employee Bundles */
-        .sidebar-bundle-link {
+        .company-box {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.625rem 0.875rem;
-            color: var(--text-primary);
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            min-height: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: all 0.3s ease;
             text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .sidebar-bundle-link:hover {
-            background: var(--wsu-crimson);
             color: white;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .bundle-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
+        /* Active company box (Drain-Pro) */
+        .company-box-active {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white !important;
         }
 
-        /* Responsive Bento Grid */
+        .company-box-active:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Override browser default link colors for active company boxes */
+        .company-box-active,
+        .company-box-active:link,
+        .company-box-active:visited,
+        .company-box-active:hover,
+        .company-box-active:active {
+            color: white !important;
+        }
+
+        /* Ensure child elements inherit white color */
+        .company-box-active *,
+        .company-box-active:visited * {
+            color: white !important;
+        }
+
+        /* Placeholder boxes (Coming Soon) */
+        .company-box-placeholder {
+            background: #f3f4f6;
+            color: #9ca3af;
+            border: 2px dashed #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .company-box i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .coming-soon-text {
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .bento-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+            .seasonal-btn {
+                padding: 1rem 1.25rem;
+                font-size: 1rem;
             }
 
-            .bento-card {
-                padding: 1.25rem 1.5rem;
-            }
-
-            .bento-card-icon {
-                width: 48px;
-                height: 48px;
-            }
-
-            .bento-card-icon i {
-                font-size: 1.25rem;
+            .seasonal-btn i {
+                font-size: 1.5rem;
             }
         }
 
@@ -1197,6 +1260,109 @@
             color: var(--text-secondary);
         }
 
+        /* Weather Widget */
+        .weather-widget {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .weather-widget:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .weather-loading {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .weather-icon {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .weather-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .weather-temp {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .weather-desc {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-condition {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .weather-location {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .weather-extra {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+        }
+
+        .weather-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 1rem;
+            border-left: 1px solid var(--border-light);
+        }
+
+        .weather-stat:first-child {
+            border-left: none;
+        }
+
+        .weather-stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .weather-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         /* Sales Goal Banner */
         .sales-goal-banner {
             background: linear-gradient(135deg, #f59e0b, #eab308);
@@ -1525,6 +1691,20 @@
             color: white;
         }
 
+        @media (max-width: 768px) {
+            .weather-widget {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .weather-extra {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+        
         /* KPI Dashboard Cards */
         .kpi-grid {
             display: grid;
@@ -3253,6 +3433,243 @@
             font-size: 1rem;
         }
 
+        /* Graduation Year Guessing Game Styles */
+        .graduation-game-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(152, 30, 50, 0.3);
+        }
+
+        .graduation-game-btn:hover {
+            background: linear-gradient(135deg, #b82940 0%, #981e32 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(152, 30, 50, 0.4);
+        }
+
+        .graduation-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .graduation-modal-overlay.active {
+            display: flex;
+        }
+
+        .graduation-modal {
+            background: white;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .graduation-modal-header {
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .graduation-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .graduation-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .graduation-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .graduation-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+        }
+
+        .graduation-instructions {
+            text-align: center;
+            color: #5e6a71;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .graduation-game-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .graduation-column {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            background: #f9f9f9;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .graduation-column h3 {
+            margin: 0 0 1rem 0;
+            color: #333;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .grad-event-row {
+            background: white;
+            border: 2px dashed #ccc;
+            margin-bottom: 0.75rem;
+            padding: 1rem;
+            border-radius: 6px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .grad-event-row:hover {
+            border-color: #981e32;
+            background: #fdf8f9;
+        }
+
+        .grad-event-text {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .grad-name-bank {
+            min-height: 120px;
+            border: 2px solid #5e6a71;
+            padding: 1rem;
+            background: #eef;
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            align-content: flex-start;
+        }
+
+        .grad-name-tag {
+            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
+            color: white;
+            padding: 0.625rem 1rem;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            user-select: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .grad-name-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .grad-name-tag:active {
+            cursor: grabbing;
+        }
+
+        .graduation-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .graduation-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .graduation-btn-check {
+            background: #10b981;
+            color: white;
+        }
+
+        .graduation-btn-check:hover {
+            background: #059669;
+        }
+
+        .graduation-btn-reset {
+            background: #5e6a71;
+            color: white;
+        }
+
+        .graduation-btn-reset:hover {
+            background: #4b5563;
+        }
+
+        .grad-event-row.correct {
+            border: 3px solid #10b981 !important;
+            background: #d1fae5 !important;
+        }
+
+        .grad-event-row.wrong {
+            border: 3px solid #ef4444 !important;
+            background: #fee2e2 !important;
+        }
+
     </style>
     
     <!-- Calculator Link Styles -->
@@ -3565,36 +3982,7 @@
                             </a>
                         </div>
                     </div>
-
-                    <!-- Employee Bundles -->
-                    <div class="nav-section collapsed" data-section="employee-bundles">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>🏷️</span>
-                                <span>Employee Bundles</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <a href="/DrainPro-Bundle.html" class="sidebar-bundle-link">
-                                <span class="bundle-dot" style="background: #ef4444;"></span>
-                                <span>Drain-Pro</span>
-                            </a>
-                            <a href="/streich-bros-bundle.html" class="sidebar-bundle-link">
-                                <span class="bundle-dot" style="background: #2C2997;"></span>
-                                <span>Streich Bros</span>
-                            </a>
-                            <a href="/wcttr-bundle.html" class="sidebar-bundle-link">
-                                <span class="bundle-dot" style="background: #1f2937;"></span>
-                                <span>WCTTR</span>
-                            </a>
-                            <a href="/christmas-bundles.html" class="sidebar-bundle-link">
-                                <span class="bundle-dot" style="background: #dc2626;"></span>
-                                <span>Christmas Bundles</span>
-                            </a>
-                        </div>
-                    </div>
-
+                    
                     <!-- 5. Training (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="training">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
@@ -3854,6 +4242,12 @@
                         </div>
                     </div>
 
+                    <!-- Graduation Year Guessing Game Button -->
+                    <button class="graduation-game-btn" onclick="openGraduationGame()" title="Play the Graduation Year Guessing Game with your coworkers!">
+                        <span>🎓</span>
+                        <span>Guess The Grad Year</span>
+                    </button>
+
                     <!-- Celebrations Widget -->
                     <div class="celebrations-widget" title="Click to view upcoming celebrations and staff directory">
                         <span class="anniversaries-label">Team Celebrations:</span>
@@ -3934,27 +4328,93 @@
                         <p class="welcome-subtitle">Here's what's happening at Northwest Custom Apparel today.</p>
                     </div>
 
-                    <!-- Quick Actions - Bento Grid -->
-                    <div class="bento-grid">
-                        <a href="/pages/3-day-tees.html" class="bento-card bento-card-3day">
-                            <div class="bento-card-icon">
+                    <!-- Weather Widget -->
+                    <div class="weather-widget" id="weatherWidget">
+                        <div class="weather-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading weather...
+                        </div>
+                    </div>
+                    
+                    <!-- Seasonal & Promotions -->
+                    <div class="bundles-section" style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">Seasonal & Promotions</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                            <!-- 3 Day Tees Coming Soon Button -->
+                            <a href="/pages/3-day-tees.html" class="seasonal-btn seasonal-btn-3day">
                                 <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="bento-card-content">
-                                <span class="bento-card-title">3 Day Tees</span>
-                                <span class="bento-card-subtitle">Quick turnaround printing</span>
-                            </div>
-                            <span class="bento-badge bento-badge-live">LIVE</span>
-                        </a>
-                        <a href="top-sellers-showcase.html" class="bento-card bento-card-sellers">
-                            <div class="bento-card-icon">
+                                <span>3 Day Tees</span>
+                                <span class="coming-soon-badge">LIVE</span>
+                            </a>
+                            <a href="/bundle-orders-dashboard.html" class="seasonal-btn seasonal-btn-orders">
+                                <i class="fas fa-box-open"></i>
+                                <span>Bundle Orders</span>
+                            </a>
+                            <a href="christmas-bundles.html" class="seasonal-btn seasonal-btn-christmas">
+                                <i class="fas fa-gift"></i>
+                                <span>Christmas Bundles</span>
+                                <span class="live-badge">LIVE</span>
+                            </a>
+                            <a href="top-sellers-showcase.html" class="seasonal-btn seasonal-btn-sellers">
                                 <i class="fas fa-star"></i>
+                                <span>Top Sellers & Richardson 112</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Employee Bundles -->
+                    <div class="employee-bundles-section">
+                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">
+                            <i class="fas fa-id-badge"></i> Employee Bundles
+                        </h3>
+                        <div class="employee-bundles-grid">
+                            <!-- Drain-Pro (Active) -->
+                            <a href="/DrainPro-Bundle.html" class="company-box company-box-active">
+                                <i class="fas fa-users"></i>
+                                <span>Drain-Pro</span>
+                            </a>
+
+                            <!-- Streich Bros (Active) -->
+                            <a href="/streich-bros-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #2C2997 0%, #1f1d6b 100%);">
+                                <i class="fas fa-hard-hat"></i>
+                                <span>Streich Bros</span>
+                            </a>
+
+                            <!-- WCTTR (Active) -->
+                            <a href="/wcttr-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
+                                <i class="fas fa-truck"></i>
+                                <span>WCTTR</span>
+                            </a>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 4</span>
+                                <div class="coming-soon-text">Coming Soon</div>
                             </div>
-                            <div class="bento-card-content">
-                                <span class="bento-card-title">Top Sellers & Richardson 112</span>
-                                <span class="bento-card-subtitle">Popular products & caps</span>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 5</span>
+                                <div class="coming-soon-text">Coming Soon</div>
                             </div>
-                        </a>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 6</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 7</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+
+                            <div class="company-box company-box-placeholder">
+                                <i class="fas fa-building"></i>
+                                <span>Company 8</span>
+                                <div class="coming-soon-text">Coming Soon</div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Quick Hitter Tips Widget (Shows tips from last 14 days) -->
@@ -6810,6 +7270,77 @@
             }
         }
         
+        // Weather Widget Functions
+        async function loadWeatherData() {
+            const widget = document.getElementById('weatherWidget');
+            if (!widget) return;
+
+            const API_KEY = '698f949da5e313a1b30eeb6ffc4bd5c8';
+            const CITY = 'Milton';
+            const STATE = 'WA';
+            const COUNTRY = 'US';
+            const UNITS = 'imperial';
+
+            try {
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY},${STATE},${COUNTRY}&appid=${API_KEY}&units=${UNITS}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Weather data not available');
+                }
+
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                console.error('Weather fetch error:', error);
+                widget.innerHTML = `
+                    <div class="weather-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Weather data unavailable
+                    </div>
+                `;
+            }
+        }
+
+        function displayWeather(data) {
+            const widget = document.getElementById('weatherWidget');
+            if (!widget) return;
+
+            const temp = Math.round(data.main.temp);
+            const feelsLike = Math.round(data.main.feels_like);
+            const description = data.weather[0].description;
+            const humidity = data.main.humidity;
+            const windSpeed = Math.round(data.wind.speed);
+            const icon = getWeatherIcon(data.weather[0].main);
+
+            widget.innerHTML = `
+                <div class="weather-details">
+                    <div class="weather-main">
+                        <div class="weather-icon">${icon}</div>
+                        <div class="weather-temp">${temp}°F</div>
+                        <div class="weather-desc">
+                            <span class="weather-condition">${description}</span>
+                            <span class="weather-location">Milton, WA</span>
+                        </div>
+                    </div>
+                    <div class="weather-extra">
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${feelsLike}°F</span>
+                            <span class="weather-stat-label">Feels Like</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${humidity}%</span>
+                            <span class="weather-stat-label">Humidity</span>
+                        </div>
+                        <div class="weather-stat">
+                            <span class="weather-stat-value">${windSpeed} mph</span>
+                            <span class="weather-stat-label">Wind</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         // Quick Tips Carousel Variables
         let currentTipIndex = 0;
         let quickTips = [];
@@ -7056,16 +7587,36 @@
             console.log(`[SalesGoalBanner] Active - ${daysRemaining} days remaining`);
         }
 
+        function getWeatherIcon(condition) {
+            const icons = {
+                'Clear': '☀️',
+                'Clouds': '☁️',
+                'Rain': '🌧️',
+                'Drizzle': '🌦️',
+                'Thunderstorm': '⛈️',
+                'Snow': '❄️',
+                'Mist': '🌫️',
+                'Fog': '🌫️',
+                'Haze': '🌫️'
+            };
+            return icons[condition] || '🌤️';
+        }
+
         // Initialize dashboard on DOM load
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
-
+            
             // Restore sidebar section states
             restoreSidebarStates();
-
+            
             // Load section preferences (collapsed/expanded states)
             loadSectionPreferences();
-
+            
+            // Load weather data
+            loadWeatherData();
+            // Refresh weather every 10 minutes
+            setInterval(loadWeatherData, 600000);
+            
             // Load Quick Tips
             loadQuickTips();
             
@@ -9910,8 +10461,184 @@
             if (modal.style.display === 'flex') {
                 closeManualPricingModal();
             }
+            // Also close graduation game modal
+            const gradModal = document.getElementById('graduationGameModal');
+            if (gradModal && gradModal.classList.contains('active')) {
+                closeGraduationGame();
+            }
         }
     });
+    </script>
+
+    <!-- Graduation Year Guessing Game Modal -->
+    <div class="graduation-modal-overlay" id="graduationGameModal" onclick="if(event.target === this) closeGraduationGame()">
+        <div class="graduation-modal">
+            <div class="graduation-modal-header">
+                <h2>🎓 NW Custom Apparel: Graduation Guessing Game</h2>
+                <button class="graduation-modal-close" onclick="closeGraduationGame()">&times;</button>
+            </div>
+            <div class="graduation-modal-body">
+                <p class="graduation-instructions">
+                    Drag the staff member to their graduation year event! We give you the pop culture and historical context clues—guess the year your coworker graduated high school based on the vibe of that era.
+                </p>
+                <div class="graduation-game-container">
+                    <div class="graduation-column">
+                        <h3>📅 The Timeline</h3>
+                        <div id="gradEventColumn"></div>
+                    </div>
+                    <div class="graduation-column">
+                        <h3>👥 Staff Members</h3>
+                        <div class="grad-name-bank" id="gradNameBank"></div>
+                    </div>
+                </div>
+                <div class="graduation-buttons">
+                    <button class="graduation-btn graduation-btn-check" onclick="checkGradAnswers()">Check Answers</button>
+                    <button class="graduation-btn graduation-btn-reset" onclick="resetGraduationGame()">Reset Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Graduation Year Guessing Game
+    const graduationGameData = [
+        { id: "p1", name: "Jim", year: "1961", event: "Kennedy Inaugurated & First Human in Space" },
+        { id: "p2", name: "Steve", year: "1980", event: "Pac-Man Released & The Empire Strikes Back" },
+        { id: "p3", name: "Ruthie", year: "1989", event: "The Berlin Wall Falls & The Simpsons" },
+        { id: "p4", name: "Erik", year: "1992", event: "Baby Got Back & Wayne's World" },
+        { id: "p5", name: "Nika", year: "2009", event: "Avatar Released & Michael Jackson Passes" },
+        { id: "p6", name: "Brian", year: "2012", event: "Gangnam Style & The Avengers" },
+        { id: "p7", name: "Bradley", year: "2013", event: "Harlem Shake & Frozen Released" },
+        { id: "p8", name: "Taneisha", year: "2016", event: "Stranger Things & Pokemon Go" },
+        { id: "p9", name: "Mikalah", year: "2023", event: "Barbie Movie & Taylor Swift Eras Tour" }
+    ];
+
+    let shuffledGradData = [];
+
+    function shuffleArray(array) {
+        return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function openGraduationGame() {
+        const modal = document.getElementById('graduationGameModal');
+        modal.classList.add('active');
+        initGraduationGame();
+    }
+
+    function closeGraduationGame() {
+        const modal = document.getElementById('graduationGameModal');
+        modal.classList.remove('active');
+    }
+
+    function initGraduationGame() {
+        shuffledGradData = shuffleArray(graduationGameData);
+        const eventCol = document.getElementById('gradEventColumn');
+        const nameBank = document.getElementById('gradNameBank');
+
+        // Clear existing content
+        eventCol.innerHTML = '';
+        nameBank.innerHTML = '';
+
+        // Create drop zones (events) in shuffled order
+        shuffledGradData.forEach(item => {
+            const box = document.createElement('div');
+            box.className = 'grad-event-row';
+            box.id = 'grad-zone-' + item.id;
+            box.ondrop = function(event) { gradDrop(event); };
+            box.ondragover = function(event) { gradAllowDrop(event); };
+
+            const text = document.createElement('div');
+            text.className = 'grad-event-text';
+            text.innerText = item.event;
+
+            box.appendChild(text);
+            eventCol.appendChild(box);
+        });
+
+        // Create draggable name tags (in original order, shuffled display)
+        const shuffledNames = shuffleArray(graduationGameData);
+        shuffledNames.forEach(item => {
+            const tag = document.createElement('div');
+            tag.className = 'grad-name-tag';
+            tag.id = 'grad-' + item.id;
+            tag.draggable = true;
+            tag.innerText = item.name;
+            tag.ondragstart = function(event) { gradDrag(event); };
+            nameBank.appendChild(tag);
+        });
+    }
+
+    function gradAllowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function gradDrag(ev) {
+        ev.dataTransfer.setData('text', ev.target.id);
+    }
+
+    function gradDrop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData('text');
+        const draggedElement = document.getElementById(data);
+
+        // Ensure we drop into the div, not onto the text node inside it
+        let target = ev.target;
+        if (target.classList.contains('grad-event-text')) {
+            target = target.parentElement;
+        }
+        if (target.classList.contains('grad-name-tag')) {
+            target = target.parentElement;
+        }
+
+        // Allow dropping on event rows or the name bank
+        if (target.classList.contains('grad-event-row') || target.classList.contains('grad-name-bank')) {
+            target.appendChild(draggedElement);
+        }
+    }
+
+    function checkGradAnswers() {
+        let score = 0;
+        const total = graduationGameData.length;
+
+        shuffledGradData.forEach(item => {
+            const zone = document.getElementById('grad-zone-' + item.id);
+            const content = zone.getElementsByClassName('grad-name-tag');
+
+            // Clear old styles
+            zone.classList.remove('correct', 'wrong');
+
+            if (content.length > 0) {
+                const personId = content[0].id.replace('grad-', '');
+                if (personId === item.id) {
+                    zone.classList.add('correct');
+                    score++;
+                } else {
+                    zone.classList.add('wrong');
+                }
+            } else {
+                zone.classList.add('wrong');
+            }
+        });
+
+        if (score === total) {
+            alert('🎉 Perfect Score! You matched everyone correctly!');
+        } else {
+            alert('You got ' + score + ' out of ' + total + ' correct. Green = correct, Red = wrong!');
+        }
+    }
+
+    function resetGraduationGame() {
+        // Clear feedback styles
+        shuffledGradData.forEach(item => {
+            const zone = document.getElementById('grad-zone-' + item.id);
+            if (zone) {
+                zone.classList.remove('correct', 'wrong');
+            }
+        });
+
+        // Reinitialize the game
+        initGraduationGame();
+    }
     </script>
 
 </body>
