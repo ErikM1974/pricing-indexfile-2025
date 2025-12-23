@@ -321,217 +321,154 @@
             animation: subtle-pulse 3s infinite;
         }
 
-        /* Live Ready Badge for Christmas Bundles */
-        .live-badge {
-            display: inline-block;
-            margin-left: 8px;
-            background: #22c55e;
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 12px;
-            letter-spacing: 0.5px;
-            vertical-align: middle;
-            animation: live-pulse 2s infinite;
-            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+        /* Bento Grid Layout - Modern 2025 Dashboard Design */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
         }
 
-        @keyframes live-pulse {
-            0%, 100% {
-                opacity: 1;
-                box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
-            }
-            50% {
-                opacity: 0.85;
-                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.5);
-            }
+        .bento-card {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            background: white;
+            border-radius: 16px;
+            padding: 1.75rem 2rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                        0 1px 2px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        /* Enhanced Seasonal Promotion Buttons */
-        .seasonal-btn {
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12),
+                        0 8px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .bento-card-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.875rem;
-            padding: 1.25rem 1.75rem;
-            border-radius: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+
+        .bento-card-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .bento-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .bento-card-title {
             font-size: 1.125rem;
             font-weight: 700;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            color: #1f2937;
         }
 
-        .seasonal-btn i {
-            font-size: 1.75rem;
-            font-weight: 900;
-            color: white;
+        .bento-card-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 400;
         }
 
-        .seasonal-btn span {
-            color: white;
-        }
-
-        .seasonal-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15),
-                        0 4px 6px -2px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Bundle Orders - Northwest Green */
-        .seasonal-btn-orders {
-            background: linear-gradient(135deg, #27a844 0%, #1e7e34 100%);
-        }
-
-        .seasonal-btn-orders:hover {
-            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
-        }
-
-        /* 3 Day Tees - Blue/Teal Gradient */
-        .seasonal-btn-3day {
+        /* 3 Day Tees Card - Blue/Teal */
+        .bento-card-3day .bento-card-icon {
             background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            position: relative;
         }
 
-        .seasonal-btn-3day:hover {
+        .bento-card-3day:hover .bento-card-icon {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         }
 
-        .coming-soon-badge {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            background: #fbbf24;
-            color: #000000 !important;
-            padding: 4px 10px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-        }
-
-        /* Christmas Bundles - Red/Christmas Gradient */
-        .seasonal-btn-christmas {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            position: relative;
-        }
-
-        .seasonal-btn-christmas:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
-        }
-
-        .seasonal-btn-christmas .live-badge {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            margin: 0;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 10px;
-            letter-spacing: 0.8px;
-        }
-
-        /* Top Sellers - Orange Gradient */
-        .seasonal-btn-sellers {
+        /* Top Sellers Card - Orange */
+        .bento-card-sellers .bento-card-icon {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         }
 
-        .seasonal-btn-sellers:hover {
+        .bento-card-sellers:hover .bento-card-icon {
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
         }
 
-        /* Employee Bundles Section */
-        .employee-bundles-section {
-            background: white;
-            padding: 1.5rem;
-            margin: 1rem 0;
+        /* Bento Badge */
+        .bento-badge {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            padding: 4px 10px;
             border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .employee-bundles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-
-        .company-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem 1rem;
-            min-height: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            text-decoration: none;
+        .bento-badge-live {
+            background: #22c55e;
             color: white;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: bento-pulse 2s ease-in-out infinite;
         }
 
-        /* Active company box (Drain-Pro) */
-        .company-box-active {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white !important;
+        @keyframes bento-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
-        .company-box-active:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+        /* Sidebar Employee Bundles */
+        .sidebar-bundle-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
         }
 
-        /* Override browser default link colors for active company boxes */
-        .company-box-active,
-        .company-box-active:link,
-        .company-box-active:visited,
-        .company-box-active:hover,
-        .company-box-active:active {
-            color: white !important;
+        .sidebar-bundle-link:hover {
+            background: var(--wsu-crimson);
+            color: white;
         }
 
-        /* Ensure child elements inherit white color */
-        .company-box-active *,
-        .company-box-active:visited * {
-            color: white !important;
+        .bundle-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        /* Placeholder boxes (Coming Soon) */
-        .company-box-placeholder {
-            background: #f3f4f6;
-            color: #9ca3af;
-            border: 2px dashed #d1d5db;
-            cursor: not-allowed;
-        }
-
-        .company-box i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .coming-soon-text {
-            font-size: 0.75rem;
-            font-weight: 400;
-            opacity: 0.7;
-        }
-
-        /* Responsive adjustments */
+        /* Responsive Bento Grid */
         @media (max-width: 768px) {
-            .seasonal-btn {
-                padding: 1rem 1.25rem;
-                font-size: 1rem;
+            .bento-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
 
-            .seasonal-btn i {
-                font-size: 1.5rem;
+            .bento-card {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .bento-card-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .bento-card-icon i {
+                font-size: 1.25rem;
             }
         }
 
@@ -1260,109 +1197,6 @@
             color: var(--text-secondary);
         }
 
-        /* Weather Widget */
-        .weather-widget {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .weather-widget:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .weather-loading {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .weather-icon {
-            font-size: 2.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .weather-details {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .weather-main {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .weather-temp {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .weather-desc {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .weather-condition {
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .weather-location {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .weather-extra {
-            display: flex;
-            gap: 1.5rem;
-            margin-left: auto;
-        }
-
-        .weather-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 1rem;
-            border-left: 1px solid var(--border-light);
-        }
-
-        .weather-stat:first-child {
-            border-left: none;
-        }
-
-        .weather-stat-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .weather-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .weather-error {
-            color: var(--danger);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
         /* Sales Goal Banner */
         .sales-goal-banner {
             background: linear-gradient(135deg, #f59e0b, #eab308);
@@ -1691,20 +1525,6 @@
             color: white;
         }
 
-        @media (max-width: 768px) {
-            .weather-widget {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .weather-extra {
-                margin-left: 0;
-                width: 100%;
-                justify-content: space-around;
-            }
-        }
-        
         /* KPI Dashboard Cards */
         .kpi-grid {
             display: grid;
@@ -3745,7 +3565,32 @@
                             </a>
                         </div>
                     </div>
-                    
+
+                    <!-- Employee Bundles -->
+                    <div class="nav-section collapsed" data-section="employee-bundles">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏷️</span>
+                                <span>Employee Bundles</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/DrainPro-Bundle.html" class="sidebar-bundle-link">
+                                <span class="bundle-dot" style="background: #ef4444;"></span>
+                                <span>Drain-Pro</span>
+                            </a>
+                            <a href="/streich-bros-bundle.html" class="sidebar-bundle-link">
+                                <span class="bundle-dot" style="background: #2C2997;"></span>
+                                <span>Streich Bros</span>
+                            </a>
+                            <a href="/wcttr-bundle.html" class="sidebar-bundle-link">
+                                <span class="bundle-dot" style="background: #1f2937;"></span>
+                                <span>WCTTR</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- 5. Training (Collapsed by default) -->
                     <div class="nav-section collapsed" data-section="training">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
@@ -4085,93 +3930,27 @@
                         <p class="welcome-subtitle">Here's what's happening at Northwest Custom Apparel today.</p>
                     </div>
 
-                    <!-- Weather Widget -->
-                    <div class="weather-widget" id="weatherWidget">
-                        <div class="weather-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading weather...
-                        </div>
-                    </div>
-                    
-                    <!-- Seasonal & Promotions -->
-                    <div class="bundles-section" style="background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #e5e7eb;">
-                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">Seasonal & Promotions</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
-                            <!-- 3 Day Tees Coming Soon Button -->
-                            <a href="/pages/3-day-tees.html" class="seasonal-btn seasonal-btn-3day">
+                    <!-- Quick Actions - Bento Grid -->
+                    <div class="bento-grid">
+                        <a href="/pages/3-day-tees.html" class="bento-card bento-card-3day">
+                            <div class="bento-card-icon">
                                 <i class="fas fa-clock"></i>
-                                <span>3 Day Tees</span>
-                                <span class="coming-soon-badge">LIVE</span>
-                            </a>
-                            <a href="/bundle-orders-dashboard.html" class="seasonal-btn seasonal-btn-orders">
-                                <i class="fas fa-box-open"></i>
-                                <span>Bundle Orders</span>
-                            </a>
-                            <a href="christmas-bundles.html" class="seasonal-btn seasonal-btn-christmas">
-                                <i class="fas fa-gift"></i>
-                                <span>Christmas Bundles</span>
-                                <span class="live-badge">LIVE</span>
-                            </a>
-                            <a href="top-sellers-showcase.html" class="seasonal-btn seasonal-btn-sellers">
+                            </div>
+                            <div class="bento-card-content">
+                                <span class="bento-card-title">3 Day Tees</span>
+                                <span class="bento-card-subtitle">Quick turnaround printing</span>
+                            </div>
+                            <span class="bento-badge bento-badge-live">LIVE</span>
+                        </a>
+                        <a href="top-sellers-showcase.html" class="bento-card bento-card-sellers">
+                            <div class="bento-card-icon">
                                 <i class="fas fa-star"></i>
-                                <span>Top Sellers & Richardson 112</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Employee Bundles -->
-                    <div class="employee-bundles-section">
-                        <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #374151; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.025em;">
-                            <i class="fas fa-id-badge"></i> Employee Bundles
-                        </h3>
-                        <div class="employee-bundles-grid">
-                            <!-- Drain-Pro (Active) -->
-                            <a href="/DrainPro-Bundle.html" class="company-box company-box-active">
-                                <i class="fas fa-users"></i>
-                                <span>Drain-Pro</span>
-                            </a>
-
-                            <!-- Streich Bros (Active) -->
-                            <a href="/streich-bros-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #2C2997 0%, #1f1d6b 100%);">
-                                <i class="fas fa-hard-hat"></i>
-                                <span>Streich Bros</span>
-                            </a>
-
-                            <!-- WCTTR (Active) -->
-                            <a href="/wcttr-bundle.html" class="company-box company-box-active" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
-                                <i class="fas fa-truck"></i>
-                                <span>WCTTR</span>
-                            </a>
-
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 4</span>
-                                <div class="coming-soon-text">Coming Soon</div>
                             </div>
-
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 5</span>
-                                <div class="coming-soon-text">Coming Soon</div>
+                            <div class="bento-card-content">
+                                <span class="bento-card-title">Top Sellers & Richardson 112</span>
+                                <span class="bento-card-subtitle">Popular products & caps</span>
                             </div>
-
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 6</span>
-                                <div class="coming-soon-text">Coming Soon</div>
-                            </div>
-
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 7</span>
-                                <div class="coming-soon-text">Coming Soon</div>
-                            </div>
-
-                            <div class="company-box company-box-placeholder">
-                                <i class="fas fa-building"></i>
-                                <span>Company 8</span>
-                                <div class="coming-soon-text">Coming Soon</div>
-                            </div>
-                        </div>
+                        </a>
                     </div>
 
                     <!-- Quick Hitter Tips Widget (Shows tips from last 14 days) -->
@@ -7027,77 +6806,6 @@
             }
         }
         
-        // Weather Widget Functions
-        async function loadWeatherData() {
-            const widget = document.getElementById('weatherWidget');
-            if (!widget) return;
-
-            const API_KEY = '698f949da5e313a1b30eeb6ffc4bd5c8';
-            const CITY = 'Milton';
-            const STATE = 'WA';
-            const COUNTRY = 'US';
-            const UNITS = 'imperial';
-
-            try {
-                const url = `https://api.openweathermap.org/data/2.5/weather?q=${CITY},${STATE},${COUNTRY}&appid=${API_KEY}&units=${UNITS}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error('Weather data not available');
-                }
-
-                const data = await response.json();
-                displayWeather(data);
-            } catch (error) {
-                console.error('Weather fetch error:', error);
-                widget.innerHTML = `
-                    <div class="weather-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Weather data unavailable
-                    </div>
-                `;
-            }
-        }
-
-        function displayWeather(data) {
-            const widget = document.getElementById('weatherWidget');
-            if (!widget) return;
-
-            const temp = Math.round(data.main.temp);
-            const feelsLike = Math.round(data.main.feels_like);
-            const description = data.weather[0].description;
-            const humidity = data.main.humidity;
-            const windSpeed = Math.round(data.wind.speed);
-            const icon = getWeatherIcon(data.weather[0].main);
-
-            widget.innerHTML = `
-                <div class="weather-details">
-                    <div class="weather-main">
-                        <div class="weather-icon">${icon}</div>
-                        <div class="weather-temp">${temp}°F</div>
-                        <div class="weather-desc">
-                            <span class="weather-condition">${description}</span>
-                            <span class="weather-location">Milton, WA</span>
-                        </div>
-                    </div>
-                    <div class="weather-extra">
-                        <div class="weather-stat">
-                            <span class="weather-stat-value">${feelsLike}°F</span>
-                            <span class="weather-stat-label">Feels Like</span>
-                        </div>
-                        <div class="weather-stat">
-                            <span class="weather-stat-value">${humidity}%</span>
-                            <span class="weather-stat-label">Humidity</span>
-                        </div>
-                        <div class="weather-stat">
-                            <span class="weather-stat-value">${windSpeed} mph</span>
-                            <span class="weather-stat-label">Wind</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
         // Quick Tips Carousel Variables
         let currentTipIndex = 0;
         let quickTips = [];
@@ -7344,36 +7052,16 @@
             console.log(`[SalesGoalBanner] Active - ${daysRemaining} days remaining`);
         }
 
-        function getWeatherIcon(condition) {
-            const icons = {
-                'Clear': '☀️',
-                'Clouds': '☁️',
-                'Rain': '🌧️',
-                'Drizzle': '🌦️',
-                'Thunderstorm': '⛈️',
-                'Snow': '❄️',
-                'Mist': '🌫️',
-                'Fog': '🌫️',
-                'Haze': '🌫️'
-            };
-            return icons[condition] || '🌤️';
-        }
-
         // Initialize dashboard on DOM load
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
-            
+
             // Restore sidebar section states
             restoreSidebarStates();
-            
+
             // Load section preferences (collapsed/expanded states)
             loadSectionPreferences();
-            
-            // Load weather data
-            loadWeatherData();
-            // Refresh weather every 10 minutes
-            setInterval(loadWeatherData, 600000);
-            
+
             // Load Quick Tips
             loadQuickTips();
             
