@@ -73,19 +73,44 @@ git commit -m "Deploy: updated X files (file1, file2, ...)"
 git push origin develop
 ```
 
-### Step 4: Switch to Main Branch
+### Step 4: ASK FOR CONFIRMATION (REQUIRED)
+
+**CRITICAL: You MUST ask the user for confirmation before proceeding to production.**
+
+Display a summary and ask:
+```
+READY TO DEPLOY TO PRODUCTION?
+
+Summary so far:
+- Branch: develop
+- Committed: X files
+- Pushed to: GitHub (develop branch)
+
+Next steps will:
+- Merge develop → main
+- Create version tag
+- Push to GitHub (main) and Heroku (PRODUCTION)
+
+Are you ready to proceed?
+```
+
+Use the AskUserQuestion tool to get explicit confirmation. **DO NOT proceed without user approval.**
+
+If user says no or wants to stop, return to develop branch and stop.
+
+### Step 5: Switch to Main Branch
 
 ```bash
 git checkout main
 ```
 
-### Step 5: Pull Latest Main (Safety Check)
+### Step 6: Pull Latest Main (Safety Check)
 
 ```bash
 git pull origin main
 ```
 
-### Step 6: Merge Develop into Main
+### Step 7: Merge Develop into Main
 
 ```bash
 git merge develop --no-edit
@@ -109,7 +134,7 @@ git merge develop --no-edit
    ```
 4. **STOP** - do not continue with remaining steps
 
-### Step 7: Create Version Tag
+### Step 8: Create Version Tag
 
 Generate tag in format: `vYYYY.MM.DD.N` where N is sequence number for the day.
 
@@ -128,25 +153,25 @@ If no tags exist for today, use `.1`. Otherwise increment the last sequence numb
 git tag -a v2025.12.23.1 -m "Production deploy"
 ```
 
-### Step 8: Push Main to GitHub (with tags)
+### Step 9: Push Main to GitHub (with tags)
 
 ```bash
 git push origin main --tags
 ```
 
-### Step 9: Push Main to Heroku
+### Step 10: Push Main to Heroku
 
 ```bash
 git push heroku main
 ```
 
-### Step 10: Return to Develop Branch
+### Step 11: Return to Develop Branch
 
 ```bash
 git checkout develop
 ```
 
-### Step 11: Display Success Message
+### Step 12: Display Success Message
 
 ```
 DEPLOY SUCCESSFUL!
@@ -174,17 +199,34 @@ https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
 ```
 Starting deployment...
 
-[1/10] Checking branch... develop
-[2/10] Committing changes... 3 files staged
+[1/12] Checking branch... develop
+[2/12] Committing changes... 3 files staged
        Commit: "Deploy: updated 3 files (calculator.js, styles.css, index.html)"
-[3/10] Pushing develop to GitHub... done
-[4/10] Switching to main... done
-[5/10] Pulling latest main... already up to date
-[6/10] Merging develop into main... done
-[7/10] Creating version tag... v2025.12.23.1
-[8/10] Pushing main to GitHub... done
-[9/10] Pushing to Heroku... done
-[10/10] Returning to develop... done
+[3/12] Pushing develop to GitHub... done
+
+[4/12] CONFIRMATION REQUIRED...
+
+       READY TO DEPLOY TO PRODUCTION?
+
+       Summary so far:
+       - Branch: develop
+       - Committed: 3 files
+       - Pushed to: GitHub (develop branch)
+
+       Next steps will:
+       - Merge develop → main
+       - Create version tag
+       - Push to GitHub (main) and Heroku (PRODUCTION)
+
+       [User confirms: Yes, proceed]
+
+[5/12] Switching to main... done
+[6/12] Pulling latest main... already up to date
+[7/12] Merging develop into main... done
+[8/12] Creating version tag... v2025.12.23.1
+[9/12] Pushing main to GitHub... done
+[10/12] Pushing to Heroku... done
+[11/12] Returning to develop... done
 
 DEPLOY SUCCESSFUL! Version v2025.12.23.1 is now live.
 ```
