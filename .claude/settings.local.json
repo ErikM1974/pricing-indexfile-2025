@@ -40,7 +40,14 @@
       "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\docs\\CLAUDE_CODING_STANDARDS.md\" \"CODING_STANDARDS.md\")",
       "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\memory\\CLAUDE_ARCHITECTURE.md\" \"ARCHITECTURE.md\")",
       "Bash(Rename-Item \"c:\\Users\\erik\\OneDrive - Northwest Custom Apparel\\2025\\Pricing Index File 2025\\memory\\CLAUDE_PATTERNS.md\" \"PATTERNS.md\")",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git pull:*)",
+      "Bash(git tag:*)",
+      "Skill(deploy)",
+      "Skill(deploy:*)"
     ],
     "deny": [],
     "ask": [],
