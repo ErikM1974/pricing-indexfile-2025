@@ -65,6 +65,20 @@
             letter-spacing: 0.5px;
         }
 
+        .main-site-link {
+            display: inline-block;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            margin-top: 0.35rem;
+            transition: color 0.2s ease;
+        }
+
+        .main-site-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -2496,7 +2510,11 @@
             .header-services {
                 font-size: 0.75rem;
             }
-            
+
+            .main-site-link {
+                font-size: 0.7rem;
+            }
+
             .header-info {
                 text-align: left;
             }
