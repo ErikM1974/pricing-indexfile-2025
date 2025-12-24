@@ -396,58 +396,6 @@
             font-weight: bold;
         }
 
-        .product-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .detail-item {
-            padding: 0.75rem;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .detail-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .detail-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            padding: 2rem;
-            border-radius: 12px;
-            color: white;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .cta-section h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .cta-section p {
-            margin-bottom: 1.5rem;
-            opacity: 0.95;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
 
         .btn {
             padding: 0.875rem 2rem;
@@ -580,19 +528,6 @@
                 gap: 2rem;
             }
 
-            .product-details {
-                grid-template-columns: 1fr;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
             .related-grid {
                 grid-template-columns: 1fr;
             }
@@ -633,15 +568,6 @@
 
             .header-container h1 {
                 font-size: 1.5rem;  /* Scale down heading */
-            }
-
-            .cta-buttons {
-                gap: 0.5rem;
-            }
-
-            .btn {
-                padding: 0.75rem;
-                font-size: 0.9rem;
             }
         }
 
@@ -852,36 +778,6 @@
                 </ul>
             </div>
 
-            <div class="product-details" id="productDetails">
-                <div class="detail-item">
-                    <div class="detail-label">Category</div>
-                    <div class="detail-value" id="categoryValue">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Brand</div>
-                    <div class="detail-value" id="brandValue">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Available Sizes</div>
-                    <div class="detail-value" id="sizesValue">XS - 4XL</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Decoration Method</div>
-                    <div class="detail-value" id="decorationValue">-</div>
-                </div>
-            </div>
-
-            <!-- CTA Section: Simplified for sample ordering -->
-            <div class="cta-section" id="ctaSection">
-                <h3>Questions?</h3>
-                <p>Call us for product details, bulk pricing, or custom decoration options</p>
-                <div class="cta-buttons">
-                    <a href="tel:253-922-5793" class="btn btn-primary">
-                        <i class="fas fa-phone"></i>
-                        Call Us: 253-922-5793
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1092,11 +988,6 @@
             // Display main image and thumbnails
             updateMainImage();
             createThumbnails();
-
-            // Update product details
-            document.getElementById('categoryValue').textContent = product.CATEGORY_NAME || 'Apparel';
-            document.getElementById('brandValue').textContent = product.BRAND_NAME || 'Premium Brand';
-            document.getElementById('decorationValue').textContent = getDecorationType(params.type);
 
             // Parse and display features
             if (product.PRODUCT_DESCRIPTION) {
@@ -1319,12 +1210,10 @@
             };
             
             document.getElementById('productDescription').textContent = descriptions[params.type] || 'This is one of our most popular products. Contact us for detailed specifications and custom pricing.';
-            
-            // Detect brand from name
+
+            // Detect brand from name for feature list
             const brand = detectBrand(params.name);
-            document.getElementById('brandValue').textContent = brand;
-            document.getElementById('decorationValue').textContent = getDecorationType(params.type);
-            
+
             // Update features based on brand
             if (brand !== 'Premium Brand') {
                 const brandFeatures = {
@@ -1561,13 +1450,11 @@
                 allParams: params,
                 mode: params.mode,
                 sampleMode: sampleMode,
-                ctaElement: document.getElementById('ctaSection'),
                 sizeQuantityElement: document.getElementById('sizeQuantitySection')
             });
 
             if (sampleMode) {
-                // Hide CTA section, show size/quantity section
-                document.getElementById('ctaSection').style.display = 'none';
+                // Show size/quantity section in sample mode
                 document.getElementById('sizeQuantitySection').style.display = 'block';
 
                 // Update color indicator
@@ -1594,7 +1481,30 @@
             // Get current color from loaded products
             const currentColor = currentProducts[selectedColorIndex]?.CATALOG_COLOR || '';
 
-            // Fetch available sizes from API (color-specific)
+            // Check if this is a cap/headwear product (Richardson, type=caps, etc.)
+            // Caps are typically OSFA (One Size Fits All) and the sizes API doesn't have Richardson data
+            const productName = params.name?.toLowerCase() || '';
+            const brandName = currentProducts[0]?.BRAND_NAME?.toLowerCase() || '';
+            const categoryName = currentProducts[0]?.CATEGORY_NAME?.toLowerCase() || '';
+
+            const isCapProduct = params.type === 'caps' ||
+                                 productName.includes('cap') ||
+                                 productName.includes('trucker') ||
+                                 productName.includes('hat') ||
+                                 productName.includes('beanie') ||
+                                 brandName.includes('richardson') ||
+                                 categoryName.includes('headwear') ||
+                                 categoryName.includes('caps');
+
+            if (isCapProduct) {
+                // Caps are typically One Size Fits All
+                console.log('[SizeGrid] Cap/headwear detected - using OSFA');
+                const sizes = ['OSFA'];
+                displaySizes(gridContainer, sizes);
+                return;
+            }
+
+            // Fetch available sizes from API (color-specific) - for non-cap products
             try {
                 const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sizes-by-style-color?styleNumber=${params.style}&color=${encodeURIComponent(currentColor)}`);
 
@@ -1670,10 +1580,14 @@
             });
         }
 
-        // Display standard sizes as fallback
+        // Display error message when sizes cannot be loaded
         function displayStandardSizes(container) {
-            const standardSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
-            displaySizes(container, standardSizes);
+            container.innerHTML = `
+                <div class="size-error" style="grid-column: 1 / -1; text-align: center; padding: 1.5rem; color: var(--text-secondary); background: #f9fafb; border-radius: 8px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; color: #ef4444;"></i>
+                    <p style="margin: 0;">Unable to load sizes. Please refresh the page or call us at 253-922-5793.</p>
+                </div>
+            `;
         }
 
         // Update quantity for a size

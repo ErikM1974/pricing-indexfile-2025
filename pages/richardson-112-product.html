@@ -90,10 +90,15 @@
             <div class="product-image-section" style="position: relative;">
                 <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <img id="mainProductImage"
-                         src="https://richardson.picarioxpo.com/112_FINAL.pfs?1=1&width=1600&height=950&p.tn=Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg,Black.jpg"
+                         src="https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg"
                          alt="Richardson 112 Trucker Hat"
                          style="width: 100%; height: auto; border-radius: 8px;">
                     <p id="currentColorName" style="text-align: center; margin-top: 1rem; font-size: 1.25rem; font-weight: 600; color: #2c3e50;">Black</p>
+
+                    <!-- Thumbnail Strip -->
+                    <div id="thumbnailStrip" class="thumbnail-strip" style="display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                        <!-- Populated by JavaScript -->
+                    </div>
                 </div>
             </div>
 
@@ -212,18 +217,184 @@
 
     <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // Fetch Richardson 112 colors from SanMar API
+        async function fetchRichardson112Colors() {
+            console.log('[Richardson 112] Fetching colors from SanMar API...');
+            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=112');
+
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[Richardson 112] API returned', data.length, 'records');
+
+            // Deduplicate by COLOR_NAME and categorize by pattern
+            const colorMap = new Map();
+            data.forEach(item => {
+                if (!colorMap.has(item.COLOR_NAME)) {
+                    // Determine category based on color name pattern (count "/" separators)
+                    let category = 'Solid';
+                    const slashCount = (item.COLOR_NAME.match(/\//g) || []).length;
+
+                    if (slashCount === 1) {
+                        category = 'Split';
+                    } else if (slashCount === 2) {
+                        category = 'Tri-Color';
+                    } else if (slashCount >= 3) {
+                        category = 'Combination';
+                    }
+
+                    colorMap.set(item.COLOR_NAME, {
+                        style: '112',
+                        category: category,
+                        color: item.COLOR_NAME,
+                        catalogColor: item.CATALOG_COLOR,
+                        url: item.FRONT_MODEL || item.FRONT_FLAT || item.PRODUCT_IMAGE,  // Main image
+                        swatchUrl: item.COLOR_SQUARE_IMAGE,  // Swatch thumbnail (small image)
+                        // All image types for thumbnail gallery
+                        images: {
+                            'model-front': item.FRONT_MODEL || null,
+                            'model-back': item.BACK_MODEL || null,
+                            'flat-front': item.FRONT_FLAT || null,
+                            'flat-back': item.BACK_FLAT || null
+                        }
+                    });
+                }
+            });
+
+            const colors = Array.from(colorMap.values());
+            console.log('[Richardson 112] Processed', colors.length, 'unique colors from API');
+            return colors;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('[Richardson 112] Page loaded');
-            console.log('[Richardson 112] Available colors:', RICHARDSON_112_COLORS ? RICHARDSON_112_COLORS.length : 0);
 
             // State
             let currentCategory = 'Solid';
             let currentDecorationMethod = 'embroidery';
+            let colorData = [];
+            let selectedColorData = null;  // Track selected color for cart integration
+            let availableImages = {};  // Available image types for current color
+            let currentImageType = 'model-front';  // Current selected view
+
+            // View labels for thumbnails
+            const viewLabels = {
+                'model-front': 'Front View',
+                'model-back': 'Back View',
+                'flat-front': 'Flat Front',
+                'flat-back': 'Flat Back'
+            };
+
+            // Show loading state
+            function showLoading() {
+                document.getElementById('colorGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #4cb354;"></i>
+                        <p style="margin-top: 1rem; color: #6b7280;">Loading colors...</p>
+                    </div>
+                `;
+            }
+
+            // Show loading while fetching
+            showLoading();
+
+            // Try to fetch from SanMar API first, fallback to hardcoded data
+            try {
+                colorData = await fetchRichardson112Colors();
+                console.log('[Richardson 112] Using SanMar API data');
+
+                // Update tab counts based on actual data
+                updateTabCounts(colorData);
+            } catch (error) {
+                console.warn('[Richardson 112] API fetch failed, falling back to hardcoded data:', error);
+                // Use the existing RICHARDSON_112_COLORS from richardson-112-images.js
+                if (typeof RICHARDSON_112_COLORS !== 'undefined' && RICHARDSON_112_COLORS.length > 0) {
+                    colorData = RICHARDSON_112_COLORS;
+                    console.log('[Richardson 112] Using fallback hardcoded data');
+                }
+            }
+
+            // Store globally for other functions
+            window.RICHARDSON_112_COLORS_DATA = colorData;
+            window.selectedColorData = selectedColorData;
+
+            // Update tab counts
+            function updateTabCounts(colors) {
+                const counts = {
+                    'Solid': colors.filter(c => c.category === 'Solid').length,
+                    'Split': colors.filter(c => c.category === 'Split').length,
+                    'Tri-Color': colors.filter(c => c.category === 'Tri-Color').length,
+                    'Combination': colors.filter(c => c.category === 'Combination').length
+                };
+
+                document.querySelectorAll('.tab').forEach(tab => {
+                    const category = tab.dataset.category;
+                    if (counts[category] !== undefined) {
+                        tab.textContent = `${category} (${counts[category]})`;
+                    }
+                });
+            }
+
+            // Create thumbnails for the current color's available images
+            function createThumbnails() {
+                const thumbnailStrip = document.getElementById('thumbnailStrip');
+                if (!thumbnailStrip) return;
+
+                thumbnailStrip.innerHTML = '';
+
+                // Check if we have any images to show
+                const imageTypes = ['model-front', 'model-back', 'flat-front', 'flat-back'];
+                const availableViews = imageTypes.filter(type => availableImages[type]);
+
+                if (availableViews.length === 0) {
+                    thumbnailStrip.style.display = 'none';
+                    return;
+                }
+
+                thumbnailStrip.style.display = 'flex';
+
+                availableViews.forEach(viewType => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'thumbnail' + (viewType === currentImageType ? ' active' : '');
+                    thumb.dataset.viewType = viewType;
+                    thumb.title = viewLabels[viewType] || viewType;
+
+                    thumb.innerHTML = `
+                        <img src="${availableImages[viewType]}" alt="${viewLabels[viewType] || viewType}" loading="lazy">
+                    `;
+
+                    thumb.addEventListener('click', () => selectView(viewType));
+                    thumbnailStrip.appendChild(thumb);
+                });
+
+                console.log('[Richardson 112] Created', availableViews.length, 'thumbnails');
+            }
+
+            // Select a view from the thumbnail strip
+            function selectView(viewType) {
+                if (!availableImages[viewType]) return;
+
+                currentImageType = viewType;
+                document.getElementById('mainProductImage').src = availableImages[viewType];
+
+                // Update active state on thumbnails
+                document.querySelectorAll('.thumbnail').forEach(thumb => {
+                    thumb.classList.toggle('active', thumb.dataset.viewType === viewType);
+                });
+
+                console.log('[Richardson 112] Selected view:', viewType);
+            }
+
+            // Make functions globally available
+            window.createThumbnails = createThumbnails;
+            window.selectView = selectView;
 
             // Populate color grid for a category
             function populateColorGrid(category) {
                 console.log('[Richardson 112] Populating grid for category:', category);
-                const filtered = RICHARDSON_112_COLORS.filter(c => c.category === category);
+                const filtered = colorData.filter(c => c.category === category);
                 const grid = document.getElementById('colorGrid');
                 grid.innerHTML = '';
 
@@ -231,27 +402,121 @@
                     const swatch = document.createElement('div');
                     swatch.className = 'color-swatch';
                     swatch.style.textAlign = 'center';
-                    swatch.innerHTML = `
-                        <img src="${color.url}"
-                             alt="${color.color}"
-                             class="color-swatch-image"
-                             style="width: 70px; height: 70px; border-radius: 8px; border: 3px solid transparent; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                             onmouseover="this.style.borderColor='#4cb354'; this.style.transform='scale(1.05)';"
-                             onmouseout="this.style.borderColor='transparent'; this.style.transform='scale(1)';"
-                             onclick="updateMainImage('${color.url}', '${color.color}')">
-                        <span style="display: block; font-size: 0.75rem; margin-top: 0.25rem; color: #6b7280;">${color.color}</span>
-                    `;
+                    swatch.dataset.catalogColor = color.catalogColor || '';  // Store for inventory
+                    swatch.dataset.colorName = color.color;
+
+                    // Use swatchUrl (COLOR_SQUARE_IMAGE) for thumbnail, fall back to main url
+                    const thumbnailUrl = color.swatchUrl || color.url;
+                    const mainImageUrl = color.url;
+
+                    const img = document.createElement('img');
+                    img.src = thumbnailUrl;
+                    img.alt = color.color;
+                    img.className = 'color-swatch-image';
+                    img.style.cssText = 'width: 70px; height: 70px; border-radius: 8px; border: 3px solid transparent; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: contain; background: #f9fafb;';
+
+                    img.onmouseover = function() {
+                        this.style.borderColor = '#4cb354';
+                        this.style.transform = 'scale(1.05)';
+                    };
+                    img.onmouseout = function() {
+                        this.style.borderColor = 'transparent';
+                        this.style.transform = 'scale(1)';
+                    };
+                    img.onerror = function() {
+                        this.src = mainImageUrl;
+                    };
+
+                    // Click handler - passes full color object with images
+                    img.addEventListener('click', function() {
+                        selectColorWithImages(color, this);
+                    });
+
+                    const label = document.createElement('span');
+                    label.style.cssText = 'display: block; font-size: 0.75rem; margin-top: 0.25rem; color: #6b7280;';
+                    label.textContent = color.color;
+
+                    swatch.appendChild(img);
+                    swatch.appendChild(label);
                     grid.appendChild(swatch);
                 });
 
                 console.log('[Richardson 112] Loaded', filtered.length, 'colors for', category);
+
+                // Update main image to first color in category if available
+                if (filtered.length > 0) {
+                    const firstColor = filtered[0];
+                    selectColorWithImages(firstColor, null);
+                }
             }
 
-            // Update main image
-            window.updateMainImage = function(imageUrl, colorName) {
+            // Select color with full image data - updates main image, thumbnails, and stores cart data
+            function selectColorWithImages(colorObj, clickedElement) {
+                const imageUrl = colorObj.url;
+                const colorName = colorObj.color;
+                const catalogColor = colorObj.catalogColor || '';
+
+                // Update main image
                 document.getElementById('mainProductImage').src = imageUrl;
                 document.getElementById('currentColorName').textContent = colorName;
-                console.log('[Richardson 112] Updated image to:', colorName);
+
+                // Store selected color data for cart integration (CRITICAL for inventory checks)
+                selectedColorData = {
+                    colorName: colorName,
+                    catalogColor: catalogColor,  // This is what ShopWorks needs!
+                    imageUrl: imageUrl
+                };
+                window.selectedColorData = selectedColorData;
+
+                // Update available images for thumbnail gallery
+                if (colorObj.images) {
+                    availableImages = {};
+                    Object.keys(colorObj.images).forEach(key => {
+                        if (colorObj.images[key]) {
+                            availableImages[key] = colorObj.images[key];
+                        }
+                    });
+                } else {
+                    // Fallback: only the main image is available
+                    availableImages = { 'model-front': imageUrl };
+                }
+
+                // Reset to model-front view when changing colors
+                currentImageType = 'model-front';
+
+                // Create thumbnails for the new color
+                createThumbnails();
+
+                // Update swatch active state
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                if (clickedElement) {
+                    clickedElement.closest('.color-swatch')?.classList.add('active');
+                }
+
+                console.log('[Richardson 112] Selected color:', colorName, '| CATALOG_COLOR:', catalogColor, '| Available views:', Object.keys(availableImages).length);
+            }
+
+            // Make function globally available
+            window.selectColorWithImages = selectColorWithImages;
+
+            // Legacy function for backward compatibility (simple select without thumbnails)
+            window.selectColor = function(imageUrl, colorName, catalogColor, clickedElement) {
+                // Find the color in colorData by name to get full object
+                const colorObj = colorData.find(c => c.color === colorName);
+                if (colorObj) {
+                    selectColorWithImages(colorObj, clickedElement);
+                } else {
+                    // Fallback for colors not found - basic update
+                    document.getElementById('mainProductImage').src = imageUrl;
+                    document.getElementById('currentColorName').textContent = colorName;
+                    availableImages = { 'model-front': imageUrl };
+                    createThumbnails();
+                }
+            };
+
+            // Legacy function for backward compatibility
+            window.updateMainImage = function(imageUrl, colorName) {
+                selectColor(imageUrl, colorName, '', null);
             };
 
             // Tab switching
@@ -311,11 +576,17 @@
             window.requestQuote = requestQuote;
 
             // Initial load
-            if (typeof RICHARDSON_112_COLORS !== 'undefined' && RICHARDSON_112_COLORS.length > 0) {
+            if (colorData.length > 0) {
                 populateColorGrid('Solid');
-                console.log('[Richardson 112] Initialization complete');
+                console.log('[Richardson 112] Initialization complete with', colorData.length, 'colors');
             } else {
-                console.error('[Richardson 112] RICHARDSON_112_COLORS not found or empty');
+                console.error('[Richardson 112] No color data available');
+                document.getElementById('colorGrid').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #6b7280;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        Unable to load colors. Please refresh the page or call us at 253-922-5793.
+                    </div>
+                `;
             }
         });
     </script>

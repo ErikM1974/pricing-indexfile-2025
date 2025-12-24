@@ -899,18 +899,41 @@
     
     <style>
         :root {
+            /* Primary - Northwest Custom Apparel Green (unified) */
+            --primary: #4cb354;
+            --primary-hover: #409a47;
+            --primary-light: #e8f5e9;
+
+            /* Legacy aliases for backward compatibility */
             --primary-color: #4cb354;
             --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --bg-color: #f8f9fa;
+            --success: #4cb354;
+
+            /* Neutrals */
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+
+            /* Legacy aliases */
+            --bg-color: #f9fafb;
             --card-bg: #ffffff;
             --border-color: #e5e7eb;
-            --text-primary: #1f2937;
+            --text-primary: #111827;
             --text-secondary: #6b7280;
+
+            /* Shadows */
             --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-            --success: #22c55e;
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+
+            /* Accent (minimal use - badges only) */
+            --accent-red: #ef4444;
+            --accent-gold: #f59e0b;
         }
 
         * {
@@ -1105,11 +1128,11 @@
             transform: translateY(-1px);
         }
 
-        /* Hero Section */
+        /* Hero Section - Clean, minimal design */
         .hero {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
             color: white;
-            padding: 2.5rem 0;
+            padding: 2rem 0;
             text-align: center;
         }
 
@@ -1121,22 +1144,21 @@
 
         .hero h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: 3rem;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.5rem;
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
+            font-size: 0.9375rem;
             margin-bottom: 0;
-            opacity: 0.95;
+            opacity: 0.9;
             font-weight: 400;
         }
 
         .hero-subtitle .separator {
-            margin: 0 0.75rem;
-            opacity: 0.6;
+            margin: 0 0.5rem;
+            opacity: 0.5;
         }
 
         .hero-cta {
@@ -1416,12 +1438,175 @@
             }
         }
 
+        /* ============================================
+           NEW DESIGN: Sticky Category Tabs
+           ============================================ */
+        .category-tabs {
+            position: sticky;
+            top: 70px; /* Below header */
+            z-index: 40;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tabs-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-family: inherit;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn:hover {
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-btn.tab-new2026 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .new-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* ============================================
+           NEW DESIGN: Simple Filter Bar
+           ============================================ */
+        .filter-bar-simple {
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 0;
+        }
+
+        .filter-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .filter-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            background: var(--white);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1rem;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .results-count {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        /* ============================================
+           LEGACY: Keep old filter-bar for backward compatibility
+           (will be hidden but kept for JS references)
+           ============================================ */
         /* Filter Bar */
         .filter-bar {
+            display: none; /* Hidden - replaced by new design */
             background: white;
             padding: 2rem 0;
             border-bottom: 1px solid var(--border-color);
-            /* Sticky positioning removed - filter will scroll normally with content */
         }
 
         .filter-container {
@@ -1743,12 +1928,14 @@
         .product-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: center top;
             transition: transform 0.3s ease;
+            background: #f9fafb;
         }
 
         .product-card:hover .product-image img {
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .product-info {
@@ -2162,6 +2349,61 @@
             background: var(--bg-color);
         }
 
+        /* Sample Info Footer (moved from top of page) */
+        .sample-info-footer {
+            background: var(--gray-100);
+            border-top: 1px solid var(--gray-200);
+            padding: 2rem 0;
+        }
+
+        .sample-info-footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .sample-info-footer h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .sample-info-footer-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .sample-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            max-width: 250px;
+        }
+
+        .sample-info-item i {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-top: 0.125rem;
+        }
+
+        .sample-info-item strong {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: 0.25rem;
+        }
+
+        .sample-info-item p {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin: 0;
+            line-height: 1.4;
+        }
+
         /* Footer */
         .footer {
             background: var(--text-primary);
@@ -2190,6 +2432,57 @@
 
             .hero h1 {
                 font-size: 2rem;
+            }
+
+            /* Tab navigation responsive */
+            .category-tabs {
+                top: 60px;
+            }
+
+            .tabs-container {
+                padding: 0 1rem;
+            }
+
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8125rem;
+            }
+
+            /* Filter bar responsive */
+            .filter-bar-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-left {
+                justify-content: center;
+            }
+
+            .filter-right {
+                justify-content: center;
+            }
+
+            .filter-group {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            /* Sample info footer responsive */
+            .sample-info-footer-grid {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            .sample-info-item {
+                max-width: none;
+                text-align: center;
+                flex-direction: column;
+                align-items: center;
             }
 
             .decoration-filters {
@@ -3111,152 +3404,68 @@
         </div>
     </section>
 
-    <!-- Sample Program Info Banner -->
-    <section class="sample-info-banner">
-        <div class="sample-info-container">
-            <div class="sample-info-grid">
-                <!-- Feature 1: Blank Products -->
-                <div class="sample-info-card">
-                    <div class="sample-info-icon">
-                        <i class="fas fa-tshirt"></i>
-                    </div>
-                    <h3>Blank Products</h3>
-                    <p>Samples arrive with NO LOGOS or decoration. Perfect for testing fabric quality and fit.</p>
-                </div>
+    <!-- Sticky Category Tabs -->
+    <nav class="category-tabs" id="categoryTabs">
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="all" data-filter-type="primary">
+                All Products
+            </button>
+            <button class="tab-btn" data-tab="tshirts" data-filter-type="primary">
+                T-Shirts
+            </button>
+            <button class="tab-btn" data-tab="hoodies" data-filter-type="primary">
+                Hoodies
+            </button>
+            <button class="tab-btn" data-tab="polos" data-filter-type="primary">
+                Polos
+            </button>
+            <button class="tab-btn" data-tab="caps" data-filter-type="primary">
+                Caps
+            </button>
+            <button class="tab-btn" data-tab="jackets" data-filter-type="primary">
+                Jackets
+            </button>
+            <button class="tab-btn" data-tab="richardson" data-filter-type="secondary">
+                Richardson
+            </button>
+            <button class="tab-btn tab-new2026" data-tab="new2026" data-filter-type="secondary">
+                <span class="new-dot" style="background: #10b981;"></span>
+                2026
+            </button>
+        </div>
+    </nav>
 
-                <!-- Feature 2: Free & Paid Options -->
-                <div class="sample-info-card">
-                    <div class="sample-info-icon">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <h3>Free & Paid Samples</h3>
-                    <p><strong>Free Samples:</strong> Up to 3 items marked FREE<br>
-                    <strong>Paid Samples:</strong> Sales rep will send payment link<br>
-                    <strong>Delivery:</strong> 7-10 business days<br>
-                    <strong>Note:</strong> All samples are final sale</p>
+    <!-- Simple Filter Bar -->
+    <div class="filter-bar-simple">
+        <div class="filter-bar-container">
+            <div class="filter-left">
+                <span class="results-count" id="resultsCount">Showing 77 products</span>
+            </div>
+            <div class="filter-right">
+                <div class="filter-group">
+                    <label for="sortSelect">Sort:</label>
+                    <select id="sortSelect" class="filter-select">
+                        <option value="popular">Most Popular</option>
+                        <option value="newest">Newest First</option>
+                        <option value="name">Name A-Z</option>
+                    </select>
                 </div>
-
-                <!-- Feature 3: Test Drive -->
-                <div class="sample-info-card">
-                    <div class="sample-info-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h3>Test Drive Before You Buy</h3>
-                    <p>Keep your samples! Perfect for checking quality before ordering bulk decorated products.</p>
+                <div class="filter-group">
+                    <label for="brandSelect">Brand:</label>
+                    <select id="brandSelect" class="filter-select">
+                        <option value="all">All Brands</option>
+                        <option value="Carhartt">Carhartt</option>
+                        <option value="Port Authority">Port Authority</option>
+                        <option value="Port & Company">Port & Company</option>
+                        <option value="Richardson">Richardson</option>
+                    </select>
                 </div>
+                <label class="filter-checkbox">
+                    <input type="checkbox" id="dtgFilter">
+                    <span>DTG Only</span>
+                </label>
             </div>
         </div>
-    </section>
-
-    <!-- New Arrivals Featured Carousel -->
-    <section class="new-arrivals-banner">
-        <div class="new-arrivals-container">
-            <div class="new-arrivals-header">
-                <div class="new-arrivals-title">
-                    <i class="fas fa-star"></i>
-                    <h2>New Arrivals</h2>
-                </div>
-                <button class="view-all-btn" onclick="filterByCategory('newProducts', 'secondary')">
-                    View All <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-            <div class="new-arrivals-carousel" id="newArrivalsCarousel">
-                <!-- Populated dynamically via JavaScript -->
-                <div class="carousel-loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading new arrivals...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Bestsellers Featured Carousel -->
-    <section class="new-arrivals-banner" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-        <div class="new-arrivals-container">
-            <div class="new-arrivals-header">
-                <div class="new-arrivals-title">
-                    <i class="fas fa-trophy"></i>
-                    <h2>Top Sellers</h2>
-                </div>
-                <button class="view-all-btn" onclick="filterByCategory('bestsellers', 'secondary')">
-                    View All <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-            <div class="new-arrivals-carousel" id="bestsellersCarousel">
-                <!-- Populated dynamically via JavaScript -->
-                <div class="carousel-loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading bestsellers...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-        <!-- Mobile Toggle Button (hidden on desktop) -->
-        <button class="filter-toggle-btn" id="filterToggle" onclick="toggleFilters()" style="display: none;">
-            <span>Shop by Product Type</span>
-            <i class="fas fa-chevron-down"></i>
-        </button>
-
-        <div class="filter-content-wrapper" id="filterContent">
-            <div class="filter-container">
-                <!-- Product Category Filters (PRIMARY) -->
-                <div class="filter-header">
-                    <div class="filter-title">Shop by Product Type</div>
-                    <div class="results-count" id="resultsCount">Showing 77 products</div>
-                </div>
-                <div class="category-filters">
-                <button class="filter-btn active" data-category="all" data-filter-type="primary">
-                    <i class="fas fa-th"></i>
-                    <span>All Products</span>
-                    <span class="count">77</span>
-                </button>
-                <button class="filter-btn" data-category="tshirts" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173535" alt="T-Shirt" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>T-Shirts</span>
-                    <span class="count">28</span>
-                </button>
-                <button class="filter-btn" data-category="hoodies" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173453" alt="Hoodie" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>Hoodies</span>
-                    <span class="count">12</span>
-                </button>
-                <button class="filter-btn" data-category="polos" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173532" alt="Polo" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>Polos</span>
-                    <span class="count">8</span>
-                </button>
-                <button class="filter-btn" data-category="caps" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173527" alt="Cap" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>Caps & Hats</span>
-                    <span class="count">18</span>
-                </button>
-                <button class="filter-btn" data-category="jackets" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173529" alt="Jacket" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>Jackets</span>
-                    <span class="count">7</span>
-                </button>
-                <button class="filter-btn" data-category="workwear" data-filter-type="primary">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173533" alt="Workwear" style="width: 42px; height: 42px; object-fit: contain; margin-bottom: 0.5rem;">
-                    <span>Workwear</span>
-                    <span class="count">4</span>
-                </button>
-            </div>
-
-                <!-- Refinement Filters (SECONDARY - includes DTG as subtle badge) -->
-                <div class="secondary-filters">
-                    <span class="filter-label">Refine by:</span>
-                    <button class="badge-filter" data-category="dtgCompatible" data-filter-type="dtg" title="Show DTG-compatible products (100% cotton or high-cotton blends)">
-                        <i class="fas fa-print"></i> DTG-Compatible <span class="badge-count">24</span>
-                    </button>
-                    <button class="badge-filter" data-category="freshPicks" data-filter-type="secondary">
-                        <i class="fas fa-sparkles"></i> Brinton's Fresh Picks 2025
-                    </button>
-                </div>
-            </div>
-        </div> <!-- Close filter-content-wrapper -->
     </div>
 
     <!-- Products Section -->
@@ -3337,6 +3546,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Sample Program Info (moved from top) -->
+    <section class="sample-info-footer">
+        <div class="sample-info-footer-container">
+            <h3>About Our Sample Program</h3>
+            <div class="sample-info-footer-grid">
+                <div class="sample-info-item">
+                    <i class="fas fa-tshirt"></i>
+                    <div>
+                        <strong>Blank Products</strong>
+                        <p>Samples arrive with NO LOGOS or decoration</p>
+                    </div>
+                </div>
+                <div class="sample-info-item">
+                    <i class="fas fa-tags"></i>
+                    <div>
+                        <strong>Free & Paid Options</strong>
+                        <p>Up to 3 free samples • Paid samples available</p>
+                    </div>
+                </div>
+                <div class="sample-info-item">
+                    <i class="fas fa-truck"></i>
+                    <div>
+                        <strong>Delivery</strong>
+                        <p>7-10 business days • All samples are final sale</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
@@ -3549,8 +3788,9 @@
 
         // Simple image overrides for specific products
         // OPTION A: Hardcoded (quick, works immediately)
+        // Note: Richardson caps now use SanMar API for images (FRONT_MODEL field)
         const imageOverrides = {
-            '112': 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9108697',  // Original 112 image
+            // Original overrides for products that need custom images
             'C112': 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9116050', // C112 override only
             'CP90': 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9169209', // CP90 Port & Company Knit Cap
             'CT104597': 'https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9169220'  // CT104597 Carhartt product
@@ -3868,22 +4108,210 @@
 
             } catch (error) {
                 console.error('[Bestsellers] Error loading carousel:', error);
-                // Fallback to just Richardson 112 if API fails
                 carouselContainer.innerHTML = `
-                    <div class="carousel-product-card" onclick="window.location.href='top-sellers-product.html?style=112&name=Richardson%20-%20Trucker%20Cap'">
-                        <div class="carousel-new-badge" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000;">★ TOP SELLER</div>
-                        <img src="https://www.blankstyle.com/images/products/detail/112black1.jpg"
-                             alt="Richardson - Trucker Cap"
-                             class="carousel-product-image">
-                        <div class="carousel-product-name">Richardson - Trucker Cap</div>
-                        <div class="carousel-product-brand">Richardson • 112</div>
-                        <button class="carousel-sample-btn" onclick="event.stopPropagation(); requestSampleFromCarousel('112', 'Richardson - Trucker Cap', 'Richardson')">
-                            <i class="fas fa-box"></i>
-                            Request Sample
-                        </button>
+                    <div class="carousel-error" style="padding: 2rem; text-align: center; color: var(--gray-500);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Unable to load best sellers. Please refresh the page.</p>
                     </div>
                 `;
-                console.warn('[Bestsellers] Using fallback with Richardson 112 only');
+            }
+        }
+
+        // Richardson Caps data (curated list - images fetched from SanMar API)
+        const richardsonProducts = [
+            // Trucker & 5-Panel
+            { style: '112', name: 'Trucker Cap', description: 'The #1 selling trucker cap in the USA' },
+            { style: '111', name: 'Garment Washed Trucker', description: 'Relaxed fit washed trucker' },
+            { style: '112FP', name: 'Five-Panel Trucker', description: 'Classic five-panel design' },
+            { style: '112FPR', name: 'Five-Panel with Rope', description: 'Five-panel with rope accent' },
+            { style: '112PFP', name: 'Printed Five-Panel Trucker', description: 'Printed mesh back trucker' },
+            { style: '112PL', name: '112+ R-Flex Adjustable', description: 'Stretch-fit adjustable trucker' },
+            { style: '112PT', name: 'Printed Tactical Trucker', description: 'Tactical-style mesh back' },
+            { style: '115', name: 'Low Pro Trucker', description: 'Low profile trucker cap' },
+            // 7-Panel, Performance & More
+            { style: '168', name: '7-Panel Trucker Solid', description: 'Seven-panel solid mesh' },
+            { style: '168P', name: '7-Panel Trucker Printed', description: 'Seven-panel printed mesh' },
+            { style: '169', name: 'Cannon 7-Panel Flatbill', description: 'Flatbill seven-panel' },
+            { style: '173', name: 'Hood River', description: 'Premium unstructured cap' },
+            { style: '212', name: 'Pro Twill Snapback', description: 'Pro-style snapback' },
+            { style: '220', name: 'Performance Lite Relaxed', description: 'Lightweight performance cap' },
+            { style: '225', name: 'Performance Lite Casual', description: 'Casual performance fit' },
+            { style: '256', name: 'Umpqua Gramps Cap Solid', description: 'Retro grandpa style solid' },
+            { style: '256P', name: 'Umpqua Gramps Cap Printed', description: 'Retro grandpa style printed' },
+            { style: '312', name: 'Solid Twill Trucker', description: 'Classic twill trucker' },
+            { style: '323FPC', name: 'Full Fabric 5-Panel Champ', description: 'Full fabric camper style' },
+            { style: '326', name: 'Peached Cotton Twill', description: 'Soft peached cotton' },
+            { style: '336', name: 'Burnside', description: 'Classic burnside style' },
+            { style: '355', name: 'Laser Perf Performance Rope', description: 'Perforated performance cap' },
+            { style: '356', name: '5-Panel Relaxed Gramps', description: 'Relaxed five-panel style' }
+        ];
+
+        // New 2026 Products - Only styles with images in SanMar API
+        const new2026Products = [
+            // Jerzees
+            { style: '363TK', name: 'Jerzees Classics Unisex Cotton Tank', brand: 'Jerzees' },
+            // Gildan (only styles with images)
+            { style: '64PLSMA', name: 'Gildan Softstyle Plasma Print Tee', brand: 'Gildan' },
+            { style: '65000', name: 'Gildan Softstyle Midweight Tee', brand: 'Gildan' },
+            { style: '65000B', name: 'Gildan Youth Softstyle Midweight Tee', brand: 'Gildan' },
+            { style: '65000L', name: 'Gildan Ladies Softstyle Midweight Tee', brand: 'Gildan' },
+            { style: '67000', name: 'Gildan Softstyle CVC Tee', brand: 'Gildan' },
+            { style: '67000L', name: 'Gildan Ladies Softstyle CVC Tee', brand: 'Gildan' },
+            // Brooks Brothers (only styles with images)
+            { style: 'BB18000', name: 'Brooks Brothers Wrinkle-Free Pinpoint', brand: 'Brooks Brothers' },
+            { style: 'BB18002', name: 'Brooks Brothers Wrinkle-Free Pinpoint Stripe', brand: 'Brooks Brothers' },
+            { style: 'BB18200', name: 'Brooks Brothers Tech Stretch Patterned', brand: 'Brooks Brothers' },
+            { style: 'BB18202', name: 'Brooks Brothers Wrinkle-Free Windowpane Tech Stretch', brand: 'Brooks Brothers' },
+            // BELLA+CANVAS (only styles with images)
+            { style: 'BC3739', name: 'BELLA+CANVAS Unisex Sponge Fleece Drop Shoulder Sweatshirt', brand: 'BELLA+CANVAS' },
+            { style: 'BC6415', name: 'BELLA+CANVAS Ladies Relaxed Triblend Tee', brand: 'BELLA+CANVAS' },
+            // Port Authority (only styles with images)
+            { style: 'BG226', name: 'Port Authority Everyday Zip Tote', brand: 'Port Authority' },
+            { style: 'C950', name: 'Port Authority Performance Trucker Snapback Cap', brand: 'Port Authority' },
+            // District (only styles with images)
+            { style: 'DT365', name: 'District Perfect Tri Tee Long Sleeve', brand: 'District' },
+            { style: 'DT365A', name: 'District Perfect Tri Tee Long Sleeve ATHLETICS', brand: 'District' },
+            { style: 'DT8100', name: 'District Re-Fleece Hoodie', brand: 'District' },
+            { style: 'DT8102', name: 'District Re-Fleece Crewneck', brand: 'District' },
+            { style: 'DT8104', name: 'District Re-Fleece Quarter Zip', brand: 'District' },
+            // OGIO (only styles with images)
+            { style: 'OG1000', name: 'OGIO Evolution Hoodie', brand: 'OGIO' },
+            { style: 'OG1002', name: 'OGIO Evolution Crewneck', brand: 'OGIO' },
+            // Sport-Tek (only styles with images)
+            { style: 'ST760', name: 'Sport-Tek Classic Mesh Reversible Tank', brand: 'Sport-Tek' },
+            // Mercer+Mettle (only styles with images)
+            { style: 'MM1001', name: 'Mercer+Mettle Stretch Open Collar Polo', brand: 'Mercer+Mettle' },
+            { style: 'MM2011', name: 'Mercer+Mettle Stretch Quarter Zip', brand: 'Mercer+Mettle' },
+            { style: 'MM3010', name: 'Mercer+Mettle Everyday Cotton Tee', brand: 'Mercer+Mettle' },
+            // The North Face
+            { style: 'NF0A8BSH', name: 'The North Face Aurora Jacket', brand: 'The North Face' },
+            // Carhartt (merged from "New" category)
+            { style: 'CT107082', name: 'Carhartt Montana Insulated Hooded Jacket', brand: 'Carhartt' },
+            { style: 'CT107115', name: 'Carhartt Women\'s Rain Defender Soft Shell Jacket', brand: 'Carhartt' },
+            // New Era (merged from "New" category)
+            { style: 'NE410', name: 'New Era Foam Rope Trucker Cap', brand: 'New Era' },
+            { style: 'NE215', name: 'New Era 9TWENTY Unstructured Mesh Snapback Cap', brand: 'New Era' }
+        ];
+
+        // Load Richardson Caps Carousel (fetches images from SanMar API)
+        async function loadRichardsonCarousel() {
+            const carouselContainer = document.getElementById('richardsonCarousel');
+
+            try {
+                console.log('[Richardson] Loading Richardson caps carousel from API...');
+
+                // Display first 6 Richardson products in carousel
+                const featuredProducts = richardsonProducts.slice(0, 6);
+
+                // Fetch product details from SanMar API for all products concurrently
+                const productsWithDetails = await Promise.all(
+                    featuredProducts.map(async product => {
+                        try {
+                            // Fetch product details from SanMar API
+                            const response = await fetch(
+                                `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${product.style}`
+                            );
+
+                            let imageUrl = null;
+                            let productTitle = product.name;
+
+                            if (response.ok) {
+                                const details = await response.json();
+                                if (details && details.length > 0) {
+                                    // Cache the details for later use
+                                    productCache[product.style] = details;
+
+                                    // Use FRONT_MODEL as primary image (best for caps)
+                                    imageUrl = details[0].FRONT_MODEL ||
+                                              details[0].COLOR_PRODUCT_IMAGE ||
+                                              details[0].PRODUCT_IMAGE ||
+                                              details[0].THUMBNAIL_IMAGE;
+
+                                    // Use product title from API if available
+                                    if (details[0].PRODUCT_TITLE) {
+                                        productTitle = details[0].PRODUCT_TITLE.split('.')[0].trim();
+                                    }
+
+                                    console.log(`[Richardson] Loaded ${product.style}: ${imageUrl}`);
+                                }
+                            }
+
+                            // Check pricing eligibility
+                            const eligibility = await window.sampleCart.checkEligibility(product.style);
+
+                            return {
+                                ...product,
+                                name: productTitle,
+                                imageUrl: imageUrl,
+                                isFree: eligibility.type === 'free',
+                                price: eligibility.price || 0,
+                                eligible: eligibility.eligible !== false
+                            };
+                        } catch (error) {
+                            console.warn(`[Richardson] Error fetching ${product.style}:`, error.message);
+                            const eligibility = await window.sampleCart.checkEligibility(product.style);
+                            return {
+                                ...product,
+                                imageUrl: null,
+                                isFree: eligibility.type === 'free',
+                                price: eligibility.price || 0,
+                                eligible: eligibility.eligible !== false
+                            };
+                        }
+                    })
+                );
+
+                carouselContainer.innerHTML = productsWithDetails.map(product => {
+                    const imageUrl = product.imageUrl || `https://via.placeholder.com/280x200?text=Richardson+${product.style}`;
+                    const buttonText = product.eligible ?
+                        (product.isFree ? 'Request Free Sample' : `Request Sample - $${product.price.toFixed(2)}`)
+                        : 'View Product';
+
+                    return `
+                    <div class="carousel-product-card" onclick="window.location.href='top-sellers-product.html?style=${product.style}&name=${encodeURIComponent('Richardson ' + product.name)}'">
+                        <div class="product-image">
+                            <img src="${imageUrl}"
+                                 alt="Richardson ${product.name}"
+                                 class="carousel-product-image"
+                                 onerror="this.src='https://via.placeholder.com/280x200?text=Richardson+${product.style}'">
+                            <div class="carousel-new-badge" style="background: linear-gradient(135deg, #1a365d, #2d4a7c); color: white;">RICHARDSON</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-style" style="color: #ccc;">Richardson • ${product.style}</div>
+                            <div class="carousel-product-name" style="color: white;">${product.name}</div>
+                            <button class="carousel-sample-btn" onclick="event.stopPropagation(); requestSampleFromCarousel('${product.style}', 'Richardson - ${product.name}', 'Richardson', '${product.isFree ? 'free' : 'paid'}', ${product.price || 0})" style="background: white; color: #1a365d;">
+                                <i class="fas fa-box"></i>
+                                ${buttonText}
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                console.log(`[Richardson] Displayed ${productsWithDetails.length} Richardson caps in carousel`);
+
+            } catch (error) {
+                console.error('[Richardson] Error loading carousel:', error);
+                carouselContainer.innerHTML = '<div class="carousel-loading" style="color: white;"><p>Unable to load Richardson caps</p></div>';
+            }
+        }
+
+        // Filter by brand (for Richardson "View All" button)
+        function filterByBrand(brand) {
+            console.log(`[Filter] Filtering by brand: ${brand}`);
+            if (brand === 'Richardson') {
+                // Show Richardson products in the grid
+                loadProducts('richardson', 'secondary');
+
+                // Update filter button states
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.badge-filter').forEach(btn => {
+                    if (btn.dataset.category === 'richardson') {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
             }
         }
 
@@ -3907,23 +4335,13 @@
             // Load image overrides from API (falls back to hardcoded if API unavailable)
             await loadImageOverridesFromAPI();
 
-            // Load carousels FIRST (8 products, fast ~300-500ms)
-            // This makes the top of page appear instantly while main grid loads in background
-            await Promise.all([
-                loadNewArrivalsCarousel(), // Load the New Arrivals carousel
-                loadBestsellersCarousel()  // Load the Bestsellers carousel (Hybrid: API + Richardson 112)
-            ]);
-
             // Setup UI immediately (search, filters, event listeners)
             setupEventListeners();
             initializeSearch();
             checkEducationModal();
 
-            // Load main products grid in background (74 products, slower ~2.3s)
-            // Using setTimeout defers this to next event loop, allowing carousels to render first
-            setTimeout(() => {
-                loadProducts('all', 'primary');
-            }, 0);
+            // Load main products grid
+            loadProducts('all', 'primary');
         });
 
         // Initialize search functionality
@@ -4016,7 +4434,78 @@
 
         // Setup event listeners
         function setupEventListeners() {
-            // Primary category filter buttons
+            // NEW: Tab navigation buttons
+            document.querySelectorAll('.category-tabs .tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active from all tabs
+                    document.querySelectorAll('.category-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const category = this.dataset.tab;
+                    const filterType = this.dataset.filterType;
+
+                    // Reset DTG filter when changing tabs
+                    dtgFilterActive = false;
+                    const dtgCheckbox = document.getElementById('dtgFilter');
+                    if (dtgCheckbox) dtgCheckbox.checked = false;
+
+                    currentFilter = { category: category, type: filterType };
+                    loadProducts(category, filterType);
+                });
+            });
+
+            // NEW: DTG checkbox filter
+            const dtgCheckbox = document.getElementById('dtgFilter');
+            if (dtgCheckbox) {
+                dtgCheckbox.addEventListener('change', function() {
+                    dtgFilterActive = this.checked;
+
+                    if (dtgFilterActive) {
+                        // Show education modal on first click
+                        if (!sessionStorage.getItem('dtgEducationShown')) {
+                            showDTGEducationModal();
+                        }
+                        loadProducts('dtgCompatible', 'dtg');
+                    } else {
+                        // Return to current tab selection
+                        loadProducts(currentFilter.category, currentFilter.type);
+                    }
+                });
+            }
+
+            // NEW: Brand filter dropdown
+            const brandSelect = document.getElementById('brandSelect');
+            if (brandSelect) {
+                brandSelect.addEventListener('change', function() {
+                    // For now, brand filtering works alongside category
+                    // If Richardson is selected, switch to Richardson tab
+                    if (this.value === 'Richardson') {
+                        document.querySelectorAll('.category-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelector('.tab-btn[data-tab="richardson"]')?.classList.add('active');
+                        currentFilter = { category: 'richardson', type: 'secondary' };
+                        loadProducts('richardson', 'secondary');
+                    } else if (this.value === 'all') {
+                        // Keep current tab but reload
+                        loadProducts(currentFilter.category, currentFilter.type);
+                    } else {
+                        // Filter by brand within current view
+                        // This could be extended to filter the current product list
+                        console.log('[Filter] Brand filter:', this.value);
+                    }
+                });
+            }
+
+            // NEW: Sort dropdown
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    console.log('[Sort] Sort by:', this.value);
+                    // Sort functionality can be added here
+                    // For now, we'll just log it
+                });
+            }
+
+            // LEGACY: Primary category filter buttons (for backward compatibility)
             document.querySelectorAll('.filter-btn[data-filter-type="primary"]').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -4028,23 +4517,20 @@
                 });
             });
 
-            // Secondary filters (New Arrivals, Fresh Picks)
+            // LEGACY: Secondary filters (for backward compatibility)
             document.querySelectorAll('.badge-filter[data-filter-type="secondary"]').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const category = this.dataset.category;
                     const isActive = this.classList.contains('active');
 
-                    // Remove active class from all filters
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     document.querySelectorAll('.badge-filter').forEach(b => b.classList.remove('active'));
 
                     if (isActive) {
-                        // Was active - deactivate and show all products
                         currentFilter = { category: 'all', type: 'primary' };
                         loadProducts('all', 'primary');
-                        document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
+                        document.querySelector('.filter-btn[data-category="all"]')?.classList.add('active');
                     } else {
-                        // Was inactive - activate this filter
                         this.classList.add('active');
                         currentFilter = { category: category, type: 'secondary' };
                         loadProducts(category, 'secondary');
@@ -4052,41 +4538,38 @@
                 });
             });
 
-            // DTG Compatibility filter
-            document.querySelector('.badge-filter[data-filter-type="dtg"]').addEventListener('click', function() {
-                dtgFilterActive = !dtgFilterActive;
-                this.classList.toggle('active', dtgFilterActive);
+            // LEGACY: DTG badge filter (for backward compatibility)
+            const dtgBadge = document.querySelector('.badge-filter[data-filter-type="dtg"]');
+            if (dtgBadge) {
+                dtgBadge.addEventListener('click', function() {
+                    dtgFilterActive = !dtgFilterActive;
+                    this.classList.toggle('active', dtgFilterActive);
 
-                if (dtgFilterActive) {
-                    // Deactivate other secondary filters and primary filters
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.badge-filter[data-filter-type="secondary"]').forEach(b => b.classList.remove('active'));
+                    if (dtgFilterActive) {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.badge-filter[data-filter-type="secondary"]').forEach(b => b.classList.remove('active'));
 
-                    // Show education modal on first click
-                    if (!sessionStorage.getItem('dtgEducationShown')) {
-                        showDTGEducationModal();
-                    }
-
-                    // Load DTG products
-                    loadProducts('dtgCompatible', 'dtg');
-                } else {
-                    // Return to previous filter or all products
-                    if (currentFilter.category !== 'dtgCompatible') {
-                        loadProducts(currentFilter.category, currentFilter.type);
-                        // Re-activate the previous filter button
-                        if (currentFilter.type === 'primary') {
-                            document.querySelector(`.filter-btn[data-category="${currentFilter.category}"]`)?.classList.add('active');
+                        if (!sessionStorage.getItem('dtgEducationShown')) {
+                            showDTGEducationModal();
                         }
+
+                        loadProducts('dtgCompatible', 'dtg');
                     } else {
-                        // No previous filter - show all products
-                        loadProducts('all', 'primary');
-                        document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
+                        if (currentFilter.category !== 'dtgCompatible') {
+                            loadProducts(currentFilter.category, currentFilter.type);
+                            if (currentFilter.type === 'primary') {
+                                document.querySelector(`.filter-btn[data-category="${currentFilter.category}"]`)?.classList.add('active');
+                            }
+                        } else {
+                            loadProducts('all', 'primary');
+                            document.querySelector('.filter-btn[data-category="all"]')?.classList.add('active');
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // Modal close on outside click
-            document.getElementById('quickViewModal').addEventListener('click', function(e) {
+            document.getElementById('quickViewModal')?.addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeModal();
                 }
@@ -4227,50 +4710,6 @@
                         });
                     }
                 }
-            } else if (category === 'newProducts') {
-                // Fetch new products from API
-                try {
-                    const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/new?limit=100');
-                    if (response.ok) {
-                        const result = await response.json();
-                        const products = result.products || [];
-
-                        // Group by style number first to get unique products
-                        const uniqueProducts = new Map();
-                        products.forEach(p => {
-                            const style = p.STYLE;
-                            if (!uniqueProducts.has(style)) {
-                                uniqueProducts.set(style, p);
-                            }
-                        });
-
-                        // Filter out DISCONTINUED products
-                        const activeProducts = Array.from(uniqueProducts.values()).filter(p =>
-                            !p.PRODUCT_TITLE?.includes('DISCONTINUED') &&
-                            !p.PRODUCT_DESCRIPTION?.includes('DISCONTINUED')
-                        );
-
-                        // Convert API products to our format
-                        allProducts = activeProducts.map(product => {
-                            const style = product.STYLE || 'UNKNOWN';
-                            const productCategory = productCategoryMap[style] || 'other';
-                            const isDTG = dtgCompatibleProducts.has(style);
-
-                            return {
-                                style: style,
-                                description: product.PRODUCT_TITLE?.split('.')[0]?.trim() || product.PRODUCT_DESCRIPTION || 'Unknown Product',
-                                brand: product.MILL || 'Unknown Brand',
-                                imageUrl: product.COLOR_PRODUCT_IMAGE || product.PRODUCT_IMAGE || product.THUMBNAIL_IMAGE,
-                                type: 'newProducts',
-                                category: productCategory,
-                                isDTG: isDTG
-                            };
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error fetching new products:', error);
-                    allProducts = [];
-                }
             } else if (category === 'bestsellers') {
                 // Fetch top sellers from API (Hybrid: API + Richardson 112)
                 try {
@@ -4312,34 +4751,12 @@
                             };
                         });
 
-                    // Add Richardson 112 cap manually (not in Sanmar database)
-                    allProducts.push({
-                        style: '112',
-                        description: 'Richardson - Trucker Cap',
-                        brand: 'Richardson',
-                        imageUrl: 'https://www.blankstyle.com/images/products/detail/112black1.jpg',
-                        type: 'bestsellers',
-                        category: 'caps',
-                        isDTG: false
-                    });
-
-                    console.log(`[TopSellers] Final count (including Richardson 112): ${allProducts.length} products`);
+                    console.log(`[TopSellers] Loaded ${allProducts.length} products from API`);
 
                 } catch (error) {
                     console.error('[TopSellers] Error loading from API:', error);
-
-                    // Fallback to empty array with just Richardson 112 if API fails
-                    allProducts = [{
-                        style: '112',
-                        description: 'Richardson - Trucker Cap',
-                        brand: 'Richardson',
-                        imageUrl: 'https://www.blankstyle.com/images/products/detail/112black1.jpg',
-                        type: 'bestsellers',
-                        category: 'caps',
-                        isDTG: false
-                    }];
-
-                    console.warn('[TopSellers] Using fallback with Richardson 112 only');
+                    allProducts = [];
+                    console.warn('[TopSellers] API failed, no products loaded');
                 }
             } else if (filterType === 'primary') {
                 // Filter by product category (tshirts, hoodies, polos, caps, jackets, workwear)
@@ -4386,8 +4803,94 @@
                     }
                 }
             } else if (filterType === 'secondary') {
+                // Handle Richardson caps filter
+                if (category === 'richardson') {
+                    console.log('[Richardson] Loading Richardson products for grid from API...');
+
+                    // Step 1: Collect all Richardson style numbers
+                    const stylesToPreload = richardsonProducts.map(p => p.style);
+
+                    // Step 2: Preload images concurrently from SanMar API
+                    await preloadImagesForProducts(stylesToPreload);
+
+                    // Step 3: Build products with images now available in cache
+                    allProducts = richardsonProducts.map(product => {
+                        const cachedDetails = productCache[product.style];
+                        // Use FRONT_MODEL as primary image for caps (best angle)
+                        const imageUrl = cachedDetails && cachedDetails[0] ?
+                            (cachedDetails[0].FRONT_MODEL ||
+                             cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                             cachedDetails[0].PRODUCT_IMAGE ||
+                             cachedDetails[0].THUMBNAIL_IMAGE) : null;
+
+                        // Get product title from API if available
+                        const productTitle = cachedDetails && cachedDetails[0] && cachedDetails[0].PRODUCT_TITLE ?
+                            cachedDetails[0].PRODUCT_TITLE.split('.')[0].trim() :
+                            'Richardson ' + product.name;
+
+                        return {
+                            style: product.style,
+                            description: productTitle,
+                            brand: 'Richardson',
+                            imageUrl: imageUrl,
+                            type: 'richardson',
+                            category: 'caps',
+                            isDTG: false,
+                            details: cachedDetails || null
+                        };
+                    });
+
+                    console.log(`[Richardson] Loaded ${allProducts.length} Richardson products from API`);
+                }
+                // Handle New 2026 Products
+                else if (category === 'new2026') {
+                    console.log('[New2026] Loading new 2026 products from API...');
+
+                    // Step 1: Collect all style numbers
+                    const stylesToPreload = new2026Products.map(p => p.style);
+
+                    // Step 2: Preload images concurrently from SanMar API
+                    await preloadImagesForProducts(stylesToPreload);
+
+                    // Step 3: Build products with images now available in cache
+                    allProducts = new2026Products.map(product => {
+                        const cachedDetails = productCache[product.style];
+                        const imageUrl = cachedDetails && cachedDetails[0] ?
+                            (cachedDetails[0].COLOR_PRODUCT_IMAGE ||
+                             cachedDetails[0].FRONT_MODEL ||
+                             cachedDetails[0].PRODUCT_IMAGE ||
+                             cachedDetails[0].THUMBNAIL_IMAGE) : null;
+
+                        // Get product title from API if available
+                        const productTitle = cachedDetails && cachedDetails[0] && cachedDetails[0].PRODUCT_TITLE ?
+                            cachedDetails[0].PRODUCT_TITLE.split('.')[0].trim() :
+                            product.name;
+
+                        // Determine category based on product name
+                        let productCategory = 'other';
+                        const nameLower = product.name.toLowerCase();
+                        if (nameLower.includes('tee') || nameLower.includes('tank')) productCategory = 'tshirts';
+                        else if (nameLower.includes('hoodie') || nameLower.includes('fleece') || nameLower.includes('sweatshirt')) productCategory = 'hoodies';
+                        else if (nameLower.includes('polo')) productCategory = 'polos';
+                        else if (nameLower.includes('cap') || nameLower.includes('trucker')) productCategory = 'caps';
+                        else if (nameLower.includes('jacket') || nameLower.includes('zip')) productCategory = 'jackets';
+
+                        return {
+                            style: product.style,
+                            description: productTitle,
+                            brand: product.brand,
+                            imageUrl: imageUrl,
+                            type: 'new2026',
+                            category: productCategory,
+                            isDTG: false,
+                            details: cachedDetails || null
+                        };
+                    });
+
+                    console.log(`[New2026] Loaded ${allProducts.length} new 2026 products from API`);
+                }
                 // Filter by freshPicks or other secondary categories
-                if (completeTopSellers[category]) {
+                else if (completeTopSellers[category]) {
                     // Step 1: Collect all style numbers
                     const stylesToPreload = completeTopSellers[category].map(p => p.style);
 
@@ -4516,11 +5019,6 @@
                     
                     const colorsToShow = uniqueColors.slice(0, 5);
 
-                    // Detect Richardson products (not in Sanmar API)
-                    const isRichardson = product.brand?.toLowerCase().includes('richardson') ||
-                                       product.style === '112' ||
-                                       product.description?.toLowerCase().includes('richardson');
-
                     card.onclick = () => navigateToProduct(product);
 
                     // Check for image override first
@@ -4551,17 +5049,10 @@
                                 ` : ''}
                             </div>
                             <div class="product-actions">
-                                ${isRichardson ? `
-                                    <button class="btn-sample" disabled style="opacity: 0.5; cursor: not-allowed;"
-                                            title="Richardson samples not available online - Call 253-922-5793">
-                                        <i class="fas fa-phone"></i> Call for Sample
-                                    </button>
-                                ` : `
-                                    <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
-                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
-                                        <i class="fas fa-box-open"></i> Request Sample
-                                    </button>
-                                `}
+                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
+                                        onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '${firstProduct.FRONT_MODEL || firstProduct.PRODUCT_IMAGE || ''}')">
+                                    <i class="fas fa-box-open"></i> Request Sample
+                                </button>
                             </div>
                         </div>
                     `;
@@ -4569,11 +5060,6 @@
                     // Product without API data - check for image from API, override, or use placeholder
                     const brandStyle = brandPlaceholders[product.brand] || brandPlaceholders['Generic'];
                     const productImage = product.imageUrl || imageOverrides[product.style];
-
-                    // Detect Richardson products (not in Sanmar API)
-                    const isRichardson = product.brand?.toLowerCase().includes('richardson') ||
-                                       product.style === '112' ||
-                                       product.description?.toLowerCase().includes('richardson');
 
                     card.onclick = () => navigateToProduct(product);
 
@@ -4607,17 +5093,10 @@
                                 Premium ${product.brand} Product
                             </div>
                             <div class="product-actions">
-                                ${isRichardson ? `
-                                    <button class="btn-sample" disabled style="opacity: 0.5; cursor: not-allowed;"
-                                            title="Richardson samples not available online - Call 253-922-5793">
-                                        <i class="fas fa-phone"></i> Call for Sample
-                                    </button>
-                                ` : `
-                                    <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
-                                            onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '')">
-                                        <i class="fas fa-box-open"></i> Request Sample
-                                    </button>
-                                `}
+                                <button class="btn-sample" data-style="${product.style}" data-eligible="pending"
+                                        onclick="event.stopPropagation(); handleSampleRequest('${product.style}', '${(product.description || '').replace(/'/g, "\\'")}', '${productImage || ''}')">
+                                    <i class="fas fa-box-open"></i> Request Sample
+                                </button>
                             </div>
                         </div>
                     `;
@@ -4773,8 +5252,9 @@
                 'embroidery': 'Best for Embroidery',
                 'caps': 'Top Selling Cap',
                 'freshPicks': "Brinton's Pick",
-                'newProducts': "New Product",
-                'bestsellers': "Top Seller"
+                'new2026': "New 2026",
+                'bestsellers': "Top Seller",
+                'richardson': "Richardson Cap"
             };
             return types[type] || 'Top Seller';
         }
