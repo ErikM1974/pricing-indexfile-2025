@@ -111,8 +111,15 @@ class ProductSearchService {
      */
     buildQueryString(params) {
         const queryParams = new URLSearchParams();
-        
+
         Object.entries(params).forEach(([key, value]) => {
+            // Special handling for status - empty string means "all statuses"
+            // Must be explicitly passed to API, otherwise API defaults to "Active" only
+            if (key === 'status') {
+                queryParams.append(key, value ?? '');
+                return;
+            }
+
             if (value !== null && value !== undefined && value !== '') {
                 if (Array.isArray(value)) {
                     // Handle arrays for multi-select filters
@@ -122,7 +129,7 @@ class ProductSearchService {
                 }
             }
         });
-        
+
         return queryParams.toString();
     }
 
@@ -185,8 +192,9 @@ class ProductSearchService {
     async performSearch(params) {
         try {
             // Default parameters - increased to 48 for better initial display
+            // Empty status shows all products (Active, New, Coming soon, etc.)
             const defaultParams = {
-                status: 'Active',
+                status: '',
                 limit: 48,
                 page: 1
             };
@@ -290,17 +298,17 @@ class ProductSearchService {
 
     /**
      * Detect if a search term looks like a style number
-     * Style numbers typically start with letters and include numbers
+     * Style number = no spaces AND contains at least one digit
+     * Examples: PC61, C112, 112, 112FP, ST-350
+     * Text search = has spaces OR no digits (e.g., "blue hoodie", "Richardson")
      */
     isStyleNumber(term) {
         if (!term || term.length < 2) return false;
-        
-        // Common patterns for style numbers:
-        // - Start with 1-4 letters followed by numbers (e.g., PC61, C112, PC450)
-        // - May have hyphens or spaces (e.g., ST-350, PC 54)
-        // - Usually 3-10 characters total
-        const stylePattern = /^[A-Za-z]{1,4}[\s-]?\d+[A-Za-z]?$/;
-        return stylePattern.test(term.trim());
+
+        const trimmed = term.trim();
+        const hasNoSpaces = !/\s/.test(trimmed);
+        const hasDigit = /\d/.test(trimmed);
+        return hasNoSpaces && hasDigit;
     }
 
     /**

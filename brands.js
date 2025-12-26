@@ -26,6 +26,7 @@ class BrandsPage {
         // Priority brands - Carhartt first for fastest perceived loading
         this.PRIORITY_BRANDS = [
             'Carhartt',
+            'Richardson',
             'Gildan',
             'Port & Company',
             'Bella + Canvas',

@@ -36,6 +36,7 @@ class BrandsFlyout {
         // Carhartt is #1 priority per customer request
         this.PRIORITY_BRANDS = [
             'Carhartt',
+            'Richardson',
             'Gildan',
             'Port & Company',
             'Bella + Canvas',

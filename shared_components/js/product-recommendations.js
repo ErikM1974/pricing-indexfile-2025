@@ -85,7 +85,7 @@ class ProductRecommendationService {
         // Fetch products from same category
         const url = `${this.apiBase}/api/products/search?` + new URLSearchParams({
             category: currentProduct.category,
-            status: 'Active',
+            status: '',
             limit: 20  // Get more than needed for variety
         });
 

@@ -351,12 +351,60 @@ class CatalogSearch {
     }
 
     /**
+     * Sort featured/best seller products to the top
+     * Currently features Richardson 112 as the flagship product
+     */
+    sortFeaturedProducts(products) {
+        // Define featured products by brand
+        // These will appear first when viewing that brand
+        const FEATURED_PRODUCTS = {
+            'Richardson': ['112', '112FP', '112PFP'] // Richardson 112 variants are best sellers
+        };
+
+        // Check if we're filtering by a brand that has featured products
+        const currentBrand = this.currentFilters.brand && this.currentFilters.brand.length === 1
+            ? this.currentFilters.brand[0]
+            : null;
+
+        if (!currentBrand || !FEATURED_PRODUCTS[currentBrand]) {
+            return products;
+        }
+
+        const featuredStyles = FEATURED_PRODUCTS[currentBrand];
+
+        // Sort: featured products first (in order), then rest alphabetically by style
+        return products.sort((a, b) => {
+            const aIndex = featuredStyles.indexOf(a.styleNumber);
+            const bIndex = featuredStyles.indexOf(b.styleNumber);
+
+            // Both are featured - sort by featured order
+            if (aIndex !== -1 && bIndex !== -1) {
+                return aIndex - bIndex;
+            }
+
+            // Only a is featured - a comes first
+            if (aIndex !== -1) return -1;
+
+            // Only b is featured - b comes first
+            if (bIndex !== -1) return 1;
+
+            // Neither is featured - keep original order
+            return 0;
+        });
+    }
+
+    /**
      * Display search results
      */
     displayResults(results) {
         const grid = document.getElementById('resultsGrid');
         const countElement = document.getElementById('resultsCount');
-        
+
+        // Sort featured products to top when viewing specific brands
+        if (results && results.products && results.products.length > 0) {
+            results.products = this.sortFeaturedProducts(results.products);
+        }
+
         if (!results || !results.products || results.products.length === 0) {
             // More helpful no results message based on current filters
             let message = 'Try adjusting your filters or search terms';
@@ -509,23 +557,28 @@ class CatalogSearch {
      */
     buildProductCard(product) {
         // Get the best image
-        const imageUrl = product.images?.display || 
-                        product.images?.main || 
-                        product.images?.thumbnail || 
+        const imageUrl = product.images?.display ||
+                        product.images?.main ||
+                        product.images?.thumbnail ||
                         '/placeholder.jpg';
-        
+
         // Get color count for display
         const colorCount = product.colors ? product.colors.length : 0;
-        
+
         // Check if product is in compare list
         const isInCompare = this.compareList.has(product.styleNumber);
-        
+
+        // Check if this is a featured/best seller product
+        // Richardson 112 is their flagship trucker cap
+        const isFeaturedProduct = ['112', '112FP', '112PFP'].includes(product.styleNumber);
+        const showBestSellerBadge = product.features?.isTopSeller || isFeaturedProduct;
+
         return `
-            <div class="product-card" data-style="${product.styleNumber}">
+            <div class="product-card ${isFeaturedProduct ? 'featured-product' : ''}" data-style="${product.styleNumber}">
                 <div class="product-image-container">
                     <a href="/product.html?style=${product.styleNumber}" class="product-link">
                         <div class="product-image">
-                            ${product.features?.isTopSeller ? '<div class="top-seller-badge">TOP SELLER</div>' : ''}
+                            ${showBestSellerBadge ? '<div class="top-seller-badge">BEST SELLER</div>' : ''}
                             <img src="${imageUrl}" 
                                  alt="${product.productName}" 
                                  loading="lazy"

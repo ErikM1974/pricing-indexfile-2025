@@ -22,7 +22,7 @@ class ProductSearch {
                 size: [],
                 minPrice: null,
                 maxPrice: null,
-                status: 'Active',
+                status: '',
                 isTopSeller: null
             },
             sort: 'name_asc',
@@ -140,7 +140,7 @@ class ProductSearch {
             q: query,
             limit: limit,
             includeFacets: false,
-            status: 'Active'
+            status: ''
         });
         
         try {
@@ -274,7 +274,7 @@ class ProductSearch {
                 size: [],
                 minPrice: null,
                 maxPrice: null,
-                status: 'Active',
+                status: '',
                 isTopSeller: null
             },
             sort: 'name_asc',

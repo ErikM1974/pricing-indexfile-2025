@@ -2660,6 +2660,16 @@
             z-index: 1;
         }
 
+        /* Featured/Best Seller product highlight */
+        .product-card.featured-product {
+            border: 3px solid #ff6b6b;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.25);
+        }
+
+        .product-card.featured-product:hover {
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
+        }
+
         .no-results {
             grid-column: 1 / -1;
             text-align: center;

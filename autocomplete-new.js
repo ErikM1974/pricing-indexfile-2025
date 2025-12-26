@@ -189,7 +189,7 @@ class SmartAutocomplete {
                 const results = await this.searchService.searchProducts({
                     q: query,
                     limit: 10,
-                    status: 'Active'
+                    status: ''
                 });
                 
                 if (results.products) {
