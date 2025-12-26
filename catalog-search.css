@@ -684,6 +684,12 @@
     margin-bottom: 8px;
 }
 
+.product-price .as-low-as {
+    font-size: 0.85em;
+    color: #6b7280;
+    font-weight: normal;
+}
+
 .price-sale {
     color: #ef4444;
 }

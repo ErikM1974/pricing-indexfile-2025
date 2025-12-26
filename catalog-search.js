@@ -24,7 +24,8 @@ class CatalogSearch {
         this.searchTimeout = null;
         this.compareList = new Set(); // Track products in compare list
         this.maxCompareItems = 4; // Maximum items to compare
-        
+        this.richardsonPrices = null; // Cache for Richardson decorated prices
+
         this.init();
     }
 
@@ -314,9 +315,14 @@ class CatalogSearch {
             }
             
             console.log('[CatalogSearch] Search results:', results);
-            
+
+            // Fetch Richardson decorated prices if viewing Richardson brand
+            if (this.currentFilters.brand?.includes('Richardson') && !this.richardsonPrices) {
+                this.richardsonPrices = await this.fetchDecoratedCapPrices('Richardson');
+            }
+
             this.currentResults = results;
-            
+
             // Update UI
             this.displayResults(results);
             this.updateFilters(results.facets);
@@ -573,10 +579,19 @@ class CatalogSearch {
         const isFeaturedProduct = ['112', '112FP', '112PFP'].includes(product.styleNumber);
         const showBestSellerBadge = product.features?.isTopSeller || isFeaturedProduct;
 
+        // For Richardson caps, show decorated price from cached API response
+        let displayPrice = product.displayPrice;
+        if (product.brand === 'Richardson' && this.richardsonPrices?.prices?.[product.styleNumber]) {
+            const price = this.richardsonPrices.prices[product.styleNumber];
+            displayPrice = `<span class="as-low-as">As low as:</span> $${price}.00`;
+        }
+
         return `
             <div class="product-card ${isFeaturedProduct ? 'featured-product' : ''}" data-style="${product.styleNumber}">
                 <div class="product-image-container">
-                    <a href="/product.html?style=${product.styleNumber}" class="product-link">
+                    <a href="${product.brand === 'Richardson' && this.richardsonPrices?.prices?.[product.styleNumber]
+                        ? `/pricing/cap-embroidery?StyleNumber=${product.styleNumber}`
+                        : `/product.html?style=${product.styleNumber}`}" class="product-link">
                         <div class="product-image">
                             ${showBestSellerBadge ? '<div class="top-seller-badge">BEST SELLER</div>' : ''}
                             <img src="${imageUrl}" 
@@ -595,7 +610,7 @@ class CatalogSearch {
                     ${colorCount > 1 ? `
                         <div class="product-colors-count">${colorCount} Colors Available</div>
                     ` : ''}
-                    <div class="product-price">${product.displayPrice}</div>
+                    <div class="product-price">${displayPrice}</div>
                 </div>
                 <div class="product-actions">
                     <button class="btn-compare ${isInCompare ? 'active' : ''}" 
@@ -1634,17 +1649,114 @@ class CatalogSearch {
     }
 
     /**
+     * Fetch cap embroidery pricing from API
+     * Used for Richardson Quick View pricing table
+     */
+    async fetchCapEmbroideryPricing(styleNumber) {
+        try {
+            const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP&styleNumber=${styleNumber}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch pricing');
+            return await response.json();
+        } catch (error) {
+            console.error('[CatalogSearch] Error fetching cap embroidery pricing:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch decorated cap prices for a brand (uses backend endpoint)
+     * Returns pre-calculated "As low as" prices for all caps of a brand
+     */
+    async fetchDecoratedCapPrices(brand) {
+        try {
+            const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/decorated-cap-prices?brand=${encodeURIComponent(brand)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch decorated prices');
+            return await response.json();
+        } catch (error) {
+            console.error('[CatalogSearch] Error fetching decorated cap prices:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Calculate decorated cap price for a quantity tier
+     * Formula: ceil((baseCapPrice / 0.6) + embroideryCost)
+     */
+    calculateCapPrice(basePrice, tierLabel, embroideryCosts) {
+        const embCost = embroideryCosts.find(e => e.TierLabel === tierLabel && e.StitchCount === 8000);
+        if (!embCost) return null;
+        const decorated = (basePrice / 0.6) + embCost.EmbroideryCost;
+        return Math.ceil(decorated);
+    }
+
+    /**
+     * Build cap embroidery pricing table HTML for Quick View
+     */
+    buildCapPricingTableHTML(pricingData, styleNumber) {
+        if (!pricingData || !pricingData.sizes || !pricingData.allEmbroideryCostsR) {
+            return '';
+        }
+
+        // Get base cap price (usually OSFA)
+        const basePrice = pricingData.sizes[0]?.price || 0;
+        const sizeName = pricingData.sizes[0]?.size || 'OSFA';
+
+        // Calculate prices for each tier
+        const price24 = this.calculateCapPrice(basePrice, '24-47', pricingData.allEmbroideryCostsR);
+        const price48 = this.calculateCapPrice(basePrice, '48-71', pricingData.allEmbroideryCostsR);
+        const price72 = this.calculateCapPrice(basePrice, '72+', pricingData.allEmbroideryCostsR);
+
+        if (!price24 || !price48 || !price72) return '';
+
+        return `
+            <div class="quick-view-pricing">
+                <h3 class="pricing-header">Cap Embroidery Pricing</h3>
+                <p class="pricing-subtitle">Includes one front logo at 8,000 stitches</p>
+                <div class="ltm-notice">
+                    <span class="ltm-icon">⚠️</span>
+                    Orders under 24 pieces: +$50.00 LTM fee
+                </div>
+                <table class="quick-view-pricing-table">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>24-47 pcs</th>
+                            <th>48-71 pcs</th>
+                            <th>72+ pcs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${sizeName}</td>
+                            <td class="price-cell">$${price24}.00</td>
+                            <td class="price-cell">$${price48}.00</td>
+                            <td class="price-cell highlight">$${price72}.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="/pricing/cap-embroidery?StyleNumber=${styleNumber}" class="pricing-calculator-link">
+                    Open Full Pricing Calculator →
+                </a>
+            </div>
+        `;
+    }
+
+    /**
      * Show quick view modal for a product
      */
     async showQuickView(styleNumber) {
         // Store product data if we need it later
         let productData = null;
-        
+        let capPricingHTML = '';
+        let decoratedPriceHTML = '';
+
         // Find product in current results first
         if (this.currentResults && this.currentResults.products) {
             productData = this.currentResults.products.find(p => p.styleNumber === styleNumber);
         }
-        
+
         // If not found, fetch it
         if (!productData) {
             const result = await this.searchService.searchByStyle(styleNumber);
@@ -1652,15 +1764,32 @@ class CatalogSearch {
                 productData = result.products[0];
             }
         }
-        
+
         if (!productData) {
             alert('Product not found');
             return;
         }
 
+        // For ALL Richardson caps, fetch cap embroidery pricing
+        if (productData.brand === 'Richardson') {
+            const pricingData = await this.fetchCapEmbroideryPricing(styleNumber);
+            if (pricingData) {
+                capPricingHTML = this.buildCapPricingTableHTML(pricingData, styleNumber);
+                // Calculate best price (72+ tier) for display instead of wholesale price
+                const bestPrice = this.calculateCapPrice(
+                    pricingData.sizes[0]?.price || 0,
+                    '72+',
+                    pricingData.allEmbroideryCostsR
+                );
+                if (bestPrice) {
+                    decoratedPriceHTML = `<span class="as-low-as">As low as:</span> $${bestPrice}.00`;
+                }
+            }
+        }
+
         // Store product data for color switching
         this.currentQuickViewProduct = productData;
-        
+
         // Get initial selected color (first one)
         const selectedColor = productData.colors && productData.colors.length > 0 ? productData.colors[0] : null;
 
@@ -1677,19 +1806,22 @@ class CatalogSearch {
                 </div>
                 <div class="quick-view-body">
                     <div class="quick-view-images">
-                        <a href="/product.html?style=${productData.styleNumber}" 
+                        <a href="${productData.brand === 'Richardson'
+                            ? `/pricing/cap-embroidery?StyleNumber=${productData.styleNumber}&COLOR=${encodeURIComponent(selectedColor?.name || '')}`
+                            : `/product.html?style=${productData.styleNumber}`}"
                            id="quickViewImageLink"
                            class="quick-view-image-link">
-                            <img id="quickViewMainImage" 
-                                 src="${selectedColor?.productImageUrl || productData.images?.display || productData.images?.main || '/placeholder.jpg'}" 
+                            <img id="quickViewMainImage"
+                                 src="${selectedColor?.productImageUrl || productData.images?.display || productData.images?.main || '/placeholder.jpg'}"
                                  alt="${productData.productName}">
                         </a>
+                        ${capPricingHTML}
                     </div>
                     <div class="quick-view-details">
                         <h1 class="quick-view-style">${productData.styleNumber}</h1>
                         <h2 class="quick-view-title">${productData.productName}</h2>
                         
-                        <div class="quick-view-price">${productData.displayPrice}</div>
+                        <div class="quick-view-price">${decoratedPriceHTML || productData.displayPrice}</div>
                         
                         ${productData.sizes ? `
                             <div class="quick-view-section">
@@ -1703,13 +1835,13 @@ class CatalogSearch {
                                 <h3>Color selected: <span id="selectedColorName" class="selected-color">${selectedColor.name}</span></h3>
                                 <div class="color-swatches">
                                     ${productData.colors.map((color, index) => `
-                                        <div class="color-swatch ${index === 0 ? 'selected' : ''}" 
+                                        <div class="color-swatch ${index === 0 ? 'selected' : ''}"
                                              data-color-index="${index}"
                                              data-color-name="${color.name}"
                                              data-product-image="${color.productImageUrl || ''}"
                                              onclick="catalogSearch.selectQuickViewColor(${index})"
                                              title="${color.name}">
-                                            ${color.swatchUrl ? 
+                                            ${color.swatchUrl ?
                                                 `<img src="${color.swatchUrl}" alt="${color.name}" />` :
                                                 `<div class="color-swatch-fallback" style="background: ${color.hex || '#ccc'}"></div>`
                                             }
@@ -1718,7 +1850,7 @@ class CatalogSearch {
                                 </div>
                             </div>
                         ` : ''}
-                        
+
                         ${productData.description ? `
                             <div class="quick-view-section">
                                 <h3>Description:</h3>
@@ -1731,8 +1863,10 @@ class CatalogSearch {
                                     class="btn-add-compare ${this.compareList.has(productData.styleNumber) ? 'active' : ''}">
                                 ${this.compareList.has(productData.styleNumber) ? '✓ Added to Compare' : 'Add To Compare'}
                             </button>
-                            <a href="/product.html?style=${productData.styleNumber}" class="btn-full-details">
-                                View full Product Details
+                            <a href="${productData.brand === 'Richardson'
+                                ? `/pricing/cap-embroidery?StyleNumber=${productData.styleNumber}&COLOR=${encodeURIComponent(selectedColor?.name || '')}`
+                                : `/product.html?style=${productData.styleNumber}`}" class="btn-full-details">
+                                ${productData.brand === 'Richardson' ? 'Get Pricing Quote' : 'View full Product Details'}
                             </a>
                         </div>
                     </div>
@@ -1779,7 +1913,9 @@ class CatalogSearch {
         // Update the product link to include the selected color
         const imageLink = document.getElementById('quickViewImageLink');
         if (imageLink && this.currentQuickViewProduct) {
-            imageLink.href = `/product.html?style=${this.currentQuickViewProduct.styleNumber}&color=${encodeURIComponent(color.name)}`;
+            imageLink.href = this.currentQuickViewProduct.brand === 'Richardson'
+                ? `/pricing/cap-embroidery?StyleNumber=${this.currentQuickViewProduct.styleNumber}&COLOR=${encodeURIComponent(color.name)}`
+                : `/product.html?style=${this.currentQuickViewProduct.styleNumber}&color=${encodeURIComponent(color.name)}`;
         }
     }
 
