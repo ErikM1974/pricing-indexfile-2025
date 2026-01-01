@@ -35,6 +35,9 @@ const StaffDashboardInit = (function() {
         // Load announcements (if data exists)
         loadAnnouncements();
 
+        // Load YTD for sales goal banner
+        loadYTDForSalesGoal();
+
         // Load metrics from ShopWorks
         await loadMetrics();
 
@@ -543,6 +546,69 @@ const StaffDashboardInit = (function() {
 
         if (btn) {
             btn.classList.remove('loading');
+        }
+    }
+
+    // =====================================================
+    // SALES GOAL TRACKER
+    // =====================================================
+
+    const SALES_GOAL_2026 = 3000000; // $3 Million goal
+
+    /**
+     * Update the 2026 sales goal progress banner
+     * @param {number} ytdRevenue - Year-to-date revenue
+     */
+    function updateSalesGoal(ytdRevenue) {
+        const progressFill = document.getElementById('goalProgress');
+        const currentEl = document.getElementById('goalCurrent');
+        const percentEl = document.getElementById('goalPercent');
+
+        if (!progressFill || !currentEl || !percentEl) return;
+
+        const revenue = ytdRevenue || 0;
+        const percent = Math.min((revenue / SALES_GOAL_2026) * 100, 100);
+
+        // Update progress bar
+        progressFill.style.width = `${percent}%`;
+
+        // Update current amount
+        currentEl.textContent = StaffDashboardService.formatCurrency(revenue);
+
+        // Update percentage
+        percentEl.textContent = percent.toFixed(1);
+    }
+
+    /**
+     * Fetch YTD revenue for sales goal
+     * Called during initialization to get year-to-date totals
+     */
+    async function loadYTDForSalesGoal() {
+        try {
+            // Get YTD dates (Jan 1 to today)
+            const today = new Date();
+            const yearStart = new Date(today.getFullYear(), 0, 1);
+
+            const startDate = yearStart.toISOString().split('T')[0];
+            const endDate = today.toISOString().split('T')[0];
+
+            // Fetch YTD orders
+            const orders = await StaffDashboardService.fetchOrders(startDate, endDate);
+
+            // Calculate total revenue
+            let ytdRevenue = 0;
+            if (orders && orders.length > 0) {
+                ytdRevenue = orders.reduce((sum, order) => {
+                    return sum + (parseFloat(order.cur_SubTotal) || 0);
+                }, 0);
+            }
+
+            // Update the banner
+            updateSalesGoal(ytdRevenue);
+        } catch (error) {
+            console.error('Failed to load YTD for sales goal:', error);
+            // Leave at $0 if fetch fails
+            updateSalesGoal(0);
         }
     }
 

@@ -211,15 +211,21 @@ body {
     text-decoration: none;
     font-size: 0.875rem;
     font-weight: 500;
-    border-radius: 4px;
-    transition: all 0.15s ease;
+    border-radius: 6px;
+    transition: all 0.2s ease;
     position: relative;
-    margin: 0.125rem 0;
+    margin: 2px 0;
 }
 
 .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
+    transform: translateX(4px);
+}
+
+.nav-link:active {
+    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .nav-link.active {

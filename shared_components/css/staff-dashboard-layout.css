@@ -21,6 +21,107 @@
 }
 
 /* =====================================================
+   2026 SALES GOAL BANNER
+   Prominent banner showing annual target and progress
+   ===================================================== */
+.sales-goal-banner {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.sales-goal-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1400px;
+    width: 100%;
+    justify-content: center;
+}
+
+.sales-goal-icon {
+    font-size: 2rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.9; }
+}
+
+.sales-goal-info {
+    text-align: center;
+}
+
+.sales-goal-title {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.sales-goal-amount {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sales-goal-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.sales-goal-progress .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.sales-goal-progress .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 5px;
+    transition: width 1s ease;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.sales-goal-progress .progress-text {
+    font-size: 0.875rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sales-goal-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .sales-goal-progress {
+        min-width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* =====================================================
    MAIN DASHBOARD ZONES CONTAINER
    ===================================================== */
 .dashboard-zones {
@@ -962,6 +1063,8 @@
 /* Nav Section Container */
 .nav-section {
     margin-bottom: 0.25rem;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 /* Section Header (clickable) */
@@ -969,16 +1072,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.625rem 0.75rem;
+    padding: 0.75rem;
     color: white;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.2s;
+    border-radius: 8px;
+    transition: all 0.25s ease;
     user-select: none;
+    position: relative;
 }
 
 .nav-section-header:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(3px);
+}
+
+/* Active/expanded section styling */
+.nav-section:not(.collapsed) .nav-section-header {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Section Title with Icon */
@@ -995,11 +1105,15 @@
 .nav-section-header .chevron {
     font-size: 0.625rem;
     color: rgba(255, 255, 255, 0.6);
-    transition: transform 0.2s;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-section.collapsed .chevron {
     transform: rotate(-90deg);
+}
+
+.nav-section-header:hover .chevron {
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Section Content (links) */
@@ -1023,26 +1137,37 @@
     color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     font-size: 0.8125rem;
-    border-radius: 4px;
-    transition: all 0.15s;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+    margin: 2px 0;
 }
 
 .nav-section-content .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
+    transform: translateX(4px);
+}
+
+.nav-section-content .nav-link:active {
+    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Single-link sections (Company Policies style) */
 .nav-section-header-link {
     text-decoration: none;
+    display: block;
 }
 
 .nav-section-header-link .nav-section-header {
     color: white;
+    transition: all 0.25s ease;
 }
 
 .nav-section-header-link:hover .nav-section-header {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(3px);
 }
 
 /* =====================================================
