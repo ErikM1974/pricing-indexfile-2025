@@ -752,6 +752,76 @@ const StaffDashboardService = (function() {
     }
 
     // =====================================================
+    // DAILY SALES ARCHIVE FUNCTIONS (YTD tracking)
+    // Stores daily sales in Caspio to overcome ManageOrders 60-day limit
+    // =====================================================
+
+    /**
+     * Fetch YTD summary from Caspio archive
+     */
+    async function fetchYTDFromArchive(year = new Date().getFullYear()) {
+        const url = `${API_CONFIG.baseURL}/caspio/daily-sales/ytd?year=${year}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch YTD: ${response.status}`);
+        return response.json();
+    }
+
+    /**
+     * Fetch archived daily sales for a date range
+     */
+    async function fetchArchivedSales(startDate, endDate) {
+        const url = `${API_CONFIG.baseURL}/caspio/daily-sales?start=${startDate}&end=${endDate}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch archived sales: ${response.status}`);
+        return response.json();
+    }
+
+    /**
+     * Archive a single day's sales to Caspio
+     */
+    async function archiveDailySales(date, revenue, orderCount) {
+        const url = `${API_CONFIG.baseURL}/caspio/daily-sales`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date, revenue, orderCount })
+        });
+        if (!response.ok) throw new Error(`Failed to archive: ${response.status}`);
+        return response.json();
+    }
+
+    /**
+     * Ensure yesterday's sales are archived (auto-capture on dashboard load)
+     * This is called each time the dashboard loads to ensure no gaps in data
+     */
+    async function ensureYesterdayArchived() {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = formatDate(yesterday);
+
+        try {
+            // Fetch YTD to check last archived date
+            const ytd = await fetchYTDFromArchive();
+            if (ytd.lastArchivedDate === yesterdayStr) {
+                return { alreadyArchived: true, date: yesterdayStr };
+            }
+
+            // Fetch yesterday's orders from ManageOrders
+            const orders = await fetchOrders(yesterdayStr, yesterdayStr);
+            const revenue = orders.reduce((sum, o) => sum + (parseFloat(o.cur_SubTotal) || 0), 0);
+
+            // Archive to Caspio
+            await archiveDailySales(yesterdayStr, revenue, orders.length);
+            console.log(`Archived ${yesterdayStr}: $${revenue.toFixed(2)} (${orders.length} orders)`);
+
+            return { archived: true, date: yesterdayStr, revenue, orderCount: orders.length };
+        } catch (error) {
+            console.warn('Could not auto-archive yesterday:', error.message);
+            return { error: error.message };
+        }
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -766,6 +836,13 @@ const StaffDashboardService = (function() {
         loadOrderTypeBreakdown,
         loadAllMetrics,
         getMetrics,
+        fetchOrders,
+
+        // Daily Sales Archive (YTD tracking)
+        fetchYTDFromArchive,
+        fetchArchivedSales,
+        archiveDailySales,
+        ensureYesterdayArchived,
 
         // Cache management
         clearCache,

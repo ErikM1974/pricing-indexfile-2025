@@ -580,35 +580,105 @@ const StaffDashboardInit = (function() {
     }
 
     /**
-     * Fetch YTD revenue for sales goal
-     * Called during initialization to get year-to-date totals
+     * Fetch YTD revenue for sales goal using HYBRID approach:
+     * - Last 60 days: Live from ManageOrders (source of truth, handles invoice updates)
+     * - Older than 60 days: Caspio archive (permanent storage)
+     *
+     * This ensures invoice changes within 60 days are always reflected,
+     * while historical data is preserved forever in Caspio.
      */
     async function loadYTDForSalesGoal() {
         try {
-            // Get YTD dates (Jan 1 to today)
             const today = new Date();
-            const yearStart = new Date(today.getFullYear(), 0, 1);
+            const year = today.getFullYear();
+            const yearStart = `${year}-01-01`;
+            const todayStr = today.toISOString().split('T')[0];
 
-            const startDate = yearStart.toISOString().split('T')[0];
-            const endDate = today.toISOString().split('T')[0];
+            // Calculate 60-day boundary
+            const sixtyDaysAgo = new Date(today);
+            sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+            const boundaryDate = sixtyDaysAgo.toISOString().split('T')[0];
 
-            // Fetch YTD orders
-            const orders = await StaffDashboardService.fetchOrders(startDate, endDate);
-
-            // Calculate total revenue
             let ytdRevenue = 0;
-            if (orders && orders.length > 0) {
-                ytdRevenue = orders.reduce((sum, order) => {
-                    return sum + (parseFloat(order.cur_SubTotal) || 0);
-                }, 0);
+
+            // Part 1: Archived data OLDER than 60 days (from Caspio)
+            // Only applies after ~March 1 when Jan data starts expiring
+            if (boundaryDate > yearStart) {
+                try {
+                    const archivedData = await StaffDashboardService.fetchArchivedSales(
+                        yearStart,
+                        boundaryDate
+                    );
+                    ytdRevenue += archivedData.summary?.totalRevenue || 0;
+                    console.log(`YTD Archive (${yearStart} to ${boundaryDate}): $${(archivedData.summary?.totalRevenue || 0).toFixed(2)}`);
+                } catch (e) {
+                    console.warn('Could not fetch archived data:', e.message);
+                }
             }
 
-            // Update the banner
+            // Part 2: Live data from last 60 days (from ManageOrders - source of truth)
+            const liveStartDate = boundaryDate > yearStart ? boundaryDate : yearStart;
+            try {
+                const liveOrders = await StaffDashboardService.fetchOrders(liveStartDate, todayStr);
+                const liveRevenue = liveOrders.reduce((sum, o) =>
+                    sum + (parseFloat(o.cur_SubTotal) || 0), 0);
+                ytdRevenue += liveRevenue;
+                console.log(`YTD Live (${liveStartDate} to ${todayStr}): $${liveRevenue.toFixed(2)} from ${liveOrders.length} orders`);
+            } catch (e) {
+                console.error('Could not fetch live data:', e.message);
+            }
+
+            // Part 3: Archive any days about to fall off (55-60 days ago)
+            // This runs in background, doesn't block the UI update
+            archiveSoonToExpireDays().catch(e =>
+                console.warn('Background archiving failed:', e.message)
+            );
+
+            // Update banner
+            console.log(`YTD Total: $${ytdRevenue.toFixed(2)}`);
             updateSalesGoal(ytdRevenue);
         } catch (error) {
             console.error('Failed to load YTD for sales goal:', error);
-            // Leave at $0 if fetch fails
             updateSalesGoal(0);
+        }
+    }
+
+    /**
+     * Archive days 55-60 ago to ensure they're saved before falling off
+     * ManageOrders' 60-day retention window.
+     * Runs in background on dashboard load.
+     */
+    async function archiveSoonToExpireDays() {
+        const today = new Date();
+        const year = today.getFullYear();
+        let archivedCount = 0;
+
+        // Archive days 55-60 ago (buffer before 60-day cutoff)
+        for (let daysAgo = 55; daysAgo <= 60; daysAgo++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - daysAgo);
+            const dateStr = date.toISOString().split('T')[0];
+
+            // Only archive if in current year
+            if (date.getFullYear() !== year) continue;
+
+            try {
+                // Fetch from ManageOrders
+                const orders = await StaffDashboardService.fetchOrders(dateStr, dateStr);
+                const revenue = orders.reduce((sum, o) =>
+                    sum + (parseFloat(o.cur_SubTotal) || 0), 0);
+
+                // Archive to Caspio (will update if exists, create if not)
+                await StaffDashboardService.archiveDailySales(dateStr, revenue, orders.length);
+                archivedCount++;
+            } catch (e) {
+                // Individual day failures are okay, continue with others
+                console.warn(`Could not archive ${dateStr}:`, e.message);
+            }
+        }
+
+        if (archivedCount > 0) {
+            console.log(`Archived ${archivedCount} days (55-60 days ago) to Caspio`);
         }
     }
 

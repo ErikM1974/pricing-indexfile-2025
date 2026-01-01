@@ -37,6 +37,19 @@
                 </div>
 
                 <div class="sidebar-content">
+                    <!-- Inksoft Transform Tool -->
+                    <div class="nav-section" data-section="inksoft-trans">
+                        <a href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/" target="_blank" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>🔄</span>
+                                    <span>Inksoft Transform</span>
+                                </div>
+                                <span>→</span>
+                            </div>
+                        </a>
+                    </div>
+
                     <!-- Training -->
                     <div class="nav-section" data-section="training">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
@@ -102,6 +115,36 @@
                             <a href="/training/adriyella-admin.html" class="nav-link"><span>Adriyella Task Admin</span></a>
                         </div>
                     </div>
+
+                    <!-- Employee Bundles -->
+                    <div class="nav-section collapsed" data-section="employee-bundles">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏷️</span>
+                                <span>Employee Bundles</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/DrainPro-Bundle.html" class="nav-link"><span>Drain-Pro</span></a>
+                            <a href="/streich-bros-bundle.html" class="nav-link"><span>Streich Bros</span></a>
+                            <a href="/wcttr-bundle.html" class="nav-link"><span>WCTTR</span></a>
+                            <a href="/christmas-bundles.html" class="nav-link"><span>Christmas Bundles</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Training Games Hub -->
+                    <div class="nav-section" data-section="training-games">
+                        <a href="/training/training-games-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>🎮</span>
+                                    <span>Training Games Hub</span>
+                                </div>
+                                <span>→</span>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </nav>
         </aside>
@@ -152,16 +195,6 @@
                         </div>
                     </div>
 
-                    <div class="header-divider"></div>
-
-                    <span id="dataSourceBadge" class="data-source-badge">
-                        <i class="fas fa-database"></i>
-                        <span>Loading...</span>
-                    </span>
-                    <span id="lastUpdated" class="last-updated"></span>
-                    <button class="refresh-btn" onclick="StaffDashboardInit.refresh()" title="Refresh data">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
                     <a href="/dashboards/staff-login.html" class="login-link" title="Sign In">
                         <i class="fas fa-sign-in-alt"></i>
                     </a>

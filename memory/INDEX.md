@@ -55,8 +55,9 @@ This documentation has been reorganized into modular components for better perfo
 │   ├── IMPLEMENTATION_EXAMPLES.md   # Working code snippets
 │   ├── ENHANCEMENT_ROADMAP.md       # Phase planning & future features
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
-├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff Dashboard data processing guide (NEW)
-├── /3-day-tees/                      # 3-Day Tees Fast Turnaround Service (NEW)
+├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff Dashboard data processing guide
+├── DAILY_SALES_ARCHIVE.md            # YTD sales tracking via Caspio archive (NEW)
+├── /3-day-tees/                      # 3-Day Tees Fast Turnaround Service
 │   ├── OVERVIEW.md                  # Architecture, 25 components, multi-SKU patterns
 │   ├── PRICING-FORMULA.md           # 7-step pricing + 25% rush fee
 │   ├── INVENTORY-INTEGRATION.md     # Multi-SKU architecture (PC54/PC54_2X/PC54_3X)
@@ -277,6 +278,16 @@ This documentation has been reorganized into modular components for better perfo
    - Phase 2: Checkout with automatic order creation (PUSH API)
    - Phase 3: Order tracking for customers (PULL API)
 5. Test with `isTest: true` flag before going live
+
+### "I need to understand the YTD Sales Goal tracking"
+1. Read **[DAILY_SALES_ARCHIVE.md](./DAILY_SALES_ARCHIVE.md)** - Complete system documentation
+2. Understand hybrid approach:
+   - Last 60 days → ManageOrders live (source of truth)
+   - Older than 60 days → Caspio archive (permanent)
+3. Key files:
+   - `staff-dashboard-service.js` - API functions
+   - `staff-dashboard-init.js` - YTD calculation logic
+4. Manual corrections: Edit `DailySalesArchive` table directly in Caspio
 
 ### "I need to enhance my ManageOrders PUSH API integration"
 1. Start with **[manageorders-push/FIELD_REFERENCE_CORE.md](./manageorders-push/FIELD_REFERENCE_CORE.md)** - Master navigation (165 fields, 100% Swagger coverage)

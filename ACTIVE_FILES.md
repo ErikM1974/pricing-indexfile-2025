@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2025-10-15
-**Total Active Files:** ~261 (includes Screen Print systems + Automated Testing Suite + Modern Step 2 Refactor)
+**Last Updated:** 2025-12-31
+**Total Active Files:** ~266 (includes Screen Print systems + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -213,10 +213,20 @@ cap-embroidery-fix.css
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/dashboards/staff-dashboard.html` | Main staff dashboard | Multiple | ✅ Active |
+| `/dashboards/staff-dashboard.html` | Main staff dashboard (legacy) | Multiple inline | ⚠️ Legacy |
+| `/dashboards/staff-dashboard-v2.html` | **NEW** Redesigned dashboard with 4-zone layout | staff-dashboard-*.js/css | ✅ Active |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | Art hub | Multiple | ✅ Active |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
+
+### Staff Dashboard V2 Files (2025-12-31 Redesign)
+| File | Purpose | Status |
+|------|---------|--------|
+| `/shared_components/css/staff-dashboard-layout.css` | 4-zone grid layout, responsive | ✅ Active |
+| `/shared_components/css/staff-dashboard-widgets.css` | Metrics cards, team performance, skeletons | ✅ Active |
+| `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration | ✅ Active |
+| `/shared_components/js/staff-dashboard-announcements.js` | Priority announcements with dismiss | ✅ Active |
+| `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |
 
 ### Employee Bundle Pages
 | File | Purpose | Dependencies | Status |
@@ -255,12 +265,12 @@ cap-embroidery-fix.css
 ## 📊 Statistics
 
 ### File Count by Type
-- **HTML Files:** ~125 (down from 353)
-- **JavaScript Files:** ~109 (down from 297)
-- **CSS Files:** ~60
+- **HTML Files:** ~126 (down from 353)
+- **JavaScript Files:** ~112 (down from 297)
+- **CSS Files:** ~62
 - **Active Calculators:** 15
 - **Active Quote Builders:** 4
-- **Active Dashboards:** 7
+- **Active Dashboards:** 8 (includes new staff-dashboard-v2)
 
 ### Organization Health
 - **Files in correct folders:** 100%

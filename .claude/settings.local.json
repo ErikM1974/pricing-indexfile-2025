@@ -47,7 +47,10 @@
       "Bash(git pull:*)",
       "Bash(git tag:*)",
       "Skill(deploy)",
-      "Skill(deploy:*)"
+      "Skill(deploy:*)",
+      "WebSearch",
+      "WebFetch(domain:www.uxpin.com)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": [],
